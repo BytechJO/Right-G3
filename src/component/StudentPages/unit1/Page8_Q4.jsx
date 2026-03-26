@@ -1,30 +1,119 @@
 import React, { useState, useEffect } from "react";
+import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Page8_Q4.css";
 
 const Page8_Q4 = () => {
   const grid = [
-  "d","t","h","e","y","t","a","d","g","b","n","m","v","g","l","i","k","e","x","n","s","r","o","l","t","o",
-  "h","f","e","a","t","b","x","a","z","b","k","g","r","a","s","s","h","a","f","g","h","r","t","f","b","i",
-  "p","m","o","l","k","i"
-];
+    "e",
+    "u",
+    "d",
+    "p",
+    "l",
+    "z",
+    "z",
+    "e",
+    "h",
+    "e",
+    "u",
+    "s",
+    "l",
+    "t",
+    "w",
+    "h",
+    "o",
+    "a",
+    "q",
+    "w",
+    "d",
+    "x",
+    "k",
+    "b",
+    "b",
+    "i",
+    "e",
+    "e",
+    "l",
+    "k",
+    "e",
+    "e",
+    "p",
+    "s",
+    "t",
+    "g",
+    "o",
+    "i",
+    "n",
+    "g",
+    "t",
+    "i",
+    "x",
+    "g",
+    "m",
+    "u",
+    "q",
+    "z",
+    "a",
+    "x",
+    "n",
+    "g",
+    "w",
+    "i",
+    "n",
+    "s",
+    "e",
+    "o",
+    "g",
+    "h",
+    "w",
+    "x",
+    "p",
+    "o",
+    "i",
+    "t",
+    "h",
+    "e",
+    "r",
+    "z",
+    "n",
+    "b",
+    "o",
+    "l",
+    "p",
+    "r",
+    "e",
+    "m",
+    "u",
+    "r",
+    "a",
+    "c",
+    "e",
+    "v",
+    "b",
+    "m",
+    "x",
+    "x",
+    "z",
+    "m",
+    "k",
+    "i",
+  ];
 
-  const letters = grid; // نفس الـ array اللي عندك
-  const wordsToFind = ["they", "like", "to", "eat","grass"];
+  const letters = grid;
+  const wordsToFind = ["he", "who", "keeps", "going", "wins", "the", "race"];
+  const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
-
   const [selected, setSelected] = useState([]);
   const [currentWord, setCurrentWord] = useState("");
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
 
   const handleClick = (letter, index) => {
+    if (locked) return;
     if (coloredCells.includes(index)) return;
 
     if (selected.includes(index)) {
       const cutIndex = selected.indexOf(index);
       const newSelected = selected.slice(0, cutIndex);
-
       const newWord = newSelected.map((i) => letters[i]).join("");
 
       setSelected(newSelected);
@@ -53,50 +142,14 @@ const Page8_Q4 = () => {
     }
   }, [currentWord]);
 
-  const checkAnswers = () => {
-    const total = wordsToFind.length;
-    const score = foundWords.length;
-
-    if (foundWords.length === 0) {
-      ValidationAlert.info(`
-        <div style="font-size:20px;text-align:center;">
-          <b>Find all the words first!</b><br/>
-          <span style="color:#1d4f7b;font-weight:bold;">
-            Current Score: ${score} / ${total}
-          </span>
-        </div>
-      `);
-      return;
-    }
-
-    if (score === 0) {
-      ValidationAlert.error(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:red;">Score: 0 / ${total}</b>
-        </div>
-      `);
-    } else if (score < total) {
-      ValidationAlert.warning(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:orange;">Score: ${score} / ${total}</b>
-        </div>
-      `);
-    } else {
-      ValidationAlert.success(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:green;">Score: ${score} / ${total}</b>
-        </div>
-      `);
-    }
-  };
   const reset = () => {
     setSelected([]);
     setCurrentWord("");
     setFoundWords([]);
     setColoredCells([]);
-    setSentence(""); // 👈 مهم
+    setSentence("");
+    setLocked(false);
   };
-
   const showAnswers = () => {
     let allCells = [];
     const fullString = letters.join("");
@@ -116,31 +169,79 @@ const Page8_Q4 = () => {
     setSelected([]);
     setCurrentWord("");
     setSentence(wordsToFind.join(" "));
+    setLocked(true);
   };
 
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        {/* ❌ الهيدر كما هو */}
-        <h5 className="header-title-page8">
-          <span className="ex-A">C</span>What do photographers use?
-        </h5>
+  const checkAnswers = () => {
+    if (locked) return;
 
-        <div className="words-list-CB-unit3-p5-q4">
+    const total = wordsToFind.length;
+    const score = foundWords.length;
+
+    if (score === 0) {
+      ValidationAlert.info("Please complete all answers.");
+      return;
+    }
+
+    if (score < total) {
+      ValidationAlert.warning(`
+      <div style="font-size:20px;text-align:center;">
+        <b style="color:orange;">Score: ${score} / ${total}</b>
+      </div>
+    `);
+    } else {
+      ValidationAlert.success(`
+      <div style="font-size:20px;text-align:center;">
+        <b style="color:green;">Score: ${score} / ${total}</b>
+      </div>
+    `);
+    }
+
+    setLocked(true); // 🔒 قفل بعد التصحيح
+  };
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <h5 className="header-title-page8 pb-2.5">
+        <span className="ex-A" style={{ marginRight: "20px" }}>
+          C
+        </span>
+        What is the moral of Slow and Steady Wins the Race on page 5?{" "}
+      </h5>
+
+      <div style={{ width: "60%" }}>
+        {/* Words */}
+        <div className="flex flex-wrap justify-center gap-5 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
           {wordsToFind.map((word) => (
             <span
               key={word}
-              className={`word-CB-unit3-p5-q4 ${
-                foundWords.includes(word) ? "found-CB-unit3-p5-q4" : ""
-              }`}
+              className={`
+        px-[18px] py-2
+        rounded-[10px]
+        border-2 border-[#2c5287]
+        text-[15px] font-semibold
+        transition duration-200
+        ${
+          foundWords.includes(word)
+            ? "bg-[#2c5287] text-white border-[#2c5287]"
+            : "bg-white text-black"
+        }
+      `}
             >
               {word}
             </span>
           ))}
         </div>
 
-        <div className="wordsearch-wrapper-CB-unit3-p5-q4">
-          <div className="grid-CB-unit3-p5-q4">
+        {/* Grid Wrapper */}
+        <div className="border-2 border-[#f28c63] px-[35px] pt-[25px] pb-[30px] w-full">
+          <div className="bg-[#daf5ff] rounded-[15px] px-[25px] py-[15px] flex flex-wrap gap-1">
             {letters.map((letter, index) => {
               const isSelected = selected.includes(index);
               const isFound = coloredCells.includes(index);
@@ -148,10 +249,16 @@ const Page8_Q4 = () => {
               return (
                 <span
                   key={index}
-                  className={`cell-CB-unit3-p5-q4 
-          ${isSelected ? "selected-CB-unit3-p5-q4" : ""}
-          ${isFound ? "found-cell-CB-unit3-p5-q4" : ""}`}
                   onClick={() => handleClick(letter, index)}
+                  className={`
+            w-[35px] h-[35px]
+            flex items-center justify-center
+            text-[20px]
+            cursor-pointer
+            transition
+            ${isSelected ? "bg-[#ffd54f] rounded-sm p-2.5" : ""}
+            ${isFound ? "bg-[#4caf50] text-white rounded-sm p-2.5" : ""}
+          `}
                 >
                   {letter}
                 </span>
@@ -160,24 +267,19 @@ const Page8_Q4 = () => {
           </div>
 
           <input
-            className="answer-input-CB-unit3-p5-q4"
             value={sentence}
             readOnly
+            className="w-[85%] mt-[15px] border-b-2 border-black text-[18px] bg-transparent outline-none"
           />
         </div>
       </div>
 
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn swal-continue">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      {/* BUTTONS */}
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={reset}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
 };

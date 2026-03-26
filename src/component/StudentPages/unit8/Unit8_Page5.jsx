@@ -1,4 +1,4 @@
-import page_5 from "../../../assets/imgs/pages/Right 2 Unit 1 Stellas Family_00001/Right 2 Unit 1 Stellas Family_00068.jpg";
+import page_5 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0068.jpg";
 import "./Unit8_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 const Unit8_Page5 = ({ openPopup }) => {

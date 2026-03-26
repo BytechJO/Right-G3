@@ -1,87 +1,84 @@
 import React, { useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Page8_Q3.css";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
+import img from "../../../assets/imgs/test6.png";
+import Button from "../../Button";
+import WrongMark from "../../WrongMark";
 
 const Page8_Q3 = () => {
-  const [answers, setAnswers] = useState(Array(3).fill(null));
   const [showResult, setShowResult] = useState(false);
-  const [locked, setLocked] = useState(false);
-
-  // 🔥 الداتا المطابقة للصورة
-  const items = [
+  const questions = [
     {
-      img: img1,
-      text: "",
-      options: ["he", "she"],
-      correctIndex: 0,
+      id: 1,
+      text: "Jad is older than his dad.",
+      answer: "false",
     },
     {
-      img: img2,
-      text: "",
-      options: ["he", "she"],
-      correctIndex: 1,
+      id: 2,
+      text: "The giraffe is taller than the bear.",
+      answer: "true",
     },
     {
-      img: img2,
-      text: "",
-      options: ["he", "she"],
-      correctIndex: 0,
+      id: 3,
+      text: "The bus is faster than the airplane.",
+      answer: "false",
+    },
+    {
+      id: 4,
+      text: "The car is bigger than the bike.",
+      answer: "true",
     },
   ];
 
-  const handleSelect = (qIndex, optionIndex) => {
-    if (locked || showResult) return; // ❌ لا يسمح بالتعديل بعد Show Answer
-    const newAns = [...answers];
-    newAns[qIndex] = optionIndex;
-    setAnswers(newAns);
+  const [answers, setAnswers] = useState({});
+
+  const [locked, setLocked] = useState(false);
+
+  const reset = () => {
+    setAnswers({ 1: "", 2: "", 3: "" });
+    setLocked(false);
     setShowResult(false);
+  };
+
+  const showAnswers = () => {
+    const filled = {};
+    questions.forEach((q) => {
+      filled[q.id] = q.answer;
+    });
+    setAnswers(filled);
+    setLocked(true);
+    setShowResult(true);
   };
 
   const checkAnswers = () => {
-    if (locked || showResult) return; // ❌ لا يسمح بالتعديل بعد Show Answer
-    if (answers.includes(null)) {
-      ValidationAlert.info("Oops!", "Please circle all words first.");
+    if (locked) return;
+    if (Object.values(answers).includes("")) {
+      ValidationAlert.info("Please complete all answers.");
       return;
     }
 
-    let correctCount = answers.filter(
-      (ans, i) => ans === items[i].correctIndex,
-    ).length;
+    let correct = 0;
 
-    const total = items.length;
+    questions.forEach((q) => {
+      if (answers[q.id] === q.answer) correct++;
+    });
 
-    let color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
+    const total = questions.length;
 
-    const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-          Score: ${correctCount} / ${total}
-        </span>
-      </div>
-    `;
+    const color =
+      correct === total ? "green" : correct === 0 ? "red" : "orange";
 
-    if (correctCount === total) ValidationAlert.success(msg);
-    else if (correctCount === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+    const message = `
+<div style="font-size:20px;text-align:center;">
+<b style="color:${color};">Score: ${correct} / ${total}</b>
+</div>
+`;
 
+    if (correct === total) ValidationAlert.success(message);
+    else if (correct === 0) ValidationAlert.error(message);
+    else ValidationAlert.warning(message);
     setShowResult(true);
-  };
-
-  const reset = () => {
-    setAnswers(Array(items.length).fill(null));
-    setShowResult(false);
-    setLocked(false);
-  };
-  const showAnswers = () => {
-    // كل سؤال → نضع correctIndex بدل null
-    const filled = items.map((item) => item.correctIndex);
-
-    setAnswers(filled);
-    setShowResult(true);
-    setLocked(true); // 🔒 قفل الإجابات
+    setLocked(true);
   };
 
   return (
@@ -89,114 +86,104 @@ const Page8_Q3 = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
-        }}
-      >
-        <div>
-          <h5 className="header-title-page8">
-            {" "}
-            <span className="ex-A">B</span> Look and circle.
-          </h5>
-        </div>
-        <div className="container-CB-unit1-p8-q3">
-          {items.map((q, i) => (
-            <div
-              key={i}
-              className="question-CB-unit1-p8-q3"
-              style={{ width: "100%" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  width: "80%",
-                }}
-              ></div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "14px",
-                }}
-              >
-                <span
-                  style={{
-                    color: "#2c5287",
-                    fontSize: "20px",
-                    fontWeight: "700",
-                  }}
-                >
-                  {i + 1}
-                </span>
-                <div className="img-div-CB-unit1-p8-q3">
-                  <img
-                    src={q.img}
-                    className="q3-image-CB-unit1-p8-q3"
-                    style={{ height: "150px", width: "auto" }}
-                  />
-                </div>
-
-                <div className="options-row-CB-unit1-p8-q3">
-                  {q.options.map((word, optIndex) => {
-                    const isSelected = answers[i] === optIndex;
-                    const isCorrect = optIndex === q.correctIndex;
-
-                    return (
-                      <p
-                        key={optIndex}
-                        className={`
-                    option-word-CB-unit1-p8-q3
-                    ${isSelected ? "selected" : ""}
-                    ${showResult && isSelected && !isCorrect ? "wrong" : ""}
-                    ${showResult && isCorrect ? "correct" : ""}
-                  `}
-                        onClick={() => handleSelect(i, optIndex)}
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          position: "relative",
-                        }}
-                      >
-                        {word}
-                        {showResult && isSelected && !isCorrect && !locked && (
-                          <span className="wrong-x-CB-unit1-p8-q3">✕</span>
-                        )}
-                      </p>
-                    );
-                  })}
-                </div>
-              </div>
+      <h5 className="header-title-page8">
+        <span className="ex-A" style={{ marginRight: "20px" }}>
+          B
+        </span>
+        Look and write
+        <span style={{ color: "#2e3192" }}>true</span>or
+        <span style={{ color: "#2e3192" }}>false</span>.
+      </h5>
+      <div className="w-[50%] flex flex-col gap-8 mt-8">
+        {questions.map((q) => (
+          <div key={q.id} className="flex items-center">
+            <div className="flex items-center gap-4 w-[55%]">
+              <span className="font-bold text-xl">{q.id}</span>
+              <span className="text-[1.2rem]">{q.text}</span>
             </div>
-          ))}
-        </div>
+
+            <div className="flex flex-col items-center w-[25%]">
+              <div className="flex gap-6 mb-2">
+                {["true", "false"].map((val) => {
+                  const isSelected = answers[q.id] === val;
+                  const isCorrect = q.answer === val;
+
+                  return (
+                    <span
+                      key={val}
+                      onClick={() => {
+                        if (locked) return;
+                        setAnswers({ ...answers, [q.id]: val });
+                      }}
+                      style={{
+                        position: "relative",
+                        cursor: "pointer",
+                        padding: "4px 12px",
+                        display: "inline-block",
+                      }}
+                    >
+                      {val}
+
+                      {/* الدائرة */}
+                      {isSelected && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-6px",
+                            left: "-10px",
+                            right: "-10px",
+                            bottom: "-6px",
+                            border: showResult
+                              ? isCorrect
+                                ? "2px solid green"
+                                : "none"
+                              : "2px solid red",
+                            borderRadius: "20px",
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+
+                      {showResult && isSelected && !isCorrect && (
+                        <div
+                        >
+                          <WrongMark />
+                        </div>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {/* الخط */}
+              <div className="w-[70%] border-b-[3px] border-gray-500"></div>
+            </div>
+
+            {/* الصورة */}
+            <div className="w-[20%] flex justify-center relative">
+              <img
+                src={img}
+                alt=""
+                style={{
+                  width: "100px",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="action-buttons-container">
-        <button className="try-again-button" onClick={reset}>
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button className="check-button2" onClick={checkAnswers}>
-          Check Answer ✓
-        </button>
-      </div>
+      {/* BUTTONS */}
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={reset}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
 };

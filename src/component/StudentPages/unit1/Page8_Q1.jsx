@@ -1,286 +1,369 @@
 import React, { useState } from "react";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import "./Page8_Q1.css";
+import Button from "../../Button";
 
 const Page8_Q1 = () => {
-  const items = [
-    { img: img1, correct: "r", correctInput: "run" },
-    { img: img2, correct: "l", correctInput: "lamb" },
-    { img: img3, correct: "r", correctInput: "rabbit" },
+  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل بعد Show Answer
+
+  const rows = [
+    {
+      vowel: "a",
+      color: "#2ecc71",
+      letters: [
+        "n",
+        "s",
+        "m",
+        "a",
+        "p",
+        "h",
+        "i",
+        "c",
+        "a",
+        "t",
+        "y",
+        "b",
+        "a",
+        "g",
+        "a",
+        "o",
+        "t",
+      ],
+      words: ["map", "cat", "bag"],
+    },
+    {
+      vowel: "e",
+      color: "#e84393",
+      letters: [
+        "p",
+        "e",
+        "n",
+        "b",
+        "y",
+        "b",
+        "e",
+        "d",
+        "m",
+        "n",
+        "e",
+        "t",
+        "b",
+        "e",
+        "v",
+        "c",
+        "t",
+      ],
+      words: ["pen", "bed", "net"],
+    },
+    {
+      vowel: "i",
+      color: "#0984e3",
+      letters: [
+        "d",
+        "b",
+        "d",
+        "x",
+        "g",
+        "s",
+        "i",
+        "t",
+        "f",
+        "i",
+        "s",
+        "h",
+        "d",
+        "s",
+        "i",
+        "c",
+        "k",
+      ],
+      words: ["sit", "fish", "sick"],
+    },
+    {
+      vowel: "o",
+      color: "#8e44ad",
+      letters: [
+        "p",
+        "t",
+        "b",
+        "o",
+        "x",
+        "m",
+        "m",
+        "o",
+        "p",
+        "g",
+        "i",
+        "s",
+        "o",
+        "c",
+        "k",
+        "u",
+        "n",
+      ],
+      words: ["box", "mop", "sock"],
+    },
+    {
+      vowel: "u",
+      color: "#e74c3c",
+      letters: [
+        "a",
+        "p",
+        "i",
+        "s",
+        "n",
+        "u",
+        "t",
+        "z",
+        "y",
+        "g",
+        "u",
+        "m",
+        "c",
+        "b",
+        "u",
+        "s",
+        "r",
+      ],
+      words: ["nut", "gum", "bus"],
+    },
   ];
 
-  const wordBank = items.map((i) => i.correctInput);
+  const [selected, setSelected] = useState([]);
+  const [currentRow, setCurrentRow] = useState(null);
+  const [foundSelections, setFoundSelections] = useState([]);
 
-  const [selected, setSelected] = useState(["", "", ""]);
-  const [answers, setAnswers] = useState(["", "", ""]);
-  const [wrongInputs, setWrongInputs] = useState([]);
-  const [showResult, setShowResult] = useState(false);
-  const [showCorrect, setShowCorrect] = useState(false);
-  const [checked, setChecked] = useState(false);
-
-  /* ================= Drag Logic (منع التكرار) ================= */
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination || showCorrect || checked) return;
-
-    if (destination.droppableId.startsWith("slot-")) {
-      const index = Number(destination.droppableId.split("-")[1]);
-      const word = draggableId.replace("bank-", "").replace(/^slot-.*?-/, "");
-
-      const updated = [...answers];
-
-      // 🔒 منع التكرار
-      const oldIndex = updated.findIndex((a) => a === word);
-      if (oldIndex !== -1) updated[oldIndex] = "";
-
-      updated[index] = word;
-      setAnswers(updated);
-      setShowResult(false);
-    }
+  /* ================= Selection ================= */
+  const startSelect = (rowIndex, colIndex) => {
+    setCurrentRow(rowIndex);
+    setSelected([{ row: rowIndex, col: colIndex }]);
   };
 
-  /* ================= Circle Logic (كما هو) ================= */
-  const handleSelect = (value, index) => {
-    if (showCorrect) return;
-    const newSel = [...selected];
-    newSel[index] = value;
-    setSelected(newSel);
-    setShowResult(false);
-  };
+  const addSelect = (rowIndex, colIndex) => {
+    if (currentRow !== rowIndex) return;
 
-  /* ================= Check Answers ================= */
-  const checkAnswers = () => {
-    if (showCorrect) return;
-
-    if (selected.some((s) => s === "")) {
-      ValidationAlert.info("Please choose a circle (f or v) for all items!");
-      return;
-    }
-
-    if (answers.some((a) => a === "")) {
-      ValidationAlert.info("Please fill in all the writing boxes!");
-      return;
-    }
-
-    let wrong = [];
-    let score = 0;
-
-    items.forEach((item, i) => {
-      const circleCorrect = selected[i] === item.correct;
-      const inputCorrect =
-        answers[i].toLowerCase() === item.correctInput.toLowerCase();
-
-      if (circleCorrect) score++;
-      if (inputCorrect) score++;
-
-      if (!circleCorrect || !inputCorrect) wrong.push(i);
+    setSelected((prev) => {
+      if (prev.some((c) => c.col === colIndex && c.row === rowIndex))
+        return prev;
+      return [...prev, { row: rowIndex, col: colIndex }];
     });
+  };
 
-    setWrongInputs(wrong);
-    setShowResult(true);
-    setChecked(true);
+  const endSelect = () => {
+    if (!selected.length) return;
 
-    const total = items.length * 2;
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+    const rowIndex = selected[0].row;
+    const row = rows[rowIndex];
 
-    ValidationAlert[
-      score === total ? "success" : score === 0 ? "error" : "warning"
-    ](`
+    const word = selected
+      .map((c) => row.letters[c.col])
+      .join("")
+      .toLowerCase();
+
+    const reversed = word.split("").reverse().join("");
+
+    if (row.words.includes(word) || row.words.includes(reversed)) {
+      const correctWord = row.words.includes(word) ? word : reversed;
+
+      setFoundSelections((prev) => {
+        if (prev.some((f) => f.word === correctWord)) return prev;
+
+        return [
+          ...prev,
+          {
+            word: correctWord,
+            cells: [...selected],
+            row: rowIndex,
+          },
+        ];
+      });
+    }
+
+    setSelected([]);
+    setCurrentRow(null);
+  };
+
+  /* ================= Check ================= */
+  const checkAnswers = () => {
+    if (locked) return;
+    const total = rows.reduce((acc, r) => acc + r.words.length, 0);
+    const score = foundSelections.length;
+    if (foundSelections.length === 0) {
+      ValidationAlert.info("Please find at least one word!");
+      return;
+    }
+
+    const msg = `
       <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold;">
+        <span style="font-weight:bold;">
           Score: ${score} / ${total}
         </span>
       </div>
-    `);
+    `;
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+    setLocked(true);
   };
 
-  /* ================= Show Answers ================= */
   const showAnswers = () => {
-    setSelected(items.map((i) => i.correct));
-    setAnswers(items.map((i) => i.correctInput));
-    setWrongInputs([]);
-    setShowResult(true);
-    setShowCorrect(true);
-    setChecked(true); // 🔒
+    let answers = [];
+
+    rows.forEach((row, i) => {
+      row.words.forEach((word) => {
+        const start = row.letters.join("").indexOf(word);
+        if (start !== -1) {
+          const cells = [];
+          for (let j = 0; j < word.length; j++) {
+            cells.push({ row: i, col: start + j });
+          }
+          answers.push({ word, cells, row: i });
+        }
+      });
+    });
+    setLocked(true);
+    setFoundSelections(answers);
   };
 
   const resetAll = () => {
-    setSelected(["", "", ""]);
-    setAnswers(["", "", ""]);
-    setWrongInputs([]);
-    setShowResult(false);
-    setShowCorrect(false);
-    setChecked(false); // 🔓
+    setFoundSelections([]);
+    setSelected([]);
+    setCurrentRow(null);
+    setLocked(false);
   };
 
+  /* ================= UI ================= */
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <h5 className="header-title-page8">
+        <span className="ex-A" style={{ marginRight: "20px" }}>
+          A
+        </span>
+        <span style={{ color: "#2e3192", marginRight: "20px" }}>1</span>
+        Find and circle three words in each box with{" "}
+        <span style={{ color: "#2e3192" }}>short vowel</span> sounds.
+      </h5>
+
       <div
         style={{
+          width: "70%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
-          padding: "30px",
         }}
       >
-        <div
-          className="div-forall"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-          }}
-        >
-          <h5 className="header-title-page8">
-            <span className="ex-A">A</span>{" "}
-            <span style={{ color: "#2e3192" }}>1</span>Does it begin with an{" "}
-            <span style={{ color: "#2e3192" }}>l</span> or{" "}
-            <span style={{ color: "#2e3192" }}>r</span>? Circle and write.
-          </h5>
+        {rows.map((row, rowIndex) => (
+          <div
+            key={rowIndex}
+            style={{
+              width: "100%",
+              margin: "15px 0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "15px",
+            }}
+          >
+            <div
+              style={{
+                color: row.color,
+                fontWeight: "bold",
+                minWidth: "80px",
+                textAlign: "right",
+              }}
+            >
+              Short {row.vowel}
+            </div>
 
-          {/* 🔤 Word Bank */}
-          <Droppable droppableId="bank" direction="horizontal" isDropDisabled>
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  padding: "10px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  // margin: "10px 0",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {wordBank.map((word, index) => (
-                  <Draggable
-                    key={word}
-                    draggableId={`bank-${word}`}
-                    index={index}
-                    isDragDisabled={showCorrect || checked}
+            <div
+              style={{
+                border: "2px solid orange",
+                borderRadius: "20px",
+                padding: "10px 15px",
+                display: "flex",
+                flexWrap: "nowrap",
+                justifyContent: "center",
+                gap: "6px",
+                background: "#fff",
+              }}
+            >
+              {row.letters.map((letter, colIndex) => {
+                const isSelected = selected.some(
+                  (c) => c.row === rowIndex && c.col === colIndex,
+                );
+
+                const isFound = foundSelections.some((f) =>
+                  f.cells.some((c) => c.row === rowIndex && c.col === colIndex),
+                );
+
+                return (
+                  <span
+                    key={colIndex}
+                    data-row={rowIndex}
+                    data-col={colIndex}
+                    onMouseDown={() => startSelect(rowIndex, colIndex)}
+                    onMouseEnter={() => addSelect(rowIndex, colIndex)}
+                    onMouseUp={endSelect}
+                    onTouchStart={() => startSelect(rowIndex, colIndex)}
+                    onTouchMove={(e) => {
+                      const touch = e.touches[0];
+                      const element = document.elementFromPoint(
+                        touch.clientX,
+                        touch.clientY,
+                      );
+
+                      if (!element) return;
+
+                      const col = element.getAttribute("data-col");
+                      const row = element.getAttribute("data-row");
+
+                      if (row !== null && col !== null) {
+                        addSelect(Number(row), Number(col));
+                      }
+                    }}
+                    onTouchEnd={endSelect}
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      borderRadius: "4px",
+                      border: "1px solid #ccc",
+                      userSelect: "none",
+                      WebkitUserSelect: "none",
+                      background: isFound
+                        ? "rgba(231, 76, 60, 0.4)"
+                        : isSelected
+                          ? "rgba(52, 152, 219, 0.4)"
+                          : "#fff",
+                    }}
                   >
-                    {(provided) => (
-                      <span
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={{
-                          padding: "7px 14px",
-                          border: "2px solid #2c5287",
-                          borderRadius: "8px",
-                          background: "white",
-                          fontWeight: "bold",
-                          cursor: "grab",
-                          ...provided.draggableProps.style,
-                        }}
-                      >
-                        {word}
-                      </span>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-
-          <div className="CB-unit1-p8-q1-grid">
-            {items.map((item, i) => (
-              <div className="CB-unit1-p8-q1-box" key={i}>
-                <img src={item.img} className="CB-unit1-p8-q1-image" />
-
-                {/* f / v circles */}
-                <div className="CB-unit1-p8-q1-choices">
-                  {["l", "r"].map((letter) => (
-                    <div className="CB-unit1-p8-q1-circle-wrapper" key={letter}>
-                      <div
-                        className={`CB-unit1-p8-q1-circle ${
-                          selected[i] === letter ? "active" : ""
-                        } ${showCorrect ? "correct-color" : ""}`}
-                        onClick={() => handleSelect(letter, i)}
-                      >
-                        {letter}
-                      </div>
-
-                      {showResult &&
-                        selected[i] === letter &&
-                        selected[i] !== item.correct && (
-                          <div className="CB-unit1-p8-q1-wrong">✕</div>
-                        )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* 🧩 Drag slot بدل input */}
-                <div className="CB-unit1-p8-q1-input-wrapper">
-                  <Droppable droppableId={`slot-${i}`}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`CB-unit1-p8-q1-input  ${
-                          showCorrect ? "correct-color" : ""
-                        } ${snapshot.isDraggingOver ? "drop-box" : ""}`}
-                      >
-                        {answers[i] && (
-                          <Draggable
-                            draggableId={`slot-${i}-${answers[i]}`}
-                            index={0}
-                            isDragDisabled={true}
-                          >
-                            {(provided) => (
-                              <span
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className="CB-unit1-p8-q1-word "
-                              >
-                                {answers[i]}
-                              </span>
-                            )}
-                          </Draggable>
-                        )}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-
-                  {showResult &&
-                    answers[i] !== "" &&
-                    answers[i].toLowerCase() !==
-                      item.correctInput.toLowerCase() &&
-                    wrongInputs.includes(i) && (
-                      <div className="CB-unit1-p8-q1-wrong">✕</div>
-                    )}
-                </div>
-              </div>
-            ))}
+                    {letter}
+                  </span>
+                );
+              })}
+            </div>
           </div>
-        </div>
-
-        <div className="action-buttons-container">
-          <button onClick={resetAll} className="try-again-button">
-            Start Again ↻
-          </button>
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
+        ))}
       </div>
-    </DragDropContext>
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={resetAll}
+        checkAnswers={checkAnswers}
+      />
+    </div>
   );
 };
 

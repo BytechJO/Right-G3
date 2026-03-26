@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import "./Page8_Q2.css";
 import sound1 from "../../../assets/audio/ClassBook/U 1/CD5.Pg8_Instruction1_Adult Lady.mp3";
@@ -5,33 +6,19 @@ import { FaPlay, FaPause } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { TbMessageCircle } from "react-icons/tb";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
-// Example images imports. Replace with your actual paths.
-import img1a from "../../../assets/imgs/test.png";
-import img1b from "../../../assets/imgs/test.png";
-import img1c from "../../../assets/imgs/test.png";
-
-import img2a from "../../../assets/imgs/test.png";
-import img2b from "../../../assets/imgs/test.png";
-import img2c from "../../../assets/imgs/test.png";
-
-import img3a from "../../../assets/imgs/test.png";
-import img3b from "../../../assets/imgs/test.png";
-import img3c from "../../../assets/imgs/test.png";
-
-import img4a from "../../../assets/imgs/test.png";
-import img4b from "../../../assets/imgs/test.png";
-import img4c from "../../../assets/imgs/test.png";
+import Button from "../../Button";
+import WrongMark from "../../WrongMark";
 
 const Page8_Q2 = () => {
   const groups = [
-    { images: [img1a, img1b, img1c], different: 2 },
-    { images: [img2a, img2b, img2c], different: 1 },
-    { images: [img3a, img3b, img3c], different: 0 },
-    { images: [img4a, img4b, img4c], different: 2 },
+    { words: ["may", "lake", "jam", "paint"], correct: [0, 1, 3] },
+    { words: ["bee", "bed", "feet", "tea"], correct: [0, 2, 3] },
+    { words: ["kite", "bike", "light", "fish"], correct: [0, 1, 2] },
+    { words: ["home", "boat", "box", "note"], correct: [0, 1, 3] },
+    { words: ["run", "blue", "sue", "tube"], correct: [1, 2, 3] },
   ];
   const [showResult2, setShowResult2] = useState(false);
-  const [selected, setSelected] = useState(Array(groups.length).fill(null));
+  const [selected, setSelected] = useState(groups.map(() => []));
   const [showResult, setShowResult] = useState(false);
   const [locked, setLocked] = useState(false);
 
@@ -134,68 +121,57 @@ const Page8_Q2 = () => {
       setIsPlaying(false);
     }
   };
-  const handleSelect = (groupIndex, imageIndex) => {
-    if (locked || showResult2) return; // 🔒 منع التعديل بعد Show Answer
-    const updated = [...selected];
-    updated[groupIndex] = imageIndex;
-    setSelected(updated);
-    setShowResult2(false);
-  };
+
   const showAnswers = () => {
-    const correctSelections = groups.map((g) => g.different);
+    const correctSelections = groups.map((g) => g.correct);
 
     setSelected(correctSelections);
     setShowResult2(true);
-    setLocked(true); // 🔒 قفل التعديل
+    setLocked(true);
   };
 
   const checkAnswers = () => {
-    if (locked || showResult2) return; // 🔒 منع التعديل بعد Show Answer
-    if (selected.some((val) => val === null)) {
-      ValidationAlert.info("Please choose a circle (f or v) for all items!");
+    if (locked || showResult2) return;
+    const hasEmpty = selected.some((arr) => arr.length === 0);
+
+    if (hasEmpty) {
+      ValidationAlert.info("Please select at least one word in each group!");
       return;
     }
     let correctCount = 0;
-    let wrongCount = 0;
-    groups.forEach((group, index) => {
-      if (selected[index] === null)
-        return ValidationAlert.info(
-          "Please choose a circle (f or v) for all items!",
-        );
+    let total = 0;
 
-      if (selected[index] === group.different) {
-        correctCount++;
-      } else {
-        wrongCount++;
-      }
+    groups.forEach((group, index) => {
+      total += group.correct.length;
+
+      group.correct.forEach((correctIndex) => {
+        if (selected[index].includes(correctIndex)) {
+          correctCount++;
+        }
+      });
     });
 
-    const total = groups.length; // 8 نقاط
-    const color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
-
-    const scoreMessage = `
-    <div style="font-size: 20px; margin-top: 10px; text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <span style="font-weight:bold;">
         Score: ${correctCount} / ${total}
       </span>
     </div>
   `;
-    // تحديد الرسالة حسب نوع الإجابات
-    if (correctCount === groups.length) {
-      ValidationAlert.success(scoreMessage);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(scoreMessage);
-    } else {
-      ValidationAlert.warning(scoreMessage);
-    }
+
+    if (correctCount === total) ValidationAlert.success(msg);
+    else if (correctCount === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+
     setShowResult2(true);
+    setLocked(true);
   };
 
   const reset = () => {
-    setSelected(Array(groups.length).fill(null));
+    setSelected(groups.map(() => []));
     setShowResult(false);
     setShowResult2(false);
+    setLocked(false);
   };
 
   return (
@@ -203,7 +179,6 @@ const Page8_Q2 = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
@@ -214,15 +189,13 @@ const Page8_Q2 = () => {
           display: "flex",
           flexDirection: "column",
           gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
         }}
       >
-        <h3 className="header-title-page8">
-          <span style={{ color: "#2e3192" }}>2</span> Listen and write <span style={{ color: "#2e3192" }}>✗</span> on the
-          picture with a different sound.
-          
-        </h3>
+        <h5 className="header-title-page8">
+          <span style={{ color: "#2e3192", marginRight: "20px" }}>2</span>
+          Listen and circle the words with
+          <span style={{ color: "#2e3192" }}>long vowel</span> sounds.
+        </h5>
         <div
           style={{
             display: "flex",
@@ -338,49 +311,120 @@ const Page8_Q2 = () => {
             </div>
           </div>
         </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "25px",
+            marginTop: "30px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "35px",
+              marginTop: "30px",
+            }}
+          >
+            {groups.map((group, index) => (
+              <div
+                key={index}
+                style={{
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "-20px",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                >
+                  {index + 1}
+                </div>
 
-        <div className="exercise-row-CB-unit1-p8-q2">
-          {groups.map((group, gIndex) => (
-            <div className="group-box-CB-unit1-p8-q2 " key={gIndex}>
-              <span style={{ color: "darkblue", fontWeight: "700" }}>
-                {gIndex + 1}
-              </span>
-              {group.images.map((img, iIndex) => {
-                const isSelected = selected[gIndex] === iIndex;
-                const isCorrect = group.different === iIndex;
+                <div
+                  style={{
+                    background: "#FEF3E6",
+                    padding: "1vw 2.5vw",
+                    borderRadius: "1vw",
+                    minWidth: "7vw",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                  }}
+                >
+                  {group.words.map((word, i) => {
+                    const isSelected = selected[index].includes(i);
+                    const isCorrect = group.correct.includes(i);
 
-                return (
-                  <div
-                    className="image-wrapper-CB-unit1-p8-q2 "
-                    key={iIndex}
-                    onClick={() => !locked && handleSelect(gIndex, iIndex)}
-                  >
-                    <img src={img} className="image-CB-unit1-p8-q2 " />
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => {
+                          if (locked) return;
 
-                    {/* Display X only when result is shown */}
-                    {isSelected && <div className="ds-x">✕</div>}
-                    {/* ❌ دائرة حمراء فيها X بيضاء للخطأ فقط عند النتيجة */}
-                    {showResult2 && !locked && isSelected && !isCorrect && (
-                      <span className="wrong-x-CB-unit1-p8-q2">✕</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+                          const newSelected = [...selected];
+
+                          if (newSelected[index].includes(i)) {
+                            newSelected[index] = newSelected[index].filter(
+                              (x) => x !== i,
+                            );
+                          } else {
+                            newSelected[index].push(i);
+                          }
+
+                          setSelected(newSelected);
+                        }}
+                        style={{
+                          fontSize: "18px",
+                          cursor: "pointer",
+                          position: "relative",
+                        }}
+                      >
+                        {word}
+
+                        {isSelected && (
+                          <>
+                            {isSelected && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "-4px",
+                                  left: "-6px",
+                                  right: "-6px",
+                                  bottom: "-4px",
+                                  border: showResult2
+                                    ? isCorrect
+                                      ? "2px solid green"
+                                      : "none" // ❌ هون تنشال الدائرة للغلط
+                                    : "2px solid red",
+                                  borderRadius: "20px",
+                                  pointerEvents: "none",
+                                }}
+                              />
+                            )}
+
+                            {/* ❌ علامة الغلط */}
+                            {showResult2 && !isCorrect && <WrongMark />}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={reset}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
 };

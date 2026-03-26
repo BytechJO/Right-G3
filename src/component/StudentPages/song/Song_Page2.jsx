@@ -1,5 +1,5 @@
 import React from "react";
-import page_1 from "../../../assets/imgs/pages/Right 2 Unit 1 Stellas Family_00001/Right 2 Unit 1 Stellas Family_00095.jpg";
+import page_1 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0095.jpg";
 const Song_Page2 = () => {
   return (
     <div

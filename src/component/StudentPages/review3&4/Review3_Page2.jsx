@@ -1,4 +1,4 @@
-import page_2 from "../../../assets/imgs/pages/Right 2 Unit 1 Stellas Family_00001/Right 2 Unit 1 Stellas Family_00035.jpg";
+import page_2 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0035.jpg";
 import "./Review3_Page2.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 // import Unit4_Page6_Q2 from "./Unit4_Page6_Q2";
