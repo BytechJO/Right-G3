@@ -83,7 +83,7 @@ const Page9_Q2 = () => {
   const checkAnswers = () => {
     if (locked) return;
     if (answers.some((row) => row.includes(""))) {
-      ValidationAlert.info("Please complete all answers.");
+      ValidationAlert.info();
       return;
     }
     let wrong = [];
@@ -217,9 +217,9 @@ const Page9_Q2 = () => {
                               answers[qIndex][1]
                                 ? locked
                                   ? wrongInputs.includes(`${qIndex}-1`)
-                                    ? "text-red-500" // ❌ غلط
-                                    : "text-green-600" // ✔ صح
-                                  : "text-red-500" // 🔴 قبل التشيك
+                                    ? "text-red-500"
+                                    : "text-green-600"
+                                  : "text-red-500"
                                 : "text-black"
                             }
                           `}

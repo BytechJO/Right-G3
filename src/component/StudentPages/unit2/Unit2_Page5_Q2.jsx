@@ -1,130 +1,177 @@
-import React, { useState } from "react";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
+/* eslint-disable no-unused-vars */
+import React, { useState, useRef, useEffect } from "react";
+import sound1 from "../../../assets/audio/ClassBook/U 1/CD5.Pg8_Instruction1_Adult Lady.mp3";
+import { FaPlay, FaPause } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
+import { TbMessageCircle } from "react-icons/tb";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Unit2_Page5_Q2.css";
+import Button from "../../Button";
+import WrongMark from "../../WrongMark";
 
 const Unit2_Page5_Q2 = () => {
-  const questions = [
+  const groups = [
+    { words: ["tune", "run", "June"], correct: [0, 2] },
+    { words: ["cube", "gum", "hut"], correct: [1, 2] },
+    { words: ["blue", "duck", "up"], correct: [1, 2] },
+    { words: ["sun", "glue", "fun"], correct: [0, 2] },
+    { words: ["spun", "cute", "tube"], correct: [1, 2] },
+    { words: ["Sue", "blue", "bus"], correct: [0, 1] },
+  ];
+  const [showResult2, setShowResult2] = useState(false);
+  const [selected, setSelected] = useState(groups.map(() => []));
+  const [showResult, setShowResult] = useState(false);
+  const [locked, setLocked] = useState(false);
+
+  const audioRef = useRef(null);
+  const [paused, setPaused] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const stopAtSecond = 9;
+
+  // إعدادات الصوت
+  const [showSettings, setShowSettings] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const settingsRef = useRef(null);
+  const [forceRender, setForceRender] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [showCaption, setShowCaption] = useState(false);
+
+  // ================================
+  // ✔ Captions Array
+  // ================================
+  const captions = [
     {
-      id: 1,
-      image: img1,
-      items: [
-        { text: "This is a red apple.", correct: "✓" },
-        { text: "That is a red apple.", correct: "x" },
-      ],
+      start: 0,
+      end: 9.04,
+      text: "Page 53, exercise E. Which picture begins with a different sound? Listen and write X.",
     },
-    {
-      id: 2,
-      image: img2,
-      items: [
-        { text: "Those are green trees.", correct: "✓" },
-        { text: "That’s a green tree.", correct: "x" },
-      ],
-    },
-    {
-      id: 3,
-      image: img3,
-      items: [
-        { text: "These are blue birds.", correct: "✓" },
-        { text: "This is a blue bird.", correct: "x" },
-      ],
-    },
-    {
-      id: 4,
-      image: img4,
-      items: [
-        { text: "That’s a red flower.", correct: "x" },
-        { text: "Those are red flowers.", correct: "✓" },
-      ],
-    },
+    { start: 9.06, end: 13.14, text: "1. goose, gate, kiwi," },
+    { start: 13.16, end: 17.17, text: "2. kick, goat, kite," },
+    { start: 17.19, end: 22.06, text: "3. king, garlic, game,  " },
+    { start: 22.08, end: 27.09, text: "4. kangaroo, key, grapes. " },
   ];
 
-  const [answers, setAnswers] = useState({});
-  const [results, setResults] = useState({});
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل
+  // ================================
+  // ✔ Update caption highlight
+  // ================================
+  const updateCaption = (time) => {
+    const index = captions.findIndex(
+      (cap) => time >= cap.start && time <= cap.end,
+    );
+    setActiveIndex(index);
+  };
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  const handleSelect = (qId, idx) => {
-    if (locked) return; // ⭐ NEW — منع التعديل بعد Show Answer
+    audio.currentTime = 0;
+    audio.play();
 
-    setAnswers({
-      ...answers,
-      [qId]: idx,
-    });
-    setResults({});
+    const interval = setInterval(() => {
+      if (audio.currentTime >= stopAtSecond) {
+        audio.pause();
+        setPaused(true);
+        setIsPlaying(false);
+        clearInterval(interval);
+      }
+    }, 100);
+
+    // عند انتهاء الأوديو يرجع يبطل أنيميشن + يظهر Continue
+    const handleEnded = () => {
+      const audio = audioRef.current;
+      audio.currentTime = 0; // ← يرجع للبداية
+      setActiveIndex(null);
+      setPaused(false);
+      setIsPlaying(false);
+    };
+
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      clearInterval(interval);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, []);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setForceRender((prev) => prev + 1);
+    }, 1000); // كل ثانية
+    if (activeIndex === -1 || activeIndex === null) return;
+
+    const el = document.getElementById(`caption-${activeIndex}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    return () => clearInterval(timer);
+  }, [activeIndex]);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    if (audio.paused) {
+      audio.play();
+      setPaused(false);
+      setIsPlaying(true);
+    } else {
+      audio.pause();
+      setPaused(true);
+      setIsPlaying(false);
+    }
+  };
+
+  const showAnswers = () => {
+    const correctSelections = groups.map((g) => g.correct);
+
+    setSelected(correctSelections);
+    setShowResult2(true);
+    setLocked(true);
   };
 
   const checkAnswers = () => {
-    if (locked) return; // ⭐ NEW — منع التعديل بعد Show Answer
-    const temp = {};
-    let correctCount = 0;
-    let total = questions.length;
+    if (locked || showResult2) return;
+    const hasEmpty = selected.some((arr) => arr.length === 0);
 
-    questions.forEach((q) => {
-      const chosenIndex = answers[q.id];
-
-      if (chosenIndex === undefined) {
-        temp[q.id] = "empty";
-        return;
-      }
-
-      const isCorrect = q.items[chosenIndex].correct.toLowerCase() === "✓";
-
-      temp[q.id] = isCorrect ? "correct" : "wrong";
-
-      if (isCorrect) correctCount++;
-    });
-
-    setResults(temp);
-
-    if (Object.values(temp).includes("empty")) {
-      ValidationAlert.info("Please answer all questions!");
+    if (hasEmpty) {
+      ValidationAlert.info();
       return;
     }
+    let correctCount = 0;
+    let total = 0;
 
-    let color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
+    groups.forEach((group, index) => {
+      total += group.correct.length;
 
-    const scoreMessage = `
-    <div style="font-size:20px; text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
+      group.correct.forEach((correctIndex) => {
+        if (selected[index].includes(correctIndex)) {
+          correctCount++;
+        }
+      });
+    });
+
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <span style="font-weight:bold;">
         Score: ${correctCount} / ${total}
       </span>
     </div>
   `;
 
-    if (correctCount === total) ValidationAlert.success(scoreMessage);
-    else if (correctCount === 0) ValidationAlert.error(scoreMessage);
-    else ValidationAlert.warning(scoreMessage);
+    if (correctCount === total) ValidationAlert.success(msg);
+    else if (correctCount === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
 
-    setLocked(true); // ⭐ NEW — منع التعديل بعد Check
+    setShowResult2(true);
+    setLocked(true);
   };
 
   const reset = () => {
-    setAnswers({});
-    setResults({});
-    setLocked(false); // ⭐ NEW — إعادة التعديل
-  };
-
-  // ⭐⭐⭐ NEW — showAnswer
-  const showAnswer = () => {
-    const correctSelections = {};
-
-    questions.forEach((q) => {
-      const correctIdx = q.items.findIndex((item) => item.correct === "✓");
-      correctSelections[q.id] = correctIdx;
-    });
-
-    setAnswers(correctSelections);
-    setResults(() => {
-      const res = {};
-      questions.forEach((q) => (res[q.id] = "correct"));
-      return res;
-    });
-
-    setLocked(true); // قفل التعديل
+    setSelected(groups.map(() => []));
+    setShowResult(false);
+    setShowResult2(false);
+    setLocked(false);
   };
 
   return (
@@ -132,7 +179,6 @@ const Unit2_Page5_Q2 = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
@@ -143,64 +189,242 @@ const Unit2_Page5_Q2 = () => {
           display: "flex",
           flexDirection: "column",
           gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
         }}
       >
-        <h4 className="header-title-page8">
-          <span className="ex-A">B</span> Look, read, and write{" "}
-          <span style={{ color: "#2e3192" }}>✓</span>.{" "}
-        </h4>
-        <div className="CB-unit2-p5-q2-grid">
-          {questions.map((q) => (
-            <div key={q.id} className="CB-unit2-p5-q2-box">
-              <div className="CB-unit2-p5-q2-img-container">
-                <span style={{ color: "#2e3192" ,fontSize:"20px" ,fontWeight:"700"}}>{q.id}</span>
-              <img src={q.image} alt="" className="CB-unit2-p5-q2-img" />
+        <h5 className="header-title-page8">
+          <span style={{ color: "#2e3192", marginRight: "20px" }}>2</span>
+          Listen and circle the words with the same 
+          <span style={{ color: "#2e3192" }}>u sound</span>.
+        </h5>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <div
+            className="audio-popup-read"
+            style={{
+              width: "50%",
+              marginTop: "0px",
+            }}
+          >
+            <div className="audio-inner player-ui">
+              <audio
+                ref={audioRef}
+                src={sound1}
+                onTimeUpdate={(e) => {
+                  const time = e.target.currentTime;
+                  setCurrent(time);
+                  updateCaption(time);
+                }}
+                onLoadedMetadata={(e) => setDuration(e.target.duration)}
+              ></audio>
+              {/* Play / Pause */}
+              {/* الوقت - السلايدر - الوقت */}
+              <div className="top-row">
+                <span className="audio-time">
+                  {new Date(current * 1000).toISOString().substring(14, 19)}
+                </span>
 
+                <input
+                  type="range"
+                  className="audio-slider"
+                  min="0"
+                  max={duration}
+                  value={current}
+                  onChange={(e) => {
+                    audioRef.current.currentTime = e.target.value;
+                    updateCaption(Number(e.target.value));
+                  }}
+                  style={{
+                    background: `linear-gradient(to right, #430f68 ${
+                      (current / duration) * 100
+                    }%, #d9d9d9ff ${(current / duration) * 100}%)`,
+                  }}
+                />
+
+                <span className="audio-time">
+                  {new Date(duration * 1000).toISOString().substring(14, 19)}
+                </span>
               </div>
+              {/* الأزرار 3 أزرار بنفس السطر */}
+              <div className="bottom-row">
+                {/* فقاعة */}
+                <div
+                  className={`round-btn ${showCaption ? "active" : ""}`}
+                  style={{ position: "relative" }}
+                  onClick={() => setShowCaption(!showCaption)}
+                >
+                  <TbMessageCircle size={36} />
+                  <div
+                    className={`caption-inPopup ${showCaption ? "show" : ""}`}
+                    style={{ top: "100%", left: "10%" }}
+                  >
+                    {captions.map((cap, i) => (
+                      <p
+                        key={i}
+                        id={`caption-${i}`}
+                        className={`caption-inPopup-line2 ${
+                          activeIndex === i ? "active" : ""
+                        }`}
+                      >
+                        {cap.text}
+                      </p>
+                    ))}
+                  </div>
+                </div>
 
-              <div>
-                {q.items.map((item, idx) => {
-                  const isSelected = answers[q.id] === idx;
-                  const isWrong = results[q.id] === "wrong" && isSelected;
+                {/* Play */}
+                <button className="play-btn2" onClick={togglePlay}>
+                  {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
+                </button>
 
-                  return (
-                    <div key={idx} className="CB-unit2-p5-q2-row">
-                      <div className="CB-unit2-p5-q2-input-box">
-                        <input
-                          type="text"
-                          readOnly
-                          value={isSelected ? "✓" : ""}
-                          onFocus={() => handleSelect(q.id, idx)}
-                          className="CB-unit2-p5-q2-input"
-                        />
+                {/* Settings */}
+                <div className="settings-wrapper" ref={settingsRef}>
+                  <button
+                    className={`round-btn ${showSettings ? "active" : ""}`}
+                    onClick={() => setShowSettings(!showSettings)}
+                  >
+                    <IoMdSettings size={36} />
+                  </button>
 
-                        {isWrong && <span className="CB-unit2-p5-q2-x">✕</span>}
-                      </div>
-                      <span className="CB-unit2-p5-q2-text">{item.text}</span>
+                  {showSettings && (
+                    <div className="settings-popup">
+                      <label>Volume</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={volume}
+                        onChange={(e) => {
+                          setVolume(e.target.value);
+                          audioRef.current.volume = e.target.value;
+                        }}
+                      />
                     </div>
-                  );
-                })}
-              </div>
+                  )}
+                </div>
+              </div>{" "}
             </div>
-          ))}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "25px",
+            marginTop: "30px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "35px",
+              marginTop: "30px",
+            }}
+          >
+            {groups.map((group, index) => (
+              <div
+                key={index}
+                style={{
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "-20px",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                  }}
+                >
+                  {index + 1}
+                </div>
+
+                <div
+                  style={{
+                    background: "#FEF3E6",
+                    padding: "1vw 2.5vw",
+                    borderRadius: "1vw",
+                    minWidth: "7vw",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                  }}
+                >
+                  {group.words.map((word, i) => {
+                    const isSelected = selected[index].includes(i);
+                    const isCorrect = group.correct.includes(i);
+
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => {
+                          if (locked) return;
+
+                          const newSelected = [...selected];
+
+                          if (newSelected[index].includes(i)) {
+                            newSelected[index] = newSelected[index].filter(
+                              (x) => x !== i,
+                            );
+                          } else {
+                            newSelected[index].push(i);
+                          }
+
+                          setSelected(newSelected);
+                        }}
+                        style={{
+                          fontSize: "18px",
+                          cursor: "pointer",
+                          position: "relative",
+                        }}
+                      >
+                        {word}
+
+                        {isSelected && (
+                          <>
+                            {isSelected && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "-4px",
+                                  left: "-6px",
+                                  right: "-6px",
+                                  bottom: "-4px",
+                                  border: showResult2
+                                    ? isCorrect
+                                      ? "2px solid green"
+                                      : "none" // ❌ هون تنشال الدائرة للغلط
+                                    : "2px solid red",
+                                  borderRadius: "20px",
+                                  pointerEvents: "none",
+                                }}
+                              />
+                            )}
+
+                            {/* ❌ علامة الغلط */}
+                            {showResult2 && !isCorrect && <WrongMark />}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-
-        {/* ⭐⭐⭐ NEW BUTTON */}
-        <button onClick={showAnswer} className="show-answer-btn swal-continue">
-          Show Answer
-        </button>
-
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={reset}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
 };

@@ -254,7 +254,7 @@ img {
   align-items: flex-start;
   gap: 5px;
   white-space: nowrap;
-  width: 60%;
+  width: 70%;
 }
 .WB-header-title-page8 {
   font-size: 25px;
@@ -802,5 +802,13 @@ img {
 @media (max-width: 540px) {
   .exercise-image {
     height: 80px;
+  }
+}
+@media (max-width: 1200px) and (min-width: 768px) {
+  .header-title-page8 {
+    font-size: 20px; /* أصغر شوي من الديسكتوب */
+    width: 90%; /* أوسع */
+    white-space: normal; /* ينزل سطر */
+    line-height: 1.4;
   }
 }

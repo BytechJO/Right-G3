@@ -52,8 +52,8 @@ const Page8_Q3 = () => {
 
   const checkAnswers = () => {
     if (locked) return;
-    if (Object.values(answers).includes("")) {
-      ValidationAlert.info("Please complete all answers.");
+    if (questions.some((q) => !answers[q.id])) {
+      ValidationAlert.info("Please answer all questions");
       return;
     }
 
@@ -149,8 +149,7 @@ const Page8_Q3 = () => {
                       )}
 
                       {showResult && isSelected && !isCorrect && (
-                        <div
-                        >
+                        <div>
                           <WrongMark />
                         </div>
                       )}

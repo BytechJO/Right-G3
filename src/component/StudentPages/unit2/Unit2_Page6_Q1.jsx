@@ -1,233 +1,240 @@
-import React, { useState, useRef } from "react";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
-import img6 from "../../../assets/imgs/test.png";
+import React, { useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Unit2_Page6_Q1.css";
 
-/* ================= DATA ================= */
+import imgA from "../../../assets/imgs/test6.png";
+import imgB from "../../../assets/imgs/test6.png";
+import imgC from "../../../assets/imgs/test6.png";
+import imgD from "../../../assets/imgs/test6.png";
+import Button from "../../Button";
+import WrongMark from "../../WrongMark";
 
-const MATCHES = [
-  { word: "yellow", image: "img4", src: img4 },
-  { word: "red", image: "img3", src: img3 },
-  { word: "green", image: "img1", src: img1 },
-  { word: "brown", image: "img6", src: img6 },
-  { word: "blue", image: "img2", src: img2 },
-  { word: "pink", image: "img5", src: img5 },
-];
-const images = [
-  { image: "img1", src: img1 },
-  { image: "img2", src: img2 },
-  { image: "img3", src: img3 },
-  { image: "img4", src: img4 },
-  { image: "img5", src: img5 },
-  { image: "img6", src: img6 },
-];
 const Unit2_Page6_Q1 = () => {
-  const containerRef = useRef(null);
-
-  const [lines, setLines] = useState([]);
-  const [start, setStart] = useState(null);
-  const [wrong, setWrong] = useState([]);
+  const questions = [
+    {
+      id: 1,
+      img: imgA,
+      options: ["take the subway", "take a taxi"],
+      correct: "take the subway",
+    },
+    {
+      id: 2,
+      img: imgB,
+      options: ["take a bus", "ride a bike"],
+      correct: "ride a bike",
+    },
+    {
+      id: 3,
+      img: imgC,
+      options: ["ride a bike", "walk"],
+      correct: "walk",
+    },
+    {
+      id: 4,
+      img: imgD,
+      options: ["take a bus", "take a train"],
+      correct: "take a bus",
+    },
+  ];
+  const [selected, setSelected] = useState({});
+  const [showResult, setShowResult] = useState(false);
   const [locked, setLocked] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const handleSelect = (qId, option) => {
+    if (locked) return;
 
-  const disabled = locked || showAnswer;
-
-  /* ================= HELPERS ================= */
-
-  const getPos = (el) => {
-    if (!el || !containerRef.current) return { x: 0, y: 0 };
-    const r = el.getBoundingClientRect();
-    const c = containerRef.current.getBoundingClientRect();
-    return { x: r.left - c.left + 8, y: r.top - c.top + 8 };
+    setSelected((prev) => ({
+      ...prev,
+      [qId]: option,
+    }));
   };
-
-  /* ================= HANDLERS ================= */
-
-  const startLine = (e) => {
-    if (disabled) return;
-
-    const container = e.currentTarget.closest(".CB-unit2-p6-q1-dot-container");
-    const dot = container?.querySelector(".dot-start1");
-    if (!dot) return;
-
-    const word = dot.dataset.word;
-    if (lines.some((l) => l.word === word)) return;
-
-    setStart({ word, ...getPos(dot) });
-  };
-
-  const endLine = (e) => {
-    if (disabled || !start) return;
-
-    const wrapper = e.currentTarget.closest(".u2-image-wrapper");
-    const dot = wrapper?.querySelector(".dot-end1");
-    if (!dot) return;
-
-    const image = dot.dataset.image;
-    const pos = getPos(dot);
-
-    setLines((l) => [
-      ...l,
-      {
-        word: start.word,
-        image,
-        x1: start.x,
-        y1: start.y,
-        x2: pos.x,
-        y2: pos.y,
-      },
-    ]);
-
-    setStart(null);
-  };
-
-  const checkAnswers = () => {
-    if (lines.length < MATCHES.length)
-      return ValidationAlert.info("Oops!", "Please connect all the pairs.");
-
-    let correct = 0;
-    const wrongWords = [];
-
-    lines.forEach((l) =>
-      MATCHES.some((m) => m.word === l.word && m.image === l.image)
-        ? correct++
-        : wrongWords.push(l.word),
-    );
-
-    setWrong(wrongWords);
-    setLocked(true);
-
-    const color =
-      correct === MATCHES.length ? "green" : correct === 0 ? "red" : "orange";
-
-    ValidationAlert[
-      correct === MATCHES.length
-        ? "success"
-        : correct === 0
-          ? "error"
-          : "warning"
-    ](
-      `<div style="font-size:20px;text-align:center">
-        <b style="color:${color}">Score: ${correct} / ${MATCHES.length}</b>
-      </div>`,
-    );
-  };
-
-  const show = () => {
-    setLines(
-      MATCHES.map((m) => {
-        const w = document.querySelector(`[data-word="${m.word}"]`);
-        const i = document.querySelector(`[data-image="${m.image}"]`);
-        const s = getPos(w);
-        const e = getPos(i);
-        return { ...m, x1: s.x, y1: s.y, x2: e.x, y2: e.y };
-      }),
-    );
-    setWrong([]);
-    setShowAnswer(true);
-    setLocked(true);
-  };
-
   const reset = () => {
-    setLines([]);
-    setWrong([]);
-    setStart(null);
+    setSelected({});
     setLocked(false);
-    setShowAnswer(false);
+    setShowResult(false);
   };
 
-  /* ================= RENDER ================= */
+  const showAnswers = () => {
+    const filled = {};
+    questions.forEach((q) => {
+      filled[q.id] = q.correct;
+    });
+    setSelected(filled);
+    setLocked(true);
+  };
+  const checkAnswers = () => {
+    if (locked) return;
+    const hasEmpty = questions.some((q) => !selected[q.id]);
 
+    if (hasEmpty) {
+      ValidationAlert.info();
+      return;
+    }
+    let correct = 0;
+
+    questions.forEach((q) => {
+      if (selected[q.id] === q.correct) correct++;
+    });
+
+    const total = questions.length;
+
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <b>Score: ${correct} / ${total}</b>
+    </div>
+  `;
+
+    if (correct === total) ValidationAlert.success(msg);
+    else if (correct === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+    setShowResult(true);
+    setLocked(true);
+  };
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        <div className="CB-unit2-p6-q1-container2">
-          <h5 className="header-title-page8">
-            <span className="ex-A">D</span> Read and match.
-          </h5>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <h5 className="header-title-page8 pb-2.5">
+        <span className="ex-A" style={{ marginRight: "20px" }}>
+          D
+        </span>
+        Look, read, and circle.
+      </h5>
 
-          <div className="CB-unit2-p6-q1-match-wrapper2" ref={containerRef}>
-            {/* WORDS */}
-            <div className="u2-match-words">
-              {MATCHES.map((m, i) => (
-                <div key={m.word} className="u2-word-item">
-                  <span className="u2-word-index">{i + 1}</span>
+      <div className="w-[50%] mx-auto">
+        <div className="flex flex-col gap-10 items-center mb-10">
+          {[0, 2].map((startIndex) => (
+            <div key={startIndex} className="w-full">
+              <div className="flex justify-between px-10">
+                {questions.slice(startIndex, startIndex + 2).map((q) => (
                   <div
-                    className="CB-unit2-p6-q1-dot-container"
-                    onClick={startLine}
+                    key={q.id}
+                    className="flex flex-col items-start  w-[45%]"
                   >
-                    <h5 className={`u2-word ${disabled ? "is-disabled" : ""}`}>
-                      {m.word}
-                    </h5>
-
-                    {wrong.includes(m.word) && (
-                      <span className="CB-unit2-p6-q1-error-mark-img">✕</span>
-                    )}
-
-                    <div className="dot1 dot-start1" data-word={m.word} />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* IMAGES */}
-            <div className="u2-match-images">
-              {images.map((m) => (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <div className="u2-image-wrapper" onClick={endLine}>
-                    <div className="dot1 dot-end1" data-image={m.image} />
-                    <div className="u2-image-item">
+                    {/* الصورة */}
+                    <div className="flex gap-2 items-start">
+                      <span className="font-bold text-lg">{q.id}</span>
                       <img
-                        src={m.src}
-                        alt=""
-                        className={`u2-image ${disabled ? "is-disabled" : ""}`}
+                        src={q.img}
+                        style={{
+                          height: "10vw",
+                          border: "2px solid #F79530",
+                          borderRadius: "10px",
+                        }}
                       />
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
 
-            {/* LINES */}
-            <svg className="lines-layer">
-              {lines.map((l, i) => (
-                <line
-                  key={i}
-                  x1={l.x1}
-                  y1={l.y1}
-                  x2={l.x2}
-                  y2={l.y2}
-                  stroke="red"
-                  strokeWidth="3"
-                />
-              ))}
-            </svg>
-          </div>
+                    <div className="flex flex-col items-start  mt-2">
+                      <div
+                        onClick={() => handleSelect(q.id, q.options[0])}
+                        style={{
+                          position: "relative",
+                          cursor: "pointer",
+                          padding: "4px 8px",
+                          marginLeft: "20px",
+                          fontSize: "18px",
+                          display: "inline-block",
+                        }}
+                      >
+                        {q.options[0]}
+
+                        {/* الدائرة */}
+                        {selected[q.id] === q.options[0] && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-5px",
+                              left: "-8px",
+                              right: "-8px",
+                              bottom: "-5px",
+                              border: showResult
+                                ? q.options[0] === q.correct
+                                  ? "2px solid green"
+                                  : "none"
+                                : "2px solid red",
+                              borderRadius: "20px",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        )}
+
+                        {/* ❌ إذا غلط */}
+                        {showResult &&
+                          selected[q.id] === q.options[0] &&
+                          selected[q.id] !== q.correct && <WrongMark />}
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "220px",
+                          fontSize: "18px",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>I</span>
+                        <span>to school.</span>
+                      </div>
+
+                      <div style={{ width: "100%" }}>
+                        <div
+                          onClick={() => handleSelect(q.id, q.options[1])}
+                          style={{
+                            position: "relative",
+                            cursor: "pointer",
+                            padding: "4px 8px",
+                            marginLeft: "20px",
+                            fontSize: "18px",
+                            display: "inline-block",
+                          }}
+                        >
+                          {q.options[1]}
+
+                          {/* الدائرة */}
+                          {selected[q.id] === q.options[1] && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "-5px",
+                                left: "-8px",
+                                right: "-8px",
+                                bottom: "-5px",
+                                border: showResult
+                                  ? q.options[1] === q.correct
+                                    ? "2px solid green"
+                                    : "none"
+                                  : "2px solid red",
+                                borderRadius: "20px",
+                                pointerEvents: "none",
+                              }}
+                            />
+                          )}
+
+                          {/* ❌ إذا غلط */}
+                          {showResult &&
+                            selected[q.id] === q.options[1] &&
+                            selected[q.id] !== q.correct && <WrongMark />}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-      {/* ACTION BUTTONS (كما هي) */}
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={show} className="show-answer-btn swal-continue">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      {/* BUTTONS */}
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={reset}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
 };

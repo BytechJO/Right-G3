@@ -1,247 +1,262 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useState } from "react";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  MouseSensor,
+  TouchSensor,
+  DragOverlay,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
 
+import imgShower from "../../../assets/imgs/test6.png";
+import imgBike from "../../../assets/imgs/test6.png";
+import imgSoccer from "../../../assets/imgs/test6.png";
+import imgFlowers from "../../../assets/imgs/test6.png";
+import WrongMark from "../../WrongMark";
+
+const ACTIVITIES = [
+  { id: "act4", text: "take a taxi." },
+  { id: "act1", text: "take the subway." },
+  { id: "act3", text: "take a bus." },
+  { id: "act2", text: "ride a bike." },
+];
+
+const CORRECT_ANSWERS = {
+  q1: "act1",
+  q2: "act2",
+  q3: "act3",
+  q4: "act4",
+};
+
+function DraggableActivity({ item, isUsed }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging || isUsed ? 0.5 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ ...style, touchAction: "none" }}
+      {...attributes}
+      {...listeners}
+      className={`p-2 bg-white border-2 border-gray-200 rounded-xl shadow-sm cursor-grab text-blue-700 font-medium text-xs text-center ${isUsed ? "bg-gray-50 text-gray-300 pointer-events-none" : "hover:border-blue-400 hover:shadow-md transition-all"}`}
+    >
+      {item.text}
+    </div>
+  );
+}
+
+function DropSlot({ id, content, isCorrect, isSubmitted }) {
+  const { setNodeRef, isOver } = useSortable({ id });
+  const borderColor = isSubmitted
+    ? isCorrect
+      ? "border-green-500 bg-green-50"
+      : "border-red-500 bg-red-50"
+    : isOver
+      ? "border-blue-400 bg-blue-50"
+      : "border-gray-300";
+  return (
+    <div
+      ref={setNodeRef}
+      className={`w-full min-h-10 border-b-2 flex items-center justify-center px-2 transition-all ${borderColor}`}
+    >
+      {content ? (
+        <div className="relative flex items-center justify-center">
+          <span className="text-blue-900 font-bold text-sm text-center">
+            {ACTIVITIES.find((a) => a.id === content).text}
+          </span>
+
+          {/* ❌ إذا الجواب غلط */}
+          {isSubmitted && !isCorrect && (
+            <div className="absolute -right-4">
+              <WrongMark />
+            </div>
+          )}
+        </div>
+      ) : (
+        <span className="text-gray-300 italic text-xs">
+          Drop answer here...
+        </span>
+      )}
+    </div>
+  );
+}
 
 const Unit2_Page5_Q3 = () => {
-  const grid = [
-    "x",
-    "t",
-    "h",
-    "e",
-    "x",
-    "y",
-    "s",
-    "b",
-    "i",
-    "r",
-    "d",
-    "s",
-    "x",
-    "e",
-    "r",
-    "f",
-    "l",
-    "y",
-    "q",
-    "n",
-    "m",
-    "i",
-    "z",
-    "o",
-    "p",
-    "i",
-    "n",
-    "m",
-    "k",
-    "i",
-    "l",
-    "o",
-    "p",
-    "x",
-    "e",
-    "f",
-    "t",
-    "h",
-    "e",
-    "i",
-    "c",
-    "k",
-    "m",
-    "k",
-    "m",
-    "k",
-    "l",
-    "o",
-    "a",
-    "b",
-    "f",
-    "n",
-    "d",
-    "s",
-    "s",
-    "b",
-    "v",
-    "r",
-    "w",
-    "s",
-    "k",
-    "y",
-    "c",
-    "s",
-    "j",
-  ];
+  const [answers, setAnswers] = useState({
+    q1: null,
+    q2: null,
+    q3: null,
+    q4: null,
+    q5: null,
+    q6: null,
+    q7: null,
+    q8: null,
+  });
+  const [activeId, setActiveId] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+  const [locked, setLocked] = useState(false);
 
-  const letters = grid; // نفس الـ array اللي عندك
-
-  const wordsToFind = ["the", "birds", "fly", "in" ,"the","sky"];
-  const [sentence, setSentence] = useState("");
-
-  const [selected, setSelected] = useState([]);
-  const [currentWord, setCurrentWord] = useState("");
-  const [foundWords, setFoundWords] = useState([]);
-  const [coloredCells, setColoredCells] = useState([]);
-
-  const handleClick = (letter, index) => {
-    if (coloredCells.includes(index)) return;
-
-    if (selected.includes(index)) {
-      const cutIndex = selected.indexOf(index);
-      const newSelected = selected.slice(0, cutIndex);
-
-      const newWord = newSelected.map((i) => letters[i]).join("");
-
-      setSelected(newSelected);
-      setCurrentWord(newWord);
-      return;
-    }
-
-    setSelected((prev) => [...prev, index]);
-    setCurrentWord((prev) => prev + letter);
-  };
-
-  useEffect(() => {
-    if (
-      wordsToFind.includes(currentWord) &&
-      !foundWords.includes(currentWord)
-    ) {
-      setFoundWords((prev) => [...prev, currentWord]);
-      setColoredCells((prev) => [...prev, ...selected]);
-
-      setSentence((prev) =>
-        prev === "" ? currentWord : prev + " " + currentWord,
-      );
-
-      setSelected([]);
-      setCurrentWord("");
-    }
-  }, [currentWord]);
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+    useSensor(PointerSensor),
+  );
 
   const checkAnswers = () => {
-    const total = wordsToFind.length;
-    const score = foundWords.length;
+    if (locked) return;
 
-    if (foundWords.length === 0) {
-      ValidationAlert.info(`
-        <div style="font-size:20px;text-align:center;">
-          <b>Find all the words first!</b><br/>
-          <span style="color:#1d4f7b;font-weight:bold;">
-            Current Score: ${score} / ${total}
-          </span>
-        </div>
-      `);
+    const unanswered = Object.keys(CORRECT_ANSWERS).filter(
+      (id) => !answers[id],
+    );
+    if (unanswered.length > 0) {
+      ValidationAlert.info();
       return;
     }
-
-    if (score === 0) {
-      ValidationAlert.error(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:red;">Score: 0 / ${total}</b>
-        </div>
-      `);
-    } else if (score < total) {
-      ValidationAlert.warning(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:orange;">Score: ${score} / ${total}</b>
-        </div>
-      `);
-    } else {
-      ValidationAlert.success(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:green;">Score: ${score} / ${total}</b>
-        </div>
-      `);
-    }
-  };
-  const reset = () => {
-    setSelected([]);
-    setCurrentWord("");
-    setFoundWords([]);
-    setColoredCells([]);
-    setSentence(""); // 👈 مهم
-  };
-
-  const showAnswers = () => {
-    let allCells = [];
-    const fullString = letters.join("");
-
-    wordsToFind.forEach((word) => {
-      const startIndex = fullString.indexOf(word);
-
-      if (startIndex !== -1) {
-        for (let i = 0; i < word.length; i++) {
-          allCells.push(startIndex + i);
-        }
-      }
+    setShowResults(true);
+    let score = 0;
+    let total = Object.keys(CORRECT_ANSWERS).length;
+    Object.keys(CORRECT_ANSWERS).forEach((id) => {
+      if (answers[id] === CORRECT_ANSWERS[id]) score++;
     });
-
-    setFoundWords(wordsToFind);
-    setColoredCells(allCells);
-    setSelected([]);
-    setCurrentWord("");
-    setSentence(wordsToFind.join(" "));
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
+
+  const handleReset = () => {
+    setAnswers({
+      q1: null,
+      q2: null,
+      q3: null,
+      q4: null,
+      q5: null,
+      q6: null,
+      q7: null,
+      q8: null,
+    });
+    setShowResults(false);
+    setLocked(false);
+  };
+
+  const QUESTIONS = [
+    { id: "q1", img: imgShower },
+    { id: "q2", img: imgBike },
+    { id: "q3", img: imgSoccer },
+    { id: "q4", img: imgFlowers },
+  ];
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        {/* ❌ الهيدر كما هو */}
-        <h5 className="header-title-page8">
-          <span className="ex-A">C</span>What do photographers use?
-        </h5>
-
-        <div className="words-list-CB-unit3-p5-q4">
-          {wordsToFind.map((word) => (
-            <span
-              key={word}
-              className={`word-CB-unit3-p5-q4 ${
-                foundWords.includes(word) ? "found-CB-unit3-p5-q4" : ""
-              }`}
-            >
-              {word}
+    <DndContext
+      sensors={sensors}
+      onDragStart={(e) => setActiveId(e.active.id)}
+      onDragEnd={(e) => {
+        if (e.over)
+          setAnswers((prev) => ({ ...prev, [e.over.id]: e.active.id }));
+        setActiveId(null);
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "30px",
+        }}
+      >
+        <div
+          className="div-forall"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "30px",
+          }}
+        >
+          <h5 className="header-title-page8">
+            <span className="ex-A" style={{ marginRight: "20px" }}>
+              B
             </span>
-          ))}
-        </div>
+            Look, read, and write. Use the words below.
+          </h5>
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1 bg-blue-50 p-5 rounded-2xl border-2 border-blue-100 h-fit sticky top-4">
+              <h3 className="font-bold text-blue-800 mb-4 text-center">
+                Activities Bank
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                <SortableContext items={ACTIVITIES.map((a) => a.id)}>
+                  {ACTIVITIES.map((act) => (
+                    <DraggableActivity
+                      key={act.id}
+                      item={act}
+                      isUsed={Object.values(answers).includes(act.id)}
+                    />
+                  ))}
+                </SortableContext>
+              </div>
+            </div>
 
-        <div className="wordsearch-wrapper-CB-unit3-p5-q4">
-          <div className="grid-CB-unit3-p5-q4">
-            {letters.map((letter, index) => {
-              const isSelected = selected.includes(index);
-              const isFound = coloredCells.includes(index);
-
-              return (
-                <span
-                  key={index}
-                  className={`cell-CB-unit3-p5-q4 
-          ${isSelected ? "selected-CB-unit3-p5-q4" : ""}
-          ${isFound ? "found-cell-CB-unit3-p5-q4" : ""}`}
-                  onClick={() => handleClick(letter, index)}
-                >
-                  {letter}
-                </span>
-              );
-            })}
+            <div className="flex-2 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+              {QUESTIONS.map((q) => (
+                <div key={q.id} className="space-y-3">
+                  <div className="bg-gray-50 p-2 rounded-xl border border-gray-100 flex justify-center">
+                    <img
+                      src={q.img}
+                      alt="activity"
+                      className="max-h-32 object-contain rounded-lg"
+                    />
+                  </div>
+                  <DropSlot
+                    id={q.id}
+                    content={answers[q.id]}
+                    isCorrect={answers[q.id] === CORRECT_ANSWERS[q.id]}
+                    isSubmitted={showResults}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <input
-            className="answer-input-CB-unit3-p5-q4"
-            value={sentence}
-            readOnly
+          <Button
+            handleShowAnswer={() => {
+              setAnswers(CORRECT_ANSWERS);
+              setShowResults(true);
+              setLocked(true);
+            }}
+            handleStartAgain={handleReset}
+            checkAnswers={checkAnswers}
           />
         </div>
       </div>
 
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn swal-continue">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
-    </div>
+      <DragOverlay>
+        {activeId ? (
+          <div className="p-3 bg-white border-2 border-blue-500 rounded-xl shadow-2xl text-blue-700 font-bold text-xs scale-105">
+            {ACTIVITIES.find((a) => a.id === activeId).text}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 };
 

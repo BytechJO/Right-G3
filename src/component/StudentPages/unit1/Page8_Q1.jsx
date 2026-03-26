@@ -189,7 +189,7 @@ const Page8_Q1 = () => {
     const total = rows.reduce((acc, r) => acc + r.words.length, 0);
     const score = foundSelections.length;
     if (foundSelections.length === 0) {
-      ValidationAlert.info("Please find at least one word!");
+      ValidationAlert.info();
       return;
     }
 

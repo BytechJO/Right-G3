@@ -4,104 +4,117 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/test6.png";
 import img2 from "../../../assets/imgs/test6.png";
 
-const Page8_Q4 = () => {
+const Unit2_Page5_Q4 = () => {
   const grid = [
+    "h",
+    "j",
+    "l",
+    "t",
+    "h",
     "e",
+    "y",
+    "o",
+    "m",
+    "l",
+    "e",
+    "n",
+    "j",
+    "o",
+    "y",
+    "r",
+    "w",
+    "s",
+    "t",
+    "h",
+    "e",
+    "l",
+    "v",
+    "v",
+    "e",
+    "l",
+    "y",
     "u",
+    "t",
+    "y",
+    "f",
+    "o",
+    "o",
+    "d",
+    "c",
+    "h",
+    "p",
+    "u",
+    "l",
+    "a",
+    "n",
     "d",
     "p",
     "l",
-    "z",
-    "z",
-    "e",
-    "h",
-    "e",
-    "u",
-    "s",
-    "l",
-    "t",
-    "w",
-    "h",
-    "o",
-    "a",
-    "q",
-    "w",
-    "d",
-    "x",
-    "k",
-    "b",
-    "b",
-    "i",
-    "e",
-    "e",
-    "l",
-    "k",
-    "e",
-    "e",
-    "p",
-    "s",
-    "t",
-    "g",
-    "o",
-    "i",
-    "n",
-    "g",
-    "t",
-    "i",
-    "x",
-    "g",
-    "m",
-    "u",
-    "q",
-    "z",
-    "a",
-    "x",
-    "n",
-    "g",
-    "w",
-    "i",
-    "n",
-    "s",
-    "e",
-    "o",
-    "g",
-    "h",
-    "w",
-    "x",
-    "p",
-    "o",
-    "i",
-    "t",
-    "h",
-    "e",
-    "r",
-    "z",
-    "n",
-    "b",
-    "o",
-    "l",
-    "p",
-    "r",
-    "e",
-    "m",
-    "u",
-    "r",
     "a",
     "c",
     "e",
-    "v",
-    "b",
-    "m",
-    "x",
-    "x",
-    "z",
-    "m",
+    "s",
+    "n",
+    "d",
+    "r",
+    "a",
+    "n",
+    "d",
+    "d",
+    "u",
+    "y",
+    "g",
+    "r",
+    "u",
+    "a",
+    "t",
+    "t",
+    "h",
+    "e",
+    "r",
+    "e",
+    "o",
     "k",
+    "u",
     "i",
+    "f",
+    "o",
+    "o",
+    "d",
+    "q",
+    "a",
+    "u",
+    "t",
+    "y",
+    "m",
+    "z",
+    "a",
+    "q",
   ];
 
   const letters = grid;
-  const wordsToFind = ["he", "who", "keeps", "going", "wins", "the", "race"];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const wordsToFind = [
+    "they",
+    "enjoy",
+    "the",
+    "food",
+    "and",
+    "places",
+    "there",
+  ];
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const correctPositions = {
+    they: [3, 4, 5, 6],
+    enjoy: [10, 11, 12, 13, 14],
+    the: [18, 19, 20],
+    food: [30, 31, 32, 33],
+    and: [39, 40, 41],
+    places: [42, 43, 44, 45, 46, 47],
+    there: [62, 63, 64, 65, 66],
+  };
+
   const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
@@ -111,7 +124,6 @@ const Page8_Q4 = () => {
 
   const handleClick = (letter, index) => {
     if (locked) return;
-    if (coloredCells.includes(index)) return;
 
     if (selected.includes(index)) {
       const cutIndex = selected.indexOf(index);
@@ -128,22 +140,28 @@ const Page8_Q4 = () => {
   };
 
   useEffect(() => {
-    if (
-      wordsToFind.includes(currentWord) &&
-      !foundWords.includes(currentWord)
-    ) {
-      setFoundWords((prev) => [...prev, currentWord]);
-      setColoredCells((prev) => [...prev, ...selected]);
+    const matchedWord = wordsToFind.find((word) => currentWord === word);
 
-      setSentence((prev) =>
-        prev === "" ? currentWord : prev + " " + currentWord,
-      );
+    if (matchedWord && !foundWords.includes(matchedWord)) {
+      const correctIndices = correctPositions[matchedWord];
 
-      setSelected([]);
-      setCurrentWord("");
+      const isPositionCorrect =
+        correctIndices &&
+        correctIndices.length === selected.length &&
+        correctIndices.every((val, idx) => val === selected[idx]);
+
+      if (isPositionCorrect) {
+        setFoundWords((prev) => [...prev, matchedWord]);
+        setColoredCells((prev) => Array.from(new Set([...prev, ...selected])));
+        setSentence((prev) =>
+          prev === "" ? matchedWord : prev + " " + matchedWord,
+        );
+
+        setSelected([]);
+        setCurrentWord("");
+      }
     }
-  }, [currentWord]);
-
+  }, [currentWord, selected, foundWords, wordsToFind, correctPositions]);
   const reset = () => {
     setSelected([]);
     setCurrentWord("");
@@ -152,17 +170,15 @@ const Page8_Q4 = () => {
     setSentence("");
     setLocked(false);
   };
+
+  // --- 3. تعديل إظهار الإجابات ---
   const showAnswers = () => {
     let allCells = [];
-    const fullString = letters.join("");
 
+    // نستخدم المواقع المخزنة مباشرة
     wordsToFind.forEach((word) => {
-      const startIndex = fullString.indexOf(word);
-
-      if (startIndex !== -1) {
-        for (let i = 0; i < word.length; i++) {
-          allCells.push(startIndex + i);
-        }
+      if (correctPositions[word]) {
+        allCells.push(...correctPositions[word]);
       }
     });
 
@@ -181,7 +197,7 @@ const Page8_Q4 = () => {
     const score = foundWords.length;
 
     if (score === 0) {
-      ValidationAlert.info("Please complete all answers.");
+      ValidationAlert.info();
       return;
     }
 
@@ -199,8 +215,9 @@ const Page8_Q4 = () => {
     `);
     }
 
-    setLocked(true); // 🔒 قفل بعد التصحيح
+    setLocked(true);
   };
+
   return (
     <div
       style={{
@@ -214,7 +231,8 @@ const Page8_Q4 = () => {
         <span className="ex-A" style={{ marginRight: "20px" }}>
           C
         </span>
-        What is the moral of Slow and Steady Wins the Race on page 5?{" "}
+        What do Tom and his family enjoy about France in Vacation in France on
+        page 11?
       </h5>
 
       <div style={{ width: "60%" }}>
@@ -267,6 +285,7 @@ const Page8_Q4 = () => {
               );
             })}
           </div>
+
           <div
             style={{
               display: "flex",
@@ -306,6 +325,7 @@ const Page8_Q4 = () => {
                 }}
               />
             </div>
+
             <img
               src={img2}
               alt="end"
@@ -315,11 +335,6 @@ const Page8_Q4 = () => {
               }}
             />
           </div>
-          <input
-            value={sentence}
-            readOnly
-            className="w-[85%] mt-[15px] border-b-2 border-black text-[18px] bg-transparent outline-none"
-          />
         </div>
       </div>
 
@@ -333,4 +348,4 @@ const Page8_Q4 = () => {
   );
 };
 
-export default Page8_Q4;
+export default Unit2_Page5_Q4;

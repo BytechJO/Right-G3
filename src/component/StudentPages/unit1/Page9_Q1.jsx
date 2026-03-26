@@ -28,7 +28,7 @@ const Page9_Q1 = () => {
     if (locked) return;
 
     if (Object.keys(answers).length < images.length) {
-      ValidationAlert.info("Please fill all numbers!");
+      ValidationAlert.info();
       return;
     }
 
