@@ -1,8 +1,8 @@
-# Right-G1
+# Right-G3
 
 ## Project Description
 
-Right-G1 is a web application built using **React** with **Vite**.  
+Right-G3 is a web application built using **React** with **Vite**.  
 It provides an interactive and responsive user interface designed for educational content and smooth user experience.
 
 ---
