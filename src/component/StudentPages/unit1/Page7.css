@@ -17,3 +17,24 @@
   right: 53%;
   cursor: pointer;
 }
+.headset-icon-CD-page7-1 {
+  position: absolute;
+  padding: 5px;
+  top: 30%; /* عدلها حسب مكانها بالصورة */
+  left: 40%; /* عدلها حسب المكان */
+  cursor: pointer;
+}
+.headset-icon-CD-page7-2 {
+  position: absolute;
+  padding: 5px;
+  top: 30%; /* عدلها حسب مكانها بالصورة */
+  left: 90%; /* عدلها حسب المكان */
+  cursor: pointer;
+}
+.headset-icon-CD-page7-3 {
+  position: absolute;
+  padding: 5px;
+  bottom: 10%; /* عدلها حسب مكانها بالصورة */
+  left: 60%; /* عدلها حسب المكان */
+  cursor: pointer;
+}

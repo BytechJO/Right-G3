@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0012.jpg";
 import "./Unit2_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 2/CD8.Pg12_Right Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 2/Pg12_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 2/Pg12_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 2/Pg12_2.1_Helen.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 2/Pg12_2.1_Helen_Take 2.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 2/Pg12_2.1_Helen_Take 3.mp3";
-import sound6 from "../../../assets/audio/ClassBook/U 2/Pg12_3.1_Stella.mp3";
-import sound7 from "../../../assets/audio/ClassBook/U 2/Pg12_4.1_Tom.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";

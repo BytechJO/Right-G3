@@ -1,21 +1,35 @@
 import React, { useState, useRef, useEffect } from "react";
 import backgroundImage from "../../../assets/imgs/test.png";
 import page2_2 from "../../../assets/imgs/test.png";
-import num1 from "../../../assets/imgs/test.png";
-import num2 from "../../../assets/imgs/test.png";
-import num3 from "../../../assets/imgs/test.png";
-import num4 from "../../../assets/imgs/test.png";
-import num5 from "../../../assets/imgs/test.png";
+import num1 from "../../../assets/imgs/test6.png";
+import num2 from "../../../assets/imgs/test6.png";
+import num3 from "../../../assets/imgs/test6.png";
+import num4 from "../../../assets/imgs/test6.png";
+import num5 from "../../../assets/imgs/test6.png";
+import num6 from "../../../assets/imgs/test6.png";
+import num8 from "../../../assets/imgs/test6.png";
+import num9 from "../../../assets/imgs/test6.png";
+import num10 from "../../../assets/imgs/test6.png";
+import num11 from "../../../assets/imgs/test6.png";
+import num12 from "../../../assets/imgs/test6.png";
 import { IoMdSettings } from "react-icons/io";
 import { TbMessageCircle } from "react-icons/tb";
-import vocabulary from "../../../assets/imgs/test.png";
+import vocabulary from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_Vocab_Adult Lady.mp3";
+
 import { FaPlay, FaPause } from "react-icons/fa";
 import "../../../index.css";
-import sound1 from "../../../assets/imgs/test.png";
-import sound4 from "../../../assets/imgs/test.png";
-import sound5 from "../../../assets/imgs/test.png";
-import sound2 from "../../../assets/imgs/test.png";
-import sound3 from "../../../assets/imgs/test.png";
+import sound1 from "../../../assets/imgs/test6.png";
+import sound4 from "../../../assets/imgs/test6.png";
+import sound5 from "../../../assets/imgs/test6.png";
+import sound2 from "../../../assets/imgs/test6.png";
+import sound3 from "../../../assets/imgs/test6.png";
+import sound6 from "../../../assets/imgs/test6.png";
+import sound7 from "../../../assets/imgs/test6.png";
+import sound8 from "../../../assets/imgs/test6.png";
+import sound9 from "../../../assets/imgs/test6.png";
+import sound10 from "../../../assets/imgs/test6.png";
+import sound11 from "../../../assets/imgs/test6.png";
+import sound12 from "../../../assets/imgs/test6.png";
 
 const Page4_vocabulary = () => {
   const mainAudioRef = useRef(null);
@@ -46,30 +60,43 @@ const Page4_vocabulary = () => {
       end: 3.0,
       text: "Page 4, Unit 1. Good morning, world.Vocabulary.",
     },
-    { start: 3.02, end: 5.1, text: "1. Goodbye." },
-    { start: 5.13, end: 7.0, text: "2. How are you?" },
-    { start: 7.03, end: 10.5, text: "3. Fine, thank you." },
-    { start: 10.52, end: 12.1, text: "4. Hello." },
-    { start: 12.12, end: 15.0, text: "5. Good morning." },
+    { start: 2, end: 3, text: "1. scoreboard" },
+    { start: 3, end: 4, text: "2. young" },
+    { start: 4, end: 5, text: "3. old" },
+    { start: 5, end: 6, text: "4. small" },
+    { start: 6, end: 7, text: "5. big" },
+    { start: 7, end: 8, text: "6. referee" },
+    { start: 8, end: 9, text: "7. whistle" },
+    { start: 9, end: 10, text: "8. fast" },
+    { start: 10, end: 11, text: "9. slow" },
+    { start: 11, end: 12, text: "10. tall" },
+    { start: 12, end: 13, text: "11. short" },
+    { start: 13, end: 15, text: "12. basketball court" },
   ];
-
+console.log(current);
   // ================================
   // ✔ Word timings
   // ================================
   const wordTimings = [
-    { start: 2.8, end: 5.0 }, // Goodbye
-    { start: 5.1, end: 7.2 }, // How are you
-    { start: 7.25, end: 10.5 }, // Fine thank you
-    { start: 10.6, end: 12.35 }, // Hello
-    { start: 12.37, end: 15.0 }, // Good morning
+    { word: "1. scoreboard", start: 2.8, end:5.2 }, //
+    { word: "2. young", start: 5.2, end: 7.3 }, //
+    { word: "3. old", start: 7.3, end: 9.5 }, //
+    { word: "4. small", start: 9.5, end: 11 }, //
+    { word: "5. big", start: 10.1, end: 12.0 }, //
+    { word: "6. referee", start: 12.0, end: 14.1 }, //
+    { word: "7. whistle", start: 14.1, end: 16.2 }, //
+    { word: "8. fast", start: 16.2, end: 18.2 }, //
+    { word: "9. slow", start: 18.2, end: 20.2 }, //
+    { word: "10. tall", start: 20.2, end: 22.3 }, //
+    { word: "11. short", start: 22.3, end: 24.3 }, //
+    { word: "12. basketball court", start: 24.3, end: 27.5 }, //
   ];
-
   // ================================
   // ✔ Update caption highlight
   // ================================
   const updateCaption = (time) => {
     const index = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end
+      (cap) => time >= cap.start && time <= cap.end,
     );
     setActiveIndex(index);
   };
@@ -79,7 +106,7 @@ const Page4_vocabulary = () => {
   // ================================
   const updateWord = (time) => {
     const wordIndex = wordTimings.findIndex(
-      (w) => time >= w.start && time <= w.end
+      (w) => time >= w.start && time <= w.end,
     );
     setActiveIndex2(wordIndex);
   };
@@ -138,40 +165,77 @@ const Page4_vocabulary = () => {
     }
   };
 
-    const wordAudios = [sound1, sound2, sound3, sound4, sound5];
- const playWordAudio = (index) => {
-  // أوقفي الأوديو الرئيسي
-  mainAudioRef.current.pause();
+  const wordAudios = [
+    sound1,
+    sound2,
+    sound3,
+    sound4,
+    sound5,
+    sound6,
+    sound7,
+    sound8,
+    sound9,
+    sound10,
+    sound11,
+    sound12,
+  ];
+  const playWordAudio = (index) => {
+    // أوقفي الأوديو الرئيسي
+    mainAudioRef.current.pause();
 
-  // أوقفي أي كلمة شغالة
-  wordRefs.current.forEach((ref) => {
-    if (ref.current) {
-      ref.current.pause();
-      ref.current.currentTime = 0;
-    }
-  });
+    // أوقفي أي كلمة شغالة
+    wordRefs.current.forEach((ref) => {
+      if (ref.current) {
+        ref.current.pause();
+        ref.current.currentTime = 0;
+      }
+    });
 
-  const audio = wordRefs.current[index].current;
-  if (!audio) return;
+    const audio = wordRefs.current[index].current;
+    if (!audio) return;
 
-  // تشغيل الصوت من البداية
-  audio.currentTime = 0;
-  audio.play();
+    // تشغيل الصوت من البداية
+    audio.currentTime = 0;
+    audio.play();
 
-  // 🔥 فعل الأنيميشن على طول فترة التشغيل
-  setClickedIndex(index);
+    // 🔥 فعل الأنيميشن على طول فترة التشغيل
+    setClickedIndex(index);
 
-  // 🔥 عند انتهاء الصوت -> أطفئ الأنيميشن
-  audio.onended = () => {
-    setClickedIndex(null);
+    // 🔥 عند انتهاء الصوت -> أطفئ الأنيميشن
+    audio.onended = () => {
+      setClickedIndex(null);
+    };
   };
-};
 
- const wordRefs = useRef(wordAudios.map(() => React.createRef()));
+  const wordRefs = useRef(wordAudios.map(() => React.createRef()));
 
-
-  const nums = [num1, num2, num3, num4, num5];
-
+  const nums = [
+    num1,
+    num2,
+    num3,
+    num4,
+    num5,
+    num6,
+    num8,
+    num9,
+    num10,
+    num11,
+    num12,
+  ];
+  const words = [
+    "scoreboard",
+    "young",
+    "old",
+    "small",
+    "big",
+    "referee",
+    "whistle",
+    "fast",
+    "slow",
+    "tall",
+    "short",
+    "basketball court",
+  ];
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
@@ -179,7 +243,8 @@ const Page4_vocabulary = () => {
       {/* ============================
            AUDIO PLAYER
       ============================= */}
-      <div className="audio-popup-vocab-container"
+      <div
+        className="audio-popup-vocab-container"
         style={{
           width: "30%",
           display: "flex",
@@ -187,7 +252,7 @@ const Page4_vocabulary = () => {
           justifyContent: "center",
           margin: "0px 20px",
           position: "relative",
-          alignItems:"center"
+          alignItems: "center",
         }}
       >
         <div className="audio-popup-vocab">
@@ -307,13 +372,7 @@ const Page4_vocabulary = () => {
         />
 
         <div className="vocab_container" style={{ bottom: "2%", right: "6%" }}>
-          {[
-            "Goodbye!",
-            "How are you?",
-            "Fine, thank you.",
-            "Hello!",
-            "Good morning!",
-          ].map((text, i) => (
+          {words.map((text, i) => (
             <h6
               key={i}
               className={
@@ -350,9 +409,9 @@ const Page4_vocabulary = () => {
         {/* Background */}
         <img src={backgroundImage} style={{ height: "75vh" }} />
       </div>
-        {wordAudios.map((src, i) => (
-  <audio key={i} ref={wordRefs.current[i]} src={src} />
-))}
+      {wordAudios.map((src, i) => (
+        <audio key={i} ref={wordRefs.current[i]} src={src} />
+      ))}
     </div>
   );
 };

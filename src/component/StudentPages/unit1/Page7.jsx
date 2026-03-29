@@ -1,14 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import page_7 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0007.jpg";
-import grammarSound from "../../../assets/audio/ClassBook/U 1/CD4.Pg7_Right Grammar2_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 1/P 7/CD5.Pg7_Grammar2_Adult Lady.mp3";
 import sound1 from "../../../assets/audio/ClassBook/U 1/Pg7_2.1_Adult Lady.mp3";
 import sound2 from "../../../assets/audio/ClassBook/U 1/Pg7_2.2_Adult Lady.mp3";
 import sound3 from "../../../assets/audio/ClassBook/U 1/Pg7_2.3_Adult Lady.mp3";
 import sound4 from "../../../assets/audio/ClassBook/U 1/Pg7_2.4_Adult Lady.mp3";
 import sound5 from "../../../assets/audio/ClassBook/U 1/Pg7_2.5_Adult Lady.mp3";
-import "./Page7.css"
+import "./Page7.css";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
-import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 // import video2 from "../../../assets/unit1/sounds/p7 1920.mp4";
 import AudioWithCaption from "../../AudioWithCaption";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
@@ -47,7 +46,6 @@ const Page7 = ({ openPopup }) => {
     { x1: 51.0, y1: 9.4, x2: 72.0, y2: 13.3, sound: sound3 },
     { x1: 73.0, y1: 9.4, x2: 89.0, y2: 13.3, sound: sound4 },
     { x1: 6.5, y1: 16.3, x2: 31.7, y2: 19.6, sound: sound5 },
-
   ];
 
   const checkAreaAndPlaySound = (x, y) => {

@@ -1,240 +1,205 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
+import WrongMark from "../../WrongMark";
 
-import "./Review1_Page2_Q1.css";
-
-const IMAGES = [
-  { id: "img1", src: img1 },
-  { id: "img2", src: img2 },
-  { id: "img3", src: img3 },
-  { id: "img4", src: img4 },
-];
-
-const WORDS = [
-  { char: "l", color: "l" },
-  { char: "r", color: "r" },
-];
-
-const ANSWERS = [
-  { word: "l", images: ["img3", "img4"] },
-  { word: "r", images: ["img1", "img2"] },
-];
+import img1 from "../../../assets/imgs/test6.png";
+import img2 from "../../../assets/imgs/test6.png";
+import img3 from "../../../assets/imgs/test6.png";
+import img4 from "../../../assets/imgs/test6.png";
+import Button from "../../Button";
 
 const Review1_Page2_Q1 = () => {
-  const ref = useRef(null);
-  const [lines, setLines] = useState([]);
-  const [start, setStart] = useState(null);
-  const [wrong, setWrong] = useState([]);
+  const items = [
+    {
+      img: img1,
+      options: ["long a", "short a"],
+      correct: "long a",
+    },
+    {
+      img: img2,
+      options: ["long o", "short o"],
+      correct: "long o",
+    },
+    {
+      img: img3,
+      options: ["long i", "short i"],
+      correct: "long i",
+    },
+    {
+      img: img4,
+      options: ["long e", "short e"],
+      correct: "short e",
+    },
+  ];
+
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
-  const getCenterPos = (el) => {
-    if (!el || !ref.current) return { x: 0, y: 0 };
+  const chooseOption = (i, value) => {
+    if (locked) return;
 
-    const r = el.getBoundingClientRect();
-    const c = ref.current.getBoundingClientRect();
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
 
-    // مركز العنصر (بدون +8 ثابت)
-    return {
-      x: r.left - c.left + r.width / 2,
-      y: r.top - c.top + r.height / 2,
-    };
+    const newAnswers = [...answers];
+    newAnswers[i] = items[i].start + value + items[i].end;
+    setAnswers(newAnswers);
   };
 
-  const startLine = (e) => {
-    if (locked || showAnswer) return;
-
-    const dot = e.currentTarget; // ✅ الدوت نفسه
-    const image = dot.dataset.image;
-
-    if (lines.some((l) => l.image === image)) return;
-
-    setStart({ image, ...getCenterPos(dot) });
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
+    setLocked(false);
+    setShowResult(false);
   };
 
-  const endLine = (e) => {
-    if (!start || locked || showAnswer) return;
-
-    const dot = e.currentTarget; // ✅ الدوت نفسه
-    const word = dot.dataset.word;
-    const pos = getCenterPos(dot);
-
-    setLines((prev) => [
-      ...prev,
-      {
-        x1: start.x,
-        y1: start.y,
-        x2: pos.x,
-        y2: pos.y,
-        image: start.image,
-        word,
-      },
-    ]);
-
-    setStart(null);
+  const showAnswers = () => {
+    setSelected(items.map((i) => i.correct));
+    setAnswers(items.map((i) => i.start + i.correct + i.end));
+    setLocked(true);
   };
 
   const checkAnswers = () => {
-    if (locked || showAnswer) return;
-    const total = ANSWERS.reduce((a, b) => a + b.images.length, 0);
-    if (lines.length < total)
-      return ValidationAlert.info("Oops!", "Please connect all the pairs.");
+    if (locked) return;
 
-    let correct = 0;
-    let wrongImgs = [];
+    if (selected.includes("")) {
+      ValidationAlert.info("Please complete all answers.");
+      return;
+    }
 
-    lines.forEach((l) => {
-      const ok = ANSWERS.some(
-        (a) => a.word === l.word && a.images.includes(l.image),
-      );
-      ok ? correct++ : wrongImgs.push(l.image);
-    });
+    let score = 0;
 
-    setWrong(wrongImgs);
-    setLocked(true);
-
-    const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
-
-    ValidationAlert[
-      correct === total ? "success" : correct === 0 ? "error" : "warning"
-    ](`<b style="color:${color}">Score: ${correct} / ${total}</b>`);
-  };
-
- const show = () => {
-  setLocked(true);
-  setShowAnswer(true);
-  setWrong([]);
-  setLines([]); // ⬅️ امسح أي خطوط قديمة
-
-  const answerLines = [];
-
-  ANSWERS.forEach((a) => {
-    a.images.forEach((imgId) => {
-      const startDot = document.querySelector(
-        `.CB-review1-p2-q1-dot-start[data-image="${imgId}"]`
-      );
-      const endDot = document.querySelector(
-        `.CB-review1-p2-q1-dot-end[data-word="${a.word}"]`
-      );
-
-      if (startDot && endDot) {
-        const s = getCenterPos(startDot);
-        const e = getCenterPos(endDot);
-
-        answerLines.push({
-          x1: s.x,
-          y1: s.y,
-          x2: e.x,
-          y2: e.y,
-          image: imgId,
-          word: a.word,
-        });
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
       }
     });
-  });
 
-  setLines(answerLines);
-};
+    const total = items.length;
 
+    const msg = `Score: ${score} / ${total}`;
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+
+    setLocked(true);
+    setShowResult(true); // 🔥 مهم
+  };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        {/* ❌ لا تعديل */}
-        <h5 className="header-title-page8">
-        <span style={{ marginRight: "20px" }}>C</span> Look and match.
-        </h5>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <h5 className="header-title-page8">
+        <span style={{ marginRight: "20px" }}>C</span>
+        Look and choose.
+      </h5>
 
-        {/* ❌ لا تعديل */}
-        <div ref={ref} className="match-wrapper2-CB-review1-p2-q1">
-          {/* IMAGES */}
-          <div className="CB-review1-p2-q1-images">
-            {IMAGES.map((img) => (
-              <div key={img.id} className="CB-review1-p2-q1-img-box">
-                <img
-                  src={img.src}
-                  alt=""
-                  className={`CB-review1-p2-q1-img ${locked ? "disabled-hover" : ""}`}
-                  onClick={() =>
-                    document.querySelector(`[data-image="${img.id}"]`)?.click()
-                  }
-                />
-                {wrong.includes(img.id) && (
-                  <span className="CB-review1-p2-q1-error">✕</span>
-                )}
+      <div className="grid grid-cols-2 gap-y-16 gap-x-20 mt-10">
+        {items.map((item, i) => (
+          <div
+            key={i}
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: "-10px",
+                left: "-15px",
+                fontWeight: "bold",
+                fontSize: "18px",
+              }}
+            >
+              {i + 1}
+            </span>
 
+            <img
+              src={item.img}
+              alt=""
+              style={{
+                width: "15vw",
+                height: "20vh",
+              }}
+            />
+
+            <div className="flex flex-col gap-5 text-[20px]">
+              {item.options.map((opt, idx) => (
                 <div
-                  className="CB-review1-p2-q1-dot CB-review1-p2-q1-dot-start"
-                  data-image={img.id}
-                  onClick={startLine}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* WORDS */}
-          <div className="CB-review1-p2-q1-words">
-            {WORDS.map((w) => (
-              <div key={w.char} className="CB-review1-p2-q1-word-box">
-                <h5
-                  className={`CB-review1-p2-q1-word ${w.color}`}
-                  onClick={() =>
-                    document.querySelector(`[data-word="${w.char}"]`)?.click()
-                  }
+                  key={idx}
+                  style={{
+                    position: "relative",  
+                    display: "inline-block",
+                  }}
                 >
-                  {w.char}
-                </h5>
+                  <span
+                    onClick={() => chooseOption(i, opt)}
+                    style={{
+                      display: "inline-block",
+                      padding: "6px 14px",
+                      borderRadius: "20px",
+                      cursor: "pointer",
+                      textAlign: "center",
+                      minWidth: "90px",
 
-                <div
-                  className="CB-review1-p2-q1-dot CB-review1-p2-q1-dot-end"
-                  data-word={w.char}
-                  onClick={endLine}
-                />
-              </div>
-            ))}
+                      border:
+                        selected[i] === opt
+                          ? showResult
+                            ? opt === item.correct
+                              ? "2px solid green"
+                              : "2px solid red"
+                            : "2px solid red"
+                          : "2px solid transparent",
+
+                      color:
+                        showResult && selected[i] === opt
+                          ? opt === item.correct
+                            ? "green"
+                            : "red"
+                          : "black",
+                    }}
+                  >
+                    {opt}
+                  </span>
+
+                  {showResult &&
+                    selected[i] === opt &&
+                    opt !== item.correct && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "-25px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }}
+                      >
+                        <WrongMark />
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
           </div>
-
-          {/* LINES */}
-          <svg className="lines-layer">
-            {lines.map((l, i) => (
-              <line
-                key={i}
-                x1={l.x1}
-                y1={l.y1}
-                x2={l.x2}
-                y2={l.y2}
-                stroke="red"
-                strokeWidth="3"
-              />
-            ))}
-          </svg>
-        </div>
+        ))}
       </div>
-      {/* ❌ الأزرار كما هي */}
-      <div className="action-buttons-container">
-        <button
-          onClick={() => {
-            setLines([]);
-            setWrong([]);
-            setShowAnswer(false); // ← رجع التعديل
-            setLocked(false); // ⭐⭐⭐ NEW: إعادة فتح الرسم
-          }}
-          className="try-again-button"
-        >
-          Start Again ↻
-        </button>
-        <button onClick={show} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={resetAll}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
 };

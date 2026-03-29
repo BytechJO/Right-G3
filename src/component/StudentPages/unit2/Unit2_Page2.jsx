@@ -3,16 +3,15 @@ import page_2 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_p
 import img1_letter from "../../../assets/imgs/test.png";
 import img2_letter from "../../../assets/imgs/test.png";
 import img3_letter from "../../../assets/imgs/test.png";
-import img4_letter from "../../../assets/imgs/test.png";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import soundListen from "../../../assets/audio/ClassBook/U 2/Pg11_1.1_Stella.mp3";
+import soundListen from "../../../assets/audio/ClassBook/Unit 2/P 11/CD8.Pg11_Reading_Adult Lady.mp3";
 import img1_conversation from "../../../assets/imgs/test.png";
 import img2_conversation from "../../../assets/imgs/test.png";
-import sound1_letter from "../../../assets/audio/ClassBook/U 2/Pg11_1.1_Adult Lady.mp3";
-import sound2_letter from "../../../assets/audio/ClassBook/U 2/Pg11_1.2_Adult Lady.mp3";
-import sound3_letter from "../../../assets/audio/ClassBook/U 2/Pg11_1.3_Adult Lady.mp3";
+import sound1_letter from "../../../assets/audio/ClassBook/Unit 2/P 11/CD8.Pg11_Reading_Adult Lady.mp3";
+import sound2_letter from "../../../assets/audio/ClassBook/Unit 2/P 11/CD8.Pg11_Reading_Adult Lady.mp3";
+import sound3_letter from "../../../assets/audio/ClassBook/Unit 2/P 11/CD8.Pg11_Reading_Adult Lady.mp3";
 
-import letterSound from "../../../assets/audio/ClassBook/U 2/Pg11_Instruction1_Adult Lady.mp3";
+import letterSound from "../../../assets/audio/ClassBook/Unit 2/P 11/Pg11_Instruction2_Adult Lady.mp3";
 
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";

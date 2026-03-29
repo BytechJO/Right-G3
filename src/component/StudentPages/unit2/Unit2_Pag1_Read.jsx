@@ -1,13 +1,12 @@
-import sound1 from "../../../assets/audio/ClassBook/U 2/Pg10a_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 2/Pg10a_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 2/Pg10a_1.3_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.2_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.3_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.4_Adult Lady.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import img1 from "../../../assets/imgs/test.png";
 import img2 from "../../../assets/imgs/test.png";
 import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
-import longAudio from "../../../assets/audio/ClassBook/U 2/CD7.Pg10_Instruction1_Adult Lady.mp3";
+import longAudio from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_Instruction1_Adult Lady.mp3";
 
 const Unit2_Page1_Read = () => {
   const imageSounds = [
@@ -15,13 +14,11 @@ const Unit2_Page1_Read = () => {
     new Audio(sound1),
     new Audio(sound2),
     new Audio(sound3),
-  
   ];
 
-const captions = [
-   { start: 0, end: 3.05, text: "Page 10. Listen and read along." },
+  const captions = [
+    { start: 0, end: 3.05, text: "Page 10. Listen and read along." },
     { start: 3.07, end: 6.14, text: "B, bird, ball, boy " },
-    
   ];
   return (
     <>

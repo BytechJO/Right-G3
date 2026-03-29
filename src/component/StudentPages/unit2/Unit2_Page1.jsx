@@ -8,7 +8,7 @@ import Unit2_Page1_Read from "./Unit2_Pag1_Read";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import allUnit2 from "../../../assets/audio/ClassBook/U 2/CD6.Pg10.U2_Intro_Adult Lady.mp3";
+import allUnit2 from "../../../assets/audio/ClassBook//Unit 2/P 10/CD7.Pg10_U2.Intro_Adult Lady.mp3";
 // import sound1 from "../../../assets/img_unit2/sounds-unit2/U2-01.mp3";
 // import sound2 from "../../../assets/img_unit2/sounds-unit2/U2-02.mp3";
 // import sound3 from "../../../assets/img_unit2/sounds-unit2/U2-03.mp3";
@@ -21,7 +21,7 @@ const Unit2_Page1 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
   const captionsExample = [
-    { start: 0, end: 4.0, text: " Page 10, Unit 2, Stella's Birthday. " },
+    { start: 0, end: 4.0, text: " Page 10, Unit 2, Summer Vacation. " },
     { start: 4.05, end: 7.09, text: "Page 10, Unit 2, Vocabulary." },
     { start: 7.12, end: 9.19, text: " 1. Party Hat. " },
     { start: 9.22, end: 11.16, text: "2. Jello." },
@@ -183,7 +183,7 @@ const Unit2_Page1 = ({ openPopup }) => {
                 }}
               >
                 <AudioWithCaption src={allUnit2} captions={captionsExample} />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
@@ -212,7 +212,7 @@ const Unit2_Page1 = ({ openPopup }) => {
               "html",
               <>
                 <Unit2_Page1_find />
-              </>
+              </>,
             )
           }
           style={{ overflow: "visible" }}
@@ -240,7 +240,7 @@ const Unit2_Page1 = ({ openPopup }) => {
               "html",
               <>
                 <Unit2_Page1_Vocab />
-              </>
+              </>,
             )
           }
           style={{ overflow: "visible" }}
@@ -268,7 +268,7 @@ const Unit2_Page1 = ({ openPopup }) => {
               "html",
               <>
                 <Unit2_Page1_Read />
-              </>
+              </>,
             )
           }
           style={{ overflow: "visible" }}

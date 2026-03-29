@@ -1,26 +1,28 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import page4 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0004.jpg";
-import allUnitSound from "../../../assets/audio/ClassBook/U 1/CD1.Pg4.U1_Intro_Adult Lady.mp3";
+import allUnitSound from "../../../assets/audio/ClassBook/Unit 1/P 4/CD1.Pg4_U1Intro_Adult Lady.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import img1 from "../../../assets/imgs/test.png";
 import img2 from "../../../assets/imgs/test.png";
 import img3 from "../../../assets/imgs/test.png";
 import img4 from "../../../assets/imgs/test.png";
-import sound1_letter from "../../../assets/audio/ClassBook/U 1/Pg4_1.1_Adult Lady.mp3";
-import sound2_letter from "../../../assets/audio/ClassBook/U 1/Pg4_1.2_Adult Lady.mp3";
-import sound3_letter from "../../../assets/audio/ClassBook/U 1/Pg4_1.3_Adult Lady.mp3";
-import sound4_letter from "../../../assets/audio/ClassBook/U 1/Pg4_1.4_Adult Lady.mp3";
+import img5 from "../../../assets/imgs/test.png";
+import sound1_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.2_Adult Lady.mp3";
+import sound2_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.3_Adult Lady.mp3";
+import sound3_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.4_Adult Lady.mp3";
+import sound4_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.5_Adult Lady.mp3";
+import sound5_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.6_Adult Lady.mp3";
 import Page4_Interactive1 from "./Page4_Interactive1";
 import Page4_vocabulary from "./Page4_vocabulary";
 import AudioWithCaption from "../../AudioWithCaption";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import longAudio from "../../../assets/audio/ClassBook/U 1/CD2.Pg4_Instruction1_Adult Lady.mp3";
+import longAudio from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_Instruction1_Adult Lady.mp3";
 // import sound1 from "../../../assets/audio/placeholders/song.mp3";
 // import sound4 from "../../../assets/audio/placeholders/song.mp3";
 // import sound5 from "../../../assets/audio/placeholders/song.mp3";
-import "./Page4.css"
+import "./Page4.css";
 const Page4 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
@@ -33,9 +35,10 @@ const Page4 = ({ openPopup }) => {
     new Audio(sound2_letter),
     new Audio(sound3_letter),
     new Audio(sound4_letter),
+    new Audio(sound5_letter),
   ];
   const captionsExample = [
-    { start: 0, end: 4.25, text: "Page 4, Unit 1. Good morning, world." },
+    { start: 0, end: 4.25, text: "Page 4, Unit 1. At the Basketball Game." },
     { start: 4.3, end: 6.0, text: "Vocabulary." },
     { start: 6.01, end: 8.16, text: "1. Goodbye." },
     { start: 8.2, end: 10.26, text: " 2. How are you? " },
@@ -114,7 +117,6 @@ const Page4 = ({ openPopup }) => {
       >
         <audio ref={audioRef} style={{ display: "none" }} />
 
-
         {areas.map((area, index) => {
           const isActive = activeAreaIndex === area.sound;
 
@@ -183,12 +185,13 @@ const Page4 = ({ openPopup }) => {
                     src={allUnitSound}
                     captions={captionsExample}
                   />
-                </div>
+                </div>,
               )
             }
             style={{ overflow: "visible" }}
           >
-            <image className="svg-img"
+            <image
+              className="svg-img"
               href={audioBtn}
               x="0"
               y="0"
@@ -210,7 +213,8 @@ const Page4 = ({ openPopup }) => {
             onClick={() => openPopup("html", <Page4_Interactive1 />)}
             style={{ overflow: "visible" }}
           >
-            <image className="svg-img"
+            <image
+              className="svg-img"
               href={arrowBtn}
               x="0"
               y="0"
@@ -232,7 +236,8 @@ const Page4 = ({ openPopup }) => {
             onClick={() => openPopup("html", <Page4_vocabulary />)}
             style={{ overflow: "visible" }}
           >
-            <image className="svg-img"
+            <image
+              className="svg-img"
               href={audioBtn}
               x="0"
               y="0"
@@ -254,19 +259,20 @@ const Page4 = ({ openPopup }) => {
               openPopup(
                 "html",
                 <FourImagesWithAudio
-                  images={[Rabbit, img1, img2, img3, img4]}
+                  images={[Rabbit, img1, img2, img3, img4, img5]}
                   audioSrc={longAudio}
                   checkpoints={[0, 2.9, 3.4, 4.2, 5.1]}
                   popupOpen={true}
                   titleQ={"Listen and read along."}
                   audioArr={imageSounds}
                   captions={captions}
-                />
+                />,
               )
             }
             style={{ overflow: "visible" }}
           >
-            <image className="svg-img"
+            <image
+              className="svg-img"
               href={arrowBtn}
               x="0"
               y="0"

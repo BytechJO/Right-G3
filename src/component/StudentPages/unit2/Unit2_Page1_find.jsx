@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import find_img from "../../../assets/imgs/test.png";//======= should change ==========
+import find_img from "../../../assets/imgs/test.png"; //======= should change ==========
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import MySVG from "../../../assets/imgs/test.png";
@@ -37,7 +37,7 @@ const Unit2_Page1_find = () => {
     if (!clickedPoint) {
       ValidationAlert.info(
         "Pay attention!",
-        "Please click on the image first."
+        "Please click on the image first.",
       );
       return;
     }
@@ -78,7 +78,7 @@ const Unit2_Page1_find = () => {
         >
           <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
           <h5 className="header-title-page8">
-            I need your help. Can you help me find the boat in the picture?
+            I need your help. Can you help me find the carriage in the picture?
           </h5>
         </div>
         <div style={{ position: "relative", display: "inline-block" }}>
@@ -123,7 +123,7 @@ const Unit2_Page1_find = () => {
                 height: `7%`,
                 pointerEvents: "none",
               }}
-            /> 
+            />
           )}
         </div>
       </div>
