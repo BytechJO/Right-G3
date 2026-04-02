@@ -65,11 +65,11 @@ function DropSlot({ id, content, isCorrect, isSubmitted }) {
   const { setNodeRef, isOver } = useSortable({ id });
   const borderColor = isSubmitted
     ? isCorrect
-      ? "border-green-500 bg-green-50"
-      : "border-red-500 bg-red-50"
+      ? "border-black"
+      : "border-red-500"
     : isOver
       ? "border-blue-400 bg-blue-50"
-      : "border-gray-300";
+      : "border-black";
   return (
     <div
       ref={setNodeRef}
@@ -193,7 +193,7 @@ const Unit2_Page5_Q3 = () => {
           }}
         >
           <h5 className="header-title-page8">
-            <span className="ex-A" style={{ marginRight: "20px" }}>
+            <span className="ex-A" style={{ marginRight: "10px" }}>
               B
             </span>
             Look, read, and write. Use the words below.

@@ -103,111 +103,126 @@ const Unit2_Page5_Q1 = () => {
           padding: "30px",
         }}
       >
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "20px" }}>
-            A
-          </span>
-          <span style={{ color: "#2e3192", marginRight: "20px" }}>1</span>
-          Look and write.
-        </h5>
+        <div className="div-forall">
+          <h5 className="header-title-page8">
+            <span className="ex-A" style={{ marginRight: "10px" }}>
+              A
+            </span>
+            <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
+            Look and write.
+          </h5>
 
-        <div className="w-[60%] mt-2">
-          <Droppable droppableId="word-bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center mb-6"
-              >
-                {wordBank
-                  .filter((w) => !usedWords.includes(w.id))
-                  .map((w, i) => (
-                    <Draggable
-                      key={w.id}
-                      draggableId={w.id}
-                      index={i}
-                      isDragDisabled={locked}
-                    >
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="px-4 py-1 rounded-lg border-2 border-[#2c5287] font-bold bg-white text-sm cursor-grab select-none"
-                          style={provided.draggableProps.style}
-                        >
-                          {w.text}
-                        </span>
-                      )}
-                    </Draggable>
-                  ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+          <div className=" mt-2">
+            <Droppable droppableId="word-bank" direction="horizontal">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center mb-6"
+                >
+                  {wordBank.map((w, i) => {
+                    const isUsed = usedWords.includes(w.id);
 
-          <div className="flex justify-center gap-20 mt-10">
-            {questions.map((q, qIndex) => (
-              <div key={qIndex} className="flex flex-col items-center gap-3">
-                {/* حاوية الصورة + الرقم */}
-                <div className="relative">
-                  {/* الرقم على زاوية الصورة */}
-                  <span className="absolute -top-2 -left-4 font-bold text-lg">
-                    {qIndex + 1}
-                  </span>
-
-                  {/* الصورة */}
-                  <img
-                    src={q.image}
-                    alt=""
-                    style={{
-                      width: "20vw",
-                      height: "20vh",
-                      objectFit: "cover",
-                      marginBottom: "20px",
-                    }}
-                  />
-
-                  <Droppable
-                    droppableId={`drop-${qIndex}`}
-                    isDropDisabled={locked}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`w-full min-h-10 border-b-2 border-black flex items-center justify-center text-center text-[16px] font-semibold px-1 relative ${
-                          snapshot.isDraggingOver ? "bg-blue-100" : ""
-                        }`}
+                    return (
+                      <Draggable
+                        key={w.id}
+                        draggableId={w.id}
+                        index={i}
+                        isDragDisabled={locked || isUsed}
                       >
-                        <span
-                          className={`${
-                            answers[qIndex]
-                              ? locked
-                                ? wrongInputs.includes(`${qIndex}`)
-                                  ? "text-red-500"
-                                  : "text-green-600"
-                                : "text-black"
-                              : "text-black"
-                          }`}
-                        >
-                          {wordBank.find((w) => w.id === answers[qIndex])
-                            ?.text || ""}
-                        </span>
-
-                        {provided.placeholder}
-
-                        {wrongInputs.includes(`${qIndex}`) && <WrongMark />}
-                      </div>
-                    )}
-                  </Droppable>
+                        {(provided) => (
+                          <span
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="px-4 py-1 rounded-lg border-2 border-[#2c5287] font-bold bg-white text-sm cursor-grab select-none"
+                            style={{
+                              padding: "6px 14px",
+                              border: "2px solid #2c5287",
+                              borderRadius: "10px",
+                              background: "#fff",
+                              fontWeight: "bold",
+                              fontSize: "14px",
+                              cursor: isUsed ? "not-allowed" : "grab",
+                              opacity: isUsed ? 0.4 : 1, // 🔥 فاتح
+                              ...provided.draggableProps.style,
+                            }}
+                          >
+                            {w.text}
+                          </span>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
                 </div>
-              </div>
-            ))}
+              )}
+            </Droppable>
+
+            <div className="flex justify-center gap-20 mt-10">
+              {questions.map((q, qIndex) => (
+                <div key={qIndex} className="flex flex-col items-center gap-3">
+                  {/* حاوية الصورة + الرقم */}
+                  <div className="relative">
+                    {/* الرقم على زاوية الصورة */}
+                    <span className="absolute -top-2 -left-4 font-bold text-lg">
+                      {qIndex + 1}
+                    </span>
+
+                    {/* الصورة */}
+                    <img
+                      src={q.image}
+                      alt=""
+                      style={{
+                        width: "20vw",
+                        height: "20vh",
+                        objectFit: "cover",
+                        marginBottom: "20px",
+                      }}
+                    />
+
+                    <Droppable
+                      droppableId={`drop-${qIndex}`}
+                      isDropDisabled={locked}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                          className={`w-full min-h-10 flex items-center justify-center text-center text-[16px] font-semibold px-1 relative ${
+                            snapshot.isDraggingOver ? "bg-blue-100" : ""
+                          }`}
+                          style={{
+                            borderBottom: locked
+                              ? wrongInputs.includes(`${qIndex}`)
+                                ? "2px solid #ef4444" // 🔴 غلط
+                                : "2px solid #000" // ⚫ صح
+                              : "2px solid #000",
+                          }}
+                        >
+                          <span
+                            style={{
+                              color: answers[qIndex] ? "#1C398E" : "#000", // 🔵 blue-600
+                              fontWeight: answers[qIndex] ? "bold" : "normal",
+                            }}
+                          >
+                            {wordBank.find((w) => w.id === answers[qIndex])
+                              ?.text || ""}
+                          </span>
+
+                          {provided.placeholder}
+
+                          {wrongInputs.includes(`${qIndex}`) && <WrongMark />}
+                        </div>
+                      )}
+                    </Droppable>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
       <Button
         handleShowAnswer={showAnswers}
         handleStartAgain={reset}

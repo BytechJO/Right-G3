@@ -1,67 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Unit3_Page6_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
-import img6 from "../../../assets/imgs/test.png";
 
 const data = [
   {
     id: 1,
-    src: img1,
-    text: "They can paint.",
-    options: [
-      { label: "eat", answer: false },
-      { label: "paint", answer: true },
-    ],
+    text: "There are a few cars in the street.",
+    secondText: "The street is full.",
+    correct: false,
   },
   {
     id: 2,
-    src: img2,
-    text: "She can fly a kite.",
-    options: [
-      { label: "kite", answer: true },
-      { label: "ride", answer: false },
-    ],
+    text: "Maria makes very few mistakes.",
+    secondText: "She’s an excellent student.",
+    correct: true,
   },
   {
     id: 3,
-    src: img3,
-    text: "He can stand on the bench.",
-    options: [
-      { label: "drum", answer: false },
-      { label: "bench", answer: true },
-    ],
+    text: "There is little light outside.",
+    secondText: "It is almost dark.",
+    correct: true,
   },
   {
     id: 4,
-    src: img4,
-    text: "I can ride a bike.",
-    options: [
-      { label: "bike", answer: true },
-      { label: "photo", answer: false },
-    ],
+    text: "On Mondays, there are few people at the theater.",
+    secondText: "The theater is full.",
+    correct: false,
   },
   {
     id: 5,
-    src: img5,
-    text: "We can make sandwiches.",
-    options: [
-      { label: "sandwiches", answer: true },
-      { label: "swim", answer: false },
-    ],
-  },
-  {
-    id: 6,
-    src: img6,
-    text: "He can play the drum.",
-    options: [
-      { label: "paint", answer: false },
-      { label: "drum", answer: true },
-    ],
+    text: "There is little food in the fridge.",
+    secondText: "It is almost empty.",
+    correct: true,
   },
 ];
 
@@ -86,8 +56,7 @@ const Unit3_Page6_Q2 = () => {
 
     // حساب عدد الإجابات الصحيحة
     data.forEach((q) => {
-      const chosenIndex = selected[q.id];
-      if (q.options[chosenIndex].answer === true) {
+      if (selected[q.id] === q.correct) {
         correct++;
       }
     });
@@ -112,17 +81,15 @@ const Unit3_Page6_Q2 = () => {
     setShowResult(true);
     setLocked(true);
   };
-  const handleSelect = (qId, index) => {
-    if (locked) return; // 🔒 منع التعديل بعد رؤية الحل
-    setSelected((prev) => ({ ...prev, [qId]: index }));
-    setShowResult(false);
+  const handleSelect = (qId, value) => {
+    if (locked) return;
+    setSelected((prev) => ({ ...prev, [qId]: value }));
   };
   const showAnswers = () => {
     const correctSelection = {};
 
     data.forEach((q) => {
-      const correctIndex = q.options.findIndex((opt) => opt.answer === true);
-      correctSelection[q.id] = correctIndex;
+      correctSelection[q.id] = q.correct;
     });
 
     setSelected(correctSelection);
@@ -151,63 +118,109 @@ const Unit3_Page6_Q2 = () => {
         }}
       >
         <h5 className="header-title-page8">
-          <span className="ex-A">E</span>Read and write{" "}
-          <span style={{ color: "#2e3192" }}>✓</span>.
+          <span className="ex-A">E</span>Read the first sentences carefully. Are
+          the second sentences right or wrong? Write
+          <span style={{ color: "#D1232A" }}>✓</span>or
+          <span style={{ color: "#D1232A" }}>✗</span>.
         </h5>
 
-       <div className="shorti-container-CB-unit3-p6-q2">
-  {data.map((question) => (
-    <div key={question.id} className="question-box-CB-unit3-p6-q2">
-      <span
-        style={{
-          color: "darkblue",
-          fontWeight: "700",
-          fontSize: "20px",
-        }}
-      >
-        {question.id}
-      </span>
+        <div className="w-full max-w-3xl space-y-6 mt-7">
+          {data.map((q) => (
+            <div key={q.id} className="flex justify-between items-start">
+              {/* LEFT TEXT */}
+              <div className="flex gap-3">
+                <span className="font-bold">{q.id}</span>
 
-      <div className="question-box2-CB-unit3-p6-q2">
-        {/* الصورة الواحدة */}
-        <img
-          src={question.src}
-          className="main-img-CB-unit3-p6-q2"
-          alt=""
-        />
-        <span>{question.text}</span>
-        {/* الخيارات */}
-        <div className="options-CB-unit3-p6-q2">
-          {question.options.map((opt, index) => (
-            <div
-              key={index}
-              className={`option-CB-unit3-p6-q2 ${
-                selected[question.id] === index
-                  ? "selected-CB-unit3-p6-q2"
-                  : ""
-              }`}
-              onClick={() => handleSelect(question.id, index)}
-            >
-              {/* X عند الغلط */}
-              {showResult &&
-                selected[question.id] === index &&
-                opt.answer === false && (
-                  <span className="wrong-x-circle-CB-unit3-p6-q2">
-                    ✕
+                <div className="flex flex-col">
+                  <span className="text-gray-900 text-[20px]">{q.text}</span>
+                  <span className="text-gray-900 text-[20px]">
+                    {/* 👇 حط الجملة الثانية هون */}
+                    {q.secondText}
                   </span>
-                )}
+                </div>
+              </div>
 
-              <span className="check-box-CB-unit3-p6-q2">
-                {selected[question.id] === index ? "✓" : ""}
-              </span>
+              {/* RIGHT CHECK BOX */}
+              <div className="flex gap-2">
+                {/* TRUE */}
+                <div
+                  onClick={() => handleSelect(q.id, true)}
+                  className={`relative w-8 h-8 border-2 rounded-md cursor-pointer flex items-center justify-center
+    ${
+      selected[q.id] === true
+        ? "border-blue-700 text-blue-700"
+        : "border-orange-400"
+    }`}
+                >
+                  {selected[q.id] === true && (
+                    <span className="font-bold">✓</span>
+                  )}
+
+                  {/* ❌ WRONG */}
+                  {showResult &&
+                    selected[q.id] === true &&
+                    q.correct !== true && (
+                      <span
+                        style={{
+                          marginLeft: "6px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "18px",
+                          height: "18px",
+                          background: "#ef4444",
+                          color: "white",
+                          borderRadius: "50%",
+                          fontSize: "12px",
+                        }}
+                        className="absolute -top-2 -right-2 text-red-500 text-xs shadow-2xl"
+                      >
+                        ✕
+                      </span>
+                    )}
+                </div>
+
+                {/* FALSE */}
+                <div
+                  onClick={() => handleSelect(q.id, false)}
+                  className={`relative w-8 h-8 border-2 rounded-md cursor-pointer flex items-center justify-center
+    ${
+      selected[q.id] === false
+        ? "border-blue-700 text-blue-700"
+        : "border-orange-400"
+    }`}
+                >
+                  {selected[q.id] === false && (
+                    <span className="font-bold">✗</span>
+                  )}
+
+                  {/* ❌ WRONG */}
+                  {showResult &&
+                    selected[q.id] === false &&
+                    q.correct !== false && (
+                      <span
+                        style={{
+                          marginLeft: "6px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "18px",
+                          height: "18px",
+                          background: "#ef4444",
+                          color: "white",
+                          borderRadius: "50%",
+                          fontSize: "12px",
+                        }}
+                        className="absolute -top-2 -right-2 text-red-500 text-xs shadow-2xl"
+                      >
+                        ✕
+                      </span>
+                    )}
+                </div>
+              </div>
             </div>
           ))}
         </div>
-      </div>
-    </div>
-  ))}
-</div>
-
       </div>
       <div className="action-buttons-container">
         <button

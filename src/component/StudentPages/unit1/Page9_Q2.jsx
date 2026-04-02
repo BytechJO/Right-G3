@@ -1,138 +1,98 @@
 import React, { useState } from "react";
-import ValidationAlert from "../../Popup/ValidationAlert";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-
+import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
 
 const Page9_Q2 = () => {
   const questions = [
     {
-      parts: [
-        { type: "text", value: "basketball player / young / referee" },
-        {
-          type: "input",
-          answer: "The basketball player is younger than the referee.",
-        },
-      ],
+      options: ["cat", "shorter", "bear"],
+      correct: ["cat", "shorter", "bear"],
     },
     {
-      parts: [
-        { type: "text", value: "cat / short / bear" },
-        { type: "input", answer: "The cat is shorter than the bear." },
-      ],
+      options: ["mouse", "smaller", "dog"],
+      correct: ["mouse", "smaller", "dog"],
     },
     {
-      parts: [
-        { type: "text", value: "mouse / small / dog" },
-        { type: "input", answer: "The mouse is smaller than the dog." },
-      ],
+      options: ["basketball player", "younger", "referee"],
+      correct: ["basketball player", "younger", "referee"],
     },
     {
-      parts: [
-        { type: "text", value: "basketball court / big / scoreboard" },
-        {
-          type: "input",
-          answer: "The basketball court is bigger than the scoreboard.",
-        },
-      ],
+      options: ["basketball court", "bigger", "scoreboard"],
+      correct: ["basketball court", "bigger", "scoreboard"],
     },
   ];
 
-  const [answers, setAnswers] = useState(
-    questions.map((q) => q.parts.map((p) => (p.type === "input" ? "" : null))),
-  );
-  const [wrongInputs, setWrongInputs] = useState([]);
+  const [answers, setAnswers] = useState(questions.map(() => ["", "", ""]));
   const [locked, setLocked] = useState(false);
+  const [wrong, setWrong] = useState([]);
 
-  const wordBank = [
-    { id: "w1", text: "The basketball player is younger than the referee." },
-    { id: "w3", text: "The mouse is smaller than the dog." },
-    { id: "w4", text: "The basketball court is bigger than the scoreboard." },
-    { id: "w2", text: "The cat is shorter than the bear." },
-  ];
   const onDragEnd = (result) => {
     if (!result.destination || locked) return;
 
     const { draggableId, destination } = result;
 
+    const [qIndex, slotIndex] = destination.droppableId
+      .replace("drop-", "")
+      .split("-")
+      .map(Number);
+
     setAnswers((prev) => {
       const copy = prev.map((row) => [...row]);
 
-      // remove word from previous place
-      copy.forEach((row, qi) =>
-        row.forEach((val, pi) => {
-          if (val === draggableId) copy[qi][pi] = "";
-        }),
-      );
+      copy[qIndex] = copy[qIndex].map((w) => (w === draggableId ? "" : w));
 
-      if (destination.droppableId.startsWith("drop-")) {
-        const [qIndex, pIndex] = destination.droppableId
-          .replace("drop-", "")
-          .split("-")
-          .map(Number);
-        copy[qIndex][pIndex] = draggableId;
-      }
+      copy[qIndex][slotIndex] = draggableId;
 
       return copy;
     });
-
-    setWrongInputs([]);
   };
-  const usedWords = answers.flat().filter(Boolean);
+
   const checkAnswers = () => {
     if (locked) return;
-    if (answers.some((row) => row.includes(""))) {
+    const hasEmpty = answers.some((row) => row.includes(""));
+
+    if (hasEmpty) {
       ValidationAlert.info();
       return;
     }
-    let wrong = [];
+    let wrongArr = [];
     let score = 0;
-    let total = 0;
 
-    questions.forEach((q, qIndex) => {
-      q.parts.forEach((p, pIndex) => {
-        if (p.type === "input") {
-          total++;
-          const word =
-            wordBank.find((w) => w.id === answers[qIndex][pIndex])?.text || "";
-          if (word === p.answer) score++;
-          else wrong.push(`${qIndex}-${pIndex}`);
-        }
-      });
+    questions.forEach((q, i) => {
+      const isCorrect =
+        JSON.stringify(answers[i]) === JSON.stringify(q.correct);
+
+      if (isCorrect) score++;
+      else wrongArr.push(i);
     });
 
-    setWrongInputs(wrong);
+    setWrong(wrongArr);
     setLocked(true);
 
-    const msg = `Score: ${score} / ${total}`;
-    if (score === total) ValidationAlert.success(msg);
+    const msg = `
+      <div style="font-size:20px;text-align:center;">
+        <span style="font-weight:bold;">
+          Score: ${score} / ${questions.length}
+        </span>
+      </div>
+            `;
+    if (score === questions.length) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
   };
 
-  const showAnswers = () => {
-    setAnswers(
-      questions.map((q) =>
-        q.parts.map((p) =>
-          p.type === "input"
-            ? wordBank.find((w) => w.text === p.answer)?.id || ""
-            : null,
-        ),
-      ),
-    );
-    setWrongInputs([]);
-    setLocked(true);
+  const reset = () => {
+    setAnswers(questions.map(() => ["", "", ""]));
+    setWrong([]);
+    setLocked(false);
   };
 
-  const reset = () => {
-    setAnswers(
-      questions.map((q) =>
-        q.parts.map((p) => (p.type === "input" ? "" : null)),
-      ),
-    );
-    setWrongInputs([]);
-    setLocked(false);
+  const showAnswer = () => {
+    setAnswers(questions.map((q) => q.correct));
+    setWrong([]);
+    setLocked(true);
   };
 
   return (
@@ -145,108 +105,197 @@ const Page9_Q2 = () => {
           padding: "30px",
         }}
       >
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "20px" }}>
-            E
-          </span>
-          Read and write the sentences.
-        </h5>
-        <div className="w-[60%]">
-          {/* WORD BANK */}
-          <Droppable droppableId="word-bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center mb-6"
-              >
-                {wordBank
-                  .filter((w) => !usedWords.includes(w.id))
-                  .map((w, i) => (
-                    <Draggable
-                      key={w.id}
-                      draggableId={w.id}
-                      index={i}
-                      isDragDisabled={locked}
-                    >
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="px-4 py-1 rounded-lg border-2 border-[#2c5287] font-bold bg-white text-sm cursor-grab select-none"
-                          style={provided.draggableProps.style}
-                        >
-                          {w.text}
-                        </span>
-                      )}
-                    </Draggable>
-                  ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+        <div className="div-forall">
+          <h5 className="header-title-page8 pb-2.5">
+            <span className="ex-A" style={{ marginRight: "10px" }}>
+              E
+            </span>
+            Read and write the sentences.
+          </h5>
 
-          {/* QUESTIONS */}
-          <div className="flex flex-col gap-7">
-            {questions.map((q, qIndex) => (
-              <div key={qIndex} className="flex items-center gap-5">
-                <span className="font-bold text-sm w-5 text-center">
-                  {qIndex + 1}
-                </span>
-                <div className="flex flex-col gap-2 flex-1">
-                  <span className="text-[16px] font-medium">
-                    {q.parts[0].value}
-                  </span>
+          <div className="flex flex-col gap-8 mt-6">
+            {questions.map((q, qIndex) => {
+              const isWrong = wrong.includes(qIndex);
 
+              return (
+                <div key={qIndex} className="flex flex-col gap-3">
+                  {/* OPTIONS */}
                   <Droppable
-                    droppableId={`drop-${qIndex}-1`}
-                    isDropDisabled={locked}
+                    droppableId={`bank-${qIndex}`}
+                    direction="horizontal"
                   >
-                    {(provided, snapshot) => (
+                    {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`w-full min-h-7 border-b-2  border-black flex items-center text-[16px] font-semibold px-1 relative ${
-                          snapshot.isDraggingOver ? "bg-blue-100" : ""
-                        }`}
+                        className="flex gap-3"
                       >
-                        <span
-                          className={`
-                            ${
-                              answers[qIndex][1]
-                                ? locked
-                                  ? wrongInputs.includes(`${qIndex}-1`)
-                                    ? "text-red-500"
-                                    : "text-green-600"
-                                  : "text-red-500"
-                                : "text-black"
-                            }
-                          `}
-                        >
-                          {wordBank.find((w) => w.id === answers[qIndex][1])
-                            ?.text || ""}
-                        </span>
+                        {q.options.map((word, i) => {
+                          const isUsed = answers[qIndex].includes(word);
 
+                          return (
+                            <Draggable
+                              key={word}
+                              draggableId={word}
+                              index={i}
+                              isDragDisabled={locked || isUsed}
+                            >
+                              {(provided) => (
+                                <span
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  style={{
+                                    padding: "6px 14px",
+                                    border: "2px solid #2c5287",
+                                    borderRadius: "10px",
+                                    background: "#fff",
+                                    fontWeight: "bold",
+                                    fontSize: "14px",
+                                    cursor: isUsed ? "not-allowed" : "grab",
+                                    opacity: isUsed ? 0.5 : 1,
+                                    ...provided.draggableProps.style,
+                                  }}
+                                >
+                                  {word}
+                                </span>
+                              )}
+                            </Draggable>
+                          );
+                        })}
                         {provided.placeholder}
-
-                        {/* ❌ WRONG */}
-                        {wrongInputs.includes(`${qIndex}-1`) && <WrongMark />}
                       </div>
                     )}
                   </Droppable>
+
+                  {/* SENTENCE */}
+                  <div
+                    style={{
+                      position: "relative",
+                      borderBottom: "2px solid #000",
+                      paddingBottom: "6px",
+                      minHeight: "30px",
+                    }}
+                  >
+                    The {/* الفراغ الأول */}
+                    <Droppable droppableId={`drop-${qIndex}-0`}>
+                      {(provided) => {
+                        const value = answers[qIndex][0];
+                        return (
+                          <span
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "80px",
+                              height: "28px",
+                              margin: "0 6px",
+                              borderBottom: locked
+                                ? wrong.includes(qIndex)
+                                  ? "2px solid #ef4444" // 🔴 غلط
+                                  : "2px solid #000" // ⚫ صح
+                                : "2px dashed #999",
+                              verticalAlign: "middle",
+                              color: value ? "#1C398E" : "#000",
+                              fontWeight: value ? "bold" : "normal",
+                            }}
+                          >
+                            {value}
+                            {provided.placeholder}
+                          </span>
+                        );
+                      }}
+                    </Droppable>{" "}
+                    is {/* الفراغ الثاني */}
+                    <Droppable droppableId={`drop-${qIndex}-1`}>
+                      {(provided) => {
+                        const value = answers[qIndex][1];
+                        return (
+                          <span
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "80px",
+                              height: "28px",
+                              margin: "0 6px",
+                              borderBottom: locked
+                                ? wrong.includes(qIndex)
+                                  ? "2px solid #ef4444" // 🔴 غلط
+                                  : "2px solid #000" // ⚫ صح
+                                : "2px dashed #999",
+                              verticalAlign: "middle",
+                              color: value ? "#1C398E" : "#000",
+                              fontWeight: value ? "bold" : "normal",
+                            }}
+                          >
+                            {value}
+                            {provided.placeholder}
+                          </span>
+                        );
+                      }}
+                    </Droppable>{" "}
+                    than the {/* الفراغ الثالث */}
+                    <Droppable droppableId={`drop-${qIndex}-2`}>
+                      {(provided) => {
+                        const value = answers[qIndex][2];
+                        return (
+                          <span
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "80px",
+                              height: "28px",
+                              borderBottom: locked
+                                ? wrong.includes(qIndex)
+                                  ? "2px solid #ef4444" // 🔴 غلط
+                                  : "2px solid #000" // ⚫ صح
+                                : "2px dashed #999",
+                              margin: "0 6px",
+                              verticalAlign: "middle",
+                              color: value ? "#1C398E" : "#000",
+                              fontWeight: value ? "bold" : "normal",
+                            }}
+                          >
+                            {value}
+                            {provided.placeholder}
+                          </span>
+                        );
+                      }}
+                    </Droppable>
+                    .
+                    {locked && isWrong && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "-25px",
+                          top: "0",
+                          zIndex: 10,
+                        }}
+                      >
+                        <WrongMark />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          <Button
+            handleShowAnswer={showAnswer}
+            handleStartAgain={reset}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
-      {/* ❌ الأزرار كما هي */}
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={reset}
-        checkAnswers={checkAnswers}
-      />
     </DragDropContext>
   );
 };

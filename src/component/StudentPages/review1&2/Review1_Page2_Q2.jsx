@@ -49,7 +49,7 @@ const Review1_Page2_Q2 = () => {
     if (locked) return;
 
     if (selected.includes("")) {
-      ValidationAlert.info("Please answer all questions.");
+      ValidationAlert.info();
       return;
     }
 
@@ -97,92 +97,129 @@ const Review1_Page2_Q2 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8">
-        <span style={{ marginRight: "20px" }}>D</span>
-        Does it have a{" "}
-        <span style={{ color: "#2e3192" }}>long vowel sound</span>? Listen and
-        write<span style={{ color: "#D52328" }}> ✓ </span>or
-        <span style={{ color: "#D52328" }}> ✗</span>
-      </h5>
-      <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={15} />
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "20px" }}>D</span>
+          Does it have a{" "}
+          <span style={{ color: "#2e3192" }}>long vowel sound</span>? Listen and
+          write<span style={{ color: "#D52328" }}> ✓ </span>or
+          <span style={{ color: "#D52328" }}> ✗</span>
+        </h5>
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
 
-      {/* GRID */}
-      <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center">
-        {items.map((item, i) => (
-          <div key={i} className="relative flex flex-col items-center">
-            {/* الرقم */}
-            <span className="absolute -top-2 -left-2 text-lg font-bold">
-              {i + 1}
-            </span>
+        {/* GRID */}
+        <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center">
+          {items.map((item, i) => (
+            <div key={i} className="relative flex flex-col items-center">
+              {/* الرقم */}
+              <span className="absolute -top-2 -left-2 text-lg font-bold">
+                {i + 1}
+              </span>
 
-            {/* الصورة */}
-            <img
-              src={item.img}
-              style={{
-                width: "15vw",
-                height: "15vh",
-                objectFit: "contain",
-              }}
-            />
+              {/* الصورة */}
+              <img
+                src={item.img}
+                style={{
+                  width: "15vw",
+                  height: "15vh",
+                  objectFit: "contain",
+                }}
+              />
 
-            <div className="flex gap-3 mt-3 items-center">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => choose(i, "yes")}
-                  className={`w-10 h-10 border-2 rounded-lg text-lg flex items-center justify-center ${
-                    locked
-                      ? selected[i] === "yes"
-                        ? item.correct === "yes"
-                          ? "bg-green-500 text-white border-green-500"
-                          : "bg-red-500 text-white border-red-500"
-                        : "border-gray-300"
-                      : selected[i] === "yes"
-                        ? "bg-purple-500 text-white border-purple-500"
-                        : "border-gray-300"
-                  }`}
+              <div className="flex gap-3 mt-3 items-center">
+                <div
+                  className="flex items-center gap-1"
+                  style={{ position: "relative" }}
                 >
-                  ✓
-                </button>
+                  <button
+                    onClick={() => choose(i, "yes")}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      cursor: "pointer",
 
-                {locked && selected[i] === "yes" && item.correct !== "yes" && (
-                  <WrongMark />
-                )}
-              </div>
+                      background: selected[i] === "yes" ? "#1C398E" : "#fff", // 🔵 دايماً
+                      color: selected[i] === "yes" ? "#fff" : "#000",
 
-              {/* NO */}
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => choose(i, "no")}
-                  className={`w-10 h-10 border-2 rounded-lg text-lg flex items-center justify-center ${
-                    locked
-                      ? selected[i] === "no"
-                        ? item.correct === "no"
-                          ? "bg-green-500 text-white border-green-500"
-                          : "bg-red-500 text-white border-red-500"
-                        : "border-gray-300"
-                      : selected[i] === "no"
-                        ? "bg-purple-500 text-white border-purple-500"
-                        : "border-gray-300"
-                  }`}
+                      border: "2px solid #ccc",
+                    }}
+                  >
+                    ✓
+                  </button>
+
+                  {locked &&
+                    selected[i] === "yes" &&
+                    item.correct !== "yes" && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "-35px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          zIndex: 10,
+                        }}
+                      >
+                        <WrongMark />
+                      </div>
+                    )}
+                </div>
+
+                {/* NO */}
+                <div
+                  className="flex items-center gap-1"
+                  style={{ position: "relative" }}
                 >
-                  ✗
-                </button>
+                  <button
+                    onClick={() => choose(i, "no")}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      cursor: "pointer",
 
-                {locked && selected[i] === "no" && item.correct !== "no" && (
-                  <WrongMark />
-                )}
+                      background: selected[i] === "no" ? "#1C398E" : "#fff",
+                      color: selected[i] === "no" ? "#fff" : "#000",
+
+                      border: "2px solid #ccc",
+                    }}
+                  >
+                    ✗
+                  </button>
+                  {locked && selected[i] === "no" && item.correct !== "no" && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "35px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        zIndex: 10,
+                      }}
+                    >
+                      <WrongMark />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* buttons */}
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={reset}
-        checkAnswers={checkAnswers}
-      />
+        {/* buttons */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
+      </div>
     </div>
   );
 };

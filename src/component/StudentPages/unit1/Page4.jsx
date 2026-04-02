@@ -2,11 +2,12 @@ import React, { useState, useRef } from "react";
 import page4 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0004.jpg";
 import allUnitSound from "../../../assets/audio/ClassBook/Unit 1/P 4/CD1.Pg4_U1Intro_Adult Lady.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4-5/Untitled-203.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4-5/Untitled-20.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4-5/Untitled-201.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4-5/Untitled-202.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4-5/Asset 437.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4-5/Asset 437 (2).svg";
 import sound1_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.2_Adult Lady.mp3";
 import sound2_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.3_Adult Lady.mp3";
 import sound3_letter from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_1.4_Adult Lady.mp3";
@@ -259,7 +260,7 @@ const Page4 = ({ openPopup }) => {
               openPopup(
                 "html",
                 <FourImagesWithAudio
-                  images={[Rabbit, img1, img2, img3, img4, img5]}
+                  images={[Rabbit, img1, img2, img3, img4]}
                   audioSrc={longAudio}
                   checkpoints={[0, 2.9, 3.4, 4.2, 5.1]}
                   popupOpen={true}

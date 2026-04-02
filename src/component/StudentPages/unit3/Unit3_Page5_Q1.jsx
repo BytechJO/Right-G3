@@ -1,203 +1,115 @@
-import React, { useState, useEffect, useRef } from "react";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import React, { useState } from "react";
 import "./Unit3_Page5_Q1.css";
-import sound1 from "../../../assets/audio/ClassBook/U 3/CD19.Pg26.Instruction1_Adult Lady.mp3";
-import { TbMessageCircle } from "react-icons/tb";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
+import ValidationAlert from "../../Popup/ValidationAlert";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 6.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 7.svg";
+import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 8.svg";
+import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 9.svg";
+
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import WrongMark from "../../WrongMark";
+
+const data = [
+  { img: img1, pattern: "icken", answer: "ch", position: "start" },
+  { img: img2, pattern: "pea", answer: "ch", position: "end" },
+  { img: img3, pattern: "fi", answer: "sh", position: "end" },
+  { img: img4, pattern: "wa", answer: "tch", position: "end" },
+  { img: img5, pattern: "ell", answer: "sh", position: "start" },
+  { img: img6, pattern: "ma", answer: "tch", position: "end" },
+  { img: img7, pattern: "kitchen", answer: "tch", position: "middle" },
+  { img: img8, pattern: "bea", answer: "ch", position: "end" },
+  { img: img9, pattern: "op", answer: "sh", position: "start" },
+];
 const Unit3_Page5_Q1 = () => {
-  const correctAnswers = ["j", "j", "j", "y"];
-  const [answers, setAnswers] = useState(["", "", "", ""]);
-  const [wrongInputs, setWrongInputs] = useState([]);
-  const [locked, setLocked] = useState(false);
-
-  /* ================ audio logic =========================*/
-
-  const audioRef = useRef(null);
-  const [showContinue, setShowContinue] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
-  const stopAtSecond = 3.5;
-  // إعدادات الصوت
-  const [showSettings, setShowSettings] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const settingsRef = useRef(null);
-  const [forceRender, setForceRender] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showCaption, setShowCaption] = useState(false);
-
-  // ================================
-  // ✔ Captions Array
-  // ================================
-  const captions = [
-    {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
-    },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
+  const [inputs, setInputs] = useState(Array(data.length).fill(""));
+  const [wrongInputs, setWrongInputs] = useState(
+    Array(data.length).fill(false),
+  );
+  const [showAnswer, setShowAnswer] = useState(false); // ⭐ NEW
+  const lettersBank = [
+    { id: "l1", value: "ch" },
+    { id: "l2", value: "tch" },
+    { id: "l3", value: "sh" },
   ];
 
-  // ================================
-  // ✔ Update caption highlight
-  // ================================
-  const updateCaption = (time) => {
-    const index = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end,
-    );
-    setActiveIndex(index);
-  };
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = 0;
-    audio.play();
-
-    const interval = setInterval(() => {
-      if (audio.currentTime >= stopAtSecond) {
-        audio.pause();
-        setPaused(true);
-        setIsPlaying(false);
-        setShowContinue(true);
-        clearInterval(interval);
-      }
-    }, 100);
-
-    // عند انتهاء الأوديو يرجع يبطل أنيميشن + يظهر Continue
-    const handleEnded = () => {
-      const audio = audioRef.current;
-      audio.currentTime = 0; // ← يرجع للبداية
-      setIsPlaying(false);
-      setPaused(false);
-      setActiveIndex(null);
-      setShowContinue(true);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      clearInterval(interval);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setForceRender((prev) => prev + 1);
-    }, 1000); // كل ثانية
-    if (activeIndex === -1 || activeIndex === null) return;
-
-    const el = document.getElementById(`caption-${activeIndex}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    return () => clearInterval(timer);
-  }, [activeIndex]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-
-    if (!audio) return;
-
-    if (audio.paused) {
-      audio.play();
-      setPaused(false);
-      setIsPlaying(true);
-    } else {
-      audio.pause();
-      setPaused(true);
-      setIsPlaying(false);
-    }
-  };
-
-  /* ================= Drag Logic ================= */
   const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination || locked) return;
+    if (!result.destination || showAnswer) return;
 
-    if (destination.droppableId.startsWith("slot-")) {
-      const index = Number(destination.droppableId.split("-")[1]);
-      const word = draggableId.replace("word-", "");
+    const letter = lettersBank.find((l) => l.id === result.draggableId)?.value;
+    const targetIndex = Number(result.destination.droppableId);
 
-      setAnswers((prev) => {
-        const updated = [...prev];
+    setInputs((prev) => {
+      const copy = [...prev];
+      copy[targetIndex] = letter; // ✔ نفس الحرف مسموح يتكرر
+      return copy;
+    });
 
-        updated[index] = word;
-        return updated;
-      });
-
-      setWrongInputs([]);
-    }
+    setWrongInputs(Array(data.length).fill(false));
   };
 
-  /* ================= Check Answers (كما هو) ================= */
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer) return; // ❌ ممنوع التعديل بعد Show Answer
 
-    if (answers.some((ans) => ans === "")) {
-      ValidationAlert.info("Please fill in all the blanks before checking!");
+    if (inputs.some((val) => val.trim() === "")) {
+      ValidationAlert.info(
+        "Oops!",
+        "Please fill in all the answers before checking.",
+      );
       return;
     }
 
-    let tempScore = 0;
-    let wrong = [];
+    let correctCount = 0;
+    const wrongFlags = [];
 
-    answers.forEach((ans, i) => {
-      if (ans === correctAnswers[i]) tempScore++;
-      else wrong.push(i);
+    data.forEach((item, index) => {
+      if (inputs[index].toLowerCase() === item.answer) {
+        correctCount++;
+        wrongFlags[index] = false;
+      } else {
+        wrongFlags[index] = true;
+      }
     });
 
-    setWrongInputs(wrong);
-
-    const total = correctAnswers.length;
+    setWrongInputs(wrongFlags);
+    setShowAnswer(true);
+    const total = data.length;
     const color =
-      tempScore === total ? "green" : tempScore === 0 ? "red" : "orange";
+      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
 
-    ValidationAlert[
-      tempScore === total ? "success" : tempScore === 0 ? "error" : "warning"
-    ](`
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold;">
-          Score: ${tempScore} / ${total}
+    const scoreMessage = `
+      <div style="font-size: 20px; text-align:center;">
+        <span style="color:${color}; font-weight:bold;">
+          Score: ${correctCount} / ${total}
         </span>
       </div>
-    `);
+    `;
 
-    setLocked(true);
+    if (correctCount === total) ValidationAlert.success(scoreMessage);
+    else if (correctCount === 0) ValidationAlert.error(scoreMessage);
+    else ValidationAlert.warning(scoreMessage);
+  };
+
+  const handleShowAnswer = () => {
+    const correct = data.map((item) => item.answer);
+    setInputs(correct); // ⭐ تعبئة الإجابة الصحيحة
+    setWrongInputs(Array(data.length).fill(false));
+    setShowAnswer(true);
   };
 
   const reset = () => {
-    setAnswers(["", "", "", ""]);
-    setWrongInputs([]);
-    setLocked(false);
-  };
-
-  const showAnswer = () => {
-    setAnswers([...correctAnswers]);
-    setWrongInputs([]);
-    setLocked(true);
+    setInputs(Array(data.length).fill(""));
+    setWrongInputs(Array(data.length).fill(false));
+    setShowAnswer(false);
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
-        className="question-wrapper-unit3-page6-q1"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -211,235 +123,207 @@ const Unit3_Page5_Q1 = () => {
           style={{
             display: "flex",
             flexDirection: "column",
-            // gap: "30px",
+            gap: "30px",
             width: "60%",
+            justifyContent: "flex-start",
           }}
         >
-          <h5 className="header-title-page8">
-            <span className="ex-A">A</span>{" "}
-            <span style={{ color: "#2e3192" }}>1</span>Does it begin with{" "}
-            <span style={{ color: "#2e3192" }}>j</span> or{" "}
-            <span style={{ color: "#2e3192" }}>y</span>? Listen and write.
-          </h5>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "30px",
-              width: "100%",
-            }}
-          >
-            <div
-              className="audio-popup-read"
-              style={{
-                width: "50%",
-              }}
-            >
-              <div className="audio-inner player-ui">
-                <audio
-                  ref={audioRef}
-                  src={sound1}
-                  onTimeUpdate={(e) => {
-                    const time = e.target.currentTime;
-                    setCurrent(time);
-                    updateCaption(time);
+          <div className="unscramble-container">
+            <h5 className="header-title-page8 pb-2.5">
+              <span className="ex-A" style={{ marginRight: "10px" }}>
+                A
+              </span>
+              Look and write<span style={{ color: "#2e3192" }}>ch</span>,
+              <span style={{ color: "#2e3192" }}>tch</span>or<span style={{ color: "#2e3192" }}>sh</span>.
+            </h5>
+
+            <Droppable droppableId="letters" direction="horizontal">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    padding: "10px",
+                    border: "2px dashed #ccc",
+                    borderRadius: "10px",
+                    marginTop: "20px",
+                    justifyContent: "center",
+                    width: "100%",
+                    // justifyContent: "center",
                   }}
-                  onLoadedMetadata={(e) => setDuration(e.target.duration)}
-                ></audio>
-                {/* Play / Pause */}
-                {/* Play / Pause */}
-                {/* الوقت - السلايدر - الوقت */}
-                <div className="top-row">
-                  <span className="audio-time">
-                    {new Date(current * 1000).toISOString().substring(14, 19)}
-                  </span>
-
-                  <input
-                    type="range"
-                    className="audio-slider"
-                    min="0"
-                    max={duration}
-                    value={current}
-                    onChange={(e) => {
-                      audioRef.current.currentTime = e.target.value;
-                      updateCaption(Number(e.target.value));
-                    }}
-                    style={{
-                      background: `linear-gradient(to right, #430f68 ${
-                        (current / duration) * 100
-                      }%, #d9d9d9ff ${(current / duration) * 100}%)`,
-                    }}
-                  />
-
-                  <span className="audio-time">
-                    {new Date(duration * 1000).toISOString().substring(14, 19)}
-                  </span>
-                </div>
-                {/* الأزرار 3 أزرار بنفس السطر */}
-                <div className="bottom-row">
-                  {/* فقاعة */}
-                  <div
-                    className={`round-btn ${showCaption ? "active" : ""}`}
-                    style={{ position: "relative" }}
-                    onClick={() => setShowCaption(!showCaption)}
-                  >
-                    <TbMessageCircle size={36} />
-                    <div
-                      className={`caption-inPopup ${showCaption ? "show" : ""}`}
-                      style={{ top: "100%", left: "10%" }}
+                >
+                  {lettersBank.map((l, i) => (
+                    <Draggable
+                      key={l.id}
+                      draggableId={l.id}
+                      index={i}
+                      isDragDisabled={showAnswer}
                     >
-                      {captions.map((cap, i) => (
-                        <p
-                          key={i}
-                          id={`caption-${i}`}
-                          className={`caption-inPopup-line2 ${
-                            activeIndex === i ? "active" : ""
-                          }`}
-                        >
-                          {cap.text}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Play */}
-                  <button className="play-btn2" onClick={togglePlay}>
-                    {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
-                  </button>
-
-                  {/* Settings */}
-                  <div className="settings-wrapper" ref={settingsRef}>
-                    <button
-                      className={`round-btn ${showSettings ? "active" : ""}`}
-                      onClick={() => setShowSettings(!showSettings)}
-                    >
-                      <IoMdSettings size={36} />
-                    </button>
-
-                    {showSettings && (
-                      <div className="settings-popup">
-                        <label>Volume</label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.05"
-                          value={volume}
-                          onChange={(e) => {
-                            setVolume(e.target.value);
-                            audioRef.current.volume = e.target.value;
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            padding: "7px 14px",
+                            border: "2px solid #2c5287",
+                            borderRadius: "8px",
+                            background: "white",
+                            fontWeight: "bold",
+                            cursor: "grab",
+                            fontSize: "22px",
+                            ...provided.draggableProps.style,
                           }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>{" "}
-              </div>
-            </div>
-          </div>
-          {/* 🔤 Word Bank */}
-          <Droppable droppableId="bank" direction="horizontal" isDropDisabled>
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  padding: "10px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  // margin: "10px 0",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {["j", "y"].map((word, index) => (
-                  <Draggable
-                    key={word}
-                    draggableId={`word-${word}`}
-                    index={index}
-                    isDragDisabled={locked}
-                  >
-                    {(provided) => (
+                        >
+                          {l.value}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+
+            <div className="unscramble-row-wb-unit1-p8-q1 ">
+              {data.map((item, index) => (
+                <div className="unscramble-box" key={index}>
+                  <div className="input-row-wb-unit1-p8-q1">
+                    <span
+                      className="num"
+                      style={{ fontSize: "25px", fontWeight: "600" }}
+                    >
+                      {index + 1}
+                    </span>
+                    <div className="img-box-wb-unit1-p8-q1">
+                      <img src={item.img} alt="" />
+                    </div>
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "inline-flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <span
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
+                        className="pattern"
                         style={{
-                          padding: "7px 14px",
-                          border: "2px solid #2c5287",
-                          borderRadius: "8px",
-                          background: "white",
-                          fontWeight: "bold",
-                          cursor: "grab",
-                          ...provided.draggableProps.style,
+                          fontSize: "22px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
                         }}
                       >
-                        {word}
-                      </span>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+                        {/* start */}
+                        {item.position === "start" && (
+                          <Droppable
+                            droppableId={String(index)}
+                            isDropDisabled={showAnswer}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className={`WB-unit1-p8-q1-input ${
+                                  wrongInputs[index] ? "wrong-line" : ""
+                                }`}
+                                style={{
+                                  color: inputs[index] ? "#1C398E" : "#000",
+                                }}
+                              >
+                                {inputs[index]}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        )}
 
-          <div className="row-content10-CB-unit3-p5-q1">
-            {[img1, img2, img3, img4].map((img, index) => (
-              <div className="row2-CB-review2-p1-q2" key={index}>
-                <img src={img} className="q-img-CB-review2-p1-q2" />
+                        {item.position !== "middle" && item.pattern}
 
-                <Droppable droppableId={`slot-${index}`}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`q-input-CB-review2-p2-q1 ${
-                        snapshot.isDraggingOver ? "drag-over-cell" : ""
-                      }`}
-                    >
-                      {answers[index] && (
-                        <Draggable
-                          draggableId={`slot-${index}-${answers[index]}`}
-                          index={0}
-                          isDragDisabled={true}
-                        >
-                          {(provided) => (
-                            <span
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                        {/* end */}
+                        {item.position === "end" && (
+                          <Droppable
+                            droppableId={String(index)}
+                            isDropDisabled={showAnswer}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className={`WB-unit1-p8-q1-input ${
+                                  wrongInputs[index] ? "wrong-line" : ""
+                                }`}
+                                style={{
+                                  color: inputs[index] ? "#1C398E" : "#000",
+                                }}
+                              >
+                                {inputs[index]}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        )}
+
+                        {/* middle */}
+                        {item.position === "middle" && (
+                          <>
+                            {"ki"} {/* أول جزء */}
+                            <Droppable
+                              droppableId={String(index)}
+                              isDropDisabled={showAnswer}
                             >
-                              {answers[index]}
-                            </span>
-                          )}
-                        </Draggable>
-                      )}
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.droppableProps}
+                                  className={`WB-unit1-p8-q1-input ${
+                                    wrongInputs[index] ? "wrong-line" : ""
+                                  }`}
+                                  style={{
+                                    color: inputs[index] ? "#1C398E" : "#000",
+                                  }}
+                                >
+                                  {inputs[index]}
+                                  {provided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
+                            {"en"} {/* آخر جزء */}
+                          </>
+                        )}
+                      </span>
 
-                      {provided.placeholder}
-
-                      {wrongInputs.includes(index) && (
-                        <span className="error-mark-input-CB-review2-p1-q2">
-                          ✕
-                        </span>
+                      {/* ✅ WrongMark INLINE */}
+                      {wrongInputs[index] && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "-1px",
+                            top: "50%",
+                            marginLeft: 0,
+                          }}
+                        >
+                          <WrongMark />
+                        </div>
                       )}
                     </div>
-                  )}
-                </Droppable>
-              </div>
-            ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
+        {/* ⭐ BUTTONS */}
         <div className="action-buttons-container">
           <button onClick={reset} className="try-again-button">
             Start Again ↻
           </button>
 
           <button
-            onClick={showAnswer}
+            onClick={handleShowAnswer}
             className="show-answer-btn swal-continue"
           >
             Show Answer

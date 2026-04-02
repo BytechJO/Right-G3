@@ -124,18 +124,22 @@ export default function QuestionAudioPlayer({
             <span className="audio-time">
               {new Date(current * 1000).toISOString().substring(14, 19)}
             </span>
-
-            <input
-              type="range"
-              className="audio-slider"
-              min="0"
-              max={duration}
-              value={current}
-              onChange={(e) => {
-                audioRef.current.currentTime = e.target.value;
-                updateCaption(Number(e.target.value));
-              }}
-            />
+ <input
+                type="range"
+                className="audio-slider"
+                min="0"
+                max={duration}
+                value={current}
+                onChange={(e) => {
+                  audioRef.current.currentTime = e.target.value;
+                  updateCaption(Number(e.target.value));
+                }}
+                style={{
+                  background: `linear-gradient(to right, #430f68 ${
+                    (current / duration) * 100
+                  }%, #d9d9d9ff ${(current / duration) * 100}%)`,
+                }}
+              />
 
             <span className="audio-time">
               {new Date(duration * 1000).toISOString().substring(14, 19)}

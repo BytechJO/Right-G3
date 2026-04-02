@@ -101,7 +101,16 @@ const Review1_Page1_Q2 = () => {
       });
     });
 
-    const msg = `Score: ${correct} / ${total}`;
+    const color =
+      correct === total ? "green" : correct === 0 ? "red" : "orange";
+
+    const msg = `
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${correct} / ${total}
+    </span>
+  </div>
+`;
 
     if (correct === total) ValidationAlert.success(msg);
     else if (correct === 0) ValidationAlert.error(msg);
@@ -121,160 +130,176 @@ const Review1_Page1_Q2 = () => {
           padding: "30px",
         }}
       >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>B</span>
-          Read, look, and write. You can answer in two ways.
-        </h5>
+        <div className="div-forall">
+          <h5 className="header-title-page8">
+            <span style={{ marginRight: "10px" }}>B</span>
+            Read, look, and write. You can answer in two ways.
+          </h5>
 
-        {/* ANSWER BANK */}
-        <Droppable droppableId="bank" direction="horizontal">
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              style={{ display: "flex", gap: "10px", marginBottom: "20px" }}
-            >
-              {answersBank.map((a, index) => (
-                <Draggable
-                  key={a}
-                  draggableId={a}
-                  index={index}
-                  isDragDisabled={locked}
+          {/* ANSWER BANK */}
+          <Droppable droppableId="bank" direction="horizontal">
+            {(provided) => (
+              <div style={{ textAlign: "center" }}>
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{
+                    display: "inline-flex", 
+                    justifyContent: "center",
+                    gap: "10px",
+                    marginBottom: "20px",
+                    border: "2px dashed #2c5287",
+                    borderRadius: "12px",
+                    padding: "10px",
+                  }}
                 >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={{
-                        padding: "10px 15px",
-                        background: "#fde68a",
-                        borderRadius: "8px",
-                        cursor: "grab",
-                        ...provided.draggableProps.style,
-                      }}
+                  {answersBank.map((a, index) => (
+                    <Draggable
+                      key={a}
+                      draggableId={a}
+                      index={index}
+                      isDragDisabled={locked}
                     >
-                      {a}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-
-        {/* QUESTIONS */}
-        {questions.map((q, qIndex) => (
-          <div
-            key={q.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "50px",
-              marginBottom: "40px",
-              width: "60%",
-            }}
-          >
-            {/* LEFT */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "80px auto",
-                alignItems: "center",
-                gap: "20px",
-              }}
-            >
-              <div style={{ fontWeight: "bold", gap: "10px" }}>
-                {q.id} {q.label}
-              </div>
-
-              <div style={{ display: "flex", gap: "20px" }}>
-                {q.images.map((img, i) => {
-                  const letter = ["A", "B", "C"][i];
-                  return (
-                    <div key={i} style={{ textAlign: "center" }}>
-                      <img
-                        src={img}
-                        alt=""
-                        style={{
-                          width: "80px",
-                          height: "80px",
-                          objectFit: "contain",
-                        }}
-                      />
-                      <p style={{ fontWeight: "bold" }}>{letter}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* RIGHT */}
-            <div style={{ width: "320px" }}>
-              {Object.keys(q.answers).map((type) => (
-                <Droppable key={type} droppableId={`${qIndex}-${type}`}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      style={{
-                        marginBottom: "12px",
-                        minHeight: "40px",
-                        background: snapshot.isDraggingOver
-                          ? "#dbeafe"
-                          : "#f9f9f9",
-                        borderBottom: "2px solid black",
-                        padding: "5px",
-                        position: "relative",
-                      }}
-                    >
-                      <p>
-                        <span
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
                           style={{
-                            color: showResult
-                              ? answers[`${qIndex}-${type}`] === q.answers[type]
-                                ? "green"
-                                : "red"
-                              : "red",
+                            padding: "6px 14px",
+                            border: "2px solid #2c5287",
+                            borderRadius: "10px",
+                            background: "#fff",
                             fontWeight: "bold",
+                            ...provided.draggableProps.style,
                           }}
                         >
-                          {answers[`${qIndex}-${type}`] || "___"}
-                        </span>{" "}
-                        is the {type}.
-                      </p>
+                          {a}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              </div>
+            )}
+          </Droppable>
 
-                      {/* WRONG MARK */}
-                      {showResult &&
-                        answers[`${qIndex}-${type}`] &&
-                        answers[`${qIndex}-${type}`] !== q.answers[type] && (
-                          <div
+          {/* QUESTIONS */}
+          {questions.map((q, qIndex) => (
+            <div
+              key={q.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "50px",
+                marginBottom: "40px",
+              }}
+            >
+              {/* LEFT */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "80px auto",
+                  alignItems: "center",
+                  gap: "20px",
+                }}
+              >
+                <div style={{ fontWeight: "bold", gap: "10px" }}>
+                  {q.id} {q.label}
+                </div>
+
+                <div style={{ display: "flex", gap: "20px" }}>
+                  {q.images.map((img, i) => {
+                    const letter = ["A", "B", "C"][i];
+                    return (
+                      <div key={i} style={{ textAlign: "center" }}>
+                        <img
+                          src={img}
+                          alt=""
+                          style={{
+                            width: "80px",
+                            height: "80px",
+                            objectFit: "contain",
+                          }}
+                        />
+                        <p style={{ fontWeight: "bold" }}>{letter}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* RIGHT */}
+              <div style={{ width: "320px" }}>
+                {Object.keys(q.answers).map((type) => (
+                  <Droppable key={type} droppableId={`${qIndex}-${type}`}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        style={{
+                          marginBottom: "12px",
+                          minHeight: "40px",
+                          background: snapshot.isDraggingOver
+                            ? "#dbeafe"
+                            : "#f9f9f9",
+                          borderBottom: locked
+                            ? answers[`${qIndex}-${type}`] === q.answers[type]
+                              ? "2px solid #000"
+                              : "2px solid #ef4444"
+                            : "2px solid #000",
+                          padding: "5px",
+                          position: "relative",
+                        }}
+                      >
+                        <p>
+                          <span
                             style={{
-                              position: "absolute",
-                              right: "-20px",
-                              top: "0",
+                              color: answers[`${qIndex}-${type}`]
+                                ? "#1C398E"
+                                : "#000",
+                              fontWeight: answers[`${qIndex}-${type}`]
+                                ? "bold"
+                                : "normal",
                             }}
                           >
-                            <WrongMark />
-                          </div>
-                        )}
+                            {answers[`${qIndex}-${type}`] || "___"}
+                          </span>{" "}
+                          is the {type}.
+                        </p>
 
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              ))}
+                        {/* WRONG MARK */}
+                        {showResult &&
+                          answers[`${qIndex}-${type}`] &&
+                          answers[`${qIndex}-${type}`] !== q.answers[type] && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                right: "-20px",
+                                top: "0",
+                              }}
+                            >
+                              <WrongMark />
+                            </div>
+                          )}
+
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* BUTTONS */}
-        <Button
-          handleShowAnswer={showAnswers}
-          handleStartAgain={reset}
-          checkAnswers={checkAnswers}
-        />
+          {/* BUTTONS */}
+          <Button
+            handleShowAnswer={showAnswers}
+            handleStartAgain={reset}
+            checkAnswers={checkAnswers}
+          />
+        </div>
       </div>
     </DragDropContext>
   );

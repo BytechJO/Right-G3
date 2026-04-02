@@ -1,5 +1,6 @@
 /* ============page 4=============== */
 .page {
+  overflow: visible;
   position: relative;
   width: 100%;
   max-width: 900px; /* حجم مناسب */
@@ -46,7 +47,7 @@
 .vocab_container {
   position: absolute;
   bottom: 5%;
-  right: 8%;
+  right: -180px; /* 👈 هذا أهم سطر (طلّع الصندوق لبرا) */
   display: flex;
   flex-direction: column;
   align-items: flex-start;

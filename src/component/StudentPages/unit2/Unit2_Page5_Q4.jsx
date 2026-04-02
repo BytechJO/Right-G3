@@ -227,15 +227,15 @@ const Unit2_Page5_Q4 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8 pb-2.5">
-        <span className="ex-A" style={{ marginRight: "20px" }}>
-          C
-        </span>
-        What do Tom and his family enjoy about France in Vacation in France on
-        page 11?
-      </h5>
+      <div className="div-forall">
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            C
+          </span>
+          What do Tom and his family enjoy about France in Vacation in France on
+          page 11?
+        </h5>
 
-      <div style={{ width: "60%" }}>
         {/* Words */}
         <div className="flex flex-wrap justify-center gap-5 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
           {wordsToFind.map((word) => (
@@ -336,14 +336,14 @@ const Unit2_Page5_Q4 = () => {
             />
           </div>
         </div>
-      </div>
 
-      {/* BUTTONS */}
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={reset}
-        checkAnswers={checkAnswers}
-      />
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
+      </div>
     </div>
   );
 };

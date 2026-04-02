@@ -1,12 +1,17 @@
 import React, { useState, useRef } from "react";
-import page_3 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0024.jpg";
+import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 24.png";
 import "./unit3_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 3/CD17.Pg24_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 3/Pg24_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 3/Pg24_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 3/Pg24_2.1_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 3/Pg24_3.1_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 3/Pg24_4.1_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 3/P 24/fullAudio.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_1.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_1.3_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_1.4_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_5.1_Lala.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_5.2_Lala's Mom.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_6.1_Lala.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_6.2_Lala's Mom.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_7.1_Lala.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 3/P 24/Pg24_7.2_Lala's Mom.mp3";
 
 
 import AudioWithCaption from "../../AudioWithCaption";
@@ -19,39 +24,109 @@ const Unit3_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 12, Exercise 1. Right Grammar." },
-    { start: 3.25, end: 7.11, text: " How old are you? I'm seven years old." },
     {
-      start: 7.15,
-      end: 11.02,
-      text: " When is your birthday? My birthday is in August.",
+      start: 0.0,
+      end: 3.67,
+      text: "Page 24, exercise one. Write grammar.",
     },
     {
-      start: 11.06,
-      end: 13.11,
-      text: "It is on Tuesday. ",
+      start: 4.1,
+      end: 7.42,
+      text: " Do you, we, they, have any caps?",
     },
-    { start: 13.15, end: 14.22, text: "How old are you, Sara? " },
-    { start: 14.26, end: 16.05, text: "I'm three years old. " },
-    { start: 16.09, end: 17.24, text: "When is your birthday party, Stella? " },
-    { start: 17.27, end: 19.16, text: "It is on Tuesday. " },
     {
-      start: 19.2,
-      end: 22.1,
-      text: "Happy birthday! This is for you, Stella. ",
+      start: 8.2,
+      end: 13.2,
+      text: "Yes, I, we, they, do have some. ",
     },
-    { start: 22.14, end: 23.1, text: "Thank you.  " },
-    { start: 23.14, end: 25.05, text: "You're welcome. Open it." },
+    {
+      start: 14.32,
+      end: 18.12,
+      text: "No, I, we, they, don't have any.",
+    },
+    {
+      start: 19.06,
+      end: 22.86,
+      text: "Does he, she, have any fruit?",
+    },
+    {
+      start: 22.86,
+      end: 26.0,
+      text: "Does he, she, have a ball?",
+    },
+    {
+      start: 27.04,
+      end: 29.98,
+      text: "Does it have any fruit? ",
+    },
+    {
+      start: 30.1,
+      end: 32,
+      text: " Does it have a ball?",
+    },
+    {
+      start: 32.78,
+      end: 35.58,
+      text: "Yes, he, she, has some.",
+    },
+    {
+      start: 36.2,
+      end: 40.14,
+      text: "Yes, he, she, has one.",
+    },
+    {
+      start: 41.2,
+      end: 43.66,
+      text: "No, it hasn't any.",
+    },
+    {
+      start: 44.86,
+      end: 48.08,
+      text: "No, it hasn't one.",
+    },
+    {
+      start: 48.08,
+      end: 51.24,
+      text: "Do we have any fruit in the fridge, Mom?",
+    },
+    {
+      start: 51.24,
+      end: 53.1,
+      text: "Yes, we do have some.",
+    },
+    {
+      start: 53.1,
+      end: 56.12,
+      text: "Do we have any orange juice, Mom?",
+    },
+    {
+      start: 56.12,
+      end: 58.4,
+      text: "Yes, we do have some.",
+    },
+    {
+      start: 58.4,
+      end: 60.78,
+      text: "Do we have any carrots?",
+    },
+    {
+      start: 60.78,
+      end: 62.14,
+      text: "No, we don't have any.",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
-    { x1: 54.2, y1: 17.0, x2: 74.1, y2: 20.4, sound: sound5 },
-
-    
+    { x1: 6.5, y1: 10, x2: 49, y2: 15.0, sound: sound1 },
+    { x1: 53, y1: 9, x2: 92, y2: 15, sound: sound2 },
+    { x1: 6.5, y1: 15.8, x2: 49, y2: 29, sound: sound3 },
+    { x1: 53.5, y1: 16.7, x2: 92, y2: 27.8, sound: sound4 },
+    { x1: 5.5, y1: 29, x2: 37, y2: 34, sound: sound5 },
+    { x1: 25.5, y1: 35, x2:51.5, y2: 38.5, sound: sound6 },
+    { x1: 53.5, y1: 30, x2:94, y2: 34, sound: sound7 },
+    { x1: 67, y1: 57.9, x2:93.5, y2: 61.5, sound: sound8 },
+    { x1: 6.5, y1: 73.5, x2: 27, y2: 79, sound: sound9},
+    { x1: 44.5, y1: 63.5, x2:70.7, y2: 67, sound: sound10 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

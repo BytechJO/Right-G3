@@ -70,11 +70,16 @@ const Review1_Page1_Q1 = () => {
 
     const total = requiredQuestions.length;
 
+    const color =
+      correct === total ? "green" : correct === 0 ? "red" : "orange";
+
     const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <b>Score: ${correct} / ${total}</b>
-    </div>
-  `;
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${correct} / ${total}
+    </span>
+  </div>
+`;
 
     if (correct === total) ValidationAlert.success(msg);
     else if (correct === 0) ValidationAlert.error(msg);
@@ -92,141 +97,166 @@ const Review1_Page1_Q1 = () => {
           padding: "30px",
         }}
       >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>A</span>
-          Look, read, and answer the questions.
-        </h5>
+        <div className="div-forall">
+          <h5 className="header-title-page8">
+            <span style={{ marginRight: "10px" }}>A</span>
+            Look, read, and answer the questions.
+          </h5>
 
-        {/* IMAGES */}
-        <div className="w-[70%] mx-auto">
-          <div className="flex justify-center gap-8 ">
-            <div className="relative">
-              <img
-                src={imgA}
-                style={{
-                  width: "100%",
-                  height: "30vh",
-                  objectFit: "contain",
-                }}
-              />
+          {/* IMAGES */}
+          <div >
+            <div className="flex justify-center gap-8 ">
+              <div className="relative">
+                <img
+                  src={imgA}
+                  style={{
+                    width: "100%",
+                    height: "30vh",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* ANSWERS BANK */}
+            {/* ANSWERS BANK */}
 
-          <Droppable droppableId="bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex flex-wrap gap-4 justify-center mb-5 mt-2"
-              >
-                {answersBank
-                  .filter((a) => !Object.values(answers).includes(a))
-                  .map((a, index) => (
-                    <Draggable
-                      key={a}
-                      draggableId={a}
-                      index={index}
-                      isDragDisabled={locked}
-                    >
+            <Droppable droppableId="bank" direction="horizontal">
+              {(provided) => (
+                <div style={{ textAlign: "center" }}>
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="flex flex-wrap gap-4 mb-5 mt-2"
+                    style={{
+                      display: "inline-flex", 
+                      border: "2px dashed #2c5287",
+                      borderRadius: "12px",
+                      padding: "10px",
+                    }}
+                  >
+                    {answersBank.map((a, index) => {
+                      const isUsed = Object.values(answers).includes(a);
+
+                      return (
+                        <Draggable
+                          key={a}
+                          draggableId={a}
+                          index={index}
+                          isDragDisabled={locked || isUsed}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                padding: "6px 14px",
+                                border: "2px solid #2c5287",
+                                borderRadius: "10px",
+                                background: "#fff",
+                                fontWeight: "bold",
+                                fontSize: "14px",
+                                cursor: isUsed ? "not-allowed" : "grab",
+                                opacity: isUsed ? 0.4 : 1,
+                                ...provided.draggableProps.style,
+                              }}
+                            >
+                              {a}
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+
+                    {provided.placeholder}
+                  </div>
+                </div>
+              )}
+            </Droppable>
+
+            {/* QUESTIONS GRID */}
+
+            <div className="grid grid-cols-2 gap-x-16 mb-20 ">
+              {questions.map((q) => (
+                <div key={q.id}>
+                  <div className="flex gap-3 text-lg">
+                    <span className="font-bold">{q.id}</span>
+                    <p>{q.text}</p>
+                  </div>
+
+                  {q.id === 7 ? (
+                    <input
+                      value={textAnswer}
+                      onChange={(e) => setTextAnswer(e.target.value)}
+                      disabled={locked}
+                      placeholder="Type your answer..."
+                      className="border-b-2 border-black w-full mt-2 outline-none"
+                    />
+                  ) : (
+                    <Droppable droppableId={`answer-${q.id}`}>
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="bg-yellow-200 px-4 py-2 rounded-lg cursor-grab"
-                        >
-                          {a}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-
-          {/* QUESTIONS GRID */}
-
-          <div className="grid grid-cols-2 gap-x-16 mb-20 ">
-            {questions.map((q) => (
-              <div key={q.id}>
-                <div className="flex gap-3 text-lg">
-                  <span className="font-bold">{q.id}</span>
-                  <p>{q.text}</p>
-                </div>
-
-                {q.id === 7 ? (
-                  <input
-                    value={textAnswer}
-                    onChange={(e) => setTextAnswer(e.target.value)}
-                    disabled={locked}
-                    placeholder="Type your answer..."
-                    className="border-b-2 border-black w-full mt-2 outline-none"
-                  />
-                ) : (
-                  <Droppable droppableId={`answer-${q.id}`}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="border-b-2 border-black min-h-10 mt-2"
-                      >
-                        <div
+                          {...provided.droppableProps}
                           style={{
-                            position: "relative",
-                            display: "inline-block",
+                            borderBottom: locked
+                              ? answers[q.id] === q.answer
+                                ? "2px solid #000" // صح
+                                : "2px solid #ef4444" // غلط
+                              : "2px solid #000",
                           }}
+                          className=" min-h-10 mt-2"
                         >
-                          <p>
-                            Clown{" "}
-                            <span
-                              style={{
-                                color: showResult
-                                  ? answers[q.id] === q.answer
-                                    ? "green"
-                                    : "red"
-                                  : "red",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {answers[q.id] || "___"}
-                            </span>{" "}
-                            is the {q.text.split("the ")[1].replace("?", "")}.
-                          </p>
-
-                          {showResult &&
-                            answers[q.id] &&
-                            answers[q.id] !== q.answer && (
-                              <div
+                          <div
+                            style={{
+                              position: "relative",
+                              display: "inline-block",
+                            }}
+                          >
+                            <p>
+                              Clown{" "}
+                              <span
                                 style={{
-                                  position: "absolute",
-                                  right: "-20px",
-                                  top: "0",
+                                  color: answers[q.id] ? "#1C398E" : "#000",
+                                  fontWeight: answers[q.id] ? "bold" : "normal",
                                 }}
                               >
-                                <WrongMark />
-                              </div>
-                            )}
-                        </div>
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* BUTTONS */}
+                                {answers[q.id] || "___"}
+                              </span>{" "}
+                              is the {q.text.split("the ")[1].replace("?", "")}.
+                            </p>
 
-        <Button
-          handleShowAnswer={showAnswers}
-          handleStartAgain={reset}
-          checkAnswers={checkAnswers}
-        />
+                            {showResult &&
+                              answers[q.id] &&
+                              answers[q.id] !== q.answer && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    right: "-20px",
+                                    top: "0",
+                                  }}
+                                >
+                                  <WrongMark />
+                                </div>
+                              )}
+                          </div>
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* BUTTONS */}
+
+          <Button
+            handleShowAnswer={showAnswers}
+            handleStartAgain={reset}
+            checkAnswers={checkAnswers}
+          />
+        </div>
       </div>
     </DragDropContext>
   );

@@ -1,54 +1,112 @@
 import React, { useState, useRef } from "react";
-import page_4 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0025.jpg";
-import "./unit3_Page4.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 3/CD18.Pg25_Grammar2_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 3/Pg25_2.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 3/Pg25_2.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 3/Pg25_2.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 3/Pg25_2.4_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 3/Pg25_2.5_Adult Lady.mp3";
-import sound6 from "../../../assets/audio/ClassBook/U 3/Pg25_2.6_Adult Lady.mp3";
-import sound7 from "../../../assets/audio/ClassBook/U 3/Pg25_3.1_Adult Lady.mp3";
-import sound8 from "../../../assets/audio/ClassBook/U 3/Pg25_4.1_Adult Lady.mp3";
+import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 25.png";
+import "./unit3_Page3.css";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 3/P 25/fullAudio.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_2.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_2.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_2.3_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_2.4_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_3.1_Lala.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_3.2_Lala's Mom.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_4.1_Lala.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_4.2_Lala's Mom.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_5.1_Lala.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_5.2_Lala's Mom.mp3";
 
-// import video from "../../../assets/img_unit3/sounds-unit3/p13.mp4";
+import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-import AudioWithCaption from "../../AudioWithCaption";
-
+// import video from "../../../assets/img_unit3/sounds-unit3/p12 1920.mp4";
 const Unit3_Page4 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 4.07, text: " Page 13, exercise 2. Right Grammar. " },
-    { start: 4.1, end: 5.12, text: " What is it? " },
-    { start: 5.15, end: 6.15, text: "It’s a cake." },
-    { start: 6.19, end: 7.21, text: "What are these?" },
-    { start: 7.25, end: 9.04, text: "These are presents. " },
-    { start: 9.07, end: 11.29, text: "What is it? It's a birthday cake. " },
-    { start: 11.32, end: 15.04, text: "What are these? These are presents." },
-    { start: 15.07, end: 18.22, text: "Is it a train? Yes, it is. " },
     {
-      start: 18.26,
-      end: 21.24,
-      text: "Is it a cake? No, it isn't.",
+      start: 0.0,
+      end: 3.67,
+      text: "Page 25, exercise one. Write grammar.",
+    },
+    {
+      start: 4.3,
+      end: 7.9,
+      text: " Do you, we, they have any Jell-O?",
+    },
+    {
+      start: 9.26,
+      end: 13.88,
+      text: "Do you, we, they have any muffins? ",
+    },
+    {
+      start: 14.52,
+      end: 17.54,
+      text: "I, we, they have a little. ",
+    },
+    {
+      start: 18.66,
+      end: 23.16,
+      text: "Does he, she, it have any Jell-O?",
+    },
+    {
+      start: 24.24,
+      end: 29.04,
+      text: "Does he, she, it have any muffins?",
+    },
+    {
+      start: 29.44,
+      end: 33.06,
+      text: "He, she, it has a few. ",
+    },
+    {
+      start: 33.54,
+      end: 35,
+      text: "Mom, it's very hot.",
+    },
+    {
+      start: 35.22,
+      end: 37.88,
+      text: "Do we have any Jell-O in the fridge?",
+    },
+    {
+      start: 37.88,
+      end: 40.14,
+      text: "Yes, we have a little.",
+    },
+    {
+      start: 40.14,
+      end: 44.52,
+      text: "I'm very hungry. Do we have any muffins to eat? ",
+    },
+    {
+      start: 44.52,
+      end: 47.54,
+      text: "Yes, we have a few muffins over there. ",
+    },
+    {
+      start: 47.54,
+      end: 50.78,
+      text: "Mom, do we have any balls in the fridge? ",
+    },
+    {
+      start: 50.78,
+      end: 55.8,
+      text: "No, we don't have any balls in the fridge. The fridge is only for food",
     },
   ];
 
   const clickableAreas = [
-    { x1: 6.53, y1: 10.4, x2: 23.43, y2: 14.2, sound: sound1 },
-    { x1: 54.19, y1: 10.4, x2: 71.5, y2: 14.5, sound: sound2 },
-    { x1: 6.53, y1: 15.27, x2: 30.7, y2: 19.4, sound: sound3 },
-    { x1: 54.2, y1: 15.27, x2: 78.3, y2: 19.5, sound: sound4 },
-    { x1: 6.7, y1: 32.3, x2: 21.8, y2: 36.2, sound: sound5 },
-    { x1: 23.3, y1: 25.5, x2: 39.8, y2: 30.7, sound: sound6 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound7 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound8 },
-
+    { x1: 5.5, y1: 8, x2: 55, y2:15, sound: sound1 },
+    { x1: 58, y1: 8, x2: 94, y2: 15, sound: sound2 },
+    { x1: 5.5, y1: 14.4, x2: 55, y2: 20, sound: sound3 },
+    { x1: 58, y1: 14.4, x2: 94, y2: 20, sound: sound4 },
+    { x1: 5, y1: 32, x2: 24, y2: 41, sound: sound5 },
+    { x1: 24, y1: 57, x2: 48, y2: 60.5, sound: sound6 },
+    { x1: 47.49 , y1: 32.53, x2: 72, y2: 39.98, sound: sound7 },
+    { x1: 60.41, y1: 55.72, x2: 93.81, y2: 60.29, sound: sound8 },
+    { x1: 13.66, y1: 68.75, x2: 39.08, y2: 73.32, sound: sound9 },
+    { x1: 51.15, y1: 90.58, x2: 96.18, y2: 95.49, sound: sound10 },
   ];
-
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
@@ -71,10 +129,16 @@ const Unit3_Page4 = ({ openPopup }) => {
   };
 
   return (
-    <div className="page1-img-wrapper"
-          onClick={handleImageClick}
-          style={{ backgroundImage: `url(${page_4})` }}>
-   
+    <div
+      className="page1-img-wrapper"
+      onClick={handleImageClick}
+      style={{ backgroundImage: `url(${page_3})` }}
+    >
+      {/* <img
+        src={page_3}
+        style={{ display: "block" }}
+        onClick={handleImageClick}
+      /> */}
       {clickableAreas.map((area, index) => (
         <div
           key={index}
@@ -102,8 +166,9 @@ const Unit3_Page4 = ({ openPopup }) => {
           }}
         ></div>
       ))}
+
       <div
-        className="headset-icon-CD-unit3-page4-1 hover:scale-110 transition"
+        className="headset-icon-CD-unit3-page3-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -112,7 +177,8 @@ const Unit3_Page4 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           onClick={() =>
             openPopup(
-             "audio", <div
+              "audio",
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -123,16 +189,23 @@ const Unit3_Page4 = ({ openPopup }) => {
                   src={grammarSound}
                   captions={captionsExample}
                 />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <div
-        className="pauseBtn-icon-CD-unit3-page4-1 hover:scale-110 transition"
+        className="pauseBtn-icon-CD-unit3-page3-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -141,7 +214,8 @@ const Unit3_Page4 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           onClick={() =>
             openPopup(
-             "video", <div
+              "video",
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -149,7 +223,6 @@ const Unit3_Page4 = ({ openPopup }) => {
                   alignItems: "center",
                   height: "100%",
                   width: "100%",
-                
                 }}
               >
                 <video
@@ -164,12 +237,19 @@ const Unit3_Page4 = ({ openPopup }) => {
                 >
                   {/* <source src={video} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />

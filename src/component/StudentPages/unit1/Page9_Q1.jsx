@@ -86,91 +86,99 @@ const Page9_Q1 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8 pb-2.5">
-        <span className="ex-A" style={{ marginRight: "20px" }}>
-          D
-        </span>
-        Read and number the pictures.
-      </h5>
-      <div className="w-[60%] mt-6 flex gap-10">
-        <div className="flex flex-col gap-12 w-1/2">
-          {questions.map((q) => (
-            <p key={q.id}>
-              <span className="font-bold mr-2">{q.id}</span>
-              {q.text}
-            </p>
-          ))}
-        </div>
+      <div className="div-forall">
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            D
+          </span>
+          Read and number the pictures.
+        </h5>
+        <div className=" mt-6 flex gap-10">
+          <div className="flex flex-col gap-12 w-1/2">
+            {questions.map((q) => (
+              <p key={q.id}>
+                <span className="font-bold mr-2">{q.id}</span>
+                {q.text}
+              </p>
+            ))}
+          </div>
 
-        <div className="grid grid-cols-2 gap-4 w-1/2">
-          {images.map((img, i) => (
-            <div
-              key={i}
-              className="border-2 border-orange-400 rounded-xl relative overflow-hidden"
-              style={{ height: "100px" }}
-            >
-              <img
-                src={img}
-                alt=""
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                }}
-              />
-
-              {/* 🔥 الدائرة (بس بعد check) */}
-              {showResult && answers[i] && (
-                <div
+          <div className="grid grid-cols-2 gap-4 w-1/2">
+            {images.map((img, i) => (
+              <div
+                key={i}
+                className="border-2 border-orange-400 rounded-xl relative overflow-hidden"
+                style={{ height: "100px" }}
+              >
+                <img
+                  src={img}
+                  alt=""
                   style={{
-                    position: "absolute",
-                    top: "-6px",
-                    left: "-6px",
-                    right: "-6px",
-                    bottom: "-6px",
-                    border:
-                      Number(answers[i]) === questions[i].answer
-                        ? "3px solid green"
-                        : "3px solid red",
-                    borderRadius: "16px",
-                    pointerEvents: "none",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
                   }}
                 />
-              )}
 
-              {/* ❌ WrongMark */}
-              {showResult &&
-                answers[i] &&
-                Number(answers[i]) !== questions[i].answer && (
-                  <WrongMark top="bottom-1" left="left-10" marginLeft="" />
+                {showResult && answers[i] && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-6px",
+                      left: "-6px",
+                      right: "-6px",
+                      bottom: "-6px",
+                      border:
+                        Number(answers[i]) === questions[i].answer
+                          ? "3px solid green"
+                          : "3px solid red",
+                      borderRadius: "16px",
+                      pointerEvents: "none",
+                    }}
+                  />
                 )}
 
-              {/* input */}
-              <input
-                type="number"
-                min="1"
-                max={images.length}
-                value={answers[i] || ""}
-                onChange={(e) => {
-                  if (locked) return;
+                {/* ❌ WrongMark */}
+                {showResult &&
+                  answers[i] &&
+                  Number(answers[i]) !== questions[i].answer && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        zIndex: 10, // 🔥 هذا المهم
+                      }}
+                    >
+                      <WrongMark top="bottom-2.5" left="left-6" marginLeft="" />
+                    </div>
+                  )}
 
-                  let value = Number(e.target.value);
+                {/* input */}
+                <input
+                  type="number"
+                  min="1"
+                  max={images.length}
+                  value={answers[i] || ""}
+                  onChange={(e) => {
+                    if (locked) return;
 
-                  if (!value) return;
-                  if (value < 1 || value > images.length) return;
+                    let value = Number(e.target.value);
 
-                  const alreadyUsed = Object.entries(answers).some(
-                    ([key, val]) => Number(val) === value && Number(key) !== i,
-                  );
+                    if (!value) return;
+                    if (value < 1 || value > images.length) return;
 
-                  if (alreadyUsed) return;
+                    const alreadyUsed = Object.entries(answers).some(
+                      ([key, val]) =>
+                        Number(val) === value && Number(key) !== i,
+                    );
 
-                  setAnswers((prev) => ({
-                    ...prev,
-                    [i]: value,
-                  }));
-                }}
-                className="
+                    if (alreadyUsed) return;
+
+                    setAnswers((prev) => ({
+                      ...prev,
+                      [i]: value,
+                    }));
+                  }}
+                  className="
                 absolute bottom-0 left-0
                 w-10 h-10
                 border border-orange-400
@@ -179,17 +187,18 @@ const Page9_Q1 = () => {
                 outline-none
                  rounded-xl rounded-bl-none
                 "
-              />
-            </div>
-          ))}
+                />
+              </div>
+            ))}
+          </div>
         </div>
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswer}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
-      {/* BUTTONS */}
-      <Button
-        handleShowAnswer={showAnswer}
-        handleStartAgain={reset}
-        checkAnswers={checkAnswers}
-      />
     </div>
   );
 };

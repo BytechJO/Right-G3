@@ -10,6 +10,7 @@ import img6 from "../../../assets/imgs/test6.png";
 import img7 from "../../../assets/imgs/test6.png";
 import img8 from "../../../assets/imgs/test6.png";
 import Button from "../../Button";
+import WrongMark from "../../WrongMark";
 
 const Unit2_Page6_Q2 = () => {
   const questions = [
@@ -23,7 +24,7 @@ const Unit2_Page6_Q2 = () => {
     { img: img8, option: ["the subway", "a bike"], answer: "the subway" },
   ];
 
-  const [answers, setAnswers] = useState(Array(6).fill(""));
+  const [answers, setAnswers] = useState(Array(questions.length).fill(""));
   const [locked, setLocked] = useState(false);
 
   const choose = (index, value) => {
@@ -35,7 +36,7 @@ const Unit2_Page6_Q2 = () => {
   };
 
   const resetAll = () => {
-    setAnswers(Array(6).fill(""));
+    setAnswers(Array(questions.length).fill(""));
     setLocked(false);
   };
 
@@ -60,13 +61,15 @@ const Unit2_Page6_Q2 = () => {
 
     const total = questions.length;
 
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
     const message = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:#2e7d32;font-weight:bold;">
-          Score: ${score} / ${total}
-        </span>
-      </div>
-    `;
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color};font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
+`;
 
     if (score === total) ValidationAlert.success(message);
     else if (score === 0) ValidationAlert.error(message);
@@ -83,61 +86,74 @@ const Unit2_Page6_Q2 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8 pb-2.5">
-        <span className="ex-A" style={{ marginRight: "20px" }}>
-          E
-        </span>
-        Look, read, and circle.
-      </h5>
-      {/* 🔥 GRID */}
-      <div className="grid grid-cols-4 gap-6 text-center mt-5">
-        {questions.map((q, index) => (
-          <div key={index} className="flex flex-col items-center gap-3">
-            {/* IMAGE + NUMBER */}
-            <div className="relative">
-              <img
-                src={q.img}
-                style={{
-                  height: "100px",
-                  objectFit: "cover",
-                }}
-              />
+      <div className="div-forall">
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            E
+          </span>
+          Look, read, and circle.
+        </h5>
+        {/* 🔥 GRID */}
+        <div className="grid grid-cols-4 gap-6 text-center mt-5">
+          {questions.map((q, index) => (
+            <div key={index} className="flex flex-col items-center gap-3">
+              {/* IMAGE + NUMBER */}
+              <div className="relative">
+                <img
+                  src={q.img}
+                  style={{
+                    height: "100px",
+                    objectFit: "cover",
+                  }}
+                />
 
-              <div className="absolute -top-3 -left-3 font-bold text-lg">
-                {index + 1}
+                <div className="absolute -top-3 -left-3 font-bold text-lg">
+                  {index + 1}
+                </div>
+              </div>
+
+              <div
+                className="bg-[#ead6cc] rounded-xl  flex flex-col  items-center"
+                style={{
+                  width: "160px", 
+                }}
+              >
+                {q.option.map((type) => {
+                  const selected = answers[index] === type;
+
+                  return (
+                    <div
+                      key={type}
+                      onClick={() => choose(index, type)}
+                      className={`cursor-pointer px-2 py-1 rounded-full`}
+                      style={{
+                        border: selected
+                          ? locked
+                            ? type === q.answer
+                              ? "2px solid #1C398E" // 🔵 صح
+                              : "2px solid #ef4444" // 🔴 غلط
+                            : "2px solid #1C398E" // قبل check
+                          : "2px solid transparent",
+                        position: "relative",
+                      }}
+                    >
+                      {type} a
+                      {locked && selected && type !== q.answer && <WrongMark />}
+                    </div>
+                  );
+                })}
               </div>
             </div>
+          ))}
+        </div>
 
-            <div className="bg-[#ead6cc] rounded-xl px-4 py-2 flex flex-col gap-1">
-              {q.option.map((type) => {
-                const selected = answers[index] === type;
-
-                return (
-                  <div
-                    key={type}
-                    onClick={() => choose(index, type)}
-                    className={`cursor-pointer px-2 py-1 rounded-full
-                        ${
-                          selected
-                            ? "border-2 border-red-500"
-                            : "border-2 border-transparent"
-                        }`}
-                  >
-                    {type} a
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
-
-      {/* BUTTONS */}
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={resetAll}
-        checkAnswers={checkAnswers}
-      />
     </div>
   );
 };

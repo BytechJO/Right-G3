@@ -66,7 +66,7 @@ const Review1_Page2_Q1 = () => {
     if (locked) return;
 
     if (selected.includes("")) {
-      ValidationAlert.info("Please complete all answers.");
+      ValidationAlert.info();
       return;
     }
 
@@ -80,7 +80,15 @@ const Review1_Page2_Q1 = () => {
 
     const total = items.length;
 
-    const msg = `Score: ${score} / ${total}`;
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
+`;
 
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
@@ -99,107 +107,102 @@ const Review1_Page2_Q1 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8">
-        <span style={{ marginRight: "20px" }}>C</span>
-        Look and choose.
-      </h5>
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>C</span>
+          Look and choose.
+        </h5>
 
-      <div className="grid grid-cols-2 gap-y-16 gap-x-20 mt-10">
-        {items.map((item, i) => (
-          <div
-            key={i}
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              gap: "20px",
-            }}
-          >
-            <span
+        <div className="grid grid-cols-2 gap-y-16 gap-x-20 mt-10 ">
+          {items.map((item, i) => (
+            <div
+              key={i}
               style={{
-                position: "absolute",
-                top: "-10px",
-                left: "-15px",
-                fontWeight: "bold",
-                fontSize: "18px",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
               }}
             >
-              {i + 1}
-            </span>
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-10px",
+                  left: "-15px",
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                }}
+              >
+                {i + 1}
+              </span>
 
-            <img
-              src={item.img}
-              alt=""
-              style={{
-                width: "15vw",
-                height: "20vh",
-              }}
-            />
+              <img
+                src={item.img}
+                alt=""
+                style={{
+                  width: "15vw",
+                  height: "20vh",
+                }}
+              />
 
-            <div className="flex flex-col gap-5 text-[20px]">
-              {item.options.map((opt, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    position: "relative",  
-                    display: "inline-block",
-                  }}
-                >
-                  <span
-                    onClick={() => chooseOption(i, opt)}
+              <div className="flex flex-col gap-5 text-[20px]">
+                {item.options.map((opt, idx) => (
+                  <div
+                    key={idx}
                     style={{
+                      position: "relative",
                       display: "inline-block",
-                      padding: "6px 14px",
-                      borderRadius: "20px",
-                      cursor: "pointer",
-                      textAlign: "center",
-                      minWidth: "90px",
-
-                      border:
-                        selected[i] === opt
-                          ? showResult
-                            ? opt === item.correct
-                              ? "2px solid green"
-                              : "2px solid red"
-                            : "2px solid red"
-                          : "2px solid transparent",
-
-                      color:
-                        showResult && selected[i] === opt
-                          ? opt === item.correct
-                            ? "green"
-                            : "red"
-                          : "black",
                     }}
                   >
-                    {opt}
-                  </span>
+                    <span
+                      onClick={() => chooseOption(i, opt)}
+                      style={{
+                        display: "inline-block",
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        textAlign: "center",
+                        minWidth: "90px",
 
-                  {showResult &&
-                    selected[i] === opt &&
-                    opt !== item.correct && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          right: "-25px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                        }}
-                      >
-                        <WrongMark />
-                      </div>
-                    )}
-                </div>
-              ))}
+                        border:
+                          selected[i] === opt
+                            ? locked
+                              ? opt === item.correct
+                                ? "2px solid #1C398E"
+                                : "2px solid #ef4444"
+                              : "2px solid #1C398E"
+                            : "2px solid transparent",
+                      }}
+                    >
+                      {opt}
+                    </span>
+
+                    {showResult &&
+                      selected[i] === opt &&
+                      opt !== item.correct && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "-25px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                          }}
+                        >
+                          <WrongMark />
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={resetAll}
-        checkAnswers={checkAnswers}
-      />
     </div>
   );
 };

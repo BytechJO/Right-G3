@@ -210,20 +210,21 @@ const Page8_Q4 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8 pb-2.5">
-        <span className="ex-A" style={{ marginRight: "20px" }}>
-          C
-        </span>
-        What is the moral of Slow and Steady Wins the Race on page 5?{" "}
-      </h5>
+      <div className="div-forall">
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            C
+          </span>
+          What is the moral of Slow and Steady Wins the Race on page 5?{" "}
+        </h5>
 
-      <div style={{ width: "60%" }}>
-        {/* Words */}
-        <div className="flex flex-wrap justify-center gap-5 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((word) => (
-            <span
-              key={word}
-              className={`
+        <div>
+          {/* Words */}
+          <div className="flex flex-wrap justify-center gap-5 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
+            {wordsToFind.map((word) => (
+              <span
+                key={word}
+                className={`
         px-[18px] py-2
         rounded-[10px]
         border-2 border-[#2c5287]
@@ -235,24 +236,24 @@ const Page8_Q4 = () => {
             : "bg-white text-black"
         }
       `}
-            >
-              {word}
-            </span>
-          ))}
-        </div>
+              >
+                {word}
+              </span>
+            ))}
+          </div>
 
-        {/* Grid Wrapper */}
-        <div className="border-2 border-[#f28c63] px-[35px] pt-[25px] pb-[30px] w-full">
-          <div className="bg-[#daf5ff] rounded-[15px] px-[25px] py-[15px] flex flex-wrap gap-1">
-            {letters.map((letter, index) => {
-              const isSelected = selected.includes(index);
-              const isFound = coloredCells.includes(index);
+          {/* Grid Wrapper */}
+          <div className="border-2 border-[#f28c63] px-[35px] pt-[25px] pb-[30px] w-full">
+            <div className="bg-[#daf5ff] rounded-[15px] px-[25px] py-[15px] flex flex-wrap gap-1">
+              {letters.map((letter, index) => {
+                const isSelected = selected.includes(index);
+                const isFound = coloredCells.includes(index);
 
-              return (
-                <span
-                  key={index}
-                  onClick={() => handleClick(letter, index)}
-                  className={`
+                return (
+                  <span
+                    key={index}
+                    onClick={() => handleClick(letter, index)}
+                    className={`
             w-[35px] h-[35px]
             flex items-center justify-center
             text-[20px]
@@ -261,74 +262,70 @@ const Page8_Q4 = () => {
             ${isSelected ? "bg-[#ffd54f] rounded-sm p-2.5" : ""}
             ${isFound ? "bg-[#4caf50] text-white rounded-sm p-2.5" : ""}
           `}
-                >
-                  {letter}
-                </span>
-              );
-            })}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "10px",
-              marginTop: "15px",
-            }}
-          >
-            <img
-              src={img1}
-              alt="start"
-              style={{
-                width: "12vw",
-                height: "auto",
-              }}
-            />
-
+                  >
+                    {letter}
+                  </span>
+                );
+              })}
+            </div>
             <div
               style={{
-                flex: 1,
-                borderBottom: "2px solid black",
-                height: "30px",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "15px",
               }}
             >
-              <input
-                value={sentence}
-                readOnly
+              <img
+                src={img1}
+                alt="start"
                 style={{
-                  width: "100%",
-                  border: "none",
-                  outline: "none",
-                  background: "transparent",
-                  fontSize: "18px",
+                  width: "12vw",
+                  height: "auto",
+                }}
+              />
+
+              <div
+                style={{
+                  flex: 1,
+                  borderBottom: "2px solid black",
+                  height: "30px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  value={sentence}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "18px",
+                  }}
+                />
+              </div>
+              <img
+                src={img2}
+                alt="end"
+                style={{
+                  width: "12vw",
+                  height: "auto",
                 }}
               />
             </div>
-            <img
-              src={img2}
-              alt="end"
-              style={{
-                width: "12vw",
-                height: "auto",
-              }}
-            />
           </div>
-          <input
-            value={sentence}
-            readOnly
-            className="w-[85%] mt-[15px] border-b-2 border-black text-[18px] bg-transparent outline-none"
-          />
         </div>
-      </div>
 
-      {/* BUTTONS */}
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={reset}
-        checkAnswers={checkAnswers}
-      />
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
+      </div>
     </div>
   );
 };

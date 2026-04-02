@@ -1,235 +1,321 @@
 import React, { useState } from "react";
 import "./Unit3_Page5_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
-import img6 from "../../../assets/imgs/test.png";
-import img7 from "../../../assets/imgs/test.png";
-import img8 from "../../../assets/imgs/test.png";
-import img9 from "../../../assets/imgs/test.png";
-import img10 from "../../../assets/imgs/test.png";
-import img11 from "../../../assets/imgs/test.png";
-import img12 from "../../../assets/imgs/test.png";
+import WrongMark from "../../WrongMark";
+
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex B 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex B 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex B 6.svg";
+
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import Button from "../../Button";
+
 const data = [
   {
-    id: 1,
-    images: [
-      { id: 1, src: img1, value: "plane" },
-      { id: 2, src: img2, value: "yo-yo" },
-      { id: 3, src: img3, value: "juice" },
-    ],
-    correct: ["yo-yo", "juice"], // نفس صوت /j/
+    img: img1,
+    before: "There are",
+    after: "bananas in the fridge.",
+    answer: "a few",
   },
   {
-    id: 2,
-    images: [
-      { id: 1, src: img4, value: "rocket" },
-      { id: 2, src: img5, value: "oil" },
-      { id: 3, src: img6, value: "boy" },
-    ],
-    correct: ["oil", "boy"], // نفس صوت /oi/
+    img: img2,
+    before: "There’s",
+    after: "orange juice.",
+    answer: "a little",
   },
   {
-    id: 3,
-    images: [
-      { id: 1, src: img7, value: "juice" },
-      { id: 2, src: img8, value: "jacket" },
-      { id: 3, src: img9, value: "yogurt" },
-    ],
-    correct: ["juice", "jacket"], // نفس صوت /j/
+    img: img3,
+    before: "There is",
+    after: "water in the glass.",
+    answer: "a little",
   },
   {
-    id: 4,
-    images: [
-      { id: 1, src: img10, value: "milk" },
-      { id: 2, src: img11, value: "boy" },
-      { id: 3, src: img12, value: "oil" },
-    ],
-    correct: ["boy", "oil"], // نفس صوت /oi/
+    img: img4,
+    before: "There is",
+    after: "chocolate cake.",
+    answer: "a little",
+  },
+  {
+    img: img5,
+    before: "There’s",
+    after: "sugar.",
+    answer: "a little",
+  },
+  {
+    img: img6,
+    before: "There are",
+    after: "apples in the bowl.",
+    answer: "a few",
   },
 ];
 
+const options = [
+  { id: "o1", value: "a little" },
+  { id: "o2", value: "a few" },
+];
+
 export default function Unit3_Page5_Q2() {
-  const [answers, setAnswers] = useState({});
-  const [score, setScore] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [inputs, setInputs] = useState(Array(data.length).fill(""));
+  const [wrongInputs, setWrongInputs] = useState(
+    Array(data.length).fill(false),
+  );
   const [showAnswer, setShowAnswer] = useState(false);
 
-  const handleSelect = (qId, value) => {
-    if (showAnswer || submitted) return; // 🔥 يمنع الضغط بعد إظهار الحل
-    setAnswers((prev) => {
-      const current = prev[qId] || [];
+  const onDragEnd = (result) => {
+    if (!result.destination || showAnswer) return;
 
-      // 1️⃣ إذا كانت الصورة مختارة → نشيلها (Toggle)
-      if (current.includes(value)) {
-        return { ...prev, [qId]: current.filter((v) => v !== value) };
-      }
+    const value = options.find((o) => o.id === result.draggableId)?.value;
 
-      // 2️⃣ إذا حاول يختار أكثر من 2 → نمنعه
-      if (current.length >= 2) {
-        return prev;
-      }
+    const index = Number(result.destination.droppableId);
 
-      // 3️⃣ إضافة اختيار جديد
-      return { ...prev, [qId]: [...current, value] };
+    setInputs((prev) => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
     });
+
+    setWrongInputs(Array(data.length).fill(false));
   };
 
-  const handleCheck = () => {
-    if (showAnswer || submitted) return; // 🔥 يمنع الضغط بعد إظهار الحل
-    // فحص إذا الطالب مختار على الأقل إجابة من السؤال الأول
-    if (!answers[data[0].id] || answers[data[0].id].length === 0) {
-      ValidationAlert.info("Please select at least one picture in question 1.");
+  const checkAnswers = () => {
+    if (showAnswer) return;
+
+    if (inputs.some((i) => i === "")) {
+      ValidationAlert.info(
+        "Oops!",
+        "Please fill in all the answers before checking.",
+      );
       return;
     }
 
-    // فحص إذا الطالب مختار على الأقل إجابة من السؤال الثاني
-    if (!answers[data[1].id] || answers[data[1].id].length === 0) {
-      ValidationAlert.info("Please select at least one picture in question 2.");
-      return;
-    }
+    let correct = 0;
+    const wrong = [];
 
-    let correctCount = 0;
-
-    // نحسب total = مجموع كل الإجابات الصحيحة
-    const total = data.reduce((sum, q) => sum + q.correct.length, 0);
-
-    // حساب عدد الصح
-    data.forEach((q) => {
-      const studentAnswers = answers[q.id] || [];
-
-      q.correct.forEach((correctValue) => {
-        if (studentAnswers.includes(correctValue)) {
-          correctCount++;
-        }
-      });
+    data.forEach((item, i) => {
+      if (inputs[i] === item.answer) {
+        correct++;
+        wrong[i] = false;
+      } else {
+        wrong[i] = true;
+      }
     });
 
-    // اختيار اللون حسب النتيجة
+    setWrongInputs(wrong);
+    setShowAnswer(true);
+
+    const total = data.length;
     const color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
+      correct === total ? "green" : correct === 0 ? "red" : "orange";
 
     const scoreMessage = `
-    <div style="font-size: 20px; text-align:center; margin-top: 8px;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${correctCount} / ${total}
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color};font-weight:bold;">
+        Score: ${correct} / ${total}
       </span>
     </div>
   `;
 
-    // إظهار نوع النتيجة
-    if (correctCount === total) {
-      ValidationAlert.success(scoreMessage);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(scoreMessage);
-    } else {
-      ValidationAlert.warning(scoreMessage);
-    }
-    setSubmitted(true);
+    if (correct === total) ValidationAlert.success(scoreMessage);
+    else if (correct === 0) ValidationAlert.error(scoreMessage);
+    else ValidationAlert.warning(scoreMessage);
   };
+
   const handleShowAnswer = () => {
-    const correctAnswersObj = {};
-
-    data.forEach((q) => {
-      correctAnswersObj[q.id] = [...q.correct]; // نضع كل الإجابات الصحيحة
-    });
-
-    setAnswers(correctAnswersObj);
+    setInputs(data.map((d) => d.answer));
+    setWrongInputs(Array(data.length).fill(false));
     setShowAnswer(true);
   };
 
   const handleReset = () => {
-    setAnswers({});
-    setSubmitted(false);
-    setScore(null);
-    setShowAnswer(false); // 🔥 إلغاء وضع Show Answer
+    setInputs(Array(data.length).fill(""));
+    setWrongInputs(Array(data.length).fill(false));
+    setShowAnswer(false);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "30px",
-      }}
-    >
+    <DragDropContext onDragEnd={onDragEnd}>
       <div
-        className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "30px",
         }}
       >
-        <div className="circle-wrapper-Unit5_Page5_Q2">
-          <h5 className="header-title-page8">
-            <span style={{ color: "#2e3192" }}>2</span> Which pictures begin with
-            the same sound? Circle.
-          </h5>
-         <div className="CB-unit3-p5-q2-content-container">
-          {data.map((q) => (
-            <div key={q.id} className="question-row-CB-unit3-p5-q2">
-              <span
-                className="q-number"
-                style={{
-                  color: "#2c5287",
-                  fontSize: "20px",
-                  fontWeight: "700",
-                }}
-              >
-                {q.id}.
+        <div
+          className="div-forall"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "30px",
+            width: "60%",
+            justifyContent: "flex-start",
+          }}
+        >
+          <div className="unscramble-container">
+            <h5 className="header-title-page8 pb-2.5">
+              <span className="ex-A" style={{ marginRight: "10px" }}>
+                A
               </span>
+              Look, read, and write.
+            </h5>
 
-              <div className="images-row-CB-unit3-p5-q2">
-                {q.images.map((img) => {
-                  const isSelected = answers[q.id]?.includes(img.value);
-                  const isWrong =
-                    submitted && isSelected && !q.correct.includes(img.value);
-
-                  return (
-                    <div
-                      key={img.id}
-                      className={`img-box-CB-unit3-p5-q2 
-              ${isSelected ? "selected-CB-unit3-p5-q2" : ""} 
-              ${isWrong ? "wrong" : ""}`}
-                      onClick={() => handleSelect(q.id, img.value)}
+            {/* OPTIONS */}
+            <Droppable droppableId="options" direction="horizontal">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{
+                    display: "flex",
+                    gap: "15px",
+                    margin: "20px 0",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {options.map((opt, i) => (
+                    <Draggable
+                      key={opt.id}
+                      draggableId={opt.id}
+                      index={i}
+                      isDragDisabled={showAnswer}
                     >
-                      <img src={img.src} alt="" />
-
-                      {/* علامة X تظهر فقط عند الغلط */}
-                      {!showAnswer && isWrong && (
-                        <div className="wrong-mark-CB-unit3-p5-q2">✕</div>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            padding: "8px 16px",
+                            border: "2px solid #2c5287",
+                            borderRadius: "20px",
+                            background: "#eee",
+                            fontWeight: "bold",
+                            cursor: "grab",
+                            ...provided.draggableProps.style,
+                          }}
+                        >
+                          {opt.value}
+                        </div>
                       )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+
+            {/* QUESTIONS */}
+            <div
+              style={{
+                width: "100%",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr", // 🔥 عمودين
+                gap: "30px 60px",
+              }}
+            >
+              {data.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "15px",
+                  }}
+                >
+                  <span style={{ fontWeight: "bold" }}>{index + 1}</span>
+                  <div style={{ position: "relative" }}>
+                    <img
+                      src={item.img}
+                      style={{ width: "90px", height: "90px" }}
+                    />
+                    {wrongInputs[index] && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "6px",
+                          right: "-6px",
+                          width: "22px",
+                          height: "22px",
+                          background: "#ef4444",
+                          color: "white",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        }}
+                      >
+                        ✕
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 🔥 الجمل */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      flexWrap: "wrap", // 🔥 يخليها ذكية
+                    }}
+                  >
+                    {/* السطر الأول (فيه drag) */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <span>{item.before}</span>
+
+                      <Droppable droppableId={String(index)}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            style={{
+                              minWidth: "100px",
+                              borderBottom: `3px solid ${
+                                wrongInputs[index] ? "red" : "#000"
+                              }`,
+                              textAlign: "center",
+                              color: inputs[index] ? "#1C398E" : "#000",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {inputs[index]}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* السطر الثاني */}
+                    <span>{item.after}</span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}</div>
+
+            {/* BUTTONS */}
+            <Button
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleReset}
+              checkAnswers={checkAnswers}
+            />
+          </div>
         </div>
       </div>
-      <div className="action-buttons-container">
-        <button className="try-again-button" onClick={handleReset}>
-          Start Again ↻
-        </button>
-        {/* ⭐⭐⭐ NEW — زر Show Answer */}
-        <button
-          onClick={handleShowAnswer}
-          className="show-answer-btn swal-continue"
-        >
-          Show Answer
-        </button>
-        <button onClick={handleCheck} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
-    </div>
+    </DragDropContext>
   );
 }

@@ -1,414 +1,198 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Review2_Page2_Q2.css";
-import sound1 from "../../../assets/audio/ClassBook/U 2/CD13.Pg19_Instruction2_Adult Lady.mp3";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-
-import { TbMessageCircle } from "react-icons/tb";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
+import Button from "../../Button";
+const COLORS = [
+  { key: "long a", color: "#D1232A" },
+  { key: "long e", color: "#FFF101" },
+  { key: "long i", color: "#ED028C" },
+  { key: "long o", color: "#962A90" },
+  { key: "long u", color: "#EE5625" },
+  { key: "short a", color: "#40AE49" },
+  { key: "short e", color: "#A3CF9A" },
+  { key: "short i", color: "#7B4521" },
+  { key: "short o", color: "#3730A3" },
+  { key: "short u", color: "#00AEEF" },
+];
+const WORDS = [
+  ["snow", "soap", "cup", "date", "may", "make", "cape", "coat", "grow"],
+  ["five", "time", "chat", "hat", "desk", "man", "act", "glue", "mine"],
+  ["kid", "sit", "bee", "log", "pop", "pen", "he", "see", "blue"],
+];
+const CORRECT = {
+  snow: "long o",
+  soap: "long o",
+  cup: "short u",
+  date: "long a",
+  may: "long a",
+  make: "long a",
+  cape: "long a",
+  coat: "long o",
+  grow: "long o",
+  five: "long i",
+  time: "long i",
+  chat: "short a",
+  hat: "short a",
+  desk: "short e",
+  man: "short a",
+  act: "short a",
+  glue: "long u",
+  mine: "long i",
+  kid: "short i",
+  sit: "short i",
+  bee: "long e",
+  log: "short o",
+  pop: "short o",
+  pen: "short e",
+  he: "long e",
+  see: "long e",
+  blue: "long u",
+};
 const Review2_Page2_Q2 = () => {
-  const [answers, setAnswers] = useState([null, null, null, null]);
-  const audioRef = useRef(null);
-  const [showResult, setShowResult] = useState(false);
-  const stopAtSecond = 5.98;
-  const [paused, setPaused] = useState(false);
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل بعد Show Answer
-
-  // إعدادات الصوت
-  const [showSettings, setShowSettings] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const settingsRef = useRef(null);
-  const [forceRender, setForceRender] = useState(0);
-  const [showContinue, setShowContinue] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showCaption, setShowCaption] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
-
-  const items = [
-    { img: img1, correct: "-x" },
-    { img: img2, correct: "-ck" },
-    { img: img3, correct: "-x" },
-    { img: img4, correct: "-ck" },
-  ];
-  // ================================
-  // ✔ Captions Array
-  // ================================
-  const captions = [
-    {
-      start: 0,
-      end: 6.06,
-      text: "Page 71, exercise F. Listen and circle the beginning sound ",
-    },
-    {
-      start: 6.09,
-      end: 8.11,
-      text: "1-watch",
-    },
-    { start: 8.14, end: 10.17, text: "2- house" },
-    { start: 10.2, end: 12.15, text: "3-whale" },
-    { start: 12.19, end: 14.14, text: "4-hanger" },
-    { start: 14.18, end: 16.22, text: "5-water" },
-    { start: 16.25, end: 18.2, text: "6-hare" },
-  ];
-
-  // ================================
-  // ✔ Update caption highlight
-  // ================================
-  const updateCaption = (time) => {
-    const index = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end,
-    );
-    setActiveIndex(index);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [locked, setLocked] = useState(false);
+  const handleSelectColor = (key) => {
+    if (locked) return;
+    setSelectedColor(key);
   };
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = 0;
-    audio.play();
-
-    const interval = setInterval(() => {
-      if (audio.currentTime >= stopAtSecond) {
-        audio.pause();
-        setPaused(true);
-        setIsPlaying(false);
-        setShowContinue(true);
-        clearInterval(interval);
-      }
-    }, 100);
-
-    // عند انتهاء الأوديو يرجع يبطل أنيميشن + يظهر Continue
-    const handleEnded = () => {
-      const audio = audioRef.current;
-      audio.currentTime = 0; // ← يرجع للبداية
-      setIsPlaying(false);
-      setPaused(false);
-      setActiveIndex(null);
-      setShowContinue(true);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      clearInterval(interval);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setForceRender((prev) => prev + 1);
-    }, 1000); // كل ثانية
-    if (activeIndex === -1 || activeIndex === null) return;
-
-    const el = document.getElementById(`caption-${activeIndex}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    return () => clearInterval(timer);
-  }, [activeIndex]);
-
-  const handleSelect = (index, value) => {
-    if (locked) return; // ⭐ NEW — منع التعديل بعد Show Answer
-    const newAnswers = [...answers];
-    newAnswers[index] = value;
-    setAnswers(newAnswers);
+  const handleClickWord = (word) => {
+    if (locked || !selectedColor) return;
+    setAnswers((prev) => ({ ...prev, [word]: selectedColor }));
   };
-
   const checkAnswers = () => {
-    if (locked) return; // ⭐ NEW — منع التعديل بعد Show Answer
-    if (answers.includes(null)) {
-      ValidationAlert.info("Oops!", "Please answer all items first.");
+    if (locked) return;
+    const allWords = Object.keys(CORRECT);
+    if (allWords.some((w) => !answers[w])) {
+      ValidationAlert.info();
       return;
     }
-
-    const correctCount = answers.filter(
-      (a, i) => a?.toLowerCase() === items[i].correct?.toLowerCase(),
-    ).length;
-
-    const total = items.length;
-    const color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
-
-    const scoreMessage = `
-      <div style="font-size: 20px; text-align:center; margin-top: 8px;">
-        <span style="color:${color}; font-weight:bold;">
-          Score: ${correctCount} / ${total}
-        </span>
-      </div>
-    `;
-    setLocked(true); // ⭐ NEW — قفل التعديل بعد Check
-    if (correctCount === total) ValidationAlert.success(scoreMessage);
-    else if (correctCount === 0) ValidationAlert.error(scoreMessage);
-    else ValidationAlert.warning(scoreMessage);
-
-    setTimeout(() => setShowResult(true), 200);
+    let score = 0;
+    allWords.forEach((w) => {
+      if (answers[w] === CORRECT[w]) score++;
+    });
+    const total = allWords.length;
+    if (score === total) ValidationAlert.success(`Score: ${score}/${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score}/${total}`);
+    else ValidationAlert.error(`Score: ${score}/${total}`);
+    setLocked(true);
   };
-
-  const resetAnswers = () => {
-    setAnswers(Array(items.length).fill(null));
-    setShowResult(false);
-    setLocked(false); // ⭐ NEW — إعادة فتح التعديل
+  const reset = () => {
+    setAnswers({});
+    setSelectedColor(null);
+    setLocked(false);
   };
-  // ⭐⭐⭐ NEW — Show Answer
   const showAnswer = () => {
-    const correctFilled = items.map((item) => item.correct);
-
-    setAnswers(correctFilled); // ضع الإجابات الصحيحة
-    setShowResult(true); // إظهار النتيجة
-    setLocked(true); // قفل الخيارات
-  };
-  const togglePlay = () => {
-    const audio = audioRef.current;
-
-    if (!audio) return;
-
-    if (audio.paused) {
-      audio.play();
-      setPaused(false);
-      setIsPlaying(true);
-    } else {
-      audio.pause();
-      setPaused(true);
-      setIsPlaying(false);
-    }
+    setAnswers(CORRECT);
+    setLocked(true);
   };
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "60%",
-          justifyContent: "flex-start",
-        }}
-      >
-        <div>
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "20px" }}>F</span> Does it end with <span style={{ color: "#2e3192" }}>-ck</span> or{" "}
-            <span style={{ color: "#2e3192" }}>-x</span>? Listen and circle.
-           
-          </h5>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "30px",
-            width: "100%",
-          }}
-        >
-          <div
-            className="audio-popup-read"
-            style={{
-              width: "50%",
-            }}
-          >
-            <div className="audio-inner player-ui">
-              <audio
-                ref={audioRef}
-                src={sound1}
-                onTimeUpdate={(e) => {
-                  const time = e.target.currentTime;
-                  setCurrent(time);
-                  updateCaption(time);
-                }}
-                onLoadedMetadata={(e) => setDuration(e.target.duration)}
-              ></audio>
-              {/* Play / Pause */}
-              {/* Play / Pause */}
-              {/* الوقت - السلايدر - الوقت */}
-              <div className="top-row">
-                <span className="audio-time">
-                  {new Date(current * 1000).toISOString().substring(14, 19)}
-                </span>
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "20px" }}>D</span>
+          Color each square according to the{" "}
+          <span style={{ color: "#2e3192" }}>vowel sound</span> you hear in the
+          word.
+        </h5>
 
-                <input
-                  type="range"
-                  className="audio-slider"
-                  min="0"
-                  max={duration}
-                  value={current}
-                  onChange={(e) => {
-                    audioRef.current.currentTime = e.target.value;
-                    updateCaption(Number(e.target.value));
-                  }}
-                  style={{
-                    background: `linear-gradient(to right, #430f68 ${
-                      (current / duration) * 100
-                    }%, #d9d9d9ff ${(current / duration) * 100}%)`,
-                  }}
-                />
+        <div className="flex flex-col items-center px-6">
+          {" "}
+          {/* 🎨 COLOR BAR */}{" "}
+          <div className="mb-6">
+            <table className="border-2 border-gray-500 text-center text-lg scale-100">
+              <tbody>
+                <tr>
+                  <td className="border px-3 py-2 text-sm font-medium">
+                    color
+                  </td>
+                  {COLORS.map((c) => (
+                    <td
+                      key={c.key}
+                      onClick={() => handleSelectColor(c.key)}
+                      className={`border cursor-pointer ${
+                        selectedColor === c.key ? `ring-2 ${c.color}` : ""
+                      }`}
+                      style={{
+                        background: c.color,
+                        width: "60px",
+                        height: "40px",
+                      }}
+                    />
+                  ))}
+                </tr>
 
-                <span className="audio-time">
-                  {new Date(duration * 1000).toISOString().substring(14, 19)}
-                </span>
-              </div>
-              {/* الأزرار 3 أزرار بنفس السطر */}
-              <div className="bottom-row">
-                {/* فقاعة */}
+                <tr>
+                  <td className="border px-3 py-2 text-sm font-medium">
+                    sound
+                  </td>
+                  {COLORS.map((c) => (
+                    <td key={c.key} className="border px-2 text-xs">
+                      {c.key}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="w-full ">
+            <div className="flex flex-col gap-6"></div>
+            {/* 🧩 WORDS */}{" "}
+            <div className="flex flex-col gap-4">
+              {" "}
+              {WORDS.map((row, i) => (
                 <div
-                  className={`round-btn ${showCaption ? "active" : ""}`}
-                  style={{ position: "relative" }}
-                  onClick={() => setShowCaption(!showCaption)}
+                  key={i}
+                  className="grid grid-cols-9 border-2 border-orange-400 rounded-xl overflow-hidden w-full"
                 >
-                  <TbMessageCircle size={36} />
-                  <div
-                    className={`caption-inPopup ${showCaption ? "show" : ""}`}
-                    style={{ top: "100%", left: "10%" }}
-                  >
-                    {captions.map((cap, i) => (
-                      <p
-                        key={i}
-                        id={`caption-${i}`}
-                        className={`caption-inPopup-line2 ${
-                          activeIndex === i ? "active" : ""
-                        }`}
-                      >
-                        {cap.text}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Play */}
-                <button className="play-btn2" onClick={togglePlay}>
-                  {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
-                </button>
-
-                {/* Settings */}
-                <div className="settings-wrapper" ref={settingsRef}>
-                  <button
-                    className={`round-btn ${showSettings ? "active" : ""}`}
-                    onClick={() => setShowSettings(!showSettings)}
-                  >
-                    <IoMdSettings size={36} />
-                  </button>
-
-                  {showSettings && (
-                    <div className="settings-popup">
-                      <label>Volume</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={volume}
-                        onChange={(e) => {
-                          setVolume(e.target.value);
-                          audioRef.current.volume = e.target.value;
+                  {" "}
+                  {row.map((word) => {
+                    const colorKey = answers[word];
+                    const colorObj = COLORS.find((c) => c.key === colorKey);
+                    const isWrong =
+                      locked && colorKey && colorKey !== CORRECT[word];
+                    return (
+                      <div
+                        key={word}
+                        onClick={() => handleClickWord(word)}
+                        className="relative py-5 text-lg font-semibold cursor-pointer border-r last:border-r-0 flex items-center justify-center"
+                        style={{
+                          backgroundColor: colorObj?.color || "#f3f4f6",
                         }}
-                      />
-                    </div>
-                  )}
+                      >
+                        {word}
+                        {isWrong && (
+                          <div
+                            className="absolute top-3 right-3 translate-x-1/2 -translate-y-1/2
+                     w-5 h-5 text-xs bg-red-500 text-white rounded-full
+                     flex items-center justify-center font-bold border-2 border-white
+                     pointer-events-none shadow"
+                          >
+                            ✕
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>{" "}
+              ))}
             </div>
+            {/* 🔘 BUTTON */}{" "}
+            <Button
+              handleShowAnswer={showAnswer}
+              handleStartAgain={reset}
+              checkAnswers={checkAnswers}
+            />{" "}
           </div>
         </div>
-       <div
-  className="imgFeild"
-  style={{
-    display: "flex",
-    gap: "13px",
-    flexDirection: "column",
-  }}
->
-  <div className="wh-container-CB-review2-p2-q2">
-    {items.map((item, index) => (
-      <div className="ck-x-item-CB-review2-p2-q2" key={index}>
-        <div style={{ display: "flex", gap: "20px" }}>
-          <span
-            className="q-number"
-            style={{
-              color: "#2c5287",
-              fontSize: "20px",
-              fontWeight: "700",
-            }}
-          >
-            {index + 1}
-          </span>
-          <img src={item.img} className="ck-x-image-CB-review2-p2-q2" />
-        </div>
-
-        <div className="ck-x-options-CB-review2-p2-q2">
-          {/* CK OPTION */}
-          <span
-            className={`ck-x-option-CB-review2-p2-q2 
-              ${answers[index] === "-ck" ? "selected" : ""}
-              ${
-                showResult &&
-                answers[index] === "-ck" &&
-                answers[index] !== item.correct
-                  ? "wrong-answer"
-                  : ""
-              }`}
-            onClick={() => handleSelect(index, "-ck")}
-          >
-            h
-            {showResult &&
-              answers[index] === "-ck" &&
-              answers[index] !== item.correct && (
-                <span className="wrong-x-CB-review2-p2-q2">✕</span>
-              )}
-          </span>
-
-          {/* X OPTION */}
-          <span
-            className={`ck-x-option-CB-review2-p2-q2 
-              ${answers[index] === "-x" ? "selected" : ""}
-              ${
-                showResult &&
-                answers[index] === "-x" &&
-                answers[index] !== item.correct
-                  ? "wrong-answer"
-                  : ""
-              }`}
-            onClick={() => handleSelect(index, "-x")}
-          >
-            w
-            {showResult &&
-              answers[index] === "-x" &&
-              answers[index] !== item.correct && (
-                <span className="wrong-x-CB-review2-p2-q2">✕</span>
-              )}
-          </span>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-
-      </div>
-      <div className="action-buttons-container">
-        <button onClick={resetAnswers} className="try-again-button">
-          Start Again ↻
-        </button>
-        {/* ⭐⭐⭐ NEW — زر Show Answer */}
-        <button onClick={showAnswer} className="show-answer-btn swal-continue">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
       </div>
     </div>
   );
 };
-
 export default Review2_Page2_Q2;

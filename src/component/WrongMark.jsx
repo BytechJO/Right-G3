@@ -8,7 +8,7 @@ const WrongMark = ({
       className={`absolute ${top} ${left} ${marginLeft} -translate-y-1/2
       w-6 h-6 text-xs bg-red-500 text-white rounded-full
       flex items-center justify-center font-bold border-2 border-white
-      pointer-events-none`}
+      pointer-events-none shadow-lg`}
     >
       ✕
     </div>

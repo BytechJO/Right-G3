@@ -1,18 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
-import page_2 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0023.jpg";
-import img1_letter from "../../../assets/imgs/test.png";
-import img2_letter from "../../../assets/imgs/test.png";
-import img3_letter from "../../../assets/imgs/test.png";
-import img4_letter from "../../../assets/imgs/test.png";
+import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 23.png";
+import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-05.svg";
+import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-06.svg";
+import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-07.svg";
+import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-08.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import soundListen from "../../../assets/audio/ClassBook/U 3/Pg23_1.1_Tom.mp3";
-import img1_conversation from "../../../assets/imgs/test.png";
-import img2_conversation from "../../../assets/imgs/test.png";
-import sound1_letter from "../../../assets/audio/ClassBook/U 3/Pg23_1.1_Adult Lady.mp3";
-import sound2_letter from "../../../assets/audio/ClassBook/U 3/Pg23_1.2_Adult Lady.mp3";
-import sound3_letter from "../../../assets/audio/ClassBook/U 3/Pg23_1.3_Adult Lady.mp3";
-import sound4_letter from "../../../assets/audio/ClassBook/U 3/Pg23_1.4_Adult Lady.mp3";
+import main from "../../../assets/audio/ClassBook/Unit 3/P 23/main.mp3";
+import sound1_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound1.mp3";
+import sound2_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound2.mp3";
+import sound3_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound3.mp3";
+import sound4_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound4.mp3";
 import letterSound from "../../../assets/audio/ClassBook/U 3/Pg23_Instruction1_Adult Lady.mp3";
+import reapeatSound from "../../../assets/audio/ClassBook/Unit 3/P 23/repeat.mp3";
+import Bebo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.1_Bebo.mp3";
+import Lolo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Lolo.mp3";
+import along from "../../../assets/audio/ClassBook/Unit 3/P 23/along.mp3";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Page23-listen6.svg";
+
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Page23-listen5.svg";
+import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
+import shopkeeper1 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Shopkeeper.mp3";
+import Lala1 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.3_Lala.mp3";
+import shopkeeper2 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.4_Shopkeeper.mp3";
+import Lala2 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.5_Lala.mp3";
+import shopkeeper3 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.6_Shopkeeper.mp3";
+import Lala3 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.7_Lala.mp3";
+import shopkeeper4 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.8_Shopkeeper.mp3";
 
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
@@ -38,53 +51,75 @@ const Unit3_Page2 = ({ openPopup }) => {
     new Audio(sound3_letter),
     new Audio(sound4_letter),
   ];
+  const repeatSounds = [
+    null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
+    new Audio(Bebo),
+    new Audio(Lolo),
+  ];
+  const captions = [
+    { start: 0, end: 5.48, text: "Page 23. Listen, read, and repeat." },
+    { start: 5.48, end: 8.22, text: "Can we go shopping on Saturday?" },
+    { start: 8.22, end: 9.18, text: "Yes, we can." },
+  ];
 
-  const readChooseData = {
-    title: "Read and complete the sentences.",
-    questions: [
-      {
-        text: "The boy is watching his mom",
-        options: ["make a sandwich", "can take a nice photo"],
-        correct: "make a sandwich",
-      },
-      {
-        text: "The man with a camera",
-        options: ["can take a nice photo", "make a sandwich"],
-        correct: "can take a nice photo",
-      },
-    ],
-  };
   const captionsExample = [
-    { start: 0, end: 2.0, text: "Page11. Birthdays Are Fun" },
-    { start: 2.05, end: 5.2, text: "Hi, everyone. Today is my birthday." },
-    { start: 5.24, end: 7.2, text: " I'm seven years old." },
-    { start: 7.24, end: 9.0, text: "  My friends are here. It's fun." },
+    {
+      start: 0,
+      end: 5,
+      text: "Unit three, page 23 reading. Listen and read along.",
+    },
+    {
+      start: 5,
+      end: 6.54,
+      text: " Picky shopper.",
+    },
+    {
+      start: 7,
+      end: 17,
+      text: "It is a nice sunny day. Lala decides to go shopping. He goes to the store next to his home. He is thinking about what he will buy. ",
+    },
+    {
+      start: 17.12,
+      end: 20.18,
+      text: "Good morning. How can I help you, Lala?",
+    },
+    {
+      start: 20.18,
+      end: 27.38,
+      text: "Good morning to you. I'm looking for some boots. Do you have any orange boots, please?",
+    },
+    {
+      start: 27.38,
+      end: 33.02,
+      text: "No, I'm sorry, I don't have any orange boots, but I have some pink ones.",
+    },
+    {
+      start: 33.02,
+      end: 39.3,
+      text: "No, that won't work. I don't like pink. What else do you have? Do you have any purple gloves?",
+    },
+    {
+      start: 40.38,
+      end: 49.18,
+      text: "Yes, I do have some purple gloves. Look, I also have some blue and green gloves too. The blue gloves would match your shirt.",
+    },
+    {
+      start: 49.18,
+      end: 53.86,
+      text: "Wow, that's great, but I'll take some red gloves, please.",
+    },
+    {
+      start: 53.86,
+      end: 57.48,
+      text: "There are no red gloves. You are a picky shopper, aren't you?",
+    },
   ];
 
   const captions2 = [
-    { start: 0, end: 3.18, text: "Page 11. Listen and read along. " },
-    { start: 3.2, end: 7.01, text: "P, pencil, pink, pizza. " },
+    { start: 0, end: 3.9, text: "Page 22. Listen and read along." },
+    { start: 4, end: 10.38, text: "C-H, ch. T-C-H, ch. S-H, sh." },
+    { start: 11.44, end: 13.66, text: "peach, watch, shell" },
   ];
-
-  const areas = [
-    // الصوت الأول – المنطقة الأساسية
-    { x1: 35.24, y1: 54.6, x2: 39.0, y2: 58.0, sound: 1, isPrimary: true },
-
-    // // // الصوت الأول – منطقة إضافية
-    { x1: 31.3, y1: 45.4, x2: 40.12, y2: 53.4, sound: 1, isPrimary: false },
-
-    // // // الصوت الثاني – الأساسية
-    { x1: 43.6, y1: 54.1, x2: 47.7, y2: 57.1, sound: 2, isPrimary: true },
-
-    // // // الصوت الثاني – الإضافية
-    { x1: 41.6, y1: 47.31, x2: 48.3, y2: 53.7, sound: 2, isPrimary: false },
-  ];
-  const sounds = {
-    // 1: sound1,
-    // 2: sound2,
-    // 3: sound3,
-    // 4: sound4,
-  };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -106,60 +141,50 @@ const Unit3_Page2 = ({ openPopup }) => {
       };
     }
   };
+
+  const clickableAreas = [
+    { x1: 5, y1: 22, x2: 56, y2: 26.5, sound: shopkeeper1 },
+    { x1: 5, y1: 26, x2: 63, y2: 31.5, sound: Lala1 },
+    { x1: 5, y1: 31, x2: 56, y2: 36.5, sound: shopkeeper2 },
+    { x1: 5, y1: 36, x2: 66.5, y2: 41.5, sound: Lala2 },
+    { x1: 5, y1: 42, x2: 63, y2: 46.5, sound: shopkeeper3 },
+    { x1: 5, y1: 46, x2: 58, y2: 54, sound: Lala3 },
+    { x1: 5, y1: 53.5, x2: 56, y2: 59, sound: shopkeeper4 },
+  ];
   return (
     <div
       className="page1-img-wrapper"
       onClick={handleImageClick}
       style={{ backgroundImage: `url(${page_2})` }}
     >
+      {clickableAreas.map((area, index) => (
+        <div
+          key={index}
+          className={`clickable-area ${
+            hoveredAreaIndex === index || activeAreaIndex === index
+              ? "highlight"
+              : ""
+          }`}
+          style={{
+            position: "absolute",
+            left: `${area.x1}%`,
+            top: `${area.y1}%`,
+            width: `${area.x2 - area.x1}%`,
+            height: `${area.y2 - area.y1}%`,
+          }}
+          onClick={() => {
+            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
+            playSound(area.sound);
+          }}
+          onMouseEnter={() => {
+            if (!isPlaying) setHoveredAreaIndex(index);
+          }}
+          onMouseLeave={() => {
+            if (!isPlaying) setHoveredAreaIndex(null);
+          }}
+        ></div>
+      ))}
       <audio ref={audioRef} style={{ display: "none" }} />
-
-      {areas.map((area, index) => {
-        const isActive = activeAreaIndex === area.sound;
-
-        // ============================
-        // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
-        // ============================
-        if (area.isPrimary) {
-          return (
-            <div
-              key={index}
-              className={`circle-area ${isActive ? "active" : ""}`}
-              style={{
-                left: `${area.x1}%`,
-                top: `${area.y1}%`,
-              }}
-              onClick={() => {
-                setActiveAreaIndex(area.sound);
-                playSound(sounds[area.sound]);
-              }}
-            ></div>
-          );
-        }
-
-        // ============================
-        // 2️⃣ المناطق الفرعية → مربعات داكنة مخفية ولازم
-        //    عند الضغط عليها → تفعّل الدائرة الأساسية
-        // ============================
-        return (
-          <div
-            key={index}
-            className="clickable-area"
-            style={{
-              position: "absolute",
-              left: `${area.x1}%`,
-              top: `${area.y1}%`,
-              width: `${area.x2 - area.x1}%`,
-              height: `${area.y2 - area.y1}%`,
-            }}
-            onClick={() => {
-              setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-              playSound(sounds[area.sound]);
-            }}
-          ></div>
-        );
-      })}
-
       <div
         className="headset-icon-CD-unit3-page2-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -171,7 +196,7 @@ const Unit3_Page2 = ({ openPopup }) => {
           onClick={() =>
             openPopup(
               "audio",
-              <AudioWithCaption src={soundListen} captions={captionsExample} />,
+              <AudioWithCaption src={main} captions={captionsExample} />,
             )
           }
           style={{ overflow: "visible" }}
@@ -186,6 +211,7 @@ const Unit3_Page2 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="headset-icon-CD-unit3-page2-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -195,7 +221,18 @@ const Unit3_Page2 = ({ openPopup }) => {
           height="22"
           viewBox="0 0 90 90"
           onClick={() =>
-            openPopup("html", <ReadChoose data={readChooseData} />)
+            openPopup(
+              "html",
+              <FourImagesWithAudio
+                images={[read, img1, img2]}
+                audioSrc={reapeatSound}
+                checkpoints={[0, 5.48, 8.22]}
+                popupOpen={true}
+                titleQ={`Listen, read, and repeat.`}
+                audioArr={repeatSounds}
+                captions={captions}
+              />,
+            )
           }
           style={{ overflow: "visible" }}
         >
@@ -221,9 +258,15 @@ const Unit3_Page2 = ({ openPopup }) => {
             openPopup(
               "html",
               <FourImagesWithAudio
-                images={[Rabbit, img1_letter, img2_letter, img3_letter,img4_letter]}
-                audioSrc={letterSound}
-                checkpoints={[0, 3.4, 4, 4.9, 6]}
+                images={[
+                  Rabbit,
+                  img1_letter,
+                  img2_letter,
+                  img3_letter,
+                  img4_letter,
+                ]}
+                audioSrc={along}
+                checkpoints={[0, 3.94, 10.66, 11.88, 13.1]}
                 popupOpen={true}
                 titleQ={"Listen and read along."}
                 audioArr={imageSounds}

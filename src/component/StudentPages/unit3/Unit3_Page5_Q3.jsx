@@ -1,260 +1,341 @@
-import React, { useState } from "react";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
+import React, { useState, useEffect } from "react";
+import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-
-import "./Unit3_Page5_Q3.css";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex C 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex C 2.svg";
 
 const Unit3_Page5_Q3 = () => {
-  const questions = [
-    {
-      img: img1,
-      parts: [
-        { type: "text", value: "She can" },
-        { type: "input", answer: "make a sandwich" },
-        { type: "text", value: "." },
-      ],
-      data: ["make", "sandwich"],
-    },
-    {
-      img: img2,
-      parts: [
-        { type: "text", value: "He" },
-        { type: "input", answer: "can’t fly a kite." },
-        { type: "text", value: "." },
-      ],
-      data: ["fly", "kite"],
-    },
+  const grid = [
+    "p",
+    "l",
+    "k",
+    "j",
+    "t",
+    "h",
+    "e",
+    "b",
+    "g",
+    "h",
+    "j",
+    "n",
+    "s",
+    "h",
+    "o",
+    "p",
+    "k",
+    "e",
+    "e",
+    "p",
+    "e",
+    "r",
+    "v",
+    "e",
+    "r",
+    "x",
+    "b",
+    "h",
+    "a",
+    "s",
+    "u",
+    "v",
+    "i",
+    "e",
+    "y",
+    "p",
+    "u",
+    "r",
+    "p",
+    "l",
+    "e",
+    "d",
+    "c",
+    "x",
+    "d",
+    "s",
+    "x",
+    "o",
+    "b",
+    "x",
+    "g",
+    "r",
+    "e",
+    "e",
+    "n",
+    "r",
+    "e",
+    "x",
+    "n",
+    "a",
+    "n",
+    "d",
+    "t",
+    "c",
+    "d",
+    "f",
+    "s",
+    "s",
+    "n",
+    "j",
+    "b",
+    "l",
+    "u",
+    "e",
+    "k",
+    "l",
+    "j",
+    "m",
+    "i",
+    "n",
+    "w",
+    "q",
+    "s",
+    "z",
+    "g",
+    "l",
+    "o",
+    "v",
+    "e",
+    "s",
+    "p",
   ];
 
-  const [answers, setAnswers] = useState(
-    questions.map((q) => q.parts.map((p) => (p.type === "input" ? "" : null))),
-  );
-  const [wrongInputs, setWrongInputs] = useState([]);
+  const letters = grid;
+  const wordsToFind = [
+    "the",
+    "shopkeeper",
+    "has",
+    "purple",
+    "green",
+    "and",
+    "blue",
+    "gloves",
+  ];
   const [locked, setLocked] = useState(false);
+  const [sentence, setSentence] = useState("");
+  const [selected, setSelected] = useState([]);
+  const [currentWord, setCurrentWord] = useState("");
+  const [foundWords, setFoundWords] = useState([]);
+  const [coloredCells, setColoredCells] = useState([]);
 
-  const wordBank = [
-    { id: "w1", text: "make a sandwich" },
-    { id: "w2", text: "can’t fly a kite" },
-  ];
+  const handleClick = (letter, index) => {
+    if (locked) return;
+    if (coloredCells.includes(index)) return;
 
-  const onDragEnd = (result) => {
-    if (!result.destination || locked) return;
+    if (selected.includes(index)) {
+      const cutIndex = selected.indexOf(index);
+      const newSelected = selected.slice(0, cutIndex);
+      const newWord = newSelected.map((i) => letters[i]).join("");
 
-    const { draggableId, destination } = result;
+      setSelected(newSelected);
+      setCurrentWord(newWord);
+      return;
+    }
 
-    setAnswers((prev) => {
-      const copy = prev.map((row) => [...row]);
+    setSelected((prev) => [...prev, index]);
+    setCurrentWord((prev) => prev + letter);
+  };
 
-      // remove word from previous place
-      copy.forEach((row, qi) =>
-        row.forEach((val, pi) => {
-          if (val === draggableId) copy[qi][pi] = "";
-        }),
+  useEffect(() => {
+    if (
+      wordsToFind.includes(currentWord) &&
+      !foundWords.includes(currentWord)
+    ) {
+      setFoundWords((prev) => [...prev, currentWord]);
+      setColoredCells((prev) => [...prev, ...selected]);
+
+      setSentence((prev) =>
+        prev === "" ? currentWord : prev + " " + currentWord,
       );
 
-      if (destination.droppableId.startsWith("drop-")) {
-        const [qIndex, pIndex] = destination.droppableId
-          .replace("drop-", "")
-          .split("-")
-          .map(Number);
-        copy[qIndex][pIndex] = draggableId;
-      }
+      setSelected([]);
+      setCurrentWord("");
+    }
+  }, [currentWord]);
 
-      return copy;
+  const reset = () => {
+    setSelected([]);
+    setCurrentWord("");
+    setFoundWords([]);
+    setColoredCells([]);
+    setSentence("");
+    setLocked(false);
+  };
+  const showAnswers = () => {
+    let allCells = [];
+    const fullString = letters.join("");
+
+    wordsToFind.forEach((word) => {
+      const startIndex = fullString.indexOf(word);
+
+      if (startIndex !== -1) {
+        for (let i = 0; i < word.length; i++) {
+          allCells.push(startIndex + i);
+        }
+      }
     });
 
-    setWrongInputs([]);
+    setFoundWords(wordsToFind);
+    setColoredCells(allCells);
+    setSelected([]);
+    setCurrentWord("");
+    setSentence(wordsToFind.join(" "));
+    setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
 
-    // 🔴 1) فحص إذا في input فاضي
-    for (let qIndex = 0; qIndex < questions.length; qIndex++) {
-      for (let pIndex = 0; pIndex < questions[qIndex].parts.length; pIndex++) {
-        const part = questions[qIndex].parts[pIndex];
+    const total = wordsToFind.length;
+    const score = foundWords.length;
 
-        if (part.type === "input") {
-          const value = answers[qIndex][pIndex];
-
-          if (!value || value.trim() === "") {
-            ValidationAlert.info(
-              "Oops!",
-              "Please complete all sentences before checking.",
-            );
-            return; // ⛔ وقف التشييك
-          }
-        }
-      }
+    if (score === 0) {
+      ValidationAlert.info("Please complete all answers.");
+      return;
     }
 
-    // 🟢 2) التشييك الطبيعي
-    let wrong = [];
-    let score = 0;
-    let total = 0;
+    if (score < total) {
+      ValidationAlert.warning(`
+      <div style="font-size:20px;text-align:center;">
+        <b style="color:orange;">Score: ${score} / ${total}</b>
+      </div>
+    `);
+    } else {
+      ValidationAlert.success(`
+      <div style="font-size:20px;text-align:center;">
+        <b style="color:green;">Score: ${score} / ${total}</b>
+      </div>
+    `);
+    }
 
-    questions.forEach((q, qIndex) => {
-      q.parts.forEach((p, pIndex) => {
-        if (p.type === "input") {
-          total++;
-          const word =
-            wordBank.find((w) => w.id === answers[qIndex][pIndex])?.text || "";
-          if (word === p.answer) score++;
-          else wrong.push(`${qIndex}-${pIndex}`);
-        }
-      });
-    });
-
-    setWrongInputs(wrong);
-    setLocked(true);
-
-    const msg = `Score: ${score} / ${total}`;
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+    setLocked(true); // 🔒 قفل بعد التصحيح
   };
-
-  const showAnswers = () => {
-    setAnswers(
-      questions.map((q) =>
-        q.parts.map((p) =>
-          p.type === "input"
-            ? wordBank.find((w) => w.text === p.answer)?.id || ""
-            : null,
-        ),
-      ),
-    );
-    setWrongInputs([]);
-    setLocked(true);
-  };
-
-  const reset = () => {
-    setAnswers(
-      questions.map((q) =>
-        q.parts.map((p) => (p.type === "input" ? "" : null)),
-      ),
-    );
-    setWrongInputs([]);
-    setLocked(false);
-  };
-
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{ display: "flex", justifyContent: "center", padding: "30px" }}
-      >
-        <div className="div-forall" style={{ width: "60%" }}>
-          {/* ❌ الهيدر كما هو */}
-          <h5 className="header-title-page8">
-            <span className="ex-A">B</span>Look and write.
-          </h5>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall">
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            C
+          </span>
+          What color gloves does the shopkeeper have in Picky Shopper on page
+          23?
+        </h5>
 
-          {/* WORD BANK */}
-          <Droppable droppableId="word-bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="CB-unit2-p6-q2-word-bank"
+        <div>
+          {/* Words */}
+          <div className="flex flex-wrap justify-center gap-5 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
+            {wordsToFind.map((word) => (
+              <span
+                key={word}
+                className={`
+        px-[18px] py-2
+        rounded-[10px]
+        border-2 border-[#2c5287]
+        text-[15px] font-semibold
+        transition duration-200
+        ${
+          foundWords.includes(word)
+            ? "bg-[#2c5287] text-white border-[#2c5287]"
+            : "bg-white text-black"
+        }
+      `}
               >
-                {wordBank.map((w, i) => (
-                  <Draggable
-                    key={w.id}
-                    draggableId={w.id}
-                    index={i}
-                    isDragDisabled={locked}
-                  >
-                    {(provided) => (
-                      <span
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="CB-unit2-p6-q2-word"
-                        style={provided.draggableProps.style}
-                      >
-                        {w.text}
-                      </span>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-
-          {/* QUESTIONS */}
-          <div className="CB-review1-p1-q2-content">
-            {questions.map((q, qIndex) => (
-              <div key={qIndex} className="CB-unit2-p6-q2-row">
-                <div className="CB-unit2-p6-q2-left-container">
-                  <div className="CB-unit2-p6-q2-left">
-                    <span className="CB-unit2-p6-q2-index">{qIndex + 1}</span>
-                    <img src={q.img} alt="" className="CB-unit2-p6-q2-img" />
-                  </div>
-
-                  <span className="CB-unit2-p6-q2-textSide">
-                    {`${q.data[0]} /  ${q.data[1]}`}
-                  </span>
-                </div>
-                <div className="CB-unit2-p6-q2-sentence">
-                  {q.parts.map((part, pIndex) =>
-                    part.type === "text" ? (
-                      <span key={pIndex} className="CB-unit2-p6-q2-text">
-                        {part.value}
-                      </span>
-                    ) : (
-                      <Droppable
-                        key={pIndex}
-                        droppableId={`drop-${qIndex}-${pIndex}`}
-                        isDropDisabled={locked}
-                      >
-                        {(provided, snapshot) => (
-                          <span
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className={`CB-unit2-p6-q2-input ${
-                              snapshot.isDraggingOver ? "drag-over-cell" : ""
-                            }`}
-                          >
-                            {wordBank.find(
-                              (w) => w.id === answers[qIndex][pIndex],
-                            )?.text || ""}
-                            {provided.placeholder}
-                            {wrongInputs.includes(`${qIndex}-${pIndex}`) && (
-                              <span className="CB-unit2-p6-q2-input-error">
-                                ✕
-                              </span>
-                            )}
-                          </span>
-                        )}
-                      </Droppable>
-                    ),
-                  )}
-                </div>
-              </div>
+                {word}
+              </span>
             ))}
+          </div>
+
+          {/* Grid Wrapper */}
+          <div className="border-2 border-[#f28c63] px-[35px] pt-[25px] pb-[30px] w-full">
+            <div className="bg-[#daf5ff] rounded-[15px] px-[25px] py-[15px] flex flex-wrap gap-1">
+              {letters.map((letter, index) => {
+                const isSelected = selected.includes(index);
+                const isFound = coloredCells.includes(index);
+
+                return (
+                  <span
+                    key={index}
+                    onClick={() => handleClick(letter, index)}
+                    className={`
+            w-[35px] h-[35px]
+            flex items-center justify-center
+            text-[20px]
+            cursor-pointer
+            transition
+            ${isSelected ? "bg-[#ffd54f] rounded-sm p-2.5" : ""}
+            ${isFound ? "bg-[#4caf50] text-white rounded-sm p-2.5" : ""}
+          `}
+                  >
+                    {letter}
+                  </span>
+                );
+              })}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "15px",
+              }}
+            >
+              <img
+                src={img1}
+                alt="start"
+                style={{
+                  width: "12vw",
+                  height: "auto",
+                }}
+              />
+
+              <div
+                style={{
+                  flex: 1,
+                  borderBottom: "2px solid black",
+                  height: "30px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  value={sentence}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "18px",
+                  }}
+                />
+              </div>
+              <img
+                src={img2}
+                alt="end"
+                style={{
+                  width: "12vw",
+                  height: "auto",
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        {/* ❌ الأزرار كما هي */}
-        <div className="action-buttons-container">
-          <button onClick={reset} className="try-again-button">
-            Start Again ↻
-          </button>
-          <button
-            onClick={showAnswers}
-            className="show-answer-btn swal-continue"
-          >
-            Show Answer
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 

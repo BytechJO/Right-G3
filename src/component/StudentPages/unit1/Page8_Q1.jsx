@@ -186,24 +186,29 @@ const Page8_Q1 = () => {
   /* ================= Check ================= */
   const checkAnswers = () => {
     if (locked) return;
-    const total = rows.reduce((acc, r) => acc + r.words.length, 0);
-    const score = foundSelections.length;
+
     if (foundSelections.length === 0) {
       ValidationAlert.info();
       return;
     }
 
+    const total = rows.reduce((acc, r) => acc + r.words.length, 0);
+    const score = foundSelections.length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
     const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="font-weight:bold;">
-          Score: ${score} / ${total}
-        </span>
-      </div>
-    `;
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color}; font-weight:bold;">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
 
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
+
     setLocked(true);
   };
 
@@ -243,126 +248,129 @@ const Page8_Q1 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8">
-        <span className="ex-A" style={{ marginRight: "20px" }}>
-          A
-        </span>
-        <span style={{ color: "#2e3192", marginRight: "20px" }}>1</span>
-        Find and circle three words in each box with{" "}
-        <span style={{ color: "#2e3192" }}>short vowel</span> sounds.
-      </h5>
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            A
+          </span>
+          <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
+          Find and circle three words in each box with{" "}
+          <span style={{ color: "#2e3192" }}>short vowel</span> sounds.
+        </h5>
 
-      <div
-        style={{
-          width: "70%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        {rows.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            style={{
-              width: "100%",
-              margin: "15px 0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "15px",
-            }}
-          >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          {rows.map((row, rowIndex) => (
             <div
+              key={rowIndex}
               style={{
-                color: row.color,
-                fontWeight: "bold",
-                minWidth: "80px",
-                textAlign: "right",
-              }}
-            >
-              Short {row.vowel}
-            </div>
-
-            <div
-              style={{
-                border: "2px solid orange",
-                borderRadius: "20px",
-                padding: "10px 15px",
+                margin: "15px 0",
                 display: "flex",
-                flexWrap: "nowrap",
+                alignItems: "center",
                 justifyContent: "center",
-                gap: "6px",
-                background: "#fff",
+                gap: "15px",
               }}
             >
-              {row.letters.map((letter, colIndex) => {
-                const isSelected = selected.some(
-                  (c) => c.row === rowIndex && c.col === colIndex,
-                );
+              <div
+                style={{
+                  color: row.color,
+                  fontWeight: "bold",
+                  minWidth: "80px",
+                  textAlign: "right",
+                }}
+              >
+                Short {row.vowel}
+              </div>
 
-                const isFound = foundSelections.some((f) =>
-                  f.cells.some((c) => c.row === rowIndex && c.col === colIndex),
-                );
+              <div
+                style={{
+                  border: "2px solid orange",
+                  borderRadius: "20px",
+                  padding: "10px 15px",
+                  display: "flex",
+                  flexWrap: "nowrap",
+                  justifyContent: "center",
+                  gap: "6px",
+                  background: "#fff",
+                }}
+              >
+                {row.letters.map((letter, colIndex) => {
+                  const isSelected = selected.some(
+                    (c) => c.row === rowIndex && c.col === colIndex,
+                  );
 
-                return (
-                  <span
-                    key={colIndex}
-                    data-row={rowIndex}
-                    data-col={colIndex}
-                    onMouseDown={() => startSelect(rowIndex, colIndex)}
-                    onMouseEnter={() => addSelect(rowIndex, colIndex)}
-                    onMouseUp={endSelect}
-                    onTouchStart={() => startSelect(rowIndex, colIndex)}
-                    onTouchMove={(e) => {
-                      const touch = e.touches[0];
-                      const element = document.elementFromPoint(
-                        touch.clientX,
-                        touch.clientY,
-                      );
+                  const isFound = foundSelections.some((f) =>
+                    f.cells.some(
+                      (c) => c.row === rowIndex && c.col === colIndex,
+                    ),
+                  );
 
-                      if (!element) return;
+                  return (
+                    <span
+                      key={colIndex}
+                      data-row={rowIndex}
+                      data-col={colIndex}
+                      onMouseDown={() => startSelect(rowIndex, colIndex)}
+                      onMouseEnter={() => addSelect(rowIndex, colIndex)}
+                      onMouseUp={endSelect}
+                      onTouchStart={() => startSelect(rowIndex, colIndex)}
+                      onTouchMove={(e) => {
+                        const touch = e.touches[0];
+                        const element = document.elementFromPoint(
+                          touch.clientX,
+                          touch.clientY,
+                        );
 
-                      const col = element.getAttribute("data-col");
-                      const row = element.getAttribute("data-row");
+                        if (!element) return;
 
-                      if (row !== null && col !== null) {
-                        addSelect(Number(row), Number(col));
-                      }
-                    }}
-                    onTouchEnd={endSelect}
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      borderRadius: "4px",
-                      border: "1px solid #ccc",
-                      userSelect: "none",
-                      WebkitUserSelect: "none",
-                      background: isFound
-                        ? "rgba(231, 76, 60, 0.4)"
-                        : isSelected
-                          ? "rgba(52, 152, 219, 0.4)"
-                          : "#fff",
-                    }}
-                  >
-                    {letter}
-                  </span>
-                );
-              })}
+                        const col = element.getAttribute("data-col");
+                        const row = element.getAttribute("data-row");
+
+                        if (row !== null && col !== null) {
+                          addSelect(Number(row), Number(col));
+                        }
+                      }}
+                      onTouchEnd={endSelect}
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                        userSelect: "none",
+                        WebkitUserSelect: "none",
+                        background: isFound
+                          ? "rgba(231, 76, 60, 0.4)"
+                          : isSelected
+                            ? "rgba(52, 152, 219, 0.4)"
+                            : "#fff",
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={resetAll}
-        checkAnswers={checkAnswers}
-      />
     </div>
   );
 };

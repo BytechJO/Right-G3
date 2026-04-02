@@ -52,6 +52,7 @@ const Page8_Q3 = () => {
 
   const checkAnswers = () => {
     if (locked) return;
+
     if (questions.some((q) => !answers[q.id])) {
       ValidationAlert.info("Please answer all questions");
       return;
@@ -68,19 +69,21 @@ const Page8_Q3 = () => {
     const color =
       correct === total ? "green" : correct === 0 ? "red" : "orange";
 
-    const message = `
-<div style="font-size:20px;text-align:center;">
-<b style="color:${color};">Score: ${correct} / ${total}</b>
-</div>
-`;
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color}; font-weight:bold;">
+        Score: ${correct} / ${total}
+      </span>
+    </div>
+  `;
 
-    if (correct === total) ValidationAlert.success(message);
-    else if (correct === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
+    if (correct === total) ValidationAlert.success(msg);
+    else if (correct === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+
     setShowResult(true);
     setLocked(true);
   };
-
   return (
     <div
       style={{
@@ -90,99 +93,109 @@ const Page8_Q3 = () => {
         padding: "30px",
       }}
     >
-      <h5 className="header-title-page8">
-        <span className="ex-A" style={{ marginRight: "20px" }}>
-          B
-        </span>
-        Look and write
-        <span style={{ color: "#2e3192" }}>true</span>or
-        <span style={{ color: "#2e3192" }}>false</span>.
-      </h5>
-      <div className="w-[50%] flex flex-col gap-8 mt-8">
-        {questions.map((q) => (
-          <div key={q.id} className="flex items-center">
-            <div className="flex items-center gap-4 w-[55%]">
-              <span className="font-bold text-xl">{q.id}</span>
-              <span className="text-[1.2rem]">{q.text}</span>
-            </div>
-
-            <div className="flex flex-col items-center w-[25%]">
-              <div className="flex gap-6 mb-2">
-                {["true", "false"].map((val) => {
-                  const isSelected = answers[q.id] === val;
-                  const isCorrect = q.answer === val;
-
-                  return (
-                    <span
-                      key={val}
-                      onClick={() => {
-                        if (locked) return;
-                        setAnswers({ ...answers, [q.id]: val });
-                      }}
-                      style={{
-                        position: "relative",
-                        cursor: "pointer",
-                        padding: "4px 12px",
-                        display: "inline-block",
-                      }}
-                    >
-                      {val}
-
-                      {/* الدائرة */}
-                      {isSelected && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "-6px",
-                            left: "-10px",
-                            right: "-10px",
-                            bottom: "-6px",
-                            border: showResult
-                              ? isCorrect
-                                ? "2px solid green"
-                                : "none"
-                              : "2px solid red",
-                            borderRadius: "20px",
-                            pointerEvents: "none",
-                          }}
-                        />
-                      )}
-
-                      {showResult && isSelected && !isCorrect && (
-                        <div>
-                          <WrongMark />
-                        </div>
-                      )}
-                    </span>
-                  );
-                })}
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            B
+          </span>
+          Look and write
+          <span style={{ color: "#2e3192" }}>true</span>or
+          <span style={{ color: "#2e3192" }}>false</span>.
+        </h5>
+        <div className=" flex flex-col  gap-8 mt-8">
+          {questions.map((q) => (
+            <div key={q.id} className="flex items-center">
+              <div className="flex items-center gap-4 w-[55%]">
+                <span className="font-bold text-xl">{q.id}</span>
+                <span className="text-[1.2rem]">{q.text}</span>
               </div>
 
-              {/* الخط */}
-              <div className="w-[70%] border-b-[3px] border-gray-500"></div>
-            </div>
+              <div className="flex flex-col items-center w-[25%]">
+                <div className="flex gap-6 mb-2">
+                  {["true", "false"].map((val) => {
+                    const isSelected = answers[q.id] === val;
+                    const isCorrect = q.answer === val;
 
-            {/* الصورة */}
-            <div className="w-[20%] flex justify-center relative">
-              <img
-                src={img}
-                alt=""
-                style={{
-                  width: "100px",
-                  height: "auto",
-                  objectFit: "contain",
-                }}
-              />
+                    return (
+                      <span
+                        key={val}
+                        onClick={() => {
+                          if (locked) return;
+                          setAnswers({ ...answers, [q.id]: val });
+                        }}
+                        style={{
+                          position: "relative",
+                          cursor: "pointer",
+                          padding: "4px 12px",
+                          display: "inline-block",
+                        }}
+                      >
+                        {val}
+
+                        {/* الدائرة */}
+                        {isSelected && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-6px",
+                              left: "-10px",
+                              right: "-10px",
+                              bottom: "-6px",
+                              border: isSelected
+                                ? showResult
+                                  ? isCorrect
+                                    ? "2px solid #1C398E"
+                                    : "2px solid #ef4444"
+                                  : "2px solid #1C398E"
+                                : "none",
+                              borderRadius: "20px",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        )}
+
+                        {showResult && isSelected && !isCorrect && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: "-2px", // 🔥 حركها يمين
+                              top: "0px", // 🔥 حركها لأعلى
+                            }}
+                          >
+                            <WrongMark />
+                          </div>
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+
+                {/* الخط */}
+                <div className="w-[70%] border-b-[3px] border-gray-500"></div>
+              </div>
+
+              {/* الصورة */}
+              <div className="w-[20%] flex justify-center relative">
+                <img
+                  src={img}
+                  alt=""
+                  style={{
+                    width: "100px",
+                    height: "auto",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
-      {/* BUTTONS */}
-      <Button
-        handleShowAnswer={showAnswers}
-        handleStartAgain={reset}
-        checkAnswers={checkAnswers}
-      />
     </div>
   );
 };

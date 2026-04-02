@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import page_6 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0027.jpg";
+import page_6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 27.png";
 // import song from "../../../assets/img_unit3/sounds-unit3/Pg15.Sing_Adult Lady.mp3";
 import "./unit3_Page6.css";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -23,7 +23,7 @@ const Unit3_Page6 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 27 })}
+          onClick={() => openPopup("exercise", { startIndex: 25 })}
           style={{ overflow: "visible" }}
         >
           <image
@@ -44,7 +44,7 @@ const Unit3_Page6 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 28 })}
+          onClick={() => openPopup("exercise", { startIndex: 26 })}
           style={{ overflow: "visible" }}
         >
           <image
