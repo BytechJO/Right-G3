@@ -1,32 +1,36 @@
 import React, { useState, useRef, useEffect } from "react";
-import backgroundImage from "../../../assets/imgs/test.png";
-import page2_2 from "../../../assets/imgs/test.png";
-import vocabulary from "../../../assets/audio/ClassBook/U 4/Pg28_Vocab_Adult Lady.mp3";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/G5_U4_Pg_28.png";
+import vocabularyImg from "../../../assets/imgs/Voc.svg";
+import vocabulary from "../../../assets/audio/ClassBook/Unit 4/P 28/Pg28_Vocab_Adult Lady.mp3";
 import "./unit4_Page1.css";
-import num1 from "../../../assets/imgs/test.png";
-import num2 from "../../../assets/imgs/test.png";
-import num3 from "../../../assets/imgs/test.png";
-import num4 from "../../../assets/imgs/test.png";
-import num5 from "../../../assets/imgs/test.png";
-import num6 from "../../../assets/imgs/test.png";
-import num7 from "../../../assets/imgs/test.png";
-import num8 from "../../../assets/imgs/test.png";
-import num9 from "../../../assets/imgs/test.png";
-import num10 from "../../../assets/imgs/test.png";
-import num11 from "../../../assets/imgs/test.png";
-import num12 from "../../../assets/imgs/test.png";
-// import sound1 from "../../../assets/img_unit4/sounds-unit4/U2-01.mp3";
-// import sound2 from "../../../assets/img_unit4/sounds-unit4/U2-02.mp3";
-// import sound3 from "../../../assets/img_unit4/sounds-unit4/U2-03.mp3";
-// import sound4 from "../../../assets/img_unit4/sounds-unit4/U2-04.mp3";
-// import sound5 from "../../../assets/img_unit4/sounds-unit4/U2-05.mp3";
-// import sound6 from "../../../assets/img_unit4/sounds-unit4/U2-06.mp3";
-// import sound7 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
-// import sound8 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
-// import sound9 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
-// import sound10 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
-// import sound11 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
-// import sound12 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
+import num1 from "../../../assets/imgs/num/1_1.svg";
+import num2 from "../../../assets/imgs/num/2_1.svg";
+import num3 from "../../../assets/imgs/num/3_1.svg";
+import num4 from "../../../assets/imgs/num/4_1.svg";
+import num5 from "../../../assets/imgs/num/5_1.svg";
+import num6 from "../../../assets/imgs/num/6_1.svg";
+import num7 from "../../../assets/imgs/num/7_1.svg";
+import num8 from "../../../assets/imgs/num/8_1.svg";
+import num9 from "../../../assets/imgs/num/9_1.svg";
+import num10 from "../../../assets/imgs/num/10_1.svg";
+import num11 from "../../../assets/imgs/num/11_1.svg";
+import num12 from "../../../assets/imgs/num/12_1.svg";
+import num13 from "../../../assets/imgs/num/13_1.svg";
+import num14 from "../../../assets/imgs/num/14_1.svg";
+import sound1 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound12.mp3";
+import sound13 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound13.mp3";
+import sound14 from "../../../assets/audio/ClassBook/Unit 4/P 28/sound14.mp3";
 import { TbMessageCircle } from "react-icons/tb";
 import { IoMdSettings } from "react-icons/io";
 import { FaPlay, FaPause } from "react-icons/fa";
@@ -38,7 +42,7 @@ const Unit4_Page1_Vocab = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeIndex2, setActiveIndex2] = useState(null);
   const [showContinue, setShowContinue] = useState(false);
-  const stopAtSecond = 3.0;
+  const stopAtSecond = 3.3;
   const [clickedIndex, setClickedIndex] = useState(null);
   // إعدادات الصوت
   const [showSettings, setShowSettings] = useState(false);
@@ -56,24 +60,47 @@ const Unit4_Page1_Vocab = () => {
   // ✔ Captions Array
   // ================================
   const captions = [
-    { start: 0, end: 3.1, text: "Page 10, Unit 2, Vocabulary." },
-    { start: 3.12, end: 5.15, text: " 1. Party Hat. " },
-    { start: 5.17, end: 7.16, text: "2. Jello." },
-    { start: 7.18, end: 9.27, text: "3. Cake. " },
-    { start: 9.29, end: 12.2, text: "4. Happy Birthday." },
-    { start: 12.22, end: 15.07, text: " 5. Balloons." },
-    { start: 15.09, end: 17.13, text: " 6. Present. " },
-    { start: 17.15, end: 19.26, text: "7.card" },
+    { start: 0.459, end: 3.299, text: "Page 28. Unit 4 Vocabulary." },
+
+    { start: 4.339, end: 6.2, text: "1. Email address." },
+    { start: 6.82, end: 8.54, text: "2. Minimize." },
+    { start: 9.32, end: 11.08, text: "3. Enlarge." },
+    { start: 12.02, end: 13.74, text: "4. Exit." },
+
+    { start: 14.56, end: 16.24, text: "5. Call." },
+    { start: 17.0, end: 18.9, text: "6. Chat box." },
+    { start: 19.62, end: 21.3, text: "7. Chat." },
+    { start: 21.99, end: 23.73, text: "8. Camera." },
+
+    { start: 24.91, end: 27.7, text: "9. Emoticons." },
+    { start: 28.28, end: 30.21, text: "10. Picture." },
+
+    { start: 30.8, end: 32.94, text: "11. Send." },
+    { start: 33.4, end: 35.45, text: "12. Search." },
+
+    { start: 36.28, end: 38.56, text: "13. Laptop." },
+    { start: 39.06, end: 40.92, text: "14. Type." },
   ];
   // 🎵 فترات الكلمات داخل الأوديو الرئيسي
   const wordTimings = [
-    { start: 3.2, end: 5.15 }, // party hat
-    { start: 5.22, end: 7.2 }, // jellow
-    { start: 7.23, end: 9.43 }, // cake
-    { start: 9.43, end: 12.25 }, // Hello
-    { start: 12.27, end: 15.05 }, // Good morning
-    { start: 15.04, end: 17.13 },
-    { start: 17.15, end: 19.26 },
+    { start: 4.339, end: 6.2 }, // 1. Email address
+    { start: 6.82, end: 8.54 }, // 2. Minimize
+    { start: 9.32, end: 11.08 }, // 3. Enlarge
+    { start: 12.02, end: 13.74 }, // 4. Exit
+
+    { start: 14.56, end: 16.24 }, // 5. Call
+    { start: 17.18, end: 18.5 }, // 6. Chat box
+    { start: 19.92, end: 20.82 }, // 7. Chat
+    { start: 22.14, end: 23.64 }, // 8. Camera
+
+    { start: 25.18, end: 27.44 }, // 9. Emoticons
+    { start: 28.519, end: 30.019 }, // 10. Picture
+
+    { start: 31.06, end: 32.47 }, // 11. Send
+    { start: 33.72, end: 35.32 }, // 12. Search
+
+    { start: 36.44, end: 38.38 }, // 13. Laptop
+    { start: 39.24, end: 40.92 }, // 14. Type
   ];
 
   // ================================
@@ -169,6 +196,8 @@ const Unit4_Page1_Vocab = () => {
     sound10,
     sound11,
     sound12,
+    sound13,
+    sound14,
   ];
   const playWordAudio = (index) => {
     // أوقفي الأوديو الرئيسي
@@ -211,9 +240,26 @@ const Unit4_Page1_Vocab = () => {
     num10,
     num11,
     num12,
+    num13,
+    num14,
   ];
   const wordRefs = useRef(wordAudios.map(() => React.createRef()));
-
+  const positions = [
+    { top: "12.5%", left: "38%" }, //1
+    { top: "16%", left: "65%" }, //2
+    { top: "16%", left: "68%" }, //3
+    { top: "16%", left: "71%" }, //4
+    { top: "18%", left: "37.5%" }, //5
+    { top: "33%", left: "35%" }, //6
+    { top: "23%", left: "32.5%" }, //7
+    { top: "27.5%", left: "61%" }, // 8
+    { top: "39.5%", left: "30.5%" }, //9
+    { top: "38.5%", left: "67.5%" }, //10
+    { top: "38.5%", left: "48%" }, //11
+    { top: "40.5%", left: "48%" }, //12
+    { top: "50%", left: "65%" }, //13
+    { top: "59%", left: "67%" }, //14
+  ];
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
@@ -338,13 +384,13 @@ const Unit4_Page1_Vocab = () => {
         {/* كلمة + صورة صغيرة */}
 
         <img
-          src={page2_2}
+          src={vocabularyImg}
           style={{
-            height: "210px",
+            height: "380px",
             width: "auto",
             position: "absolute",
             bottom: "0%",
-            right: "0%",
+            right: "-44.5%",
             borderRadius: "5%",
           }}
         />
@@ -352,21 +398,23 @@ const Unit4_Page1_Vocab = () => {
         {/* النصوص */}
         <div
           className="vocab_container"
-          style={{ bottom: "1.4%", right: "4.5%" }}
+          style={{ bottom: "0.9%", right: "-27.5%" }}
         >
           {[
-            "nurse",
-            "pilot",
-            "grow food",
-            "taxi driver",
-            "vet",
-            "clerk",
-            "photographer",
-            "fix cars",
-            "police officer",
-            "farmer",
-            "mechanic",
-            "chef",
+            "Email address",
+            "Minimize",
+            "Enlarge",
+            "Exit",
+            "Call",
+            "Chat box",
+            "Chat",
+            "Camera",
+            "Emoticons",
+            "Picture",
+            "Send",
+            "Search",
+            "Laptop",
+            "Type",
           ].map((text, i) => (
             <h6
               key={i}
@@ -394,18 +442,82 @@ const Unit4_Page1_Vocab = () => {
                 : ""
             }`}
             style={{
-              height: "20px",
-              width: "auto",
+              height: "12px",
               position: "absolute",
+              ...positions[i], // 👈 أهم سطر
             }}
           />
         ))}
+        <div
+          style={{
+            position: "absolute",
+            top: "15.2%",
+            left: "66%",
+            width: "10px",
+            height: "1px",
+            backgroundColor: "black",
+            transform: "rotate(-61deg)",
+          }}
+        />
 
+        <div
+          style={{
+            position: "absolute",
+            top: "15%",
+            left: "68%",
+            width: "9px",
+            height: "1px",
+            backgroundColor: "black",
+            transform: "rotate(-90deg)",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            top: "15%",
+            left: "70%",
+            width: "13px",
+            height: "1px",
+            backgroundColor: "black",
+            transform: "rotate(-130deg)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "38%",
+            left: "27%",
+            transform: "rotate(-142deg)",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {/* الخط */}
+          <div
+            style={{
+              width: "12px",
+              height: "1px",
+              backgroundColor: "black",
+            }}
+          />
+
+          {/* رأس السهم */}
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderTop: "4px solid transparent",
+              borderBottom: "4px solid transparent",
+              borderLeft: "6px solid black",
+            }}
+          />
+        </div>
         {/* الصورة الرئيسية */}
         <img
           src={backgroundImage}
           alt="interactive"
-          style={{ height: "75vh" }}
+          style={{ height: "85vh" }}
         />
       </div>
       {wordAudios.map((src, i) => (

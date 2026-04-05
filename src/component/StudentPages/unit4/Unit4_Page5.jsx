@@ -1,5 +1,5 @@
 
-import page_5 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0032.jpg";
+import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32.png";
 import "./unit4_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 const Unit4_Page5 = ({ openPopup }) => {
@@ -56,20 +56,7 @@ const Unit4_Page5 = ({ openPopup }) => {
         </svg>
       </div>
 
-       <div
-        className="click-icon-unit4-page5-4 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 32 })}
-          style={{ overflow: "visible" }}
-        >
-          <image className="svg-img" href={arrowBtn} x="0" y="0" width="90" height="90" />
-        </svg>
-      </div>
+      
     </div>
   );
 };

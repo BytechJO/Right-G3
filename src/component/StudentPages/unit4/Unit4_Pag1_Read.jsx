@@ -1,14 +1,14 @@
-import sound1 from "../../../assets/audio/ClassBook/U 4/Pg28_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 4/Pg28_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 4/Pg28_1.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 4/Pg28_1.4_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 4/P 28/Pg28_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 28/Pg28_1.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 28/Pg28_1.3_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 28/Pg28_1.4_Adult Lady.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 28-29/List Pa 28-29-01.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 28-29/List Pa 28-29-02.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 28-29/List Pa 28-29-03.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 28-29/List Pa 28-29-04.svg";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
-import longAudio from "../../../assets/audio/ClassBook/U 4/CD21.Pg28.Instruction1_Adult Lady.mp3";
+import longAudio from "../../../assets/audio/ClassBook/Unit 4/P 28/read-p28.mp3";
 
 const Unit4_Page1_Read = () => {
   const imageSounds = [
@@ -17,20 +17,18 @@ const Unit4_Page1_Read = () => {
     new Audio(sound2),
     new Audio(sound3),
     new Audio(sound4),
-  
   ];
 
-const captions = [
-   { start: 0, end: 3.05, text: "Page 10. Listen and read along." },
-    { start: 3.07, end: 6.14, text: "B, bird, ball, boy " },
-    
+  const captions = [
+    { start: 0, end: 3.67, text: "Page 28. Listen and read along." },
+    { start: 4.48, end: 10.42, text: "Voiceless T-H. Bath. Thirsty. Thursday" },
   ];
   return (
     <>
       <FourImagesWithAudio
-        images={[Rabbit, img1, img2, img3,img4]}
+        images={[Rabbit, img1, img2, img3, img4]}
         audioSrc={longAudio}
-        checkpoints={[0, 2.9, 3.4, 4.2, 5.1]}
+        checkpoints={[0, 4.48, 6.76, 8.26, 9.66]}
         popupOpen={true}
         titleQ={"Listen and read along."}
         audioArr={imageSounds}

@@ -43,7 +43,7 @@ const Unit3_Page1_Vocab = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeIndex2, setActiveIndex2] = useState(null);
   const [showContinue, setShowContinue] = useState(false);
-  const stopAtSecond = 3.9;
+  const stopAtSecond = 4.1;
   const [clickedIndex, setClickedIndex] = useState(null);
   // إعدادات الصوت
   const [showSettings, setShowSettings] = useState(false);

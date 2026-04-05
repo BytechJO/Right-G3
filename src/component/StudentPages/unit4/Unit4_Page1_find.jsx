@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import find_img from "../../../assets/imgs/test.png";//======= should change ==========
+import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/G5_U4_Pg_28.png"; //======= should change ==========
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import MySVG from "../../../assets/imgs/test.png";
+import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 28-29/interactive Svg.svg";
 
 const Unit4_Page1_find = () => {
   const [clickedPoint, setClickedPoint] = useState(null);
@@ -10,16 +10,17 @@ const Unit4_Page1_find = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   // ✅ منطقة المطعم (بالنسب المئوية)
   const targetArea = {
-    x1: 18,
-    y1: 69,
-    x2: 24,
-    y2: 74,
+    x1: 60.345,
+    y1: 50.88,
+    x2: 73.06,
+    y2: 55.56,
   };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+console.log("X",xPercent,"y",yPercent);
 
     setClickedPoint({
       x: xPercent,
@@ -37,7 +38,7 @@ const Unit4_Page1_find = () => {
     if (!clickedPoint) {
       ValidationAlert.info(
         "Pay attention!",
-        "Please click on the image first."
+        "Please click on the image first.",
       );
       return;
     }
@@ -78,7 +79,7 @@ const Unit4_Page1_find = () => {
         >
           <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
           <h5 className="header-title-page8">
-            I need your help. Can you help me find the boat in the picture?
+            I need your help. Can you help me find the umbrella in the picture?
           </h5>
         </div>
         <div style={{ position: "relative", display: "inline-block" }}>
@@ -87,7 +88,7 @@ const Unit4_Page1_find = () => {
             alt="interactive"
             style={{
               width: "auto",
-              height: "75vh",
+              height: "95vh",
               cursor: "pointer",
               display: "block",
             }}
@@ -118,12 +119,13 @@ const Unit4_Page1_find = () => {
               alt="answer highlight"
               style={{
                 position: "absolute",
-                top: `67%`,
-                left: `18.5%`,
-                height: `7%`,
+                top: `54%`,
+                left: `65%`,
+                height: "7%",
+                transform: "translate(-50%, -50%)",
                 pointerEvents: "none",
               }}
-            /> 
+            />
           )}
         </div>
       </div>

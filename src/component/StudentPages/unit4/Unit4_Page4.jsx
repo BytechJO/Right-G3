@@ -1,15 +1,11 @@
 import React, { useState, useRef } from "react";
-import page_4 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0031.jpg";
+import page_4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 31.png";
 import "./unit4_Page4.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 4/Pg31_2.1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 4/Pg31_3.1_Dad.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 4/Pg31_3.2_Hansel.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 4/Pg31_3.3_Dad.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 4/Pg31_3.4_Helen.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 4/Pg31_4.1_Stella.mp3";
-import sound6 from "../../../assets/audio/ClassBook/U 4/Pg31_4.2_Tom.mp3";
-import sound7 from "../../../assets/audio/ClassBook/U 4/Pg31_4.3_Stella.mp3";
-import sound8 from "../../../assets/audio/ClassBook/U 4/Pg31_4.4_Tom.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 4/P 31/gram2.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_1.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_2.1_Boy.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_3.1_Boy.mp3";
 
 // import video from "../../../assets/img_unit4/sounds-unit4/p13.mp4";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -22,30 +18,33 @@ const Unit4_Page4 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 4.07, text: " Page 13, exercise 2. Right Grammar. " },
-    { start: 4.1, end: 5.12, text: " What is it? " },
-    { start: 5.15, end: 6.15, text: "It’s a cake." },
-    { start: 6.19, end: 7.21, text: "What are these?" },
-    { start: 7.25, end: 9.04, text: "These are presents. " },
-    { start: 9.07, end: 11.29, text: "What is it? It's a birthday cake. " },
-    { start: 11.32, end: 15.04, text: "What are these? These are presents." },
-    { start: 15.07, end: 18.22, text: "Is it a train? Yes, it is. " },
-    {
-      start: 18.26,
-      end: 21.24,
-      text: "Is it a cake? No, it isn't.",
-    },
+    { start: 0.239, end: 5.0, text: "Page 31, exercise two, write grammar." },
+
+    { start: 5.0, end: 6.139, text: "What season is it?" },
+    { start: 6.139, end: 7.859, text: "It's spring." },
+    { start: 7.859, end: 9.579, text: "It's summer." },
+    { start: 9.579, end: 11.479, text: "It's autumn." },
+    { start: 11.479, end: 13.979, text: "It's winter." },
+
+    { start: 13.979, end: 15.659, text: "In their country, it's hot." },
+    { start: 15.659, end: 18.6, text: "They wear shorts and T-shirts." },
+    { start: 18.6, end: 21.84, text: "They go to the beach and swim daily." },
+    { start: 21.84, end: 23.519, text: "It's summer." },
+
+    { start: 24.539, end: 26.539, text: "In her country, it's cold." },
+    { start: 26.539, end: 29.659, text: "She wears boots and gloves." },
+    { start: 29.659, end: 32.079, text: "She builds a snowman." },
+
+    { start: 33.319, end: 34.88, text: "She plays with her friends." },
+
+    { start: 36.139, end: 36.979, text: "It's winter." },
   ];
 
   const clickableAreas = [
-    { x1: 6.53, y1: 10.4, x2: 23.43, y2: 14.2, sound: sound1 },
-    { x1: 54.19, y1: 10.4, x2: 71.5, y2: 14.5, sound: sound2 },
-    { x1: 6.53, y1: 15.27, x2: 30.7, y2: 19.4, sound: sound3 },
-    { x1: 54.2, y1: 15.27, x2: 78.3, y2: 19.5, sound: sound4 },
-    { x1: 6.7, y1: 32.3, x2: 21.8, y2: 36.2, sound: sound5 },
-    { x1: 23.3, y1: 25.5, x2: 39.8, y2: 30.7, sound: sound6 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound7 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound8 },
+    { x1: 6.33, y1: 9.69, x2: 51.15, y2: 20.35, sound: sound1 },
+    { x1: 51.8, y1: 10.03, x2: 93.38, y2: 20.69, sound: sound2 },
+    { x1: 6.12, y1: 34.4, x2: 52.01, y2: 41.5, sound: sound3 },
+    { x1: 6.12, y1: 65.53, x2: 56.11, y2: 72.13, sound: sound4 },
   ];
 
   const handleImageClick = (e) => {

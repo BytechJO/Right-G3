@@ -7,7 +7,7 @@ import Unit3_Page1_find from "./Unit3_Page1_find";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import main from "../../../assets/audio/ClassBook/Unit 3/P 22/unit_3_main.mp3";
+import main from "../../../assets/audio/ClassBook/Unit 3/unit-3-main.mp3";
 import sound1 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound1.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound2.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound3.mp3";
@@ -57,6 +57,59 @@ const Unit3_Page1 = ({ openPopup }) => {
       end: 59.52,
       text: "C-H, ch. T-C-H, ch. S-H, sh. Chicken, kitchen, fish.",
     },
+    {
+      start: 60,
+      end: 76.78,
+      text: "Unit 3, Page 23, Reading. Listen and read along. Picky shopper. It is a nice, sunny day. Lala decides to go shopping. He goes to the store next to his home. He is thinking about what he will buy.",
+    },
+    {
+      start: 76.78,
+      end: 79.84,
+      text: "Good morning. How can I help you, Lala?",
+    },
+    {
+      start: 79.84,
+      end: 87.04,
+      text: "Good morning to you. I'm looking for some boots. Do you have any orange boots, please?",
+    },
+    {
+      start: 87.04,
+      end: 92.66,
+      text: "No, I'm sorry, I don't have any orange boots, but I have some pink ones.",
+    },
+    {
+      start: 92.66,
+      end: 98.96,
+      text: "No, that won't work. I don't like pink. What else do you have? Do you have any purple gloves?",
+    },
+    {
+      start: 100.04,
+      end: 108.84,
+      text: "Yes, I do have some purple gloves. Look, I also have some blue and green gloves, too. The blue gloves would match your shirt.",
+    },
+    {
+      start: 108.84,
+      end: 113.52,
+      text: "Wow, that's great, but I'll take some red gloves, please.",
+    },
+    {
+      start: 113.52,
+      end: 117.58,
+      text: "There are no red gloves. You are a picky shopper, aren't you?",
+    },
+    {
+      start: 117.07,
+      end: 122.8,
+      text: "Page 23. Listen, read, and repeat.",
+    },
+    { start: 122.8, end: 125.52, text: "Can we go shopping on Saturday?" },
+    { start: 125.52, end: 127.32, text: "Yes, we can." },
+    {
+      start: 127.32,
+      end: 130.62,
+      text: "Page 23. Listen and read along.",
+    },
+    { start: 130.98, end: 140.6, text: "C-H, ch. T-C-H, ch. S-H, sh. Peach, watch, shell." },
   ];
 
   const areas = [
@@ -69,7 +122,7 @@ const Unit3_Page1 = ({ openPopup }) => {
     // // الصوت الثاني – الأساسية
     { x1: 83.3, y1: 27, sound: 2, isPrimary: true },
     // // الصوت الثاني – الإضافية
-    { x1: 79, y1: 26, x2: 88, y2:35, sound: 2, isPrimary: false },
+    { x1: 79, y1: 26, x2: 88, y2: 35, sound: 2, isPrimary: false },
     //
 
     // // الصوت الثالث – الأساسية
@@ -91,7 +144,7 @@ const Unit3_Page1 = ({ openPopup }) => {
     //
 
     // // الصوت السادس – الأساسية
-    { x1: 43.3 , y1: 19, sound: 6, isPrimary: true },
+    { x1: 43.3, y1: 19, sound: 6, isPrimary: true },
     // // الصوت السادس – الإضافية
     { x1: 42, y1: 19, x2: 52.5, y2: 27, sound: 6, isPrimary: false },
 
@@ -107,7 +160,7 @@ const Unit3_Page1 = ({ openPopup }) => {
     //
 
     // الصوت التاسع – الأساسية
-    { x1:64, y1: 38.9,  sound: 9, isPrimary: true },
+    { x1: 64, y1: 38.9, sound: 9, isPrimary: true },
     // الصوت التاسع – الإضافية
     { x1: 59, y1: 34, x2: 92, y2: 42, sound: 9, isPrimary: false },
     //
@@ -125,9 +178,9 @@ const Unit3_Page1 = ({ openPopup }) => {
     //
 
     // الصوت الثاني عشر – الأساسية
-    {  x1:62.5, y1: 44.8, sound: 12, isPrimary: true },
+    { x1: 62.5, y1: 44.8, sound: 12, isPrimary: true },
     // الصوت الثاني عشر – الإضافية
-    { x1: 62.5, y1: 46, x2: 82, y2:57, sound: 12, isPrimary: false },
+    { x1: 62.5, y1: 46, x2: 82, y2: 57, sound: 12, isPrimary: false },
     //
 
     // الصوت الثالث عشر – الأساسية
@@ -137,9 +190,9 @@ const Unit3_Page1 = ({ openPopup }) => {
     //
 
     // الصوت الرابع عشر – الأساسية
-    { x1:83.9, y1: 44, sound: 14, isPrimary: true },
+    { x1: 83.9, y1: 44, sound: 14, isPrimary: true },
     // الصوت الرابع عشر – الإضافية
-    { x1: 83, y1: 44, x2:99, y2: 57, sound: 14, isPrimary: false },
+    { x1: 83, y1: 44, x2: 99, y2: 57, sound: 14, isPrimary: false },
   ];
   const sounds = {
     1: sound1,

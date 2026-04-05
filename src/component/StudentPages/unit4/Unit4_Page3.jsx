@@ -1,15 +1,11 @@
 import React, { useState, useRef } from "react";
-import page_3 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0030.jpg";
+import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 30.png";
 import "./Unit4_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 4/CD22.Pg30_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 4/Pg30_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 4/Pg30_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 4/Pg30_1.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 4/Pg30_1.4_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 4/Pg30_2.1_Harley.mp3";
-import sound6 from "../../../assets/audio/ClassBook/U 4/Pg30_2.2_Stella.mp3";
-import sound7 from "../../../assets/audio/ClassBook/U 4/Pg30_3.1_Hansel.mp3";
-import sound8 from "../../../assets/audio/ClassBook/U 4/Pg30_3.2_Helen.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 4/P 30/greammerp30.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_1.4_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_2.1_Boy.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_3.1_Older Boy.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -21,41 +17,43 @@ const Unit4_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 12, Exercise 1. Right Grammar." },
-    { start: 3.25, end: 7.11, text: " How old are you? I'm seven years old." },
+    { start: 0.219, end: 3.38, text: "Page 30, exercise 1.Write grammar." },
+    { start: 4.32, end: 5.78, text: " What's the weather like today?" },
+
     {
-      start: 7.15,
-      end: 11.02,
-      text: " When is your birthday? My birthday is in August.",
+      start: 6.92,
+      end: 8.679,
+      text: "What's the weather like in your country?",
     },
+
     {
-      start: 11.06,
-      end: 13.11,
-      text: "It is on Tuesday. ",
+      start: 9.96,
+      end: 13.739,
+      text: "What's the weather like in May? It's rainy.",
     },
-    { start: 13.15, end: 14.22, text: "How old are you, Sara? " },
-    { start: 14.26, end: 16.05, text: "I'm three years old. " },
-    { start: 16.09, end: 17.24, text: "When is your birthday party, Stella? " },
-    { start: 17.27, end: 19.16, text: "It is on Tuesday. " },
+
+    { start: 13.739, end: 15.939, text: "In my country, it's often warm." },
+    { start: 16.719, end: 19.159, text: "We can see flowers and baby birds." },
     {
-      start: 19.2,
-      end: 22.1,
-      text: "Happy birthday! This is for you, Stella. ",
+      start: 20.039,
+      end: 23.079,
+      text: "We usually go to the park. It's spring.",
     },
-    { start: 22.14, end: 23.1, text: "Thank you.  " },
-    { start: 23.14, end: 25.05, text: "You're welcome. Open it." },
+
+    { start: 24.1, end: 26.099, text: "In his country, it's often cool." },
+    { start: 26.42, end: 28.999, text: "He wears a jacket and warm clothing." },
+    {
+      start: 29.059,
+      end: 32.459,
+      text: "The wind often blows his cap away. It's autumn",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
-    { x1: 54.2, y1: 17.0, x2: 74.1, y2: 20.4, sound: sound5 },
-    { x1: 14.08, y1: 27.0, x2: 29.6, y2: 31.7, sound: sound6 },
-    { x1: 7.0, y1: 47.5, x2: 29.2, y2: 50.4, sound: sound7 },
-    { x1: 7.0, y1: 47.5, x2: 29.2, y2: 50.4, sound: sound8 },
-    
+    { x1: 6.49, y1: 9.69, x2: 65.1, y2: 20.69, sound: sound1 },
+    { x1: 65.31, y1: 10.2, x2: 92.46, y2: 20.01, sound: sound2 },
+    { x1: 32.56, y1: 35.24, x2: 83.19, y2: 42.84, sound: sound3 },
+    {  x1: 45.70 , y1: 65.53, x2: 93.75, y2: 72.81, sound: sound4 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
