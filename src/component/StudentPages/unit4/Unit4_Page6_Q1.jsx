@@ -1,57 +1,29 @@
 import React, { useState } from "react";
-import farmImg from "../../../assets/imgs/test.png";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Unit4_Page6_Q1.css";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 33/Ex D 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 33/Ex D 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 33/Ex D 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 33/Ex D 4.svg";
 
 const Unit4_Page6_Q1 = () => {
   const items = [
+    { text: "It's hot! We can wear shorts and T-shirts.", answer: "summer" },
+    { text: "Sometimes we can ice skate.", answer: "winter" },
+    { text: "It's often cool. We wear jackets.", answer: "autumn" },
+    { text: "We can see baby birds.", answer: "spring" },
     {
-      image: img1,
-      questionParts: ["Do you want a doll?"],
-      blanksCount: 0,
-      questionAnswers: [],
-      answer: "Yes, I do.",
+      text: "It's cold. There aren’t any leaves on the trees.",
+      answer: "winter",
     },
-    {
-      image: img2,
-      questionParts: ["Do you want a", ""],
-      blanksCount: 1,
-      questionAnswers: ["robot"],
-      answer: "Yes, I do.",
-    },
-    {
-      image: img3,
-      questionParts: [""],
-      blanksCount: 1,
-      questionAnswers: ["Do you want a computer?"],
-      answer: "Yes, I do.",
-    },
-    {
-      image: img4,
-      questionParts: ["Do you want a bike?"],
-      blanksCount: 0,
-      questionAnswers: [],
-      answer: "No, I don't. I want a dress",
-    },
+    { text: "We can go to the beach, and we can swim.", answer: "summer" },
+    { text: "It’s often warm. We can see flowers.", answer: "spring" },
   ];
 
-  const wordBank = [
-    "Yes, I do.",
-    "robot",
-    "Do you want a computer?",
-    "No, I don't. I want a dress",
-  ];
+  const wordBank = ["spring", "summer", "autumn", "winter"];
 
-  const [questionInputs, setQuestionInputs] = useState(
-    items.map((item) => Array(item.blanksCount).fill("")),
-  );
-
-  const [answers, setAnswers] = useState(items.map(() => ""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [showCorrect, setShowCorrect] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
 
@@ -60,37 +32,20 @@ const Unit4_Page6_Q1 = () => {
   // =========================
   const onDragEnd = (result) => {
     const { destination, draggableId } = result;
-    if (!destination || showCorrect) return;
+    if (!destination) return;
 
-    const value = draggableId.replace("word-", "");
-    const [type, i, j] = destination.droppableId.split("-");
+    const value = draggableId.replace("season-", "");
+    const index = Number(destination.droppableId);
 
-    const qIndex = Number(i);
-    const blankIndex = Number(j);
-
-    if (type === "q") {
-      const updated = [...questionInputs];
-      updated[qIndex][blankIndex] = value;
-      setQuestionInputs(updated);
-    }
-
-    if (type === "a") {
-      const updated = [...answers];
-      updated[qIndex] = value;
-      setAnswers(updated);
-    }
+    const updated = [...answers];
+    updated[index] = value;
+    setAnswers(updated);
   };
 
   // =========================
   // SHOW ANSWERS (🔥 FIXED)
   // =========================
   const showAnswers = () => {
-    setQuestionInputs(
-      items.map((item) =>
-        item.blanksCount > 0 ? [...item.questionAnswers] : [],
-      ),
-    );
-
     setAnswers(items.map((item) => item.answer));
     setShowCorrect(true);
     setWrongMarks([]);
@@ -100,7 +55,6 @@ const Unit4_Page6_Q1 = () => {
   // RESET
   // =========================
   const resetAll = () => {
-    setQuestionInputs(items.map((item) => Array(item.blanksCount).fill("")));
     setAnswers(items.map(() => ""));
     setShowCorrect(false);
     setWrongMarks([]);
@@ -112,52 +66,21 @@ const Unit4_Page6_Q1 = () => {
   const checkAnswers = () => {
     if (showCorrect) return;
 
-    // 1️⃣ Check blanks
-    for (let i = 0; i < items.length; i++) {
-      for (let j = 0; j < questionInputs[i].length; j++) {
-        if (!questionInputs[i][j]?.trim()) {
-          ValidationAlert.info(
-            "Oops!",
-            "Please complete all question blanks before checking.",
-          );
-          return;
-        }
-      }
-
-      // 2️⃣ Check answers
-      if (!answers[i]?.trim()) {
-        ValidationAlert.info(
-          "Oops!",
-          "Please complete all answers before checking.",
-        );
-        return;
-      }
+    // ❌ إذا في فراغ
+    if (answers.includes("")) {
+      ValidationAlert.info();
+      return;
     }
 
     let score = 0;
-    let total = 0;
+    let total = items.length;
     let wrong = [];
 
     items.forEach((item, i) => {
-      // blanks
-      item.questionAnswers.forEach((correctWord, idx) => {
-        total++;
-        if (
-          questionInputs[i][idx]?.trim().toLowerCase() ===
-          correctWord.toLowerCase()
-        ) {
-          score++;
-        } else {
-          wrong.push({ type: "question", qIndex: i, idx });
-        }
-      });
-
-      // answers
-      total++;
       if (answers[i]?.trim().toLowerCase() === item.answer.toLowerCase()) {
         score++;
       } else {
-        wrong.push({ type: "answer", qIndex: i });
+        wrong.push({ qIndex: i });
       }
     });
 
@@ -167,18 +90,17 @@ const Unit4_Page6_Q1 = () => {
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
     const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-          Score: ${score} / ${total}
-        </span>
-      </div>
-    `;
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color};font-weight:bold">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
 
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
   };
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
@@ -190,38 +112,103 @@ const Unit4_Page6_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall" style={{ width: "60%" }}>
+        <div
+          className="div-forall"
+          style={{ width: "60%", marginBottom: "40px" }}
+        >
           <h5 className="header-title-page8">
             <span className="ex-A">D</span>Complete the conversations.
           </h5>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "25px",
+              marginTop: "20px",
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              { word: "spring", img: img1 },
+              { word: "autumn", img: img2 },
+              { word: "summer", img: img3 },
+              { word: "winter", img: img4 },
+            ].map((item) => (
+              <div
+                key={item.word}
+                style={{
+                  position: "relative",
+                  border: "2px solid #f97316",
+                  borderRadius: "16px",
+                  padding: "6px",
+                  background: "#fff",
+                }}
+              >
+                {/* 🔥 اللابل فوق */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-12px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "#FEF3E6",
+                    border: "2px solid #F79938",
+                    borderRadius: "999px",
+                    padding: "2px 5px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    textTransform: "lowercase",
+                    zIndex: 5,
+                  }}
+                >
+                  {item.word}
+                </div>
 
+                {/* الصورة */}
+                <img
+                  src={item.img}
+                  alt={item.word}
+                  style={{
+                    width: "180px",
+                    height: "110px",
+                    objectFit: "cover",
+                    borderRadius: "12px",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
           {/* WORD BANK */}
-          <Droppable droppableId="bank" isDropDisabled={showCorrect}>
+          <Droppable droppableId="bank" direction="horizontal">
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 style={{
                   display: "flex",
-                  gap: "10px",
+                  gap: "12px",
                   padding: "10px",
                   border: "2px dashed #ccc",
                   borderRadius: "10px",
+                  marginTop: "20px",
                   justifyContent: "center",
+                  width: "100%",
+                  marginBottom: "20px",
+                  // justifyContent: "center",
                 }}
               >
                 {wordBank.map((word, index) => (
                   <Draggable
                     key={word}
-                    draggableId={`word-${word}`}
+                    draggableId={`season-${word}`}
                     index={index}
-                    isDragDisabled={showCorrect}
                   >
                     {(provided) => (
                       <span
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
+                        className="season-chip"
                         style={{
                           padding: "7px 14px",
                           border: "2px solid #2c5287",
@@ -229,6 +216,7 @@ const Unit4_Page6_Q1 = () => {
                           background: "white",
                           fontWeight: "bold",
                           cursor: "grab",
+                          fontSize: "16px",
                           ...provided.draggableProps.style,
                         }}
                       >
@@ -241,88 +229,76 @@ const Unit4_Page6_Q1 = () => {
               </div>
             )}
           </Droppable>
-
           {/* CONTENT */}
 
-          {items.map((item, i) => {
-            return (
-              <div className="content-CB-unit4-p6-q1">
-                <div className="CB-unit4-p6-q1-img-container">
-                   <span className="CB-unit4-p6-q1-index">{i + 1}</span>
-                  <img
-                    src={farmImg}
-                    alt=""
-                    style={{ height: "150px", width: "200px" }}
-                  />
-                </div>
-                <div key={i} className="question-box-CB-unit4-p6-q1">
-                  <div className="CB-unit4-p6-q1-title-container">
-                    <span className="CB-unit4-p6-q1-index">{i + 1}</span>
-                    <p style={{ width: "100%", display: "flex" }}>
-                      {item.questionParts.map((part, idx) => {
-                        if (part === "") {
-                          const blankIndex =
-                            item.questionParts
-                              .slice(0, idx + 1)
-                              .filter((p) => p === "").length - 1;
+          <div className="space-y-6">
+            {items.map((item, i) => (
+              <div key={i} className="flex items-center gap-7">
+                {/* TEXT */}
+                <span className="text-base">
+                  {i + 1}. {item.text}
+                </span>
 
-                          return (
-                            <Droppable
-                              key={idx}
-                              droppableId={`q-${i}-${blankIndex}`}
-                              isDropDisabled={showCorrect}
-                            >
-                              {(provided, snapshot) => (
-                                <span
-                                  ref={provided.innerRef}
-                                  {...provided.droppableProps}
-                                  className={`question-blank-CB-unit4-p6-q1 ${
-                                    snapshot.isDraggingOver
-                                      ? "drag-over-cell"
-                                      : ""
-                                  }`}
-                                >
-                                  {questionInputs[i][blankIndex]}
-                                  {provided.placeholder}
-                                </span>
-                              )}
-                            </Droppable>
-                          );
-                        }
+                {/* INLINE DROP */}
+                <Droppable droppableId={`${i}`}>
+                  {(provided) => {
+                    const isWrong = wrongMarks.some((w) => w.qIndex === i);
 
-                        return (
-                          <span
-                            key={idx}
-                            style={{ width: "100%", fontSize: "18px" }}
-                          >
-                            {" "}
-                            {part}{" "}
-                          </span>
-                        );
-                      })}
-                    </p>
-                  </div>
-                  <Droppable
-                    droppableId={`a-${i}`}
-                    isDropDisabled={showCorrect}
-                  >
-                    {(provided, snapshot) => (
+                    return (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`answer-input-CB-unit4-p6-q1  ${
-                          snapshot.isDraggingOver ? "drag-over-cell" : ""
-                        }`}
+                        style={{
+                          position: "relative",
+                          minWidth: "120px",
+                          textAlign: "center",
+                          fontWeight: "bold",
+                          color: answers[i] ? "#1C398E" : "black", // الكلمة أزرق غامق
+                          borderBottom: `2px solid ${
+                            showCorrect
+                              ? isWrong
+                                ? "red"
+                                : "#1C398E"
+                              : "black"
+                          }`,
+                          paddingBottom: "4px",
+                        }}
                       >
                         {answers[i]}
                         {provided.placeholder}
+
+                        {showCorrect && isWrong && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              right: "-28px",
+                              transform: "translateY(-50%)",
+                              width: "22px",
+                              height: "22px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </Droppable>
-                </div>
+                    );
+                  }}
+                </Droppable>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
 
         {/* BUTTONS */}

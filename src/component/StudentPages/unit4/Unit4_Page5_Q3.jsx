@@ -1,217 +1,338 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Unit4_Page5_Q3.css";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
-const Unit4_Page5_Q3 = () => {
-  const [answers, setAnswers] = useState(Array(4).fill(null));
-  const [showResult, setShowResult] = useState(false);
-  const [locked, setLocked] = useState(false);
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex C 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex C 2.svg";
 
-  // 🔥 الداتا المطابقة للصورة
-  const items = [
-    {
-      img: img1,
-      text: "She can",
-      options: [
-        "a I’m a teacher.",
-        "b I’m a police officer.",
-        "c I’m a photographer.",
-      ],
-      correctIndex: 0,
-    },
-    {
-      img: img2,
-      text: "He can’t",
-      options: ["a He’s a nurse.", "b He’s a chef.", "c He’s a clerk."],
-      correctIndex: 1,
-    },
-    {
-      img: img3,
-      text: "It can",
-      options: ["a He’s a taxi driver.", "b He’s a vet.", "c He’s a pilot"],
-      correctIndex: 2,
-    },
-    {
-      img: img4,
-      text: "She can",
-      options: [
-        "a She’s a nurse.",
-        "b She’s a taxi driver.",
-        "c She’s a clerk.",
-      ],
-      correctIndex: 0,
-    },
+const Unit4_Page5_Q3 = () => {
+  const grid = [
+    "t",
+    "u",
+    "e",
+    "j",
+    "k",
+    "h",
+    "t",
+    "h",
+    "e",
+    "b",
+    "v",
+    "e",
+    "d",
+    "v",
+    "e",
+    "d",
+    "n",
+    "a",
+    "m",
+    "e",
+    "p",
+    "l",
+    "o",
+    "f",
+    "y",
+    "u",
+    "j",
+    "u",
+    "l",
+    "i",
+    "a",
+    "s",
+    "q",
+    "w",
+    "a",
+    "c",
+    "v",
+    "x",
+    "z",
+    "c",
+    "v",
+    "o",
+    "s",
+    "c",
+    "h",
+    "o",
+    "o",
+    "l",
+    "k",
+    "i",
+    "s",
+    "f",
+    "r",
+    "t",
+    "h",
+    "e",
+    "s",
+    "x",
+    "z",
+    "l",
+    "o",
+    "n",
+    "d",
+    "o",
+    "n",
+    "e",
+    "h",
+    "g",
+    "m",
+    "c",
+    "o",
+    "u",
+    "r",
+    "t",
+    "j",
+    "r",
+    "e",
+    "w",
+    "d",
+    "c",
+    "s",
+    "c",
+    "h",
+    "o",
+    "o",
+    "l",
+    "m",
+    "b",
+    "v",
   ];
 
-  const handleSelect = (qIndex, optionIndex) => {
-    if (locked || showResult) return; // ❌ لا يسمح بالتعديل بعد Show Answer
-    const newAns = [...answers];
-    newAns[qIndex] = optionIndex;
-    setAnswers(newAns);
-    setShowResult(false);
-  };
+  const letters = grid;
+  const wordsToFind = [
+    "the",
+    "name",
+    "of",
+    "julia",
+    "school",
+    "is",
+    "london",
+    "court",
+    "school",
+  ];
+  const [locked, setLocked] = useState(false);
+  const [sentence, setSentence] = useState("");
+  const [selected, setSelected] = useState([]);
+  const [currentWord, setCurrentWord] = useState("");
+  const [foundWords, setFoundWords] = useState([]);
+  const [coloredCells, setColoredCells] = useState([]);
 
-  const checkAnswers = () => {
-    if (locked || showResult) return; // ❌ لا يسمح بالتعديل بعد Show Answer
-    if (answers.includes(null)) {
-      ValidationAlert.info("Oops!", "Please circle all words first.");
+  const handleClick = (letter, index) => {
+    if (locked) return;
+    if (coloredCells.includes(index)) return;
+
+    if (selected.includes(index)) {
+      const cutIndex = selected.indexOf(index);
+      const newSelected = selected.slice(0, cutIndex);
+      const newWord = newSelected.map((i) => letters[i]).join("");
+
+      setSelected(newSelected);
+      setCurrentWord(newWord);
       return;
     }
 
-    let correctCount = answers.filter(
-      (ans, i) => ans === items[i].correctIndex,
-    ).length;
-
-    const total = items.length;
-
-    let color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
-
-    const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-          Score: ${correctCount} / ${total}
-        </span>
-      </div>
-    `;
-
-    if (correctCount === total) ValidationAlert.success(msg);
-    else if (correctCount === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setShowResult(true);
+    setSelected((prev) => [...prev, index]);
+    setCurrentWord((prev) => prev + letter);
   };
 
+  useEffect(() => {
+    if (
+      wordsToFind.includes(currentWord) &&
+      !foundWords.includes(currentWord)
+    ) {
+      setFoundWords((prev) => [...prev, currentWord]);
+      setColoredCells((prev) => [...prev, ...selected]);
+
+      setSentence((prev) =>
+        prev === "" ? currentWord : prev + " " + currentWord,
+      );
+
+      setSelected([]);
+      setCurrentWord("");
+    }
+  }, [currentWord]);
+
   const reset = () => {
-    setAnswers(Array(items.length).fill(null));
-    setShowResult(false);
+    setSelected([]);
+    setCurrentWord("");
+    setFoundWords([]);
+    setColoredCells([]);
+    setSentence("");
     setLocked(false);
   };
   const showAnswers = () => {
-    // كل سؤال → نضع correctIndex بدل null
-    const filled = items.map((item) => item.correctIndex);
+    let allCells = [];
+    const fullString = letters.join("");
 
-    setAnswers(filled);
-    setShowResult(true);
-    setLocked(true); // 🔒 قفل الإجابات
+    wordsToFind.forEach((word) => {
+      const startIndex = fullString.indexOf(word);
+
+      if (startIndex !== -1) {
+        for (let i = 0; i < word.length; i++) {
+          allCells.push(startIndex + i);
+        }
+      }
+    });
+
+    setFoundWords(wordsToFind);
+    setColoredCells(allCells);
+    setSelected([]);
+    setCurrentWord("");
+    setSentence(wordsToFind.join(" "));
+    setLocked(true);
   };
 
+  const checkAnswers = () => {
+    if (locked) return;
+
+    const total = wordsToFind.length;
+    const score = foundWords.length;
+
+    if (score === 0) {
+      ValidationAlert.info("Please complete all answers.");
+      return;
+    }
+
+    if (score < total) {
+      ValidationAlert.warning(`
+      <div style="font-size:20px;text-align:center;">
+        <b style="color:orange;">Score: ${score} / ${total}</b>
+      </div>
+    `);
+    } else {
+      ValidationAlert.success(`
+      <div style="font-size:20px;text-align:center;">
+        <b style="color:green;">Score: ${score} / ${total}</b>
+      </div>
+    `);
+    }
+
+    setLocked(true); // 🔒 قفل بعد التصحيح
+  };
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
-        }}
-      >
+      <div className="div-forall">
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            C
+          </span>
+          What color gloves does the shopkeeper have in Picky Shopper on page
+          23?
+        </h5>
+
         <div>
-          <h5 className="header-title-page8">
-            <span className="ex-A">B</span>Look, read, and circle.
-          </h5>
-        </div>
-        <div className="container-CB-unit4-p5-q3">
-          {items.map((q, i) => (
+          {/* Words */}
+          <div className="flex flex-wrap justify-center gap-5 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
+            {wordsToFind.map((word) => (
+              <span
+                key={word}
+                className={`
+        px-[18px] py-2
+        rounded-[10px]
+        border-2 border-[#2c5287]
+        text-[15px] font-semibold
+        transition duration-200
+        ${
+          foundWords.includes(word)
+            ? "bg-[#2c5287] text-white border-[#2c5287]"
+            : "bg-white text-black"
+        }
+      `}
+              >
+                {word}
+              </span>
+            ))}
+          </div>
+
+          {/* Grid Wrapper */}
+          <div className="border-2 border-[#f28c63] px-[35px] pt-[25px] pb-[30px] w-full">
+            <div className="bg-[#daf5ff] rounded-[15px] px-[25px] py-[15px] flex flex-wrap gap-1">
+              {letters.map((letter, index) => {
+                const isSelected = selected.includes(index);
+                const isFound = coloredCells.includes(index);
+
+                return (
+                  <span
+                    key={index}
+                    onClick={() => handleClick(letter, index)}
+                    className={`
+            w-[35px] h-[35px]
+            flex items-center justify-center
+            text-[20px]
+            cursor-pointer
+            transition
+            ${isSelected ? "bg-[#ffd54f] rounded-sm p-2.5" : ""}
+            ${isFound ? "bg-[#4caf50] text-white rounded-sm p-2.5" : ""}
+          `}
+                  >
+                    {letter}
+                  </span>
+                );
+              })}
+            </div>
             <div
-              key={i}
-              className="question-box-CB-unit4-p5-q3"
-              style={{ width: "100%" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "15px",
+              }}
             >
+              <img
+                src={img1}
+                alt="start"
+                style={{
+                  width: "12vw",
+                  height: "auto",
+                }}
+              />
+
               <div
                 style={{
+                  flex: 1,
+                  borderBottom: "2px solid black",
+                  height: "30px",
                   display: "flex",
-                  gap: "10px",
-                  flexDirection: "row",
                   alignItems: "center",
-                  width: "80%",
                 }}
               >
-                <span
+                <input
+                  value={sentence}
+                  readOnly
                   style={{
-                    color: "#2c5287",
-                    fontSize: "20px",
-                    fontWeight: "700",
+                    width: "100%",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "18px",
                   }}
-                >
-                  {i + 1}
-                </span>
+                />
               </div>
-
-              <div style={{ display: "flex", gap: "10px" }}>
-                <div className="img-div-CB-unit4-p5-q3">
-                  <img
-                    src={q.img}
-                    className="q3-image-CB-unit4-p5-q3"
-                    style={{ height: "150px", width: "auto" }}
-                  />
-                </div>
-
-                <div className="options-row-CB-unit4-p5-q3">
-                  {q.options.map((word, optIndex) => {
-                    const isSelected = answers[i] === optIndex;
-                    const isCorrect = optIndex === q.correctIndex;
-
-                    return (
-                      <p
-                        key={optIndex}
-                        className={`
-                  option-word-CB-unit4-p5-q3
-                  ${isSelected ? "selected3" : ""}
-                  ${showResult && isSelected && !isCorrect ? "wrong" : ""}
-                  ${showResult && isCorrect ? "correct" : ""}
-                `}
-                        onClick={() => handleSelect(i, optIndex)}
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          position: "relative",
-                        }}
-                      >
-                        <>
-                          <span style={{ fontWeight: "700",marginRight:"10px" }}>
-                            {word.charAt(0)}
-                          </span>
-                          {word.slice(1)}
-                        </>
-
-                        {showResult && isSelected && !isCorrect && !locked && (
-                          <span className="wrong-x-CB-unit4-p5-q3">✕</span>
-                        )}
-                      </p>
-                    );
-                  })}
-                </div>
-              </div>
+              <img
+                src={img2}
+                alt="end"
+                style={{
+                  width: "12vw",
+                  height: "auto",
+                }}
+              />
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-      <div className="action-buttons-container">
-        <button className="try-again-button" onClick={reset}>
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button className="check-button2" onClick={checkAnswers}>
-          Check Answer ✓
-        </button>
+
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );

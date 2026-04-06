@@ -1,242 +1,278 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
-import "./Unit4_Page5_Q1.css";
-
-const ITEMS = [
-  { id: "p_ _ nt" },
-  { id: "c_ k _" },
-  { id: "pl _ _" },
-  { id: "l _ k _" },
-  { id: "M _ _" },
-  { id: "r _ _ n" },
-];
-
-const WORDS = [
-  { char: "a_e", color: "l" },
-  { char: "ai", color: "r" },
-  { char: "ay", color: "r" },
-];
-
-const ANSWERS = [
-  { word: "a_e", images: ["c_ k _", "l _ k _"] },
-  { word: "ai", images: ["p_ _ nt", "r _ _ n"] },
-  { word: "ay", images: ["pl _ _", "M _ _"] },
-];
+import image from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex A 1.svg";
+import Button from "../../Button";
 
 const Unit4_Page5_Q1 = () => {
-  const ref = useRef(null);
-  const [lines, setLines] = useState([]);
-  const [start, setStart] = useState(null);
-  const [wrong, setWrong] = useState([]);
+  const [selected, setSelected] = useState([]);
   const [locked, setLocked] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [wrongWords, setWrongWords] = useState([]);
+  // ✅ الكلمات + أماكنها (بالنسب)
+  const words = [
+    { id: "they", top: "23.32%", left: "32.21%", correct: true },
+    { id: "that", top: "49.82%", left: "14.31%", correct: true },
+    { id: "this", top: "48.10%", left: "43%", correct: true },
+    { id: "mother", top: "30.25%", left: "59.5%", correct: true },
+    { id: "brother", top: "65.43%", left: "79.94%", correct: true },
+    { id: "father", top: "93.68%", left: "23.92%", correct: true },
+    { id: "birthday", top: "73%", left: "60%", correct: true },
 
-  const getCenterPos = (el) => {
-    if (!el || !ref.current) return { x: 0, y: 0 };
+    // ❌ غلط
+    { id: "bath", top: "10.53%", left: "79.13%", correct: false },
+    { id: "thirsty", top: "73.42%", left: "16.03%", correct: false },
+    { id: "thick", top: "73%", left: "38%", correct: false },
+    { id: "thin", top: "92.48%", left: "45.68%", correct: false },
+  ];
 
-    const r = el.getBoundingClientRect();
-    const c = ref.current.getBoundingClientRect();
+  const handleClick = (word) => {
+    if (locked) return;
 
-    // مركز العنصر (بدون +8 ثابت)
-    return {
-      x: r.left - c.left + r.width / 2,
-      y: r.top - c.top + r.height / 2,
-    };
+    const exists = selected.find((w) => w.id === word.id);
+
+    if (exists) {
+      setSelected(selected.filter((w) => w.id !== word.id));
+    } else {
+      setSelected([...selected, word]);
+    }
   };
 
-  const startLine = (e) => {
+  const handleCheck = () => {
+    if (locked || showAnswer) return;
     if (locked || showAnswer) return;
 
-    const dot = e.currentTarget; // ✅ الدوت نفسه
-    const image = dot.dataset.image;
+    const totalCorrect = words.filter((w) => w.correct).length;
 
-    if (lines.some((l) => l.image === image)) return;
+    // ❌ ما اختار ولا شي
+    if (selected.length === 0) {
+      return ValidationAlert.info();
+    }
 
-    setStart({ image, ...getCenterPos(dot) });
-  };
+    let correctCount = 0;
+    let wrong = [];
 
-  const endLine = (e) => {
-    if (!start || locked || showAnswer) return;
-
-    const dot = e.currentTarget; // ✅ الدوت نفسه
-    const word = dot.dataset.word;
-    const pos = getCenterPos(dot);
-
-    setLines((prev) => [
-      ...prev,
-      {
-        x1: start.x,
-        y1: start.y,
-        x2: pos.x,
-        y2: pos.y,
-        image: start.image,
-        word,
-      },
-    ]);
-
-    setStart(null);
-  };
-
-  const checkAnswers = () => {
-    if (locked || showAnswer) return;
-    const total = ANSWERS.reduce((a, b) => a + b.images.length, 0);
-    if (lines.length < total)
-      return ValidationAlert.info("Oops!", "Please connect all the pairs.");
-
-    let correct = 0;
-    let wrongImgs = [];
-
-    lines.forEach((l) => {
-      const ok = ANSWERS.some(
-        (a) => a.word === l.word && a.images.includes(l.image),
-      );
-      ok ? correct++ : wrongImgs.push(l.image);
+    selected.forEach((w) => {
+      if (w.correct) {
+        correctCount++;
+      } else {
+        wrong.push(w.id);
+      }
     });
 
-    setWrong(wrongImgs);
+    setWrongWords(wrong);
     setLocked(true);
 
     const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
+      correctCount === totalCorrect
+        ? "green"
+        : correctCount === 0
+          ? "red"
+          : "orange";
 
     ValidationAlert[
-      correct === total ? "success" : correct === 0 ? "error" : "warning"
-    ](`<b style="color:${color}">Score: ${correct} / ${total}</b>`);
+      correctCount === totalCorrect
+        ? "success"
+        : correctCount === 0
+          ? "error"
+          : "warning"
+    ](`<b style="color:${color}">Score: ${correctCount} / ${totalCorrect}</b>`);
+
+    setLocked(true);
   };
 
-  const show = () => {
-    setLocked(true);
+  const handleShowAnswer = () => {
     setShowAnswer(true);
-    setWrong([]);
-    setLines([]); // ⬅️ امسح أي خطوط قديمة
+    setLocked(true);
+    setSelected(words.filter((w) => w.correct));
+  };
 
-    const answerLines = [];
-
-    ANSWERS.forEach((a) => {
-      a.images.forEach((imgId) => {
-        const startDot = document.querySelector(
-          `.CB-review1-p2-q1-dot-start[data-image="${imgId}"]`,
-        );
-        const endDot = document.querySelector(
-          `.CB-review1-p2-q1-dot-end[data-word="${a.word}"]`,
-        );
-
-        if (startDot && endDot) {
-          const s = getCenterPos(startDot);
-          const e = getCenterPos(endDot);
-
-          answerLines.push({
-            x1: s.x,
-            y1: s.y,
-            x2: e.x,
-            y2: e.y,
-            image: imgId,
-            word: a.word,
-          });
-        }
-      });
-    });
-
-    setLines(answerLines);
+  const handleReset = () => {
+    setSelected([]);
+    setWrongWords([]);
+    setLocked(false);
+    setShowAnswer(false);
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        {/* ❌ لا تعديل */}
-        <h5 className="header-title-page8">
-          <span className="ex-A">A</span>{" "}
-          <span style={{ color: "#2e3192" }}>1</span>Match and write.{" "}
-        </h5>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "30px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <div className="unscramble-container">
+          <h5 className="header-title-page8 pb-2.5">
+            <span className="ex-A" style={{ marginRight: "10px" }}>
+              A
+            </span>
+            Follow the words with the
+            <span style={{ color: "#2e3192" }}>voiced th</span>sound.
+          </h5>
 
-        {/* ❌ لا تعديل */}
-        <div ref={ref} className="match-wrapper2-CB-review1-p2-q1">
-          {/* IMAGES */}
-          <div className="CB-unit4-p5-q1-images">
-            {ITEMS.map((item, index) => (
-              <div key={item.id} className="CB-review1-p2-q1-img-box">
-                <span className="CB-unit4-p5-q1-index">{index + 1}</span>
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "1000px", // ⭐ تحكم بالحجم العام
+              margin: "0 auto",
+            }}
+          >
+            {/* الصورة */}
+            <img
+              src={image}
+              alt="interactive"
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+              }}
+            />
+            {/* START */}
+            <div
+              style={{
+                position: "absolute",
+                top: "10.53%",
+                left: "10.18%",
+                transform: "translate(-50%, -50%) rotate(-15deg)",
+                fontSize: "clamp(20px, 1vw, 16px)",
+                fontWeight: "bold",
+                pointerEvents: "none",
+              }}
+            >
+              Start
+            </div>
+
+            {/* FINISH */}
+            <div
+              style={{
+                position: "absolute",
+                top: "82.75%",
+                left: "88.65%",
+                transform: "translate(-50%, -50%) rotate(-15deg)",
+                fontSize: "clamp(20px, 1vw, 16px)",
+                fontWeight: "bold",
+                pointerEvents: "none",
+              }}
+            >
+              Finish
+            </div>
+            {/* ✅ الدوائر */}
+            {selected.map((word, i) => {
+              const isWrong = wrongWords.includes(word.id);
+
+              return (
                 <div
-                  className={`CB-review1-p2-q1-text-item ${locked ? "disabled-hover" : ""}`}
-                  onClick={() =>
-                    document.querySelector(`[data-image="${item.id}"]`)?.click()
-                  }
+                  key={i}
+                  style={{
+                    position: "absolute",
+                    top: word.top,
+                    left: word.left,
+                    width: "10%",
+                    height: "16%",
+                    border: `0.2vw solid ${isWrong ? "red" : "#1C398E"}`, // 🔥 التغيير
+                    borderRadius: "50%",
+                    transform: "translate(-50%, -50%)",
+                    pointerEvents: "none",
+                    zIndex: 5,
+                  }}
                 >
-                  {item.id}
+                  {/* ❌ X */}
+                  {isWrong && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-6px",
+                        right: "-6px",
+                        width: "20px",
+                        height: "20px",
+                        background: "#ef4444",
+                        color: "white",
+                        borderRadius: "50%",
+                        fontSize: "12px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ✕
+                    </div>
+                  )}
                 </div>
+              );
+            })}
 
-                {wrong.includes(item.id) && (
-                  <span className="CB-review1-p2-q1-error">✕</span>
-                )}
-
+            {/* ✅ مناطق الضغط */}
+            {words.map((word, i) => {
+              return (
                 <div
-                  className="CB-review1-p2-q1-dot CB-review1-p2-q1-dot-start"
-                  data-image={item.id}
-                  onClick={startLine}
-                />
-              </div>
-            ))}
-          </div>
+                  key={i}
+                  onClick={() => handleClick(word)}
+                  style={{
+                    position: "absolute",
+                    top: word.top,
+                    left: word.left,
+                    transform: "translate(-50%, -50%)",
+                    fontSize: "clamp(10px, 1vw, 16px)",
+                    padding: "0.2vw 0.6vw",
+                    borderRadius: "0.5vw",
+                    whiteSpace: "nowrap",
+                    cursor: "pointer",
 
-          {/* WORDS */}
-          <div className="CB-review1-p2-q1-words">
-            {WORDS.map((w) => (
-              <div key={w.char} className="CB-review1-p2-q1-word-box">
-                <h5
-                  className={`CB-review1-p2-q1-word ${w.color}`}
-                  onClick={() =>
-                    document.querySelector(`[data-word="${w.char}"]`)?.click()
-                  }
+                    // 🔥 هذا المهم
+                    border: "0.2vw solid orange",
+                  }}
                 >
-                  {w.char}
-                </h5>
+                  {word.id}
+                </div>
+              );
+            })}
 
-                <div
-                  className="CB-review1-p2-q1-dot CB-review1-p2-q1-dot-end"
-                  data-word={w.char}
-                  onClick={endLine}
-                />
+            {/* ✅ الكلمات */}
+            {words.map((word, i) => (
+              <div
+                key={i}
+                style={{
+                  position: "absolute",
+                  top: word.top,
+                  left: word.left,
+                  transform: "translate(-50%, -50%)",
+                  fontSize: "clamp(10px, 1vw, 16px)", // ⭐ responsive ذكي
+                  background: "white",
+                  padding: "0.2vw 0.6vw",
+                  borderRadius: "0.5vw",
+                  whiteSpace: "nowrap",
+                  pointerEvents: "none",
+                }}
+              >
+                {word.id}
               </div>
             ))}
           </div>
-
-          {/* LINES */}
-          <svg className="lines-layer">
-            {lines.map((l, i) => (
-              <line
-                key={i}
-                x1={l.x1}
-                y1={l.y1}
-                x2={l.x2}
-                y2={l.y2}
-                stroke="red"
-                strokeWidth="3"
-              />
-            ))}
-          </svg>
         </div>
       </div>
-      {/* ❌ الأزرار كما هي */}
-      <div className="action-buttons-container">
-        <button
-          onClick={() => {
-            setLines([]);
-            setWrong([]);
-            setShowAnswer(false); // ← رجع التعديل
-            setLocked(false); // ⭐⭐⭐ NEW: إعادة فتح الرسم
-          }}
-          className="try-again-button"
-        >
-          Start Again ↻
-        </button>
-        <button onClick={show} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+
+      {/* ⭐ BUTTONS */}
+      <Button
+        handleShowAnswer={handleShowAnswer}
+        handleStartAgain={handleReset}
+        checkAnswers={handleCheck}
+      />
     </div>
   );
 };
