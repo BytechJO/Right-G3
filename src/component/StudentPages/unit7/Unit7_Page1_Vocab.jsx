@@ -1,33 +1,41 @@
 import React, { useState, useRef, useEffect } from "react";
-import backgroundImage from "../../../assets/imgs/test.png";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/G5_U7_Pg_58.png";
 import page2_2 from "../../../assets/imgs/test.png";
-// import vocabulary from "../../../assets/img_unit3/sounds-unit3/Pg10_Vocabulary_Adult Lady.mp3";
+import vocabulary from "../../../assets/audio/ClassBook/Unit 7/P 58/Pg58_Vocab_Adult Lady.mp3";
+import vocabularyImg from "../../../assets/imgs/Voc.svg";
 import "./unit7_Page1.css";
-import num1 from "../../../assets/imgs/test.png";
-import num2 from "../../../assets/imgs/test.png";
-import num3 from "../../../assets/imgs/test.png";
-import num4 from "../../../assets/imgs/test.png";
-import num5 from "../../../assets/imgs/test.png";
-import num6 from "../../../assets/imgs/test.png";
-import num7 from "../../../assets/imgs/test.png";
-import num8 from "../../../assets/imgs/test.png";
-import num9 from "../../../assets/imgs/test.png";
-import num10 from "../../../assets/imgs/test.png";
-import num11 from "../../../assets/imgs/test.png";
-// import sound1 from "../../../assets/img_unit3/sounds-unit3/U2-01.mp3";
-// import sound2 from "../../../assets/img_unit3/sounds-unit3/U2-02.mp3";
-// import sound3 from "../../../assets/img_unit3/sounds-unit3/U2-03.mp3";
-// import sound4 from "../../../assets/img_unit3/sounds-unit3/U2-04.mp3";
-// import sound5 from "../../../assets/img_unit3/sounds-unit3/U2-05.mp3";
-// import sound6 from "../../../assets/img_unit3/sounds-unit3/U2-06.mp3";
-// import sound7 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
-// import sound8 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
-// import sound9 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
-// import sound10 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
+import num1 from "../../../assets/imgs/num/1_1.svg";
+import num2 from "../../../assets/imgs/num/2_1.svg";
+import num3 from "../../../assets/imgs/num/3_1.svg";
+import num4 from "../../../assets/imgs/num/4_1.svg";
+import num5 from "../../../assets/imgs/num/5_1.svg";
+import num6 from "../../../assets/imgs/num/6_1.svg";
+import num7 from "../../../assets/imgs/num/7_1.svg";
+import num8 from "../../../assets/imgs/num/8_1.svg";
+import num9 from "../../../assets/imgs/num/9_1.svg";
+import num10 from "../../../assets/imgs/num/10_1.svg";
+import num11 from "../../../assets/imgs/num/11_1.svg";
+import num12 from "../../../assets/imgs/num/12_1.svg";
+import num13 from "../../../assets/imgs/num/13_1.svg";
+import num14 from "../../../assets/imgs/num/14_1.svg";
+import sound1 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound12.mp3";
+import sound13 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound13.mp3";
+import sound14 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound14.mp3";
 import { TbMessageCircle } from "react-icons/tb";
 import { IoMdSettings } from "react-icons/io";
 import { FaPlay, FaPause } from "react-icons/fa";
-const Unit5_Page1_Vocab = () => {
+const Unit3_Page1_Vocab = () => {
   const mainAudioRef = useRef(null);
   const clickAudioRef = useRef(null);
 
@@ -35,7 +43,7 @@ const Unit5_Page1_Vocab = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeIndex2, setActiveIndex2] = useState(null);
   const [showContinue, setShowContinue] = useState(false);
-  const stopAtSecond = 3.0;
+  const stopAtSecond = 4.1;
   const [clickedIndex, setClickedIndex] = useState(null);
   // إعدادات الصوت
   const [showSettings, setShowSettings] = useState(false);
@@ -53,25 +61,37 @@ const Unit5_Page1_Vocab = () => {
   // ✔ Captions Array
   // ================================
   const captions = [
-    { start: 0, end: 3.1, text: "Page 10, Unit 2, Vocabulary." },
-    { start: 3.12, end: 5.15, text: " 1. Party Hat. " },
-    { start: 5.17, end: 7.16, text: "2. Jello." },
-    { start: 7.18, end: 9.27, text: "3. Cake. " },
-    { start: 9.29, end: 12.2, text: "4. Happy Birthday." },
-    { start: 12.22, end: 15.07, text: " 5. Balloons." },
-    { start: 15.09, end: 17.13, text: " 6. Present. " },
-    { start: 17.15, end: 19.26, text: "7.card" },
+    { start: 0.44, end: 3.22, text: "Page 58, unit seven vocabulary." },
+    { start: 4.10, end: 5.76, text: "1. Soccer field." },
+    { start: 6.44, end: 7.86, text: "2. team." },
+    { start: 8.68, end: 10.48, text: "3. Class." },
+    { start: 11.42, end: 13.14, text: "4. Music room." },
+    { start: 14.40, end: 15.46, text: "5. Cafeteria." },
+    { start: 17.32, end: 19.20, text: "6. Library." },
+    { start: 20.16, end: 22.04, text: "7. Computer lab" },
+    { start: 22.86, end: 24.5, text: "8. Student." },
+    { start: 25.5, end: 26.98, text: "9. Bus station." },
+    { start: 28.32, end: 29.89, text: "10. Street" },
+    { start: 31.00, end: 32.74, text: "11. Balcony." },
+    { start: 33.78, end: 35.42, text: "12. City." },
+    { start: 36.46, end: 38.06, text: "13. Walk." },
   ];
   // 🎵 فترات الكلمات داخل الأوديو الرئيسي
-  const wordTimings = [
-    { start: 3.2, end: 5.15 }, // party hat
-    { start: 5.22, end: 7.2 }, // jellow
-    { start: 7.23, end: 9.43 }, // cake
-    { start: 9.43, end: 12.25 }, // Hello
-    { start: 12.27, end: 15.05 }, // Good morning
-    { start: 15.04, end: 17.13 },
-    { start: 17.15, end: 19.26 },
-  ];
+const wordTimings = [
+  { start: 4.10, end: 5.76 },
+  { start: 6.44, end: 7.86 },
+  { start: 8.68, end: 10.48 },
+  { start: 11.42, end: 13.14 },
+  { start: 14.40, end: 15.46 },
+  { start: 17.32, end: 19.20 },
+  { start: 20.16, end: 22.04 },
+  { start: 22.86, end: 24.5 },
+  { start: 25.5, end: 26.98 },
+  { start: 28.32, end: 29.89 },
+  { start: 31.00, end: 32.74 },
+  { start: 33.78, end: 35.42 },
+  { start: 36.46, end: 38.06 },
+];
 
   // ================================
   // ✔ Update caption highlight
@@ -153,7 +173,22 @@ const Unit5_Page1_Vocab = () => {
       setIsPlaying(false);
     }
   };
-  const wordAudios = [sound1, sound2, sound3, sound4, sound5, sound6, sound7];
+  const wordAudios = [
+    sound1,
+    sound2,
+    sound3,
+    sound4,
+    sound5,
+    sound6,
+    sound7,
+    sound8,
+    sound9,
+    sound10,
+    sound11,
+    sound12,
+    sound13,
+    sound14,
+  ];
   const playWordAudio = (index) => {
     // أوقفي الأوديو الرئيسي
     mainAudioRef.current.pause();
@@ -182,9 +217,37 @@ const Unit5_Page1_Vocab = () => {
     };
   };
 
-  const nums = [num1, num2, num3, num4, num5, num6, num7, num8, num9, num10];
+  const nums = [
+    num1,
+    num2,
+    num3,
+    num4,
+    num5,
+    num6,
+    num7,
+    num8,
+    num9,
+    num10,
+    num11,
+    num12,
+    num13,
+  ];
   const wordRefs = useRef(wordAudios.map(() => React.createRef()));
-
+  const positions = [
+    { top: "28%", left: "61%" },//1
+    { top: "27%", left: "53%" },//2
+    { top: "37%", left: "46%" },//3
+    { top: "44%", left: "65%" },//4
+    { top: "44%", left: "47%" },//5
+    { top: "44%", left: "56%" },//6
+    { top: "37%", left: "56%" },//7
+    { top: "51%", left: "41%" },// 8
+    { top: "70%", left: "61%" },//9
+    { top: "76%", left: "37%" },//10
+    { top: "53%", left: "77%" },//11
+    { top: "23%", left: "82%" },//12
+    { top: "54%", left: "68%" },//13
+  ];
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
@@ -232,9 +295,8 @@ const Unit5_Page1_Vocab = () => {
                   updateCaption(Number(e.target.value));
                 }}
                 style={{
-                  background: `linear-gradient(to right, #430f68 ${
-                    (current / duration) * 100
-                  }%, #d9d9d9ff ${(current / duration) * 100}%)`,
+                  background: `linear-gradient(to right, #430f68 ${(current / duration) * 100
+                    }%, #d9d9d9ff ${(current / duration) * 100}%)`,
                 }}
               />
 
@@ -298,9 +360,8 @@ const Unit5_Page1_Vocab = () => {
             <p
               key={i}
               id={`caption-${i}`}
-              className={`caption-inPopup-line2 ${
-                activeIndex === i ? "active" : ""
-              }`}
+              className={`caption-inPopup-line2 ${activeIndex === i ? "active" : ""
+                }`}
             >
               {cap.text}
             </p>
@@ -309,13 +370,13 @@ const Unit5_Page1_Vocab = () => {
         {/* كلمة + صورة صغيرة */}
 
         <img
-          src={page2_2}
+          src={vocabularyImg}
           style={{
-            height: "210px",
+            height: "370px",
             width: "auto",
             position: "absolute",
             bottom: "0%",
-            right: "0%",
+            right: "-49%",
             borderRadius: "5%",
           }}
         />
@@ -323,19 +384,22 @@ const Unit5_Page1_Vocab = () => {
         {/* النصوص */}
         <div
           className="vocab_container"
-          style={{ bottom: "1.4%", right: "4.5%" }}
+          style={{ bottom: "0.9%", right: "-33.5%" }}
         >
           {[
-            "kitchen",
-            "carry",
-            "fruit",
-            "meat",
-            "fish",
-            "rice",
-            "chicken",
-            "happy",
-            "look",
-            "tablecloth",
+            "Soccer field",
+            "team",
+            "Class",
+            "Music room",
+            "Cafeteria",
+            "Library",
+            "Computer lab",
+            "Student",
+            "Bus station",
+            "Street",
+            "Balcony",
+            "City",
+            "Walk"
           ].map((text, i) => (
             <h6
               key={i}
@@ -357,15 +421,14 @@ const Unit5_Page1_Vocab = () => {
             key={i}
             src={num}
             id={`num-${i + 1}`}
-            className={`num-img ${
-              (activeIndex2 === i && current >= 3.2) || clickedIndex === i
+            className={`num-img ${(activeIndex2 === i && current >= 3.2) || clickedIndex === i
                 ? "active"
                 : ""
-            }`}
+              }`}
             style={{
-              height: "20px",
-              width: "auto",
+              height: "17px",
               position: "absolute",
+              ...positions[i], // 👈 أهم سطر
             }}
           />
         ))}
@@ -384,4 +447,4 @@ const Unit5_Page1_Vocab = () => {
   );
 };
 
-export default Unit5_Page1_Vocab;
+export default Unit3_Page1_Vocab;

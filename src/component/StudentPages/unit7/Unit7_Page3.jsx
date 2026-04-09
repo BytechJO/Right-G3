@@ -2,11 +2,12 @@ import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0060.jpg";
 import "./Unit7_Page3.css";
 import grammarSound from "../../../assets/audio/ClassBook/U 7/CD41.Pg60_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 5/Pg42_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 5/Pg41_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 5/Pg42_2.1_Helen.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 5/Pg42_3.1_John.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 5/Pg42_4.1_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_1.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_5.1_Boy.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_3.1_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_4.1_Adult Lady.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_5.2_Girl.mp3";
 
 
 import AudioWithCaption from "../../AudioWithCaption";
@@ -23,13 +24,15 @@ const Unit7_Page3 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
-    { x1: 54.2, y1: 17.0, x2: 74.1, y2: 20.4, sound: sound5 },
+{ x1: 9.5, y1: 12.7, x2: 35.0, y2: 22.0, sound: sound1 },   
+  { x1: 39.5, y1: 11.8, x2: 91.6, y2: 23.0, sound: sound2 },
+{ x1: 58.5, y1: 26.8, x2: 87.6, y2: 36.0, sound: sound5 },
+// { x1: 8.5, y1: 26.8, x2: 39.6, y2: 36.0, sound: sound2 },
+{ x1: 8.5, y1: 26.8, x2: 39.6, y2: 36.0, sound: sound4 },
+{ x1: 8.5, y1: 64.8, x2: 48.6, y2: 68.0, sound: sound3 },
+{ x1: 31.5, y1: 89.2, x2: 54.6, y2: 92.4, sound: sound6 }
 
-    
+
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

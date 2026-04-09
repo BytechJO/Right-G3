@@ -17,14 +17,14 @@ const Unit7_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 71 })}
+          onClick={() => openPopup("exercise", { startIndex: 32 })}
           style={{ overflow: "visible" }}
         >
           <image
             className="svg-img"
             href={arrowBtn}
-            x="0"
-            y="0"
+            x="150"
+            y="-20"
             width="90"
             height="90"
           />
@@ -39,14 +39,14 @@ const Unit7_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 74 })}
+          onClick={() => openPopup("exercise", { startIndex: 33 })}
           style={{ overflow: "visible" }}
         >
           <image
             className="svg-img"
             href={arrowBtn}
-            x="0"
-            y="0"
+            x="-400"
+            y="160"
             width="90"
             height="90"
           />
@@ -61,14 +61,14 @@ const Unit7_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 72 })}
+          onClick={() => openPopup("exercise", { startIndex: 34 })}
           style={{ overflow: "visible" }}
         >
           <image
             className="svg-img"
             href={arrowBtn}
-            x="0"
-            y="0"
+            x="30"
+            y="110"
             width="90"
             height="90"
           />
@@ -83,13 +83,13 @@ const Unit7_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 73 })}
+          onClick={() => openPopup("exercise", { startIndex: 35 })}
           style={{ overflow: "visible" }}
         >
           <image
             className="svg-img"
             href={arrowBtn}
-            x="0"
+            x="500"
             y="0"
             width="90"
             height="90"

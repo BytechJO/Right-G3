@@ -1,178 +1,299 @@
-import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useState } from "react";
+
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const Unit7_Page6_Q1 = () => {
-  const wordBank = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
-  const questions = [
-    { id: 1, number: 4, answer: "Wednesday" },
-    { id: 2, number: 2, answer: "Monday" },
-    { id: 3, number: 6, answer: "Friday" },
-  ];
-
-  const [answers, setAnswers] = useState({
+  const [userAnswers, setUserAnswers] = useState({
     1: "",
     2: "",
     3: "",
+    4: "",
+    5: "",
+    6: "",
+    7: "",
+    8: "",
+    9: "",
   });
 
-  const [locked, setLocked] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  const words = ["them", "it",  "them", "you", "her",  "us"];
+
+  const correctAnswers = {
+    1: "it",
+    2: "her",
+    3: "them",
+    4: "them",
+    5: "you",
+    6: "us",
+  };
+
+  const questions = [
+    {
+      parts: [
+        { type: "text", value: "1. Look! There's a car. Can you see " },
+        { type: "blank", id: "1" },
+        { type: "text", value: "?" },
+      ],
+    },
+    {
+      parts: [
+        { type: "text", value: "2. There's Mom. Can you see" },
+        { type: "blank", id: "2" },
+        { type: "text", value: "?" },
+      ],
+    },
+    {
+      parts: [
+        { type: "text", value: "3. There are crayons. Can you see" },
+        { type: "blank", id: "3" },
+        { type: "text", value: " ?" },
+      ],
+    },
+    {
+      parts: [
+        { type: "text", value: "4. There are two dogs. Can you see" },
+        { type: "blank", id: "4" },
+        { type: "text", value: "?" },
+      ],
+    },
+    {
+      parts: [
+        { type: "text", value: "5. There you are. i can see " },
+        { type: "blank", id: "5" },
+        { type: "text", value: "!" },
+      ],
+    },
+    {
+      parts: [
+        { type: "text", value: "6. Here we are. can you see ? " },
+        { type: "blank", id: "6" },
+        { type: "text", value: "?" },
+      ],
+    },
+  ];
 
   const onDragEnd = (result) => {
-    if (!result.destination || locked) return;
+    const { destination, draggableId } = result;
+    if (!destination) return;
 
-    const word = result.draggableId;
-    const dest = result.destination.droppableId;
+    const inputId = destination.droppableId;
 
-    if (dest.startsWith("answer-")) {
-      const id = dest.split("-")[1];
-
-      setAnswers((prev) => ({
-        ...prev,
-        [id]: word,
-      }));
-    }
+    setUserAnswers((prev) => ({
+      ...prev,
+      [inputId]: draggableId,
+    }));
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    const hasEmptyInputs = Object.values(userAnswers).some(
+      (value) => !value || value.trim() === ""
+    );
 
-    // ✅ إذا لم يملأ كل الإجابات
-    if (Object.values(answers).includes("")) {
-      ValidationAlert.info("Please complete all answers.");
+    if (hasEmptyInputs) {
+      ValidationAlert.info("Please complete all answers first.");
       return;
     }
 
-    let correct = 0;
+    let currentScore = 0;
+    const totalQuestions = Object.keys(correctAnswers).length;
 
-    questions.forEach((q) => {
-      if (answers[q.id] === q.answer) correct++;
+    Object.keys(correctAnswers).forEach((id) => {
+      const userAnswer = userAnswers[id]?.toLowerCase().trim();
+      const correctAnswer = correctAnswers[id].toLowerCase();
+
+      if (userAnswer === correctAnswer) currentScore++;
     });
 
-    const total = questions.length;
+    setChecked(true);
 
-    let color = correct === total ? "green" : correct === 0 ? "red" : "orange";
-
-    const message = `
-    <div style="font-size:20px;text-align:center;">
-      <b style="color:${color};">Score: ${correct} / ${total}</b>
-    </div>
-  `;
-
-    if (correct === total) ValidationAlert.success(message);
-    else if (correct === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
-
-    setLocked(true);
+    if (currentScore === totalQuestions) {
+      ValidationAlert.success(`Perfect! ${currentScore} / ${totalQuestions}`);
+    } else if (currentScore > 1) {
+      ValidationAlert.warning(`Good job! You got ${currentScore} / ${totalQuestions}`);
+    } else {
+      ValidationAlert.error(`You got ${currentScore} / ${totalQuestions}`);
+    }
   };
-  const reset = () => {
-    setAnswers({
+
+  const handleShowAnswer = () => {
+    setUserAnswers({
+      1: "Stella",
+      2: "he is",
+      3: "is",
+      4: "uncle",
+      5: "she is stella's",
+      6: "is stella's",
+      7: "she is",
+      8: "sister",
+      9: "stella's mother",
+    });
+  };
+
+  const handleStartAgain = () => {
+    setUserAnswers({
       1: "",
       2: "",
       3: "",
+      4: "",
+      5: "",
+      6: "",
+      7: "",
+      8: "",
+      9: "",
     });
-    setLocked(false);
+    setChecked(false);
   };
 
-  const showAnswers = () => {
-    const filled = {};
-    questions.forEach((q) => {
-      filled[q.id] = q.answer;
+  // ✅ FIX: حساب كم مرة مطلوب كل كلمة
+  const getRequiredCounts = () => {
+    const counts = {};
+    Object.values(correctAnswers).forEach((word) => {
+      const w = word.toLowerCase().trim();
+      counts[w] = (counts[w] || 0) + 1;
     });
-
-    setAnswers(filled);
-    setLocked(true);
+    return counts;
   };
+
+  // ✅ FIX: حساب كم مرة المستخدم استخدم كل كلمة
+  const getUsedCounts = () => {
+    const counts = {};
+    Object.values(userAnswers).forEach((word) => {
+      const w = word.toLowerCase().trim();
+      if (w) counts[w] = (counts[w] || 0) + 1;
+    });
+    return counts;
+  };
+
+  const requiredCounts = getRequiredCounts();
+  const usedCounts = getUsedCounts();
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col items-center p-8">
-        <div className="w-[60%]">
-          <h5 className="header-title-page8" style={{ marginBottom: "20px" }}>
-            <span className="ex-A">D </span>Read and write.
-          </h5>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "30px",
+        }}
+      >
+        <div
+          className="div-forall"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "30px",
+            width: "60%",
+            justifyContent: "flex-start",
+          }}
+        >
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">D</span> Read and complete.
+          </h1>
 
-          {/* WORD BANK */}
-          <Droppable droppableId="bank" direction="horizontal">
+          {/* الكلمات */}
+          <Droppable droppableId="words" direction="horizontal">
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex flex-wrap gap-3 mb-10"
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  padding: "10px",
+                  border: "2px dashed #ccc",
+                  borderRadius: "10px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                }}
               >
-                {wordBank.map((word, index) => (
-                  <Draggable key={word} draggableId={word} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="px-4 py-2 border rounded-lg bg-white shadow cursor-grab hover:bg-gray-100"
-                      >
-                        {word}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+                {words.map((word, index) => {
+                  const usedCount = usedCounts[word] || 0;
+                  const requiredCount = requiredCounts[word] || 0;
+
+                  const isUsed = usedCount >= requiredCount;
+
+                  return (
+                    <Draggable
+                      key={word}
+                      draggableId={word}
+                      index={index}
+                      isDragDisabled={checked || isUsed}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            padding: "7px 14px",
+                            border: "2px solid #2c5287",
+                            borderRadius: "8px",
+                            background: isUsed ? "#ccc" : "white",
+                            opacity: isUsed ? 0.6 : 1,
+                            cursor: isUsed ? "not-allowed" : "grab",
+                            fontSize: "15px",
+                            ...provided.draggableProps.style,
+                          }}
+                        >
+                          {word}
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
                 {provided.placeholder}
               </div>
             )}
           </Droppable>
 
-          {/* QUESTIONS */}
-          {questions.map((q) => (
-            <div key={q.id} className="flex items-center gap-6 mb-8">
-              <div className="w-20 h-20 flex items-center justify-center text-4xl border-2 border-red-400 rounded-xl">
-                {q.number}
+          {/* الأسئلة الديناميكية */}
+          <div className="flex-1 bg-white border-2 border-gray-300 rounded-2xl p-6 space-y-4 text-xl">
+            {questions.map((q, qIndex) => (
+              <div key={qIndex} className="flex items-center gap-2 flex-wrap">
+                {q.parts.map((part, i) => {
+                  if (part.type === "text") {
+                    return <span key={i}>{part.value}</span>;
+                  }
+
+                  return (
+                    <Droppable key={i} droppableId={part.id}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                          className={`relative border-b-2 w-30 text-center min-h-[30px] ${
+                            snapshot.isDraggingOver ? "bg-yellow-100" : ""
+                          }`}
+                        >
+                          {checked &&
+                            userAnswers[part.id] &&
+                            userAnswers[part.id].toLowerCase().trim() !==
+                              correctAnswers[part.id].toLowerCase() && (
+                              <div className="wb-wrong-icon-unit1-page6-q1">✕</div>
+                            )}
+
+                          {userAnswers[part.id]}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  );
+                })}
               </div>
-
-              <div className="text-lg">
-                <p>What day is it today?</p>
-
-                <Droppable droppableId={`answer-${q.id}`}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className="border-b-2 border-black min-w-[250px] py-1"
-                    >
-                      It is
-                      <span style={{ color: "red" }}>
-                        {" "}
-                        {answers[q.id]}
-                        {provided.placeholder}
-                      </span>
-                    </div>
-                  )}
-                </Droppable>
-              </div>
-            </div>
-          ))}
-
-          {/* BUTTONS */}
-          <div className="action-buttons-container">
-            <button onClick={reset} className="try-again-button">
-              Start Again ↻
-            </button>
-            <button
-              onClick={showAnswers}
-              className="show-answer-btn swal-continue"
-            >
-              Show Answer
-            </button>
-            <button onClick={checkAnswers} className="check-button2">
-              Check Answer ✓
-            </button>
+            ))}
           </div>
+
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
     </DragDropContext>
