@@ -1,201 +1,203 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Unit7_Page6_Q2.css";
+import Button from "../../Button";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 63/Ex E 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 63/Ex E 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 63/Ex E 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 63/Ex E 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 63/Ex E 5.svg";
 
 const Unit7_Page6_Q2 = () => {
+  const [userAnswers, setUserAnswers] = useState({
+    1: "", 2: "", 3: "", 4: "", 5: "",
+  });
+  const [checked, setChecked] = useState(false);
+
+  const words = ["it", "her", "them", "you", "us"];
+
+  const correctAnswers = {
+    1: "it", 2: "her", 3: "them", 4: "them", 5: "you", 6: "us",
+  };
+
   const questions = [
-    "It’s a quarter to eight in the morning.",
-    "It’s half past two in the afternoon.",
-    "It’s half past five in the afternoon.",
-    "It’s a quarter past seven at night.",
-    "It’s a quarter past three in the morning.",
-    "It’s a quarter to eleven at night.",
+    { id: 1, image: img1 },
+    { id: 2, image: img2 },
+    { id: 3, image: img3 },
+    { id: 4, image: img4 },
+    { id: 5, image: img5 },
   ];
 
-  const correct = [
-    { h: "7", m: "45", p: "am" },
-    { h: "2", m: "30", p: "pm" },
-    { h: "5", m: "30", p: "pm" },
-    { h: "7", m: "15", p: "pm" },
-    { h: "3", m: "15", p: "am" },
-    { h: "10", m: "45", p: "pm" },
-  ];
-
-  const [answers, setAnswers] = useState(
-    questions.map(() => ({ h: 0, m: "00", p: "" })),
-  );
-
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-
-  const handleChange = (i, field, value) => {
-    if (locked) return;
-
-    const updated = [...answers];
-    updated[i][field] = value;
-    setAnswers(updated);
+  const onDragEnd = (result) => {
+    const { destination, draggableId } = result;
+    if (!destination) return;
+    setUserAnswers((prev) => ({
+      ...prev,
+      [destination.droppableId]: draggableId,
+    }));
   };
 
   const checkAnswers = () => {
-    if (locked || showResult) return;
-
-    if (answers.some((a) => !a.h || !a.m || !a.p)) {
-      ValidationAlert.info("Please complete all answers.");
+    const empty = Object.values(userAnswers).some((v) => !v?.trim());
+    if (empty) {
+      ValidationAlert.info("كمل كل الفراغات");
       return;
     }
-
-    let correctCount = 0;
-
-    answers.forEach((a, i) => {
-      if (
-        a.h === correct[i].h &&
-        a.m === correct[i].m &&
-        a.p === correct[i].p
-      ) {
-        correctCount++;
+    let score = 0;
+    Object.keys(correctAnswers).forEach((id) => {
+      if (userAnswers[id]?.toLowerCase().trim() === correctAnswers[id].toLowerCase()) {
+        score++;
       }
     });
-
-    const total = correct.length;
-
-    const message = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:#2e7d32;font-weight:bold;">
-          Score: ${correctCount} / ${total}
-        </span>
-      </div>
-    `;
-
-    if (correctCount === total) {
-      ValidationAlert.success(message);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(message);
-    } else {
-      ValidationAlert.warning(message);
-    }
-
-    setLocked(true);
-    setShowResult(true);
+    setChecked(true);
+    if (score === 6) ValidationAlert.success(`Perfect ${score}/6`);
+    else if (score >= 3) ValidationAlert.warning(`Good ${score}/6`);
+    else ValidationAlert.error(`${score}/6`);
   };
 
-  const showAnswers = () => {
-    setAnswers(correct);
-    setLocked(true);
-    setShowResult(true);
-  };
-
-  const reset = () => {
-    setAnswers(questions.map(() => ({ h: 0, m: "00", p: "" })));
-    setLocked(false);
-    setShowResult(false);
+  const handleStartAgain = () => {
+    setUserAnswers({ 1: "", 2: "", 3: "", 4: "", 5: "" });
+    setChecked(false);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        padding: "30px",
-      }}
-    >
-      <div className="div-forall" style={{ width: "80%" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A">E</span> Read, write, and check{" "}
-          <span style={{ color: "#2e3192" }}>✓</span>.
-        </h5>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div style={{ display: "flex", justifyContent: "center", padding: "10px" }}>
+        <div style={{ width: "100%", maxWidth: "900px", display: "flex", flexDirection: "column", gap: "12px" }}>
 
-        <div className="grid grid-cols-2 gap-y-5 gap-x-[60px] mt-5 ">
-          {questions.map((q, i) => (
-            <div key={i} className="flex flex-col gap-2.5 ">
-              <div className="text-[18px]">
-                <span className=" font-bold mr-1.5">{i + 1}</span>
-                {q}
-              </div>
-
-              <div className="flex items-center gap-5">
-                {/* Time Box */}
-                <div className="flex items-center justify-center gap-2.5 border-4 border-[#e7a98e] rounded-[14px] w-[200px] h-20 bg-[#f4f4f4]">
-                  <input
-                    type="number"
-                    value={answers[i].h}
-                    min="1"
-                    max="12"
-                    step="1"
-                    onChange={(e) => handleChange(i, "h", e.target.value)}
-                    className="w-[45px] border-none bg-transparent text-[26px] text-center outline-none"
-                  />
-
-                  <span className="text-[26px] text-[#c33]">:</span>
-
-                  <input
-                    type="number"
-                    value={answers[i].m}
-                    min="0"
-                    max="59"
-                    step="1"
-                    onChange={(e) => handleChange(i, "m", e.target.value)}
-                    className="w-[45px] border-none bg-transparent text-[26px] text-center outline-none"
-                  />
-                </div>
-
-                {/* AM PM */}
-                <div className="bg-[#d82525] rounded-[22px] p-2 w-[120px] h-20 flex flex-col justify-between">
-                  <div
-                    onClick={() => handleChange(i, "p", "am")}
-                    className={`flex justify-between items-center h-7 px-2.5 py-1 rounded-lg text-white text-[18px] cursor-pointer box-border transition-all
-    ${
-      answers[i].p === "am"
-        ? "text-[#d82525] font-bold bg-white/80"
-        : "bg-white/20 hover:bg-white/40"
-    }
-  `}
-                  >
-                    a.m.
-                    <span
-                      className={`${answers[i].p === "am" ? "opacity-100" : "opacity-0"}`}
-                    >
-                      ✔
-                    </span>
-                  </div>
-
-                  <div
-                    onClick={() => handleChange(i, "p", "pm")}
-                    className={`flex justify-between items-center h-7 px-2.5 py-1 rounded-lg text-white text-[18px] cursor-pointer box-border transition-all
-    ${
-      answers[i].p === "pm"
-        ? "text-[#d82525] font-bold bg-white/80"
-        : "bg-white/20 hover:bg-white/40"
-    }
-  `}
-                  >
-                    p.m.
-                    <span
-                      className={`${answers[i].p === "pm" ? "opacity-100" : "opacity-0"}`}
-                    >
-                      ✔
-                    </span>
-                  </div>
-                </div>
-              </div>
+          {/* عنوان التمرين */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{
+              backgroundColor: "#f4a62a",
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "14px",
+              padding: "2px 8px",
+              borderRadius: "4px",
+            }}>
+              E
             </div>
-          ))}
-        </div>
+            <span style={{ color: "#f4a62a", fontWeight: "bold", fontSize: "14px" }}>
+              Look and write. Use the words below.
+            </span>
+          </div>
 
-        <div className="action-buttons-container">
-          <button className="try-again-button" onClick={reset}>
-            Start Again ↻
-          </button>
+          {/* الكلمات */}
+          <Droppable droppableId="words" direction="horizontal">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                  padding: "8px",
+                  border: "2px dashed #ccc",
+                  borderRadius: "10px",
+                  justifyContent: "center",
+                }}
+              >
+                {words.map((word, index) => (
+                  <Draggable
+                    key={word}
+                    draggableId={word}
+                    index={index}
+                    isDragDisabled={checked}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={{
+                          padding: "5px 12px",
+                          border: "2px solid #2c5287",
+                          borderRadius: "8px",
+                          background: "white",
+                          cursor: "grab",
+                          fontSize: "14px",
+                          ...provided.draggableProps.style,
+                        }}
+                      >
+                        {word}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
 
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
+          {/* الصور - صف واحد 5 صور */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: "10px",
+          }}>
+            {questions.map((q) => (
+              <div
+                key={q.id}
+                style={{
+                  border: "2px solid #ddd",
+                  borderRadius: "10px",
+                  padding: "6px",
+                  textAlign: "center",
+                  background: "#fff",
+                }}
+              >
+                {/* رقم السؤال */}
+                <div style={{ fontSize: "12px", fontWeight: "bold", textAlign: "left", marginBottom: "4px", color: "#333" }}>
+                  {q.id}
+                </div>
 
-          <button className="check-button2" onClick={checkAnswers}>
-            Check Answer ✓
-          </button>
+                <img
+                  src={q.image}
+                  alt={`q${q.id}`}
+                  style={{
+                    width: "100%",
+                    height: "90px",
+                    objectFit: "contain",
+                    borderRadius: "8px",
+                  }}
+                />
+
+                <Droppable droppableId={String(q.id)}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      style={{
+                        marginTop: "6px",
+                        borderBottom: "2px solid #000",
+                        minHeight: "26px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {userAnswers[q.id]}
+                      {checked && userAnswers[q.id] !== correctAnswers[q.id] && (
+                        <span style={{ color: "red", marginLeft: "4px" }}>✕</span>
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            handleShowAnswer={() => setUserAnswers(correctAnswers)}
+            handleStartAgain={handleStartAgain}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 };
 

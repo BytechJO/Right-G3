@@ -1,233 +1,154 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-
-const Unit7_Page5_Q3 = () => {
-  const questions = [
+// بيانات التمرين
+const exerciseData = {
+  questions: [
     {
       id: 1,
-      type: "complete",
-      img: img1,
-      sentence: "It is a quarter past five.",
+      question: "Our teacher likes ...",
+      options: [
+        { id: "a", text: "us" },
+        { id: "b", text: "we" },
+      ],
+      correct: "a",
     },
-
     {
       id: 2,
-      type: "twoWords",
-      img: img2,
-      words: ["thirty", "four"],
-      answer: "four thirty",
+      question: "Can you see ... ",
+      options: [
+        { id: "a", text: "me" },
+        { id: "b", text: "i" },
+      ],
+      correct: "a",
     },
-
     {
       id: 3,
-      type: "scramble",
-      img: img3,
-      words: ["to", "quarter", "ten", "a", "o'clock"],
-      answer: "a quarter to ten o'clock",
+      question: "I don't like snakes, but my btother likes ...",
+      options: [
+        { id: "a", text: "they" },
+        { id: "b", text: "them" },
+      ],
+      correct: "b",
     },
-  ];
+    {
+      id: 4,
+      question: "My friends likes ...",
+      options: [
+        { id: "a", text: "I" },
+        { id: "b", text: "me" },
+      ],
+      correct: "b",
+    },
+  ],
+};
 
+const Unit7_Page5_Q3 = () => {
   const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination || locked) return;
-
-    const word = draggableId.replace("word-", "");
-
-    setAnswers({
-      ...answers,
-      [destination.droppableId]: answers[destination.droppableId]
-        ? answers[destination.droppableId] + " " + word
-        : word,
-    });
-  };
-
-  const reset = () => {
-    setAnswers({});
-    setLocked(false);
-  };
-
-  const showAnswers = () => {
-    const correct = {};
-
-    questions.forEach((q, i) => {
-      if (q.answer) {
-        correct[`slot-${i}`] = q.answer;
-      }
-    });
-
-    setAnswers(correct);
-    setLocked(true);
+  const handleSelect = (questionId, optionId) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: optionId,
+    }));
+    setShowResults(false);
   };
 
   const checkAnswers = () => {
-    if (locked) return;
-    const empty = questions.some((q, i) => q.answer && !answers[`slot-${i}`]);
+    const allAnswered = exerciseData.questions.every(
+      (q) => answers[q.id]
+    );
 
-    if (empty) {
-      ValidationAlert.info("Please complete all answers.");
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all questions first.");
       return;
     }
+
+    setShowResults(true);
+
     let score = 0;
-    let total = 0;
 
-    questions.forEach((q, i) => {
-      if (!q.answer) return;
-
-      total++;
-
-      if (answers[`slot-${i}`] === q.answer) {
+    exerciseData.questions.forEach((q) => {
+      if (answers[q.id] === q.correct) {
         score++;
       }
     });
 
-    const msg = `
-<div style="font-size:20px;text-align:center;">
-<span style="color:#2e7d32;font-weight:bold;">
-Score: ${score} / ${total}
-</span>
-</div>
-`;
+    if (score === exerciseData.questions.length) {
+      ValidationAlert.success(`Score: ${score} / ${exerciseData.questions.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${exerciseData.questions.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${exerciseData.questions.length}`);
+    }
+  };
 
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+  const handleStartAgain = () => {
+    setAnswers({});
+    setShowResults(false);
+  };
 
-    setLocked(true);
+  const handleShowAnswer = () => {
+    const autoAnswers = {};
+    exerciseData.questions.forEach((q) => {
+      autoAnswers[q.id] = q.correct;
+    });
+    setAnswers(autoAnswers);
+    setShowResults(true);
+  };
+
+  const getOptionStyle = (qId, optId) => {
+    const isSelected = answers[qId] === optId;
+
+    if (!showResults) {
+      return isSelected ? "bg-blue-500 text-white" : "bg-gray-200";
+    }
+
+    const isCorrect = exerciseData.questions.find((q) => q.id === qId).correct === optId;
+
+    if (isCorrect) return "bg-green-500 text-white";
+    if (isSelected && !isCorrect) return "bg-red-500 text-white";
+
+    return "bg-gray-200";
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{ display: "flex", justifyContent: "center", padding: "30px" }}
-      >
-        <div className="div-forall" style={{ width: "60%" }}>
-          {/* ❌ الهيدر كما هو */}
-          <h5 className="header-title-page8">
-            <span className="ex-A mr-2.5">B</span>Look and write.
-          </h5>
-          {questions.map((q, i) => {
-            return (
-              <div key={i} className="flex flex-col gap-4 w-full max-w-[800px]">
-                {/* OPTIONS */}
-                {q.words && (
-                  <Droppable
-                    droppableId={`bank-${i}`}
-                    direction="horizontal"
-                    isDropDisabled
+    <div className="main-container-component">
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">Read and choose the correct answer</h1>
+
+        <div className="space-y-6 mt-6">
+          {exerciseData.questions.map((q) => (
+            <div key={q.id} className="p-4 bg-white shadow rounded-lg">
+              <p className="text-lg mb-3">{q.question}</p>
+
+              <div className="flex gap-4">
+                {q.options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => handleSelect(q.id, opt.id)}
+                    className={`px-4 py-2 rounded-lg transition-all ${getOptionStyle(
+                      q.id,
+                      opt.id
+                    )}`}
                   >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="flex gap-4 justify-center items-center w-full"
-                      >
-                        {q.words
-                          .filter(
-                            (w) =>
-                              !(answers[`slot-${i}`] || "")
-                                .split(" ")
-                                .includes(w),
-                          )
-                          .map((w, index) => (
-                            <Draggable
-                              key={w}
-                              draggableId={`word-${w}`}
-                              index={index}
-                              isDragDisabled={locked}
-                            >
-                              {(provided) => (
-                                <span
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  className="bg-blue-200 px-4 py-2 rounded-lg cursor-grab"
-                                >
-                                  {w}
-                                </span>
-                              )}
-                            </Draggable>
-                          ))}
-
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                )}
-
-                {/* ROW */}
-
-                <div className="flex items-center gap-4">
-                  <span className="font-bold w-5">{q.id}</span>
-
-                  <img
-                    src={q.img}
-                    className="w-[110px]! h-[110px]! object-contain"
-                  />
-
-                  {q.type === "complete" && <span>{q.sentence}</span>}
-
-                  {q.type !== "complete" && (
-                    <>
-                      <span>It is</span>
-
-                      <Droppable droppableId={`slot-${i}`}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className="border-b-2 flex-1 min-h-[35px]"
-                          >
-                            {answers[`slot-${i}`] && (
-                              <span
-                                className="text-red-600 cursor-pointer"
-                                onClick={() => {
-                                  const updated = { ...answers };
-                                  delete updated[`slot-${i}`];
-                                  setAnswers(updated);
-                                }}
-                              >
-                                {answers[`slot-${i}`]}
-                              </span>
-                            )}
-
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-
-                      <span>.</span>
-                    </>
-                  )}
-                </div>
+                    {opt.text}
+                  </button>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
-        <div className="action-buttons-container">
-          <button onClick={reset} className="try-again-button">
-            Start Again ↻
-          </button>
-          <button
-            onClick={showAnswers}
-            className="show-answer-btn swal-continue"
-          >
-            Show Answer
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
+        <Button
+          checkAnswers={checkAnswers}
+          handleStartAgain={handleStartAgain}
+          handleShowAnswer={handleShowAnswer}
+        />
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 
