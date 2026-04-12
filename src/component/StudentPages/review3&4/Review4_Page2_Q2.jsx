@@ -1,120 +1,92 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import find_img from "../../../assets/imgs/test.png";
+import WrongMark from "../../WrongMark";
 
-/* ================= DATA ================= */
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex E 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex E 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex E 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex E 4.svg";
 
-const items = [
-  {
-    key: "cake",
-    label: "cake",
-    area: { x1: 26.4395, y1: 48.9356, x2: 34.2037, y2: 53.5385 },
-  },
-  {
-    key: "rain",
-    label: "rain",
-    area: { x1: 17.6300, y1: 33.6881, x2: 28.9778, y2: 37.7158 },
-  },
-  {
-    key: "paint",
-    label: "paint",
-    area: {
-      x1: 56.1526,
-      y1: 50.0863,
-      x2: 61.2292,
-      y2: 54.9770,
-    },
-  },
- 
-];
+import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
 
-/* ================= COMPONENT ================= */
-
+import Button from "../../Button";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 const Review4_Page2_Q2 = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [circles, setCircles] = useState({});
-  const [checked, setChecked] = useState(false);
+  const items = [
+    { img: img1, correct: "no" },
+    { img: img2, correct: "yes" },
+    { img: img3, correct: "yes" },
+    { img: img4, correct: "yes" },
+  ];
 
-  /* ================= IMAGE CLICK ================= */
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [locked, setLocked] = useState(false);
+  const captions = [
+    {
+      start: 0,
+      end: 4.23,
+      text: "Page 8. Right Activities. Exercise A, number 1. ",
+    },
+    {
+      start: 4.25,
+      end: 8.28,
+      text: "Listen and write the missing letters. Number the pictures.  ",
+    },
+    { start: 8.3, end: 11.05, text: "1-tiger." },
+    { start: 11.07, end: 13.12, text: "2-taxi." },
+    { start: 13.14, end: 15.14, text: "3-duck." },
+    { start: 15.16, end: 17.13, text: "4-deer." },
+  ];
+  const choose = (i, value) => {
+    if (locked) return;
 
-  const handleImageClick = (e) => {
-    if (!selectedItem || checked) return;
-
-    const rect = e.target.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-  console.log(`x: ${x.toFixed(4)}, y: ${y.toFixed(4)}`);
-    setCircles((prev) => ({
-      ...prev,
-      [selectedItem]: { x, y },
-    }));
+    const updated = [...selected];
+    updated[i] = value;
+    setSelected(updated);
   };
 
-  /* ================= CHECK ANSWER ================= */
+  const checkAnswers = () => {
+    if (locked) return;
 
-  const handleCheck = () => {
-    if (checked) return;
-    if (Object.keys(circles).length < items.length) {
-      ValidationAlert.info("Pay attention!", "Please circle all the words.");
+    if (selected.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
     let score = 0;
 
-    items.forEach((item) => {
-      const p = circles[item.key];
-      if (!p) return;
-
-      if (
-        p.x >= item.area.x1 &&
-        p.x <= item.area.x2 &&
-        p.y >= item.area.y1 &&
-        p.y <= item.area.y2
-      ) {
-        score++;
-      }
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) score++;
     });
 
-    setChecked(true);
+    const total = items.length;
 
-    const color =
-      score === items.length ? "green" : score === 0 ? "red" : "orange";
-    const scoreMessage = `
-    <div style="font-size: 20px; margin-top: 10px; text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-      Score: ${score} / ${items.length}
-      </span>
-    </div>
-  `;
-    if (score === items.length) ValidationAlert.success(scoreMessage);
-    else if (score === 0) ValidationAlert.error(scoreMessage);
-    else ValidationAlert.warning(scoreMessage);
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+      <div style="font-size:20px;text-align:center;">
+        <span style="color:${color};font-weight:bold">
+        Score: ${score} / ${total}
+        </span>
+      </div>
+    `;
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+
+    setLocked(true);
   };
 
-  /* ================= SHOW ANSWER ================= */
-
-  const handleShowAnswer = () => {
-    const correct = {};
-    items.forEach((item) => {
-      correct[item.key] = {
-        x: (item.area.x1 + item.area.x2) / 2,
-        y: (item.area.y1 + item.area.y2) / 2,
-      };
-    });
-
-    setCircles(correct);
-    setChecked(true);
+  const showAnswers = () => {
+    setSelected(items.map((i) => i.correct));
+    setLocked(true);
   };
 
-  /* ================= RESET ================= */
-
-  const handleStartAgain = () => {
-    setSelectedItem(null);
-    setCircles({});
-    setChecked(false);
+  const reset = () => {
+    setSelected(Array(items.length).fill(""));
+    setLocked(false);
   };
-
-  /* ================= RENDER ================= */
 
   return (
     <div
@@ -125,90 +97,131 @@ const Review4_Page2_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          width: "60%",
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-        }}
-      >
-       <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>E</span> Does it have{" "}
-          <span style={{ color: "#2e3192" }}>long a</span>?Look and circle.
-
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "20px" }}>E</span>
+          Does the word have a{" "}
+          <span style={{ color: "#2e3192" }}>voiced th</span> sound? Listen and
+          write<span style={{ color: "#D52328" }}> ✓ </span>or
+          <span style={{ color: "#D52328" }}> ✗</span>
         </h5>
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
 
-        {/* WORD BUTTONS */}
-        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-          {items.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => setSelectedItem(item.key)}
-              style={{
-                padding: "6px 16px",
-                borderRadius: "12px",
-                background: "white",
-                border:
-                  selectedItem === item.key
-                    ? "2px solid #007bff"
-                    : "1px solid #999",
-                cursor: "pointer",
-              }}
-            >
-              {item.label}
-            </button>
+        {/* GRID */}
+        <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center">
+          {items.map((item, i) => (
+            <div key={i} className="relative flex flex-col items-center">
+              {/* الرقم */}
+              <span className="absolute -top-3 -left-3 text-lg font-bold">
+                {i + 1}
+              </span>
+
+              {/* الصورة */}
+              <img
+                src={item.img}
+                style={{
+                  width: "15vw",
+                  height: "18vh",
+                  objectFit: "contain",
+                  border: "3px solid #F79530", // 🔥 برتقالي
+                  borderRadius: "12px",
+                  padding: "4px",
+                }}
+              />
+
+              <div className="flex gap-3 mt-3 items-center">
+                <div
+                  className="flex items-center gap-1"
+                  style={{ position: "relative" }}
+                >
+                  <button
+                    onClick={() => choose(i, "yes")}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      cursor: "pointer",
+
+                      background: selected[i] === "yes" ? "#1C398E" : "#fff", // 🔵 دايماً
+                      color: selected[i] === "yes" ? "#fff" : "#000",
+
+                      border: "2px solid #F79530",
+                    }}
+                  >
+                    ✓
+                  </button>
+
+                  {locked &&
+                    selected[i] === "yes" &&
+                    item.correct !== "yes" && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "-35px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          zIndex: 10,
+                        }}
+                      >
+                        <WrongMark />
+                      </div>
+                    )}
+                </div>
+
+                {/* NO */}
+                <div
+                  className="flex items-center gap-1"
+                  style={{ position: "relative" }}
+                >
+                  <button
+                    onClick={() => choose(i, "no")}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      cursor: "pointer",
+
+                      background: selected[i] === "no" ? "#1C398E" : "#fff",
+                      color: selected[i] === "no" ? "#fff" : "#000",
+
+                      border: "2px solid #F79530",
+                    }}
+                  >
+                    ✗
+                  </button>
+                  {locked && selected[i] === "no" && item.correct !== "no" && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "35px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        zIndex: 10,
+                      }}
+                    >
+                      <WrongMark />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           ))}
         </div>
-      </div>
 
-      {/* IMAGE */}
-      <div style={{ position: "relative", marginTop: "20px" }}>
-        <img
-          src={find_img}
-          alt="classroom"
-          style={{
-            height: "50vh",
-            width: "auto",
-            cursor: selectedItem ? "crosshair" : "default",
-            display: "block",
-          }}
-          onClick={handleImageClick}
+        {/* buttons */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
         />
-
-        {/* DRAW CIRCLES */}
-        {Object.entries(circles).map(([key, point]) => (
-          <div
-            key={key}
-            style={{
-              position: "absolute",
-              top: `${point.y}%`,
-              left: `${point.x}%`,
-              width: "9%",
-              height: "10%",
-              border: "3px solid red",
-              borderRadius: "50%",
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "none",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* ACTION BUTTONS */}
-      <div className="action-buttons-container">
-        <button className="try-again-button" onClick={handleStartAgain}>
-          Start Again ↻
-        </button>
-
-        <button className="show-answer-btn" onClick={handleShowAnswer}>
-          Show Answer
-        </button>
-
-        <button className="check-button2" onClick={handleCheck}>
-          Check Answer ✓
-        </button>
       </div>
     </div>
   );
