@@ -1,242 +1,327 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-
-import "./Review3_Page2_Q3.css";
-
-const IMAGES = [
-  { id: "img1", src: img1 },
-  { id: "img2", src: img2 },
-  { id: "img3", src: img3 },
-  { id: "img4", src: img4 },
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 6.svg";
+const items = [
+  {
+    sentence: "pcaeh",
+    scrambled: ["pcaeh"],
+    correct: ["peach"],
+    img: img1,
+  },
+  {
+    sentence: "hilci",
+    scrambled: ["hilci"],
+    correct: ["chili"],
+    img: img4,
+  },
+  {
+    sentence: "wcath",
+    scrambled: ["wcath"],
+    correct: ["watch"],
+    img: img2,
+  },
+  {
+    sentence: "bnech",
+    scrambled: ["bnech"],
+    correct: ["bench"],
+    img: img5,
+  },
+  {
+    sentence: "nechkit",
+    scrambled: ["nechkit"],
+    correct: ["kitchen"],
+    img: img3,
+  },
+  {
+    sentence: "tachc",
+    scrambled: ["tachc"],
+    correct: ["catch"],
+    img: img6,
+  },
 ];
 
-const WORDS = [
-  { char: "j", color: "l" },
-  { char: "y", color: "r" },
-];
+export default function Review3_Page2_Q3() {
+  // ✨ كل كلمة string بدل array
+  const [answers, setAnswers] = useState(
+    items.map((item) => Array(item.correct[0].length).fill("")),
+  );
 
-const ANSWERS = [
-  { word: "j", images: ["img1", "img2"] },
-  { word: "y", images: ["img3", "img4"] },
-];
-
-const Review3_Page2_Q3 = () => {
-  const ref = useRef(null);
-  const [lines, setLines] = useState([]);
-  const [start, setStart] = useState(null);
-  const [wrong, setWrong] = useState([]);
   const [locked, setLocked] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
-  const getCenterPos = (el) => {
-    if (!el || !ref.current) return { x: 0, y: 0 };
+  const onDragEnd = (result) => {
+    const { destination, draggableId, source } = result;
+    if (!destination || locked) return;
 
-    const r = el.getBoundingClientRect();
-    const c = ref.current.getBoundingClientRect();
+    const letterId = draggableId;
+    const letter = letterId.split("-")[0];
 
-    // مركز العنصر (بدون +8 ثابت)
-    return {
-      x: r.left - c.left + r.width / 2,
-      y: r.top - c.top + r.height / 2,
-    };
+    // إذا سحب داخل نفس المكان → تجاهل
+    if (destination.droppableId === source.droppableId) return;
+
+    // إذا drop على slot
+    if (destination.droppableId.startsWith("slot")) {
+      const [, qIndex, letterIndex] = destination.droppableId.split("-");
+
+      const updated = [...answers];
+
+      // 🔁 إذا في حرف قديم → احذفه (عشان يرجع يتفعل بالبنك)
+      updated[qIndex][letterIndex] = {
+        char: letter,
+        id: letterId,
+      };
+
+      setAnswers(updated);
+    }
   };
 
-  const startLine = (e) => {
-    if (locked || showAnswer) return;
-
-    const dot = e.currentTarget; // ✅ الدوت نفسه
-    const image = dot.dataset.image;
-
-    if (lines.some((l) => l.image === image)) return;
-
-    setStart({ image, ...getCenterPos(dot) });
+  const resetAll = () => {
+    setAnswers(items.map((item) => Array(item.correct[0].length).fill("")));
+    setLocked(false);
+    setShowResult(false);
   };
 
-  const endLine = (e) => {
-    if (!start || locked || showAnswer) return;
-
-    const dot = e.currentTarget; // ✅ الدوت نفسه
-    const word = dot.dataset.word;
-    const pos = getCenterPos(dot);
-
-    setLines((prev) => [
-      ...prev,
-      {
-        x1: start.x,
-        y1: start.y,
-        x2: pos.x,
-        y2: pos.y,
-        image: start.image,
-        word,
-      },
-    ]);
-
-    setStart(null);
+  const showAnswers = () => {
+    setAnswers(
+      items.map((item) =>
+        item.correct[0].split("").map((char, index) => ({
+          char,
+          id: `answer-${index}`,
+        })),
+      ),
+    );
+    setLocked(true);
+    setShowResult(true);
   };
 
   const checkAnswers = () => {
-    if (locked || showAnswer) return;
-    const total = ANSWERS.reduce((a, b) => a + b.images.length, 0);
-    if (lines.length < total)
-      return ValidationAlert.info("Oops!", "Please connect all the pairs.");
+    if (locked) return;
 
-    let correct = 0;
-    let wrongImgs = [];
+    const empty = answers.some((row) => row.some((word) => word === ""));
 
-    lines.forEach((l) => {
-      const ok = ANSWERS.some(
-        (a) => a.word === l.word && a.images.includes(l.image),
-      );
-      ok ? correct++ : wrongImgs.push(l.image);
-    });
+    if (empty) {
+      ValidationAlert.info("Please complete all answers.");
+      return;
+    }
 
-    setWrong(wrongImgs);
-    setLocked(true);
+    let score = 0;
 
-    const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
-
-    ValidationAlert[
-      correct === total ? "success" : correct === 0 ? "error" : "warning"
-    ](`<b style="color:${color}">Score: ${correct} / ${total}</b>`);
-  };
-
- const show = () => {
-  setLocked(true);
-  setShowAnswer(true);
-  setWrong([]);
-  setLines([]); // ⬅️ امسح أي خطوط قديمة
-
-  const answerLines = [];
-
-  ANSWERS.forEach((a) => {
-    a.images.forEach((imgId) => {
-      const startDot = document.querySelector(
-        `.CB-review1-p2-q1-dot-start[data-image="${imgId}"]`
-      );
-      const endDot = document.querySelector(
-        `.CB-review1-p2-q1-dot-end[data-word="${a.word}"]`
-      );
-
-      if (startDot && endDot) {
-        const s = getCenterPos(startDot);
-        const e = getCenterPos(endDot);
-
-        answerLines.push({
-          x1: s.x,
-          y1: s.y,
-          x2: e.x,
-          y2: e.y,
-          image: imgId,
-          word: a.word,
-        });
+    answers.forEach((row, i) => {
+      if (row.map((l) => l.char).join("") === items[i].correct[0]) {
+        score++;
       }
     });
-  });
 
-  setLines(answerLines);
-};
+    const total = items.length;
 
+    const message = `
+      <div style="font-size:20px;text-align:center;">
+        <span style="color:#2e7d32;font-weight:bold;">
+          Score: ${score} / ${total}
+        </span>
+      </div>
+    `;
+
+    if (score === total) ValidationAlert.success(message);
+    else if (score === 0) ValidationAlert.error(message);
+    else ValidationAlert.warning(message);
+
+    setShowResult(true);
+    setLocked(true);
+  };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        {/* ❌ لا تعديل */}
-        <h5 className="header-title-page8">
-        <span style={{ marginRight: "20px" }}>G</span> Look and match.
-        </h5>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex justify-center p-8">
+        <div className="div-forall">
+          <h5 className="header-title-page8">
+            <span style={{ marginRight: "10px" }}>B</span>
+            Unscramble the letters to make words with a
+            <span style={{ color: "#2e3192" }}>ch</span> sound.
+          </h5>
 
-        {/* ❌ لا تعديل */}
-        <div ref={ref} className="match-wrapper2-CB-review1-p2-q1">
-          {/* IMAGES */}
-          <div className="CB-review1-p2-q1-images">
-            {IMAGES.map((img) => (
-              <div key={img.id} className="CB-review1-p2-q1-img-box">
-                <img
-                  src={img.src}
-                  alt=""
-                  className={`CB-review1-p2-q1-img ${locked ? "disabled-hover" : ""}`}
-                  onClick={() =>
-                    document.querySelector(`[data-image="${img.id}"]`)?.click()
-                  }
-                />
-                {wrong.includes(img.id) && (
-                  <span className="CB-review1-p2-q1-error">✕</span>
-                )}
+          <div className="grid grid-cols-1 gap-6 justify-center pb-15">
+            {items.map((item, i) => {
+              const userWord = answers[i].map((l) => l?.char || "").join("");
 
-                <div
-                  className="CB-review1-p2-q1-dot CB-review1-p2-q1-dot-start"
-                  data-image={img.id}
-                  onClick={startLine}
-                />
-              </div>
-            ))}
+              const isWordWrong =
+                showResult && userWord && userWord !== item.correct[0];
+
+              return (
+                <div key={i} className="flex items-center gap-4">
+                  {/* 🟠 الصورة */}
+                  <img
+                    src={item.img}
+                    alt=""
+                    style={{ width: "70px", height: "70px" }}
+                  />
+
+                  {/* 🔵 المحتوى */}
+                  <div className="flex flex-col gap-2">
+                    {/* السطر الأول */}
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg w-5">{i + 1}</span>
+                      <span className="text-lg">{item.sentence}</span>
+                    </div>
+
+                    {/* السطر الثاني */}
+                    <div className="flex items-center gap-3 ml-7 relative">
+                      {/* 🔤 الحروف */}
+                      <Droppable
+                        droppableId={`bank-${i}`}
+                        direction="horizontal"
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            className="flex gap-1"
+                          >
+                            {item.scrambled.map((word, wordIndex) => {
+                              const letters = word
+                                .split("")
+                                .map((letter, index) => ({
+                                  char: letter,
+                                  id: `${letter}-${i}-${wordIndex}-${index}`,
+                                }));
+
+                              return (
+                                <div key={wordIndex} className="flex gap-1">
+                                  {letters.map((letterObj, letterIndex) => {
+                                    const isUsed = answers[i].some(
+                                      (l) => l?.id === letterObj.id,
+                                    );
+
+                                    return (
+                                      <Draggable
+                                        key={letterObj.id}
+                                        draggableId={letterObj.id}
+                                        index={wordIndex * 10 + letterIndex}
+                                        isDragDisabled={locked || isUsed}
+                                      >
+                                        {(provided) => (
+                                          <span
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            className={`w-8 h-8 flex items-center justify-center rounded border font-bold
+          ${
+            isUsed
+              ? "bg-gray-300 opacity-40 cursor-not-allowed"
+              : "bg-yellow-200 cursor-grab"
+          }`}
+                                          >
+                                            {letterObj.char}
+                                          </span>
+                                        )}
+                                      </Draggable>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                      {isWordWrong && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "-30px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "#ef4444",
+                            color: "white",
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: "13px",
+                              lineHeight: "1",
+                              transform: "translateY(-1px)",
+                            }}
+                          >
+                            ✕
+                          </span>
+                        </div>
+                      )}
+                      {/* 🔲 البوكسات */}
+                      <div className="flex gap-1 ml-4 relative">
+                        {item.correct[0].split("").map((_, letterIndex) => {
+                          const isCorrect =
+                            answers[i][letterIndex]?.char ===
+                            item.correct[0][letterIndex];
+
+                          const isWrong =
+                            showResult && answers[i][letterIndex] && !isCorrect;
+
+                          return (
+                            <Droppable
+                              droppableId={`slot-${i}-${letterIndex}`}
+                              key={letterIndex}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.droppableProps}
+                                  className={`w-8 h-8 border-b-2 flex items-center justify-center font-bold relative
+                ${isWrong ? "border-red-500" : "border-black"}
+              `}
+                                >
+                                  <span
+                                    style={{
+                                      color: "#1C398E",
+                                    }}
+                                  >
+                                    {answers[i][letterIndex]?.char}
+                                  </span>
+                                  {provided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* WORDS */}
-          <div className="CB-review1-p2-q1-words">
-            {WORDS.map((w) => (
-              <div key={w.char} className="CB-review1-p2-q1-word-box">
-                <h5
-                  className={`CB-review1-p2-q1-word ${w.color}`}
-                  onClick={() =>
-                    document.querySelector(`[data-word="${w.char}"]`)?.click()
-                  }
-                >
-                  {w.char}
-                </h5>
+          {/* buttons */}
+          <div className="action-buttons-container">
+            <button className="try-again-button" onClick={resetAll}>
+              Start Again ↻
+            </button>
 
-                <div
-                  className="CB-review1-p2-q1-dot CB-review1-p2-q1-dot-end"
-                  data-word={w.char}
-                  onClick={endLine}
-                />
-              </div>
-            ))}
+            <button onClick={showAnswers} className="show-answer-btn">
+              Show Answer
+            </button>
+
+            <button className="check-button2" onClick={checkAnswers}>
+              Check Answer ✓
+            </button>
           </div>
-
-          {/* LINES */}
-          <svg className="lines-layer">
-            {lines.map((l, i) => (
-              <line
-                key={i}
-                x1={l.x1}
-                y1={l.y1}
-                x2={l.x2}
-                y2={l.y2}
-                stroke="red"
-                strokeWidth="3"
-              />
-            ))}
-          </svg>
         </div>
       </div>
-      {/* ❌ الأزرار كما هي */}
-      <div className="action-buttons-container">
-        <button
-          onClick={() => {
-            setLines([]);
-            setWrong([]);
-            setShowAnswer(false); // ← رجع التعديل
-            setLocked(false); // ⭐⭐⭐ NEW: إعادة فتح الرسم
-          }}
-          className="try-again-button"
-        >
-          Start Again ↻
-        </button>
-        <button onClick={show} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
-    </div>
+    </DragDropContext>
   );
-};
-
-export default Review3_Page2_Q3;
+}
