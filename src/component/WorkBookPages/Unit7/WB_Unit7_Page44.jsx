@@ -17,15 +17,15 @@ const WB_Unit7_Page44 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 4 })}
+          onClick={() => openPopup("exercise", { startIndex: 10 })}
           style={{ overflow: "visible" }}
           // className="click-icon-page8-2 hover:scale-110 transition"
         >
           <image
             className="svg-img"
             href={arrowBtn}
-            x="0"
-            y="0"
+            x="250"
+            y="-50  "
             width="100%"
             height="100%"
             preserveAspectRatio="xMidYMid meet"
@@ -41,7 +41,30 @@ const WB_Unit7_Page44 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 88 })}
+          onClick={() => openPopup("exercise", { startIndex: 11 })}
+          style={{ overflow: "visible" }}
+          // className="click-icon-page8-2 hover:scale-110 transition"
+        >
+          <image
+            className="svg-img"
+            href={arrowBtn}
+            x="-900"
+            y="-700"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMid meet"
+          />
+        </svg>
+      </div>
+       <div
+        className="wb-unit7-p6-q2 hover:scale-110 transition"
+        style={{ overflow: "visible" }}
+      >
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 90 90"
+          onClick={() => openPopup("exercise", { startIndex: 12 })}
           style={{ overflow: "visible" }}
           // className="click-icon-page8-2 hover:scale-110 transition"
         >
@@ -49,7 +72,7 @@ const WB_Unit7_Page44 = ({ openPopup }) => {
             className="svg-img"
             href={arrowBtn}
             x="0"
-            y="0"
+            y="-250"
             width="100%"
             height="100%"
             preserveAspectRatio="xMidYMid meet"
