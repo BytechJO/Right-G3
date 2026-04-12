@@ -1,132 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
-import img6 from "../../../assets/imgs/test.png";
+import React, { useState } from "react";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex C 1.svg";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import "./Review3_Page2_Q1.css";
-import sound1 from "../../../assets/audio/ClassBook/U 4/CD25.Pg35_Instruction1_Adult Lady.mp3";
-import { TbMessageCircle } from "react-icons/tb";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
 const Review3_Page2_Q1 = () => {
-  const correctAnswers = ["yo-yo", "jam", "yogurt", "jet", "jacket", "yellow"];
+  const correctAnswers = ["sh", "ch", "ch", "sh", "ch", "sh"];
   const [answers, setAnswers] = useState(["", "", "", "", "", ""]);
   const [wrongInputs, setWrongInputs] = useState([]);
   const [locked, setLocked] = useState(false);
-
-  /* ================ audio logic =========================*/
-
-  const audioRef = useRef(null);
-  const [showContinue, setShowContinue] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
-  const stopAtSecond = 3.5;
-  // إعدادات الصوت
-  const [showSettings, setShowSettings] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const settingsRef = useRef(null);
-  const [forceRender, setForceRender] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showCaption, setShowCaption] = useState(false);
-
-  // ================================
-  // ✔ Captions Array
-  // ================================
-  const captions = [
-    {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
-    },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
-  ];
-
-  // ================================
-  // ✔ Update caption highlight
-  // ================================
-  const updateCaption = (time) => {
-    const index = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end,
-    );
-    setActiveIndex(index);
-  };
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = 0;
-    audio.play();
-
-    const interval = setInterval(() => {
-      if (audio.currentTime >= stopAtSecond) {
-        audio.pause();
-        setPaused(true);
-        setIsPlaying(false);
-        setShowContinue(true);
-        clearInterval(interval);
-      }
-    }, 100);
-
-    // عند انتهاء الأوديو يرجع يبطل أنيميشن + يظهر Continue
-    const handleEnded = () => {
-      const audio = audioRef.current;
-      audio.currentTime = 0; // ← يرجع للبداية
-      setIsPlaying(false);
-      setPaused(false);
-      setActiveIndex(null);
-      setShowContinue(true);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      clearInterval(interval);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setForceRender((prev) => prev + 1);
-    }, 1000); // كل ثانية
-    if (activeIndex === -1 || activeIndex === null) return;
-
-    const el = document.getElementById(`caption-${activeIndex}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    return () => clearInterval(timer);
-  }, [activeIndex]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-
-    if (!audio) return;
-
-    if (audio.paused) {
-      audio.play();
-      setPaused(false);
-      setIsPlaying(true);
-    } else {
-      audio.pause();
-      setPaused(true);
-      setIsPlaying(false);
-    }
-  };
 
   /* ================= Drag Logic ================= */
   const onDragEnd = (result) => {
@@ -213,129 +94,14 @@ const Review3_Page2_Q1 = () => {
           style={{
             display: "flex",
             flexDirection: "column",
-            // gap: "30px",
-            width: "60%",
           }}
         >
           <h5 className="header-title-page8">
-            <span style={{marginRight:"20px"}}>E</span>Look, listen, and write.
+            <span style={{ marginRight: "10px" }}>C</span>Read and complete the
+            sentences. Write
+            <span style={{ color: "#2e3192" }}>sh</span>or{" "}
+            <span style={{ color: "#2e3192" }}>ch</span>
           </h5>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "30px",
-              width: "100%",
-            }}
-          >
-            <div
-              className="audio-popup-read"
-              style={{
-                width: "50%",
-              }}
-            >
-              <div className="audio-inner player-ui">
-                <audio
-                  ref={audioRef}
-                  src={sound1}
-                  onTimeUpdate={(e) => {
-                    const time = e.target.currentTime;
-                    setCurrent(time);
-                    updateCaption(time);
-                  }}
-                  onLoadedMetadata={(e) => setDuration(e.target.duration)}
-                ></audio>
-                {/* Play / Pause */}
-                {/* Play / Pause */}
-                {/* الوقت - السلايدر - الوقت */}
-                <div className="top-row">
-                  <span className="audio-time">
-                    {new Date(current * 1000).toISOString().substring(14, 19)}
-                  </span>
-
-                  <input
-                    type="range"
-                    className="audio-slider"
-                    min="0"
-                    max={duration}
-                    value={current}
-                    onChange={(e) => {
-                      audioRef.current.currentTime = e.target.value;
-                      updateCaption(Number(e.target.value));
-                    }}
-                    style={{
-                      background: `linear-gradient(to right, #430f68 ${
-                        (current / duration) * 100
-                      }%, #d9d9d9ff ${(current / duration) * 100}%)`,
-                    }}
-                  />
-
-                  <span className="audio-time">
-                    {new Date(duration * 1000).toISOString().substring(14, 19)}
-                  </span>
-                </div>
-                {/* الأزرار 3 أزرار بنفس السطر */}
-                <div className="bottom-row">
-                  {/* فقاعة */}
-                  <div
-                    className={`round-btn ${showCaption ? "active" : ""}`}
-                    style={{ position: "relative" }}
-                    onClick={() => setShowCaption(!showCaption)}
-                  >
-                    <TbMessageCircle size={36} />
-                    <div
-                      className={`caption-inPopup ${showCaption ? "show" : ""}`}
-                      style={{ top: "100%", left: "10%" }}
-                    >
-                      {captions.map((cap, i) => (
-                        <p
-                          key={i}
-                          id={`caption-${i}`}
-                          className={`caption-inPopup-line2 ${
-                            activeIndex === i ? "active" : ""
-                          }`}
-                        >
-                          {cap.text}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Play */}
-                  <button className="play-btn2" onClick={togglePlay}>
-                    {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
-                  </button>
-
-                  {/* Settings */}
-                  <div className="settings-wrapper" ref={settingsRef}>
-                    <button
-                      className={`round-btn ${showSettings ? "active" : ""}`}
-                      onClick={() => setShowSettings(!showSettings)}
-                    >
-                      <IoMdSettings size={36} />
-                    </button>
-
-                    {showSettings && (
-                      <div className="settings-popup">
-                        <label>Volume</label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.05"
-                          value={volume}
-                          onChange={(e) => {
-                            setVolume(e.target.value);
-                            audioRef.current.volume = e.target.value;
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>{" "}
-              </div>
-            </div>
-          </div>
           {/* 🔤 Word Bank */}
           <Droppable droppableId="bank" direction="horizontal" isDropDisabled>
             {(provided) => (
@@ -353,84 +119,133 @@ const Review3_Page2_Q1 = () => {
                   justifyContent: "center",
                 }}
               >
-                {["yo-yo", "jam", "yogurt", "jet", "jacket", "yellow"].map(
-                  (word, index) => (
-                    <Draggable
-                      key={word}
-                      draggableId={`word-${word}`}
-                      index={index}
-                      isDragDisabled={locked}
-                    >
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            padding: "7px 14px",
-                            border: "2px solid #2c5287",
-                            borderRadius: "8px",
-                            background: "white",
-                            fontWeight: "bold",
-                            cursor: "grab",
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          {word}
-                        </span>
-                      )}
-                    </Draggable>
-                  ),
-                )}
+                {["sh", "ch"].map((word, index) => (
+                  <Draggable
+                    key={word}
+                    draggableId={`word-${word}`}
+                    index={index}
+                    isDragDisabled={locked}
+                  >
+                    {(provided) => (
+                      <span
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={{
+                          padding: "7px 14px",
+                          border: "2px solid #2c5287",
+                          borderRadius: "8px",
+                          background: "white",
+                          fontWeight: "bold",
+                          cursor: "grab",
+                          ...provided.draggableProps.style,
+                        }}
+                      >
+                        {word}
+                      </span>
+                    )}
+                  </Draggable>
+                ))}
                 {provided.placeholder}
               </div>
             )}
           </Droppable>
+          <div className="w-full flex gap-10 mt-6">
+            {/* 🔵 LEFT (QUESTIONS) */}
+            <div className="flex-1 space-y-6">
+              {[
+                "There was a big spla____ when Jan dived in the pool.",
+                "Mar____ is the third month of the year.",
+                "Mrs. Bell is the best tea____er in the school.",
+                "____ut the door when you leave.",
+                "We used a knife to ____op the peppers.",
+                "Aunt Jo went ____opping at the mall.",
+              ].map((text, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2"
+                  style={{ position: "relative" }}
+                >
+                  <span className="text-lg font-medium">
+                    {i + 1}{" "}
+                    {text.split("____").map((part, j) => {
+                      const isWrong = wrongInputs.includes(i);
 
-          <div className="row-content10-CB-review3-p2-q1">
-            {[img1, img2, img3, img4, img5, img6].map((img, index) => (
-              <div className="row2-CB-review2-p1-q2" key={index}>
-                <img src={img} className="q-img-CB-review2-p1-q2" />
+                      return (
+                        <span key={j}>
+                          {part}
 
-                <Droppable droppableId={`slot-${index}`}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`q-input-CB-review2-p2-q1 ${
-                        snapshot.isDraggingOver ? "drag-over-cell" : ""
-                      }`}
-                    >
-                      {answers[index] && (
-                        <Draggable
-                          draggableId={`slot-${index}-${answers[index]}`}
-                          index={0}
-                          isDragDisabled={true}
-                        >
-                          {(provided) => (
-                            <span
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              {answers[index]}
-                            </span>
+                          {j === 0 && (
+                            <Droppable droppableId={`slot-${i}`}>
+                              {(provided) => (
+                                <span
+                                  ref={provided.innerRef}
+                                  {...provided.droppableProps}
+                                  className={`inline-block min-w-10 text-center font-bold relative ${
+                                    isWrong ? "border-red-500" : "border-black"
+                                  } border-b-2 mx-1`}
+                                >
+                                  <span style={{ color: "#1C398E" }}>
+                                    {answers[i]}
+                                  </span>
+                                  {provided.placeholder}
+
+                                  {isWrong && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "0%",
+                                        left: "30px",
+                                        transform: "translateY(-50%)",
+                                        width: "22px",
+                                        height: "22px",
+                                        background: "#ef4444",
+                                        color: "white",
+                                        borderRadius: "50%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontWeight: "bold",
+                                        border: "2px solid white",
+                                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                        pointerEvents: "none",
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          fontSize: "13px",
+                                          lineHeight: "1",
+                                          transform: "translateY(-1px)",
+                                        }}
+                                      >
+                                        ✕
+                                      </span>
+                                    </div>
+                                  )}
+                                </span>
+                              )}
+                            </Droppable>
                           )}
-                        </Draggable>
-                      )}
-
-                      {provided.placeholder}
-
-                      {wrongInputs.includes(index) && (
-                        <span className="error-mark-input-CB-review2-p1-q2">
-                          ✕
                         </span>
-                      )}
-                    </div>
-                  )}
-                </Droppable>
-              </div>
-            ))}
+                      );
+                    })}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* 🟠 RIGHT (IMAGE) */}
+            <div>
+              <img
+                src={img1}
+                alt="exercise"
+                style={{
+                  width: "200px",
+                  height: "auto",
+                  display: "block",
+                }}
+              />
+            </div>
           </div>
         </div>
 

@@ -39,15 +39,21 @@ import Unit4_Page5_Q3 from "./unit4/Unit4_Page5_Q3";
 import Unit4_Page6_Q1 from "./unit4/Unit4_Page6_Q1";
 import Unit4_Page6_Q2 from "./unit4/Unit4_Page6_Q2";
 
-// unit 7 
-import Unit7_Page5_Q1 from "./unit7/Unit7_Page5_Q1"
-import Unit7_Page5_Q2 from "./unit7/Unit7_Page5_Q2"
-import Unit7_Page5_Q3 from "./unit7/Unit7_Page5_Q3"
-import Unit7_Page5_Q4 from "./unit7/Unit7_Page5_Q4"
+//review1&2
+import Review3_Page1_Q1 from "./review3&4/Review3_Page1_Q1";
+import Review3_Page1_Q2 from "./review3&4/Review3_Page1_Q2";
+import Review3_Page2_Q1 from "./review3&4/Review3_Page2_Q1";
+import Review3_Page2_Q2 from "./review3&4/Review3_Page2_Q2";
+import Review3_Page2_Q3 from "./review3&4/Review3_Page2_Q3";
 
-import Unit7_Page6_Q1 from "./unit7/Unit7_Page6_Q1"
-import Unit7_Page6_Q2 from "./unit7/Unit7_Page6_Q2"
+// unit 7
+import Unit7_Page5_Q1 from "./unit7/Unit7_Page5_Q1";
+import Unit7_Page5_Q2 from "./unit7/Unit7_Page5_Q2";
+import Unit7_Page5_Q3 from "./unit7/Unit7_Page5_Q3";
+import Unit7_Page5_Q4 from "./unit7/Unit7_Page5_Q4";
 
+import Unit7_Page6_Q1 from "./unit7/Unit7_Page6_Q1";
+import Unit7_Page6_Q2 from "./unit7/Unit7_Page6_Q2";
 
 export const lessons = [
   // UNIT 1
@@ -93,14 +99,17 @@ export const lessons = [
   { component: Unit4_Page6_Q1, unit: 4 }, //30
   { component: Unit4_Page6_Q2, unit: 4 }, //31
 
+  //review1&2
+  { component: Review3_Page1_Q1, unit: 4, isReview: true }, //32
+  { component: Review3_Page1_Q2, unit: 4, isReview: true }, //33
+  { component: Review3_Page2_Q1, unit: 4, isReview: true }, //34
+  { component: Review3_Page2_Q2, unit: 4, isReview: true }, //35
+  { component: Review3_Page2_Q3, unit: 4, isReview: true }, //35
 
-  { component: Unit7_Page5_Q1, unit: 7}, //32
-
-  { component: Unit7_Page5_Q2, unit: 7}, //33
-  { component: Unit7_Page5_Q3, unit: 7}, //34
-  { component: Unit7_Page5_Q4, unit: 7}, //35
-
-  { component: Unit7_Page6_Q1, unit: 7}, //36
-  { component: Unit7_Page6_Q2, unit: 7 , lastOfUnit: true }, //37
-
+  // { component: Unit7_Page5_Q1, unit: 7}, //32
+  // { component: Unit7_Page5_Q2, unit: 7}, //33
+  // { component: Unit7_Page5_Q3, unit: 7}, //34
+  // { component: Unit7_Page5_Q4, unit: 7}, //35
+  // { component: Unit7_Page6_Q1, unit: 7}, //36
+  // { component: Unit7_Page6_Q2, unit: 7 , lastOfUnit: true }, //37
 ];
