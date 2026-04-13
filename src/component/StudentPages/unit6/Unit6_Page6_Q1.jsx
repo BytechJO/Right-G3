@@ -1,125 +1,95 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import "./Unit6_Page6_Q1.css";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import pencilCursor from "../../../assets/imgs/pen_96740.png";
-import eraserCursor from "../../../assets/imgs/gui_eraser_icon_157160.png";
-import img1 from "../../../assets/imgs/clock1.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 4.svg";
+import Button from "../../Button";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
 const Unit6_Page6_Q1 = () => {
   const [locked, setLocked] = useState(false);
+  const [answers, setAnswers] = useState({});
+
   const questions = [
-    { id: 1, text: "I brush my teeth at six thirty.", img: img1 },
-    { id: 2, text: "I wash my face at seven o’clock.", img: img1 },
-    { id: 3, text: "I comb my hair at seven thirty.", img: img1 },
-    { id: 4, text: "I eat my breakfast at eight o’clock.", img: img1 },
-    { id: 5, text: "I go to school at eight thirty.", img: img1 },
+    {
+      id: 1,
+      subject: "She",
+      action: "study better",
+      img: img1,
+      correct: "must",
+    },
+    {
+      id: 2,
+      subject: "He",
+      action: "stand under the hot sun",
+      img: img2,
+      correct: "mustnt",
+    },
+    { id: 3, subject: "You", action: "be quiet", img: img3, correct: "must" },
+    {
+      id: 4,
+      subject: "She",
+      action: "brush her hair",
+      img: img4,
+      correct: "must",
+    },
   ];
-  const correctTimes = {
-    1: { h: 6, m: 30 },
-    2: { h: 7, m: 0 },
-    3: { h: 7, m: 30 },
-    4: { h: 8, m: 0 },
-    5: { h: 8, m: 30 },
-  };
-  const [tool, setTool] = useState("pen");
 
-  const canvasRefs = useRef({});
-
-  const startDrawing = (e, id) => {
+  const handleAnswer = (id, value) => {
     if (locked) return;
-    const canvas = canvasRefs.current[id];
-    const ctx = canvas.getContext("2d");
 
-    ctx.isDrawing = true;
-    ctx.lineCap = "round";
-
-    if (tool === "eraser") {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.lineWidth = 20;
-    } else {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.strokeStyle = "purple";
-      ctx.lineWidth = 3;
-    }
-
-    const rect = canvas.getBoundingClientRect();
-    ctx.lastX = (e.clientX || e.touches[0].clientX) - rect.left;
-    ctx.lastY = (e.clientY || e.touches[0].clientY) - rect.top;
+    setAnswers((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
-
-  const draw = (e, id) => {
-    const canvas = canvasRefs.current[id];
-    const ctx = canvas.getContext("2d");
-    if (!ctx.isDrawing) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-    const y = (e.clientY || e.touches[0].clientY) - rect.top;
-
-    ctx.beginPath();
-    ctx.moveTo(ctx.lastX, ctx.lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-
-    ctx.lastX = x;
-    ctx.lastY = y;
-  };
-
-  const stopDrawing = (id) => {
-    const canvas = canvasRefs.current[id];
-    const ctx = canvas.getContext("2d");
-    ctx.isDrawing = false;
-  };
-
-  const resetCanvas = () => {
-    questions.forEach((q) => {
-      const canvas = canvasRefs.current[q.id];
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
+  const reset = () => {
     setLocked(false);
+    setAnswers({});
   };
-  const drawCorrectTime = (canvas, hour, minute) => {
-    const ctx = canvas.getContext("2d");
+  const showAnswers = () => {
+    const correctAnswers = {};
+    questions.forEach((q) => {
+      correctAnswers[q.id] = q.correct;
+    });
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = canvas.width / 2 - 10;
-
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 3;
-
-    // minute hand
-    const minuteAngle = (minute * Math.PI) / 30 - Math.PI / 2;
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.lineTo(
-      centerX + Math.cos(minuteAngle) * radius,
-      centerY + Math.sin(minuteAngle) * radius,
-    );
-    ctx.stroke();
-
-    // hour hand
-    const hourAngle =
-      ((hour % 12) * Math.PI) / 6 + (minute * Math.PI) / 360 - Math.PI / 2;
-
-    ctx.lineWidth = 4;
-
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.lineTo(
-      centerX + Math.cos(hourAngle) * radius * 0.6,
-      centerY + Math.sin(hourAngle) * radius * 0.6,
-    );
-    ctx.stroke();
+    setAnswers(correctAnswers);
+    setLocked(true);
   };
   const checkAnswers = () => {
-    questions.forEach((q) => {
-      const canvas = canvasRefs.current[q.id];
-      const time = correctTimes[q.id];
+    if (locked) return;
 
-      drawCorrectTime(canvas, time.h, time.m);
+    // تأكد إنو كل الأسئلة مجاوبة
+    const unanswered = questions.some((q) => !answers[q.id]);
+    if (unanswered) {
+      ValidationAlert.info();
+      return;
+    }
+
+    let score = 0;
+
+    questions.forEach((q) => {
+      if (answers[q.id] === q.correct) {
+        score++;
+      }
     });
+
+    const total = questions.length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color};font-weight:bold">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
 
     setLocked(true);
   };
@@ -147,77 +117,117 @@ const Unit6_Page6_Q1 = () => {
           <span style={{ marginRight: "15px" }} className="ex-A">
             D
           </span>
-          Read and then draw the time.{" "}
+          Look and write<span style={{ color: "#D1232A" }}>✓</span>or
+          <span style={{ color: "#D1232A" }}>✗</span>.Then write.
         </h5>
-        {/* TOOLS */}
-        <div className="flex gap-3 mb-8 mt-6">
-          <button
-            onClick={() => setTool("pen")}
-            className={`px-4 py-1 rounded-md ${
-              tool === "pen" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            ✏️ Pen
-          </button>
+        <div style={{ padding: "20px" }}>
+          {questions.map((q, index) => (
+            <div
+              key={q.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+                marginBottom: "25px",
+              }}
+            >
+              {/* الرقم */}
+              <span style={{ fontWeight: "bold" }}>{index + 1}</span>
 
-          <button
-            onClick={() => setTool("eraser")}
-            className={`px-4 py-1 rounded-md ${
-              tool === "eraser" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            🧽 Eraser
-          </button>
-        </div>
+              {/* الصورة */}
+              <div
+                style={{
+                  width: "200px",
+                  height: "150px",
+                  overflow: "hidden",
+                  border: "3px solid orange",
+                  borderRadius: "8px",
+                }}
+              >
+                <img
+                  src={q.img}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+              {/* بوكسات الصح والخطا */}
+              <div style={{ display: "flex", gap: "10px" }}>
+                <div
+                  onClick={() => handleAnswer(q.id, "must")}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    border: "2px solid orange",
+                    borderRadius: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    background: answers[q.id] === "must" ? "#2a4e7c" : "white",
+                    color: answers[q.id] === "must" ? "white" : "black",
+                  }}
+                >
+                  ✓
+                </div>
 
-        {/* MAIN */}
-        <div className="flex flex-col gap-8 mt-6">
-          {questions.map((q) => (
-            <div key={q.id} className="flex items-center justify-between">
-              {/* TEXT */}
-              <div className="flex gap-3 text-[18px] w-[70%]">
-                <span className="font-bold">{q.id}</span>
-                <span>{q.text}</span>
+                <div
+                  onClick={() => handleAnswer(q.id, "mustnt")}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    border: "2px solid orange",
+                    borderRadius: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    background:
+                      answers[q.id] === "mustnt" ? "#2a4e7c" : "white",
+                    color: answers[q.id] === "mustnt" ? "white" : "black",
+                  }}
+                >
+                  ✕
+                </div>
               </div>
 
-              {/* CLOCK */}
-              <canvas
-                ref={(el) => (canvasRefs.current[q.id] = el)}
-                width={90}
-                height={90}
+              {/* الخط + الجملة */}
+              <div
                 style={{
-                  backgroundImage: `url(${q.img})`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  cursor:
-                    tool === "eraser"
-                      ? `url(${eraserCursor}) 12 12, auto`
-                      : `url(${pencilCursor}) 4 28, auto`,
+                  position: "relative",
+                  flex: 1,
+                  borderBottom: `2px solid ${
+                    locked && answers[q.id] !== q.correct ? "red" : "black"
+                  }`,
+                  paddingBottom: "5px",
+                  minHeight: "24px",
+                  color: "#2a4e7c",
+                  fontWeight: "500",
                 }}
-                className="shrink-0"
-                onMouseDown={(e) => startDrawing(e, q.id)}
-                onMouseMove={(e) => draw(e, q.id)}
-                onMouseUp={() => stopDrawing(q.id)}
-                onMouseLeave={() => stopDrawing(q.id)}
-                onTouchStart={(e) => startDrawing(e, q.id)}
-                onTouchMove={(e) => {
-                  e.preventDefault();
-                  draw(e, q.id);
-                }}
-                onTouchEnd={() => stopDrawing(q.id)}
-              />
+              >
+                {answers[q.id] && (
+                  <span>
+                    {q.subject} {answers[q.id] === "must" ? "must" : "mustn't"}{" "}
+                    {q.action}.{/* ❌ فقط عند الغلط */}
+                    {locked && answers[q.id] !== q.correct && (
+                      <span className="absolute -top-2 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
+                        ✕
+                      </span>
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>
-        <div className="action-buttons-container">
-          <button onClick={resetCanvas} className="try-again-button">
-            Start Again ↻
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Show Answer
-          </button>
-        </div>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );

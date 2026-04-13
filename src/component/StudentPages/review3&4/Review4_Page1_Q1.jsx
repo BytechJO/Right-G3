@@ -1,200 +1,149 @@
 import React, { useState } from "react";
-import "./Review4_Page1_Q1.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import imgDown1 from "../../../assets/imgs/test.png";
-import imgAcross1 from "../../../assets/imgs/test.png";
-import imgDown2 from "../../../assets/imgs/test.png";
-import imgAcross2 from "../../../assets/imgs/test.png";
-import imgDown3 from "../../../assets/imgs/test.png";
-import imgAcross3 from "../../../assets/imgs/test.png";
-import imgDown4 from "../../../assets/imgs/test.png";
-import imgAcross4 from "../../../assets/imgs/test.png";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 4.svg";
 
-const crosswordStructure = [
-  // Row 1 (10 columns)
-  ["1", "W", "W", "W", "W", "W", "W", "W", "2", "W", "W", "W", "B", "B", "B"],
+const Review4_Page1_Q1 = () => {
+  const questions = [
+    {
+      text: "It is cold. There is snow on the ground. The trees have no leaves.",
+      answer: "winter",
+      correctImage: 3,
+    },
+    {
+      text: "It is hot. The sun is shining. We are playing in the yard.",
+      answer: "summer",
+      correctImage: 4,
+    },
+    {
+      text: "It is cool. The leaves on the trees are turning brown. We like to play in the leaves.",
+      answer: "autumn",
+      correctImage: 1,
+    },
+    {
+      text: "It is warm. The flowers and plants are growing. There are baby birds in the trees.",
+      answer: "spring",
+      correctImage: 2,
+    },
+  ];
 
-  // Row 2 (10 columns)
-  ["W", "B", "B", "B", "B", "B", "B", "B", "W", "B", "B", "B", "B", "B", "B"],
+  const wordBank = ["spring", "summer", "autumn", "winter"];
+  const numbers = [1, 2, 3, 4];
+  const images = [img1, img2, img3, img4];
 
-  // Row 3 (10 columns)
-  ["W", "B", "B", "B", "B", "B", "B", "B", "W", "B", "B", "B", "B", "B", "B"],
+  const [answers, setAnswers] = useState(Array(4).fill(""));
+  const [imageNumbers, setImageNumbers] = useState([null, null, null, null]);
+  const [showCorrect, setShowCorrect] = useState(false);
+  const [wrongMarks, setWrongMarks] = useState([]);
 
-  // Row 4 (10 columns)
-  ["W", "B", "B", "B", "B", "B", "B", "B", "W", "B", "3", "B", "B", "B", "B"],
-
-  // Row 5 (5 columns)
-  ["W", "B", "B", "B", "B", "B", "4", "W", "W", "W", "W", "W", "W", "5", "B"],
-
-  // Row 6 (5 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "W", "B", "B", "W", "B"],
-
-  // Row 7 (3 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "W", "B", "6", "W", "W"],
-  // Row 8 (3 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "W", "B", "B", "W", "B"],
-  // Row 9 (3 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "W", "B", "B", "W", "B"],
-  // Row 10 (3 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "B", "B", "B", "B", "B"],
-  // Row 11 (3 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "B", "B", "B", "B", "B"],
-
-  // Row 12 (3 columns)
-  ["B", "B", "B", "B", "7", "W", "W", "W", "W", "B", "B", "B", "B", "B", "B"],
-
-  // Row 13 (3 columns)
-  ["B", "B", "B", "B", "B", "B", "B", "B", "W", "B", "B", "B", "B", "B", "B"],
-];
-
-const solution = [
-  { num: 1, direction: "Down", answer: "pilot" },
-  { num: 2, direction: "Down", answer: "policeofficer" },
-  { num: 3, direction: "Down", answer: "farmer" },
-  { num: 5, direction: "Down", answer: "clerk" },
-  { num: 1, direction: "Across", answer: "photographer" },
-  { num: 4, direction: "Across", answer: "mechanic" },
-  { num: 6, direction: "Across", answer: "vet" },
-  { num: 7, direction: "Across", answer: "nurse" },
-];
-export default function Review4_Page1_Q1() {
-  const [userGrid, setUserGrid] = useState(
-    crosswordStructure.map((row) =>
-      row.map((cell) => (cell === "W" || /[1-9]/.test(cell) ? "" : null)),
-    ),
-  );
-  const [wrongCells, setWrongCells] = useState([]);
-  const [showAnswers, setShowAnswers] = useState(false);
-  const letters = "abcdefghijklmnopqrstuvwxyz".split("");
-
-  const findCellPosition = (num) => {
-    for (let r = 0; r < crosswordStructure.length; r++) {
-      for (let c = 0; c < crosswordStructure[r].length; c++) {
-        if (crosswordStructure[r][c] === String(num)) {
-          return { r, c };
-        }
-      }
-    }
-    return null;
-  };
-
-
-  const checkAnswers = () => {
-    if (showAnswers) return;
-    let totalInputCells = 0;
-    let hasEmptyCell = false;
-
-    // 1) حساب عدد الخلايا التي يجب تعبئتها
-    for (let r = 0; r < crosswordStructure.length; r++) {
-      for (let c = 0; c < crosswordStructure[r].length; c++) {
-        const cell = crosswordStructure[r][c];
-
-        if (cell === "W" || /[1-9]/.test(cell)) {
-          totalInputCells++;
-
-          if (!userGrid[r][c] || userGrid[r][c].trim() === "") {
-            hasEmptyCell = true;
-          }
-        }
-      }
-    }
-
-    // 2) لو في خانة فاضية → alert
-    if (hasEmptyCell) {
-      return ValidationAlert.info(
-        `<div style="font-size:20px; text-align:center;">Please fill all cells before checking.</div>`,
-      );
-    }
-
-    // ⭐ NEW — استخدام Set لمنع التكرار
-    const correctSet = new Set();
-    const wrongSet = new Set();
-
-    // 3) التحقق من كل الكلمات
-    solution.forEach((item) => {
-      const { num, direction, answer } = item;
-      const start = findCellPosition(num);
-
-      if (start) {
-        for (let i = 0; i < answer.length; i++) {
-          const r = direction === "Down" ? start.r + i : start.r;
-          const c = direction === "Across" ? start.c + i : start.c;
-          const key = `${r}-${c}`;
-
-          if (userGrid[r] && userGrid[r][c] === answer[i]) {
-            correctSet.add(key); // يتم تسجيلها مرة واحدة فقط
-          } else {
-            wrongSet.add(key); // يتم تسجيلها مرة واحدة فقط
-          }
-        }
-      }
-    });
-
-    // 4) تحديث الخلايا الخاطئة
-    setWrongCells(Array.from(wrongSet));
-    setShowAnswers(true);
-    // عدد الخلايا الصحيحة الحقيقي
-    const correctFilledCells = correctSet.size;
-
-    // 5) اختيار اللون
-    let color =
-      correctFilledCells === totalInputCells
-        ? "green"
-        : correctFilledCells === 0
-          ? "red"
-          : "orange";
-
-    const scoreMessage = `
-    <div style="font-size: 20px; text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${correctFilledCells} / ${totalInputCells}
-      </span>
-    </div>
-  `;
-
-    // 6) عرض النتيجة
-    if (correctFilledCells === totalInputCells) {
-      ValidationAlert.success(scoreMessage);
-    } else if (correctFilledCells === 0) {
-      ValidationAlert.error(scoreMessage);
-    } else {
-      ValidationAlert.warning(scoreMessage);
-    }
-  };
-
+  // =========================
+  // DRAG END
+  // =========================
   const onDragEnd = (result) => {
     const { destination, draggableId } = result;
-    if (!destination || showAnswers) return;
+    if (!destination) return;
 
-    const letter = draggableId.replace("letter-", "");
-    const [r, c] = destination.droppableId.split("-").map(Number);
+    // ✨ كلمات
+    if (draggableId.startsWith("season-")) {
+      const value = draggableId.replace("season-", "");
+      const index = Number(destination.droppableId);
 
-    const updated = [...userGrid];
-    updated[r][c] = letter;
-    setUserGrid(updated);
+      if (!isNaN(index)) {
+        const updated = [...answers];
+        updated[index] = value;
+        setAnswers(updated);
+      }
+    }
+
+    // 🔥 أرقام
+    if (draggableId.startsWith("num-")) {
+      const number = Number(draggableId.split("-")[1]);
+
+      if (destination.droppableId.startsWith("image-")) {
+        const index = Number(destination.droppableId.split("-")[1]);
+
+        const updated = [...imageNumbers];
+        updated[index] = number;
+        setImageNumbers(updated);
+      }
+    }
   };
 
-  const handleShowAnswers = () => {
-    const updated = [...userGrid];
+  // =========================
+  // SHOW ANSWERS
+  // =========================
+  const showAnswers = () => {
+    setAnswers(questions.map((q) => q.answer));
 
-    solution.forEach((item) => {
-      const { num, direction, answer } = item;
-      const start = findCellPosition(num);
+    // 🔥 هاي الإضافة
+    setImageNumbers(questions.map((q) => q.correctImage));
 
-      if (start) {
-        for (let i = 0; i < answer.length; i++) {
-          const r = direction === "Down" ? start.r + i : start.r;
-          const c = direction === "Across" ? start.c + i : start.c;
+    setShowCorrect(true);
+    setWrongMarks([]);
+  };
 
-          updated[r][c] = answer[i]; // اكتب الإجابة الصحيحة
-        }
+  // =========================
+  // RESET
+  // =========================
+  const resetAll = () => {
+    setAnswers(questions.map(() => ""));
+    setImageNumbers([null, null, null, null]);
+    setShowCorrect(false);
+    setWrongMarks([]);
+  };
+
+  // =========================
+  // CHECK ANSWERS
+  // =========================
+  const checkAnswers = () => {
+    if (showCorrect) return;
+
+    if (answers.includes("")) {
+      ValidationAlert.info();
+      return;
+    }
+
+    let score = 0;
+    let wrong = [];
+
+    questions.forEach((q, i) => {
+      const wordCorrect =
+        answers[i]?.trim().toLowerCase() === q.answer.toLowerCase();
+
+      const imageCorrect = imageNumbers[i] === q.correctImage;
+
+      if (!wordCorrect || !imageCorrect) {
+        wrong.push({
+          qIndex: i,
+          wordWrong: !wordCorrect,
+          imageWrong: !imageCorrect,
+        });
       }
+
+      if (wordCorrect) score++;
+      if (imageCorrect) score++;
     });
 
-    setUserGrid(updated);
-    setShowAnswers(true);
-    setWrongCells([]);
+    setWrongMarks(wrong);
+    setShowCorrect(true);
+
+    const total = questions.length * 2;
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+      <div style="font-size:20px;text-align:center;">
+        <span style="color:${color};font-weight:bold">
+          Score: ${score} / ${total}
+        </span>
+      </div>
+    `;
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
   };
 
   return (
@@ -203,249 +152,322 @@ export default function Review4_Page1_Q1() {
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
           padding: "30px",
         }}
       >
         <div
           className="div-forall"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
-          }}
         >
-          <div className="crossword-container">
-            <h3 className="header-title-page8">
-              <span style={{ marginRight: "20px" }}>A</span> Look and complete the crossword puzzle.
-            </h3>
+          <h5 className="header-title-page8">
+            <span style={{marginRight:"10px"}}>A</span> Read and write the season. Number the pictures.
+            the pictures.
+          </h5>
+          <Droppable droppableId="mixed" direction="horizontal">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  padding: "8px",
+                  border: "2px dashed #ccc",
+                  borderRadius: "10px",
+                  marginTop: "15px",
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                {/* 🔢 الأرقام */}
+                {[1, 2, 3, 4].map((num, index) => {
+                  const isUsed = imageNumbers.includes(num);
 
-            <Droppable droppableId="letters-bank" isDropDisabled>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    padding: "10px",
-                    border: "2px dashed #ccc",
-                    borderRadius: "10px",
-                    // margin: "10px 0",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    justifyContent: "center",
-                  }}
-                >
-                  {letters.map((l, index) => (
+                  return (
                     <Draggable
-                      key={l + index}
-                      draggableId={`letter-${l}`}
+                      key={`num-${num}`}
+                      draggableId={`num-${num}`}
                       index={index}
-                      isDragDisabled={showAnswers}
+                      isDragDisabled={isUsed} // 🔥 disable
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                            border: "2px solid #1C398E",
+                            borderRadius: "8px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "14px",
+                            opacity: isUsed ? 0.4 : 1, // 🔥 opacity
+                            cursor: isUsed ? "not-allowed" : "grab",
+                            ...provided.draggableProps.style,
+                          }}
+                        >
+                          <div
+                            {...provided.dragHandleProps}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {num}
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+
+                {/* 🌸 الكلمات */}
+                {wordBank.map((word, index) => {
+                  const isUsed = answers.includes(word);
+
+                  return (
+                    <Draggable
+                      key={`season-${word}`}
+                      draggableId={`season-${word}`}
+                      index={index + 10}
+                      isDragDisabled={isUsed} // 🔥 disable
                     >
                       {(provided) => (
                         <span
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          {...provided.dragHandleProps}
                           style={{
-                            padding: "7px 14px",
-                            border: "2px solid #d2232a",
-                            borderRadius: "8px",
+                            padding: "5px 10px",
+                            border: "2px solid #2c5287",
+                            borderRadius: "6px",
                             background: "white",
                             fontWeight: "bold",
-                            cursor: "grab",
-                            fontSize: "18px",
+                            fontSize: "13px",
+                            opacity: isUsed ? 0.4 : 1, // 🔥 opacity
+                            cursor: isUsed ? "not-allowed" : "grab",
                             ...provided.draggableProps.style,
                           }}
                         >
-                          {l}
+                          <span
+                            {...provided.dragHandleProps}
+                            style={{
+                              display: "inline-block",
+                              cursor: isUsed ? "not-allowed" : "grab",
+                            }}
+                          >
+                            {word}
+                          </span>
                         </span>
                       )}
                     </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+                  );
+                })}
 
-            {/* ===================== الصور ===================== */}
-         <div className="CB-review4-p1-q1-grid-container">
-  <div className="CB-review4-p1-q1-puzzle-images-box">
-    <div className="CB-review4-p1-q1-column-box">
-      <h4 className="CB-review4-p1-q1-label">Down</h4>
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+          {/* الصور */}
+          <div style={{ marginTop: "20px" }}>
+            {questions.map((q, i) => {
+              const wrongItem = wrongMarks.find((w) => w.qIndex === i);
 
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">1</span>
-        <img src={imgDown1} alt="down1" />
-      </div>
+              const isWordWrong = wrongItem?.wordWrong;
+              const isImageWrong = wrongItem?.imageWrong;
 
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">2</span>
-        <img src={imgDown2} alt="down2" />
-      </div>
+              return (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "25px",
+                    gap: "20px",
+                  }}
+                >
+                  {/* 🟢 TEXT */}
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontWeight: "bold" }}>{i + 1}</span> {q.text}
+                    <br />
+                    It’s{" "}
+                    <Droppable droppableId={`${i}`}>
+                      {(provided) => (
+                        <span
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                          style={{
+                            borderBottom: `2px solid ${
+                              showCorrect
+                                ? isWordWrong
+                                  ? "red"
+                                  : "#1C398E"
+                                : "black"
+                            }`,
+                            display: "inline-block",
+                            padding: "0 4px",
+                            minWidth: answers[i] ? "auto" : "60px", // 🔥 الحل
+                            marginLeft: "8px",
+                            color: "#1C398E",
+                            fontWeight: "bold",
+                            position: "relative",
+                            textAlign: "center",
+                          }}
+                        >
+                          {answers[i]}
+                          {provided.placeholder}
 
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">3</span>
-        <img src={imgDown3} alt="down3" />
-      </div>
+                          {/* ❌ للكلمة */}
+                          {showCorrect && isWordWrong && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "50%",
+                                right: "-30px",
+                                transform: "translateY(-50%)",
+                                width: "22px",
+                                height: "22px",
+                                background: "#ef4444",
+                                color: "white",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontWeight: "bold",
+                                border: "2px solid white",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: "13px",
+                                  lineHeight: "1",
+                                  transform: "translateY(-1px)",
+                                }}
+                              >
+                                ✕
+                              </span>
+                            </div>
+                          )}
+                        </span>
+                      )}
+                    </Droppable>
+                    .
+                  </div>
 
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">5</span>
-        <img src={imgDown4} alt="down4" />
-      </div>
-    </div>
-
-    <div className="CB-review4-p1-q1-column-box">
-      <h4 className="CB-review4-p1-q1-label">Across</h4>
-
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">1</span>
-        <img src={imgAcross1} alt="across1" />
-      </div>
-
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">4</span>
-        <img src={imgAcross2} alt="across2" />
-      </div>
-
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">6</span>
-        <img src={imgAcross3} alt="across3" />
-      </div>
-
-      <div className="CB-review4-p1-q1-img-item">
-        <span className="CB-review4-p1-q1-num">7</span>
-        <img src={imgAcross4} alt="across4" />
-      </div>
-    </div>
-  </div>
-
-  <div className="CB-review4-p1-q1-crossword-grid">
-    {crosswordStructure.map((row, r) => (
-      <div key={r} className="CB-review4-p1-q1-row">
-        {row.map((cell, c) => {
-          const isBlock = cell === "B";
-          const isNumber = /[1-9]/.test(cell);
-
-          return (
-            <div
-              key={r + "-" + c}
-              className={`CB-review4-p1-q1-cell ${
-                isBlock
-                  ? "CB-review4-p1-q1-block"
-                  : "CB-review4-p1-q1-white"
-              }`}
-            >
-              {/* رقم + input */}
-              {isNumber && (
-                <>
-                  <span className="CB-review4-p1-q1-number">
-                    {cell}
-                  </span>
-
-                  <Droppable
-                    droppableId={`${r}-${c}`}
-                    isDropDisabled={showAnswers}
-                  >
-                    {(provided, snapshot) => (
+                  {/* 🟠 IMAGE + NUMBER */}
+                  <Droppable droppableId={`image-${i}`}>
+                    {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`CB-review4-p1-q1-letter ${
-                          snapshot.isDraggingOver
-                            ? "CB-review4-p1-q1-drag-over"
-                            : ""
-                        }`}
+                        style={{
+                          position: "relative",
+                          border: "2px solid orange",
+                          borderRadius: "16px",
+                          padding: "6px",
+                          background: "#fff",
+                        }}
                       >
-                        {userGrid[r][c] && (
-                          <span className="CB-review4-p1-q1-filled-letter">
-                            {userGrid[r][c]}
-                          </span>
-                        )}
+                        <img
+                          src={images[i]}
+                          style={{
+                            width: "170px",
+                            height: "100px",
+                            objectFit: "cover",
+                            borderRadius: "12px",
+                          }}
+                        />
+
+                        {/* 🔢 الرقم */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "-10px",
+                            bottom: "-10px",
+                            width: "40px",
+                            height: "40px",
+                            background: "white",
+                            border: "2px solid orange",
+                            borderRadius: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "18px",
+                            color:
+                              showCorrect && isImageWrong ? "red" : "black",
+                          }}
+                        >
+                          {imageNumbers[i]}
+
+                          {/* ❌ للرقم */}
+                          {showCorrect && isImageWrong && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                top: "-1px",
+                                right: "-8px",
+                                transform: "translateY(-50%)",
+                                width: "22px",
+                                height: "22px",
+                                background: "#ef4444",
+                                color: "white",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontWeight: "bold",
+                                border: "2px solid white",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: "13px",
+                                  lineHeight: "1",
+                                  transform: "translateY(-1px)",
+                                }}
+                              >
+                                ✕
+                              </span>
+                            </span>
+                          )}
+                        </div>
+
                         {provided.placeholder}
                       </div>
                     )}
                   </Droppable>
-                </>
-              )}
-
-              {/* خانة بيضاء بدون رقم */}
-              {!isBlock && !isNumber && (
-                <Droppable
-                  droppableId={`${r}-${c}`}
-                  isDropDisabled={showAnswers}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`CB-review4-p1-q1-letter ${
-                        snapshot.isDraggingOver
-                          ? "CB-review4-p1-q1-drag-over"
-                          : ""
-                      }`}
-                    >
-                      {userGrid[r][c] && (
-                        <span className="CB-review4-p1-q1-filled-letter">
-                          {userGrid[r][c]}
-                        </span>
-                      )}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              )}
-
-              {/* ❌ دائرة الخطأ */}
-              {!isBlock &&
-                wrongCells.includes(`${r}-${c}`) && (
-                  <span className="CB-review4-p1-q1-error-badge">
-                    ✕
-                  </span>
-                )}
-            </div>
-          );
-        })}
-      </div>
-    ))}
-  </div>
-</div>
-
+                </div>
+              );
+            })}
           </div>
         </div>
+
+        {/* buttons */}
         <div className="action-buttons-container">
-          <button
-            className="try-again-button"
-            onClick={() => {
-              setUserGrid(
-                crosswordStructure.map((row) =>
-                  row.map((cell) =>
-                    cell === "W" || /[1-9]/.test(cell) ? "" : null,
-                  ),
-                ),
-              );
-              setWrongCells([]);
-            }}
-          >
+          <button onClick={resetAll} className="try-again-button">
             Start Again ↻
           </button>
-          {/* ⭐⭐⭐ NEW — زر Show Answer */}
-          <button
-            className="show-answer-btn swal-continue"
-            onClick={handleShowAnswers}
-          >
+          <button onClick={showAnswers} className="show-answer-btn">
             Show Answer
           </button>
-          <button className="check-button2" onClick={checkAnswers}>
+          <button onClick={checkAnswers} className="check-button2">
             Check Answer ✓
           </button>
         </div>
       </div>
     </DragDropContext>
   );
-}
+};
+
+export default Review4_Page1_Q1;
