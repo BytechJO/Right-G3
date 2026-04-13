@@ -1,441 +1,282 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./Unit5_Page6_Q1.css";
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test1.png";
-import img3 from "../../../assets/imgs/test2.png";
-import img4 from "../../../assets/imgs/test3.png";
-import img5 from "../../../assets/imgs/test4.png";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
+import WrongMark from "../../WrongMark";
+
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 45/Ex D 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 45/Ex D 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 45/Ex D 3.svg";
 
 const Unit5_Page6_Q1 = () => {
-  const [lines, setLines] = useState([]);
-  const containerRef = useRef(null);
-  let startPoint = null;
-  const [wrongWords, setWrongWords] = useState([]);
-  const [wrongInputs, setWrongInputs] = useState([]);
-  const [locked, setLocked] = useState(false);
-  const [firstDot, setFirstDot] = useState(null);
-  const [showAnswer, setShowAnswer] = useState(false);
   const questions = [
     {
       id: 1,
-      matchWord: "likes / she / fruit",
-      correctSentence: "she likes fruit",
-      scrambled: ["likes", "she", "fruit"],
-      image: img4,
+      img: img1,
+      question: "Is there a bathtub behind the toilet?",
+      correct: "No, there isn’t.",
     },
     {
       id: 2,
-      matchWord: "don't like / I / meat",
-      correctSentence: "I don't like meat",
-      scrambled: ["don't", "like", "I", "meat"],
-      image: img5,
+      img: img2,
+      question: "Are there books in front of the door?",
+      correct: "No, there aren’t",
     },
     {
       id: 3,
-      matchWord: "doesn't like / she / stew",
-      correctSentence: "she doesn't like stew",
-      scrambled: ["doesn't", "like", "she", "stew"],
-      image: img1,
-    },
-    {
-      id: 4,
-      matchWord: "like / you / fish",
-      correctSentence: "you like fish",
-      scrambled: ["like", "you", "fish"],
-      image: img2,
-    },
-    {
-      id: 5,
-      matchWord: "doesn't like / he / chicken",
-      correctSentence: "he doesn't like chicken",
-      scrambled: ["doesn't", "like", "he", "chicken"],
-      image: img3,
+      img: img3,
+      question: "Is there a telephone next to the sink?",
+      correct: "Yes, there is.",
     },
   ];
-  const correctMatches = questions.map((q) => ({
-    word: q.matchWord,
-    image: q.image,
-  }));
-  const images = [img1, img2, img3, img4, img5];
-  const correctSentences = Object.fromEntries(
-    questions.map((q) => [q.id, q.correctSentence]),
-  );
+  const senteces = [
+    "No, there isn’t.",
+    "No, there aren’t",
+    "Yes, there is.",
+    "Yes, there are.",
+  ];
+  const [answers, setAnswers] = useState(questions.map(() => ""));
 
+  const [locked, setLocked] = useState(false);
+
+  /* ================= Drag ================= */
   const onDragEnd = (result) => {
-    if (!result.destination || locked || showAnswer) return;
+    const { destination, draggableId } = result;
+    if (!destination || locked) return;
 
-    const [qId, word] = result.draggableId.split("-");
-    const dest = result.destination.droppableId;
+    const word = draggableId.split("-").slice(1).join("-"); // إصلاح
+    const qIndex = Number(destination.droppableId);
 
-    if (!dest.startsWith("sentence-")) return;
+    setAnswers((prev) => {
+      const updated = [...prev];
 
-    setUserInputs((prev) => ({
-      ...prev,
-      [qId]: [...prev[qId].filter((w) => w !== word), word],
-    }));
-  };
+      // منع التكرار
+      const existingIndex = updated.findIndex((a) => a === word);
+      if (existingIndex !== -1) updated[existingIndex] = "";
 
-  const [userInputs, setUserInputs] = useState({
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-  });
-
-  // ============================
-  // 1️⃣ الضغط على النقطة الأولى (start-dot)
-  // ============================
-  const handleStartDotClick = (e) => {
-    if (showAnswer || locked) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-
-    const word = e.target.dataset.word || null;
-    const image = e.target.dataset.image || null;
-
-    const alreadyUsed = lines.some((line) => line.word === word);
-    if (alreadyUsed) return;
-
-    setFirstDot({
-      word,
-      image,
-      x: e.target.getBoundingClientRect().left - rect.left + 8,
-      y: e.target.getBoundingClientRect().top - rect.top + 8,
+      updated[qIndex] = word;
+      return updated;
     });
   };
 
-  // ============================
-  // 2️⃣ الضغط على النقطة الثانية (end-dot)
-  // ============================
-  const handleEndDotClick = (e) => {
-    if (showAnswer || locked) return;
-    if (!firstDot) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-
-    const endWord = e.target.dataset.word || null;
-    const endImage = e.target.dataset.image || null;
-
-    const newLine = {
-      x1: firstDot.x,
-      y1: firstDot.y,
-      x2: e.target.getBoundingClientRect().left - rect.left + 8,
-      y2: e.target.getBoundingClientRect().top - rect.top + 8,
-      word: firstDot.word || endWord,
-      image: firstDot.image || endImage,
-    };
-
-    setLines((prev) => [...prev, newLine]);
-    setFirstDot(null);
-  };
-
+  /* ================= Check ================= */
   const checkAnswers = () => {
-    if (showAnswer || locked) return;
+    if (locked) return;
 
-    if (
-      !userInputs[1] ||
-      !userInputs[2] ||
-      !userInputs[3] ||
-      !userInputs[4] ||
-      !userInputs[5]
-    ) {
-      ValidationAlert.info("Oops!", "Please complete all sentences.");
+    if (answers.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
-    if (lines.length < 5) {
-      ValidationAlert.info("Oops!", "Please match all pairs before checking.");
-      return;
-    }
+    let score = 0;
 
-    let sentenceCorrect = 0;
-    let lineCorrect = 0;
-
-    let wrongInputsTemp = [];
-
-    Object.keys(correctSentences).forEach((key) => {
-      const userAnswer = userInputs[key].join(" ").toLowerCase();
-
-      const correctAnswer = correctSentences[key];
-
-      if (userAnswer === correctAnswer) sentenceCorrect++;
-      else wrongInputsTemp.push(key);
+    answers.forEach((ans, i) => {
+      if (ans === questions[i].correct) score++;
     });
 
-    setWrongInputs(wrongInputsTemp);
+    const total = questions.length;
+    // const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
-    let wrongLines = [];
+    ValidationAlert[
+      score === total ? "success" : score === 0 ? "error" : "warning"
+    ](`
+        Score: ${score} / ${total}
+  `);
 
-    lines.forEach((line) => {
-      const isCorrect = correctMatches.some(
-        (pair) => pair.word === line.word && pair.image === line.image,
-      );
-
-      if (isCorrect) lineCorrect++;
-      else wrongLines.push(line.word);
-    });
-
-    const totalScore = 9;
-    const userScore = sentenceCorrect + lineCorrect;
-
-    setWrongWords([...wrongLines]);
     setLocked(true);
-
-    let color =
-      userScore === totalScore ? "green" : userScore === 0 ? "red" : "orange";
-
-    const scoreMessage = `
-    <div style="font-size:20px; text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${userScore} / ${totalScore}
-      </span>
-    </div>
-  `;
-
-    if (userScore === totalScore) ValidationAlert.success(scoreMessage);
-    else if (userScore === 0) ValidationAlert.error(scoreMessage);
-    else ValidationAlert.warning(scoreMessage);
   };
 
+  const reset = () => {
+    setAnswers(
+      questions.map((q) => [
+        new Array(q.correct[0].length).fill(""),
+        new Array(q.correct[1].length).fill(""),
+      ]),
+    );
+    setLocked(false);
+  };
+
+  const showAnswer = () => {
+    setAnswers(questions.map((q) => q.correct));
+    setLocked(true);
+  };
+  const usedWords = answers.flat().filter(Boolean);
+  const getStatus = (index) => {
+    if (!locked) return null;
+
+    if (answers[index] === questions[index].correct) return "correct";
+    return "wrong";
+  };
+  /* ================= UI ================= */
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
           padding: "30px",
         }}
       >
-        <div
-          className="div-forall"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            // gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
-          }}
-        >
-          <div className="page8-q1-container">
-            <h4 className="header-title-page8">
-              <span className="ex-A">D</span> Unscramble and write. Then, match.
-            </h4>
+        <div className="div-forall">
+          <h5 className="header-title-page8">
+            <span className="ex-A" style={{ marginRight: "10px" }}>
+              D
+            </span>
+            Look, read, and answer.
+          </h5>
+          <Droppable droppableId="bank" direction="horizontal">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  padding: "10px",
+                  border: "2px dashed #ccc",
+                  borderRadius: "10px",
+                  marginTop: "20px",
+                  justifyContent: "center",
+                  width: "100%",
+                  marginBottom: "20px",
+                  // justifyContent: "center",
+                }}
+              >
+                {senteces.map((word, index) => {
+                  const isUsed = usedWords.includes(word);
 
-            <div
-              className="container12"
-              ref={containerRef}
-              // style={{ margin: "30px" }}
-            >
-              {/* الصف الأول */}
-              {questions.map((q, i) => (
-                <div className="CB-unit5-p6-q1-row" key={q.id}>
-                  <div style={{ width: "50%" }}>
-                    <div className="CB-unit5-p6-q1-word-with-dot">
-                      <span className="CB-unit5-p6-q1-number">{q.id}</span>
-
-                      <span
-                        className={`CB-unit5-p6-q1-word-text ${
-                          locked || showAnswer
-                            ? "CB-unit5-p6-q1-disabled-word"
-                            : ""
-                        }`}
-                        onClick={() =>
-                          document.getElementById(`dot-word-${q.id}`).click()
-                        }
-                        style={{ cursor: "pointer" }}
-                      >
-                        {q.matchWord}
-                      </span>
-
-                      {wrongWords.includes(q.matchWord) && (
-                        <span className="CB-unit5-p6-q1-error-mark">✕</span>
-                      )}
-
-                      <div className="CB-unit5-p6-q1-dot-wrapper">
-                        <div
-                          className="CB-unit5-p6-q1-dot CB-unit5-p6-q1-dot-start"
-                          id={`dot-word-${q.id}`}
-                          data-word={q.matchWord}
-                          onClick={handleStartDotClick}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Word Bank */}
-                    <Droppable
-                      droppableId={`bank-${q.id}`}
-                      direction="horizontal"
+                  return (
+                    <Draggable
+                      key={word}
+                      draggableId={`season-${word}`}
+                      index={index}
+                      isDragDisabled={isUsed} // 🔥 يمنع السحب
                     >
                       {(provided) => (
-                        <div
+                        <span
                           ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className="CB-unit5-p6-q1-word-bank"
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="season-chip"
+                          style={{
+                            padding: "7px 14px",
+                            border: "2px solid #2c5287",
+                            borderRadius: "8px",
+                            background: "white",
+                            fontWeight: "bold",
+                            cursor: isUsed ? "not-allowed" : "grab",
+                            fontSize: "16px",
+                            opacity: isUsed ? 0.4 : 1, // 🔥 تخفيف اللون
+                            ...provided.draggableProps.style,
+                          }}
                         >
-                          {q.scrambled
-                            .filter((w) => !userInputs[q.id].includes(w))
-                            .map((word, i) => (
-                              <Draggable
-                                key={word}
-                                draggableId={`${q.id}-${word}`}
-                                index={i}
-                              >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className="CB-unit5-p6-q1-word-box"
-                                    style={{
-                                      textAlign: "center",
-                                      cursor: "grab",
-                                      ...provided.draggableProps.style,
-                                    }}
-                                  >
-                                    {word}
-                                  </div>
-                                )}
-                              </Draggable>
-                            ))}
-                          {provided.placeholder}
-                        </div>
+                          {word}
+                        </span>
                       )}
-                    </Droppable>
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+          {questions.map((q, index) => (
+            <div
+              key={q.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+                marginBottom: "30px",
+                width: "100%",
+                maxWidth: "800px",
+              }}
+            >
+              {/* 🖼️ الصورة */}
+              <img
+                src={q.img}
+                alt=""
+                style={{
+                  width: "180px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                  border: "2px solid #ddd",
+                }}
+              />
 
-                    {/* Sentence */}
-                    <Droppable
-                      droppableId={`sentence-${q.id}`}
-                      direction="horizontal"
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className={`CB-unit5-p6-q1-unscramble-input ${
-                            snapshot.isDraggingOver
-                              ? "CB-unit5-p6-q1-active-drop"
-                              : ""
-                          }`}
-                        >
-                          {userInputs[q.id].join(" ")}
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </div>
+              {/* ❓ السؤال + الإجابة */}
+              <div style={{ flex: 1 }}>
+                <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
+                  {q.question}
+                </p>
 
-                  {/* Image Side */}
-                  <div className="CB-unit5-p6-q1-match-section">
-                    <div className="CB-unit5-p6-q1-dot-wrapper">
+                <Droppable droppableId={`${index}`}>
+                  {(provided) => {
+                    const status = getStatus(index);
+
+                    return (
                       <div
-                        className="CB-unit5-p6-q1-dot CB-unit5-p6-q1-dot-end"
-                        data-image={images[i]}
-                        id={`dot-img-${q.id}`}
-                        onClick={handleEndDotClick}
-                      />
-                    </div>
-
-                    <img
-                      src={images[i]}
-                      className={`CB-unit5-p6-q1-matched-img ${
-                        locked || showAnswer
-                          ? "CB-unit5-p6-q1-disabled-word"
-                          : ""
-                      }`}
-                      alt=""
-                      onClick={() =>
-                        document.getElementById(`dot-img-${q.id}`).click()
-                      }
-                    />
-                  </div>
-                </div>
-              ))}
-
-              <svg className="lines-layer">
-                {lines.map((line, i) => (
-                  <line key={i} {...line} stroke="red" strokeWidth="3" />
-                ))}
-              </svg>
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        style={{
+                          position: "relative",
+                          minHeight: "40px",
+                          borderBottom: `2px solid ${
+                            status === "wrong" ? "red" : "black"
+                          }`,
+                          padding: "5px",
+                          fontSize: "16px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: answers[index] ? "#2c5287" : "black",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {answers[index]}
+                        </span>
+                        {status === "wrong" && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: "25%",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              width: "20px",
+                              height: "20px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                              zIndex: 3,
+                            }}
+                          >
+                            ✕
+                          </span>
+                        )}
+                        {provided.placeholder}
+                      </div>
+                    );
+                  }}
+                </Droppable>
+              </div>
             </div>
-          </div>
-
-          <div className="action-buttons-container">
-            <button
-              onClick={() => {
-                setLines([]);
-                setUserInputs({
-                  1: [],
-                  2: [],
-                  3: [],
-                  4: [],
-                  5: [],
-                });
-
-                setWrongWords([]);
-                setWrongInputs([]);
-                setShowAnswer(false);
-                setLocked(false);
-              }}
-              className="try-again-button"
-            >
-              Start Again ↻
-            </button>
-
-            <button
-              onClick={() => {
-                const rect = containerRef.current.getBoundingClientRect();
-
-                const getDotPosition = (selector) => {
-                  const el = document.querySelector(selector);
-                  if (!el) return { x: 0, y: 0 };
-                  const r = el.getBoundingClientRect();
-                  return {
-                    x: r.left - rect.left + 8,
-                    y: r.top - rect.top + 8,
-                  };
-                };
-
-                // 1️⃣ إنشاء الخطوط الصحيحة
-                const finalLines = correctMatches.map((line) => ({
-                  ...line,
-                  x1: getDotPosition(`[data-word="${line.word}"]`).x,
-                  y1: getDotPosition(`[data-word="${line.word}"]`).y,
-                  x2: getDotPosition(`[data-image="${line.image}"]`).x,
-                  y2: getDotPosition(`[data-image="${line.image}"]`).y,
-                }));
-
-                setLines(finalLines);
-
-                // 2️⃣ تعبئة جميع الإجابات الصحيحة في inputs
-                setUserInputs({
-                  1: correctSentences["1"].split(" "),
-                  2: correctSentences["2"].split(" "),
-                  3: correctSentences["3"].split(" "),
-                  4: correctSentences["4"].split(" "),
-                  5: correctSentences["5"].split(" "),
-                });
-
-                // 3️⃣ منع التعديل على كل شيء (قفل inputs + منع الرسم)
-                setLocked(true);
-                setShowAnswer(true);
-                setWrongWords([]);
-                setWrongInputs([]);
-              }}
-              className="show-answer-btn swal-continue"
-            >
-              Show Answer
-            </button>
-
-            <button onClick={checkAnswers} className="check-button2">
-              Check Answer ✓
-            </button>
-          </div>
+          ))}
+          <Button
+            handleShowAnswer={showAnswer}
+            handleStartAgain={reset}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
     </DragDropContext>
