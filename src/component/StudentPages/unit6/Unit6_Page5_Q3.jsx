@@ -1,221 +1,423 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Unit6_Page5_Q3.css";
-
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
-import img5 from "../../../assets/imgs/test.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex C 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex C 2.svg";
 
 const Unit6_Page5_Q3 = () => {
-  const [selectedImg, setSelectedImg] = useState(null);
-  const [matches, setMatches] = useState({});
-  const [showResult, setShowResult] = useState(false);
+  const grid = [
+    [
+      "h",
+      "i",
+      "j",
+      "k",
+      "s",
+      "t",
+      "e",
+      "l",
+      "l",
+      "a",
+      "m",
+      "u",
+      "f",
+      "r",
+      "q",
+      "r",
+      "e",
+      "c",
+      "o",
+      "m",
+      "m",
+      "e",
+      "n",
+      "d",
+      "s",
+      "f",
+      "x",
+      "c",
+      "s",
+      "a",
+      "e",
+      "e",
+    ],
+    [
+      "e",
+      "v",
+      "e",
+      "r",
+      "y",
+      "o",
+      "n",
+      "e",
+      "k",
+      "i",
+      "u",
+      "j",
+      "k",
+      "k",
+      "i",
+      "j",
+      "u",
+      "t",
+      "g",
+      "f",
+      "v",
+      "t",
+      "o",
+      "m",
+      "l",
+      "o",
+      "k",
+      "s",
+      "t",
+      "a",
+      "r",
+      "t",
+    ],
+    [
+      "t",
+      "w",
+      "e",
+      "d",
+      "s",
+      "v",
+      "c",
+      "a",
+      "k",
+      "u",
+      "b",
+      "j",
+      "s",
+      "x",
+      "g",
+      "a",
+      "r",
+      "d",
+      "e",
+      "n",
+      "t",
+      "y",
+      "h",
+      "f",
+      "g",
+      "v",
+    ],
+  ];
+  const letters = grid;
+  const wordsToFind = [
+    "stella",
+    "recommends",
+    "everyone",
+    "to",
+    "start",
+    "a",
+    "garden",
+  ];
+
+  const correctPositions = {
+    stella: [4, 5, 6, 7, 8, 9],
+    recommends: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+    everyone: [
+      100 + 0,
+      100 + 1,
+      100 + 2,
+      100 + 3,
+      100 + 4,
+      100 + 5,
+      100 + 6,
+      100 + 7,
+    ],
+    to: [100 + 21, 100 + 22],
+    start: [100 + 27, 100 + 28, 100 + 29, 100 + 30, 100 + 31],
+    a: [200 + 7],
+    garden: [200 + 14, 200 + 15, 200 + 16, 200 + 17, 200 + 18, 200 + 19],
+  };
+
   const [locked, setLocked] = useState(false);
+  const [sentence, setSentence] = useState("");
+  const [selected, setSelected] = useState([]);
+  const [currentWord, setCurrentWord] = useState("");
+  const [foundWords, setFoundWords] = useState([]);
+  const [coloredCells, setColoredCells] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const imageRefs = useRef([]);
-  const sentenceRefs = useRef([]);
-  const containerRef = useRef(null);
+  const handleMouseDown = (index) => {
+    if (locked) return;
 
-  const images = [
-    { id: 0, img: img1 },
-    { id: 1, img: img2 },
-    { id: 2, img: img3 },
-    { id: 3, img: img4 },
-    { id: 4, img: img5 },
-  ];
+    const row = Math.floor(index / 100);
+    const col = index % 100;
 
-  const sentences = [
-    { id: 0, text: "I wash my face." },
-    { id: 1, text: "I eat my breakfast." },
-    { id: 2, text: "I go to school." },
-    { id: 3, text: "I comb my hair." },
-    { id: 4, text: "I brush my teeth." },
-  ];
+    setIsDragging(true);
+    setSelected([index]);
+    setCurrentWord(letters[row][col]);
+  };
+  const handleMouseEnter = (index) => {
+    if (!isDragging || locked) return;
 
-  const correct = {
-    0: 3,
-    1: 4,
-    2: 0,
-    3: 1,
-    4: 2,
+    const lastIndex = selected[selected.length - 1];
+
+    if (index === lastIndex + 1 || index === lastIndex - 1) {
+      if (!selected.includes(index)) {
+        const row = Math.floor(index / 100);
+        const col = index % 100;
+
+        setSelected((prev) => [...prev, index]);
+        setCurrentWord((prev) => prev + letters[row][col]);
+      }
+    }
   };
 
-  const selectImage = (id) => {
-    if (locked || showResult) return;
-    setSelectedImg(id);
+  const handleTouchMove = (e) => {
+    if (!isDragging || locked) return;
+    e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
+
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!element) return;
+
+    const index = element.getAttribute("data-index");
+    if (index !== null) {
+      handleMouseEnter(Number(index));
+    }
   };
 
-  const selectSentence = (id) => {
-    if (locked || showResult) return;
-    if (selectedImg === null) return;
+  const handleMouseUp = () => {
+    if (locked) return;
+    setIsDragging(false);
 
-    setMatches((prev) => {
-      const updated = { ...prev };
+    const reversedWord = currentWord.split("").reverse().join("");
 
-      Object.keys(updated).forEach((imgKey) => {
-        if (updated[imgKey] === id) {
-          delete updated[imgKey];
-        }
-      });
+    const matchedWord = wordsToFind.find(
+      (word) => word === currentWord || word === reversedWord,
+    );
 
-      updated[selectedImg] = id;
-      return updated;
-    });
-
-    setSelectedImg(null);
-  };
-  const checkAnswers = () => {
-    if (locked || showResult) return;
-
-    if (Object.keys(matches).length !== images.length) {
-      ValidationAlert.info("Please match all.");
-      return;
+    if (matchedWord && !foundWords.includes(matchedWord)) {
+      setFoundWords((prev) => [...prev, matchedWord]);
+      setColoredCells((prev) => [...prev, ...selected]);
+      setSentence(
+        wordsToFind
+          .filter((word) => [...foundWords, matchedWord].includes(word))
+          .join(" "),
+      );
     }
 
-    let correctCount = 0;
-
-    Object.entries(matches).forEach(([imgId, sentId]) => {
-      if (correct[imgId] === sentId) correctCount++;
-    });
-
-    const total = images.length;
-
-    const message = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:#2e7d32;font-weight:bold;">
-        Score: ${correctCount} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (correctCount === total) {
-      ValidationAlert.success(message);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(message);
-    } else {
-      ValidationAlert.warning(message);
-    }
-
-    setShowResult(true);
-    setLocked(true);
-  };
-
-  const showAnswers = () => {
-    setMatches(correct);
-    setLocked(true);
-    setShowResult(true);
+    setSelected([]);
+    setCurrentWord("");
   };
 
   const reset = () => {
-    setSelectedImg(null);
-    setMatches({});
-    setShowResult(false);
+    setSelected([]);
+    setCurrentWord("");
+    setFoundWords([]);
+    setColoredCells([]);
+    setSentence("");
     setLocked(false);
+  };
+
+  const showAnswers = () => {
+    let allCells = [];
+    wordsToFind.forEach((word) => {
+      if (correctPositions[word]) {
+        allCells.push(...correctPositions[word]);
+      }
+    });
+    setFoundWords(wordsToFind);
+    setColoredCells(allCells);
+    setSelected([]);
+    setCurrentWord("");
+    setSentence(wordsToFind.join(" "));
+    setLocked(true);
+  };
+
+  const checkAnswers = () => {
+    if (locked) return;
+    const total = wordsToFind.length;
+    const score = foundWords.length;
+
+    if (score === 0) {
+      ValidationAlert.info();
+      return;
+    }
+
+    if (score < total) {
+      ValidationAlert.warning(`
+        <div style="font-size:20px;text-align:center;">
+          <b style="color:orange;">Score: ${score} / ${total}</b>
+        </div>
+      `);
+    } else {
+      ValidationAlert.success(`
+        <div style="font-size:20px;text-align:center;">
+          <b style="color:green;">Score: ${score} / ${total}</b>
+        </div>
+      `);
+    }
+    setLocked(true);
   };
 
   return (
     <div
-      ref={containerRef}
-      className="relative flex flex-col items-center p-[30px]"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+
+        width: "100%",
+        boxSizing: "border-box",
+      }}
     >
-      <div className="w-full max-w-[900px] flex flex-col gap-[30px]">
-        <h5 className="header-title-page8">
-          <span className="ex-A">B</span> Look, read, and match.
+      <div className="div-forall">
+        <h5
+          className="header-title-page8 pb-2.5"
+        >
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            C
+          </span>
+          What does Stella recommend in I Love My Garden! on page 47?
         </h5>
 
-        {/* Images */}
-        <div className="flex justify-between gap-5">
-          {images.map((img) => (
-            <div
-              key={img.id}
-              ref={(el) => (imageRefs.current[img.id] = el)}
-              onClick={() => selectImage(img.id)}
-              className={`border-2 border-red-500 rounded-[10px] p-[5px] cursor-pointer transition-all duration-200 ${
-                selectedImg === img.id ? "bg-red-100" : ""
+        {/* Words List */}
+        <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
+          {wordsToFind.map((word) => (
+            <span
+              key={word}
+              className={`px-3 py-1.5 rounded-[10px] border-2 border-[#2c5287] font-semibold transition duration-200 ${
+                foundWords.includes(word)
+                  ? "bg-[#2c5287] text-white border-[#2c5287]"
+                  : "bg-white text-black"
               }`}
+              style={{ fontSize: "clamp(12px, 2vw, 15px)" }}
             >
-              <img src={img.img} alt="" style={{ height: "90px" }} />
-            </div>
+              {word}
+            </span>
           ))}
         </div>
 
-        {/* Sentences */}
-        <div className="grid grid-cols-5 gap-5 mt-5 w-full justify-center">
-          {sentences.map((sent, index) => {
-            const colMap = [1, 3, 5, 2, 4];
+        <div
+          style={{ width: "100%", display: "flex", justifyContent: "center" }}
+        >
+          {/* Grid Wrapper */}
+          <div
+            className="border-2 border-[#f28c63] px-4 pt-4 pb-5"
+            style={{ width: "fit-content", margin: "0 auto" }}
+          >
+            <div
+              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px]"
+              style={{
+                userSelect: "none",
+                width: "max-content",
+                touchAction: "none", // 🔥 الحل السحري لمنع تحريك الصفحة أثناء السحب على الآيباد
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              {letters.map((row, rowIndex) => (
+                <div
+                  key={rowIndex}
+                  style={{
+                    display: "flex",
+                    gap: "clamp(1px, 0.3vw, 4px)", // مسافة تتغير حسب الشاشة
+                    width: "fit-content",
+                  }}
+                >
+                  {row.map((letter, colIndex) => {
+                    const index = rowIndex * 100 + colIndex;
+                    const isSelected = selected.includes(index);
+                    const isFound = coloredCells.includes(index);
 
-            return (
-              <div
-                key={sent.id}
-                ref={(el) => (sentenceRefs.current[sent.id] = el)}
-                onClick={() => selectSentence(sent.id)}
-                className="bg-[#f4e9e2] py-3 px-7 rounded-[20px] cursor-pointer font-medium text-center whitespace-nowrap w-fit"
-                style={{ gridColumn: colMap[index] }}
-              >
-                {sent.text}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+                    return (
+                      <span
+                        key={index}
+                        data-index={index}
+                        onMouseDown={() => handleMouseDown(index)}
+                        onMouseEnter={() => handleMouseEnter(index)}
+                        onMouseUp={handleMouseUp}
+                        onDragStart={(e) => e.preventDefault()}
+                        onTouchStart={(e) => {
+                          e.preventDefault(); // 🔥 منع تحريك الصفحة عند بدء اللمس
+                          handleMouseDown(index);
+                        }}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleMouseUp}
+                        className={`
+                          flex items-center justify-center
+                          cursor-pointer
+                          transition
+                          ${isSelected ? "bg-[#ffd54f] rounded-sm" : ""}
+                          ${isFound ? "bg-[#4caf50] text-white rounded-sm" : ""}
+                        `}
+                        style={{
+                          width: "clamp(16px, 2.5vw, 25px)", // 🔥 عرض ديناميكي
+                          height: "clamp(22px, 3.5vw, 35px)", // 🔥 طول ديناميكي
+                          fontSize: "clamp(12px, 1.8vw, 18px)", // 🔥 حجم خط ديناميكي
+                        }}
+                      >
+                        {letter}
+                      </span>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
 
-      {/* SVG LINES (برا div-forall) */}
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-visible">
-        {Object.entries(matches).map(([imgId, sentId], i) => {
-          const imgEl = imageRefs.current[imgId];
-          const sentEl = sentenceRefs.current[sentId];
-
-          if (!imgEl || !sentEl || !containerRef.current) return null;
-
-          const imgRect = imgEl.getBoundingClientRect();
-          const sentRect = sentEl.getBoundingClientRect();
-          const containerRect = containerRef.current.getBoundingClientRect();
-
-          const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
-          const y1 = imgRect.bottom - containerRect.top;
-
-          const x2 = sentRect.left + sentRect.width / 2 - containerRect.left;
-          const y2 = sentRect.top - containerRect.top;
-
-          const curveOffset = 60;
-
-          const pathData = `
-          M ${x1} ${y1}
-          C ${x1} ${y1 + curveOffset},
-            ${x2} ${y2 - curveOffset},
-            ${x2} ${y2}
-        `;
-
-          return (
-            <g key={i}>
-              <path
-                d={pathData}
-                stroke="#e53935"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "15px",
+              }}
+            >
+              <img
+                src={img1}
+                alt="start"
+                style={{
+                  width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
+                  height: "auto",
+                }}
               />
-              <circle cx={x2} cy={y2} r="4" fill="#9e9e9e" />
-            </g>
-          );
-        })}
-      </svg>
 
-      {/* Buttons */}
-      <div className="action-buttons-container mt-5">
-        <button className="try-again-button" onClick={reset}>
-          Start Again ↻
-        </button>
+              <div
+                style={{
+                  flex: 1,
+                  borderBottom: "2px solid black",
+                  height: "30px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  value={sentence}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "clamp(14px, 2vw, 18px)", // 🔥 حجم خط ديناميكي للإجابة
+                  }}
+                />
+              </div>
 
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
+              <img
+                src={img2}
+                alt="end"
+                style={{
+                  width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
+                  height: "auto",
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
-        <button className="check-button2" onClick={checkAnswers}>
-          Check Answer ✓
-        </button>
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );

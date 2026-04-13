@@ -245,7 +245,6 @@ const Unit5_Page5_Q3 = () => {
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
-
         width: "100%",
         boxSizing: "border-box",
       }}
@@ -253,7 +252,6 @@ const Unit5_Page5_Q3 = () => {
       <div className="div-forall">
         <h5
           className="header-title-page8 pb-2.5"
-          style={{ fontSize: "clamp(14px, 2.5vw, 18px)" }}
         >
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C

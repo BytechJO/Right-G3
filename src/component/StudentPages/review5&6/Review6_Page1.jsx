@@ -1,4 +1,4 @@
-import page_1 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0045.jpg";
+import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 54.png";
 import "./Review6_Page1.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 

@@ -1,175 +1,174 @@
-import "./Unit6_Page5_Q2.css";
 import React, { useState } from "react";
-import mapImg from "../../../assets/imgs/mapImg.png";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import "./Unit6_Page5_Q1.css";
 
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 4.svg";
+import sound1 from "../../../assets/audio/ClassBook/Unit 6/P 50/CD39.Pg50_Instruction_Adult Lady.mp3";
+
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 const Unit6_Page5_Q2 = () => {
-  const [circles, setCircles] = useState([]);
-  const [showResult, setShowResult] = useState(false);
-  const [locked, setLocked] = useState(false);
-  const wordAreas = [
-    { id: "kite", x: 28.4, y: 13, w: 6, h: 6, correct: true },
-    { id: "it", x: 30, y: 27, w: 4, h: 6, correct: false },
-    { id: "light", x: 25, y: 39, w: 6, h: 7, correct: true },
-    { id: "rain", x: 19.5, y: 52, w: 6, h: 6, correct: false },
-    { id: "sit", x: 20.5, y: 68, w: 4, h: 6, correct: false },
-    { id: "five", x: 29.5, y: 62, w: 6, h: 7, correct: true },
-    { id: "cake", x: 40.5, y: 48.5, w: 6, h: 7, correct: false },
-    { id: "bike", x: 46.4, y: 60, w: 6, h: 7, correct: true },
-    { id: "feet", x: 52.5, y: 70.5, w: 6, h: 7, correct: false },
-    { id: "night", x: 60, y: 65, w: 7, h: 7, correct: true },
-    { id: "time", x: 63, y: 53, w: 7, h: 7, correct: true },
-    { id: "in", x: 64, y: 37.5, w: 5, h: 6, correct: false },
-    { id: "tight", x: 72, y: 18.5, w: 7, h: 7, correct: true },
-    { id: "tea", x: 79.5, y: 37.5, w: 6, h: 6, correct: false },
-    { id: "like", x: 79, y: 53, w: 6, h: 7, correct: true },
-    { id: "meat", x: 73.5, y: 65.5, w: 7, h: 7, correct: false },
-    { id: "six", x: 69, y: 80, w: 5, h: 6, correct: false },
+  const items = [
+    {
+      img: img1,
+      options: ["gl", "fl", "pl"],
+      correct: "gl",
+    },
+    {
+      img: img2,
+      options: ["cl", "bl", "sl"],
+      correct: "bl",
+    },
+    {
+      img: img3,
+      options: ["cl", "gl", "fl"],
+      correct: "cl",
+    },
+    {
+      img: img4,
+      options: ["fl", "sl", "gl"],
+      correct: "fl",
+    },
   ];
-  const handleClick = (area) => {
-    if (locked || showResult) return;
 
-    if (circles.some((c) => c.id === area.id)) {
-      setCircles((prev) => prev.filter((c) => c.id !== area.id));
-      return;
-    }
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [locked, setLocked] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const captions = [
+    {
+      start: 0.5,
+      end: 8.34,
+      text: "Page 62, Write Activities. Exercise A, number 1. Listen, circle, and write.",
+    },
+    { start: 9.639, end: 10.859, text: "1, window." },
+    { start: 12.139, end: 13.279, text: "2, coat." },
+    { start: 14.559, end: 15.799, text: "3, note." },
+    { start: 17.219, end: 18.379, text: "5, boat" },
+  ];
+ const chooseOption = (i, value) => {
+  if (locked) return;
 
-    setCircles((prev) => [
-      ...prev,
-      {
-        id: area.id,
-        x: area.x,
-        y: area.y,
-        w: area.w,
-        h: area.h,
-        correct: area.correct,
-      },
-    ]);
-  };
+  const newSelected = [...selected];
+  newSelected[i] = value;
+  setSelected(newSelected);
+};
 
+ const resetAll = () => {
+  setSelected(Array(items.length).fill(""));
+  setLocked(false);
+  setShowResult(false);
+};
+  const showAnswers = () => {
+  setSelected(items.map((i) => i.correct));
+  setLocked(true);
+};
   const checkAnswers = () => {
-    if (locked || showResult) return;
+    if (locked) return;
 
-    if (circles.length === 0) {
-      ValidationAlert.info("");
+    if (selected.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
-    const total = wordAreas.filter((w) => w.correct).length;
+    let score = 0;
 
-    const correctSelected = circles.filter((c) => c.correct).length;
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
+    });
 
-    const score = correctSelected;
+    const total = items.length;
 
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
-    const message = `
-  <div style="font-size:20px;text-align:center;">
-    <span style="color:${color};font-weight:bold;">
-      Score: ${score} / ${total}
-    </span>
-  </div>
-  `;
+    const msg = `
+      <div style="font-size:20px;text-align:center;">
+        <span style="color:${color};font-weight:bold">
+        Score: ${score} / ${total}
+        </span>
+      </div>
+    `;
 
-    if (score === total) ValidationAlert.success(message);
-    else if (score === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
 
-    setShowResult(true);
     setLocked(true);
+    setShowResult(true);
   };
-
-  const showAnswers = () => {
-    const correctCircles = wordAreas
-      .filter((w) => w.correct)
-      .map((w) => ({
-        id: w.id,
-        x: w.x,
-        y: w.y,
-        w: w.w,
-        h: w.h,
-        correct: true,
-      }));
-
-    setCircles(correctCircles);
-    setShowResult(true);
-    setLocked(true);
+  const isWrong = (index) => {
+    return showResult && selected[index] !== items[index].correct;
   };
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "30px",
-      }}
-    >
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          width: "100%",
-          maxWidth: "1000px",
-          gap: "30px",
-        }}
-      >
-        <div>
-          <h5 className="header-title-page8">
-            <span style={{ color: "#2e3192" }}> 2 </span> Read and circle the{" "}
-            <span style={{ color: "#2e3192" }}>long i</span>words.
-          </h5>
-        </div>
-        <div className="relative w-full max-w-[1000px]">
-          <img
-            src={mapImg}
-            alt=""
-            style={{
-              width: "100%",
-              height: "auto",
-              display: "block",
-            }}
-          />
+    <div className="main-container-component">
+      <div className="div-forall">
+        <h5 className="header-title-page8 mb-5">
+          <span className="ex-A mr-4">B</span>
+          Look, listen, and choose
+        </h5>
+        <QuestionAudioPlayer
+          src={sound1}
+          captions={captions}
+          stopAtSecond={8.43}
+        />
+        <div className="flex w-full">
+          <div className="flex justify-center w-full">
+            <div className="grid grid-cols-2 gap-y-10 gap-x-[200px] mt-10">
+              {items.map((item, i) => (
+                <div key={i} className="flex flex-col justify-between h-40">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[20px] font-bold text-[#2a4e7c]">
+                      {i + 1}
+                    </span>
 
-          {wordAreas.map((area) => (
-            <div
-              key={area.id}
-              onClick={() => handleClick(area)}
-              className="absolute cursor-pointer"
-              style={{
-                left: `${area.x}%`,
-                top: `${area.y}%`,
-                width: `${area.w}%`,
-                height: `${area.h}%`,
-              }}
-            />
-          ))}
+                    <img
+                      src={item.img}
+                      alt=""
+                      style={{
+                        width: "80px",
+                        height: "auto",
+                      }}
+                    />
 
-          {circles.map((c, i) => (
-            <div
-              key={i}
-              className="absolute border-4 border-purple-500 rounded-full pointer-events-none cursor-pointer"
-              style={{
-                left: `${c.x - 0.5}%`,
-                top: `${c.y - 0.5}%`,
-                width: `${c.w + 1}%`,
-                height: `${c.h + 1}%`,
-              }}
-            />
-          ))}
+                    {/* OPTIONS */}
+                    <div className="flex flex-col gap-1.5 text-[18px] ml-4">
+                      <div className="relative  mt-2">
+                        {/* ❌ */}
+                        {isWrong(i) && (
+                          <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
+                            ✕
+                          </span>
+                        )}
+                      </div>
+                      {item.options.map((opt, idx) => (
+                        <span
+                          key={idx}
+                          onClick={() => chooseOption(i, opt)}
+                          className={`cursor-pointer px-2 py-0.5 rounded-full ${
+                            selected[i] === opt
+                              ? isWrong(i)
+                                ? "border-2 border-red-500"
+                                : "border-2 border-[#1C398E]"
+                              : "hover:bg-gray-100"
+                          }`}
+                        >
+                          {opt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
       <div className="action-buttons-container">
-        <button
-          className="try-again-button"
-          onClick={() => {
-            setCircles([]);
-            setShowResult(false);
-            setLocked(false);
-          }}
-        >
+        <button onClick={resetAll} className="try-again-button">
           Start Again ↻
         </button>
 

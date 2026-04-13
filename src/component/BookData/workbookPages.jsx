@@ -37,9 +37,9 @@ export const workbookPages = (openPopup, goToUnit) => [
   // unit4
 
   // unit5
-  <WB_Unit5_Page27 openPopup={openPopup} />,
+  // <WB_Unit5_Page27 openPopup={openPopup} />,
 
-  // unit6
+  // unit6WB_Unit5_Page27
 
   // unit7
  // unit7

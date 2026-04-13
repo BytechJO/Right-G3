@@ -1,174 +1,211 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Unit6_Page5_Q1.css";
+
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 6.svg";
+
 const Unit6_Page5_Q1 = () => {
-  const questions = [
-    { id: 1, optionA: "bike", optionB: "kite", correct: "A" },
-    { id: 2, optionA: "night", optionB: "light", correct: "B" },
-    { id: 3, optionA: "five", optionB: "bike", correct: "A" },
-    { id: 4, optionA: "tight", optionB: "night", correct: "A" },
-    { id: 5, optionA: "light", optionB: "night", correct: "B" },
-    { id: 6, optionA: "kite", optionB: "five", correct: "A" },
+  const items = [
+    {
+      img: img1,
+      options: ["sl", "pl"],
+      correct: "sl",
+      word: "__eep",
+    },
+    {
+      img: img2,
+      options: ["pl", "fl"],
+      correct: "pl",
+      word: "air__ane",
+    },
+    {
+      img: img3,
+      options: ["cl", "sl"],
+      correct: "cl",
+      word: "__own",
+    },
+    {
+      img: img4,
+      options: ["pl", "fl"],
+      correct: "pl",
+      word: "__ate",
+    },
+    {
+      img: img5,
+      options: ["fl", "sl"],
+      correct: "sl",
+      word: "__ide",
+    },
+    {
+      img: img6,
+      options: ["pl", "fl"],
+      correct: "fl",
+      word: "__ag",
+    },
   ];
 
-  const [answers, setAnswers] = useState({});
-  const [wrongRows, setWrongRows] = useState([]);
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const chooseOption = (i, value) => {
+    if (locked) return;
 
-  // ============================
-  // اختيار مربع
-  // ============================
-  const handleSelect = (id, choice) => {
-    if (locked || showAnswer) return;
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
 
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: choice,
-    }));
+    const newAnswers = [...answers];
+
+    newAnswers[i] = items[i].word.replace("__", value).replace("_", value);
+    setAnswers(newAnswers);
   };
 
-  // ============================
-  // Check Answer
-  // ============================
-  const checkAnswers = () => {
-    if (locked || showAnswer) return;
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
+    setLocked(false);
+    setShowResult(false);
+  };
 
-    let correctCount = 0;
-    let wrongTemp = [];
+  const showAnswers = () => {
+    setSelected(items.map((i) => i.correct));
 
-    questions.forEach((q) => {
-      if (answers[q.id] === q.correct) correctCount++;
-      else wrongTemp.push(q.id);
+    const newAnswers = items.map((i) => {
+      return i.word.replace("__", i.correct).replace("_", i.correct);
     });
 
-    setWrongRows(wrongTemp);
+    setAnswers(newAnswers);
     setLocked(true);
+  };
+  const checkAnswers = () => {
+    if (locked) return;
+    if (selected.includes("")) {
+      ValidationAlert.info("Please complete all answers.");
+      return;
+    }
 
-    const total = questions.length;
+    let score = 0;
 
-    let color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
+    });
 
-    const message = `
+    const total = items.length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
       <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold;">
-          Score: ${correctCount} / ${total}
+        <span style="color:${color};font-weight:bold">
+        Score: ${score} / ${total}
         </span>
       </div>
     `;
 
-    if (correctCount === total) ValidationAlert.success(message);
-    else if (correctCount === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
-  };
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
 
-  // ============================
-  // Show Answer
-  // ============================
-  const handleShowAnswer = () => {
-    const filled = Object.fromEntries(questions.map((q) => [q.id, q.correct]));
-
-    setAnswers(filled);
-    setShowAnswer(true);
     setLocked(true);
-    setWrongRows([]);
+    setShowResult(true);
   };
-
-  // ============================
-  // Start Again
-  // ============================
-  const handleStartAgain = () => {
-    setAnswers({});
-    setWrongRows([]);
-    setLocked(false);
-    setShowAnswer(false);
+  const isWrong = (index) => {
+    return showResult && selected[index] !== items[index].correct;
   };
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "30px",
-      }}
-    >
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          width: "60%",
-          gap: "30px",
-        }}
-      >
-        <div>
-          <h5 className="header-title-page8">
-            <span className="ex-A">A</span>{" "}
-            <span style={{ color: "#2e3192" }}>1</span> Which picture has{" "}
-            <span style={{ color: "#2e3192" }}>long e</span>? Listen and circle.
-          </h5>
-        </div>
-        <div className="CB-unit6-p5-q1-container" style={{ marginTop: "20px" }}>
-          {questions.map((q, i) => (
-            <div key={q.id} className="CB-unit6-p5-q1-row">
-              <span style={{ width: "20px" }}>{q.id}</span>
+    <div className="main-container-component">
+      <div className="div-forall">
+        <h5 className="header-title-page8 mb-5">
+          <span className="ex-A mr-4">A</span>
+          Look, circle, and write.
+        </h5>
+        <div className="flex w-full">
+          <div className="grid grid-cols-3 gap-y-10 w-full gap-x-[60px] mt-10 justify-center">
+            {items.map((item, i) => (
+              <div key={i} className="flex flex-col justify-between h-40">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[20px] font-bold text-[#2a4e7c]">
+                    {i + 1}
+                  </span>
 
-              {/* Option A */}
-              <div className="CB-unit6-p5-q1-options">
-                <span>{q.optionA}</span>
-
-                <div className="CB-unit6-p5-q1-input-wrapper">
-                  <input
-                    readOnly
-                    className={`CB-unit6-p5-q1-blank ${
-                      answers[q.id] === "A" ? "selected" : ""
-                    }`}
-                    onClick={() => handleSelect(q.id, "A")}
-                    value={answers[q.id] === "A" ? "✓" : ""}
+                  <img
+                    src={item.img}
+                    alt=""
+                    style={{
+                      width: "80px",
+                      height: "auto",
+                    }}
                   />
 
-                  {locked && answers[q.id] === "A" && q.correct !== "A" && (
-                    <span className="CB-unit6-p5-q1-wrong-icon">✕</span>
+                  {/* OPTIONS */}
+                  <div className="flex flex-col gap-1.5 text-[18px]">
+                    {item.options.map((opt, idx) => (
+                      <span
+                        key={idx}
+                        onClick={() => chooseOption(i, opt)}
+                        className={`cursor-pointer px-2 py-0.5 ${
+                          selected[i] === opt
+                            ? "border-2 border-[#1C398E] rounded-full"
+                            : "hover:bg-gray-100 rounded-full"
+                        }`}
+                      >
+                        {opt}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="relative w-40 mt-2">
+                  {/* ❌ */}
+                  {isWrong(i) && (
+                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
+                      ✕
+                    </span>
                   )}
+
+                  <div className="text-[22px] flex items-end gap-1">
+                    {(() => {
+                      const parts = item.word.split(/__|_/); // يقسم الكلمة
+
+                      return (
+                        <>
+                          <span>{parts[0]}</span>
+
+                          {/* الحرف بالمكان الصحيح */}
+                          <span
+                            className={`px-1 min-w-6 text-center border-b-2 ${
+                              isWrong(i) ? "border-red-500" : "border-black"
+                            } text-[#1C398E]`}
+                          >
+                            {selected[i] || ""}
+                          </span>
+
+                          <span>{parts[1]}</span>
+                        </>
+                      );
+                    })()}
+                  </div>
                 </div>
               </div>
-
-              {/* Option B */}
-              <div className="CB-unit6-p5-q1-options">
-                <span>{q.optionB}</span>
-
-                <div className="CB-unit6-p5-q1-input-wrapper">
-                  <input
-                    readOnly
-                    className={`CB-unit6-p5-q1-blank ${
-                      answers[q.id] === "B" ? "selected" : ""
-                    }`}
-                    onClick={() => handleSelect(q.id, "B")}
-                    value={answers[q.id] === "B" ? "✓" : ""}
-                  />
-
-                  {locked && answers[q.id] === "B" && q.correct !== "B" && (
-                    <span className="CB-unit6-p5-q1-wrong-icon">✕</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
+
       <div className="action-buttons-container">
-        <button onClick={handleStartAgain} className="try-again-button">
+        <button onClick={resetAll} className="try-again-button">
           Start Again ↻
         </button>
-        {/* ⭐⭐⭐ NEW: زر Show Answer */}
-        <button
-          onClick={handleShowAnswer}
-          className="show-answer-btn swal-continue"
-        >
+
+        <button onClick={showAnswers} className="show-answer-btn">
           Show Answer
         </button>
 
