@@ -1,162 +1,262 @@
 import React, { useState } from "react";
+import "./Review5_Page2_Q2.css";
+
 import ValidationAlert from "../../Popup/ValidationAlert";
+import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
-import img5 from "../../../assets/imgs/test6.png";
-import img6 from "../../../assets/imgs/test6.png";
-
-const Review5_Page2_Q3 = () => {
-  const items = [
-    { img: img1, options: ["ee", "ea"], correct: "ee", start: "b", end: "" },
-    { img: img2, options: ["ee", "ea"], correct: "ea", start: "t", end: "" },
-    { img: img3, options: ["ee", "ea"], correct: "ee", start: "f", end: "t" },
-    { img: img4, options: ["ee", "ea"], correct: "ea", start: "m", end: "t" },
-    { img: img5, options: ["ee", "ea"], correct: "ea", start: "r", end: "d" },
-    { img: img6, options: ["ee", "ea"], correct: "ee", start: "sl", end: "p" },
+const Review5_Page2_Q2 = () => {
+  const captions = [
+    {
+      start: 0,
+      end: 4.23,
+      text: "Page 8. Right Activities. Exercise A, number 1. ",
+    },
+    {
+      start: 4.25,
+      end: 8.28,
+      text: "Listen and write the missing letters. Number the pictures.  ",
+    },
+    { start: 8.3, end: 11.05, text: "1-tiger." },
+    { start: 11.07, end: 13.12, text: "2-taxi." },
+    { start: 13.14, end: 15.14, text: "3-duck." },
+    { start: 15.16, end: 17.13, text: "4-deer." },
   ];
 
-  const [selected, setSelected] = useState(Array(items.length).fill(""));
-  const [answers, setAnswers] = useState(Array(items.length).fill(""));
+  const groups = [
+    { id: 1, word1: "try", word2: "fly", answer: "yes" },
+    { id: 2, word1: "bunny", word2: "spy", answer: "no" },
+    { id: 3, word1: "cry", word2: "fry", answer: "yes" },
+    { id: 4, word1: "candy", word2: "baby", answer: "yes" },
+    { id: 5, word1: "sunny", word2: "sly", answer: "no" },
+    { id: 6, word1: "fluffy", word2: "sky", answer: "no" },
+  ];
+
+  const [selected, setSelected] = useState(Array(groups.length).fill(null));
+  const [showResult2, setShowResult2] = useState(false);
   const [locked, setLocked] = useState(false);
 
-  const chooseOption = (i, value) => {
-    if (locked) return;
+  const handleSelect = (groupIndex, value) => {
+    if (locked || showResult2) return;
 
-    const newSelected = [...selected];
-    newSelected[i] = value;
-    setSelected(newSelected);
-
-    const newAnswers = [...answers];
-    newAnswers[i] = items[i].start + value + items[i].end;
-    setAnswers(newAnswers);
-  };
-
-  const resetAll = () => {
-    setSelected(Array(items.length).fill(""));
-    setAnswers(Array(items.length).fill(""));
-    setLocked(false);
+    const updated = [...selected];
+    updated[groupIndex] = value;
+    setSelected(updated);
   };
 
   const showAnswers = () => {
-    setSelected(items.map((i) => i.correct));
-    setAnswers(items.map((i) => i.start + i.correct + i.end));
+    const correctSelections = groups.map((g) => g.answer);
+    setSelected(correctSelections);
+    setShowResult2(true);
     setLocked(true);
   };
 
   const checkAnswers = () => {
-    if (locked) return;
-    if (selected.includes("")) {
-      ValidationAlert.info("Please complete all answers.");
+    if (locked || showResult2) return;
+
+    if (selected.some((val) => val === null)) {
+      ValidationAlert.info("Please choose ✓ or ✗ for all items!");
       return;
     }
 
-    let score = 0;
+    let correctCount = 0;
 
-    items.forEach((item, i) => {
-      if (selected[i] === item.correct) {
-        score++;
+    groups.forEach((group, index) => {
+      if (selected[index] === group.answer) {
+        correctCount++;
       }
     });
 
-    const total = items.length;
+    const total = groups.length;
+    const color =
+      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
 
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
-
-    const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-        Score: ${score} / ${total}
+    const scoreMessage = `
+      <div style="font-size: 20px; margin-top: 10px; text-align:center;">
+        <span style="color:${color}; font-weight:bold;">
+          Score: ${correctCount} / ${total}
         </span>
       </div>
     `;
 
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+    if (correctCount === total) {
+      ValidationAlert.success(scoreMessage);
+    } else if (correctCount === 0) {
+      ValidationAlert.error(scoreMessage);
+    } else {
+      ValidationAlert.warning(scoreMessage);
+    }
 
+    setShowResult2(true);
     setLocked(true);
   };
 
+  const reset = () => {
+    setSelected(Array(groups.length).fill(null));
+    setShowResult2(false);
+    setLocked(false);
+  };
+
+  const renderChoiceBox = (index, value, symbol) => {
+    const isSelected = selected[index] === value;
+    const isWrong =
+      showResult2 &&
+      selected[index] === value &&
+      groups[index].answer !== value;
+
+    return (
+      <div
+        onClick={() => handleSelect(index, value)}
+        style={{
+          width: "34px",
+          height: "34px",
+          border: "2px solid #F79530",
+          borderRadius: "9px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: locked ? "default" : "pointer",
+          background: isSelected ? "#fff" : "#fff",
+          position: "relative",
+          fontSize: "22px",
+          fontWeight: "700",
+          color: isSelected ? "#2c5287" : "transparent",
+          lineHeight: 1,
+          userSelect: "none",
+        }}
+      >
+        {isSelected ? symbol : ""}
+
+        {isWrong && (
+          <span
+            style={{
+              position: "absolute",
+              right: "-14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: "20px",
+              height: "20px",
+              background: "#ef4444",
+              color: "white",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "bold",
+              border: "2px solid white",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              pointerEvents: "none",
+              zIndex: 3,
+            }}
+          >
+            ✕
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="flex justify-center p-8">
-      <div className="w-[80%]">
-        <h5 className="header-title-page8">
-          <span className=" mr-4">F</span>
-          Look, circle, and write.
-        </h5>
-        <div className="flex justify-center">
-          <div className="grid grid-cols-3 gap-y-10 gap-x-[60px] mt-10 justify-center">
-            {items.map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-col scale-[1.2] origin-top-left"
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "30px",
+          width: "60%",
+          justifyContent: "flex-start",
+        }}
+      >
+        <h3 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>
+            D
+          </span>{" "}
+          Do both words have the same{" "}
+          <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and write{" "}
+          <span style={{ color: "#D52328" }}>✓</span> or{" "}
+          <span style={{ color: "#D52328" }}>✗</span>.
+        </h3>
+
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            columnGap: "70px",
+            rowGap: "34px",
+            marginTop: "10px",
+          }}
+        >
+          {groups.map((group, index) => (
+            <div
+              key={group.id}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "32px 1fr 1fr 40px 40px",
+                alignItems: "center",
+                columnGap: "14px",
+                minHeight: "52px",
+              }}
+            >
+              <span
+                style={{
+                  fontWeight: "700",
+                  fontSize: "18px",
+                  color: "#1f1f1f",
+                }}
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-[20px] font-bold text-[#2a4e7c]">
-                    {i + 1}
-                  </span>
+                {group.id}
+              </span>
 
-                  <img
-                    src={item.img}
-                    alt=""
-                    style={{
-                      width: "100px",
-                      height: "auto",
-                    }}
-                  />
+              <span
+                style={{
+                  fontSize: "18px",
+                  color: "#2b2b2b",
+                }}
+              >
+                {group.word1}
+              </span>
 
-                  <div className="flex flex-col gap-1.5 text-[18px]">
-                    <span
-                      onClick={() => chooseOption(i, item.options[0])}
-                      className={`cursor-pointer px-2 py-0.5 ${
-                        selected[i] === item.options[0]
-                          ? "border-2 border-red-500 rounded-full"
-                          : "hover:bg-gray-100 rounded-full"
-                      }`}
-                    >
-                      {item.options[0]}
-                    </span>
+              <span
+                style={{
+                  fontSize: "18px",
+                  color: "#2b2b2b",
+                }}
+              >
+                {group.word2}
+              </span>
 
-                    <span
-                      onClick={() => chooseOption(i, item.options[1])}
-                      className={`cursor-pointer px-2 py-0.5 ${
-                        selected[i] === item.options[1]
-                          ? "border-2 border-red-500 rounded-full"
-                          : "hover:bg-gray-100 rounded-full"
-                      }`}
-                    >
-                      {item.options[1]}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="border-b-2 border-[#444] w-40 mt-2 text-[18px]">
-                  {answers[i]}
-                </div>
-              </div>
-            ))}
-          </div>
+              {renderChoiceBox(index, "yes", "✓")}
+              {renderChoiceBox(index, "no", "✗")}
+            </div>
+          ))}
         </div>
-        {/* ⭐ الأزرار (كما هي) */}
-        <div className="action-buttons-container">
-          <button onClick={resetAll} className="try-again-button">
-            Start Again ↻
-          </button>
+      </div>
 
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
+      <div className="action-buttons-container">
+        <button onClick={reset} className="try-again-button">
+          Start Again ↻
+        </button>
+        <button onClick={showAnswers} className="show-answer-btn">
+          Show Answer
+        </button>
+        <button onClick={checkAnswers} className="check-button2">
+          Check Answer ✓
+        </button>
       </div>
     </div>
   );
 };
 
-export default Review5_Page2_Q3;
+export default Review5_Page2_Q2;
