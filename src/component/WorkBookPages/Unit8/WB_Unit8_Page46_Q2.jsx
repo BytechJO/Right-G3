@@ -1,270 +1,514 @@
-import React, { useState, useRef } from "react";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useState } from "react";
 import Button from "../Button";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgClown from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 46/Ex E 1_1.svg";
+// ====== 15 images exactly ======
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/2.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/3.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/4.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/5.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/6.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/7.svg";
+import img7 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/8.svg";
+import img8 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/9.svg";
+import img9 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/10.svg";
+import img10 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/11.svg";
+import img11 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/12.svg";
+import img12 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/13.svg";
+import img13 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/14.svg";
+import img14 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/15.svg";
+import img15 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/16.svg";
 
-const VERB_CHIPS = [
-  { id: "has", label: "has" },
-  { id: "doesnt", label: "doesn't have" },
+const LEFT_GROUP = [
+  { id: 1, person: img1, yesImg: img2, noImg: img3 },
+  { id: 2, person: img4, yesImg: img5, noImg: img6 },
+  { id: 3, person: img7, yesImg: img8, noImg: img9 },
 ];
 
-const QUESTIONS = [
+const RIGHT_GROUP = [
+  { id: 4, person: img10, yesImg: img11, noImg: img12 },
+  { id: 5, person: img13, yesImg: img14, noImg: img15 },
+];
+
+const SENTENCES = [
   {
-    key: "q1",
-    hint: "big hat",
-    correctVerb: "doesnt",
-    restOfSentence: "a big hat",
+    id: 1,
+    first: "She had a doll,",
+    second: "she didn’t have a computer.",
   },
   {
-    key: "q2",
-    hint: "short tie",
-    correctVerb: "has",
-    restOfSentence: "a short tie",
+    id: 2,
+    first: "He had a kite,",
+    second: "he didn’t have a car.",
   },
   {
-    key: "q3",
-    hint: "big shoes",
-    correctVerb: "has",
-    restOfSentence: "big shoes",
+    id: 3,
+    first: "He had a ball,",
+    second: "he didn’t have a train.",
   },
   {
-    key: "q4",
-    hint: "small jacket",
-    correctVerb: "doesnt",
-    restOfSentence: "a small jacket",
+    id: 4,
+    first: "They had a radio,",
+    second: "they didn’t have a TV.",
+  },
+  {
+    id: 5,
+    first: "She had a book,",
+    second: "she didn’t have a robot.",
   },
 ];
 
-const INITIAL_DROPS = { q1: null, q2: null, q3: null, q4: null };
+const DRAG_ITEMS = [
+  { id: "1-a", value: "She had a doll," },
+  
+  
+  { id: "1-b", value: "she didn’t have a computer." },
+  { id: "3-a", value: "He had a ball," },
+  { id: "4-a", value: "They had a radio," },
+  { id: "2-a", value: "He had a kite," },
+  { id: "3-b", value: "he didn’t have a train." },
+  { id: "2-b", value: "he didn’t have a car." },
+  { id: "5-a", value: "She had a book," },
+  { id: "5-b", value: "she didn’t have a robot." },
 
-const WB_Unit8_Page46_Q2 = () => {
-  const [drops, setDrops] = useState({ ...INITIAL_DROPS });
-  const [dragOver, setDragOver] = useState(null);
+  { id: "4-b", value: "they didn’t have a TV." },
+
+];
+
+const GroupTable = ({ rows }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "76px 104px 104px",
+        gridTemplateRows: `36px repeat(${rows.length}, 90px)`,
+        borderRadius: "14px",
+        overflow: "visible",
+
+      }}
+    >
+      <div style={{ width: "76px", height: "36px"  }} />
+
+      <div
+        style={{
+          height: "36px",
+          border: "2px solid #a7a7a7",
+          borderBottom: "none",
+          borderTopLeftRadius: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "28px",
+          color: "#7c7c7c",
+          fontWeight: "700",
+          background: "#f9f9f9",
+          lineHeight: 1,
+        }}
+      >
+        ✓
+      </div>
+
+      <div
+        style={{
+          height: "36px",
+          border: "2px solid #a7a7a7",
+          borderLeft: "none",
+          borderBottom: "none",
+          borderTopRightRadius: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "28px",
+          color: "#7c7c7c",
+          fontWeight: "700",
+          background: "#f9f9f9",
+          lineHeight: 1,
+        }}
+      >
+        ✕
+      </div>
+
+      {rows.map((row, index) => (
+        <React.Fragment key={row.id}>
+          <div
+            style={{
+              position: "relative",
+              width: "76px",
+              height: "90px",
+              border: "2px solid #a7a7a7",
+              borderTop: index === 0 ? "2px solid #a7a7a7" : "none",
+              borderRight: "none",
+              borderTopLeftRadius: index === 0 ? "14px" : 0,
+              borderBottomLeftRadius: index === rows.length - 1 ? "14px" : 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#fff",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "5px",
+                left: "5px",
+                width: "22px",
+                height: "22px",
+                borderRadius: "50%",
+                border: "1.5px solid #8d8d8d",
+                background: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "13px",
+                color: "#555",
+                fontWeight: "700",
+                zIndex: 2,
+              }}
+            >
+              {row.id}
+            </div>
+
+            <img
+              src={row.person}
+              alt={`person-${row.id}`}
+              style={{
+                width: "68px",
+                height: "74px",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              width: "104px",
+              height: "90px",
+              border: "2px solid #a7a7a7",
+              borderTop: index === 0 ? "2px solid #a7a7a7" : "none",
+              borderRight: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#fff",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={row.yesImg}
+              alt={`yes-${row.id}`}
+              style={{
+                width: "84px",
+                height: "64px",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              width: "104px",
+              height: "90px",
+              border: "2px solid #a7a7a7",
+              borderTop: index === 0 ? "2px solid #a7a7a7" : "none",
+              borderBottomRightRadius: index === rows.length - 1 ? "14px" : 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#fff",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={row.noImg}
+              alt={`no-${row.id}`}
+              style={{
+                width: "84px",
+                height: "64px",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          </div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+};
+
+export default function WB_Unit8_Page46_QD() {
+  const [answers, setAnswers] = useState({});
+  const [draggedText, setDraggedText] = useState(null);
   const [showResults, setShowResults] = useState(false);
-  const dragging = useRef(null);
+  const [showAns, setShowAns] = useState(false);
 
-  const getChipLabel = (id) =>
-    VERB_CHIPS.find((c) => c.id === id)?.label ?? "";
+  const usedValues = Object.values(answers);
 
-  const onBankDragStart = (e, chipId) => {
-    dragging.current = { chipId, fromZone: null };
-    e.dataTransfer.effectAllowed = "copy";
+  const handleDragStart = (value) => {
+    if (showAns || usedValues.includes(value)) return;
+    setDraggedText(value);
   };
 
-  const onZoneChipDragStart = (e, chipId, qKey) => {
-    dragging.current = { chipId, fromZone: qKey };
-    e.dataTransfer.effectAllowed = "move";
-  };
+  const handleDrop = (dropKey) => {
+    if (showAns || !draggedText) return;
 
-  const onZoneDragOver = (e, qKey) => {
-    e.preventDefault();
-    setDragOver(qKey);
-  };
-
-  const onZoneDragLeave = () => setDragOver(null);
-
-  const onZoneDrop = (e, qKey) => {
-    e.preventDefault();
-    setDragOver(null);
-    if (!dragging.current) return;
-
-    const { chipId, fromZone } = dragging.current;
-
-    setDrops((prev) => {
-      const next = { ...prev };
-      if (fromZone) next[fromZone] = null;
-      next[qKey] = chipId;
-      return next;
-    });
-
-    dragging.current = null;
-    setShowResults(false);
-  };
-
-  const onBankDrop = (e) => {
-    e.preventDefault();
-    if (!dragging.current?.fromZone) return;
-
-    setDrops((prev) => ({
+    setAnswers((prev) => ({
       ...prev,
-      [dragging.current.fromZone]: null,
+      [dropKey]: draggedText,
     }));
 
-    dragging.current = null;
-    setShowResults(false);
+    setDraggedText(null);
+  };
+
+  const getItemResult = (item) => {
+    return (
+      answers[`${item.id}-first`] === item.first &&
+      answers[`${item.id}-second`] === item.second
+    );
+  };
+
+  const isWrong = (item) => {
+    if (!showResults) return false;
+    return !getItemResult(item);
   };
 
   const checkAnswers = () => {
-    const keys = Object.keys(INITIAL_DROPS);
+    const allAnswered = SENTENCES.every(
+      (item) => answers[`${item.id}-first`] && answers[`${item.id}-second`]
+    );
 
-    if (keys.some((k) => !drops[k])) {
-      ValidationAlert.info();
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all sentences first.");
       return;
     }
 
     let score = 0;
-    keys.forEach((k) => {
-      if (drops[k] === QUESTIONS.find((q) => q.key === k).correctVerb) score++;
+    SENTENCES.forEach((item) => {
+      if (getItemResult(item)) score++;
     });
 
-    const msg = `Score: ${score} / ${keys.length}`;
-
-    if (score === keys.length) ValidationAlert.success(msg);
-    else if (score > 0) ValidationAlert.warning(msg);
-    else ValidationAlert.error(msg);
-
     setShowResults(true);
-  };
 
-  const handleReset = () => {
-    setDrops({ ...INITIAL_DROPS });
-    setShowResults(false);
+    if (score === SENTENCES.length) {
+      ValidationAlert.success(`Score: ${score} / ${SENTENCES.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${SENTENCES.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${SENTENCES.length}`);
+    }
   };
 
   const handleShowAnswer = () => {
-    const ans = {};
-    QUESTIONS.forEach((q) => {
-      ans[q.key] = q.correctVerb;
+    const correctMap = {};
+    SENTENCES.forEach((item) => {
+      correctMap[`${item.id}-first`] = item.first;
+      correctMap[`${item.id}-second`] = item.second;
     });
-    setDrops(ans);
+
+    setAnswers(correctMap);
+    setShowAns(true);
     setShowResults(true);
   };
 
-  const chipClasses = (id, qKey = null) => {
-    const isCorrect =
-      qKey && id === QUESTIONS.find((q) => q.key === qKey)?.correctVerb;
-    const ok = showResults && qKey && isCorrect;
-    const bad = showResults && qKey && !isCorrect;
-
-    return [
-      "inline-flex items-center px-3 py-0.5 rounded-md text-lg font-semibold",
-      "cursor-grab select-none whitespace-nowrap transition-all duration-200",
-     
-    ].join(" ");
+  const handleStartAgain = () => {
+    setAnswers({});
+    setDraggedText(null);
+    setShowResults(false);
+    setShowAns(false);
   };
 
-  const zoneClasses = (qKey) => {
-    const over = dragOver === qKey;
+  const renderDropBox = (dropKey, width) => {
+    const value = answers[dropKey];
 
-    return [
-      "inline-flex items-center justify-center min-w-[110px] min-h-[30px] px-2",
-      "border-b-2 border-dashed rounded-sm transition-all duration-200",
-      over ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-transparent",
-    ].join(" ");
+    return (
+      <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={() => handleDrop(dropKey)}
+        style={{
+          minWidth: width,
+          minHeight: "28px",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 2px 2px 2px",
+          borderBottom: "2px solid #555",
+          color: value ? "#dc2626" : "#9ca3af",
+          fontSize: "17px",
+          lineHeight: "1.5",
+          backgroundColor: value ? "transparent" : "transparent",
+        }}
+      >
+        {value || ""}
+      </div>
+    );
   };
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "10px" }}>
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+          maxWidth: "980px",
+          margin: "0 auto",
+        }}
+      >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>Look and write.
+          <span className="WB-ex-A">D</span>
+          Find and write sentences.
         </h1>
 
-        {/* Verb bank */}
+        {/* top layout - close together */}
         <div
-          className="flex items-center justify-center gap-3 px-4 py-2 mb-5 border border-gray-200 rounded-lg bg-gray-50"
-          onDrop={onBankDrop}
-          onDragOver={(e) => e.preventDefault()}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            gap: "36px",
+            marginTop: "-4px",
+          }}
         >
-          {VERB_CHIPS.map((chip) => (
-            <span
-              key={chip.id}
-              draggable
-              onDragStart={(e) => onBankDragStart(e, chip.id)}
-              className={chipClasses(chip.id)}
+          <GroupTable rows={LEFT_GROUP} />
+          <GroupTable rows={RIGHT_GROUP} />
+        </div>
+
+        {/* sentence bank */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "8px",
+            flexWrap: "wrap",
+            marginTop: "2px",
+          }}
+        >
+          {DRAG_ITEMS.map((item) => {
+            const disabled = usedValues.includes(item.value);
+
+            return (
+              <div
+                key={item.id}
+                draggable={!disabled && !showAns}
+                onDragStart={() => handleDragStart(item.value)}
+                style={{
+                  padding: "8px 10px",
+                  borderRadius: "10px",
+                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
+                  color: "#fff",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  cursor: disabled ? "not-allowed" : "grab",
+                  opacity: disabled ? 0.5 : 1,
+                  userSelect: "none",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                }}
+              >
+                {item.value}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* writing lines with fixed but */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            marginTop: "2px",
+          }}
+        >
+          {SENTENCES.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
             >
-              {chip.label}
-            </span>
+              <span
+                style={{
+                  width: "20px",
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  color: "#222",
+                  textAlign: "right",
+                }}
+              >
+                {item.id}
+              </span>
+
+              <div
+                style={{
+                  position: "relative",
+                  flex: 1,
+                  minHeight: "38px",
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                }}
+              >
+                {renderDropBox(`${item.id}-first`, "255px")}
+
+                <span
+                  style={{
+                    fontSize: "18px",
+                    color: "#222",
+                    fontWeight: "600",
+                  }}
+                >
+                  but
+                </span>
+
+                {renderDropBox(`${item.id}-second`, "265px")}
+
+                {isWrong(item) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-8px",
+                      right: "-8px",
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      backgroundColor: "#ef4444",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                    }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* Clown + questions */}
-        <div className="flex items-start gap-10">
-          <div className="min-w-[120px]">
-            <img
-              src={imgClown}
-              alt="clown"
-              className="max-w-90 max-h-50 object-contain"
-            />
-          </div>
-
-          {/* Questions */}
-          <div className="flex-1 flex flex-col gap-5">
-            {QUESTIONS.map((q, idx) => {
-              const isWrong =
-                showResults &&
-                drops[q.key] &&
-                drops[q.key] !== q.correctVerb;
-
-              return (
-                <div key={q.key} className="flex items-center gap-3">
-                  <span className="font-bold text-blue-900 text-lg max-w-4">
-                    {idx + 1}
-                  </span>
-
-                  <div className="flex items-center flex-wrap gap-1 font-semibold text-lg text-gray-700">
-                    <span>He</span>
-
-                    {/* Drop zone */}
-                    <div className="relative inline-block">
-                      <div
-                        className={zoneClasses(q.key)}
-                        onDragOver={(e) => onZoneDragOver(e, q.key)}
-                        onDragLeave={onZoneDragLeave}
-                        onDrop={(e) => onZoneDrop(e, q.key)}
-                      >
-                        {drops[q.key] ? (
-                          <span
-                            draggable
-                            onDragStart={(e) =>
-                              onZoneChipDragStart(e, drops[q.key], q.key)
-                            }
-                            className={chipClasses(drops[q.key], q.key)}
-                          >
-                            {getChipLabel(drops[q.key])}
-                          </span>
-                        ) : (
-                          <span className="text-gray-300 text-xs font-normal">
-                            ـــــ
-                          </span>
-                        )}
-                      </div>
-
-                      {/* ❌ Wrong Icon */}
-                      {isWrong && (
-                        <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow border-2 border-white">
-                          ✕
-                        </div>
-                      )}
-                    </div>
-
-                    <span>{q.restOfSentence}.</span>
-                  </div>
-
-                  {/* Speech bubble */}
-                  <div className="ml-auto relative inline-flex items-center px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 whitespace-nowrap">
-                    <span className="absolute -left-2 top-1/2 -translate-y-1/2 max-w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-gray-300" />
-                    <span className="absolute -left-[5px] top-1/2 -translate-y-1/2 max-w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[7px] border-r-white" />
-                    {q.hint}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="mt-10 flex justify-center">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
           <Button
             handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
+            handleStartAgain={handleStartAgain}
             checkAnswers={checkAnswers}
           />
         </div>
       </div>
     </div>
   );
-};
-
-export default WB_Unit8_Page46_Q2;
+}

@@ -2,245 +2,228 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-const colorsList = [
-  { name: "Gray", value: "gray" },
-  { name: "Green", value: "green" },
-  { name: "Black", value: "black" },
-  { name: "Yellow", value: "yellow" },
-  { name: "White", value: "white" },
-  { name: "Brown", value: "brown" },
-  { name: "Red", value: "red" },
-  { name: "Orange", value: "orange" },
-  { name: "Blue", value: "blue" },
-  { name: "Pink", value: "pink" },
-  { name: "Purple", value: "purple" },
+import roomImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/1.svg";
+
+const QUESTIONS = [
+  { id: 1, text: "Did Grandma have a radio?", correct: "Yes" },
+  { id: 2, text: "Did she have a TV?", correct: "No" },
+  { id: 3, text: "Did she have a cat?", correct: "No" },
+  { id: 4, text: "Did she have a bird?", correct: "No" },
+  { id: 5, text: "Did she have a lamp?", correct: "Yes" },
+  { id: 6, text: "Did she have a phone?", correct: "No" },
+  { id: 7, text: "Did she have a rug?", correct: "Yes" },
+  { id: 8, text: "Did she have a mirror?", correct: "No" },
 ];
 
-const correctAnswers = {
-  peter: { pants: "gray", jacket: "green", shoes: "black" },
-  joanna: { dress: "yellow", socks: "white", shoes: "brown" },
-  mark: { shorts: "red", shirt: "white", hat: "orange" },
-  susan: { skirt: "blue", shirt: "pink", glasses: "purple" },
-};
+export default function WB_Unit6_Page46_Q1() {
+  const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
-const ReadAndColor = () => {
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [colors, setColors] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [showPalette, setShowPalette] = useState(false);
-  const [activePart, setActivePart] = useState(null);
+  const handleSelect = (id, value) => {
+    if (showAns) return;
 
-  const handleColorPart = (person, part) => {
-    // خزّني الجزء اللي انكبس
-    setActivePart({ person, part });
-
-    // افتحي الباليت
-    setShowPalette(true);
-    setColors((prev) => ({
+    setAnswers((prev) => ({
       ...prev,
-      [person]: {
-        ...(prev[person] || {}),
-        [part]: selectedColor,
-      },
+      [id]: prev[id] === value ? undefined : value,
     }));
   };
 
-  const isCorrect = (person, part) => {
-    return colors[person]?.[part] === correctAnswers[person][part];
-  };
+  const handleCheck = () => {
+    if (showAns) return;
 
-  const checkAnswers = () => {
+    const allAnswered = QUESTIONS.every((q) => answers[q.id] !== undefined);
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all questions!");
+      return;
+    }
+
     let score = 0;
-    let total = 0;
 
-    Object.keys(correctAnswers).forEach((person) => {
-      Object.keys(correctAnswers[person]).forEach((part) => {
-        total++;
-        if (isCorrect(person, part)) score++;
-      });
+    QUESTIONS.forEach((q) => {
+      if (answers[q.id] === q.correct) {
+        score++;
+      }
     });
 
-    setShowResults(true);
+    setChecked(true);
 
-    const msg = `Score: ${score} / ${total}`;
-    if (score === total) ValidationAlert.success(msg);
-    else ValidationAlert.warning(msg);
+    if (score === QUESTIONS.length) {
+      ValidationAlert.success(`Score: ${score} / ${QUESTIONS.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${QUESTIONS.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${QUESTIONS.length}`);
+    }
   };
 
-  const handleStartAgain = () => {
-    setColors({});
-    setShowResults(false);
+  const handleShowAnswer = () => {
+    const correctMap = {};
+    QUESTIONS.forEach((q) => {
+      correctMap[q.id] = q.correct;
+    });
+
+    setAnswers(correctMap);
+    setChecked(true);
+    setShowAns(true);
   };
+
+  const handleReset = () => {
+    setAnswers({});
+    setChecked(false);
+    setShowAns(false);
+  };
+
+  const isWrong = (id) => {
+    if (!checked) return false;
+    return answers[id] !== QUESTIONS.find((q) => q.id === id).correct;
+  };
+
+  const getBoxStyle = (selected) => ({
+    width: "22px",
+    height: "22px",
+    border: "1.5px solid #f59e0b",
+    borderRadius: "4px",
+    backgroundColor: selected ? "#ef4444" : "#fff",
+    cursor: showAns ? "default" : "pointer",
+  });
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "20px" }}>
-        {" "}
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          width: "100%",
+          maxWidth: "900px",
+          margin: "0 auto",
+        }}
+      >
         <h1 className="WB-header-title-page8">
-          {" "}
-          <span className="WB-ex-A">D</span> Read and color.{" "}
+          <span className="WB-ex-A">C</span>
+          Look and write ✓ for Yes or No.
         </h1>
-        {/* الشخصيات */}
-        <div className="flex justify-around mt-6">
-          {/* PETER */}
-          <div className="text-center">
-            <p>Peter</p>
-            <svg width="80" height="120">
-              <rect
-                x="20"
-                y="40"
-                width="40"
-                height="50"
-                fill={colors.peter?.pants || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("peter", "pants")}
-              />
-              <rect
-                x="20"
-                y="10"
-                width="40"
-                height="30"
-                fill={colors.peter?.jacket || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("peter", "jacket")}
-              />
-              <rect
-                x="20"
-                y="90"
-                width="15"
-                height="10"
-                fill={colors.peter?.shoes || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("peter", "shoes")}
-              />
-            </svg>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "220px 1fr",
+            gap: "26px",
+            alignItems: "start",
+          }}
+        >
+          {/* left image */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <img
+              src={roomImg}
+              alt="grandma-room"
+              style={{
+                width: "190px",
+                height: "215px",
+                objectFit: "contain",
+                display: "block",
+                borderRadius: "10px",
+                border: "1.5px solid #f59e0b",
+              }}
+            />
           </div>
 
-          {/* JOANNA */}
-          <div className="text-center">
-            <p>Joanna</p>
-            <svg width="80" height="120">
-              <rect
-                x="20"
-                y="30"
-                width="40"
-                height="60"
-                fill={colors.joanna?.dress || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("joanna", "dress")}
-              />
-              <rect
-                x="20"
-                y="90"
-                width="15"
-                height="10"
-                fill={colors.joanna?.shoes || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("joanna", "shoes")}
-              />
-            </svg>
-          </div>
+          {/* right questions */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 42px 42px",
+                alignItems: "center",
+                marginBottom: "2px",
+                fontSize: "18px",
+                color: "#222",
+              }}
+            >
+              <div></div>
+              <div style={{ textAlign: "center" }}>Yes</div>
+              <div style={{ textAlign: "center" }}>No</div>
+            </div>
 
-          {/* MARK */}
-          <div className="text-center">
-            <p>Mark</p>
-            <svg width="80" height="120">
-              <rect
-                x="20"
-                y="50"
-                width="40"
-                height="30"
-                fill={colors.mark?.shorts || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("mark", "shorts")}
-              />
-              <rect
-                x="20"
-                y="20"
-                width="40"
-                height="30"
-                fill={colors.mark?.shirt || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("mark", "shirt")}
-              />
-            </svg>
-          </div>
-
-          {/* SUSAN */}
-          <div className="text-center">
-            <p>Susan</p>
-            <svg width="80" height="120">
-              <rect
-                x="20"
-                y="50"
-                width="40"
-                height="40"
-                fill={colors.susan?.skirt || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("susan", "skirt")}
-              />
-              <rect
-                x="20"
-                y="20"
-                width="40"
-                height="30"
-                fill={colors.susan?.shirt || "#fff"}
-                stroke="#000"
-                onClick={() => handleColorPart("susan", "shirt")}
-              />
-            </svg>
-          </div>
-        </div>
-        {/* النص */}
-        <div className="mt-6 text-start text-lg">
-          <p>Peter has gray pants and a green jacket. His shoes are black.</p>
-          <p>Joanna has a yellow dress, white socks, and brown shoes.</p>
-          <p>Mark has red shorts and a white shirt. His hat is orange.</p>
-          <p>
-            Susan has a blue skirt and a pink shirt. Her glasses are purple.
-          </p>
-        </div>
-        {/* لوحة الألوان */}
-        {showPalette && (
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
-            {colorsList.map((c) => (
-              <button
-                key={c.value}
-                onClick={() => {
-                  if (!activePart) return;
-
-                  const { person, part } = activePart;
-
-                  setColors((prev) => ({
-                    ...prev,
-                    [person]: {
-                      ...(prev[person] || {}),
-                      [part]: c.value,
-                    },
-                  }));
-
-                  setSelectedColor(c.value);
-                  setShowPalette(false);
-                  setActivePart(null); // مهم
+            {QUESTIONS.map((q) => (
+              <div
+                key={q.id}
+                style={{
+                  position: "relative",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 42px 42px",
+                  alignItems: "center",
+                  gap: "8px",
+                  minHeight: "30px",
                 }}
-                className={`w-8 h-8 rounded border ${
-                  selectedColor === c.value ? "ring-2 ring-black" : ""
-                }`}
-                style={{ backgroundColor: c.value }}
-              />
+              >
+                <div
+                  style={{
+                    fontSize: "16px",
+                    color: "#111",
+                    lineHeight: "1.4",
+                  }}
+                >
+                  <strong>{q.id}</strong> {q.text}
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <button
+                    onClick={() => handleSelect(q.id, "Yes")}
+                    style={getBoxStyle(answers[q.id] === "Yes")}
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <button
+                    onClick={() => handleSelect(q.id, "No")}
+                    style={getBoxStyle(answers[q.id] === "No")}
+                  />
+                </div>
+
+                {isWrong(q.id) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-4px",
+                      right: "-24px",
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      backgroundColor: "#ef4444",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-        )}
-        {/* الأزرار */}
-        <div className="mt-6">
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <Button
-            handleStartAgain={handleStartAgain}
-            checkAnswers={checkAnswers}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+            checkAnswers={handleCheck}
           />
         </div>
       </div>
     </div>
   );
-};
-
-export default ReadAndColor;
+}

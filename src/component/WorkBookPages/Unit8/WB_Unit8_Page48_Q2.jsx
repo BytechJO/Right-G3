@@ -1,431 +1,525 @@
-import React, { useState, useRef } from "react";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
-import imgJohn from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 1.svg";
-import imgBike from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 2.svg";
-import imgMomAunt from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 3.svg";
-import imgDress from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 4.svg";
-import imgDad from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 5.svg";
-import imgTie from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 6.svg";
-import imgGrandpa from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 7.svg";
-import imgGlasses from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 8.svg";
-import imgSarahJack from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 9.svg";
-import imgDollRobot from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 10.svg";
-import imgHelenStella from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 11.svg";
-import imgDresses from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 48/Ex I 12.svg";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/8.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/9.svg";
+import img3 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/10.svg";
 
-const CORRECT_ANSWERS = {
-  q1: "chip1",
-  q2: "chip2",
-  q3: "chip3",
-  q4: "chip4",
-  q5: "chip5",
-  q6: "chip6",
-};
+const COLORS = [
+  "#111827",
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#3b82f6",
+  "#a855f7",
+  "#ec4899",
+  "#ffffff",
+];
 
-const QUESTIONS = [
+const SIZES = [2, 4, 8, 12];
+
+const ITEMS = [
   {
-    key: "q1",
-    personImg: imgJohn,
-    itemImg: imgBike,
-    prefix: "John",
-    suffix: "",
+    id: 1,
+    img: img1,
+    width: 320,
+    height: 250,
+    text: [
+      "My grandfather had a small, old house.",
+      "It had a red roof and two tall chimneys.",
+      "It had little windows and a big green door.",
+    ],
   },
   {
-    key: "q2",
-    personImg: imgMomAunt,
-    itemImg: imgDress,
-    prefix: "Mom and my aunt",
-    suffix: "",
+    id: 2,
+    img: img2,
+    width: 320,
+    height: 250,
+    text: [
+      "Grandpa had a pretty garden, too.",
+      "There was a swing in the tree.",
+      "There were lots of pink and yellow flowers.",
+    ],
   },
   {
-    key: "q3",
-    personImg: imgDad,
-    itemImg: imgTie,
-    prefix: "Dad",
-    suffix: "",
-  },
-  {
-    key: "q4",
-    personImg: imgGrandpa,
-    itemImg: imgGlasses,
-    prefix: "Grandpa has",
-    suffix: "",
-  },
-  {
-    key: "q5",
-    personImg: imgSarahJack,
-    itemImg: imgDollRobot,
-    prefix: "Sarah and Jack",
-    suffix: "",
-  },
-  {
-    key: "q6",
-    personImg: imgHelenStella,
-    itemImg: imgDresses,
-    prefix: "Helen and Stella",
-    suffix: "",
+    id: 3,
+    img: img3,
+    width: 320,
+    height: 220,
+    text: [
+      "Grandpa had a car. It was very old, slow, and noisy,",
+      "but it was beautiful. It was red and black.",
+    ],
   },
 ];
 
-const ALL_CHIPS = [
-  { id: "chip1", label: "has a bike" },
-  { id: "chip2", label: "have a dress" },
-  { id: "chip3", label: "has a tie" },
-  { id: "chip4", label: "glasses" },
-  { id: "chip5", label: "have a doll and a robot" },
-  { id: "chip6", label: "have dresses" },
-];
+export default function WB_Unit8_Page48_QH() {
+  const [tool, setTool] = useState("pencil");
+  const [color, setColor] = useState("#ef4444");
+  const [size, setSize] = useState(4);
+  const [selectedCanvas, setSelectedCanvas] = useState(1);
+  const [textValue, setTextValue] = useState("");
+  const [isDrawing, setIsDrawing] = useState(false);
 
-const SHUFFLED_CHIPS = [...ALL_CHIPS].sort(() => Math.random() - 0.5);
+  const canvasRefs = useRef({});
+  const ctxRefs = useRef({});
+  const imageRefs = useRef({});
+  const lastPos = useRef({});
 
-const INITIAL_DROPS = {
-  q1: null,
-  q2: null,
-  q3: null,
-  q4: null,
-  q5: null,
-  q6: null,
-};
+  useEffect(() => {
+    ITEMS.forEach((item) => {
+      const canvas = canvasRefs.current[item.id];
+      if (!canvas) return;
 
-const WB_Unit8_Page48_Q2 = () => {
-  const [drops, setDrops] = useState({ ...INITIAL_DROPS });
-  const [dragOver, setDragOver] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-  const draggingChip = useRef(null);
+      const ctx = canvas.getContext("2d");
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctxRefs.current[item.id] = ctx;
 
-  const usedChips = new Set(Object.values(drops).filter(Boolean));
-  const availableChips = SHUFFLED_CHIPS.filter((c) => !usedChips.has(c.id));
-
-  const onChipDragStart = (e, chipId) => {
-    draggingChip.current = chipId;
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const onDropZoneDragOver = (e, qKey) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setDragOver(qKey);
-  };
-
-  const onDropZoneDragLeave = () => setDragOver(null);
-
-  const onDropZoneDrop = (e, qKey) => {
-    e.preventDefault();
-    setDragOver(null);
-    const chipId = draggingChip.current;
-    if (!chipId) return;
-
-    setDrops((prev) => {
-      const next = { ...prev };
-      Object.keys(next).forEach((k) => {
-        if (next[k] === chipId) next[k] = null;
-      });
-      next[qKey] = chipId;
-      return next;
+      loadImageToCanvas(item.id, item.img, item.width, item.height);
     });
+  }, []);
 
-    draggingChip.current = null;
-    setShowResults(false);
+  const loadImageToCanvas = (id, src, width, height) => {
+    const canvas = canvasRefs.current[id];
+    const ctx = ctxRefs.current[id];
+    if (!canvas || !ctx) return;
+
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      imageRefs.current[id] = img;
+    };
   };
 
-  const onDropZoneChipDragStart = (e, chipId, qKey) => {
-    draggingChip.current = chipId;
-    e.dataTransfer.effectAllowed = "move";
+  const clearCanvas = (id) => {
+    const item = ITEMS.find((x) => x.id === id);
+    if (!item) return;
+    loadImageToCanvas(id, item.img, item.width, item.height);
   };
 
-  const onPoolDrop = (e) => {
-    e.preventDefault();
-    const chipId = draggingChip.current;
-    if (!chipId) return;
-
-    setDrops((prev) => {
-      const next = { ...prev };
-      Object.keys(next).forEach((k) => {
-        if (next[k] === chipId) next[k] = null;
-      });
-      return next;
+  const clearAllCanvases = () => {
+    ITEMS.forEach((item) => {
+      loadImageToCanvas(item.id, item.img, item.width, item.height);
     });
-
-    draggingChip.current = null;
-    setShowResults(false);
   };
 
-  const onPoolDragOver = (e) => {
+  const getPos = (e, canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    if (e.touches && e.touches.length > 0) {
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top) * scaleY,
+      };
+    }
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
+  const startDrawing = (e, id) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
+    setSelectedCanvas(id);
 
-  const checkAnswers = () => {
-    const allKeys = Object.keys(INITIAL_DROPS);
-    const unanswered = allKeys.filter((k) => !drops[k]);
+    const canvas = canvasRefs.current[id];
+    const ctx = ctxRefs.current[id];
+    if (!canvas || !ctx) return;
 
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
+    if (tool === "fill") {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.35;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 1;
       return;
     }
 
-    let score = 0;
-    allKeys.forEach((k) => {
-      if (drops[k] === CORRECT_ANSWERS[k]) score++;
-    });
+    if (tool === "text") {
+      if (!textValue.trim()) {
+        ValidationAlert.info("Please type text first.");
+        return;
+      }
 
-    const total = allKeys.length;
-    const msg = `Score: ${score} / ${total}`;
+      const pos = getPos(e, canvas);
+      ctx.fillStyle = color;
+      ctx.font = "18px Arial";
+      ctx.textBaseline = "top";
+      ctx.fillText(textValue, pos.x, pos.y);
+      return;
+    }
 
-    if (score === total) ValidationAlert.success(msg);
-    else if (score > 0) ValidationAlert.warning(msg);
-    else ValidationAlert.error(msg);
+    const pos = getPos(e, canvas);
+    lastPos.current[id] = pos;
+    setIsDrawing(true);
 
-    setShowResults(true);
+    ctx.beginPath();
+    ctx.arc(
+      pos.x,
+      pos.y,
+      (tool === "eraser" ? size * 2.5 : size) / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.fillStyle = tool === "eraser" ? "#ffffff" : color;
+    ctx.fill();
   };
 
-  const handleReset = () => {
-    setDrops({ ...INITIAL_DROPS });
-    setShowResults(false);
+  const draw = (e, id) => {
+    e.preventDefault();
+
+    if (!isDrawing || selectedCanvas !== id) return;
+
+    const canvas = canvasRefs.current[id];
+    const ctx = ctxRefs.current[id];
+    if (!canvas || !ctx) return;
+
+    if (tool !== "pencil" && tool !== "eraser") return;
+
+    const pos = getPos(e, canvas);
+    const prev = lastPos.current[id];
+    if (!prev) return;
+
+    ctx.beginPath();
+    ctx.moveTo(prev.x, prev.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = tool === "eraser" ? "#ffffff" : color;
+    ctx.lineWidth = tool === "eraser" ? size * 3 : size;
+    ctx.stroke();
+
+    lastPos.current[id] = pos;
   };
 
-  const handleShowAnswer = () => {
-    setDrops({ ...CORRECT_ANSWERS });
-    setShowResults(true);
+  const stopDrawing = (e, id) => {
+    e?.preventDefault?.();
+    setIsDrawing(false);
+    lastPos.current[id] = null;
   };
 
-  const getDropZoneStyle = (qKey) => {
-    const chipId = drops[qKey];
-    const isOver = dragOver === qKey;
-
-    return {
-      minWidth: 160,
-      minHeight: 32,
-      borderBottom: "2px dashed #3b82f6",
-      borderRadius: 2,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "0 6px",
-      transition: "border-color 0.2s, background 0.2s",
-      background: isOver ? "#eff6ff" : "transparent",
-      cursor: chipId ? "grab" : "default",
-      position: "relative",
-    };
+  const handleCheck = () => {
+    ValidationAlert.success("Great! Check your drawing and coloring.");
   };
 
-  const getChipStyle = (chipId, inZone = false, qKey = null) => {
-    return {
-      display: "inline-flex",
-      alignItems: "center",
-      padding: "3px 10px",
-      borderRadius: 6,
-      fontSize: 18,
-      fontWeight: 600,
-      cursor: "grab",
-      userSelect: "none",
-      whiteSpace: "nowrap",
-      border: "1.5px solid #3b82f6",
-      color: "#2563eb",
-      background: "#eff6ff",
-      transition: "all 0.2s",
-    };
+  const getCursor = () => {
+    if (tool === "eraser") return "cell";
+    if (tool === "text") return "text";
+    return "crosshair";
   };
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "10px" }}>
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+          width: "100%",
+          maxWidth: "980px",
+          margin: "0 auto",
+          paddingBottom: "50px",
+        }}
+      >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span>Look and write.
+          <span className="WB-ex-A">H</span>
+          Read, draw, and color.
         </h1>
 
-        {/* Chips pool */}
+        {/* Toolbar */}
         <div
-          onDrop={onPoolDrop}
-          onDragOver={onPoolDragOver}
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: 8,
-            padding: "10px 14px",
-            marginBottom: 24,
-            minHeight: 48,
-            border: "1.5px dashed #d1d5db",
-            borderRadius: 10,
-            background: "#f9fafb",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            padding: "12px 14px",
+            border: "1px solid #e5e7eb",
+            borderRadius: "16px",
+            backgroundColor: "#f9fafb",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
-          {availableChips.length === 0 && (
-            <span style={{ color: "#9ca3af", fontSize: 13 }}>Drag the world</span>
-          )}
-
-          {availableChips.map((chip) => (
-            <span
-              key={chip.id}
-              draggable
-              onDragStart={(e) => onChipDragStart(e, chip.id)}
-              style={getChipStyle(chip.id)}
+          {[
+            { id: "pencil", label: "✏️ Draw" },
+            { id: "eraser", label: "🧽 Erase" },
+            { id: "fill", label: "🪣 Fill" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setTool(item.id)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "10px",
+                border:
+                  tool === item.id
+                    ? "2px solid #3b82f6"
+                    : "2px solid #d1d5db",
+                backgroundColor: tool === item.id ? "#eff6ff" : "#fff",
+                color: tool === item.id ? "#1d4ed8" : "#374151",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
             >
-              {chip.label}
-            </span>
+              {item.label}
+            </button>
           ))}
-        </div>
 
-        <div className="flex gap-4">
-          <div className="flex flex-col gap-2" style={{ minWidth: 64 }}>
-            {QUESTIONS.map((q) => (
-              <div
-                key={q.key}
-                className="flex items-center justify-center"
-                style={{ height: 56 }}
-              >
-                <img
-                  src={q.personImg}
-                  alt="person"
-                  className="object-contain"
-                  style={{ maxWidth: 90, maxHeight: 90 }}
-                />
-              </div>
+          <div
+            style={{
+              width: "1px",
+              height: "28px",
+              backgroundColor: "#d1d5db",
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            {COLORS.map((c) => (
+              <button
+                key={c}
+                onClick={() => setColor(c)}
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  border:
+                    color === c ? "3px solid #111827" : "2px solid #d1d5db",
+                  backgroundColor: c,
+                  cursor: "pointer",
+                }}
+              />
             ))}
           </div>
 
           <div
-            className="flex flex-col items-center gap-2"
-            style={{ minWidth: 12 }}
+            style={{
+              width: "1px",
+              height: "28px",
+              backgroundColor: "#d1d5db",
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
           >
-            {QUESTIONS.map((q) => (
-              <div
-                key={q.key}
-                style={{ height: 56 }}
-                className="flex items-center"
+            {SIZES.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSize(s)}
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  border:
+                    size === s ? "2px solid #3b82f6" : "2px solid #d1d5db",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <span
                   style={{
-                    width: 8,
-                    height: 8,
+                    width: `${Math.min(s * 2, 16)}px`,
+                    height: `${Math.min(s * 2, 16)}px`,
                     borderRadius: "50%",
-                    border: "2px solid #aaa",
-                    display: "inline-block",
+                    backgroundColor: "#111827",
+                    display: "block",
                   }}
                 />
-              </div>
+              </button>
             ))}
           </div>
 
-          <div className="flex flex-col gap-2" style={{ minWidth: 64 }}>
-            {QUESTIONS.map((q) => (
-              <div
-                key={q.key}
-                className="flex items-center justify-center"
-                style={{ height: 56 }}
-              >
-                <img
-                  src={q.itemImg}
-                  alt="item"
-                  className="object-contain"
-                  style={{ maxWidth: 90, maxHeight: 90 }}
-                />
-              </div>
-            ))}
-          </div>
 
-          <div className="flex flex-col gap-2 flex-1">
-            {QUESTIONS.map((q, idx) => {
-              const droppedChipId = drops[q.key];
-              const droppedChip = droppedChipId
-                ? ALL_CHIPS.find((c) => c.id === droppedChipId)
-                : null;
 
-              const isWrong =
-                showResults &&
-                droppedChipId &&
-                droppedChipId !== CORRECT_ANSWERS[q.key];
+          <button
+            onClick={() => clearCanvas(selectedCanvas)}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "10px",
+              border: "2px solid #fca5a5",
+              backgroundColor: "#fef2f2",
+              color: "#dc2626",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            Clear Selected
+          </button>
 
-              return (
-                <div
-                  key={q.key}
-                  className="flex items-center gap-2"
-                  style={{ height: 56 }}
-                >
-                  <span
-                    className="font-bold text-blue-900 text-lg"
-                    style={{ minWidth: 18 }}
-                  >
-                    {idx + 1}
-                  </span>
-
-                  <span className="text-gray-700 font-semibold text-lg whitespace-nowrap">
-                    {q.prefix}
-                  </span>
-
-                  <div
-                    style={getDropZoneStyle(q.key)}
-                    onDragOver={(e) => onDropZoneDragOver(e, q.key)}
-                    onDragLeave={onDropZoneDragLeave}
-                    onDrop={(e) => onDropZoneDrop(e, q.key)}
-                  >
-                    {droppedChip ? (
-                      <span
-                        draggable
-                        onDragStart={(e) =>
-                          onDropZoneChipDragStart(e, droppedChip.id, q.key)
-                        }
-                        // style={getChipStyle(droppedChip.id, true, q.key)}
-                      >
-                        {droppedChip.label}
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          color: "#d1d5db",
-                          fontSize: 12,
-                          pointerEvents: "none",
-                        }}
-                      >
-                        Drop here ...
-                      </span>
-                    )}
-
-                    {isWrong && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: -8,
-                          right: -8,
-                          background: "red",
-                          color: "#ffffff",
-                          borderRadius: "9999px",
-                          width: 25,
-                          height: 25,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 14,
-                          fontWeight: "bold",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                          border:"2px solid white"
-                        }}
-                      >
-                        ✕
-                      </div>
-                    )}
-                  </div>
-
-                  <span className="text-gray-700 font-semibold">.</span>
-                </div>
-              );
-            })}
-          </div>
+          <button
+            onClick={clearAllCanvases}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "10px",
+              border: "2px solid #fecaca",
+              backgroundColor: "#fff",
+              color: "#b91c1c",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            Clear All
+          </button>
         </div>
 
-        {/* Buttons */}
-        <div className="mt-10 flex justify-center">
+        {/* Sections */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "24px",
+            width: "100%",
+          }}
+        >
+          {ITEMS.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "22px",
+                width: "100%",
+                flexWrap: "wrap",
+              }}
+            >
+              {/* image + canvas */}
+              <div
+                style={{
+                  position: "relative",
+                  width: `${item.width}px`,
+                  height: `${item.height}px`,
+                  flexShrink: 0,
+                  border:
+                    selectedCanvas === item.id
+                      ? "3px solid #f59e0b"
+                      : "2px solid #e5e7eb",
+                  borderRadius: "14px",
+                  overflow: "hidden",
+                  backgroundColor: "#fff",
+                  boxSizing: "border-box",
+                }}
+                onClick={() => setSelectedCanvas(item.id)}
+              >
+                <canvas
+                  ref={(el) => {
+                    if (el) canvasRefs.current[item.id] = el;
+                  }}
+                  width={item.width}
+                  height={item.height}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "block",
+                    cursor: getCursor(),
+                    touchAction: "none",
+                  }}
+                  onMouseDown={(e) => startDrawing(e, item.id)}
+                  onMouseMove={(e) => draw(e, item.id)}
+                  onMouseUp={(e) => stopDrawing(e, item.id)}
+                  onMouseLeave={(e) => stopDrawing(e, item.id)}
+                  onTouchStart={(e) => startDrawing(e, item.id)}
+                  onTouchMove={(e) => draw(e, item.id)}
+                  onTouchEnd={(e) => stopDrawing(e, item.id)}
+                />
+
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "6px",
+                    left: "6px",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    backgroundColor: "#fff",
+                    border: "1px solid #111",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    zIndex: 2,
+                  }}
+                >
+                  {item.id}
+                </div>
+              </div>
+
+              {/* text */}
+              <div
+                style={{
+                  flex: "1 1 420px",
+                  minWidth: "280px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  justifyContent: "center",
+                }}
+              >
+                {item.text.map((line, index) => (
+                  <p
+                    key={index}
+                    style={{
+                      margin: 0,
+                      fontSize: "19px",
+                      lineHeight: "1.45",
+                      color: "#222",
+                      fontWeight: index === 0 ? "600" : "500",
+                    }}
+                  >
+                    {index === 0 ? (
+                      <>
+                        <span style={{ fontWeight: "700", marginRight: "8px" }}>
+                          {item.id}
+                        </span>
+                        {line}
+                      </>
+                    ) : (
+                      line
+                    )}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "8px",
+          }}
+        >
           <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-            checkAnswers={checkAnswers}
+            checkAnswers={handleCheck}
+            handleStartAgain={clearAllCanvases}
           />
         </div>
       </div>
     </div>
   );
-};
-
-export default WB_Unit8_Page48_Q2;
+}
