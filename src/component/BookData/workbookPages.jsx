@@ -47,6 +47,12 @@ import WB_Unit9_Page55 from "../WorkBookPages/Unit9/WB_Unit9_Page55";
 import WB_Unit9_Page56 from "../WorkBookPages/Unit9/WB_Unit9_Page56";
 
 // Unit10
+import WB_Unit10_Page57 from "../WorkBookPages/Unit10/WB_Unit10_Page57";
+import WB_Unit10_Page58 from "../WorkBookPages/Unit10/WB_Unit10_Page58";
+import WB_Unit10_Page59 from "../WorkBookPages/Unit10/WB_Unit10_Page59";
+import WB_Unit10_Page60 from "../WorkBookPages/Unit10/WB_Unit10_Page60";
+import WB_Unit10_Page61 from "../WorkBookPages/Unit10/WB_Unit10_Page61";
+import WB_Unit10_Page62 from "../WorkBookPages/Unit10/WB_Unit10_Page62";
 
 export const workbookPages = (openPopup, goToUnit) => [
   // unit1
@@ -96,4 +102,11 @@ export const workbookPages = (openPopup, goToUnit) => [
   <WB_Unit9_Page56 openPopup={openPopup} />,
 
   // unit10
+    <WB_Unit10_Page57 openPopup={openPopup} />,
+  <WB_Unit10_Page58 openPopup={openPopup} />,
+  <WB_Unit10_Page59 openPopup={openPopup} />,
+  <WB_Unit10_Page60 openPopup={openPopup} />,
+  <WB_Unit10_Page61 openPopup={openPopup} />,
+  <WB_Unit10_Page62 openPopup={openPopup} />,
+
 ];
