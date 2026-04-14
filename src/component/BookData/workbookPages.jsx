@@ -39,6 +39,12 @@ import WB_Unit8_Page49 from "../WorkBookPages/Unit8/WB_Unit8_Page49";
 import WB_Unit8_Page50 from "../WorkBookPages/Unit8/WB_Unit8_Page50";
 
 // Unit9
+import WB_Unit9_Page51 from "../WorkBookPages/Unit9/WB_Unit9_Page51";
+import WB_Unit9_Page52 from "../WorkBookPages/Unit9/WB_Unit9_Page52";
+import WB_Unit9_Page53 from "../WorkBookPages/Unit9/WB_Unit9_Page53";
+import WB_Unit9_Page54 from "../WorkBookPages/Unit9/WB_Unit9_Page54";
+import WB_Unit9_Page55 from "../WorkBookPages/Unit9/WB_Unit9_Page55";
+import WB_Unit9_Page56 from "../WorkBookPages/Unit9/WB_Unit9_Page56";
 
 // Unit10
 
@@ -82,6 +88,12 @@ export const workbookPages = (openPopup, goToUnit) => [
   <WB_Unit8_Page49 openPopup={openPopup} />,
   <WB_Unit8_Page50 openPopup={openPopup} />, 
   // unit9
+  <WB_Unit9_Page51 openPopup={openPopup} />,
+  <WB_Unit9_Page52 openPopup={openPopup} />,
+  <WB_Unit9_Page53 openPopup={openPopup} />,
+  <WB_Unit9_Page54 openPopup={openPopup} />,
+  <WB_Unit9_Page55 openPopup={openPopup} />,
+  <WB_Unit9_Page56 openPopup={openPopup} />,
 
   // unit10
 ];
