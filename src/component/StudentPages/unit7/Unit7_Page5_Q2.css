@@ -31,3 +31,9 @@
 .WB-unit3-page18-q2-word:active {
   transform: scale(0.97);
 }
+.lines-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
