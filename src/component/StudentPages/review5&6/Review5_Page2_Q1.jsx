@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgA from "../../../assets/imgs/test6.png";
-import imgB from "../../../assets/imgs/test6.png";
-import imgC from "../../../assets/imgs/test6.png";
-import imgD from "../../../assets/imgs/test6.png";
+import imgA from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 1.svg";
+import imgB from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 2.svg";
+import imgC from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 3.svg";
+import imgD from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 4.svg";
+import imgE from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 5.svg";
+import imgF from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 6.svg";
 
 const Review5_Page2_Q1 = () => {
   const senteces = ["sky", "baby", "party", "July", "candy", "fly"];
@@ -33,12 +35,12 @@ const Review5_Page2_Q1 = () => {
     },
     {
       id: 5,
-      img: imgD,
+      img: imgE,
       answer: "candy",
     },
     {
       id: 6,
-      img: imgD,
+      img: imgF,
       answer: "fly",
     },
   ];

@@ -2,147 +2,85 @@ import React, { useState, useRef } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Review6_Page2_Q2.css";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
-import img5 from "../../../assets/imgs/test6.png";
-import img6 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 3.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 4.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 5.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 6.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 7.svg";
 
 const Review6_Page2_Q2 = () => {
-  const [lines, setLines] = useState([]);
-  const [startDot, setStartDot] = useState(null);
-
-  const imageDotRefs = useRef([]);
-  const textDotRefs = useRef([]);
-  const containerRef = useRef(null);
-  const [isChecked, setIsChecked] = useState(false);
+  const [locked, setLocked] = useState(false);
   const [showedAnswer, setShowedAnswer] = useState(false);
-  const images = [
-    { image: img1 },
-    { image: img2 },
-    { image: img3 },
-    { image: img4 },
-    { image: img5 },
-    { image: img6 },
+  const items = [
+    { word: "an", correct: false, img: img1 },
+    { word: "fl", correct: true, img: img2 },
+    { word: "cr", correct: true, img: img3 },
+    { word: "cra", correct: false, img: img4 },
+    { word: "lio", correct: false, img: img5 },
+    { word: "sk", correct: true, img: img6 },
   ];
+  const [answers, setAnswers] = useState(Array(items.length).fill(null));
+  const [showResult, setShowResult] = useState(false);
+  const handleSelect = (index, value) => {
+    if (locked) return;
 
-  const words = ["light", "five", "kite", "tight", "night", "bike"];
-
-  const correctMatches = {
-    0: 2,
-    1: 4,
-    2: 3,
-    3: 0,
-    4: 5,
-    5: 1,
-  };
-
-  const handleDotClick = (index, type) => {
-    if (isChecked || showedAnswer) return;
-    if (!startDot) {
-      setStartDot({ index, type });
-      return;
-    }
-
-    if (startDot.type === type) {
-      setStartDot(null);
-      return;
-    }
-
-    const imageIndex = startDot.type === "image" ? startDot.index : index;
-
-    const textIndex = startDot.type === "text" ? startDot.index : index;
-
-    setLines((prevLines) => {
-      let updatedLines = [...prevLines];
-
-      updatedLines = updatedLines.filter((line) => {
-        const img =
-          line.from.type === "image" ? line.from.index : line.to.index;
-
-        return img !== imageIndex;
-      });
-
-      updatedLines = updatedLines.filter((line) => {
-        const txt = line.from.type === "text" ? line.from.index : line.to.index;
-
-        return txt !== textIndex;
-      });
-
-      updatedLines.push({
-        from: { index: imageIndex, type: "image" },
-        to: { index: textIndex, type: "text" },
-      });
-
-      return updatedLines;
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
     });
-
-    setStartDot(null);
   };
-
   const showAnswers = () => {
-    if (isChecked) return;
-
-    const answerLines = Object.keys(correctMatches).map((imgIndex) => ({
-      from: { index: parseInt(imgIndex), type: "image" },
-      to: { index: correctMatches[imgIndex], type: "text" },
-    }));
-
-    setLines(answerLines);
+    const correct = items.map((item) => (item.correct ? "y" : "n"));
+    setAnswers(correct);
+    setShowResult(true);
     setShowedAnswer(true);
+    setLocked(true);
   };
   const resetAll = () => {
-    setLines([]);
-    setStartDot(null);
-    setIsChecked(false);
+    setAnswers(Array(items.length).fill(null)); // ❗ مش ""
+    setShowResult(false);
+    setLocked(false);
     setShowedAnswer(false);
   };
-
   const checkAnswers = () => {
-    if (showedAnswer) return;
-    if (lines.length !== images.length) {
-      ValidationAlert.info(
-        "Oops!",
-        "Please complete all matches before checking.",
-      );
+    if (locked || showedAnswer) return;
+
+    // ❗ لازم يجاوب الكل
+    const allAnswered = answers.every((a) => a !== null);
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all questions.");
       return;
     }
 
     let score = 0;
 
-    lines.forEach((line) => {
-      const imageIndex =
-        line.from.type === "image" ? line.from.index : line.to.index;
-
-      const textIndex =
-        line.from.type === "text" ? line.from.index : line.to.index;
-
-      if (correctMatches[imageIndex] === textIndex) {
+    items.forEach((item, i) => {
+      if (
+        (item.correct && answers[i] === "y") ||
+        (!item.correct && answers[i] === "n")
+      ) {
         score++;
       }
     });
 
-    const total = images.length;
+    const total = items.length; // 🔥 = 6
 
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+    const message = `
+        Score: ${score} / ${total}
+  `;
 
-    const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-          Score: ${score} / ${total}
-        </span>
-      </div>
-    `;
-    setIsChecked(true);
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+    setShowResult(true);
+    setLocked(true);
+
+    if (score === total) ValidationAlert.success(message);
+    else if (score === 0) ValidationAlert.error(message);
+    else ValidationAlert.warning(message);
   };
-
   return (
     <div
-      ref={containerRef}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -153,103 +91,97 @@ const Review6_Page2_Q2 = () => {
     >
       <div className="div-forall" style={{ width: "60%" }}>
         <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>E</span>
-          Read, look, and match.
+          <span style={{ marginRight: "10px" }}>E</span>
+          Write <span style={{ color: "#2e3192" }}>y</span> in the blank only
+          under the pictures that end with
+          <span style={{ color: "#2e3192" }}>y</span>.
         </h5>
-        {images.map((item, i) => (
-          <div key={i} className="flex justify-between items-center my-3">
-            {/* WORD SIDE */}
-            <div className="w-[45%] flex justify-start">
-              <div className="relative inline-block">
-                <p
-                  onClick={() => handleDotClick(i, "text")}
-                  className={`px-5 py-1.5 rounded-full font-semibold text-[18px] cursor-pointer min-w-20 ${
-                    startDot?.index === i && startDot?.type === "text"
-                      ? "border-2 border-[#e74c3c] bg-[#fdecea]"
-                      : "bg-[#f6e6de]"
-                  }`}
-                >
-                  {words[i]}
-                </p>
-
-                <div
-                  ref={(el) => (textDotRefs.current[i] = el)}
-                  onClick={() => handleDotClick(i, "text")}
-                  className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-[#d82b2b] rounded-full cursor-pointer"
-                />
-              </div>
-            </div>
-
-            {/* IMAGE SIDE */}
-            <div className="w-[35%] flex items-center justify-end gap-2">
-              <div
-                ref={(el) => (imageDotRefs.current[i] = el)}
-                onClick={() => handleDotClick(i, "image")}
-                className="w-3 h-3 bg-[#d82b2b] rounded-full cursor-pointer"
-              />
-
-              <img
-                src={item.image}
-                alt=""
-                onClick={() => handleDotClick(i, "image")}
-                style={{
-                  height: "60px",
-                  width: "auto",
-                  objectFit: "contain",
-                  cursor: "pointer",
-                  border:
-                    startDot?.index === i && startDot?.type === "image"
-                      ? "3px solid #e74c3c"
-                      : "none",
-                  transform:
-                    startDot?.index === i && startDot?.type === "image"
-                      ? "scale(1.05)"
-                      : "scale(1)",
-                }}
-              />
-            </div>
-          </div>
-        ))}
-
-        {/* SVG */}
-        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          {lines.map((line, i) => {
-            const imageIndex =
-              line.from.type === "image" ? line.from.index : line.to.index;
-
-            const textIndex =
-              line.from.type === "text" ? line.from.index : line.to.index;
-
-            const imgDot = imageDotRefs.current[imageIndex];
-            const txtDot = textDotRefs.current[textIndex];
-
-            if (!imgDot || !txtDot || !containerRef.current) return null;
-
-            const imgRect = imgDot.getBoundingClientRect();
-            const txtRect = txtDot.getBoundingClientRect();
-            const containerRect = containerRef.current.getBoundingClientRect();
-
-            const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
-            const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
-
-            const x2 = txtRect.left + txtRect.width / 2 - containerRect.left;
-            const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
+        <div className="grid grid-cols-3 gap-10">
+          {items.map((item, i) => {
+            const isWrong =
+              showResult &&
+              ((item.correct && answers[i] !== "y") ||
+                (!item.correct && answers[i] !== "n"));
 
             return (
-              <line
-                key={i}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                stroke="#e74c3c"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
+              <div key={i} className="relative text-center">
+                {/* الصورة */}
+                <img
+                  src={item.img}
+                  style={{ width: "90px", height: "auto" }}
+                  className="mb-2 mx-auto"
+                />
+
+                {/* الكلمة + الخط */}
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-lg">
+                    {i + 1} {item.word}
+                  </span>
+
+                  {/* الخط + البوكسين */}
+                  <div className="relative w-24">
+                    {/* الخط */}
+                    <div
+                      className={`border-b-2 w-full h-6
+                  "border-black"
+              `}
+                    />
+
+                    {/* البوكسين فوق الخط */}
+                    <div className="absolute inset-0 flex items-center justify-center gap-2">
+                      {/* Y */}
+                      <div
+                        onClick={() => handleSelect(i, "y")}
+                        className={`px-2 py-0.5 border rounded text-xs font-bold cursor-pointer
+                  ${answers[i] === "y" ? "bg-[#1C398E] text-white" : "bg-white"}
+                  ${locked ? "cursor-not-allowed " : "hover:bg-[#1C398E]"}
+                `}
+                      >
+                        Y
+                      </div>
+
+                      {/* NO */}
+                      <div
+                        onClick={() => handleSelect(i, "n")}
+                        className={`px-2 py-0.5 border rounded text-xs font-bold cursor-pointer 
+                  ${answers[i] === "n" ? "bg-[#1C398E] text-white" : "bg-white"}
+                  ${locked ? "cursor-not-allowed " : "hover:bg-gray-200"}
+                `}
+                      >
+                        No
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ❌ الغلط */}
+                {isWrong && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: "22px",
+                      height: "22px",
+                      background: "#ef4444",
+                      color: "white",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
             );
           })}
-        </svg>
-
+        </div>
         <div className="action-buttons-container">
           <button onClick={resetAll} className="try-again-button">
             Start Again ↻
