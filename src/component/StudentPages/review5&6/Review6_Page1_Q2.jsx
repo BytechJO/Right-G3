@@ -1,203 +1,337 @@
-import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import React, { useState, useRef } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Review6_Page1_Q2.css";
+import "./Review6_Page2_Q2.css";
 
-const items = [
-  { scrambled: ["og", "ot", "pseel"], correct: ["go", "to", "sleep"] },
-  { scrambled: ["mkea", "hte", "deb"], correct: ["make", "the", "bed"] },
-  { scrambled: ["tae", "chunl"], correct: ["eat", "lunch"] },
-  { scrambled: ["teg", "pu"], correct: ["get", "up"] },
-  { scrambled: ["og", "meoh"], correct: ["go", "home"] },
-  { scrambled: ["tae", "stafkearb"], correct: ["eat", "breakfast"] },
-];
+const Review6_Page1_Q2 = () => {
+  const [lines, setLines] = useState([]);
+  const [startDot, setStartDot] = useState(null);
+  const [wrongTextIndexes, setWrongTextIndexes] = useState([]);
+  const imageDotRefs = useRef([]);
+  const textDotRefs = useRef([]);
+  const containerRef = useRef(null);
+  const [isChecked, setIsChecked] = useState(false);
+  const [showedAnswer, setShowedAnswer] = useState(false);
+  const items = [
+    { letter: "a", word: "3rd" },
+    { letter: "b", word: "4th" },
+    { letter: "c", word: "1st" },
+    { letter: "d", word: "2nd" },
+    { letter: "e", word: "8th" },
+    { letter: "f", word: "6th" },
+    { letter: "g", word: "9th" },
+    { letter: "h", word: "10th" },
+    { letter: "i", word: "7th" },
+    { letter: "j", word: "5th" },
+  ];
 
-export default function Review6_Page1_Q2() {
-  const [answers, setAnswers] = useState(
-    items.map((item) =>
-      item.correct.map((word) => Array(word.length).fill("")),
-    ),
-  );
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const words = [
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth",
+    "sixth",
+    "seventh",
+    "eighth",
+    "ninth",
+    "tenth",
+  ];
 
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-
-    if (!destination || locked) return;
-
-    const letter = draggableId.split("-")[1];
-    const [qIndex, wordIndex, letterIndex] = destination.droppableId
-      .split("-")
-      .slice(1);
-
-    const updated = [...answers];
-    updated[qIndex][wordIndex][letterIndex] = letter;
-
-    setAnswers(updated);
-
-    setAnswers(updated);
-    setShowResult(false);
+  const correctMatches = {
+    0: 2, // a → third
+    1: 3, // b → fourth
+    2: 0, // c → first
+    3: 1, // d → second
+    4: 7, // e → eighth
+    5: 5, // f → sixth
+    6: 8, // g → ninth
+    7: 9, // h → tenth
+    8: 6, // i → seventh
+    9: 4, // j → fifth
   };
+  const handleDotClick = (index, type) => {
+    if (isChecked || showedAnswer) return;
+    if (!startDot) {
+      setStartDot({ index, type });
+      return;
+    }
 
-  const resetAll = () => {
-    setAnswers(
-      items.map((item) =>
-        item.correct.map((word) => Array(word.length).fill("")),
-      ),
-    );
+    if (startDot.type === type) {
+      setStartDot(null);
+      return;
+    }
 
-    setLocked(false);
-    setShowResult(false);
+    const imageIndex = startDot.type === "image" ? startDot.index : index;
+
+    const textIndex = startDot.type === "text" ? startDot.index : index;
+
+    setLines((prevLines) => {
+      let updatedLines = [...prevLines];
+
+      updatedLines = updatedLines.filter((line) => {
+        const img =
+          line.from.type === "image" ? line.from.index : line.to.index;
+
+        return img !== imageIndex;
+      });
+
+      updatedLines = updatedLines.filter((line) => {
+        const txt = line.from.type === "text" ? line.from.index : line.to.index;
+
+        return txt !== textIndex;
+      });
+
+      updatedLines.push({
+        from: { index: imageIndex, type: "image" },
+        to: { index: textIndex, type: "text" },
+      });
+
+      return updatedLines;
+    });
+
+    setStartDot(null);
   };
 
   const showAnswers = () => {
-    setAnswers(items.map((item) => item.correct.map((word) => word.split(""))));
+    if (isChecked) return;
 
-    setLocked(true);
+    const answerLines = Object.keys(correctMatches).map((imgIndex) => ({
+      from: { index: parseInt(imgIndex), type: "image" },
+      to: { index: correctMatches[imgIndex], type: "text" },
+    }));
+
+    setLines(answerLines);
+    setShowedAnswer(true);
   };
+  const resetAll = () => {
+    setLines([]);
+    setStartDot(null);
+    setIsChecked(false);
+    setShowedAnswer(false);
+    setWrongTextIndexes([]);
+  };
+
   const checkAnswers = () => {
-    if (locked) return;
+    if (showedAnswer) return;
 
-    const empty = answers.some((row) =>
-      row.some((word) => word.some((l) => l === "")),
-    );
-
-    if (empty) {
-      ValidationAlert.info("Please complete all answers.");
+    if (lines.length !== items.length) {
+      ValidationAlert.info(
+        "Oops!",
+        "Please complete all matches before checking.",
+      );
       return;
     }
 
     let score = 0;
+    const wrongIndexes = [];
 
-    answers.forEach((row, i) => {
-      const built = row.map((word) => word.join("")).join(" ");
+    lines.forEach((line) => {
+      const imageIndex =
+        line.from.type === "image" ? line.from.index : line.to.index;
 
-      if (built === items[i].correct.join(" ")) {
+      const textIndex =
+        line.from.type === "text" ? line.from.index : line.to.index;
+
+      if (correctMatches[imageIndex] === textIndex) {
         score++;
+      } else {
+        wrongIndexes.push(textIndex);
       }
     });
+
+    setWrongTextIndexes(wrongIndexes);
+
     const total = items.length;
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
-    const message = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:#2e7d32;font-weight:bold;">
-          Score: ${score} / ${total}
-        </span>
-      </div>
-    `;
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color};font-weight:bold">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
 
-    if (score === total) ValidationAlert.success(message);
-    else if (score === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
+    setIsChecked(true);
+    setShowedAnswer(true);
 
-    setShowResult(true);
-    setLocked(true);
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex justify-center p-8">
-        <div className="w-[60%]">
-          <h5 className="header-title-page8 mb-5">
-            <span className=" mr-4">A</span>
-            Unscramble and write.{" "}
-          </h5>
-
-          {items.map((item, i) => {
-            return (
+    <div
+      ref={containerRef}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+        position: "relative",
+      }}
+    >
+      <div className="div-forall" style={{ width: "60%" }}>
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>B</span>
+          Match.
+        </h5>
+        <div className="flex justify-center mt-7">
+          {/* 🟢 LEFT SIDE (words) */}
+          <div className="w-[35%] flex flex-col gap-4">
+            {words.map((word, i) => (
               <div
                 key={i}
-                className="flex items-center gap-[15px] my-5 text-[20px]"
+                onClick={() => handleDotClick(i, "text")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                }}
               >
-                <span className="font-bold">{i + 1}</span>
-
-                {/* scrambled letters */}
-                <Droppable droppableId={`bank-${i}`} direction="horizontal">
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className="flex gap-1.5"
+                <span
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "30%", // 🔥 مهم
+                    justifyContent: "flex-start",
+                    padding: "2px 6px",
+                    borderRadius: "6px",
+                    background:
+                      startDot?.index === i && startDot?.type === "text"
+                        ? "#fde68a"
+                        : "transparent",
+                  }}
+                >
+                  {isChecked && wrongTextIndexes.includes(i) && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: "-20px",
+                        top: "20%",
+                        width: "20px",
+                        height: "20px",
+                        background: "#ef4444",
+                        color: "white",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                      }}
                     >
-                      {item.scrambled.map((chunk, chunkIndex) => {
-                        const letters = chunk.split("");
-
-                        return (
-                          <div
-                            key={chunkIndex}
-                            className="flex gap-1 mr-3.5"
-                          >
-                            {letters.map((letter, letterIndex) => {
-                              const id = `${letter}-${i}-${chunkIndex}-${letterIndex}`;
-
-                              return (
-                                <Draggable
-                                  key={id}
-                                  draggableId={`letter-${id}`}
-                                  index={chunkIndex * 10 + letterIndex}
-                                  isDragDisabled={locked}
-                                >
-                                  {(provided) => (
-                                    <span
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      className="px-2.5 py-1.5 border-2 border-[#444] rounded-md bg-[#f3f3f3] cursor-grab font-bold"
-                                    >
-                                      {letter}
-                                    </span>
-                                  )}
-                                </Draggable>
-                              );
-                            })}
-                          </div>
-                        );
-                      })}
-
-                      {provided.placeholder}
-                    </div>
+                      ✕
+                    </span>
                   )}
-                </Droppable>
+                  <span style={{ fontWeight: "bold", marginRight: 4 }}>
+                    {i + 1}
+                  </span>
+                  {word}
+                </span>
 
-                {/* answer slots */}
-                <div className="flex gap-5 ml-5">
-                  {answers[i].map((wordSlots, wordIndex) => {
-                    return (
-                      <div key={wordIndex} className="flex gap-1">
-                        {wordSlots.map((letter, slotIndex) => {
-                          const slotId = `slot-${i}-${wordIndex}-${slotIndex}`;
-
-                          return (
-                            <Droppable droppableId={slotId} key={slotId}>
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.droppableProps}
-                                  className="w-7 border-b-2 border-black text-center text-[22px]"
-                                >
-                                  {letter}
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* wrong mark */}
-                {showResult &&
-                  answers[i].map((w) => w.join("")).join(" ") !==
-                    items[i].correct.join(" ") && (
-                    <span className="text-red-500 font-bold ml-2.5">✕</span>
-                  )}
+                <div
+                  ref={(el) => (textDotRefs.current[i] = el)}
+                  className="w-3 h-3 bg-[orange] rounded-full"
+                />
               </div>
+            ))}
+          </div>
+
+          {/* 🟠 RIGHT SIDE (letters + ordinals) */}
+          <div
+            className="flex flex-col gap-4 items-end"
+            style={{
+              width: "30%", // 🔥 صغّر العرض
+              alignItems: "flex-end",
+            }}
+          >
+            {items.map((item, i) => (
+              <div
+                key={i}
+                onClick={() => handleDotClick(i, "image")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between", // 🔥
+                  width: "40%", // 🔥 مهم
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  ref={(el) => (imageDotRefs.current[i] = el)}
+                  className="w-3 h-3 bg-[orange] rounded-full"
+                />
+
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "80px",
+                    padding: "2px 6px",
+                    borderRadius: "6px",
+                    background:
+                      startDot?.index === i && startDot?.type === "image"
+                        ? "#fde68a"
+                        : "transparent",
+                  }}
+                >
+                  <span style={{ fontWeight: "bold", marginRight: 4 }}>
+                    {item.letter}
+                  </span>
+                  {item.word}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SVG */}
+        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          {lines.map((line, i) => {
+            const imageIndex =
+              line.from.type === "image" ? line.from.index : line.to.index;
+
+            const textIndex =
+              line.from.type === "text" ? line.from.index : line.to.index;
+
+            const imgDot = imageDotRefs.current[imageIndex];
+            const txtDot = textDotRefs.current[textIndex];
+
+            if (!imgDot || !txtDot || !containerRef.current) return null;
+
+            const imgRect = imgDot.getBoundingClientRect();
+            const txtRect = txtDot.getBoundingClientRect();
+            const containerRect = containerRef.current.getBoundingClientRect();
+
+            const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
+            const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
+
+            const x2 = txtRect.left + txtRect.width / 2 - containerRect.left;
+            const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
+
+            return (
+              <path
+                key={i}
+                d={`
+                  M ${x1} ${y1}
+                  C ${(x1 + x2) / 2} ${y1},
+                    ${(x1 + x2) / 2} ${y2},
+                    ${x2} ${y2}
+                `}
+                stroke="orange"
+                strokeWidth="3"
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray="6,6" // 🔥 هذا اللي بخلي الخط منقط
+              />
             );
           })}
-        </div>
+        </svg>
 
         <div className="action-buttons-container">
           <button onClick={resetAll} className="try-again-button">
@@ -213,6 +347,8 @@ export default function Review6_Page1_Q2() {
           </button>
         </div>
       </div>
-    </DragDropContext>
+    </div>
   );
-}
+};
+
+export default Review6_Page1_Q2;
