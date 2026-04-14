@@ -12,14 +12,11 @@ const Unit7_Page6_Q1 = () => {
     4: "",
     5: "",
     6: "",
-    7: "",
-    8: "",
-    9: "",
   });
 
   const [checked, setChecked] = useState(false);
 
-  const words = ["them", "it",  "them", "you", "her",  "us"];
+  const words = ["them", "it", "you", "her", "us"];
 
   const correctAnswers = {
     1: "it",
@@ -81,15 +78,19 @@ const Unit7_Page6_Q1 = () => {
 
     const inputId = destination.droppableId;
 
+    const word = draggableId.split("-")[0]; // 🔥 الحل
+
     setUserAnswers((prev) => ({
       ...prev,
-      [inputId]: draggableId,
+      [inputId]: word,
     }));
   };
 
   const checkAnswers = () => {
-    const hasEmptyInputs = Object.values(userAnswers).some(
-      (value) => !value || value.trim() === ""
+    if (checked) return;
+
+    const hasEmptyInputs = Object.keys(correctAnswers).some(
+      (id) => !userAnswers[id] || userAnswers[id].trim() === "",
     );
 
     if (hasEmptyInputs) {
@@ -109,29 +110,17 @@ const Unit7_Page6_Q1 = () => {
 
     setChecked(true);
 
-    if (currentScore === totalQuestions) {
-      ValidationAlert.success(`Perfect! ${currentScore} / ${totalQuestions}`);
-    } else if (currentScore > 1) {
-      ValidationAlert.warning(`Good job! You got ${currentScore} / ${totalQuestions}`);
-    } else {
-      ValidationAlert.error(`You got ${currentScore} / ${totalQuestions}`);
-    }
+     ValidationAlert[
+      currentScore === totalQuestions ? "success" : currentScore === 0 ? "error" : "warning"
+    ](`
+        Score: ${currentScore} / ${totalQuestions}
+  `);
   };
 
   const handleShowAnswer = () => {
-    setUserAnswers({
-      1: "Stella",
-      2: "he is",
-      3: "is",
-      4: "uncle",
-      5: "she is stella's",
-      6: "is stella's",
-      7: "she is",
-      8: "sister",
-      9: "stella's mother",
-    });
+    setUserAnswers({ ...correctAnswers });
+    setChecked(true);
   };
-
   const handleStartAgain = () => {
     setUserAnswers({
       1: "",
@@ -140,35 +129,10 @@ const Unit7_Page6_Q1 = () => {
       4: "",
       5: "",
       6: "",
-      7: "",
-      8: "",
-      9: "",
     });
+
     setChecked(false);
   };
-
-  // ✅ FIX: حساب كم مرة مطلوب كل كلمة
-  const getRequiredCounts = () => {
-    const counts = {};
-    Object.values(correctAnswers).forEach((word) => {
-      const w = word.toLowerCase().trim();
-      counts[w] = (counts[w] || 0) + 1;
-    });
-    return counts;
-  };
-
-  // ✅ FIX: حساب كم مرة المستخدم استخدم كل كلمة
-  const getUsedCounts = () => {
-    const counts = {};
-    Object.values(userAnswers).forEach((word) => {
-      const w = word.toLowerCase().trim();
-      if (w) counts[w] = (counts[w] || 0) + 1;
-    });
-    return counts;
-  };
-
-  const requiredCounts = getRequiredCounts();
-  const usedCounts = getUsedCounts();
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -181,19 +145,16 @@ const Unit7_Page6_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div
-          className="div-forall"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
-          }}
-        >
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">D</span> Read and complete.
-          </h1>
+        <div className="div-forall">
+          <h5 className="header-title-page8 pb-2.5">
+            <span
+              className="ex-A"
+              style={{ marginRight: "10px", marginBottom: 7 }}
+            >
+              D
+            </span>
+            Read and complete.
+          </h5>
 
           {/* الكلمات */}
           <Droppable droppableId="words" direction="horizontal">
@@ -203,27 +164,24 @@ const Unit7_Page6_Q1 = () => {
                 {...provided.droppableProps}
                 style={{
                   display: "flex",
-                  gap: "10px",
+                  gap: "12px",
                   padding: "10px",
                   border: "2px dashed #ccc",
                   borderRadius: "10px",
-                  alignItems: "center",
+                  marginTop: "20px",
                   justifyContent: "center",
-                  flexWrap: "wrap",
+                  width: "100%",
+                  marginBottom: "20px",
+                  // justifyContent: "center",
                 }}
               >
                 {words.map((word, index) => {
-                  const usedCount = usedCounts[word] || 0;
-                  const requiredCount = requiredCounts[word] || 0;
-
-                  const isUsed = usedCount >= requiredCount;
-
                   return (
                     <Draggable
-                      key={word}
-                      draggableId={word}
+                      key={`${word}-${index}`}
+                      draggableId={`${word}-${index}`}
                       index={index}
-                      isDragDisabled={checked || isUsed}
+                      isDragDisabled={checked} // بس بعد التشيك
                     >
                       {(provided) => (
                         <div
@@ -234,10 +192,13 @@ const Unit7_Page6_Q1 = () => {
                             padding: "7px 14px",
                             border: "2px solid #2c5287",
                             borderRadius: "8px",
-                            background: isUsed ? "#ccc" : "white",
-                            opacity: isUsed ? 0.6 : 1,
-                            cursor: isUsed ? "not-allowed" : "grab",
-                            fontSize: "15px",
+                            background: "white",
+                            fontWeight: "bold",
+                            cursor: checked ? "not-allowed" : "grab",
+                            fontSize: "16px",
+
+                            opacity: provided.snapshot?.isDragging ? 0.6 : 1, // 🔥 بس وقت السحب
+
                             ...provided.draggableProps.style,
                           }}
                         >
@@ -269,16 +230,51 @@ const Unit7_Page6_Q1 = () => {
                           {...provided.droppableProps}
                           className={`relative border-b-2 w-30 text-center min-h-[30px] ${
                             snapshot.isDraggingOver ? "bg-yellow-100" : ""
+                          } ${
+                            checked &&
+                            userAnswers[part.id] &&
+                            userAnswers[part.id].toLowerCase().trim() !==
+                              correctAnswers[part.id].toLowerCase()
+                              ? "border-red-500"
+                              : "border-black"
                           }`}
                         >
                           {checked &&
                             userAnswers[part.id] &&
                             userAnswers[part.id].toLowerCase().trim() !==
                               correctAnswers[part.id].toLowerCase() && (
-                              <div className="wb-wrong-icon-unit1-page6-q1">✕</div>
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  left: "120%",
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  width: "20px",
+                                  height: "20px",
+                                  background: "#ef4444",
+                                  color: "white",
+                                  borderRadius: "50%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "12px",
+                                  fontWeight: "bold",
+                                  border: "2px solid white",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                  pointerEvents: "none",
+                                  zIndex: 3,
+                                }}
+                              >
+                                ✕
+                              </span>
                             )}
+                          <span
+                            style={{ color: "#2c5287", fontWeight: "bold" }}
+                          >
+                            {" "}
+                            {userAnswers[part.id]}
+                          </span>
 
-                          {userAnswers[part.id]}
                           {provided.placeholder}
                         </div>
                       )}
