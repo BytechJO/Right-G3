@@ -66,6 +66,21 @@ import WB_Unit8_Page49_Q2 from "./Unit8/WB_Unit8_Page49_Q2";
 import WB_Unit8_Page50_Q1 from "./Unit8/WB_Unit8_Page50_Q1";
 import WB_Unit8_Page50_Q2 from "./Unit8/WB_Unit8_Page50_Q2";
 // Unit9
+import WB_Unit9_Page51_Q1 from "./Unit9/WB_Unit9_Page51_Q1";
+import WB_Unit9_Page51_Q2 from "./Unit9/WB_Unit9_Page51_Q2";
+import WB_Unit9_Page52_Q1 from "./Unit9/WB_Unit9_Page52_Q1";
+import WB_Unit9_Page52_Q2 from "./Unit9/WB_Unit9_Page52_Q2";
+import WB_Unit9_Page53_Q1 from "./Unit9/WB_Unit9_Page53_Q1";
+import WB_Unit9_Page53_Q2 from "./Unit9/WB_Unit9_Page53_Q2";
+import WB_Unit9_Page54_Q1 from "./Unit9/WB_Unit9_Page54_Q1";
+import WB_Unit9_Page54_Q2 from "./Unit9/WB_Unit9_Page54_Q2";
+import WB_Unit9_Page55_Q1 from "./Unit9/WB_Unit9_Page55_Q1";
+import WB_Unit9_Page55_Q2 from "./Unit9/WB_Unit9_Page55_Q2";
+import WB_Unit9_Page56_Q1 from "./Unit9/WB_Unit9_Page56_Q1";
+import WB_Unit9_Page56_Q2 from "./Unit9/WB_Unit9_Page56_Q2";
+import WB_Unit9_Page56_Q3 from "./Unit9/WB_Unit9_Page56_Q3";
+import WB_Unit9_Page56_Q4 from "./Unit9/WB_Unit9_Page56_Q4";
+
 
 // Unit10
 
@@ -128,21 +143,36 @@ export const workBookData = [
 
 
   // UNIT 8
-   { component: WB_Unit8_Page45_Q1, unit: 8 },
-  { component: WB_Unit8_Page45_Q2, unit: 8 },
-  { component: WB_Unit8_Page46_Q1, unit: 8 },
-  { component: WB_Unit8_Page46_Q2, unit: 8 },
-  { component: WB_Unit8_Page47_Q1, unit: 8 },
-  { component: WB_Unit8_Page47_Q2, unit: 8 },
-  { component: WB_Unit8_Page48_Q1, unit: 8 },
-  { component: WB_Unit8_Page48_Q2, unit: 8 },
-  { component: WB_Unit8_Page49_Q1, unit: 8 },
-  { component: WB_Unit8_Page49_Q2, unit: 8 },
-  { component: WB_Unit8_Page50_Q1, unit: 8 },
-  { component: WB_Unit8_Page50_Q2, unit: 8 },
+  //  { component: WB_Unit8_Page45_Q1, unit: 8 },
+  // { component: WB_Unit8_Page45_Q2, unit: 8 },
+  // { component: WB_Unit8_Page46_Q1, unit: 8 },
+  // { component: WB_Unit8_Page46_Q2, unit: 8 },
+  // { component: WB_Unit8_Page47_Q1, unit: 8 },
+  // { component: WB_Unit8_Page47_Q2, unit: 8 },
+  // { component: WB_Unit8_Page48_Q1, unit: 8 },
+  // { component: WB_Unit8_Page48_Q2, unit: 8 },
+  // { component: WB_Unit8_Page49_Q1, unit: 8 },
+  // { component: WB_Unit8_Page49_Q2, unit: 8 },
+  // { component: WB_Unit8_Page50_Q1, unit: 8 },
+  // { component: WB_Unit8_Page50_Q2, unit: 8 , lastOfUnit: true },
 
   // UNIT 9
-  
+    { component: WB_Unit9_Page51_Q1, unit: 9 },
+  { component: WB_Unit9_Page51_Q2, unit: 9 },
+  { component: WB_Unit9_Page52_Q1, unit: 9 },
+  { component: WB_Unit9_Page52_Q2, unit: 9 },
+  { component: WB_Unit9_Page53_Q1, unit: 9 },
+  { component: WB_Unit9_Page53_Q2, unit:  9},
+  { component: WB_Unit9_Page54_Q1, unit: 9 },
+  { component: WB_Unit9_Page54_Q2, unit: 9 },
+  { component: WB_Unit9_Page55_Q1, unit: 9 },
+  { component: WB_Unit9_Page55_Q2, unit: 9 },
+  { component: WB_Unit9_Page56_Q1, unit: 9 },
+  { component: WB_Unit9_Page56_Q2, unit: 9},
+  { component: WB_Unit9_Page56_Q3, unit: 9},
+  { component: WB_Unit9_Page56_Q4, unit: 9 ,  lastOfUnit: true },
+
+
   // UNIT 10
   
 ];
