@@ -1,308 +1,277 @@
 import React, { useState } from "react";
-import {
-  DndContext,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  DragOverlay,
-} from "@dnd-kit/core";
-
-import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgBlueInk from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex B 1.svg";
-import imgTubeItem from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex B 2.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/6.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/7.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/8.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/9.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/10.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/11.svg";
 
-const WORDS = ["cute", "cube", "chute", "Sue", "glue", "true", "mute"];
+const ITEMS = [
+  {
+    id: 1,
+    img: img1,
+    options: ["cr", "dr", "pr"],
+    correct: "pr",
+  },
+  {
+    id: 2,
+    img: img2,
+    options: ["br", "tr", "dr"],
+    correct: "br",
+  },
+  {
+    id: 3,
+    img: img3,
+    options: ["fr", "pr", "cr"],
+    correct: "pr",
+  },
+  {
+    id: 4,
+    img: img4,
+    options: ["tr", "gr", "pr"],
+    correct: "gr",
+  },
+  {
+    id: 5,
+    img: img5,
+    options: ["cr", "tr", "br"],
+    correct: "br",
+  },
+  {
+    id: 6,
+    img: img6,
+    options: ["gr", "fr", "dr"],
+    correct: "gr",
+  },
+];
 
-// الكلمات الصحيحة لكل عمود
-const BLUE_WORDS = ["glue", "true", "Sue"];
-const TUBE_WORDS = ["mute", "cube", "cute", "chute"];
+export default function WB_Unit8_Page49_QB() {
+  const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
-const INITIAL_ANSWERS = {
-  b1: null,
-  b2: null,
-  b3: null,
-  t1: null,
-  t2: null,
-  t3: null,
-  t4: null,
-};
+  const handleSelect = (id, value) => {
+    if (showAns) return;
 
-function isWordCorrectInSlot(slotId, word) {
-  if (!word) return false;
-
-  if (slotId.startsWith("b")) {
-    return BLUE_WORDS.includes(word);
-  }
-
-  if (slotId.startsWith("t")) {
-    return TUBE_WORDS.includes(word);
-  }
-
-  return false;
-}
-
-function DraggableWord({ word, isUsed }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: word,
-      disabled: isUsed,
-    });
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...(!isUsed ? listeners : {})}
-      {...(!isUsed ? attributes : {})}
-      className={`px-4 py-2 bg-white border rounded-lg shadow-sm text-blue-700 text-sm font-bold ${
-        isUsed
-          ? "bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed opacity-60"
-          : isDragging
-          ? "cursor-grabbing shadow-lg"
-          : "cursor-grab hover:border-blue-400"
-      }`}
-    >
-      {word}
-    </div>
-  );
-}
-
-function DropSlot({ id, value, showResults, onClear }) {
-  const { isOver, setNodeRef } = useDroppable({
-    id,
-  });
-
-  const isCorrect = isWordCorrectInSlot(id, value);
-
-  let slotStyle = "border-gray-300 bg-white";
-  if (showResults) {
-    slotStyle = isCorrect ? "border-blue-400 bg-blue-50" : "border-red-300";
-  } else if (isOver) {
-    slotStyle = "border-blue-400 bg-blue-50";
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`relative min-h-[54px] border-2 border-dashed rounded-xl flex items-center justify-center px-3 transition-all ${slotStyle}`}
-    >
-      {value ? (
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-blue-900">{value}</span>
-
-          {!showResults && (
-            <button
-              type="button"
-              onClick={() => onClear(id)}
-              className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-300"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      ) : (
-        <span className="text-gray-400 text-sm italic">Drop here</span>
-      )}
-
-      {showResults && value && !isCorrect && (
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-white bg-red-500 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white">
-          ✕
-        </span>
-      )}
-    </div>
-  );
-}
-
-const WB_Unit8_Page50_Q2 = () => {
-  const [answers, setAnswers] = useState(INITIAL_ANSWERS);
-  const [showResults, setShowResults] = useState(false);
-  const [activeId, setActiveId] = useState(null);
-
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const handleDragStart = (event) => {
-    setActiveId(event.active.id);
-  };
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    setActiveId(null);
-
-    if (!over) return;
-    if (showResults) return;
-
-    const draggedWord = active.id;
-    const dropSlotId = over.id;
-
-    setAnswers((prev) => {
-      const updated = { ...prev };
-
-      Object.keys(updated).forEach((key) => {
-        if (updated[key] === draggedWord) {
-          updated[key] = null;
-        }
-      });
-
-      updated[dropSlotId] = draggedWord;
-
-      return updated;
-    });
-  };
-
-  const handleClearSlot = (slotId) => {
     setAnswers((prev) => ({
       ...prev,
-      [slotId]: null,
+      [id]: value,
     }));
   };
 
-  const checkAnswers = () => {
-    const unanswered = Object.keys(INITIAL_ANSWERS).filter((id) => !answers[id]);
+  const handleCheck = () => {
+    if (showAns) return;
 
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all items first.");
       return;
     }
 
-    setShowResults(true);
-
     let score = 0;
-    Object.keys(answers).forEach((id) => {
-      if (isWordCorrectInSlot(id, answers[id])) score++;
+
+    ITEMS.forEach((item) => {
+      if (answers[item.id] === item.correct) {
+        score++;
+      }
     });
 
-    const total = Object.keys(answers).length;
-    const msg = `Score: ${score} / ${total}`;
+    setChecked(true);
 
-    if (score === total) ValidationAlert.success(msg);
-    else if (score > 0) ValidationAlert.warning(msg);
-    else ValidationAlert.error(msg);
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+    }
   };
 
   const handleShowAnswer = () => {
-    setAnswers({
-      b1: "glue",
-      b2: "true",
-      b3: "Sue",
-      t1: "mute",
-      t2: "cube",
-      t3: "cute",
-      t4: "chute",
+    const correctMap = {};
+    ITEMS.forEach((item) => {
+      correctMap[item.id] = item.correct;
     });
-    setShowResults(true);
+
+    setAnswers(correctMap);
+    setChecked(true);
+    setShowAns(true);
   };
 
   const handleReset = () => {
-    setAnswers(INITIAL_ANSWERS);
-    setShowResults(false);
-    setActiveId(null);
+    setAnswers({});
+    setChecked(false);
+    setShowAns(false);
+  };
+
+  const isWrong = (item) => {
+    if (!checked) return false;
+    return answers[item.id] !== item.correct;
+  };
+
+  const renderOption = (itemId, option) => {
+    const selected = answers[itemId] === option;
+
+    return (
+      <button
+        onClick={() => handleSelect(itemId, option)}
+        style={{
+          width: "58px",
+          height: "58px",
+          borderRadius: "50%",
+          border: selected ? "4px solid #dc2626" : "4px solid transparent",
+          backgroundColor: "#fff",
+          color: "#222",
+          fontSize: "24px",
+          fontWeight: "500",
+          cursor: showAns ? "default" : "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          lineHeight: "1",
+          transition: "all 0.2s ease",
+        }}
+      >
+        {option}
+      </button>
+    );
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="main-container-component">
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          width: "100%",
+          maxWidth: "900px",
+          margin: "0 auto",
+        }}
+      >
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">B</span>
+          Listen and circle.
+        </h1>
+
         <div
-          className="div-forall"
-          style={{ gap: "10px", marginBottom: "50px" }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "28px 34px",
+            justifyItems: "center",
+            alignItems: "start",
+            width: "100%",
+          }}
         >
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">B</span> Read and write the words in the
-            correct column.
-          </h1>
-
-          <div className="mb-10 p-4 bg-blue-50 rounded-2xl border border-blue-100">
-            <div className="flex flex-wrap justify-center gap-3">
-              {WORDS.map((word) => (
-                <DraggableWord
-                  key={word}
-                  word={word}
-                  isUsed={Object.values(answers).includes(word)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            <div className="space-y-6">
-              <div className="flex flex-col items-center gap-4 mb-8">
-                <img
-                  src={imgBlueInk}
-                  alt="blue"
-                  className="max-w-45 max-h-24 object-contain"
-                />
-                <span className="text-2xl font-black text-blue-900">blue</span>
+          {ITEMS.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "14px",
+                width: "100%",
+                maxWidth: "220px",
+              }}
+            >
+              <div
+                style={{
+                  alignSelf: "flex-start",
+                  fontSize: "22px",
+                  fontWeight: "700",
+                  color: "#222",
+                  marginLeft: "2px",
+                }}
+              >
+                {item.id}
               </div>
 
-              <div className="space-y-4 px-10">
-                {["b1", "b2", "b3"].map((id) => (
-                  <DropSlot
-                    key={id}
-                    id={id}
-                    value={answers[id]}
-                    showResults={showResults}
-                    onClear={handleClearSlot}
-                  />
+              <div
+                style={{
+                  width: "100%",
+                  height: "150px",
+                  border: "3px solid #bdbdbd",
+                  borderRadius: "20px",
+                  backgroundColor: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={item.img}
+                  alt={`item-${item.id}`}
+                  style={{
+                    width: "85%",
+                    height: "85%",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "14px",
+                  width: "100%",
+                }}
+              >
+                {item.options.map((option) => (
+                  <div key={option}>{renderOption(item.id, option)}</div>
                 ))}
               </div>
+
+              {isWrong(item) && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-6px",
+                    right: "-6px",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    backgroundColor: "#ef4444",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  ✕
+                </div>
+              )}
             </div>
+          ))}
+        </div>
 
-            <div className="space-y-6">
-              <div className="flex flex-col items-center gap-4 mb-8">
-                <img
-                  src={imgTubeItem}
-                  alt="tube"
-                  className="max-w-45 max-h-24 object-contain"
-                />
-                <span className="text-2xl font-black text-blue-900">tube</span>
-              </div>
-
-              <div className="space-y-4 px-10">
-                {["t1", "t2", "t3", "t4"].map((id) => (
-                  <DropSlot
-                    key={id}
-                    id={id}
-                    value={answers[id]}
-                    showResults={showResults}
-                    onClear={handleClearSlot}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 flex justify-center">
-            <Button
-              handleShowAnswer={handleShowAnswer}
-              handleStartAgain={handleReset}
-              checkAnswers={checkAnswers}
-            />
-          </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "8px",
+          }}
+        >
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+            checkAnswers={handleCheck}
+          />
         </div>
       </div>
-
-      <DragOverlay>
-        {activeId ? (
-          <div className="px-4 py-2 bg-white border-2 border-blue-500 rounded-lg shadow-xl text-blue-700 text-sm font-bold">
-            {activeId}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+    </div>
   );
-};
-
-export default WB_Unit8_Page50_Q2;
+}

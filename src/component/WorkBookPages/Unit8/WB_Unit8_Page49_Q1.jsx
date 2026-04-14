@@ -1,238 +1,295 @@
 import React, { useState } from "react";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  DragOverlay,
-} from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgBedroom from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/page 49/Asset54.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/1.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/3.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/4.svg";
 
-const SENTENCES_J = [
-  { id: "j1", text: "She has four pairs of shoes." },
-  { id: "j2", text: "She has four shirts." },
-  { id: "j3", text: "She has five skirts." },
+const ITEMS = [
+  {
+    id: 1,
+    img: img1,
+    options: [
+      "There were horses on the farm.",
+      "There weren’t horses on the farm.",
+    ],
+    correct: "There were horses on the farm.",
+  },
+  {
+    id: 2,
+    img: img2,
+    options: [
+      "They were at the bus station.",
+      "They weren’t at the bus station.",
+    ],
+    correct: "They weren’t at the bus station.",
+  },
+  {
+    id: 3,
+    img: img3,
+    options: [
+      "They were watching TV at home.",
+      "They weren’t watching TV at home.",
+    ],
+    correct: "They were watching TV at home.",
+  },
+  {
+    id: 4,
+    img: img4,
+    options: ["He was at school.", "He wasn’t at school."],
+    correct: "He wasn’t at school.",
+  },
 ];
 
-const CORRECT_J = { q1: "j1", q2: "j2", q3: "j3" };
+export default function WB_Unit8_Page48_QI() {
+  const [answers, setAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
-function DraggableSentence({ item, isUsed }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
+  const handleSelect = (id, value) => {
+    if (showAns) return;
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging || isUsed ? 0.5 : 1,
+    setAnswers((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`p-3 bg-white border-2 border-gray-200 rounded-xl shadow-sm cursor-grab text-blue-700 font-medium text-sm ${
-        isUsed
-          ? "bg-gray-50 text-gray-300 pointer-events-none"
-          : "hover:border-blue-400 hover:shadow-md transition-all"
-      }`}
-    >
-      {item.text}
-    </div>
-  );
-}
+  const handleCheck = () => {
+    if (showAns) return;
 
-function DropSlot({ id, content, isCorrect, isSubmitted }) {
-  const { setNodeRef, isOver } = useSortable({ id });
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
 
-  return (
-    <div
-      ref={setNodeRef}
-      className={`w-full min-h-[45px] border-b-2 flex items-center justify-between px-4 transition-all border-blue-400`}
-    >
-      {content ? (
-        <>
-          <span className="text-blue-900 font-bold text-sm">
-            {SENTENCES_J.find((s) => s.id === content)?.text}
-          </span>
-
-          {isSubmitted && !isCorrect && (
-            <div className="w-6 h-6 flex items-center justify-center rounded-full bg-red-500 text-white text-lg font-bold shadow-sm border-2 border-white">
-              ✕
-            </div>
-          )}
-        </>
-      ) : (
-        <span className="text-gray-300 italic text-sm">
-          Drop your answer here...
-        </span>
-      )}
-    </div>
-  );
-}
-
-const WB_Unit8_Page49_Q1 = () => {
-  const [answers, setAnswers] = useState({ q1: null, q2: null, q3: null });
-  const [activeId, setActiveId] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const checkAnswers = () => {
-    const unanswered = Object.keys(CORRECT_J).filter((id) => !answers[id]);
-
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all questions first.");
       return;
     }
 
-    setShowResults(true);
-
     let score = 0;
-    const total = Object.keys(CORRECT_J).length;
 
-    Object.keys(CORRECT_J).forEach((id) => {
-      if (answers[id] === CORRECT_J[id]) score++;
+    ITEMS.forEach((item) => {
+      if (answers[item.id] === item.correct) {
+        score++;
+      }
     });
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
+    setShowResults(true);
+
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
     }
   };
 
+  const handleShowAnswer = () => {
+    const correctMap = {};
+    ITEMS.forEach((item) => {
+      correctMap[item.id] = item.correct;
+    });
+
+    setAnswers(correctMap);
+    setShowResults(true);
+    setShowAns(true);
+  };
+
+  const handleReset = () => {
+    setAnswers({});
+    setShowResults(false);
+    setShowAns(false);
+  };
+
+  const isWrong = (id) => {
+    if (!showResults) return false;
+    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
+  };
+
+  const renderCheckBox = (itemId, text) => {
+    const selected = answers[itemId] === text;
+
+    return (
+      <button
+        onClick={() => handleSelect(itemId, text)}
+        style={{
+          width: "44px",
+          height: "44px",
+          border: "2px solid #a3a3a3",
+          borderRadius: "8px",
+          backgroundColor: "#fff",
+          color: selected ? "#dc2626" : "transparent",
+          fontSize: "40px",
+          lineHeight: "1",
+          fontWeight: "700",
+          cursor: showAns ? "default" : "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          padding: 0,
+        }}
+      >
+        ✓
+      </button>
+    );
+  };
+
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={(e) => setActiveId(e.active.id)}
-      onDragEnd={(e) => {
-        if (e.over) {
-          setAnswers((prev) => ({
-            ...prev,
-            [e.over.id]: e.active.id,
-          }));
-        }
-        setActiveId(null);
-      }}
-    >
-      <div className="main-container-component">
-        <div
-          className="div-forall"
-          style={{ gap: "10px", marginBottom: "50px" }}
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+          width: "100%",
+          maxWidth: "980px",
+          margin: "0 auto",
+          padding: "10px 18px 20px 18px",
+          boxSizing: "border-box",
+        }}
+      >
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin: 0,
+          }}
         >
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">J</span> Read, look, and write the
-            answers.
-          </h1>
+          <span className="WB-ex-A">I</span> Look, read, and write ✓.
+        </h1>
 
-          <div className="flex flex-col gap-8">
-            <div className="w-full flex justify-center">
-              <img
-                src={imgBedroom}
-                alt="Bedroom Scene"
-                className="max-h-[350px] w-full object-cover rounded-2xl border-gray-50"
-              />
-            </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            width: "100%",
+          }}
+        >
+          {ITEMS.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                position: "relative",
+                display: "grid",
+                gridTemplateColumns: "360px 1fr",
+                gap: "18px",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              {/* left side */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "12px",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: "700",
+                    color: "#222",
+                    minWidth: "18px",
+                    lineHeight: "1",
+                    marginTop: "10px",
+                  }}
+                >
+                  {item.id}
+                </span>
 
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="flex-1 space-y-8">
-                <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
-                    1. How many pairs of shoes does she have?
-                  </p>
-                  <DropSlot
-                    id="q1"
-                    content={answers.q1}
-                    isCorrect={answers.q1 === CORRECT_J.q1}
-                    isSubmitted={showResults}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
-                    2. How many shirts does she have?
-                  </p>
-                  <DropSlot
-                    id="q2"
-                    content={answers.q2}
-                    isCorrect={answers.q2 === CORRECT_J.q2}
-                    isSubmitted={showResults}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
-                    3. How many skirts does she have?
-                  </p>
-                  <DropSlot
-                    id="q3"
-                    content={answers.q3}
-                    isCorrect={answers.q3 === CORRECT_J.q3}
-                    isSubmitted={showResults}
-                  />
-                </div>
+                <img
+                  src={item.img}
+                  alt={`question-${item.id}`}
+                  style={{
+                    width: "310px",
+                    height: "150px",
+                    objectFit: "contain",
+                    display: "block",
+                    flexShrink: 0,
+                  }}
+                />
               </div>
 
-              <div className="w-full md:w-72 bg-blue-50 p-5 rounded-2xl border-2 border-blue-100 h-fit">
-                <h3 className="font-bold text-blue-800 mb-4 text-center">
-                  Answers Bank
-                </h3>
+              {/* right side */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  width: "100%",
+                }}
+              >
+                {item.options.map((option, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 50px",
+                      gap: "14px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "26px",
+                        lineHeight: "1.35",
+                        color: "#222",
+                      }}
+                    >
+                      {option}
+                    </p>
 
-                <div className="flex flex-col gap-3">
-                  <SortableContext items={SENTENCES_J.map((s) => s.id)}>
-                    {SENTENCES_J.map((s) => (
-                      <DraggableSentence
-                        key={s.id}
-                        item={s}
-                        isUsed={Object.values(answers).includes(s.id)}
-                      />
-                    ))}
-                  </SortableContext>
-                </div>
+                    {renderCheckBox(item.id, option)}
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
 
-          <div className="mt-10 flex justify-center">
-            <Button
-              handleShowAnswer={() => {
-                setAnswers(CORRECT_J);
-                setShowResults(true);
-              }}
-              handleStartAgain={() => {
-                setAnswers({ q1: null, q2: null, q3: null });
-                setShowResults(false);
-              }}
-              checkAnswers={checkAnswers}
-            />
-          </div>
+              {isWrong(item.id) && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-6px",
+                    right: "-6px",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    backgroundColor: "#ef4444",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                  }}
+                >
+                  ✕
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "8px",
+          }}
+        >
+          <Button
+            checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+          />
         </div>
       </div>
-
-      <DragOverlay>
-        {activeId ? (
-          <div className="p-3 bg-white border-2 border-blue-500 rounded-xl shadow-2xl text-blue-700 font-bold text-sm scale-105">
-            {SENTENCES_J.find((s) => s.id === activeId)?.text}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+    </div>
   );
-};
-
-export default WB_Unit8_Page49_Q1;
+}

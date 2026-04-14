@@ -1,202 +1,597 @@
-import React, { useState, useRef, useEffect } from "react";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import { useState, useRef, useLayoutEffect } from "react";
 import Button from "../Button";
-import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-import sound from "../../../assets/audio/WorkBook/p50q1.mp3";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgElephant from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex A 1.svg";
-import imgTube from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex A 2.svg";
-import imgGlue from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex A 3.svg";
-import imgBlue from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex A 4.svg";
-import imgCube from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex A 5.svg";
-import imgTune from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 50/Ex A 6.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/1.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/3.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/4.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/5.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/6.svg";
 
-const CORRECT_A = {
-  q1_1: "u",
-  q1_2: "e",
-  q2_1: "u",
-  q2_2: "e",
-  q3_1: "u",
-  q3_2: "e",
-  q4_1: "u",
-  q4_2: "e",
-  q5_1: "u",
-  q5_2: "e",
-  q6_1: "u",
-  q6_2: "e",
-};
-
-const OPTIONS = ["u", "e", "o", "a", "i"];
-
-const WORD_PARTS = [
-  { before: "h", middle: "g", after: "" },
-  { before: "t", middle: "b", after: "" },
-  { before: "gl", middle: "", after: "" },
-  { before: "bl", middle: "", after: "" },
-  { before: "c", middle: "b", after: "" },
-  { before: "t", middle: "n", after: "" },
+const WORDS = [
+  {
+    id: 1,
+    prefix: "",
+    suffix: "andmother",
+    correctChunk: "gr",
+    fullWord: "grandmother",
+    correctImage: 2,
+  },
+  {
+    id: 2,
+    prefix: "bus",
+    suffix: "",
+    correctChunk: "es",
+    fullWord: "buses",
+    correctImage: 1,
+  },
+  {
+    id: 3,
+    prefix: "",
+    suffix: "esent",
+    correctChunk: "pr",
+    fullWord: "present",
+    correctImage: 6,
+  },
+  {
+    id: 4,
+    prefix: "box",
+    suffix: "",
+    correctChunk: "es",
+    fullWord: "boxes",
+    correctImage: 3,
+  },
+  {
+    id: 5,
+    prefix: "",
+    suffix: "ize",
+    correctChunk: "pr",
+    fullWord: "prize",
+    correctImage: 4,
+  },
+  {
+    id: 6,
+    prefix: "sandwich",
+    suffix: "",
+    correctChunk: "es",
+    fullWord: "sandwiches",
+    correctImage: 5,
+  },
 ];
 
-const IMGS = [imgElephant, imgTube, imgGlue, imgBlue, imgCube, imgTune];
+const IMAGES = [
+  { id: 1, img: img1, alt: "buses" },
+  { id: 2, img: img2, alt: "grandmother" },
+  { id: 3, img: img3, alt: "boxes" },
+  { id: 4, img: img4, alt: "prize" },
+  { id: 5, img: img5, alt: "sandwiches" },
+  { id: 6, img: img6, alt: "present" },
+];
 
-const INITIAL_STATE = {
-  q1_1: "",
-  q1_2: "",
-  q2_1: "",
-  q2_2: "",
-  q3_1: "",
-  q3_2: "",
-  q4_1: "",
-  q4_2: "",
-  q5_1: "",
-  q5_2: "",
-  q6_1: "",
-  q6_2: "",
-};
+const CHUNKS = [
+  { id: "es-1", value: "es" },
+  { id: "gr-1", value: "gr" },
+  { id: "pr-2", value: "pr" },
+  { id: "pr-1", value: "pr" },
+  { id: "es-2", value: "es" },
+  { id: "es-3", value: "es" },
+];
 
-const WB_Unit8_Page50_Q1 = () => {
-  const [answers, setAnswers] = useState({ ...INITIAL_STATE });
+const ROW_HEIGHT = 72;
+
+const WB_Unit8_Page48_QA = () => {
+  const [chunkAnswers, setChunkAnswers] = useState({});
+  const [usedChunkIds, setUsedChunkIds] = useState({});
+  const [draggedChunk, setDraggedChunk] = useState(null);
+
+  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [showAns, setShowAns] = useState(false);
+
+  const [lines, setLines] = useState([]);
+
+  const containerRef = useRef(null);
+  const elementRefs = useRef({});
+
+  useLayoutEffect(() => {
+    const updateLines = () => {
+      if (!containerRef.current) return;
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+
+      const newLines = Object.entries(matches)
+        .map(([leftId, rightId]) => {
+          const leftEl = elementRefs.current[`left-${leftId}`];
+          const rightEl = elementRefs.current[`right-${rightId}`];
+
+          if (!leftEl || !rightEl) return null;
+
+          const leftRect = leftEl.getBoundingClientRect();
+          const rightRect = rightEl.getBoundingClientRect();
+
+          return {
+            id: `${leftId}-${rightId}`,
+            x1: leftRect.right - containerRect.left,
+            y1: leftRect.top + leftRect.height / 2 - containerRect.top,
+            x2: rightRect.left - containerRect.left,
+            y2: rightRect.top + rightRect.height / 2 - containerRect.top,
+          };
+        })
+        .filter(Boolean);
+
+      setLines(newLines);
+    };
+
+    updateLines();
+    window.addEventListener("resize", updateLines);
+    return () => window.removeEventListener("resize", updateLines);
+  }, [matches]);
+
+  const handleDragStart = (chunk) => {
+    if (showAns) return;
+    if (usedChunkIds[chunk.id]) return;
+    setDraggedChunk(chunk);
+  };
+
+  const handleDropChunk = (wordId) => {
+    if (showAns || !draggedChunk) return;
+
+    const oldChunkId = chunkAnswers[wordId]?.chunkId;
+
+    setChunkAnswers((prev) => ({
+      ...prev,
+      [wordId]: {
+        chunk: draggedChunk.value,
+        chunkId: draggedChunk.id,
+      },
+    }));
+
+    setUsedChunkIds((prev) => {
+      const updated = { ...prev, [draggedChunk.id]: true };
+      if (oldChunkId) delete updated[oldChunkId];
+      return updated;
+    });
+
+    setDraggedChunk(null);
+    setShowResults(false);
+  };
+
+  const handleLeftClick = (id) => {
+    if (showAns) return;
+    setSelectedLeft(id);
+    setShowResults(false);
+  };
+
+  const handleRightClick = (rightId) => {
+    if (showAns) return;
+    if (selectedLeft === null) return;
+
+    const newMatches = { ...matches };
+
+    Object.keys(newMatches).forEach((key) => {
+      if (newMatches[key] === rightId) {
+        delete newMatches[key];
+      }
+    });
+
+    newMatches[selectedLeft] = rightId;
+
+    setMatches(newMatches);
+    setSelectedLeft(null);
+    setShowResults(false);
+  };
+
+  const getItemResult = (item) => {
+    const chunkCorrect = chunkAnswers[item.id]?.chunk === item.correctChunk;
+    const matchCorrect = matches[item.id] === item.correctImage;
+    return chunkCorrect && matchCorrect;
+  };
+
+  const isWrongItem = (item) => {
+    if (!showResults) return false;
+    return !getItemResult(item);
+  };
 
   const checkAnswers = () => {
-    const allKeys = Object.keys(INITIAL_STATE);
-    const unanswered = allKeys.filter((k) => !answers[k]);
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
+    if (showAns) return;
+
+    const allChunksDone = WORDS.every((item) => chunkAnswers[item.id]?.chunk);
+    const allMatchesDone = WORDS.every((item) => matches[item.id]);
+
+    if (!allChunksDone || !allMatchesDone) {
+      ValidationAlert.info("Please complete all answers first.");
       return;
     }
 
-    setShowResults(true); // 👈 مهم
-
     let score = 0;
-    const total = allKeys.length;
-    allKeys.forEach((k) => {
-      if (answers[k] === CORRECT_A[k]) score++;
+    WORDS.forEach((item) => {
+      if (getItemResult(item)) score++;
     });
 
-    const msg = `Score: ${score} / ${total}`;
-    if (score === total) ValidationAlert.success(msg);
-    else if (score > 0) ValidationAlert.warning(msg);
-    else ValidationAlert.error(msg);
+    setShowResults(true);
+
+    if (score === WORDS.length) {
+      ValidationAlert.success(`Score: ${score} / ${WORDS.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${WORDS.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${WORDS.length}`);
+    }
   };
 
-  const handleReset = () => {
-    setAnswers({ ...INITIAL_STATE });
+  const handleShowAnswer = () => {
+    const correctChunks = {};
+    const correctUsed = {};
+    const correctMatches = {};
+    const usedIndexes = new Set();
+
+    WORDS.forEach((item) => {
+      const foundIndex = CHUNKS.findIndex(
+        (chunk, idx) =>
+          chunk.value === item.correctChunk && !usedIndexes.has(idx)
+      );
+
+      if (foundIndex !== -1) {
+        correctChunks[item.id] = {
+          chunk: CHUNKS[foundIndex].value,
+          chunkId: CHUNKS[foundIndex].id,
+        };
+        correctUsed[CHUNKS[foundIndex].id] = true;
+        usedIndexes.add(foundIndex);
+      }
+
+      correctMatches[item.id] = item.correctImage;
+    });
+
+    setChunkAnswers(correctChunks);
+    setUsedChunkIds(correctUsed);
+    setMatches(correctMatches);
+    setShowAns(true);
+    setShowResults(true);
+    setSelectedLeft(null);
+  };
+
+  const handleStartAgain = () => {
+    setChunkAnswers({});
+    setUsedChunkIds({});
+    setDraggedChunk(null);
+    setSelectedLeft(null);
+    setMatches({});
     setShowResults(false);
+    setShowAns(false);
+    setLines([]);
   };
-  const captions = [
-    { start: 0.56, end: 3.18, text: "Page 50, Phonics Exercise A." },
 
-    { start: 4.34, end: 6.34, text: "Listen and write the missing letters." },
+  const getDotColor = (side, id) => {
+    if (side === "left" && selectedLeft === id) return "#3b82f6";
 
-    { start: 7.46, end: 9.32, text: "1.huge." },
-    { start: 10.22, end: 12.14, text: "2.tube." },
+    const isConnected =
+      side === "left" ? !!matches[id] : Object.values(matches).includes(id);
 
-    { start: 13.2, end: 15.21, text: "3.glue" },
-    { start: 16, end: 18, text: "4.blue." },
+    return isConnected ? "#3b82f6" : "#9ca3af";
+  };
 
-    { start: 18.78, end: 21.39, text: "5.cube." },
-    { start: 22, end: 23.96, text: "6.tune." },
-  ];
+  const getLeftRowStyle = (itemId) => {
+    const isActive = selectedLeft === itemId;
+
+    return {
+      position: "relative",
+      height: `${ROW_HEIGHT}px`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "12px",
+      padding: "0 10px 0 8px",
+      borderRadius: "14px",
+      border: isActive ? "2px solid #3b82f6" : "2px solid transparent",
+      backgroundColor: isActive ? "rgba(59,130,246,0.08)" : "transparent",
+      boxShadow: isActive ? "0 0 0 3px rgba(59,130,246,0.12)" : "none",
+      transition: "all 0.2s ease",
+    };
+  };
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "10px", marginBottom: "50px" }}>
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+        }}
+      >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span> Listen and write the missing
-          letters.
+          <span className="WB-ex-A">A</span>
+          Look, write, and match.
         </h1>
-        <QuestionAudioPlayer src={sound} captions={captions} stopAtSecond={6.35} />
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-10">
-          {[1, 2, 3, 4, 5, 6].map((num, idx) => {
-            const parts = WORD_PARTS[idx];
-            const key1 = `q${num}_1`;
-            const key2 = `q${num}_2`;
+
+        {/* chunk bank */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          {CHUNKS.map((chunk) => {
+            const disabled = !!usedChunkIds[chunk.id];
 
             return (
-              <div key={num} className="flex flex-col items-center gap-3 p-4">
-                <div className="flex gap-4 justify-center items-center">
-                  <span className="self-start font-bold text-blue-900 text-lg">
-                    {num}
-                  </span>
-                  <img
-                    src={IMGS[idx]}
-                    alt="phonics"
-                    className="max-w-50 max-h-40 object-contain"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 text-xl font-bold text-gray-600">
-                  <span>{parts.before}</span>
-
-                  {/* select 1 */}
-                  <div className="relative">
-                    <select
-                      value={answers[key1]}
-                      onChange={(e) =>
-                        setAnswers({ ...answers, [key1]: e.target.value })
-                      }
-                      className="border-b-2 cursor-pointer pr-6"
-                    >
-                      <option value=""></option>
-                      {OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-
-                    {showResults &&
-                      answers[key1] &&
-                      answers[key1] !== CORRECT_A[key1] && (
-                        <span className="absolute right-0 top-3 -translate-y-1/2 text-white bg-red-500 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white">
-                          ✕
-                        </span>
-                      )}
-                  </div>
-
-                  {parts.middle && <span>{parts.middle}</span>}
-
-                  {/* select 2 */}
-                  <div className="relative">
-                    <select
-                      value={answers[key2]}
-                      onChange={(e) =>
-                        setAnswers({ ...answers, [key2]: e.target.value })
-                      }
-                      className="border-b-2 cursor-pointer pr-6"
-                    >
-                      <option value=""></option>
-                      {OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-
-                    {showResults &&
-                      answers[key2] &&
-                      answers[key2] !== CORRECT_A[key2] && (
-                        <span className="absolute right-0 top-3 -translate-y-1/2 text-white bg-red-500 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white">
-                          ✕
-                        </span>
-                      )}
-                  </div>
-
-                  {parts.after && <span>{parts.after}</span>}
-                </div>
+              <div
+                key={chunk.id}
+                draggable={!disabled && !showAns}
+                onDragStart={() => handleDragStart(chunk)}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "10px",
+                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
+                  color: "#fff",
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  cursor: disabled ? "not-allowed" : "grab",
+                  opacity: disabled ? 0.5 : 1,
+                  userSelect: "none",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                  minWidth: "52px",
+                  textAlign: "center",
+                }}
+              >
+                {chunk.value}
               </div>
             );
           })}
         </div>
 
-        <div className="mt-10 flex justify-center">
-          <Button
-            handleShowAnswer={() => {
-              setAnswers({ ...CORRECT_A });
-              setShowResults(true);
+        {/* matching area */}
+        <div
+          ref={containerRef}
+          style={{
+            position: "relative",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            gap: "90px",
+            padding: "10px 20px",
+            minHeight: "560px",
+          }}
+        >
+          {/* left side */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0",
+              width: "390px",
             }}
-            handleStartAgain={handleReset}
+          >
+            {WORDS.map((item) => (
+              <div key={item.id} style={getLeftRowStyle(item.id)}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    flex: 1,
+                    minHeight: "38px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      color: "#222",
+                      minWidth: "18px",
+                    }}
+                  >
+                    {item.id}
+                  </span>
+
+                  {item.prefix ? (
+                    <>
+                      <span
+                        style={{
+                          fontSize: "22px",
+                          color: "#222",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {item.prefix}
+                      </span>
+
+                      <div
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => handleDropChunk(item.id)}
+                        style={{
+                          minWidth: "88px",
+                          minHeight: "34px",
+                          borderBottom: "2px solid #444",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: chunkAnswers[item.id]?.chunk ? "#dc2626" : "#9ca3af",
+                          fontSize: "22px",
+                          lineHeight: "1",
+                          padding: "0 4px",
+                        }}
+                      >
+                        {chunkAnswers[item.id]?.chunk || ""}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => handleDropChunk(item.id)}
+                        style={{
+                          minWidth: "88px",
+                          minHeight: "34px",
+                          borderBottom: "2px solid #444",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: chunkAnswers[item.id]?.chunk ? "#dc2626" : "#9ca3af",
+                          fontSize: "22px",
+                          lineHeight: "1",
+                          padding: "0 4px",
+                        }}
+                      >
+                        {chunkAnswers[item.id]?.chunk || ""}
+                      </div>
+
+                      <span
+                        style={{
+                          fontSize: "22px",
+                          color: "#222",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {item.suffix}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                <div
+                  ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
+                  onClick={() => handleLeftClick(item.id)}
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    backgroundColor: getDotColor("left", item.id),
+                    cursor: showAns ? "default" : "pointer",
+                    flexShrink: 0,
+                    transition: "all 0.2s ease",
+                    boxShadow:
+                      selectedLeft === item.id
+                        ? "0 0 0 4px rgba(59,130,246,0.18)"
+                        : "none",
+                  }}
+                />
+
+                {isWrongItem(item) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: "-34px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      backgroundColor: "#ef4444",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                    }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* right side */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0",
+              width: "250px",
+            }}
+          >
+            {IMAGES.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  height: `${ROW_HEIGHT}px`,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                }}
+              >
+                <div
+                  ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
+                  onClick={() => handleRightClick(item.id)}
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    backgroundColor: getDotColor("right", item.id),
+                    cursor: showAns ? "default" : "pointer",
+                    flexShrink: 0,
+                    transition: "all 0.2s ease",
+                  }}
+                />
+
+                <div
+                  style={{
+                    width: "120px",
+                    height: "56px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src={item.img}
+                    alt={item.alt}
+                    style={{
+                      maxWidth: "110px",
+                      maxHeight: "52px",
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* lines */}
+          <svg
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+            }}
+          >
+            {lines.map((line) => (
+              <line
+                key={line.id}
+                x1={line.x1}
+                y1={line.y1}
+                x2={line.x2}
+                y2={line.y2}
+                stroke="#dc2626"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            ))}
+          </svg>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "8px",
+          }}
+        >
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
             checkAnswers={checkAnswers}
           />
         </div>
@@ -205,4 +600,4 @@ const WB_Unit8_Page50_Q1 = () => {
   );
 };
 
-export default WB_Unit8_Page50_Q1;
+export default WB_Unit8_Page48_QA;

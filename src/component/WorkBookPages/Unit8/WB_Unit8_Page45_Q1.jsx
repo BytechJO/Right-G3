@@ -1,239 +1,481 @@
 import React, { useState } from "react";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  DragOverlay,
-} from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import imgTie from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 45/Ex A 1.svg";
-import imgSocks from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 45/Ex A 2.svg";
-import imgCap from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 45/Ex A 3.svg";
-import imgDress from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 45/Ex A 4.svg";
-import imgCloset from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 45/Ex A 5.svg";
-import imgJacket from "../../../assets/imgs/WorkBook/Right Int WB G2 U8 Folder/Page 45/Ex A 6.svg";
 
-const CLOTHES = [
-  { id: "c1", text: "tie" },
-  { id: "c2", text: "socks" },
-  { id: "c3", text: "cap" },
-  { id: "c4", text: "dress" },
-  { id: "c5", text: "closet" },
-  { id: "c6", text: "jacket" },
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/1_8.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/2_8.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/3_6.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/4_6.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/5_6.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/6_8.svg";
+import img7 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/7_6.svg";
+
+const CELL_SIZE = 64;
+
+const ITEMS = [
+  {
+    id: 1,
+    img: img1,
+    answer: "radio",
+    pairs: [
+      { top: "r", bottom: "m" },
+      { top: "f", bottom: "a" },
+      { top: "d", bottom: "e" },
+      { top: "i", bottom: "w" },
+      { top: "a", bottom: "o" },
+    ],
+  },
+  {
+    id: 2,
+    img: img2,
+    answer: "tractor",
+    pairs: [
+      { top: "t", bottom: "y" },
+      { top: "w", bottom: "r" },
+      { top: "a", bottom: "b" },
+      { top: "c", bottom: "m" },
+      { top: "d", bottom: "t" },
+      { top: "e", bottom: "o" },
+      { top: "r", bottom: "k" },
+    ],
+  },
+  {
+    id: 3,
+    img: img3,
+    answer: "farm",
+    pairs: [
+      { top: "f", bottom: "k" },
+      { top: "s", bottom: "a" },
+      { top: "r", bottom: "x" },
+      { top: "e", bottom: "m" },
+    ],
+  },
+  {
+    id: 4,
+    img: img4,
+    answer: "cottage",
+    pairs: [
+      { top: "c", bottom: "h" },
+      { top: "p", bottom: "o" },
+      { top: "o", bottom: "t" },
+      { top: "t", bottom: "c" },
+      { top: "j", bottom: "a" },
+      { top: "g", bottom: "r" },
+      { top: "q", bottom: "e" },
+    ],
+  },
+  {
+    id: 5,
+    img: img5,
+    answer: "dog",
+    pairs: [
+      { top: "d", bottom: "v" },
+      { top: "w", bottom: "o" },
+      { top: "g", bottom: "z" },
+    ],
+  },
+  {
+    id: 6,
+    img: img6,
+    answer: "sheep",
+    pairs: [
+      { top: "t", bottom: "s" },
+      { top: "h", bottom: "d" },
+      { top: "e", bottom: "x" },
+      { top: "i", bottom: "e" },
+      { top: "p", bottom: "v" },
+    ],
+  },
+  {
+    id: 7,
+    img: img7,
+    answer: "horse",
+    pairs: [
+      { top: "h", bottom: "g" },
+      { top: "f", bottom: "o" },
+      { top: "r", bottom: "w" },
+      { top: "s", bottom: "q" },
+      { top: "e", bottom: "o" },
+    ],
+  },
 ];
 
-const CORRECT_ANSWERS = {
-  q1: "c1",
-  q2: "c2",
-  q3: "c3",
-  q4: "c4",
-  q5: "c5",
-  q6: "c6",
-};
-
-function DraggableItem({ item, isUsed }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging || isUsed ? 0.5 : 1,
-  };
+function DiagonalChoiceCell({
+  pair,
+  selected,
+  disabled,
+  onSelectTop,
+  onSelectBottom,
+}) {
+  const topActive = selected === "top";
+  const bottomActive = selected === "bottom";
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`px-4 py-1 bg-white border-2 border-gray-300 rounded-full shadow-sm cursor-grab text-blue-600 font-medium ${
-        isUsed
-          ? "bg-gray-100 text-gray-400 pointer-events-none"
-          : "hover:border-blue-400"
-      }`}
+      style={{
+        position: "relative",
+        width: `${CELL_SIZE}px`,
+        height: `${CELL_SIZE}px`,
+        border: "2px solid #2b2b2b",
+        borderRadius: "10px",
+        backgroundColor: "#fff",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        flexShrink: 0,
+      }}
     >
-      {item.text}
-    </div>
-  );
-}
+      {/* Top clickable area */}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onSelectTop}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          clipPath: "polygon(0 0, 100% 0, 0 100%)",
+          border: "none",
+          backgroundColor: topActive ? "#fde68a" : "transparent",
+          cursor: disabled ? "default" : "pointer",
+          zIndex: 1,
+        }}
+      />
 
-function DropSlot({ id, content, isCorrect, isSubmitted }) {
-  const { setNodeRef, isOver } = useSortable({ id });
+      {/* Bottom clickable area */}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onSelectBottom}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          clipPath: "polygon(100% 0, 100% 100%, 0 100%)",
+          border: "none",
+          backgroundColor: bottomActive ? "#fde68a" : "transparent",
+          cursor: disabled ? "default" : "pointer",
+          zIndex: 1,
+        }}
+      />
 
-  const borderColor = isSubmitted
-    ? "border-blue-400 bg-blue-50"
-    : isOver
-      ? "border-blue-400 bg-blue-50"
-      : "border-gray-300";
-
-  const isWrong = isSubmitted && content && !isCorrect;
-
-  return (
-    <div className="relative inline-block">
-      <div
-        ref={setNodeRef}
-        className={`w-32 h-10 border-b-2 flex items-center justify-center transition-all ${borderColor}`}
+      {/* diagonal */}
+      <svg
+        width={CELL_SIZE}
+        height={CELL_SIZE}
+        viewBox={`0 0 ${CELL_SIZE} ${CELL_SIZE}`}
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
       >
-        {content ? (
-          <span
-            className={`font-bold`}
-          >
-            {CLOTHES.find((c) => c.id === content).text}
-          </span>
-        ) : (
-          <span className="text-gray-200 italic text-sm">drop here</span>
-        )}
-      </div>
+        <line
+          x1="2"
+          y1={CELL_SIZE - 2}
+          x2={CELL_SIZE - 2}
+          y2="2"
+          stroke="#2b2b2b"
+          strokeWidth="2"
+        />
+      </svg>
 
-      {isWrong && (
-        <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow border-2 border-white">
-          ✕
-        </div>
-      )}
+      {/* letters */}
+      <span
+        style={{
+          position: "absolute",
+          top: "8px",
+          left: "14px",
+          fontSize: "30px",
+          fontWeight: "500",
+          color: "#111",
+          zIndex: 3,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        {pair.top}
+      </span>
+
+      <span
+        style={{
+          position: "absolute",
+          right: "12px",
+          bottom: "6px",
+          fontSize: "30px",
+          fontWeight: "500",
+          color: "#111",
+          zIndex: 3,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        {pair.bottom}
+      </span>
     </div>
   );
 }
 
-const WB_Unit8_Page45_Q1 = () => {
-  const [answers, setAnswers] = useState({
-    q1: null,
-    q2: null,
-    q3: null,
-    q4: null,
-    q5: null,
-    q6: null,
-  });
-  const [activeId, setActiveId] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+export default function WB_Unit8_Page45_QA() {
+  const [selections, setSelections] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const buildWord = (itemId) => {
+    const item = ITEMS.find((x) => x.id === itemId);
+    const current = selections[itemId] || [];
 
-  const checkAnswers = () => {
-    const unanswered = Object.keys(CORRECT_ANSWERS).filter(
-      (id) => !answers[id]
-    );
+    return item.pairs
+      .map((pair, index) => {
+        const side = current[index];
+        if (side === "top") return pair.top;
+        if (side === "bottom") return pair.bottom;
+        return "";
+      })
+      .join("");
+  };
 
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
+  const isRowComplete = (item) => {
+    const current = selections[item.id] || [];
+    return current.length === item.pairs.length && current.every(Boolean);
+  };
+
+  const isRowCorrect = (item) => {
+    return buildWord(item.id).toLowerCase() === item.answer.toLowerCase();
+  };
+
+  const handleSelect = (itemId, index, side) => {
+    if (showAns) return;
+
+    setSelections((prev) => {
+      const current = prev[itemId] ? [...prev[itemId]] : [];
+      current[index] = side;
+      return {
+        ...prev,
+        [itemId]: current,
+      };
+    });
+  };
+
+  const handleCheck = () => {
+    const allAnswered = ITEMS.every((item) => isRowComplete(item));
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all words first.");
       return;
     }
 
-    setShowResults(true);
-
     let score = 0;
-    let total = Object.keys(CORRECT_ANSWERS).length;
-
-    Object.keys(CORRECT_ANSWERS).forEach((id) => {
-      if (answers[id] === CORRECT_ANSWERS[id]) score++;
+    ITEMS.forEach((item) => {
+      if (isRowCorrect(item)) score++;
     });
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
+    setChecked(true);
+
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
     }
   };
 
+  const handleShowAnswer = () => {
+    const solved = {};
+
+    ITEMS.forEach((item) => {
+      solved[item.id] = item.pairs.map((pair, index) => {
+        const expected = item.answer[index];
+        return pair.top.toLowerCase() === expected ? "top" : "bottom";
+      });
+    });
+
+    setSelections(solved);
+    setChecked(true);
+    setShowAns(true);
+  };
+
+  const handleReset = () => {
+    setSelections({});
+    setChecked(false);
+    setShowAns(false);
+  };
+
+  const getLineWidth = (answer) => {
+    return Math.max(220, answer.length * 30);
+  };
+
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={(e) => setActiveId(e.active.id)}
-      onDragEnd={(e) => {
-        if (e.over) {
-          setAnswers((prev) => ({ ...prev, [e.over.id]: e.active.id }));
-        }
-        setActiveId(null);
-      }}
-    >
-      <div className="main-container-component">
-        <div className="div-forall" style={{ gap: "10px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span>
-            Look and write.
-          </h1>
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          width: "100%",
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
+      >
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">A</span>
+          Find and write the words.
+        </h1>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-8 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-            <SortableContext items={CLOTHES.map((c) => c.id)}>
-              {CLOTHES.map((c) => (
-                <DraggableItem
-                  key={c.id}
-                  item={c}
-                  isUsed={Object.values(answers).includes(c.id)}
-                />
-              ))}
-            </SortableContext>
-          </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "18px",
+            width: "100%",
+          }}
+        >
+          {ITEMS.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(420px, 1fr) 110px minmax(240px, 340px)",
+                gap: "22px",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              {/* Number + cells */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  minWidth: 0,
+                }}
+              >
+                <div
+                  style={{
+                    width: "28px",
+                    textAlign: "center",
+                    fontSize: "24px",
+                    fontWeight: "700",
+                    color: "#111",
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.id}
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <div key={num} className="flex items-center gap-4">
-                <span className="font-bold text-blue-900 text-xl">{num}</span>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "2px",
+                    minWidth: 0,
+                  }}
+                >
+                  {item.pairs.map((pair, index) => (
+                    <DiagonalChoiceCell
+                      key={`${item.id}-${index}`}
+                      pair={pair}
+                      selected={(selections[item.id] || [])[index]}
+                      disabled={showAns}
+                      onSelectTop={() => handleSelect(item.id, index, "top")}
+                      onSelectBottom={() => handleSelect(item.id, index, "bottom")}
+                    />
+                  ))}
+                </div>
+              </div>
 
+              {/* image */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <img
-                  src={
-                    [imgTie, imgSocks, imgCap, imgDress, imgCloset, imgJacket][
-                      num - 1
-                    ]
-                  }
-                  alt="cloth"
-                  className="max-w-42 max-h-42 object-contain"
-                />
-
-                <DropSlot
-                  id={`q${num}`}
-                  content={answers[`q${num}`]}
-                  isCorrect={answers[`q${num}`] === CORRECT_ANSWERS[`q${num}`]}
-                  isSubmitted={showResults}
+                  src={item.img}
+                  alt={`item-${item.id}`}
+                  style={{
+                    width: "84px",
+                    height: "84px",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
                 />
               </div>
-            ))}
-          </div>
 
-          <div className="mt-10 flex justify-center">
-            <Button
-              handleShowAnswer={() => {
-                setAnswers(CORRECT_ANSWERS);
-                setShowResults(true);
-              }}
-              handleStartAgain={() => {
-                setAnswers({
-                  q1: null,
-                  q2: null,
-                  q3: null,
-                  q4: null,
-                  q5: null,
-                  q6: null,
-                });
-                setShowResults(false);
-              }}
-              checkAnswers={checkAnswers}
-            />
-          </div>
+              {/* answer */}
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${getLineWidth(item.answer)}px`,
+                    maxWidth: "100%",
+                    minHeight: "40px",
+                    borderBottom: "2px solid #666",
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "24px",
+                    color: buildWord(item.id) ? "#dc2626" : "#222",
+                    fontWeight: "500",
+                    paddingBottom: "2px",
+                    textTransform: "lowercase",
+                  }}
+                >
+                  {buildWord(item.id)}
+                </div>
+
+                {checked && isRowComplete(item) && !isRowCorrect(item) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-8px",
+                      right: "-8px",
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      backgroundColor: "#ef4444",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "13px",
+                      fontWeight: "700",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                    }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "8px",
+          }}
+        >
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+            checkAnswers={handleCheck}
+          />
         </div>
       </div>
-
-      <DragOverlay>
-        {activeId ? (
-          <div className="px-4 py-1 bg-white border-2 border-blue-500 rounded-full shadow-xl text-blue-600 font-bold">
-            {CLOTHES.find((c) => c.id === activeId).text}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+    </div>
   );
-};
-
-export default WB_Unit8_Page45_Q1;
+}
