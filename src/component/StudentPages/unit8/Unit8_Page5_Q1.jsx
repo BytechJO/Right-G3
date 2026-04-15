@@ -1,163 +1,228 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useRef, useEffect } from "react";
+import "./Unit8_Page5_Q1.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
-
-import blue from "../../../assets/audio/ClassBook/U 8/Pg64_1.2_Adult Lady.mp3";
-import home from "../../../assets/audio/ClassBook/U 7/Pg58_1.4_Adult Lady.mp3";
-import caot from "../../../assets/audio/ClassBook/U 7/Pg59_1.3_Adult Lady.mp3";
-import boat from "../../../assets/audio/ClassBook/U 7/Pg58_1.2_Adult Lady.mp3";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 6.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 7.svg";
+import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 8.svg";
 
 const Unit8_Page5_Q1 = () => {
-  const items = [
-    { img: img1, audio: caot, correct: "no" },
-    { img: img2, audio: boat, correct: "no" },
-    { img: img3, audio: blue, correct: "yes" },
-    { img: img4, audio: home, correct: "yes" },
-  ];
-
-  const [selected, setSelected] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
 
-  const playAudio = (src) => {
-    const audio = new Audio(src);
-    audio.play();
+  const questions = [
+    {
+      id: 1,
+      image1: img1,
+      image2: img2,
+      correct: "✓",
+    },
+    { id: 2, image1: img3, image2: img4, correct: "✓" },
+    {
+      id: 3,
+      image1: img5,
+      image2: img6,
+      correct: "✗",
+    },
+    { id: 4, image1: img7, image2: img8, correct: "✗" },
+  ];
+
+  const [answers, setAnswers] = useState({});
+  const [showResult, setShowResult] = useState([]);
+
+  const selectAnswer = (id, value) => {
+    if (locked) return;
+    setAnswers({ ...answers, [id]: value });
+    setShowResult(false);
   };
 
-  const choose = (i, value) => {
-    if (locked) return;
-
-    const updated = [...selected];
-    updated[i] = value;
-    setSelected(updated);
+  const showAnswers = () => {
+    const corrects = {};
+    questions.forEach((q) => {
+      corrects[q.id] = q.correct;
+    });
+    setAnswers(corrects);
+    setShowResult([]);
+    setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
-
-    if (selected.includes("")) {
-      ValidationAlert.info("Please answer all questions.");
+    const isEmpty = questions.some((q) => !answers[q.id]);
+    if (isEmpty) {
+      ValidationAlert.info("Please choose ✓ or ✗ for all questions!");
       return;
     }
 
-    let score = 0;
+    const results = questions.map((q) =>
+      answers[q.id] === q.correct ? "correct" : "wrong",
+    );
+    setShowResult(results);
+    setLocked(true);
 
-    items.forEach((item, i) => {
-      if (selected[i] === item.correct) score++;
-    });
+    const correctCount = results.filter((r) => r === "correct").length;
+    const total = questions.length;
+    const scoreMsg = `${correctCount} / ${total}`;
 
-    const total = items.length;
+    let color =
+      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
 
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
-
-    const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-        Score: ${score} / ${total}
+    const resultHTML = `
+      <div style="font-size: 20px; text-align:center; margin-top: 8px;">
+        <span style="color:${color}; font-weight:bold;">
+          Score: ${scoreMsg}
         </span>
       </div>
     `;
 
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setLocked(true);
+    if (correctCount === total) ValidationAlert.success(resultHTML);
+    else if (correctCount === 0) ValidationAlert.error(resultHTML);
+    else ValidationAlert.warning(resultHTML);
   };
 
-  const showAnswers = () => {
-    setSelected(items.map((i) => i.correct));
-    setLocked(true);
-  };
-
-  const reset = () => {
-    setSelected(Array(items.length).fill(""));
+  const resetAnswers = () => {
+    setAnswers({});
+    setShowResult([]);
     setLocked(false);
   };
 
   return (
-    <div className="flex justify-center p-8">
-      <div className="w-[80%]">
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "20px" }}>
-            A
-          </span>
-          <span style={{ marginRight: "20px", color: "#2e3192" }}>1</span>
-          Does it have a <span style={{ color: "#2e3192" }}>long u</span>?
-          Listen and write<span style={{ color: "#2e3192" }}> ✓ </span>or
-          <span style={{ color: "#2e3192" }}> ✗</span>
-        </h5>
+    <>
+      <div
+        className="u8p5-wrapper"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "30px",
+        }}
+      >
+        <div
+          className="div-forall"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "30px",
+            width: "60%",
+            justifyContent: "flex-start",
+          }}
+        >
+          <h5 className="header-title-page8">
+            <span className="ex-A" style={{ marginRight: "10px" }}>
+              A
+            </span>{" "}
+            <span style={{ color: "#2e3192" }}>1</span> Do they both have the
+            same <span style={{ color: "#2e3192" }}>consonant blend</span>?
+            Write <span style={{ color: "#D52328" }}>✓</span> or{" "}
+            <span style={{ color: "#D52328" }}>✗</span>.
+          </h5>
 
-        {/* GRID */}
-        <div className="grid grid-cols-4 gap-3 mt-10">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-center gap-3 relative mt-4"
+          <div className="grid grid-cols-4 gap-[30px] mt-5 u8p5-grid">
+            {questions.map((q, index) => (
+              <div
+                key={q.id}
+                className="u8p5-card p-4 bg-white flex flex-col items-center gap-3 relative"
+              >
+                {/* رقم السؤال */}
+                <p className="w-full text-left text-[20px] u8p5-card-num">
+                  <span className="text-[darkblue] font-bold">{q.id}.</span>
+                </p>
+
+                <div className="flex flex-col items-center gap-3.5">
+                  {/* الصور */}
+                  <div className="u8p5-images-box border-2 border-[#ff6b57] rounded-xl p-4 w-[200px]">
+                    <div className="flex">
+                      {/* الديف الأول */}
+                      <div className="u8p5-img-cell w-1/2 border-r-2 border-[#ff6b57] flex items-center justify-center h-[150px]">
+                        <img
+                          src={q.image1}
+                          alt=""
+                          style={{ height: "120px", objectFit: "contain" }}
+                        />
+                      </div>
+
+                      {/* الديف الثاني */}
+                      <div className="u8p5-img-cell w-1/2 flex items-center justify-center h-[150px]">
+                        <img
+                          src={q.image2}
+                          alt=""
+                          style={{ height: "120px", objectFit: "contain" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* الخيارات */}
+                  <div className="u8p5-opts-row flex gap-5">
+                    {/* ✓ */}
+                    <div className="relative">
+                      <div
+                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 hover:bg-[#ffe3df] ${
+                          answers[q.id] === "✓"
+                            ? "bg-[#2c5287] text-white"
+                            : "bg-white"
+                        }`}
+                        onClick={() => selectAnswer(q.id, "✓")}
+                      >
+                        ✓
+                      </div>
+
+                      {showResult[index] === "wrong" &&
+                        answers[q.id] === "✓" && (
+                          <div className="u8p5-wrong-badge absolute -top-2.5 -right-2.5 w-[22px] h-[22px] rounded-full bg-red-500 text-white flex items-center justify-center text-[14px] font-bold border-2 border-white z-3">
+                            ✕
+                          </div>
+                        )}
+                    </div>
+
+                    {/* ✗ */}
+                    <div className="relative">
+                      <div
+                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${
+                          answers[q.id] === "✗"
+                            ? "bg-[#2c5287] text-white"
+                            : "bg-white hover:bg-[#ffe3df]"
+                        }`}
+                        onClick={() => selectAnswer(q.id, "✗")}
+                      >
+                        ✗
+                      </div>
+
+                      {showResult[index] === "wrong" &&
+                        answers[q.id] === "✗" && (
+                          <div className="u8p5-wrong-badge absolute -top-2.5 -right-2.5 w-[22px] h-[22px] rounded-full bg-red-500 text-white flex items-center justify-center text-[14px] font-bold border-2 border-white z-3">
+                            ✕
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="action-buttons-container">
+            <button onClick={resetAnswers} className="try-again-button">
+              Start Again ↻
+            </button>
+            <button
+              onClick={showAnswers}
+              className="show-answer-btn swal-continue"
             >
-              {/* number in corner */}
-              <span className="absolute -top-1 -left-1 text-lg font-bold">
-                {i + 1}
-              </span>
-
-              {/* image + audio */}
-              <div className="flex flex-col items-center">
-                <img
-                  src={item.img}
-                  className="w-[150px]! h-[150px]! object-contain"
-                />
-
-                <button
-                  onClick={() => playAudio(item.audio)}
-                  className="text-2xl mt-1"
-                >
-                  🔊
-                </button>
-              </div>
-
-              {/* answers on right */}
-              <div className="flex flex-col gap-2 justify-center h-[150px]">
-                <button
-                  onClick={() => choose(i, "yes")}
-                  className={`w-10 h-10 border rounded text-lg ${
-                    selected[i] === "yes" ? "bg-green-500 text-white" : ""
-                  }`}
-                >
-                  ✓
-                </button>
-
-                <button
-                  onClick={() => choose(i, "no")}
-                  className={`w-10 h-10 border rounded text-lg ${
-                    selected[i] === "no" ? "bg-red-500 text-white" : ""
-                  }`}
-                >
-                  ✗
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* buttons */}
-        <div className="action-buttons-container">
-          <button onClick={reset} className="try-again-button">
-            Start Again ↻
-          </button>
-
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
+              Show Answer
+            </button>
+            <button onClick={checkAnswers} className="check-button2">
+              Check Answer ✓
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

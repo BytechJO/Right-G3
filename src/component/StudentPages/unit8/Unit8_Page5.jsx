@@ -1,4 +1,4 @@
-import page_5 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0068.jpg";
+import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68.png";
 import "./Unit8_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 const Unit8_Page5 = ({ openPopup }) => {
@@ -17,7 +17,7 @@ const Unit8_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 77 })}
+          onClick={() => openPopup("exercise", { startIndex: 68 })}
           style={{ overflow: "visible" }}
         >
           <image
@@ -39,7 +39,7 @@ const Unit8_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 80 })}
+          onClick={() => openPopup("exercise", { startIndex: 71 })}
           style={{ overflow: "visible" }}
         >
           <image
@@ -61,7 +61,7 @@ const Unit8_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 78 })}
+          onClick={() => openPopup("exercise", { startIndex: 69 })}
           style={{ overflow: "visible" }}
         >
           <image
@@ -83,7 +83,7 @@ const Unit8_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 79 })}
+          onClick={() => openPopup("exercise", { startIndex: 70 })}
           style={{ overflow: "visible" }}
         >
           <image
