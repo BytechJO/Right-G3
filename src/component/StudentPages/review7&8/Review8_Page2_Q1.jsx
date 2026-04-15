@@ -1,431 +1,353 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useRef, useEffect } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useState } from "react";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  MouseSensor,
+  TouchSensor,
+  DragOverlay,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
-import sound1 from "../../../assets/audio/ClassBook/U 6/Pg53_1.1_Adult Lady.mp3";
-import { TbMessageCircle } from "react-icons/tb";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
-const Review8_Page2_Q1 = () => {
-  const audioRef = useRef(null);
-  const [showContinue, setShowContinue] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
-  const stopAtSecond = 3.5;
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل بعد Show Answer
+import Button from "../../Button";
+import WrongMark from "../../WrongMark";
+import sound from "../../../assets/audio/ClassBook/Unit 2/P 19/CD15.Pg19_Instruction1_Adult Lady.mp3";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 6.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 7.svg";
+import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 8.svg";
+import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 9.svg";
+import img10 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 10.svg";
+import img11 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 11.svg";
+import img12 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 12.svg";
+import img13 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 13.svg";
+import img14 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 14.svg";
+import img15 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 15.svg";
+import img16 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 16.svg";
+import img17 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 17.svg";
+import img18 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 18.svg";
+import img19 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 19.svg";
+import img20 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 20.svg";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
-  const [showSettings, setShowSettings] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const settingsRef = useRef(null);
-  const [forceRender, setForceRender] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showCaption, setShowCaption] = useState(false);
+/* ===== البيانات ===== */
 
-  // ================================
-  // ✔ Captions Array
-  // ================================
-  const captions = [
-    {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
-    },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
-  ];
+const LETTERS = [
+  "j",
+  "v",
+  "w",
+  "c",
+  "y",
+  "n",
+  "k",
+  "b",
+  "m",
+  "f",
+  "x",
+  "e",
+  "s",
+  "z",
+  "t",
+  "h",
+  "a",
+  "d",
+];
+const ITEMS = [
+  { id: "q1", word: "January", img: img1, correct: "j" },
+  { id: "q2", word: "van", img: img2, correct: "v" },
+  { id: "q3", word: "wagon", img: img3, correct: "w" },
+  { id: "q4", word: "cat", img: img4, correct: "c" },
+  { id: "q5", word: "yo-yo", img: img5, correct: "y" },
 
-  // ================================
-  // ✔ Update caption highlight
-  // ================================
-  const updateCaption = (time) => {
-    const index = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end,
-    );
-    setActiveIndex(index);
-  };
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  { id: "q6", word: "jeep", img: img6, correct: "j" },
+  { id: "q7", word: "nine", img: img7, correct: "n" },
+  { id: "q8", word: "kite", img: img8, correct: "k" },
+  { id: "q9", word: "bubbles", img: img9, correct: "b" },
+  { id: "q10", word: "moon", img: img10, correct: "m" },
 
-    audio.currentTime = 0;
-    audio.play();
+  { id: "q11", word: "food", img: img11, correct: "f" },
+  { id: "q12", word: "book", img: img12, correct: "b" },
+  { id: "q13", word: "x-ray", img: img13, correct: "x" },
+  { id: "q14", word: "elephant", img: img14, correct: "e" },
+  { id: "q15", word: "snail", img: img15, correct: "s" },
 
-    const interval = setInterval(() => {
-      if (audio.currentTime >= stopAtSecond) {
-        audio.pause();
-        setPaused(true);
-        setIsPlaying(false);
-        setShowContinue(true);
-        clearInterval(interval);
-      }
-    }, 100);
+  { id: "q16", word: "zebra", img: img16, correct: "z" },
+  { id: "q17", word: "tomato", img: img17, correct: "t" },
+  { id: "q18", word: "house", img: img18, correct: "h" },
+  { id: "q19", word: "apple", img: img19, correct: "a" },
+  { id: "q20", word: "dog", img: img20, correct: "d" },
+];
+const captions = [
+  {
+    start: 0,
+    end: 4.23,
+    text: "Page 8. Right Activities. Exercise A, number 1. ",
+  },
+  {
+    start: 4.25,
+    end: 8.28,
+    text: "Listen and write the missing letters. Number the pictures.  ",
+  },
+  { start: 8.3, end: 11.05, text: "1-tiger." },
+  { start: 11.07, end: 13.12, text: "2-taxi." },
+  { start: 13.14, end: 15.14, text: "3-duck." },
+  { start: 15.16, end: 17.13, text: "4-deer." },
+];
+/* ===== draggable ===== */
 
-    // عند انتهاء الأوديو يرجع يبطل أنيميشن + يظهر Continue
-    const handleEnded = () => {
-      const audio = audioRef.current;
-      audio.currentTime = 0; // ← يرجع للبداية
-      setIsPlaying(false);
-      setPaused(false);
-      setActiveIndex(null);
-      setShowContinue(true);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      clearInterval(interval);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setForceRender((prev) => prev + 1);
-    }, 1000); // كل ثانية
-    if (activeIndex === -1 || activeIndex === null) return;
-
-    const el = document.getElementById(`caption-${activeIndex}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    return () => clearInterval(timer);
-  }, [activeIndex]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-
-    if (!audio) return;
-
-    if (audio.paused) {
-      audio.play();
-      setPaused(false);
-      setIsPlaying(true);
-    } else {
-      audio.pause();
-      setPaused(true);
-      setIsPlaying(false);
-    }
-  };
-  const questions = [
-    {
-      id: 1,
-      image: img1,
-      correct: "✓",
-    },
-    { id: 2, image: img2, correct: "✗" },
-    {
-      id: 3,
-      image: img3,
-      correct: "✓",
-    },
-    {
-      id: 4,
-      image: img4,
-      correct: "✓",
-    },
-  ];
-
-  const [answers, setAnswers] = useState({});
-  const [showResult, setShowResult] = useState([]);
-
-  const selectAnswer = (id, value) => {
-    if (locked) return; // 🔒 ممنوع التعديل بعد Show Answer
-    setAnswers({ ...answers, [id]: value });
-    setShowResult(false);
-  };
-  const showAnswers = () => {
-    const corrects = {};
-    questions.forEach((q) => {
-      corrects[q.id] = q.correct; // ✓ أو ✗
-    });
-
-    setAnswers(corrects);
-    setShowResult([]); // إخفاء كل X
-    setLocked(true); // 🔒 قفل التعديل
-  };
-
-  const checkAnswers = () => {
-    if (locked) return;
-    // 1) فحص الخانات الفارغة
-    const isEmpty = questions.some((q) => !answers[q.id]);
-    if (isEmpty) {
-      ValidationAlert.info("Please choose ✓ or ✗ for all questions!");
-      return;
-    }
-
-    // 2) مقارنة الإجابات
-    const results = questions.map((q) =>
-      answers[q.id] === q.correct ? "correct" : "wrong",
-    );
-
-    setShowResult(results);
-    setLocked(true); // 🔒 قفل التعديل
-    // 3) حساب السكور
-    const correctCount = results.filter((r) => r === "correct").length;
-    const total = questions.length;
-    const scoreMsg = `${correctCount} / ${total}`;
-
-    let color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
-
-    const resultHTML = `
-      <div style="font-size: 20px; text-align:center; margin-top: 8px;">
-        <span style="color:${color}; font-weight:bold;">
-          Score: ${scoreMsg}
-        </span>
-      </div>
-    `;
-
-    if (correctCount === total) ValidationAlert.success(resultHTML);
-    else if (correctCount === 0) ValidationAlert.error(resultHTML);
-    else ValidationAlert.warning(resultHTML);
-  };
-
-  const resetAnswers = () => {
-    setAnswers({});
-    setShowResult([]);
-    setLocked(false); // ← مهم جداً
-  };
+function DraggableLetter({ item, locked }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: item, disabled: locked });
 
   return (
     <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
+        transform: CSS.Transform.toString(transform),
+        transition,
+        display: "inline-flex",
         alignItems: "center",
-        padding: "30px",
+        justifyContent: "center",
+        padding: "6px 10px",
+        border: "2px solid #e5e7eb",
+        borderRadius: "8px",
+        background: "white",
+        fontWeight: "bold",
+        fontSize: "18px",
+        cursor: "grab",
+        minWidth: "35px",
+        touchAction: "none", // مهم جدا
+        userSelect: "none",
+        WebkitUserSelect: "none",
+      }}
+    >
+      {item}
+    </div>
+  );
+}
+
+/* ===== drop slot ===== */
+
+function DropSlot({ id, content }) {
+  const { setNodeRef } = useSortable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        position: "relative",
+        width: "30px",
+        height: "30px",
+        border: "2px solid #F79530", // 🔥 نفس اللون
+        borderRadius: "6px",
+        background: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: "bold",
+        fontSize: "16px",
+      }}
+    >
+      {content && (
+        <span
+          style={{
+            color: content ? "#1C398E" : "#000",
+          }}
+        >
+          {content}
+        </span>
+      )}
+    </div>
+  );
+}
+/* ===== main ===== */
+
+const Review8_Page2_Q1 = () => {
+  const [answers, setAnswers] = useState(
+    Object.fromEntries(ITEMS.map((i) => [i.id, null])),
+  );
+  const [activeId, setActiveId] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+  const [locked, setLocked] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+    useSensor(PointerSensor),
+  );
+
+  const checkAnswers = () => {
+    if (locked) return;
+
+    if (Object.values(answers).includes(null)) {
+      ValidationAlert.info();
+      return;
+    }
+
+    let score = 0;
+
+    ITEMS.forEach((item) => {
+      if (answers[item.id] === item.correct) score++;
+    });
+
+    const total = ITEMS.length;
+
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
+
+    setShowResults(true);
+    setLocked(true);
+  };
+
+  const handleReset = () => {
+    setAnswers(Object.fromEntries(ITEMS.map((i) => [i.id, null])));
+    setShowResults(false);
+    setLocked(false);
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={(e) => setActiveId(e.active.id)}
+      onDragEnd={(e) => {
+        if (locked) return;
+        if (e.over) {
+          setAnswers((prev) => ({
+            ...prev,
+            [e.over.id]: e.active.id,
+          }));
+        }
+        setActiveId(null);
       }}
     >
       <div
-        className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          // gap: "20px",
-          width: "60%",
-          justifyContent: "flex-start",
+          alignItems: "center",
+          padding: "30px",
         }}
       >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "15px" }}>D</span>
-          Do they both have <span style={{ color: "#2e3192" }}>long u</span>?
-          Listen and write
-          <span style={{ color: "#2e3192" }}>✓</span> or
-          <span style={{ color: "#2e3192" }}>✗</span>.
-        </h5>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "30px",
-            width: "100%",
-          }}
-        >
+        <div className="div-forall">
+          <h5 className="header-title-page8">
+            <span style={{ marginRight: "20px" }}>C</span>
+            Listen and write the{" "}
+            <span style={{ color: "#2e3192" }}> beginning sound</span> for each
+            word.
+          </h5>
+          <QuestionAudioPlayer
+            src={sound}
+            captions={captions}
+            stopAtSecond={15}
+          />
+
           <div
-            className="audio-popup-read"
             style={{
-              width: "50%",
+              marginBottom: "30px",
             }}
           >
-            <div className="audio-inner player-ui">
-              <audio
-                ref={audioRef}
-                src={sound1}
-                onTimeUpdate={(e) => {
-                  const time = e.target.currentTime;
-                  setCurrent(time);
-                  updateCaption(time);
-                }}
-                onLoadedMetadata={(e) => setDuration(e.target.duration)}
-              ></audio>
-              {/* Play / Pause */}
-              {/* Play / Pause */}
-              {/* الوقت - السلايدر - الوقت */}
-              <div className="top-row">
-                <span className="audio-time">
-                  {new Date(current * 1000).toISOString().substring(14, 19)}
-                </span>
-
-                <input
-                  type="range"
-                  className="audio-slider"
-                  min="0"
-                  max={duration}
-                  value={current}
-                  onChange={(e) => {
-                    audioRef.current.currentTime = e.target.value;
-                    updateCaption(Number(e.target.value));
-                  }}
-                  style={{
-                    background: `linear-gradient(to right, #430f68 ${
-                      (current / duration) * 100
-                    }%, #d9d9d9ff ${(current / duration) * 100}%)`,
-                  }}
-                />
-
-                <span className="audio-time">
-                  {new Date(duration * 1000).toISOString().substring(14, 19)}
-                </span>
+            {/* 🔤 البنك */}
+            <div className="bg-blue-50 p-3 rounded-2xl border-2 border-blue-100 mb-6">
+              <div className="flex flex-wrap justify-center gap-3">
+                <SortableContext items={LETTERS}>
+                  {LETTERS.map((l) => (
+                    <DraggableLetter key={l} item={l} locked={locked} />
+                  ))}
+                </SortableContext>
               </div>
-              {/* الأزرار 3 أزرار بنفس السطر */}
-              <div className="bottom-row">
-                {/* فقاعة */}
-                <div
-                  className={`round-btn ${showCaption ? "active" : ""}`}
-                  style={{ position: "relative" }}
-                  onClick={() => setShowCaption(!showCaption)}
-                >
-                  <TbMessageCircle size={36} />
+            </div>
+
+            {/* 🧩 الصور */}
+            <div className="grid grid-cols-5 gap-x-3 gap-y-3">
+              {ITEMS.map((item) => (
+                <div key={item.id} style={{ textAlign: "center" }}>
+                  {/* 🔥 wrapper للصورة فقط */}
                   <div
-                    className={`caption-inPopup ${showCaption ? "show" : ""}`}
-                    style={{ top: "100%", left: "10%" }}
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
                   >
-                    {captions.map((cap, i) => (
-                      <p
-                        key={i}
-                        id={`caption-${i}`}
-                        className={`caption-inPopup-line2 ${
-                          activeIndex === i ? "active" : ""
-                        }`}
-                      >
-                        {cap.text}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Play */}
-                <button className="play-btn2" onClick={togglePlay}>
-                  {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
-                </button>
-
-                {/* Settings */}
-                <div className="settings-wrapper" ref={settingsRef}>
-                  <button
-                    className={`round-btn ${showSettings ? "active" : ""}`}
-                    onClick={() => setShowSettings(!showSettings)}
-                  >
-                    <IoMdSettings size={36} />
-                  </button>
-
-                  {showSettings && (
-                    <div className="settings-popup">
-                      <label>Volume</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={volume}
-                        onChange={(e) => {
-                          setVolume(e.target.value);
-                          audioRef.current.volume = e.target.value;
-                        }}
+                    {/* 📦 البوكس مربوط بالصورة */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "0px",
+                        right: "0px",
+                        zIndex: 2,
+                      }}
+                    >
+                      <DropSlot
+                        id={item.id}
+                        content={answers[item.id]}
+                        correct={item.correct}
+                        isSubmitted={showResults}
                       />
                     </div>
-                  )}
+
+                    {/* 🖼️ الصورة */}
+                    <img
+                      src={item.img}
+                      style={{
+                        width: "150px",
+                        height: "120px",
+                        border: "2px solid #F79530",
+                        borderRadius: "10px",
+                      }}
+                    />
+                    {showResults &&
+                      answers[item.id] &&
+                      answers[item.id] !== item.correct && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "25px",
+                            right: "45px", // 🔥 زي المثال اللي بدك
+                            zIndex: 10,
+                          }}
+                        >
+                          <WrongMark />
+                        </div>
+                      )}
+                  </div>
                 </div>
-              </div>{" "}
+              ))}
             </div>
           </div>
-        </div>
-        <div className="flex justify-center gap-8 overflow-x-auto mt-4">
-          {questions.map((q, index) => (
-            <div
-              key={q.id}
-              className="w-[260px] h-[200px] border-2 border-red-400 rounded-xl p-4 flex flex-col justify-between"
-            >
-              <p className="text-[20px] font-bold text-blue-900">{q.id}.</p>
 
-              <div className="flex flex-col items-center gap-4">
-                <img
-                  src={q.image}
-                  alt=""
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                  }}
-                  className="w-full! h-full! object-cover rounded-md"
-                />
-
-                <div className="flex gap-4">
-                  {/* ✔ */}
-                  <div className="relative">
-                    <button
-                      onClick={() => selectAnswer(q.id, "✓")}
-                      className={`w-10 h-10 border-2 border-red-400 rounded-md flex items-center justify-center text-xl font-bold transition
-${
-  answers[q.id] === "✓"
-    ? "bg-[#777cfd] text-white border-[#777cfd]"
-    : "bg-white text-black"
-}`}
-                    >
-                      ✓
-                    </button>
-
-                    {showResult[index] === "wrong" && answers[q.id] === "✓" && (
-                      <span className="absolute -top-2 -right-2 text-red-600 font-bold">
-                        ✕
-                      </span>
-                    )}
-                  </div>
-
-                  {/* ✗ */}
-                  <div className="relative">
-                    <button
-                      onClick={() => selectAnswer(q.id, "✗")}
-                      className={`w-10 h-10 border-2 border-red-400 rounded-md flex items-center justify-center text-xl font-bold transition
-${
-  answers[q.id] === "✗"
-    ? "bg-[#777cfd] text-white border-[#777cfd]"
-    : "bg-white text-black"
-}`}
-                    >
-                      ✗
-                    </button>
-
-                    {showResult[index] === "wrong" && answers[q.id] === "✗" && (
-                      <span className="absolute -top-2 -right-2 text-red-600 font-bold">
-                        ✕
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="action-buttons-container">
-          <button onClick={resetAnswers} className="try-again-button">
-            Start Again ↻
-          </button>
-          {/* ⭐⭐⭐ NEW — زر Show Answer */}
-          <button
-            onClick={showAnswers}
-            className="show-answer-btn swal-continue"
-          >
-            Show Answer
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
+          {/* 🔴 نفس البوتون */}
+          <Button
+            handleShowAnswer={() => {
+              setAnswers(
+                Object.fromEntries(ITEMS.map((i) => [i.id, i.correct])),
+              );
+              setShowResults(true);
+              setLocked(true);
+            }}
+            handleStartAgain={handleReset}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
-    </div>
+
+      <DragOverlay>
+        {activeId ? (
+          <div className="p-3 bg-white border-2 rounded-xl shadow text-xs">
+            {activeId}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 };
 

@@ -103,6 +103,12 @@ import Review7_Page2_Q1 from "./review7&8/Review7_Page2_Q1";
 import Review7_Page2_Q2 from "./review7&8/Review7_Page2_Q2";
 import Review7_Page2_Q3 from "./review7&8/Review7_Page2_Q3";
 
+import Review8_Page1_Q1 from "./review7&8/Review8_Page1_Q1";
+import Review8_Page1_Q2 from "./review7&8/Review8_Page1_Q2";
+import Review8_Page2_Q1 from "./review7&8/Review8_Page2_Q1";
+import Review8_Page2_Q2 from "./review7&8/Review8_Page2_Q2";
+import Review8_Page2_Q3 from "./review7&8/Review8_Page2_Q3";
+
 export const lessons = [
   // UNIT 1
   { component: Page8_Q1, unit: 1 }, //0
@@ -209,5 +215,10 @@ export const lessons = [
   { component: Review7_Page1_Q2, unit: 8, isReview: true }, //76
   { component: Review7_Page2_Q1, unit: 8, isReview: true }, //77
   { component: Review7_Page2_Q2, unit: 8, isReview: true }, //78
-  { component: Review7_Page2_Q3, unit: 8, isReview: true, lastOfUnit: true }, //79
+  { component: Review7_Page2_Q3, unit: 8, isReview: true }, //79
+
+  { component: Review8_Page1_Q1, unit: 8, isReview: true }, //80
+  { component: Review8_Page2_Q1, unit: 8, isReview: true }, //81
+  { component: Review8_Page2_Q1, unit: 8, isReview: true }, //82
+  { component: Review8_Page2_Q2, unit: 8, isReview: true, lastOfUnit: true }, //83
 ];
