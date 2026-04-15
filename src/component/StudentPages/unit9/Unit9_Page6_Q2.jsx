@@ -1,172 +1,223 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 4.svg";
+import Button from "../../Button";
 
 const Unit9_Page6_Q2 = () => {
-  const questions = [
+  const items = [
     {
-      id: 1,
       img: img1,
-      options: ["They're watching TV.", "They're studying English."],
-      correct: "They're studying English.",
+      q: "Was he at the zoo?",
+      options: ["Yes, he was.", "No, he wasn’t."],
+      correct: "No, he wasn’t.",
     },
     {
-      id: 2,
+      q: "Was she in the restaurant?",
       img: img2,
-      options: ["We're playing chess.", "We're cooking lunch."],
-      correct: "We're playing chess.",
+      options: ["Yes, she was.", "No, she wasn’t."],
+      correct: "Yes, she was.",
     },
     {
-      id: 3,
+      q: "Was she at the bakery?",
       img: img3,
-      options: ["They're watching TV.", "They're listening to the radio."],
-      correct: "They're watching TV.",
+      options: ["Yes, she was.", "No, she wasn’t."],
+      correct: "No, she wasn’t.",
+    },
+    {
+      q: "Where is she now?",
+      img: img4,
+      options: ["She is on the train.", "She is in the computer lab."],
+      correct: "She is in the computer lab.",
     },
   ];
 
-  const [answers, setAnswers] = useState({});
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const handleSelect = (qId, option) => {
+  const [showResult, setShowResult] = useState(false);
+
+  const chooseOption = (i, value) => {
     if (locked) return;
 
-    setAnswers((prev) => ({
-      ...prev,
-      [qId]: option,
-    }));
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
+
+    const newAnswers = [...answers];
+    newAnswers[i] = items[i].start + value + items[i].end;
+    setAnswers(newAnswers);
   };
 
-  const reset = () => {
-    setAnswers({});
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
     setLocked(false);
-    setChecked(false);
+    setShowResult(false);
   };
 
   const showAnswers = () => {
-    const correctAnswers = {};
-    questions.forEach((q) => {
-      correctAnswers[q.id] = q.correct;
-    });
-    setAnswers(correctAnswers);
+    setSelected(items.map((i) => i.correct));
+    setAnswers(items.map((i) => i.start + i.correct + i.end));
     setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
 
-    const empty = questions.some((q) => !answers[q.id]);
-
-    if (empty) {
-      ValidationAlert.info("Please answer all questions.");
+    if (selected.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
     let score = 0;
 
-    questions.forEach((q) => {
-      if (answers[q.id] === q.correct) score++;
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
     });
 
-    const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:#2e7d32;font-weight:bold;">
-          Score: ${score} / ${questions.length}
-        </span>
-      </div>
-    `;
+    const total = items.length;
 
-    if (score === questions.length) ValidationAlert.success(msg);
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
+`;
+
+    if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
-    setChecked(true);
+
     setLocked(true);
-    setLocked(true);
+    setShowResult(true); // 🔥 مهم
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall">
         <h5 className="header-title-page8">
-          <span className="ex-A me-4">E</span>Look, read, and write
-          <span style={{ color: "#2e3192" }}>✓</span>.
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            E
+          </span>
+          Read, look, and circle
         </h5>
 
-        {questions.map((q) => (
-          <div key={q.id} className="flex items-center gap-6 mb-6">
-            {/* الرقم + الصورة */}
-            <div className="flex items-center gap-3">
-              <span className="font-bold w-5">{q.id}</span>
+        <div className="grid grid-cols-2 gap-y-5 gap-x-20 mt-10 mb-10">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                position: "relative",
+              }}
+            >
+              {/* الرقم + السؤال */}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <span style={{ fontWeight: "bold", fontSize: "18px" }}>
+                  {i + 1}.
+                </span>
+                <span style={{ fontSize: "18px" }}>{item.q}</span>
+              </div>
 
+              {/* الصورة */}
               <img
-                src={q.img}
-                style={{ height: "auto", width: "300px", objectFit: "cover" }}
+                src={item.img}
+                alt=""
+                style={{
+                  width: "300px",
+                  height: "auto",
+                  border: "2px solid orange",
+                  borderRadius: 10,
+                  alignSelf: "flex-start",
+                }}
               />
-            </div>
 
-            {/* الخيارات */}
-            <div className="flex flex-col gap-3">
-              {q.options.map((opt, i) => {
-                const isSelected = answers[q.id] === opt;
-                const isCorrect = opt === q.correct;
+              {/* الخيارات */}
+              <div className="flex flex-col gap-3 text-[20px]">
+                {item.options.map((opt, idx) => (
+                  <div key={idx} style={{ position: "relative" }}>
+                    <span
+                      onClick={() => chooseOption(i, opt)}
+                      style={{
+                        display: "inline-block",
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        minWidth: "90px",
 
-                return (
-                  <div
-                    key={i}
-                    onClick={() => handleSelect(q.id, opt)}
-                    className="flex items-center gap-3 cursor-pointer"
-                  >
-                    {/* checkbox */}
-                    <div
-                      className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition
-    ${
-      isSelected
-        ? checked
-          ? isCorrect
-            ? "border-green-600 bg-green-50"
-            : "border-red-600 bg-red-50"
-          : "border-red-500 bg-red-50"
-        : "border-gray-400 bg-white"
-    }
-  `}
+                        border:
+                          selected[i] === opt
+                            ? locked
+                              ? opt === item.correct
+                                ? "2px solid #1C398E"
+                                : "2px solid #ef4444"
+                              : "2px solid #1C398E"
+                            : "2px solid transparent",
+                      }}
                     >
-                      {isSelected && (
-                        <span
-                          className={`text-xl font-bold leading-none ${
-                            checked
-                              ? isCorrect
-                                ? "text-green-600"
-                                : "text-red-600"
-                              : "text-red-500"
-                          }`}
+                      {opt}
+                    </span>
+
+                    {/* ❌ */}
+                    {showResult &&
+                      selected[i] === opt &&
+                      opt !== item.correct && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "6px",
+                            right: "50%",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "#ef4444",
+                            color: "white",
+                            borderRadius: "50%",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
                         >
-                          ✓
-                        </span>
+                          ✕
+                        </div>
                       )}
-                    </div>
-
-                    {/* النص */}
-                    <span className="text-[16px]">{opt}</span>
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
+          ))}
+        </div>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );
