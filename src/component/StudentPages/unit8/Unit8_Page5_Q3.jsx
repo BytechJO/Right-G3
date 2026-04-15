@@ -1,160 +1,269 @@
 import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img from "../../../assets/imgs/test6.png";
+import WrongMark from "../../WrongMark";
+
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 4.svg";
+import Button from "../../Button";
 
 const Unit8_Page5_Q3 = () => {
-  const questions = [
+  const items = [
     {
-      id: 1,
-      question: "How many books do you have?",
-      answer: "nine",
-      options: ["eight", "nine", "ten"],
-      type: "books",
+      img: img1,
+      options: ["She was in class.", "She wasn’t in class."],
+      correct: "She was in class.",
+      mark: true,
     },
     {
-      id: 2,
-      question: "How many crayons do you have?",
-      answer: "ten",
-      options: ["nine", "ten", "eleven"],
-      type: "crayons",
+      img: img2,
+      options: ["He was at the beach.", "He wasn’t at the beach."],
+      correct: " He wasn’t at the beach.",
+      mark: true,
     },
     {
-      id: 3,
-      question: "How many pens do you have?",
-      answer: "three",
-      options: ["two", "three", "four"],
-      type: "pens",
+      img: img3,
+      options: ["She was cleaning the car.", "She wasn’t cleaning the car."],
+      correct: "She was cleaning the car.",
+      mark: true,
+    },
+    {
+      img: img4,
+      options: ["They were at the farm.", "They weren’t at the farm."],
+      correct: "They weren’t at the farm.",
+      mark: true,
     },
   ];
-
-  const [answers, setAnswers] = useState({
-    1: "",
-    2: "",
-    3: "",
-  });
-
+  const [hovered, setHovered] = useState(null);
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
-  const reset = () => {
-    setAnswers({ 1: "", 2: "", 3: "" });
+  const chooseOption = (i, value) => {
+    if (locked) return;
+
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
+
+    const newAnswers = [...answers];
+    newAnswers[i] = items[i].start + value + items[i].end;
+    setAnswers(newAnswers);
+  };
+
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
     setLocked(false);
+    setShowResult(false);
   };
 
   const showAnswers = () => {
-    const filled = {};
-    questions.forEach((q) => {
-      filled[q.id] = q.answer;
-    });
-    setAnswers(filled);
+    setSelected(items.map((i) => i.correct));
+    setAnswers(items.map((i) => i.start + i.correct + i.end));
     setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
-    if (Object.values(answers).includes("")) {
-      ValidationAlert.info("Please complete all answers.");
+
+    if (selected.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
-    let correct = 0;
+    let score = 0;
 
-    questions.forEach((q) => {
-      if (answers[q.id] === q.answer) correct++;
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
     });
 
-    const total = questions.length;
+    const total = items.length;
 
-    const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
-    const message = `
-<div style="font-size:20px;text-align:center;">
-<b style="color:${color};">Score: ${correct} / ${total}</b>
-</div>
+    const msg = `
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
 `;
 
-    if (correct === total) ValidationAlert.success(message);
-    else if (correct === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
 
     setLocked(true);
+    setShowResult(true); // 🔥 مهم
   };
 
   return (
-    <div className="flex justify-center p-8">
-      <div className="w-[70%]">
-        <h5 className="header-title-page8 mb-8">
-          <span className="ex-A">B </span>
-          Count and write.
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>D</span>
+          Look, read, and choose.
         </h5>
 
-        {/* WORD BANK */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-2 lg:gap-y-16 gap-x-4 sm:gap-x-8 md:gap-x-16 lg:gap-x-60 xl:gap-x-40 mt-10">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-10px",
+                  left: "-15px",
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                }}
+              >
+                {i + 1}
+              </span>
 
-        <div className="flex gap-10">
-          {/* QUESTIONS */}
+              <div
+                style={{
+                  position: "relative",
+                  width: "15vw",
+                  height: "20vh",
+                }}
+              >
+                <img
+                  src={item.img}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    borderRadius: "12px",
+                  }}
+                />
 
-          <div className="flex-1">
-            {questions.map((q) => (
-              <div key={q.id} className="mb-10">
-                <div className="flex gap-3 text-lg">
-                  <span className="text-[#2e3192] font-bold">{q.id}</span>
-                  <p>{q.question}</p>
-                </div>
-
-                <div className="border-b-2 border-black mt-2 py-1 text-lg min-h-10">
-                  <span className="text-red-600 font-semibold">
-                    {answers[q.id] && `I have ${answers[q.id]} ${q.type}.`}
-                  </span>
-                </div>
-
-                {/* OPTIONS FOR THIS QUESTION */}
-
-                <div className="flex gap-3 mt-3">
-                  {q.options.map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() =>
-                        setAnswers((prev) => ({
-                          ...prev,
-                          [q.id]: opt,
-                        }))
-                      }
-                      className={`px-3 py-1 rounded border
-${answers[q.id] === opt ? "bg-yellow-300" : "bg-white"}
-`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
+                {/* البوكس */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "5px",
+                    right: "5px",
+                    display: "flex",
+                    gap: "4px",
+                    background: "white",
+                    padding: "4px 6px",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc",
+                    fontSize: "14px",
+                  }}
+                >
+                  <span style={{ opacity: item.mark ? 1 : 0.3 }}>✔️</span>
+                  <span style={{ opacity: !item.mark ? 1 : 0.3 }}>❌</span>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* IMAGE */}
+              <div className="flex flex-col gap-5 text-[18px]">
+                {item.options.map((opt, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
+                  >
+                    <span
+                      onClick={() => chooseOption(i, opt)}
+                      onMouseEnter={() => setHovered(i + "-" + idx)}
+                      onMouseLeave={() => setHovered(null)}
+                      style={{
+                        display: "inline-block",
+                        padding: "6px 7px",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        textAlign: "center",
+                        minWidth: "90px",
+                        whiteSpace: "nowrap",
+                        background:
+                          hovered === i + "-" + idx ? "#e0f2fe" : "transparent",
 
-          <img src={img} className="w-[350px]! h-[400px]! " />
+                        border:
+                          selected[i] === opt
+                            ? locked
+                              ? opt === item.correct
+                                ? "2px solid #1C398E"
+                                : "2px solid #ef4444"
+                              : "2px solid #1C398E"
+                            : hovered === i + "-" + idx
+                              ? "2px solid #60a5fa"
+                              : "2px solid transparent",
+
+                        transition: "0.2s", // 🔥 حركة ناعمة
+                      }}
+                    >
+                      {opt}
+                    </span>
+
+                    {showResult &&
+                      selected[i] === opt &&
+                      opt !== item.correct && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "-20px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "#ef4444",
+                            color: "white",
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: "13px",
+                              lineHeight: "1",
+                              transform: "translateY(-1px)",
+                            }}
+                          >
+                            ✕
+                          </span>
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-
-        {/* BUTTONS */}
-
-        <div className="action-buttons-container mt-10">
-          <button onClick={reset} className="try-again-button">
-            Start Again ↻
-          </button>
-
-          <button
-            onClick={showAnswers}
-            className="show-answer-btn swal-continue"
-          >
-            Show Answer
-          </button>
-
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );

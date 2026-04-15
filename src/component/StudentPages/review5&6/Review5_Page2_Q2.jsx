@@ -177,7 +177,7 @@ const Review5_Page2_Q2 = () => {
           justifyContent: "flex-start",
         }}
       >
-        <h3 className="header-title-page8">
+        <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>
             D
           </span>{" "}
@@ -185,7 +185,7 @@ const Review5_Page2_Q2 = () => {
           <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and write{" "}
           <span style={{ color: "#D52328" }}>✓</span> or{" "}
           <span style={{ color: "#D52328" }}>✗</span>.
-        </h3>
+        </h5>
 
         <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
 

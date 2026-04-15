@@ -1,204 +1,245 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useRef, useEffect } from "react";
+import "./Unit8_Page5_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-
-import calendar from "../../../assets/imgs/test6.png";
-import glue from "../../../assets/imgs/test6.png";
-import tube from "../../../assets/imgs/test6.png";
-import blue from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 6.svg";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
 
 const Unit8_Page5_Q2 = () => {
-  const options = ["flute", "June", "blue", "glue", "tube"];
-
-  const blanks = {
-    b1: "flute",
-    b2: "June",
-    b3: "blue",
-    b4: "glue",
-    b5: "tube",
-  };
-
-  const [answers, setAnswers] = useState({});
   const [locked, setLocked] = useState(false);
 
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
+  const questions = [
+    {
+      id: 1,
+      image1: img1,
+      image2: img2,
+      correct: "✗",
+    },
+    { id: 2, image1: img3, image2: img4, correct: "✓" },
+    {
+      id: 3,
+      image1: img5,
+      image2: img6,
+      correct: "✓",
+    },
+  ];
+  const captions = [
+    {
+      start: 0,
+      end: 4.23,
+      text: "Page 8. Right Activities. Exercise A, number 1. ",
+    },
+    {
+      start: 4.25,
+      end: 8.28,
+      text: "Listen and write the missing letters. Number the pictures.  ",
+    },
+    { start: 8.3, end: 11.05, text: "1-tiger." },
+    { start: 11.07, end: 13.12, text: "2-taxi." },
+    { start: 13.14, end: 15.14, text: "3-duck." },
+    { start: 15.16, end: 17.13, text: "4-deer." },
+  ];
+  const [answers, setAnswers] = useState({});
+  const [showResult, setShowResult] = useState([]);
 
-    if (!destination || locked) return;
+  const selectAnswer = (id, value) => {
+    if (locked) return;
+    setAnswers({ ...answers, [id]: value });
+    setShowResult(false);
+  };
 
-    const word = draggableId.replace("word-", "");
-
-    setAnswers({
-      ...answers,
-      [destination.droppableId]: word,
+  const showAnswers = () => {
+    const corrects = {};
+    questions.forEach((q) => {
+      corrects[q.id] = q.correct;
     });
-  };
-
-  const reset = () => {
-    setAnswers({});
-    setLocked(false);
-  };
-
-  const show = () => {
-    setAnswers(blanks);
+    setAnswers(corrects);
+    setShowResult([]);
     setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
-    const total = Object.keys(blanks).length;
-
-    if (Object.keys(answers).length < total) {
-      ValidationAlert.info("Please complete all answers");
+    const isEmpty = questions.some((q) => !answers[q.id]);
+    if (isEmpty) {
+      ValidationAlert.info("Please choose ✓ or ✗ for all questions!");
       return;
     }
 
-    let score = 0;
-
-    Object.keys(blanks).forEach((key) => {
-      if (answers[key] === blanks[key]) score++;
-    });
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-    <span style="color:#2e7d32;font-weight:bold">
-    Score: ${score} / ${total}
-    </span>
-    </div>`;
-
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
+    const results = questions.map((q) =>
+      answers[q.id] === q.correct ? "correct" : "wrong",
+    );
+    setShowResult(results);
     setLocked(true);
+
+    const correctCount = results.filter((r) => r === "correct").length;
+    const total = questions.length;
+    const scoreMsg = `${correctCount} / ${total}`;
+
+    let color =
+      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
+
+    const resultHTML = `
+      <div style="font-size: 20px; text-align:center; margin-top: 8px;">
+        <span style="color:${color}; font-weight:bold;">
+          Score: ${scoreMsg}
+        </span>
+      </div>
+    `;
+
+    if (correctCount === total) ValidationAlert.success(resultHTML);
+    else if (correctCount === 0) ValidationAlert.error(resultHTML);
+    else ValidationAlert.warning(resultHTML);
   };
 
-  const Blank = ({ id }) => (
-    <Droppable droppableId={id}>
-      {(provided) => (
-        <span
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          className="inline-block min-w-[90px] border-b-2 border-black text-center mx-2"
-        >
-          {answers[id] && (
-            <span className="text-red-600 font-semibold">{answers[id]}</span>
-          )}
-          {provided.placeholder}
-        </span>
-      )}
-    </Droppable>
-  );
+  const resetAnswers = () => {
+    setAnswers({});
+    setShowResult([]);
+    setLocked(false);
+  };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <>
       <div
-        style={{ display: "flex", justifyContent: "center", padding: "30px" }}
+        className="u8p5-wrapper"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "30px",
+        }}
       >
-        <div className="div-forall" style={{ width: "60%" }}>
-          {/* ❌ الهيدر كما هو */}
-          <h5 className="header-title-page8 mb-8">
-            <span style={{ color: "#2e3192", marginRight: "20px" }}>2</span>Look
-            and complete the poem. Then say.
+        <div
+          className="div-forall"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "30px",
+            width: "60%",
+            justifyContent: "flex-start",
+          }}
+        >
+          <h5 className="header-title-page8">
+            <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>{" "}
+            Does it have the same <span style={{ color: "#2e3192" }}>-es </span>
+            sound? Listen and write
+            <span style={{ color: "#D52328" }}>✓</span> or{" "}
+            <span style={{ color: "#D52328" }}>✗</span>.
           </h5>
-          {/* word bank */}
+          <QuestionAudioPlayer
+            src={blue}
+            captions={captions}
+            stopAtSecond={10}
+          />
 
-          <Droppable droppableId="bank" direction="horizontal" isDropDisabled>
-            {(provided) => (
+          <div className="grid grid-cols-3 gap-[30px] u8p5-grid">
+            {questions.map((q, index) => (
               <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-4 justify-center mt-6 mb-6"
+                key={q.id}
+                className="u8p5-card p-4 bg-white flex flex-col items-center gap-3 relative"
               >
-                {options
-                  .filter((w) => !Object.values(answers).includes(w))
-                  .map((word, i) => (
-                    <Draggable
-                      key={word}
-                      draggableId={`word-${word}`}
-                      index={i}
-                      isDragDisabled={locked}
-                    >
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="px-3 py-1 bg-yellow-200 rounded cursor-pointer font-semibold"
-                        >
-                          {word}
-                        </span>
-                      )}
-                    </Draggable>
-                  ))}
+                {/* رقم السؤال */}
+                <p className="w-full text-left text-[20px] u8p5-card-num">
+                  <span className="text-[darkblue] font-bold">{q.id}.</span>
+                </p>
 
-                {provided.placeholder}
+                <div className="flex flex-col items-center gap-3.5">
+                  {/* الصور */}
+                  <div className="u8p5-images-box border-2 border-[#ff6b57] rounded-xl p-4 w-[250px]">
+                    <div className="flex">
+                      {/* الديف الأول */}
+                      <div className="u8p5-img-cell w-1/2 border-r-2 border-[#ff6b57] flex items-center justify-center h-[150px]">
+                        <img
+                          src={q.image1}
+                          alt=""
+                          style={{ height: "120px", objectFit: "contain" }}
+                        />
+                      </div>
+
+                      {/* الديف الثاني */}
+                      <div className="u8p5-img-cell w-1/2 flex items-center justify-center h-[150px]">
+                        <img
+                          src={q.image2}
+                          alt=""
+                          style={{ height: "120px", objectFit: "contain" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* الخيارات */}
+                  <div className="u8p5-opts-row flex gap-5">
+                    {/* ✓ */}
+                    <div className="relative">
+                      <div
+                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 hover:bg-[#ffe3df] ${
+                          answers[q.id] === "✓"
+                            ? "bg-[#2c5287] text-white"
+                            : "bg-white"
+                        }`}
+                        onClick={() => selectAnswer(q.id, "✓")}
+                      >
+                        ✓
+                      </div>
+
+                      {showResult[index] === "wrong" &&
+                        answers[q.id] === "✓" && (
+                          <div className="u8p5-wrong-badge absolute -top-2.5 -right-2.5 w-[22px] h-[22px] rounded-full bg-red-500 text-white flex items-center justify-center text-[14px] font-bold border-2 border-white z-3">
+                            ✕
+                          </div>
+                        )}
+                    </div>
+
+                    {/* ✗ */}
+                    <div className="relative">
+                      <div
+                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${
+                          answers[q.id] === "✗"
+                            ? "bg-[#2c5287] text-white"
+                            : "bg-white hover:bg-[#ffe3df]"
+                        }`}
+                        onClick={() => selectAnswer(q.id, "✗")}
+                      >
+                        ✗
+                      </div>
+
+                      {showResult[index] === "wrong" &&
+                        answers[q.id] === "✗" && (
+                          <div className="u8p5-wrong-badge absolute -top-2.5 -right-2.5 w-[22px] h-[22px] rounded-full bg-red-500 text-white flex items-center justify-center text-[14px] font-bold border-2 border-white z-3">
+                            ✕
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
-          </Droppable>
+            ))}
+          </div>
 
-          {/* poem */}
-
-          <div className="text-2xl leading-[60px] text-gray-700 mt-8">
-            <div>
-              <span className="text-[#2e3192] font-bold mr-4">1</span>
-              Sue McClue likes to play her
-              <Blank id="b1" />
-              <img
-                src={blue}
-                className="inline w-14! h-14! mx-2 object-contain"
-              />{" "}
-              in
-              <Blank id="b2" />
-              <img
-                src={calendar}
-                className="inline w-14! h-14! ml-2 object-contain"
-              />
-            </div>
-
-            <div>
-              <span className="text-[#2e3192] font-bold mr-4">2 </span>
-              Sue wears
-              <Blank id="b3" />
-              <img
-                src={blue}
-                className="inline w-14! h-14! mx-2 object-contain"
-              />
-              and puts a spoon in the
-              <Blank id="b4" />
-              <img
-                src={glue}
-                className="inline w-14! h-14! ml-2 object-contain"
-              />
-            </div>
-
-            <div>
-              when she plays her tune called
-              <Blank id="b5" />
-              <img
-                src={tube}
-                className="inline w-14! h-14! mx-2 object-contain"
-              />
-              on the Moon.
-            </div>
+          <div className="action-buttons-container">
+            <button onClick={resetAnswers} className="try-again-button">
+              Start Again ↻
+            </button>
+            <button
+              onClick={showAnswers}
+              className="show-answer-btn swal-continue"
+            >
+              Show Answer
+            </button>
+            <button onClick={checkAnswers} className="check-button2">
+              Check Answer ✓
+            </button>
           </div>
         </div>
-
-        {/* buttons */}
-
-        <div className="action-buttons-container">
-          <button onClick={reset} className="try-again-button">
-            Start Again ↻
-          </button>
-          <button onClick={show} className="show-answer-btn swal-continue">
-            Show Answer
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
       </div>
-    </DragDropContext>
+    </>
   );
 };
 

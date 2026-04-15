@@ -1,4 +1,4 @@
-import page_1 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0072.jpg";
+import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 72.png";
 import "./Review8_Page1.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
