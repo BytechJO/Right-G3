@@ -1,217 +1,399 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 1.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 3.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 4.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 4.svg";
 
 const Unit9_Page6_Q1 = () => {
+  const [userAnswers, setUserAnswers] = useState({});
+  const [locked, setLocked] = useState(false);
+
+  const [checked, setChecked] = useState(false);
+
   const questions = [
     {
       id: 1,
-      img: img1,
-      correct: "He's riding a bike.",
+      image: img1,
+      sentence: "Where were they yesterday?",
+      word1: ["the train stop", "the airport"],
+      word2: ["are at", " were at", "are in", " were in"],
+      correct1: "were at",
+      correct2: "the train stop",
     },
     {
       id: 2,
-      img: img2,
-      correct: "She is eating an apple.",
+      image: img2,
+      sentence: "Where are they now?",
+      word1: ["work", "the clinic"],
+      word2: ["are at", " were at", "are in", " were in"],
+      correct1: "are in",
+      correct2: "the clinic",
     },
     {
       id: 3,
-      img: img3,
-      correct: "They're eating corn.",
+      image: img3,
+      sentence: "Where are they now?",
+      word1: ["the library", "the bus stop"],
+      word2: ["are at", " were at", "are in", " were in"],
+      correct1: "are at",
+      correct2: "the bus stop",
     },
     {
       id: 4,
-      img: img4,
-      correct: "They're playing soccer.",
+      image: img4,
+      sentence: "Where were they yesterday?",
+      word1: ["the theater", "the bakery"],
+      word2: ["are at", " were at", "are in", " were in"],
+      correct1: "were at",
+      correct2: "the theater",
     },
   ];
-
-  const sentences = [
-    "He's riding a bike.",
-    "They're playing soccer.",
-    "They're eating corn.",
-    "She is eating an apple.",
-  ];
-
-  const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
-
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination || locked) return;
-
-    // إذا رجع للبنك
-    if (destination.droppableId === "bank") return;
-
-    setAnswers((prev) => {
-      const updated = { ...prev };
-
-      // حذف الجملة من أي مكان سابق
-      Object.keys(updated).forEach((key) => {
-        if (updated[key] === draggableId) delete updated[key];
-      });
-
-      updated[destination.droppableId] = draggableId;
-      return updated;
-    });
+  const correctAnswers = {
+    1: { word1: "the train stop", word2: "were at" },
+    2: { word1: "the clinic", word2: "are in" },
+    3: { word1: "the bus stop", word2: "are at" },
+    4: { word1: "the theater", word2: "were at" },
   };
-  const reset = () => {
-    setAnswers({});
-    setLocked(false);
+  const handleChange = (id, field, value) => {
+    if (locked) return;
+
+    setUserAnswers((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value,
+      },
+    }));
   };
-
-  const showAnswers = () => {
-    const correctAnswers = {};
-
-    questions.forEach((q) => {
-      correctAnswers[`slot-${q.id}`] = q.correct;
-    });
-
-    setAnswers(correctAnswers);
+  const showAnswer = () => {
+    setUserAnswers(correctAnswers);
     setLocked(true);
+    setChecked(true);
   };
-
   const checkAnswers = () => {
     if (locked) return;
 
-    const empty = questions.some((q) => !answers[`slot-${q.id}`]);
+    // ✅ التحقق إذا في فراغ
+    const empty = questions.some(
+      (q) => !userAnswers[q.id]?.word1 || !userAnswers[q.id]?.word2,
+    );
 
     if (empty) {
-      ValidationAlert.info("Please complete all answers.");
+      ValidationAlert.info();
       return;
     }
 
     let score = 0;
 
-    questions.forEach((q) => {
-      if (answers[`slot-${q.id}`] === q.correct) {
-        score++;
+    Object.keys(correctAnswers).forEach((id) => {
+      // ✅ أول select
+      if (userAnswers[id]?.word2 === correctAnswers[id].word2) {
+        score += 1;
+      }
+
+      // ✅ ثاني select
+      if (userAnswers[id]?.word1 === correctAnswers[id].word1) {
+        score += 1;
       }
     });
 
+    const total = Object.keys(correctAnswers).length * 2; // = 8
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
     const msg = `
     <div style="font-size:20px;text-align:center;">
-      <span style="color:#2e7d32;font-weight:bold;">
-        Score: ${score} / ${questions.length}
+      <span style="color:${color}; font-weight:bold;">
+        Score: ${score} / ${total}
       </span>
     </div>
   `;
 
-    if (score === questions.length) ValidationAlert.success(msg);
+    setChecked(true);
+    setLocked(true);
+
+    if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
-
-    setLocked(true);
+  };
+  const handleStartAgain = () => {
+    setUserAnswers({});
+    setChecked(false);
+    setLocked(false);
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{ display: "flex", justifyContent: "center", padding: "30px" }}
-      >
-        <div className="div-forall" style={{ width: "60%" }}>
-          {/* ❌ الهيدر كما هو */}
-          <h5 className="header-title-page8">
-            <span className="ex-A mr-4">D</span>Look and write .
-          </h5>
-          <Droppable droppableId="bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-4 justify-center flex-wrap mb-3"
-              >
-                {sentences
-                  .filter((s) => !Object.values(answers).includes(s))
-                  .map((s, index) => (
-                    <Draggable
-                      key={s}
-                      draggableId={s}
-                      index={index}
-                      isDragDisabled={locked}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="bg-blue-200 px-4 py-2 rounded-full cursor-grab text-center"
-                        >
-                          {s}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-          {questions.map((q) => (
-            <div key={q.id} className="flex items-center gap-4 ">
-              <span className="font-bold w-5">{q.id}</span>
-
-              <img
-                src={q.img}
-                style={{ height: "130px", width: "130px" }}
-                className=" object-contain"
-              />
-
-              <Droppable droppableId={`slot-${q.id}`}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="border-b-2 flex-1 min-h-[35px]"
-                  >
-                    {answers[`slot-${q.id}`] && (
-                      <Draggable
-                        draggableId={answers[`slot-${q.id}`]}
-                        index={0}
-                        isDragDisabled={locked}
-                      >
-                        {(provided) => (
-                          <span
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="text-red-600 cursor-pointer"
-                          >
-                            {answers[`slot-${q.id}`]}
-                          </span>
-                        )}
-                      </Draggable>
-                    )}
-
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
-          ))}
-        </div>
-
-        <div className="action-buttons-container">
-          <button onClick={reset} className="try-again-button">
-            Start Again ↻
-          </button>
-          <button
-            onClick={showAnswers}
-            className="show-answer-btn swal-continue"
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            D
+          </span>
+          Read and answer the questions.
+        </h5>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "900px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+            }}
           >
-            Show Answer
-          </button>
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
+            {/* الأسئلة بالصور */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "12px",
+              }}
+            >
+              {questions.map((q) => (
+                <div
+                  key={q.id}
+                  style={{
+                    padding: "12px",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "0px",
+                      left: "0px",
+                      color: "black",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      zIndex: 2,
+                    }}
+                  >
+                    {q.id}
+                  </div>
+
+                  <img
+                    src={q.image}
+                    alt={`q${q.id}`}
+                    style={{
+                      width: "70%",
+                      height: "auto",
+                      objectFit: "cover",
+                      marginTop: "10px",
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      marginTop: "8px",
+                      fontWeight: "500",
+                      marginBottom: 15,
+                    }}
+                  >
+                    {q.sentence}
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: "5px",
+                      borderBottom: "2px solid black",
+                      paddingBottom: "3px",
+                      minWidth: "220px",
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "6px",
+                      fontSize: "16px",
+                    }}
+                  >
+                    They
+                    <div
+                      style={{ position: "relative", display: "inline-block" }}
+                    >
+                      <select
+                        value={userAnswers[q.id]?.word2 || ""}
+                        onChange={(e) =>
+                          handleChange(q.id, "word2", e.target.value)
+                        }
+                        disabled={locked}
+                        style={{
+                          appearance: "none",
+                          WebkitAppearance: "none",
+                          MozAppearance: "none",
+
+                          border: "none",
+                          borderBottom: "1px dashed #aaa",
+                          backgroundColor: "transparent",
+
+                          fontSize: "inherit",
+                          fontWeight: "600",
+                          color: userAnswers[q.id]?.word2 ? "#1e3a8a" : "#aaa",
+
+                          padding: "2px 18px 2px 4px",
+                          minWidth: "90px",
+
+                          cursor: locked ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        <option value="" disabled hidden>
+                          Select
+                        </option>
+                        {q.word2.map((w, i) => (
+                          <option key={i} value={w}>
+                            {w}
+                          </option>
+                        ))}
+                      </select>
+                      {checked &&
+                        userAnswers[q.id]?.word2 &&
+                        userAnswers[q.id]?.word2 !== q.correct1 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-6px",
+                              right: "-6px",
+                              transform: "translateY(-50%)",
+                              width: "22px",
+                              height: "22px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </div>
+                        )}
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                          fontSize: "10px",
+                          color: "#666",
+                        }}
+                      >
+                        ▾
+                      </span>
+                    </div>
+                    <div
+                      style={{ position: "relative", display: "inline-block" }}
+                    >
+                      <select
+                        value={userAnswers[q.id]?.word1 || ""}
+                        onChange={(e) =>
+                          handleChange(q.id, "word1", e.target.value)
+                        }
+                        disabled={locked}
+                        style={{
+                          appearance: "none",
+                          WebkitAppearance: "none",
+                          MozAppearance: "none",
+
+                          border: "none",
+                          borderBottom: "1px dashed #aaa",
+                          backgroundColor: "transparent",
+
+                          fontSize: "inherit",
+                          fontWeight: "600",
+                          color: userAnswers[q.id]?.word1 ? "#1e3a8a" : "#aaa",
+
+                          padding: "2px 18px 2px 4px",
+                          minWidth: "90px",
+
+                          cursor: locked ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        <option value="" disabled hidden>
+                          Select
+                        </option>
+                        {q.word1.map((w, i) => (
+                          <option key={i} value={w}>
+                            {w}
+                          </option>
+                        ))}
+                      </select>
+                      {checked &&
+                        userAnswers[q.id]?.word1 &&
+                        userAnswers[q.id]?.word1 !== q.correct2 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-6px",
+                              right: "-6px",
+                              transform: "translateY(-50%)",
+                              width: "22px",
+                              height: "22px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </div>
+                        )}
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                          fontSize: "10px",
+                          color: "#666",
+                        }}
+                      >
+                        ▾
+                      </span>
+                    </div>
+                    .
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Button
+              handleShowAnswer={showAnswer}
+              handleStartAgain={handleStartAgain}
+              checkAnswers={checkAnswers}
+            />
+          </div>
         </div>
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 
