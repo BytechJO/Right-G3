@@ -8,6 +8,7 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 6.svg";
 import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 7.svg";
+import qImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Asset 8.svg";
 const items = [
   {
     sentence: "onpy",
@@ -227,12 +228,22 @@ export default function Review6_Page2_Q1() {
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>D</span>
 
-            <div >
+            <div>
               Unscramble the letters to make words with the end sound
               <br />
               you hear in{" "}
-              <span className="inline-block border-b-2 w-10 mx-1"></span>. Then
-              match each word to its picture.
+              <img
+                src={qImage}
+                alt=""
+                style={{
+                  display: "inline-block",
+                  width: "40px",
+                  height: "auto",
+                  margin: "0 6px",
+                  verticalAlign: "middle",
+                }}
+              />
+              . Then match each word to its picture.
             </div>
           </h5>
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Unit8_Page6_Q1.css";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex D 1.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Asset 11.svg";
 
 const Unit8_Page6_Q1 = () => {
   const items = [
@@ -126,7 +126,7 @@ const Unit8_Page6_Q1 = () => {
           >
             <img
               src={img1}
-              style={{ width: "auto", height: "80px", objectFit: "cover" }}
+              style={{ width: "auto", height: "auto", objectFit: "cover" }}
             />
           </div>
           {/* WORD BANK */}

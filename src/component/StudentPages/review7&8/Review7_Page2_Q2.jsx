@@ -1,321 +1,356 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 6.svg";
+import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
 
-const wordsData = [
-  {
-    word: "boat",
-    correct: true,
-    top: "20px",
-    left: "40px",
-    color: "text-blue-500",
-    rotate: "-rotate-12",
-  },
-  {
-    word: "note",
-    correct: true,
-    top: "20px",
-    left: "160px",
-    color: "text-green-500",
-    rotate: "rotate-6",
-  },
-  {
-    word: "slow",
-    correct: true,
-    top: "20px",
-    left: "280px",
-    color: "text-red-500",
-    rotate: "rotate-3",
-  },
-  {
-    word: "green",
-    correct: false,
-    top: "20px",
-    left: "400px",
-    color: "text-purple-500",
-    rotate: "-rotate-6",
-  },
-  {
-    word: "name",
-    correct: false,
-    top: "20px",
-    left: "520px",
-    color: "text-blue-500",
-    rotate: "rotate-2",
-  },
-
-  {
-    word: "window",
-    correct: true,
-    top: "100px",
-    left: "60px",
-    color: "text-yellow-500",
-    rotate: "-rotate-12",
-  },
-  {
-    word: "home",
-    correct: true,
-    top: "110px",
-    left: "300px",
-    color: "text-orange-500",
-    rotate: "rotate-6",
-  },
-  {
-    word: "coat",
-    correct: true,
-    top: "100px",
-    left: "500px",
-    color: "text-green-500",
-    rotate: "rotate-2",
-  },
-
-  {
-    word: "goat",
-    correct: true,
-    top: "180px",
-    left: "40px",
-    color: "text-red-500",
-    rotate: "-rotate-12",
-  },
-  {
-    word: "snow",
-    correct: true,
-    top: "180px",
-    left: "200px",
-    color: "text-purple-500",
-    rotate: "rotate-2",
-  },
-  {
-    word: "kite",
-    correct: false,
-    top: "180px",
-    left: "330px",
-    color: "text-green-500",
-    rotate: "-rotate-6",
-  },
-  {
-    word: "yellow",
-    correct: true,
-    top: "180px",
-    left: "450px",
-    color: "text-blue-500",
-    rotate: "rotate-6",
-  },
-  {
-    word: "nine",
-    correct: false,
-    top: "180px",
-    left: "580px",
-    color: "text-yellow-500",
-    rotate: "-rotate-3",
-  },
-
-  {
-    word: "cop",
-    correct: false,
-    top: "260px",
-    left: "80px",
-    color: "text-blue-500",
-    rotate: "-rotate-6",
-  },
-  {
-    word: "shop",
-    correct: false,
-    top: "260px",
-    left: "240px",
-    color: "text-red-500",
-    rotate: "rotate-6",
-  },
-  {
-    word: "rope",
-    correct: true,
-    top: "260px",
-    left: "360px",
-    color: "text-yellow-500",
-    rotate: "-rotate-12",
-  },
-  {
-    word: "slope",
-    correct: true,
-    top: "260px",
-    left: "500px",
-    color: "text-purple-500",
-    rotate: "rotate-3",
-  },
-
-  {
-    word: "bot",
-    correct: false,
-    top: "340px",
-    left: "60px",
-    color: "text-purple-500",
-    rotate: "-rotate-12",
-  },
-  {
-    word: "five",
-    correct: false,
-    top: "360px",
-    left: "200px",
-    color: "text-green-500",
-    rotate: "rotate-6",
-  },
-  {
-    word: "sleep",
-    correct: false,
-    top: "360px",
-    left: "320px",
-    color: "text-blue-500",
-    rotate: "-rotate-6",
-  },
-  {
-    word: "row",
-    correct: true,
-    top: "360px",
-    left: "450px",
-    color: "text-red-500",
-    rotate: "rotate-6",
-  },
-  {
-    word: "cone",
-    correct: true,
-    top: "360px",
-    left: "550px",
-    color: "text-yellow-500",
-    rotate: "rotate-3",
-  },
-
-  {
-    word: "clip",
-    correct: false,
-    top: "420px",
-    left: "60px",
-    color: "text-red-500",
-    rotate: "-rotate-3",
-  },
-];
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
 const Review7_Page2_Q2 = () => {
-  const [selected, setSelected] = useState([]);
+  const [userAnswers, setUserAnswers] = useState({
+    1: "",
+    2: "",
+    3: "",
+    4: "",
+    5: "",
+    6: "",
+  });
   const [locked, setLocked] = useState(false);
 
-  const toggleWord = (word) => {
-    if (locked) return;
+  const [checked, setChecked] = useState(false);
 
-    setSelected((prev) =>
-      prev.includes(word) ? prev.filter((w) => w !== word) : [...prev, word],
-    );
+  const words = ["s", "v", "w", "b", "m", "d"];
+  const captions = [
+    {
+      start: 0,
+      end: 4.23,
+      text: "Page 8. Right Activities. Exercise A, number 1. ",
+    },
+    {
+      start: 4.25,
+      end: 8.28,
+      text: "Listen and write the missing letters. Number the pictures.  ",
+    },
+    { start: 8.3, end: 11.05, text: "1-tiger." },
+    { start: 11.07, end: 13.12, text: "2-taxi." },
+    { start: 13.14, end: 15.14, text: "3-duck." },
+    { start: 15.16, end: 17.13, text: "4-deer." },
+  ];
+  const correctAnswers = {
+    1: "m",
+    2: "b",
+    3: "d",
+    4: "v",
+    5: "s",
+    6: "w",
   };
 
+  const questions = [
+    { id: 1, image: img1 },
+    { id: 2, image: img2 },
+    { id: 3, image: img3 },
+    { id: 4, image: img4 },
+    { id: 5, image: img5 },
+    { id: 6, image: img6 },
+  ];
+
+  const onDragEnd = (result) => {
+    const { destination, draggableId } = result;
+    if (!destination) return;
+
+    setUserAnswers((prev) => ({
+      ...prev,
+      [destination.droppableId]: draggableId.split("-")[0],
+    }));
+  };
+  const showAnswer = () => {
+    setUserAnswers(correctAnswers);
+    setLocked(true);
+  };
   const checkAnswers = () => {
     if (locked) return;
-    if (selected.length === 0) {
-      ValidationAlert.info("Please select at least one word.");
+
+    const empty = Object.values(userAnswers).some((v) => !v?.trim());
+    if (empty) {
+      ValidationAlert.info();
       return;
     }
-    let correctCount = wordsData.filter((w) => w.correct).length;
-    let userCorrect = selected.filter((w) =>
-      wordsData.find((item) => item.word === w && item.correct),
-    ).length;
 
-    const color =
-      userCorrect === correctCount
-        ? "green"
-        : userCorrect === 0
-          ? "red"
-          : "orange";
+    let score = 0;
+
+    Object.keys(correctAnswers).forEach((id) => {
+      if (
+        userAnswers[id]?.toLowerCase().trim() ===
+        correctAnswers[id].toLowerCase()
+      ) {
+        score++;
+      }
+    });
+
+    const total = Object.keys(correctAnswers).length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
     const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-        ${userCorrect} / ${correctCount}
-        </span>
-      </div>
-    `;
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color}; font-weight:bold;">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
 
-    if (userCorrect === correctCount) ValidationAlert.success(msg);
-    else if (userCorrect === 0) ValidationAlert.error(msg);
+    setChecked(true);
+    setLocked(true);
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
-
-    setLocked(true);
   };
 
-  const showAnswers = () => {
-    const correctWords = wordsData.filter((w) => w.correct).map((w) => w.word);
-
-    setSelected(correctWords);
-    setLocked(true);
-  };
-
-  const resetAll = () => {
-    setSelected([]);
+  const handleStartAgain = () => {
+    setUserAnswers({
+      1: "",
+      2: "",
+      3: "",
+      4: "",
+      5: "",
+      6: "",
+    });
+    setChecked(false);
     setLocked(false);
   };
 
   return (
-    <div className="flex justify-center p-8">
-      <div className="w-[80%]">
-        {/* Title */}
-        <h5 className="header-title-page8" style={{ marginBottom: "20px" }}>
-          <span  style={{ marginRight: "20px" }}>
-            E
-          </span>
-          Circle and count the<span style={{ color: "#2e3192" }}>long o</span>
-          words.
-        </h5>
-        <div className="flex gap-10">
-          {/* LEFT BOX */}
-          <div className="bg-[#F9E5DC] rounded-3xl w-[650px] h-[500px] relative p-6">
-            {wordsData.map((item, i) => (
-              <span
-                key={i}
-                onClick={() => toggleWord(item.word)}
-                className={`
-        absolute cursor-pointer text-lg font-medium
-        ${item.color}
-        ${item.rotate}
-        ${
-          selected.includes(item.word)
-            ? "border-2 border-red-500 rounded-full px-2 py-1"
-            : ""
-        }
-      `}
-                style={{
-                  top: item.top,
-                  left: item.left,
-                }}
-              >
-                {item.word}
-              </span>
-            ))}
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "30px",
+        }}
+      >
+        <div
+          className="div-forall"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+            width: "60%",
+          }}
+        >
+          <div>
+            <h5 className="header-title-page8">
+              <span style={{ marginRight: "10px" }}>D</span> What is the{" "}
+              <span style={{ color: "#2e3192" }}>beginning sound</span> of the
+              word? Listen and write.
+            </h5>
           </div>
 
-          {/* RIGHT SIDE */}
-          <div className="flex flex-col justify-center gap-6">
-            <p className="text-lg">
-              How many <span className="text-blue-700">long o</span> words?
-            </p>
+          <QuestionAudioPlayer
+            src={blue}
+            captions={captions}
+            stopAtSecond={10}
+          />
 
-            <div className="w-[200px] border-b-2 border-gray-400 text-center text-2xl">
-              <span className="text-red-500 font-bold">{selected.length}</span>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "20px",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "900px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
+              {/* الكلمات */}
+              <Droppable droppableId="words" direction="horizontal">
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    style={{
+                      display: "flex",
+                      gap: "12px",
+                      padding: "10px",
+                      border: "2px dashed #ccc",
+                      borderRadius: "10px",
+                      justifyContent: "center",
+                      width: "100%",
+                      marginBottom: "10px",
+                      // justifyContent: "center",
+                    }}
+                  >
+                    {words.map((word, index) => {
+                      const usedCount = Object.values(userAnswers).filter(
+                        (v) => v === word,
+                      ).length;
+
+                      const totalCount = words.filter((w) => w === word).length;
+
+                      const isUsed = usedCount >= totalCount;
+                      return (
+                        <Draggable
+                          key={`${word}-${index}`}
+                          draggableId={`${word}-${index}`}
+                          index={index}
+                          isDragDisabled={checked || isUsed}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                padding: "7px 14px",
+                                border: "2px solid #2c5287",
+                                borderRadius: "8px",
+                                background: "white",
+                                fontWeight: "bold",
+                                cursor: isUsed ? "not-allowed" : "grab",
+                                fontSize: "16px",
+                                opacity: isUsed ? 0.4 : 1, // 🔥 تخفيف اللون
+                                ...provided.draggableProps.style,
+                              }}
+                            >
+                              {word}
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+
+              {/* الأسئلة بالصور */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: "12px",
+                }}
+              >
+                {questions.map((q) => (
+                  <div
+                    key={q.id}
+                    style={{
+                      padding: "6px",
+                      textAlign: "center",
+                      position: "relative",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "0px",
+                        left: "0px",
+                        color: "black",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    >
+                      {q.id}
+                    </div>
+                    <img
+                      src={q.image}
+                      alt={`q${q.id}`}
+                      style={{
+                        width: "100%",
+                        height: "90px",
+                        objectFit: "contain",
+                      }}
+                    />
+
+                    <Droppable droppableId={String(q.id)}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                          style={{
+                            position: "relative",
+                            marginTop: "6px",
+                            borderBottom: `2px solid ${
+                              checked &&
+                              userAnswers[q.id] !== correctAnswers[q.id]
+                                ? "red"
+                                : "#000"
+                            }`,
+                            minHeight: "28px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            fontSize: "20px",
+                            color: "#1C398E",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {userAnswers[q.id]}
+
+                          {checked &&
+                            userAnswers[q.id] !== correctAnswers[q.id] && (
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  left: "25%",
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  width: "20px",
+                                  height: "20px",
+                                  background: "#ef4444",
+                                  color: "white",
+                                  borderRadius: "50%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "12px",
+                                  fontWeight: "bold",
+                                  border: "2px solid white",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                  pointerEvents: "none",
+                                  zIndex: 3,
+                                }}
+                              >
+                                ✕
+                              </span>
+                            )}
+
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                handleShowAnswer={showAnswer}
+                handleStartAgain={handleStartAgain}
+                checkAnswers={checkAnswers}
+              />
             </div>
           </div>
         </div>
-
-        {/* Buttons */}
-        <div className="action-buttons-container">
-          <button onClick={resetAll} className="try-again-button">
-            Start Again ↻
-          </button>
-
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
-        </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 };
 

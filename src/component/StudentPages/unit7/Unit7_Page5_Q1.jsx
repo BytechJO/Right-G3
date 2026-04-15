@@ -73,6 +73,7 @@ const Unit7_Page5_Q1 = () => {
   };
   const checkAnswers = () => {
     if (locked) return;
+
     const empty = Object.values(userAnswers).some((v) => !v?.trim());
     if (empty) {
       ValidationAlert.info();
@@ -80,6 +81,7 @@ const Unit7_Page5_Q1 = () => {
     }
 
     let score = 0;
+
     Object.keys(correctAnswers).forEach((id) => {
       if (
         userAnswers[id]?.toLowerCase().trim() ===
@@ -89,16 +91,24 @@ const Unit7_Page5_Q1 = () => {
       }
     });
 
+    const total = Object.keys(correctAnswers).length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color}; font-weight:bold;">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
+
     setChecked(true);
     setLocked(true);
 
-    if (score === 10) {
-      ValidationAlert.success(`Perfect ${score}/10`);
-    } else if (score >= 5) {
-      ValidationAlert.warning(`Good ${score}/10`);
-    } else {
-      ValidationAlert.error(`${score}/10`);
-    }
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
   };
 
   const handleStartAgain = () => {
@@ -290,6 +300,7 @@ const Unit7_Page5_Q1 = () => {
                             alignItems: "center",
                             fontSize: "20px",
                             color: "#1C398E",
+                            fontWeight: "bold",
                           }}
                         >
                           {userAnswers[q.id]}
