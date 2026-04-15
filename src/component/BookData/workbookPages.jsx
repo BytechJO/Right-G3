@@ -25,12 +25,12 @@ import WB_Unit3_Page19 from "../WorkBookPages/Unit3/WB_Unit3_Page19";
 import WB_Unit3_Page20 from "../WorkBookPages/Unit3/WB_Unit3_Page20";
 
 // Unit4
-// import WB_Unit4_Page21 from "../WorkBookPages/Unit4/WB_Unit4_Page21";
-// import WB_Unit4_Page22 from "../WorkBookPages/Unit4/WB_Unit4_Page22";
-// import WB_Unit4_Page23 from "../WorkBookPages/Unit4/WB_Unit4_Page23";
-// import WB_Unit4_Page24 from "../WorkBookPages/Unit4/WB_Unit4_Page24";
-// import WB_Unit4_Page25 from "../WorkBookPages/Unit4/WB_Unit4_Page25";
-// import WB_Unit4_Page26 from "../WorkBookPages/Unit4/WB_Unit4_Page26";
+import WB_Unit4_Page21 from "../WorkBookPages/Unit4/WB_Unit4_Page21";
+import WB_Unit4_Page22 from "../WorkBookPages/Unit4/WB_Unit4_Page22";
+import WB_Unit4_Page23 from "../WorkBookPages/Unit4/WB_Unit4_Page23";
+import WB_Unit4_Page24 from "../WorkBookPages/Unit4/WB_Unit4_Page24";
+import WB_Unit4_Page25 from "../WorkBookPages/Unit4/WB_Unit4_Page25";
+import WB_Unit4_Page26 from "../WorkBookPages/Unit4/WB_Unit4_Page26";
 
 // Unit5
 import WB_Unit5_Page27 from "../WorkBookPages/Unit5/WB_Unit5_Page27";
@@ -106,12 +106,12 @@ export const workbookPages = (openPopup, goToUnit) => [
   <WB_Unit3_Page20 openPopup={openPopup} />,
 
   // unit4
-  // <WB_Unit4_Page21 openPopup={openPopup} />,
-  // <WB_Unit4_Page22 openPopup={openPopup} />,
-  // <WB_Unit4_Page23 openPopup={openPopup} />,
-  // <WB_Unit4_Page24 openPopup={openPopup} />,
-  // <WB_Unit4_Page25 openPopup={openPopup} />,
-  // <WB_Unit4_Page26 openPopup={openPopup} />,
+  <WB_Unit4_Page21 openPopup={openPopup} />,
+  <WB_Unit4_Page22 openPopup={openPopup} />,
+  <WB_Unit4_Page23 openPopup={openPopup} />,
+  <WB_Unit4_Page24 openPopup={openPopup} />,
+  <WB_Unit4_Page25 openPopup={openPopup} />,
+  <WB_Unit4_Page26 openPopup={openPopup} />,
 
   // unit5
   <WB_Unit5_Page27 openPopup={openPopup} />,
