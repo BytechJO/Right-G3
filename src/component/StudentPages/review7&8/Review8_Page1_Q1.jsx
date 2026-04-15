@@ -1,261 +1,216 @@
 import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import "./Review8_Page1_Q1.css";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 72/Review 8.svg";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
-import imgA from "../../../assets/imgs/test6.png";
-import imgB from "../../../assets/imgs/test6.png";
+import Button from "../../Button";
 
 const Review8_Page1_Q1 = () => {
-  const I_answers = ["I have pants.", "I have a cap.", "I have shorts."];
-
-  const She_answers = ["She has skirts.", "She has a hat.", "She has a scarf."];
-
-  const answersBank = [...I_answers, ...She_answers];
-
-  const questions = [
-    { id: "I-1", type: "I" },
-    { id: "I-2", type: "I" },
-    { id: "I-3", type: "I" },
-
-    { id: "S-1", type: "She" },
-    { id: "S-2", type: "She" },
-    { id: "S-3", type: "She" },
+  const items = [
+    {
+      text: "Was the teacher in the classroom?",
+      options: ["yes", "no"],
+      correct: "yes",
+    },
+    {
+      text: "What was her name?",
+      options: ["Miss Rose", "Miss Anna", "Miss Sara"],
+      correct: "Miss Rose",
+    },
+    {
+      text: "Were the students in the classroom?",
+      options: ["yes", "no"],
+      correct: "no",
+    },
+    {
+      text: "Was there a clock in the classroom?",
+      options: ["yes", "no"],
+      correct: "no",
+    },
+    {
+      text: "Where were the students?",
+      options: ["in the classroom", "outside the classroom", "at the door"],
+      correct: "outside the classroom",
+    },
   ];
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [showResult, setShowResult] = useState(false);
 
-  const [answers, setAnswers] = useState({});
   const [locked, setLocked] = useState(false);
 
-  const onDragEnd = (result) => {
-    if (!result.destination || locked) return;
+  const chooseOption = (i, value) => {
+    if (locked) return;
 
-    const sentence = result.draggableId;
-    const id = result.destination.droppableId.replace("answer-", "");
-    setAnswers((prev) => {
-      const newAnswers = { ...prev };
-
-      // remove sentence if already used
-      Object.keys(newAnswers).forEach((key) => {
-        if (newAnswers[key] === sentence) {
-          delete newAnswers[key];
-        }
-      });
-
-      newAnswers[id] = sentence;
-
-      return newAnswers;
-    });
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
   };
-
-  const reset = () => {
-    setAnswers({});
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
     setLocked(false);
+    setShowResult(false);
   };
 
   const showAnswers = () => {
-    const filled = {};
-
-    let iIndex = 0;
-    let sIndex = 0;
-
-    questions.forEach((q) => {
-      if (q.type === "I") {
-        filled[q.id] = I_answers[iIndex++];
-      } else {
-        filled[q.id] = She_answers[sIndex++];
-      }
-    });
-
-    setAnswers(filled);
+    setSelected(items.map((i) => i.correct));
+    setAnswers(items.map((i) => i.start + i.correct + i.end));
     setLocked(true);
   };
+  // =========================
+  // CHECK ANSWERS (🔥 FIXED)
+  // =========================
   const checkAnswers = () => {
     if (locked) return;
-    if (Object.keys(answers).length < questions.length) {
-      ValidationAlert.info("Please complete all answers.");
+
+    if (selected.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
-    let correct = 0;
+    let score = 0;
 
-    // I group
-    const userI = Object.entries(answers)
-      .filter(([k]) => k.startsWith("I"))
-      .map(([, v]) => v);
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
+    });
 
-    const correctI = I_answers;
+    const total = items.length;
 
-    correct += userI.filter((a) => correctI.includes(a)).length;
-
-    // She group
-    const userShe = Object.entries(answers)
-      .filter(([k]) => k.startsWith("S"))
-      .map(([, v]) => v);
-
-    const correctShe = She_answers;
-
-    correct += userShe.filter((a) => correctShe.includes(a)).length;
-    const total = questions.length;
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
     const msg = `
-<div style="font-size:20px;text-align:center;">
-<b>Score: ${correct} / ${total}</b>
-</div>
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
 `;
 
-    if (correct === total) ValidationAlert.success(msg);
-    else if (correct === 0) ValidationAlert.error(msg);
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
     setLocked(true);
+    setShowResult(true); // 🔥 مهم
   };
-
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex justify-center p-8">
-        <div className="w-[80%]">
-          <h5 className="header-title-page8 ">
-            <span style={{ marginRight: "20px" }}>A</span> Look and write.
-          </h5>
-
-          {/* IMAGES */}
-          <div className="w-[70%] mx-auto">
-            <div className="flex justify-center gap-8 ">
-              <div className="relative">
-                <img
-                  src={imgA}
-                  className="w-[380px]! h-[230px]! object-contain"
-                />
-                <span className="absolute bottom-2 right-2 bg-yellow-300 rounded-full px-2 text-sm">
-                  A
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div
+        className="div-forall"
+        style={{ width: "60%", marginBottom: "40px" }}
+      >
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>A</span>
+          Read and look at the picture. Then answer the questions.
+        </h5>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "25px",
+            marginTop: "20px",
+            flexWrap: "wrap",
+          }}
+        >
+          <img
+            src={img1}
+            style={{
+              width: "650px",
+              height: "auto",
+              objectFit: "cover",
+              marginBottom: "10px",
+            }}
+          />
+        </div>
+        <div className="space-y-6">
+          {items.map((item, i) => (
+            <div key={i} className="flex items-center gap-6 flex-wrap">
+              {/* السؤال */}
+              <span className="text-base">
+                <span style={{ fontWeight: "bold", marginRight: "10px" }}>
+                  {i + 1}
                 </span>
-              </div>
+                {item.text}
+              </span>
 
-              <div className="relative">
-                <img
-                  style={{ width: "380px", height: "230px" }}
-                  src={imgB}
-                  className="object-contain"
-                />
-                <span className="absolute bottom-2 right-2 bg-yellow-300 rounded-full px-2 text-sm">
-                  B
-                </span>
+              {/* الخيارات */}
+              <div className="flex items-center gap-4">
+                {item.options.map((opt, idx) => (
+                  <span
+                    key={idx}
+                    onClick={() => chooseOption(i, opt)}
+                    style={{
+                      position: "relative", // 🔥 مهم
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      cursor: "pointer",
+                      border:
+                        selected[i] === opt
+                          ? locked
+                            ? opt === item.correct
+                              ? "2px solid #1C398E"
+                              : "2px solid red"
+                            : "2px solid #1C398E"
+                          : "2px solid transparent",
+
+                      transition: "0.2s",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {opt}
+
+                    {showResult &&
+                      selected[i] === opt &&
+                      opt !== item.correct && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            right: "-18px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "#ef4444",
+                            color: "white",
+                            borderRadius: "50%",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          ✕
+                        </span>
+                      )}
+                  </span>
+                ))}
               </div>
             </div>
-
-            {/* ANSWERS BANK */}
-
-            <Droppable droppableId="bank" direction="horizontal">
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="flex flex-wrap gap-4 justify-center mb-5"
-                >
-                  {answersBank
-                    .filter((a) => !Object.values(answers).includes(a))
-                    .map((a, index) => (
-                      <Draggable
-                        key={a}
-                        draggableId={a}
-                        index={index}
-                        isDragDisabled={locked}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="bg-yellow-200 px-4 py-2 rounded-lg cursor-grab"
-                          >
-                            {a}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-
-            {/* QUESTIONS GRID */}
-
-            <div className="grid grid-cols-2 gap-x-16 mb-20">
-              {/* LEFT - I */}
-              <div>
-                {questions
-                  .filter((q) => q.type === "I")
-                  .map((q, index) => (
-                    <div key={q.id} className="flex items-center gap-3 mb-4">
-                      <span className="font-bold text-lg">{index + 1}</span>
-
-                      <Droppable droppableId={`answer-${q.id}`}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className="border-b-2 border-black min-h-10 flex-1"
-                          >
-                            <span className="text-red-600 font-semibold">
-                              {answers[q.id]}
-                            </span>
-
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </div>
-                  ))}
-              </div>
-
-              {/* RIGHT - She */}
-              <div>
-                {questions
-                  .filter((q) => q.type === "She")
-                  .map((q, index) => (
-                    <div key={q.id} className="flex items-center gap-3 mb-4">
-                      <span className="font-bold text-lg">{index + 1}</span>
-
-                      <Droppable droppableId={`answer-${q.id}`}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className="border-b-2 border-black min-h-10 flex-1"
-                          >
-                            <span className="text-red-600 font-semibold">
-                              {answers[q.id]}
-                            </span>
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </div>
-          {/* BUTTONS */}
-
-          <div className="action-buttons-container mt-10">
-            <button onClick={reset} className="try-again-button">
-              Start Again ↻
-            </button>
-
-            <button
-              onClick={showAnswers}
-              className="show-answer-btn swal-continue"
-            >
-              Show Answer
-            </button>
-
-            <button onClick={checkAnswers} className="check-button2">
-              Check Answer ✓
-            </button>
-          </div>
+          ))}
         </div>
       </div>
-    </DragDropContext>
+
+      {/* BUTTONS */}
+      <Button
+        handleShowAnswer={showAnswers}
+        handleStartAgain={resetAll}
+        checkAnswers={checkAnswers}
+      />
+    </div>
   );
 };
 
