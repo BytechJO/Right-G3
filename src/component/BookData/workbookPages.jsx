@@ -17,12 +17,12 @@
 // import WB_Unit2_Page14 from "../WorkBookPages/Unit2/WB_Unit2_Page14";
 
 // Unit3
-// import WB_Unit3_Page15 from "../WorkBookPages/Unit3/WB_Unit3_Page15";
-// import WB_Unit3_Page16 from "../WorkBookPages/Unit3/WB_Unit3_Page16";
-// import WB_Unit3_Page17 from "../WorkBookPages/Unit3/WB_Unit3_Page17";
-// import WB_Unit3_Page18 from "../WorkBookPages/Unit3/WB_Unit3_Page18";
-// import WB_Unit3_Page19 from "../WorkBookPages/Unit3/WB_Unit3_Page19";
-// import WB_Unit3_Page20 from "../WorkBookPages/Unit3/WB_Unit3_Page20";
+import WB_Unit3_Page15 from "../WorkBookPages/Unit3/WB_Unit3_Page15";
+import WB_Unit3_Page16 from "../WorkBookPages/Unit3/WB_Unit3_Page16";
+import WB_Unit3_Page17 from "../WorkBookPages/Unit3/WB_Unit3_Page17";
+import WB_Unit3_Page18 from "../WorkBookPages/Unit3/WB_Unit3_Page18";
+import WB_Unit3_Page19 from "../WorkBookPages/Unit3/WB_Unit3_Page19";
+import WB_Unit3_Page20 from "../WorkBookPages/Unit3/WB_Unit3_Page20";
 
 // Unit4
 // import WB_Unit4_Page21 from "../WorkBookPages/Unit4/WB_Unit4_Page21";
@@ -98,12 +98,12 @@ export const workbookPages = (openPopup, goToUnit) => [
   // <WB_Unit2_Page14 openPopup={openPopup} />,
 
   // unit3
-  // <WB_Unit3_Page15 openPopup={openPopup} />,
-  // <WB_Unit3_Page16 openPopup={openPopup} />,
-  // <WB_Unit3_Page17 openPopup={openPopup} />,
-  // <WB_Unit3_Page18 openPopup={openPopup} />,
-  // <WB_Unit3_Page19 openPopup={openPopup} />,
-  // <WB_Unit3_Page20 openPopup={openPopup} />,
+  <WB_Unit3_Page15 openPopup={openPopup} />,
+  <WB_Unit3_Page16 openPopup={openPopup} />,
+  <WB_Unit3_Page17 openPopup={openPopup} />,
+  <WB_Unit3_Page18 openPopup={openPopup} />,
+  <WB_Unit3_Page19 openPopup={openPopup} />,
+  <WB_Unit3_Page20 openPopup={openPopup} />,
 
   // unit4
   // <WB_Unit4_Page21 openPopup={openPopup} />,
