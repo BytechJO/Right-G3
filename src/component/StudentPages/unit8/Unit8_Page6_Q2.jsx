@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Unit8_Page6_Q1.css";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import bigImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 2.svg";
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 2.svg";
+import bigImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Asset 11.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Asset 12.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 4.svg";
@@ -153,7 +153,7 @@ const Unit8_Page6_Q2 = () => {
           >
             <img
               src={bigImage}
-              style={{ width: "auto", height: "80px", objectFit: "cover" }}
+              style={{ width: "auto", height: "auto", objectFit: "cover" }}
             />
           </div>
           {/* WORD BANK */}
@@ -213,7 +213,7 @@ const Unit8_Page6_Q2 = () => {
             {items.map((item, i) => (
               <div key={i} className="flex items-center gap-7">
                 {/* TEXT */}
-                <span className="text-2xl">
+                <span className="text-2xl md:text-xl lg:text-1xl">
                   {i + 1}. {item.text}
                 </span>
 
@@ -228,10 +228,10 @@ const Unit8_Page6_Q2 = () => {
                         {...provided.droppableProps}
                         style={{
                           position: "relative",
-                          minWidth: "350px",
+                          flex: 1, // 🔥 هذا السر
                           textAlign: "center",
                           fontWeight: "bold",
-                          color: answers[i] ? "#1C398E" : "black", // الكلمة أزرق غامق
+                          color: answers[i] ? "#1C398E" : "black",
                           borderBottom: `2px solid ${
                             showCorrect
                               ? isWrong

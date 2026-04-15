@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 1.svg";
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 2.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex B 4.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 13.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 14.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 15.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 16.svg";
 import Button from "../../Button";
 
 const Unit8_Page5_Q3 = () => {
@@ -14,25 +14,21 @@ const Unit8_Page5_Q3 = () => {
       img: img1,
       options: ["She was in class.", "She wasn’t in class."],
       correct: "She was in class.",
-      mark: true,
     },
     {
       img: img2,
       options: ["He was at the beach.", "He wasn’t at the beach."],
       correct: " He wasn’t at the beach.",
-      mark: true,
     },
     {
       img: img3,
       options: ["She was cleaning the car.", "She wasn’t cleaning the car."],
       correct: "She was cleaning the car.",
-      mark: true,
     },
     {
       img: img4,
       options: ["They were at the farm.", "They weren’t at the farm."],
       correct: "They weren’t at the farm.",
-      mark: true,
     },
   ];
   const [hovered, setHovered] = useState(null);
@@ -113,11 +109,23 @@ const Unit8_Page5_Q3 = () => {
     >
       <div className="div-forall">
         <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>D</span>
-          Look, read, and choose.
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            B
+          </span>
+          Look, read, and circle.
         </h5>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-2 lg:gap-y-16 gap-x-4 sm:gap-x-8 md:gap-x-16 lg:gap-x-60 xl:gap-x-40 mt-10">
+        <div
+          className="
+grid grid-cols-1 
+lg:grid-cols-2 
+gap-y-16 
+gap-x-50
+xl:gap-x-20   /* 🔥 للويب فقط */
+mt-10
+"
+        >
+          {" "}
           {items.map((item, i) => (
             <div
               key={i}
@@ -140,43 +148,15 @@ const Unit8_Page5_Q3 = () => {
                 {i + 1}
               </span>
 
-              <div
+              <img
+                src={item.img}
+                alt=""
                 style={{
-                  position: "relative",
-                  width: "15vw",
-                  height: "20vh",
+                  width: "140px",
+                  height: "auto",
+                  objectFit: "contain",
                 }}
-              >
-                <img
-                  src={item.img}
-                  alt=""
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    borderRadius: "12px",
-                  }}
-                />
-
-                {/* البوكس */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "5px",
-                    right: "5px",
-                    display: "flex",
-                    gap: "4px",
-                    background: "white",
-                    padding: "4px 6px",
-                    borderRadius: "6px",
-                    border: "1px solid #ccc",
-                    fontSize: "14px",
-                  }}
-                >
-                  <span style={{ opacity: item.mark ? 1 : 0.3 }}>✔️</span>
-                  <span style={{ opacity: !item.mark ? 1 : 0.3 }}>❌</span>
-                </div>
-              </div>
+              />
 
               <div className="flex flex-col gap-5 text-[18px]">
                 {item.options.map((opt, idx) => (

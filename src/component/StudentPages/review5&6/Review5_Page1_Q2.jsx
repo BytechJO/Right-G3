@@ -6,8 +6,8 @@ import behind from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run
 import under from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Ex B 2.svg";
 import between from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Ex B 3.svg";
 import inFrontOf from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Ex B 4.svg";
-import on from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Ex B 4.svg";
-import nextTo from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Ex B 4.svg";
+import on from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Asset 10.svg";
+import nextTo from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Asset 9.svg";
 
 const Review5_Page1_Q2 = () => {
   const leftRefs = useRef({});
