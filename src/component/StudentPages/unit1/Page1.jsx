@@ -1,4 +1,4 @@
-import page_1 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0001.jpg";
+import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 1.png";
 const Page1 = () => {
   return (
     <div

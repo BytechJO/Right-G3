@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import page_5 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0005.jpg";
+import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 5.png";
 
 import allUnitSound from "../../../assets/audio/ClassBook/Unit 1/P 5/CD2.Pg5_Reading_Adult Lady.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
