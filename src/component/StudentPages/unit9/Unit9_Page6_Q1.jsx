@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 1.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 3.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 4.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 4.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Asset 63.svg";
 
 const Unit9_Page6_Q1 = () => {
   const [userAnswers, setUserAnswers] = useState({});
@@ -19,36 +19,28 @@ const Unit9_Page6_Q1 = () => {
       image: img1,
       sentence: "Where were they yesterday?",
       word1: ["the train stop", "the airport"],
-      word2: ["are at", " were at", "are in", " were in"],
-      correct1: "were at",
-      correct2: "the train stop",
+      word2: ["are at", "were at", "are in", "were in"],
     },
     {
       id: 2,
       image: img2,
       sentence: "Where are they now?",
       word1: ["work", "the clinic"],
-      word2: ["are at", " were at", "are in", " were in"],
-      correct1: "are in",
-      correct2: "the clinic",
+      word2: ["are at", "were at", "are in", "were in"],
     },
     {
       id: 3,
       image: img3,
       sentence: "Where are they now?",
       word1: ["the library", "the bus stop"],
-      word2: ["are at", " were at", "are in", " were in"],
-      correct1: "are at",
-      correct2: "the bus stop",
+      word2: ["are at", "were at", "are in", "were in"],
     },
     {
       id: 4,
       image: img4,
       sentence: "Where were they yesterday?",
       word1: ["the theater", "the bakery"],
-      word2: ["are at", " were at", "are in", " were in"],
-      correct1: "were at",
-      correct2: "the theater",
+      word2: ["are at", "were at", "are in", "were in"],
     },
   ];
   const correctAnswers = {
@@ -263,7 +255,7 @@ const Unit9_Page6_Q1 = () => {
                       </select>
                       {checked &&
                         userAnswers[q.id]?.word2 &&
-                        userAnswers[q.id]?.word2 !== q.correct1 && (
+                        userAnswers[q.id]?.word2 !== correctAnswers[q.id].word2 && (
                           <div
                             style={{
                               position: "absolute",
@@ -341,7 +333,7 @@ const Unit9_Page6_Q1 = () => {
                       </select>
                       {checked &&
                         userAnswers[q.id]?.word1 &&
-                        userAnswers[q.id]?.word1 !== q.correct2 && (
+                        userAnswers[q.id]?.word1 !== correctAnswers[q.id].word1 && (
                           <div
                             style={{
                               position: "absolute",

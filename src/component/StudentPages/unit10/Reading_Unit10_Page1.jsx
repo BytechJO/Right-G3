@@ -1,4 +1,4 @@
-import page24 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0092.jpg";
+import page24 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 92.png";
 import React, { useState, useRef } from "react";
 import "./Reading_Unit10_Page2.css";
 import sound1 from "../../../assets/audio/ClassBook/U 2/CD1.Pg20_Reading_Adult Lady.mp3";

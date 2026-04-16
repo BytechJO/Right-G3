@@ -1,182 +1,257 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import WrongMark from "../../WrongMark";
 
-const Unit10_Page5_Q3 = () => {
-  const questions = [
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 5.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 6.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 7.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 8.svg";
+import Button from "../../Button";
+import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+
+const Unit10_Page5_Q2 = () => {
+  const items = [
     {
-      id: 1,
-      base: "nest",
-      words: ["feet", "rest", "eat", "desk"],
-      correct: [ "rest", "desk"],
+      img: img1,
+      options: ["br", "gr", "tr"],
+      correct: "gr",
     },
     {
-      id: 2,
-      base: "egg",
-      words: ["beg", "meat", "vet", "seal"],
-      correct: [ "beg", "vet"],
+      img: img2,
+      options: ["tr", "cr", "dr"],
+      correct: "tr",
     },
     {
-      id: 3,
-      base: "net",
-      words: ["tea", "pen", "pet", "ten"],
-      correct: ["pen", "pet", "ten"],
+      img: img3,
+      options: ["fr", "tr", "br"],
+      correct: "fr",
+    },
+    {
+      img: img4,
+      options: ["br", "dr", "cr"],
+      correct: "br",
     },
   ];
-
-  const [selected, setSelected] = useState({});
-  const [checked, setChecked] = useState(false);
+  const captions = [
+    {
+      start: 0,
+      end: 4.23,
+      text: "Page 8. Right Activities. Exercise A, number 1. ",
+    },
+    {
+      start: 4.25,
+      end: 8.28,
+      text: "Listen and write the missing letters. Number the pictures.  ",
+    },
+    { start: 8.3, end: 11.05, text: "1-tiger." },
+    { start: 11.07, end: 13.12, text: "2-taxi." },
+    { start: 13.14, end: 15.14, text: "3-duck." },
+    { start: 15.16, end: 17.13, text: "4-deer." },
+  ];
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
-  const toggleWord = (qId, word) => {
+  const chooseOption = (i, value) => {
     if (locked) return;
 
-    setSelected((prev) => {
-      const current = prev[qId] || [];
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
 
-      if (current.includes(word)) {
-        return {
-          ...prev,
-          [qId]: current.filter((w) => w !== word),
-        };
-      } else {
-        return {
-          ...prev,
-          [qId]: [...current, word],
-        };
-      }
-    });
+    const newAnswers = [...answers];
+    newAnswers[i] = items[i].start + value + items[i].end;
+    setAnswers(newAnswers);
   };
 
-  const reset = () => {
-    setSelected({});
-    setChecked(false);
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
     setLocked(false);
+    setShowResult(false);
   };
 
   const showAnswers = () => {
-    const correct = {};
-    questions.forEach((q) => {
-      correct[q.id] = q.correct;
-    });
-    setSelected(correct);
-    setChecked(true);
+    setSelected(items.map((i) => i.correct));
+    setAnswers(items.map((i) => i.start + i.correct + i.end));
     setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
 
-    const empty = questions.some(
-      (q) => !(selected[q.id] && selected[q.id].length > 0),
-    );
-
-    if (empty) {
-      ValidationAlert.info(
-        "Please select at least one word for each question.",
-      );
+    if (selected.includes("")) {
+      ValidationAlert.info();
       return;
     }
 
     let score = 0;
-    let total = 0;
 
-    questions.forEach((q) => {
-      const selectedWords = selected[q.id] || [];
-
-      // عدد الكلمات الصح
-      total += q.correct.length;
-
-      selectedWords.forEach((word) => {
-        if (q.correct.includes(word)) {
-          score++;
-        }
-      });
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
     });
 
+    const total = items.length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
     const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:#2e7d32;font-weight:bold;">
-        Score: ${score} / ${total}
-      </span>
-    </div>
-  `;
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
+`;
 
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setChecked(true);
     setLocked(true);
+    setShowResult(true); // 🔥 مهم
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
-      <div className="div-forall" style={{ width: "60%" }}>
-        <h5 className="header-title-page8 mb-8">
-          <span style={{ color: "#2e3192", marginRight: "20px" }}>2</span>
-          Read and circle the words with the same vowel sound.
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
+          Listen and choose.
         </h5>
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
 
-        {questions.map((q) => (
-          <div
-            key={q.id}
-            className="flex items-center gap-10 mb-4 px-4 py-3 rounded-xl bg-[#f5eee8]"
-          >
-            {/* رقم */}
-            <span className="font-bold w-5">{q.id}</span>
-
-            {/* الكلمات */}
-            <div className="flex gap-10 flex-wrap items-center">
-              {/* الكلمة الأساسية */}
-              <div className="bg-[#e8ddd5] px-3 py-1 rounded-full font-medium">
-                {q.base}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-10 mb-10 px-2">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                alignItems: "center", // لتوسيط كل العناصر داخل العمود
+              }}
+            >
+              {/* الرقم */}
+              <div style={{ fontWeight: "bold", fontSize: "18px" }}>
+                {i + 1}
               </div>
 
-              {/* باقي الكلمات */}
-              {q.words.map((word, i) => {
-                const isSelected = (selected[q.id] || []).includes(word);
-                const isCorrect = q.correct.includes(word);
+              {/* الصورة */}
+              <img
+                src={item.img}
+                alt=""
+                style={{
+                  width: "100%",
+                  maxWidth: "160px",
+                  height: "120px",
+                  objectFit: "contain",
+                }}
+              />
 
-                return (
-                  <div
-                    key={i}
-                    onClick={() => toggleWord(q.id, word)}
-                    className={`
-                      px-3 py-1 rounded-full cursor-pointer transition text-[17px]
-                      ${
-                        isSelected
-                          ? checked
-                            ? isCorrect
-                              ? "border-2 border-green-500 text-green-600 bg-green-50"
-                              : "border-2 border-gray-300 text-gray-400"   
-                            : "border-2 border-red-400"
-                          : "border-2 border-transparent hover:bg-gray-100"
-                      }
-                    `}
-                  >
-                    {word}
-                  </div>
-                );
-              })}
+              {/* الخيارات */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px", // مسافة منطقية بين الخيارات (بدل gap-12)
+                  width: "100%",
+                  justifyContent: "center",
+                }}
+              >
+                {item.options.map((opt, idx) => {
+                  // تحديد الألوان بناءً على الحالة
+                  let borderColor = "#e5e7eb"; // رمادي افتراضي
+                  let bgColor = "#f9fafb"; // خلفية افتراضية
+
+                  if (selected[i] === opt) {
+                    borderColor = "#1C398E";
+                    bgColor = "#EBF0FF"; // أزرق فاتح لما يختار
+                  }
+
+                  if (
+                    showResult &&
+                    selected[i] === opt &&
+                    opt !== item.correct
+                  ) {
+                    borderColor = "#ef4444";
+                    bgColor = "#FEF2F2"; // أحمر فاتح لما يكون غلط
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => chooseOption(i, opt)}
+                      style={{
+                        flex: 1,
+                        textAlign: "center",
+                        padding: "8px 12px", // padding شامل عشان يبان كـ زر
+                        borderRadius: "20px",
+                        cursor: locked ? "not-allowed" : "pointer",
+                        border: `2px solid ${borderColor}`,
+                        backgroundColor: bgColor,
+                        fontWeight: "500",
+                        fontSize: "16px",
+                        position: "relative",
+                        transition: "all 0.2s ease", // حركة ناعمة لما يتغير اللون
+                        maxWidth: "120px", // حتى لو الكلام قصير ما يكبر أوي
+                      }}
+                    >
+                      {opt}
+
+                      {/* ❌ أيقونة الخطأ */}
+                      {showResult &&
+                        selected[i] === opt &&
+                        opt !== item.correct && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-10px",
+                              left: "50%",
+                              transform: "translateX(-50%)", // ضبط التوسيط فوق الزر بالظبط
+                              width: "22px",
+                              height: "22px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </div>
+                        )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* buttons */}
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
+          ))}
+        </div>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );
 };
 
-export default Unit10_Page5_Q3;
+export default Unit10_Page5_Q2;
