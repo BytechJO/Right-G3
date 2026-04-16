@@ -1,274 +1,224 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Review9_Page1.css";
+import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 88/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 88/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 88/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 88/Ex B 4.svg";
+import Button from "../../Button";
 
-const Review9_Page1 = () => {
-  const [selectedImg, setSelectedImg] = useState(null);
-  const [matches, setMatches] = useState({});
-  const [showResult, setShowResult] = useState(false);
+const Review9_Page1_Q2 = () => {
+  const items = [
+    {
+      img: img1,
+      options: ["He had a bike.", "He didn’t have a bike."],
+      correct: "He had a bike.",
+    },
+    {
+      img: img2,
+      options: ["She had a kite.", "She didn’t have a kite."],
+      correct: "She had a kite.",
+    },
+    {
+      img: img3,
+      options: ["He had a computer.", "He didn’t have a computer."],
+      correct: "He had a computer.",
+    },
+    {
+      img: img4,
+      options: ["She had a bunny.", "She didn’t have a bunny."],
+      correct: "She had a bunny.",
+    },
+  ];
+
+  const [selected, setSelected] = useState(Array(items.length).fill(""));
+  const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
-  const [selectedSentence, setSelectedSentence] = useState(null);
+  const [showResult, setShowResult] = useState(false);
 
-  const imageRefs = useRef([]);
-  const sentenceRefs = useRef([]);
-  const containerRef = useRef(null);
+  const chooseOption = (i, value) => {
+    if (locked) return;
 
-  const images = [
-    { id: 0, img: img1 },
-    { id: 1, img: img2 },
-    { id: 2, img: img3 },
-    { id: 3, img: img4 },
-  ];
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
 
-  const sentences = [
-    { id: 0, text: "Sending an email." },
-    { id: 1, text: "listening to the radio." },
-    { id: 2, text: "ironing the clothes." },
-    { id: 3, text: "playing chess." },
-  ];
-
-  const correct = {
-    0: 1,
-    1: 0,
-    2: 3,
-    3: 2,
+    const newAnswers = [...answers];
+    newAnswers[i] = items[i].start + value + items[i].end;
+    setAnswers(newAnswers);
   };
 
-  const selectImage = (id) => {
-    if (locked || showResult) return;
-
-    // إذا اختار جملة → اربط
-    if (selectedSentence !== null) {
-      setMatches((prev) => {
-        const updated = { ...prev };
-
-        Object.keys(updated).forEach((imgKey) => {
-          if (updated[imgKey] === selectedSentence) {
-            delete updated[imgKey];
-          }
-        });
-
-        updated[id] = selectedSentence;
-        return updated;
-      });
-
-      setSelectedSentence(null);
-      return;
-    }
-
-    setSelectedImg(id);
-  };
-
-  const selectSentence = (id) => {
-    if (locked || showResult) return;
-
-    if (selectedImg !== null) {
-      setMatches((prev) => {
-        const updated = { ...prev };
-
-        Object.keys(updated).forEach((imgKey) => {
-          if (updated[imgKey] === id) {
-            delete updated[imgKey];
-          }
-        });
-
-        updated[selectedImg] = id;
-        return updated;
-      });
-
-      setSelectedImg(null);
-      return;
-    }
-
-    setSelectedSentence(id);
-  };
-  const checkAnswers = () => {
-    if (locked || showResult) return;
-
-    if (Object.keys(matches).length !== images.length) {
-      ValidationAlert.info("Please match all.");
-      return;
-    }
-
-    let correctCount = 0;
-
-    Object.entries(matches).forEach(([imgId, sentId]) => {
-      if (correct[imgId] === sentId) correctCount++;
-    });
-
-    const total = images.length;
-
-    const message = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:#2e7d32;font-weight:bold;">
-        Score: ${correctCount} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (correctCount === total) {
-      ValidationAlert.success(message);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(message);
-    } else {
-      ValidationAlert.warning(message);
-    }
-
-    setShowResult(true);
-    setLocked(true);
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setAnswers(Array(items.length).fill(""));
+    setLocked(false);
+    setShowResult(false);
   };
 
   const showAnswers = () => {
-    setMatches(correct);
+    setSelected(items.map((i) => i.correct));
+    setAnswers(items.map((i) => i.start + i.correct + i.end));
     setLocked(true);
-    setShowResult(true);
   };
 
-  const reset = () => {
-    setSelectedSentence(null);
-    setSelectedImg(null);
-    setMatches({});
-    setShowResult(false);
-    setLocked(false);
+  const checkAnswers = () => {
+    if (locked) return;
+
+    if (selected.includes("")) {
+      ValidationAlert.info();
+      return;
+    }
+
+    let score = 0;
+
+    items.forEach((item, i) => {
+      if (selected[i] === item.correct) {
+        score++;
+      }
+    });
+
+    const total = items.length;
+
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    const msg = `
+  <div style="font-size:20px;text-align:center;">
+    <span style="color:${color}; font-weight:bold;">
+      Score: ${score} / ${total}
+    </span>
+  </div>
+`;
+
+    if (score === total) ValidationAlert.success(msg);
+    else if (score === 0) ValidationAlert.error(msg);
+    else ValidationAlert.warning(msg);
+
+    setLocked(true);
+    setShowResult(true); // 🔥 مهم
   };
 
   return (
-    <div
-      ref={containerRef}
+        <div
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
-        position: "relative",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "30px",
-        }}
-      >
-        <h5 className="header-title-page8 mb-10">
-          <span style={{ marginRight: "20px" }}>B</span> Read and match.
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>B</span>
+          Read, look, and circle.
         </h5>
-        {/* SENTENCES (TOP) */}
-        <div className="relative w-full h-[150px]">
-          {sentences.map((sent, index) => {
-            let style = {};
 
-            if (index === 0) style = { left: "0%", top: "0%" }; // 1
-            if (index === 1) style = { left: "25%", top: "60px" }; // 2 (نازل)
-            if (index === 2) style = { right: "25%", top: "0%" }; // 3
-            if (index === 3) style = { right: "0%", top: "60px" }; // 4
-
-            return (
-              <div
-                key={sent.id}
-                ref={(el) => (sentenceRefs.current[index] = el)}
-                onClick={() => selectSentence(sent.id)}
+        <div className="grid grid-cols-2 gap-y-10 gap-x-20 mt-5 ">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                marginBottom: "30px",
+              }}
+            >
+              <span
                 style={{
                   position: "absolute",
-                  ...style,
+                  top: "-10px",
+                  left: "-15px",
+                  fontWeight: "bold",
+                  fontSize: "18px",
                 }}
-                className={`
-          bg-[#f4e9e2] px-6 py-3 rounded-full cursor-pointer font-medium text-center whitespace-nowrap transition
-          ${selectedSentence === sent.id ? "bg-blue-200" : ""}
-        `}
               >
-                <span>{sent.id + 1}. </span>
-                {sent.text}
-              </div>
-            );
-          })}
-        </div>
-        {/* IMAGES (BOTTOM) */}
-        <div className="grid grid-cols-4 gap-6 w-full justify-items-center mt-16">
-          {images.map((img, index) => (
-            <div
-              key={img.id}
-              ref={(el) => (imageRefs.current[index] = el)}
-              className={`border-2 border-red-500 rounded-lg p-2 cursor-pointer transition
-        ${selectedImg === img.id ? "bg-red-100" : ""}`}
-              onClick={() => selectImage(img.id)}
-            >
+                {i + 1}
+              </span>
+
               <img
-                src={img.img}
+                src={item.img}
                 alt=""
                 style={{
-                  height: "100%",
-                  objectFit: "cover",
+                  width: "15vw",
+                  height: "20vh",
+                  marginBottom:"20px"
                 }}
               />
+
+              <div className="flex flex-col gap-5 text-[20px]">
+                {item.options.map((opt, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
+                  >
+                    <span
+                      onClick={() => chooseOption(i, opt)}
+                      style={{
+                        display: "inline-block",
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        textAlign: "center",
+                        minWidth: "90px",
+
+                        border:
+                          selected[i] === opt
+                            ? locked
+                              ? opt === item.correct
+                                ? "2px solid #1C398E"
+                                : "2px solid #ef4444"
+                              : "2px solid #1C398E"
+                            : "2px solid transparent",
+                      }}
+                    >
+                      {opt}
+                    </span>
+
+                    {showResult &&
+                      selected[i] === opt &&
+                      opt !== item.correct && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "10px",
+                            left: "-15px",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "#ef4444",
+                            color: "white",
+                            borderRadius: "50%",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          ✕
+                        </span>
+                      )}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
-      </div>
-
-      <svg className="lines-layer">
-        {Object.entries(matches).map(([imgId, sentId], i) => {
-          const imgEl = imageRefs.current[imgId];
-          const sentEl = sentenceRefs.current[sentId];
-
-          if (!imgEl || !sentEl || !containerRef.current) return null;
-
-          const imgRect = imgEl.getBoundingClientRect();
-          const sentRect = sentEl.getBoundingClientRect();
-          const containerRect = containerRef.current.getBoundingClientRect();
-
-          const x1 = sentRect.left + sentRect.width / 2 - containerRect.left;
-          const y1 = sentRect.bottom - containerRect.top;
-
-          const x2 = imgRect.left + imgRect.width / 2 - containerRect.left;
-          const y2 = imgRect.top - containerRect.top;
-
-          const curveOffset = 60;
-
-          const pathData = `
-  M ${x1} ${y1}
-  C ${x1} ${y1 + curveOffset},
-    ${x2} ${y2 - curveOffset},
-    ${x2} ${y2}
-`;
-          return (
-            <g key={i}>
-              <path
-                d={pathData}
-                stroke="#e53935"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <circle cx={x2} cy={y2} r="4" fill="#9e9e9e" />
-            </g>
-          );
-        })}
-      </svg>
-
-      <div className="action-buttons-container">
-        <button className="try-again-button" onClick={reset}>
-          Start Again ↻
-        </button>
-
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-
-        <button className="check-button2" onClick={checkAnswers}>
-          Check Answer ✓
-        </button>
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={resetAll}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );
 };
 
-export default Review9_Page1;
+export default Review9_Page1_Q2;
