@@ -123,6 +123,13 @@ import Unit10_Page5_Q4 from "./unit10/Unit10_Page5_Q4";
 import Unit10_Page6_Q1 from "./unit10/Unit10_Page6_Q1";
 import Unit10_Page6_Q2 from "./unit10/Unit10_Page6_Q2";
 
+//review9&10
+import Review9_Page1_Q1 from "./review9&10/Review9_Page1_Q1";
+import Review9_Page1_Q2 from "./review9&10/Review9_Page1_Q2";
+import Review9_Page2_Q1 from "./review9&10/Review9_Page2_Q1";
+import Review9_Page2_Q2 from "./review9&10/Review9_Page2_Q2";
+import Review9_Page2_Q3 from "./review9&10/Review9_Page2_Q3";
+
 export const lessons = [
   // UNIT 1
   { component: Page8_Q1, unit: 1 }, //0
@@ -251,4 +258,10 @@ export const lessons = [
   { component: Unit10_Page6_Q1, unit: 10 }, //93
   { component: Unit10_Page6_Q2, unit: 10 }, //94
 
+  //review7&8
+  { component: Review9_Page1_Q1, unit: 10, isReview: true }, //95
+  { component: Review9_Page1_Q2, unit: 10, isReview: true }, //96
+  { component: Review9_Page2_Q1, unit: 10, isReview: true }, //97
+  { component: Review9_Page2_Q2, unit: 10, isReview: true }, //98
+  { component: Review9_Page2_Q3, unit: 10, isReview: true }, //99
 ];
