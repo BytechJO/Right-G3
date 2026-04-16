@@ -359,7 +359,7 @@ const Unit4_Page6_Q2 = () => {
       <div className="main-container-component">
         <div className="div-forall">
           <h5 className="header-title-page8" style={{ marginBottom: "10px" }}>
-            <span className="ex-A">E</span>Look, unscramble, and answer. Use the
+            <span className="ex-A mr-3">E</span>Look, unscramble, and answer. Use the
             words below.
           </h5>
           <Droppable droppableId="weather-bank" direction="horizontal">
