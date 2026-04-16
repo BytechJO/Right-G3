@@ -32,7 +32,7 @@ const WB_Unit4_Page22 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 2 })}
+          onClick={() => openPopup("exercise", { startIndex: 42 })}
           style={{ overflow: "visible" }}
         >
           <image className="svg-img"
@@ -55,7 +55,7 @@ const WB_Unit4_Page22 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 3 })}
+          onClick={() => openPopup("exercise", { startIndex: 43 })}
           style={{ overflow: "visible" }}
         >
           <image className="svg-img"
@@ -69,27 +69,7 @@ const WB_Unit4_Page22 = ({ openPopup }) => {
         </svg>
       </div>
 
-      <div
-        className="wb-unit1-p4-q3 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 4 })}
-          style={{ overflow: "visible" }}
-        >
-          <image className="svg-img"
-            href={arrowBtn}
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid meet"
-          />
-        </svg>
-      </div>
+
 
       <audio ref={audioRef} style={{ display: "none" }} />
     </div>
