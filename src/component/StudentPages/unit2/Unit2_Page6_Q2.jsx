@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
-import img5 from "../../../assets/imgs/test6.png";
-import img6 from "../../../assets/imgs/test6.png";
-import img7 from "../../../assets/imgs/test6.png";
-import img8 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 6.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 7.svg";
+import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 8.svg";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
 

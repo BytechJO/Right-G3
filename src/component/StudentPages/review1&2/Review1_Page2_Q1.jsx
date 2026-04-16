@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex C 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex C 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex C 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex C 4.svg";
 import Button from "../../Button";
 
 const Review1_Page2_Q1 = () => {
@@ -23,12 +23,12 @@ const Review1_Page2_Q1 = () => {
     {
       img: img3,
       options: ["long i", "short i"],
-      correct: "long i",
+      correct: "short i",
     },
     {
       img: img4,
       options: ["long e", "short e"],
-      correct: "short e",
+      correct: "long e",
     },
   ];
 

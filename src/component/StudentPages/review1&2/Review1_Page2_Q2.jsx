@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 4.svg";
 
 import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
 

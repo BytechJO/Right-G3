@@ -102,7 +102,7 @@ const Review2_Page2_Q2 = () => {
           word.
         </h5>
 
-        <div className="flex flex-col items-center px-6">
+        <div className="flex flex-col items-center px-6 mt-3">
           {" "}
           {/* 🎨 COLOR BAR */}{" "}
           <div className="mb-6">

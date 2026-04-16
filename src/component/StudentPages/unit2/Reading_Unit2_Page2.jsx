@@ -1,5 +1,5 @@
 import React, { useRef,useState } from "react";
-import page25 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0021.jpg";
+import page25 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 21.png";
 import "./Reading_Unit2_Page1.css";
 import { FaHeadphones } from "react-icons/fa";
 import sound1 from "../../../assets/audio/ClassBook/U 2/Pg21_1.5_Adult Lady.mp3";

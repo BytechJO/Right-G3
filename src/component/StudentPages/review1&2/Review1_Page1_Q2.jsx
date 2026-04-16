@@ -4,15 +4,15 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
-import img5 from "../../../assets/imgs/test6.png";
-import img6 from "../../../assets/imgs/test6.png";
-import img7 from "../../../assets/imgs/test6.png";
-import img8 from "../../../assets/imgs/test6.png";
-import img9 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 6.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 7.svg";
+import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 8.svg";
+import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 9.svg";
 
 const Review1_Page1_Q2 = () => {
   const answersBank = ["A", "B", "C"];
@@ -144,7 +144,7 @@ const Review1_Page1_Q2 = () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                   style={{
-                    display: "inline-flex", 
+                    display: "inline-flex",
                     justifyContent: "center",
                     gap: "10px",
                     marginBottom: "20px",

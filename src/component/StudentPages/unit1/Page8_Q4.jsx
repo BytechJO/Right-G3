@@ -246,8 +246,7 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          Why weren’t Tom and his sister in school last week in Helping Out on
-          the Farm on page 65?
+          What is the moral of Slow and Steady Wins the Race on page 5?
         </h5>
 
         {/* Words List */}

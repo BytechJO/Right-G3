@@ -14,10 +14,10 @@ import { CSS } from "@dnd-kit/utilities";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 
-import imgShower from "../../../assets/imgs/test6.png";
-import imgBike from "../../../assets/imgs/test6.png";
-import imgSoccer from "../../../assets/imgs/test6.png";
-import imgFlowers from "../../../assets/imgs/test6.png";
+import imgShower from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex B 1.svg";
+import imgBike from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex B 2.svg";
+import imgSoccer from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex B 3.svg";
+import imgFlowers from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex B 4.svg";
 import WrongMark from "../../WrongMark";
 
 const ACTIVITIES = [

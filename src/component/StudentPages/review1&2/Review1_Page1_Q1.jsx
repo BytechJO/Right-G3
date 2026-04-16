@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgA from "../../../assets/imgs/test6.png";
+import imgA from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex A 1.svg";
 import WrongMark from "../../WrongMark";
 import Button from "../../Button";
 
@@ -111,7 +111,7 @@ const Review1_Page1_Q1 = () => {
                   src={imgA}
                   style={{
                     width: "100%",
-                    height: "30vh",
+                    height: "40vh",
                     objectFit: "contain",
                   }}
                 />

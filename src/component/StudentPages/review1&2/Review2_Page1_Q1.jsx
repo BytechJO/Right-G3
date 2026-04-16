@@ -3,10 +3,10 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test.png";
-import img2 from "../../../assets/imgs/test.png";
-import img3 from "../../../assets/imgs/test.png";
-import img4 from "../../../assets/imgs/test.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 4.svg";
 import Button from "../../Button";
 
 const Review2_Page1_Q1 = () => {
@@ -107,7 +107,7 @@ const Review2_Page1_Q1 = () => {
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center "
+                className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center mt-3"
                 style={{
                   display: "flex",
                   gap: "15px",
@@ -201,8 +201,6 @@ const Review2_Page1_Q1 = () => {
                     width: "300px",
                     height: "150px",
                     objectFit: "cover",
-                    borderRadius: "10px",
-                    border: "2px solid #f39b42",
                   }}
                 />
 
