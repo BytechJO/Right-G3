@@ -1,4 +1,4 @@
-import page_1 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0090.jpg";
+import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 90.png";
 import "./Review10_Page1.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 

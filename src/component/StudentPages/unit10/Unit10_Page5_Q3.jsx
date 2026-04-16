@@ -1,270 +1,397 @@
-import React, { useState, useRef } from "react";
+import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
+import Button from "../../Button";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 2.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 4.svg";
 
 const Unit10_Page5_Q3 = () => {
-  const [lines, setLines] = useState([]);
-  const [startDot, setStartDot] = useState(null);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [locked, setLocked] = useState(false);
 
-  const imageDotRefs = useRef([]);
-  const textDotRefs = useRef([]);
-  const containerRef = useRef(null);
-  const [isChecked, setIsChecked] = useState(false);
-  const [showedAnswer, setShowedAnswer] = useState(false);
-  const images = [
-    { image: img1 },
-    { image: img2 },
-    { image: img3 },
-    { image: img4 },
+  const [checked, setChecked] = useState(false);
+
+  const actions = [
+    "watch a movie",
+    "read a book",
+    "ride a bike",
+    "plant flowers",
   ];
 
-  const words = [
-    `What is it drinking?
-It’s drinking milk.`,
-    `What is he doing?
-He’s putting on a jacket.`,
-    `What is she reading?
-She’s reading a magazine.`,
-    `What is she doing?
-She’s watering the flowers.`,
+  const questions = [
+    {
+      id: 1,
+      image: img1,
+      word1: actions,
+      word2: ["will", "won’t"],
+    },
+    {
+      id: 2,
+      image: img2,
+      word1: actions,
+      word2: ["will", "won’t"],
+    },
+    {
+      id: 3,
+      image: img3,
+      word1: actions,
+      word2: ["will", "won’t"],
+    },
+    {
+      id: 4,
+      image: img4,
+      word1: actions,
+      word2: ["will", "won’t"],
+    },
   ];
-  const correctMatches = {
-    0: 2, // reading ← girl reading
-    1: 0, // drinking ← dog
-    2: 1, // jacket ← boy
-    3: 3, // watering ← flowers
+  const correctAnswers = {
+    1: { word1: "watch a movie", word2: "will" },
+    2: { word1: "read a book", word2: "won’t" },
+    3: { word1: "ride a bike", word2: "won’t" },
+    4: { word1: "plant flowers", word2: "will" },
   };
-
-  const handleDotClick = (index, type) => {
-    if (isChecked || showedAnswer) return;
-    if (!startDot) {
-      setStartDot({ index, type });
-      return;
-    }
-
-    if (startDot.type === type) {
-      setStartDot(null);
-      return;
-    }
-
-    const imageIndex = startDot.type === "image" ? startDot.index : index;
-
-    const textIndex = startDot.type === "text" ? startDot.index : index;
-
-    setLines((prevLines) => {
-      let updatedLines = [...prevLines];
-
-      updatedLines = updatedLines.filter((line) => {
-        const img =
-          line.from.type === "image" ? line.from.index : line.to.index;
-
-        return img !== imageIndex;
-      });
-
-      updatedLines = updatedLines.filter((line) => {
-        const txt = line.from.type === "text" ? line.from.index : line.to.index;
-
-        return txt !== textIndex;
-      });
-
-      updatedLines.push({
-        from: { index: imageIndex, type: "image" },
-        to: { index: textIndex, type: "text" },
-      });
-
-      return updatedLines;
-    });
-
-    setStartDot(null);
+  const isWordUsedInAnotherQuestion = (currentQuestionId, word) => {
+    return Object.entries(userAnswers).some(
+      ([id, answer]) =>
+        Number(id) !== currentQuestionId && answer?.word1 === word,
+    );
   };
+  const handleChange = (id, field, value) => {
+    if (locked) return;
 
-  const showAnswers = () => {
-    if (isChecked) return;
-
-    const answerLines = Object.keys(correctMatches).map((imgIndex) => ({
-      from: { index: parseInt(imgIndex), type: "image" },
-      to: { index: correctMatches[imgIndex], type: "text" },
+    setUserAnswers((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value,
+      },
     }));
-
-    setLines(answerLines);
-    setShowedAnswer(true);
   };
-  const resetAll = () => {
-    setLines([]);
-    setStartDot(null);
-    setIsChecked(false);
-    setShowedAnswer(false);
+  const showAnswer = () => {
+    setUserAnswers(correctAnswers);
+    setLocked(true);
+    setChecked(true);
   };
-
   const checkAnswers = () => {
-    if (showedAnswer) return;
-    if (lines.length !== images.length) {
-      ValidationAlert.info(
-        "Oops!",
-        "Please complete all matches before checking.",
-      );
+    if (locked) return;
+
+    // ✅ التحقق إذا في فراغ
+    const empty = questions.some(
+      (q) => !userAnswers[q.id]?.word1 || !userAnswers[q.id]?.word2,
+    );
+
+    if (empty) {
+      ValidationAlert.info();
       return;
     }
 
     let score = 0;
 
-    lines.forEach((line) => {
-      const imageIndex =
-        line.from.type === "image" ? line.from.index : line.to.index;
+    Object.keys(correctAnswers).forEach((id) => {
+      // ✅ أول select
+      if (userAnswers[id]?.word2 === correctAnswers[id].word2) {
+        score += 1;
+      }
 
-      const textIndex =
-        line.from.type === "text" ? line.from.index : line.to.index;
-
-      if (correctMatches[imageIndex] === textIndex) {
-        score++;
+      // ✅ ثاني select
+      if (userAnswers[id]?.word1 === correctAnswers[id].word1) {
+        score += 1;
       }
     });
 
-    const total = images.length;
+    const total = Object.keys(correctAnswers).length * 2; // = 8
 
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
     const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:${color};font-weight:bold">
-          Score: ${score} / ${total}
-        </span>
-      </div>
-    `;
-    setIsChecked(true);
+    <div style="font-size:20px;text-align:center;">
+      <span style="color:${color}; font-weight:bold;">
+        Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
+
+    setChecked(true);
+    setLocked(true);
+
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
   };
+  const handleStartAgain = () => {
+    setUserAnswers({});
+    setChecked(false);
+    setLocked(false);
+  };
 
   return (
     <div
-      ref={containerRef}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
-        position: "relative",
       }}
     >
-      <div className="w-[80%]">
-        <h5 className="header-title-page8 ">
-          <span className="ex-A mr-5">B</span> Look, read, and match.
+      <div className="div-forall">
+        <h5 className="header-title-page8">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            B
+          </span>
+          Look and write.
         </h5>
-        {images.map((item, i) => (
-          <div key={i} className="flex justify-between items-center my-3">
-            {/* WORD SIDE */}
-            <div className="w-[45%] flex justify-start">
-              <div className="relative inline-block">
-                <p
-                  className={`px-5 py-1.5 rounded-[20px] font-semibold text-[20px] cursor-pointer min-w-20 whitespace-pre-line
-          ${
-           startDot?.index === i && startDot?.type === "text"
-           ? "border-2 border-[#e74c3c] bg-[#fdecea]"
-    : "bg-[#f6e6de]"
-             }`}
-                  onClick={() => handleDotClick(i, "text")}
-                >
-                  {words[i]}
-                </p>
-
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "900px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+            }}
+          >
+            {/* الأسئلة بالصور */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "12px",
+              }}
+            >
+              {questions.map((q) => (
                 <div
-                  ref={(el) => (textDotRefs.current[i] = el)}
-                  onClick={() => handleDotClick(i, "text")}
-                  className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-[#d82b2b] rounded-full cursor-pointer"
-                />
-              </div>
+                  key={q.id}
+                  style={{
+                    padding: "12px",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "0px",
+                      left: "0px",
+                      color: "black",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      zIndex: 2,
+                    }}
+                  >
+                    {q.id}
+                  </div>
+
+                  <img
+                    src={q.image}
+                    alt={`q${q.id}`}
+                    style={{
+                      width: "70%",
+                      height: "auto",
+                      objectFit: "cover",
+                      marginTop: "10px",
+                    }}
+                  />
+                  <div
+                    style={{
+                      marginTop: "5px",
+                      borderBottom: "2px solid black",
+                      paddingBottom: "3px",
+                      minWidth: "220px",
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "6px",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {q.id === 1 || q.id === 3 ? "He" : "She"}
+                    <div
+                      style={{ position: "relative", display: "inline-block" }}
+                    >
+                      <select
+                        value={userAnswers[q.id]?.word2 || ""}
+                        onChange={(e) =>
+                          handleChange(q.id, "word2", e.target.value)
+                        }
+                        disabled={locked}
+                        style={{
+                          appearance: "none",
+                          WebkitAppearance: "none",
+                          MozAppearance: "none",
+
+                          border: "none",
+                          borderBottom: "1px dashed #aaa",
+                          backgroundColor: "transparent",
+
+                          fontSize: "inherit",
+                          fontWeight: "600",
+                          color: userAnswers[q.id]?.word2 ? "#1e3a8a" : "#aaa",
+
+                          padding: "2px 18px 2px 4px",
+                          minWidth: "90px",
+
+                          cursor: locked ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        <option value="" disabled hidden>
+                          Select
+                        </option>
+                        {q.word2.map((w, i) => (
+                          <option key={i} value={w} style={{color:"black"}}>
+                            {w}
+                          </option>
+                        ))}
+                      </select>
+                      {checked &&
+                        userAnswers[q.id]?.word2 &&
+                        userAnswers[q.id]?.word2 !==
+                          correctAnswers[q.id].word2 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-6px",
+                              right: "-6px",
+                              transform: "translateY(-50%)",
+                              width: "22px",
+                              height: "22px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </div>
+                        )}
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                          fontSize: "10px",
+                          color: "#666",
+                        }}
+                      >
+                        ▾
+                      </span>
+                    </div>
+                    <div
+                      style={{ position: "relative", display: "inline-block" }}
+                    >
+                      <select
+                        value={userAnswers[q.id]?.word1 || ""}
+                        onChange={(e) =>
+                          handleChange(q.id, "word1", e.target.value)
+                        }
+                        disabled={locked}
+                        style={{
+                          appearance: "none",
+                          WebkitAppearance: "none",
+                          MozAppearance: "none",
+
+                          border: "none",
+                          borderBottom: "1px dashed #aaa",
+                          backgroundColor: "transparent",
+
+                          fontSize: "inherit",
+                          fontWeight: "600",
+                          color: userAnswers[q.id]?.word1 ? "#1e3a8a" : "#aaa",
+
+                          padding: "2px 18px 2px 4px",
+                          minWidth: "90px",
+
+                          cursor: locked ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        <option value="" disabled hidden>
+                          Select
+                        </option>
+                        {q.word1.map((w, i) => (
+                          <option
+                            key={i}
+                            value={w}
+                            disabled={isWordUsedInAnotherQuestion(q.id, w)}
+                            style={{
+                              color: isWordUsedInAnotherQuestion(q.id, w)
+                                ? "#999"
+                                : "#000",
+                            }}
+                          >
+                            {w}
+                          </option>
+                        ))}
+                      </select>
+                      {checked &&
+                        userAnswers[q.id]?.word1 &&
+                        userAnswers[q.id]?.word1 !==
+                          correctAnswers[q.id].word1 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-6px",
+                              right: "-6px",
+                              transform: "translateY(-50%)",
+                              width: "22px",
+                              height: "22px",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </div>
+                        )}
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: "4px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          pointerEvents: "none",
+                          fontSize: "10px",
+                          color: "#666",
+                        }}
+                      >
+                        ▾
+                      </span>
+                    </div>
+                    .
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* IMAGE SIDE */}
-            <div className="w-[35%] flex items-center justify-end gap-2">
-              <div
-                ref={(el) => (imageDotRefs.current[i] = el)}
-                onClick={() => handleDotClick(i, "image")}
-                className="w-3 h-3 bg-[#d82b2b] rounded-full cursor-pointer"
-              />
-
-              <img
-                src={item.image}
-                onClick={() => handleDotClick(i, "image")}
-                style={{
-                  height: "120px",
-                  width: "200px",
-                  objectFit: "cover",
-                  cursor: "pointer",
-                  borderRadius: "16px",
-                  border: "2px solid #e74c3c",
-                  transition: "all 0.3s ease",
-                  transform:
-                    startDot?.index === i && startDot?.type === "image"
-                      ? "scale(1.05)"
-                      : "scale(1)",
-                  boxShadow:
-                    startDot?.index === i && startDot?.type === "image"
-                      ? "0 4px 10px rgba(0,0,0,0.2)"
-                      : "none",
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {lines.map((line, i) => {
-          const imageIndex =
-            line.from.type === "image" ? line.from.index : line.to.index;
-
-          const textIndex =
-            line.from.type === "text" ? line.from.index : line.to.index;
-
-          const imgDot = imageDotRefs.current[imageIndex];
-          const txtDot = textDotRefs.current[textIndex];
-
-          if (!imgDot || !txtDot || !containerRef.current) return null;
-
-          const imgRect = imgDot.getBoundingClientRect();
-          const txtRect = txtDot.getBoundingClientRect();
-          const containerRect = containerRef.current.getBoundingClientRect();
-
-          const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
-          const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
-
-          const x2 = txtRect.left + txtRect.width / 2 - containerRect.left;
-          const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
-
-          return (
-            <line
-              key={i}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#e74c3c"
-              strokeWidth="3"
-              strokeLinecap="round"
+            <Button
+              handleShowAnswer={showAnswer}
+              handleStartAgain={handleStartAgain}
+              checkAnswers={checkAnswers}
             />
-          );
-        })}
-      </svg>
-
-      <div className="action-buttons-container">
-        <button onClick={resetAll} className="try-again-button">
-          Start Again ↻
-        </button>
-
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
+          </div>
+        </div>
       </div>
     </div>
   );
