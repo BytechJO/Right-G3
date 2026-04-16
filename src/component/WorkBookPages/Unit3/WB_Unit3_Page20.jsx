@@ -17,7 +17,7 @@ return (
             width="22"
             height="22"
             viewBox="0 0 90 90"
-            onClick={() => openPopup("exercise", { startIndex: 10 })}
+            onClick={() => openPopup("exercise", { startIndex: 36 })}
             style={{ overflow: "visible" }}
             // className="click-icon-page8-2 hover:scale-110 transition"
           >
@@ -41,7 +41,53 @@ return (
             width="22"
             height="22"
             viewBox="0 0 90 90"
-            onClick={() => openPopup("exercise", { startIndex: 11 })}
+            onClick={() => openPopup("exercise", { startIndex: 37 })}
+            style={{ overflow: "visible" }}
+            // className="click-icon-page8-2 hover:scale-110 tra5nsition"
+          >
+            <image
+              className="svg-img"
+              href={arrowBtn}
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </svg>
+        </div>
+        <div
+          className="wb-unit7-p1-q2 hover:scale-110 transition "
+          style={{ overflow: "visible" }}
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 90 90"
+            onClick={() => openPopup("exercise", { startIndex: 38 })}
+            style={{ overflow: "visible" }}
+            // className="click-icon-page8-2 hover:scale-110 tra5nsition"
+          >
+            <image
+              className="svg-img"
+              href={arrowBtn}
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </svg>
+        </div>
+        <div
+          className="wb-unit7-p1-q2 hover:scale-110 transition "
+          style={{ overflow: "visible" }}
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 90 90"
+            onClick={() => openPopup("exercise", { startIndex: 39 })}
             style={{ overflow: "visible" }}
             // className="click-icon-page8-2 hover:scale-110 tra5nsition"
           >

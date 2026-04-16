@@ -1,20 +1,20 @@
 // Unit1
-// import WB_Unit1_Page1 from "../WorkBookPages/Unit1/WB_Unit1_Page1";
-// import WB_Unit1_Page2 from "../WorkBookPages/Unit1/WB_Unit1_Page2";
-// import WB_Unit1_Page3 from "../WorkBookPages/Unit1/WB_Unit1_Page3";
-// import WB_Unit1_Page4 from "../WorkBookPages/Unit1/WB_Unit1_Page4";
-// import WB_Unit1_Page5 from "../WorkBookPages/Unit1/WB_Unit1_Page5";
-// import WB_Unit1_Page6 from "../WorkBookPages/Unit1/WB_Unit1_Page6";
-// import WB_Unit1_Page7 from "../WorkBookPages/Unit1/WB_Unit1_Page7";
-// import WB_Unit1_Page8 from "../WorkBookPages/Unit1/WB_Unit1_Page8";
+import WB_Unit1_Page1 from "../WorkBookPages/Unit1/WB_Unit1_Page1";
+import WB_Unit1_Page2 from "../WorkBookPages/Unit1/WB_Unit1_Page2";
+import WB_Unit1_Page3 from "../WorkBookPages/Unit1/WB_Unit1_Page3";
+import WB_Unit1_Page4 from "../WorkBookPages/Unit1/WB_Unit1_Page4";
+import WB_Unit1_Page5 from "../WorkBookPages/Unit1/WB_Unit1_Page5";
+import WB_Unit1_Page6 from "../WorkBookPages/Unit1/WB_Unit1_Page6";
+import WB_Unit1_Page7 from "../WorkBookPages/Unit1/WB_Unit1_Page7";
+import WB_Unit1_Page8 from "../WorkBookPages/Unit1/WB_Unit1_Page8";
 
 // Unit2
-// import WB_Unit2_Page9 from "../WorkBookPages/Unit2/WB_Unit2_Page9";
-// import WB_Unit2_Page10 from "../WorkBookPages/Unit2/WB_Unit2_Page10";
-// import WB_Unit2_Page11 from "../WorkBookPages/Unit2/WB_Unit2_Page11";
-// import WB_Unit2_Page12 from "../WorkBookPages/Unit2/WB_Unit2_Page12";
-// import WB_Unit2_Page13 from "../WorkBookPages/Unit2/WB_Unit2_Page13";
-// import WB_Unit2_Page14 from "../WorkBookPages/Unit2/WB_Unit2_Page14";
+import WB_Unit2_Page9 from "../WorkBookPages/Unit2/WB_Unit2_Page9";
+import WB_Unit2_Page10 from "../WorkBookPages/Unit2/WB_Unit2_Page10";
+import WB_Unit2_Page11 from "../WorkBookPages/Unit2/WB_Unit2_Page11";
+import WB_Unit2_Page12 from "../WorkBookPages/Unit2/WB_Unit2_Page12";
+import WB_Unit2_Page13 from "../WorkBookPages/Unit2/WB_Unit2_Page13";
+import WB_Unit2_Page14 from "../WorkBookPages/Unit2/WB_Unit2_Page14";
 
 // Unit3
 import WB_Unit3_Page15 from "../WorkBookPages/Unit3/WB_Unit3_Page15";
@@ -81,21 +81,21 @@ import WB_Unit10_Page62 from "../WorkBookPages/Unit10/WB_Unit10_Page62";
 
 export const workbookPages = (openPopup, goToUnit) => [
   // unit1
-  // <WB_Unit1_Page1 />,
-  // <WB_Unit1_Page2 />,
-  // <WB_Unit1_Page3 openPopup={openPopup} />,
-  // <WB_Unit1_Page4 openPopup={openPopup} />,
-  // <WB_Unit1_Page5 openPopup={openPopup} />,
-  // <WB_Unit1_Page6 openPopup={openPopup} />,
-  // <WB_Unit1_Page7 openPopup={openPopup} />,
-  // <WB_Unit1_Page8 openPopup={openPopup} />,
+  <WB_Unit1_Page1 />,
+  <WB_Unit1_Page2 />,
+  <WB_Unit1_Page3 openPopup={openPopup} />,
+  <WB_Unit1_Page4 openPopup={openPopup} />,
+  <WB_Unit1_Page5 openPopup={openPopup} />,
+  <WB_Unit1_Page6 openPopup={openPopup} />,
+  <WB_Unit1_Page7 openPopup={openPopup} />,
+  <WB_Unit1_Page8 openPopup={openPopup} />,
   // unit2
-  // <WB_Unit2_Page9 openPopup={openPopup} />,
-  // <WB_Unit2_Page10 openPopup={openPopup} />,
-  // <WB_Unit2_Page11 openPopup={openPopup} />,
-  // <WB_Unit2_Page12 openPopup={openPopup} />,
-  // <WB_Unit2_Page13 openPopup={openPopup} />,
-  // <WB_Unit2_Page14 openPopup={openPopup} />,
+  <WB_Unit2_Page9 openPopup={openPopup} />,
+  <WB_Unit2_Page10 openPopup={openPopup} />,
+  <WB_Unit2_Page11 openPopup={openPopup} />,
+  <WB_Unit2_Page12 openPopup={openPopup} />,
+  <WB_Unit2_Page13 openPopup={openPopup} />,
+  <WB_Unit2_Page14 openPopup={openPopup} />,
 
   // unit3
   <WB_Unit3_Page15 openPopup={openPopup} />,

@@ -2,65 +2,49 @@ import { useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 1.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 2.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 3.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 4.svg";
-
-const ACTIVE_COLOR = "#f39b42";
-const LINE_COLOR = "#ffca94";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 7.svg";
+import img2 from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 8.svg";
+import img3 from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 9.svg";
+const LINE_COLOR = "#d62828";
 const INACTIVE_COLOR = "#bdbdbd";
 
 const exerciseData = {
   left: [
     {
       id: 1,
-      img: img1,
-      text: "Does he have any ink?",
+      text: "Kate wants a bike, coat, and cake.",
     },
     {
       id: 2,
-      img: img2,
-      text: "Does she have any paper?",
+      text: "Hansel likes the cat and ducks.",
     },
     {
       id: 3,
-      img: img3,
-      text: "Does he have any eggplants?",
-    },
-    {
-      id: 4,
-      img: img4,
-      text: "Does he have any grapes?",
+      text: "There are two flags on the top of the boat.",
     },
   ],
   right: [
     {
       id: 1,
-      text: "Yes, he has some.",
+      img: img1, // boat
     },
     {
       id: 2,
-      text: "No, he hasn’t any.",
+      img: img2, // girl thought bubble
     },
     {
       id: 3,
-      text: "Yes, she has some.",
-    },
-    {
-      id: 4,
-      text: "Yes, he has a little.",
+      img: img3, // ducks + boy
     },
   ],
   correctMatches: {
-    1: 4,
+    1: 2,
     2: 3,
-    3: 2,
-    4: 1,
+    3: 1,
   },
 };
 
-const WB_UnitX_PageXX_QA = () => {
+export default function WB_Unit3_Page8_QC() {
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -88,8 +72,6 @@ const WB_UnitX_PageXX_QA = () => {
 
           return {
             id: `${leftId}-${rightId}`,
-            leftId: Number(leftId),
-            rightId: Number(rightId),
             x1: leftRect.right - containerRect.left,
             y1: leftRect.top + leftRect.height / 2 - containerRect.top,
             x2: rightRect.left - containerRect.left,
@@ -201,32 +183,167 @@ const WB_UnitX_PageXX_QA = () => {
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>
+      <style>{`
+        .wb-c8-wrapper {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 28px !important;
+          max-width: 1150px !important;
+          margin: 0 auto !important;
+          padding: 8px 14px 20px !important;
+          box-sizing: border-box !important;
+          width: 100% !important;
+        }
+
+        .wb-c8-grid {
+          position: relative !important;
+          width: 100% !important;
+          display: grid !important;
+          grid-template-columns: minmax(0, 1fr) 170px minmax(260px, 360px) !important;
+          gap: 20px !important;
+          align-items: start !important;
+        }
+
+        .wb-c8-left-col {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 42px !important;
+          z-index: 2 !important;
+        }
+
+        .wb-c8-right-col {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 28px !important;
+          z-index: 2 !important;
+          padding-top: 0 !important;
+        }
+
+        .wb-c8-left-row {
+          display: grid !important;
+          grid-template-columns: 28px minmax(0, 1fr) 18px !important;
+          align-items: center !important;
+          gap: 14px !important;
+          min-height: 110px !important;
+          position: relative !important;
+        }
+
+        .wb-c8-right-row {
+          display: grid !important;
+          grid-template-columns: 18px 1fr !important;
+          align-items: center !important;
+          gap: 14px !important;
+          min-height: 116px !important;
+          position: relative !important;
+        }
+
+        .wb-c8-num {
+          font-size: 22px !important;
+          font-weight: 700 !important;
+          color: #222 !important;
+          line-height: 1 !important;
+          flex-shrink: 0 !important;
+        }
+
+        .wb-c8-text {
+          font-size: 20px !important;
+          line-height: 1.45 !important;
+          color: #222 !important;
+          cursor: pointer !important;
+          padding: 6px 8px !important;
+          border-radius: 12px !important;
+          transition: all 0.2s ease !important;
+          word-break: break-word !important;
+        }
+
+        .wb-c8-dot {
+          width: 18px !important;
+          height: 18px !important;
+          border-radius: 50% !important;
+          transition: all 0.2s ease !important;
+          box-sizing: border-box !important;
+          cursor: pointer !important;
+          flex-shrink: 0 !important;
+        }
+
+        .wb-c8-dot.selected {
+          transform: scale(1.1) !important;
+          box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.45) !important;
+        }
+
+        .wb-c8-right-img-wrap {
+          width: 100% !important;
+          min-height: 108px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+          cursor: pointer !important;
+          box-sizing: border-box !important;
+        }
+
+        .wb-c8-right-img {
+          max-width: 100% !important;
+          max-height: 115px !important;
+          width: auto !important;
+          height: auto !important;
+          object-fit: contain !important;
+          display: block !important;
+        }
+
+        .wb-c8-wrong {
+          position: absolute !important;
+          right: -28px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          width: 22px !important;
+          height: 22px !important;
+          border-radius: 50% !important;
+          background-color: #ef4444 !important;
+          color: #fff !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 12px !important;
+          font-weight: 700 !important;
+          border: 2px solid #fff !important;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+        }
+
+        .wb-c8-buttons {
+          display: flex !important;
+          justify-content: center !important;
+          margin-top: 8px !important;
+        }
+
+        @media (max-width: 900px) {
+          .wb-c8-grid {
+            grid-template-columns: 1fr !important;
+            gap: 18px !important;
+          }
+
+          .wb-c8-left-col,
+          .wb-c8-right-col {
+            gap: 18px !important;
+          }
+
+          .wb-c8-left-row,
+          .wb-c8-right-row {
+            min-height: auto !important;
+          }
+
+          .wb-c8-right-img-wrap {
+            justify-content: flex-start !important;
+          }
+        }
+      `}</style>
+
+      <div className="wb-c8-wrapper">
+        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
+          <span className="WB-ex-A">C</span>
           Read, look, and match.
         </h1>
 
-        <div
-          ref={containerRef}
-          style={{
-            position: "relative",
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1fr 180px 1fr",
-            gap: "24px",
-            alignItems: "start",
-          }}
-        >
+        <div ref={containerRef} className="wb-c8-grid">
           <svg
             style={{
               position: "absolute",
@@ -253,89 +370,27 @@ const WB_UnitX_PageXX_QA = () => {
             ))}
           </svg>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "18px",
-              zIndex: 2,
-            }}
-          >
+          <div className="wb-c8-left-col">
             {exerciseData.left.map((item) => {
               const wrong = isWrongMatch(item.id);
               const selected = isLeftSelected(item.id);
               const connected = isLeftConnected(item.id);
 
               return (
-                <div
-                  key={item.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "32px 70px 1fr 18px",
-                    alignItems: "center",
-                    gap: "14px",
-                    minHeight: "88px",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "22px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    {item.id}
-                  </div>
+                <div key={item.id} className="wb-c8-left-row">
+                  <div className="wb-c8-num">{item.id}</div>
 
                   <div
                     onClick={() => handleLeftClick(item.id)}
+                    className="wb-c8-text"
                     style={{
-                      width: "60px",
-                      height: "60px",
-                      border: selected
-                        ? `3px solid ${ACTIVE_COLOR}`
-                        : connected
-                        ? `2px solid ${LINE_COLOR}`
-                        : "2px solid transparent",
-                      borderRadius: "14px",
-                      overflow: "hidden",
-                      backgroundColor: "#fff",
-                      boxSizing: "border-box",
-                      boxShadow: selected
-                        ? `0 0 0 4px rgba(255, 202, 148, 0.45)`
-                        : "none",
-                      transition: "all 0.2s ease",
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  >
-                    <img
-                      src={item.img}
-                      alt={`question-${item.id}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
-                        display: "block",
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    onClick={() => handleLeftClick(item.id)}
-                    style={{
-                      fontSize: "20px",
-                      lineHeight: "1.4",
-                      color: "#222",
-                      cursor: showAns ? "default" : "pointer",
-                      padding: "6px 10px",
-                      borderRadius: "12px",
                       border: selected
                         ? `2px solid ${ACTIVE_COLOR}`
                         : "2px solid transparent",
                       backgroundColor: selected
                         ? "rgba(243, 155, 66, 0.08)"
                         : "transparent",
-                      transition: "all 0.2s ease",
+                      cursor: showAns ? "default" : "pointer",
                     }}
                   >
                     {item.text}
@@ -344,45 +399,14 @@ const WB_UnitX_PageXX_QA = () => {
                   <div
                     ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
                     onClick={() => handleLeftClick(item.id)}
+                    className={`wb-c8-dot ${selected ? "selected" : ""}`}
                     style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
                       backgroundColor: getDotColor("left", item.id),
                       cursor: showAns ? "default" : "pointer",
-                      boxShadow: selected
-                        ? `0 0 0 4px rgba(255, 202, 148, 0.45)`
-                        : "none",
-                      transform: selected ? "scale(1.1)" : "scale(1)",
-                      transition: "all 0.2s ease",
-                      boxSizing: "border-box",
                     }}
                   />
 
-                  {wrong && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: "-28px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        width: "22px",
-                        height: "22px",
-                        borderRadius: "50%",
-                        backgroundColor: "#ef4444",
-                        color: "#fff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "12px",
-                        fontWeight: "700",
-                        border: "2px solid #fff",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                      }}
-                    >
-                      ✕
-                    </div>
-                  )}
+                  {wrong && <div className="wb-c8-wrong">✕</div>}
                 </div>
               );
             })}
@@ -390,73 +414,48 @@ const WB_UnitX_PageXX_QA = () => {
 
           <div />
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "18px",
-              zIndex: 2,
-            }}
-          >
+          <div className="wb-c8-right-col">
             {exerciseData.right.map((item) => {
               const selectedMatch = isSelectedRightMatch(item.id);
               const connected = isRightConnected(item.id);
 
               return (
-                <div
-                  key={item.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "18px 1fr",
-                    alignItems: "center",
-                    gap: "14px",
-                    minHeight: "88px",
-                    position: "relative",
-                  }}
-                >
+                <div key={item.id} className="wb-c8-right-row">
                   <div
                     ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
                     onClick={() => handleRightClick(item.id)}
+                    className={`wb-c8-dot ${selectedMatch ? "selected" : ""}`}
                     style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
                       backgroundColor: getDotColor("right", item.id),
                       cursor: showAns ? "default" : "pointer",
-                      boxShadow: selectedMatch
-                        ? `0 0 0 4px rgba(255, 202, 148, 0.45)`
-                        : "none",
-                      transform: selectedMatch ? "scale(1.1)" : "scale(1)",
-                      transition: "all 0.2s ease",
-                      boxSizing: "border-box",
                     }}
                   />
 
                   <div
+                    className="wb-c8-right-img-wrap"
                     onClick={() => handleRightClick(item.id)}
                     style={{
-                      fontSize: "20px",
-                      lineHeight: "1.4",
-                      color: "#222",
-                      cursor: showAns ? "default" : "pointer",
-                      padding: "10px 12px",
-                      borderRadius: "12px",
                       border: selectedMatch
-                        ? `3px solid ${ACTIVE_COLOR}`
+                        ? `2px solid ${ACTIVE_COLOR}`
                         : connected
-                        ? `2px solid ${LINE_COLOR}`
-                        : "2px solid transparent",
+                        ? `2px solid transparent`
+                        : `2px solid transparent`,
+                      borderRadius: "12px",
+                      padding: "4px 6px",
                       boxShadow: selectedMatch
-                        ? `0 0 0 4px rgba(255, 202, 148, 0.45)`
+                        ? `0 0 0 4px rgba(255, 202, 148, 0.35)`
                         : "none",
                       backgroundColor: selectedMatch
-                        ? "rgba(243, 155, 66, 0.08)"
+                        ? "rgba(243, 155, 66, 0.06)"
                         : "transparent",
-                      transition: "all 0.2s ease",
-                      boxSizing: "border-box",
+                      cursor: showAns ? "default" : "pointer",
                     }}
                   >
-                    {item.text}
+                    <img
+                      src={item.img}
+                      alt={`match-${item.id}`}
+                      className="wb-c8-right-img"
+                    />
                   </div>
                 </div>
               );
@@ -464,13 +463,7 @@ const WB_UnitX_PageXX_QA = () => {
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        <div className="wb-c8-buttons">
           <Button
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}
@@ -480,6 +473,4 @@ const WB_UnitX_PageXX_QA = () => {
       </div>
     </div>
   );
-};
-
-export default WB_UnitX_PageXX_QA;
+}
