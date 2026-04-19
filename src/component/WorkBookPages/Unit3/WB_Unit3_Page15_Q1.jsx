@@ -3,10 +3,12 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 7.svg";
-import img2 from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 8.svg";
-import img3 from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 9.svg";
-const LINE_COLOR = "#d62828";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 8.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 9.svg";
+
+const LINE_COLOR = "#f39b42";
 const INACTIVE_COLOR = "#bdbdbd";
+const ACTIVE_COLOR = "#f39b42";
 
 const exerciseData = {
   left: [
@@ -26,15 +28,15 @@ const exerciseData = {
   right: [
     {
       id: 1,
-      img: img1, // boat
+      img: img1,
     },
     {
       id: 2,
-      img: img2, // girl thought bubble
+      img: img2,
     },
     {
       id: 3,
-      img: img3, // ducks + boy
+      img: img3,
     },
   ],
   correctMatches: {
@@ -187,10 +189,10 @@ export default function WB_Unit3_Page8_QC() {
         .wb-c8-wrapper {
           display: flex !important;
           flex-direction: column !important;
-          gap: 28px !important;
+          gap: clamp(18px, 2.4vw, 28px) !important;
           max-width: 1150px !important;
           margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
+          padding: clamp(8px, 1vw, 12px) clamp(10px, 1.6vw, 14px) 20px !important;
           box-sizing: border-box !important;
           width: 100% !important;
         }
@@ -199,46 +201,46 @@ export default function WB_Unit3_Page8_QC() {
           position: relative !important;
           width: 100% !important;
           display: grid !important;
-          grid-template-columns: minmax(0, 1fr) 170px minmax(260px, 360px) !important;
-          gap: 20px !important;
+          grid-template-columns: minmax(0, 1.35fr) minmax(110px, 14vw) minmax(200px, 0.95fr) !important;
+          gap: clamp(14px, 2vw, 24px) !important;
           align-items: start !important;
         }
 
         .wb-c8-left-col {
           display: flex !important;
           flex-direction: column !important;
-          gap: 42px !important;
+          gap: clamp(18px, 3vw, 42px) !important;
           z-index: 2 !important;
         }
 
         .wb-c8-right-col {
           display: flex !important;
           flex-direction: column !important;
-          gap: 28px !important;
+          gap: clamp(16px, 2.2vw, 28px) !important;
           z-index: 2 !important;
           padding-top: 0 !important;
         }
 
         .wb-c8-left-row {
           display: grid !important;
-          grid-template-columns: 28px minmax(0, 1fr) 18px !important;
+          grid-template-columns: clamp(20px, 2.5vw, 28px) minmax(0, 1fr) clamp(14px, 1.8vw, 18px) !important;
           align-items: center !important;
-          gap: 14px !important;
-          min-height: 110px !important;
+          gap: clamp(8px, 1.4vw, 14px) !important;
+          min-height: clamp(62px, 8.5vw, 110px) !important;
           position: relative !important;
         }
 
         .wb-c8-right-row {
           display: grid !important;
-          grid-template-columns: 18px 1fr !important;
+          grid-template-columns: clamp(14px, 1.8vw, 18px) minmax(0, 1fr) !important;
           align-items: center !important;
-          gap: 14px !important;
-          min-height: 116px !important;
+          gap: clamp(8px, 1.4vw, 14px) !important;
+          min-height: clamp(68px, 9vw, 116px) !important;
           position: relative !important;
         }
 
         .wb-c8-num {
-          font-size: 22px !important;
+          font-size: clamp(18px, 2vw, 22px) !important;
           font-weight: 700 !important;
           color: #222 !important;
           line-height: 1 !important;
@@ -246,19 +248,19 @@ export default function WB_Unit3_Page8_QC() {
         }
 
         .wb-c8-text {
-          font-size: 20px !important;
+          font-size: clamp(16px, 1.9vw, 20px) !important;
           line-height: 1.45 !important;
           color: #222 !important;
           cursor: pointer !important;
-          padding: 6px 8px !important;
+          padding: clamp(4px, 0.7vw, 6px) clamp(6px, 0.9vw, 8px) !important;
           border-radius: 12px !important;
           transition: all 0.2s ease !important;
           word-break: break-word !important;
         }
 
         .wb-c8-dot {
-          width: 18px !important;
-          height: 18px !important;
+          width: clamp(14px, 1.7vw, 18px) !important;
+          height: clamp(14px, 1.7vw, 18px) !important;
           border-radius: 50% !important;
           transition: all 0.2s ease !important;
           box-sizing: border-box !important;
@@ -268,22 +270,23 @@ export default function WB_Unit3_Page8_QC() {
 
         .wb-c8-dot.selected {
           transform: scale(1.1) !important;
-          box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.45) !important;
+          box-shadow: 0 0 0 clamp(2px, 0.4vw, 4px) rgba(255, 202, 148, 0.45) !important;
         }
 
         .wb-c8-right-img-wrap {
           width: 100% !important;
-          min-height: 108px !important;
+          min-height: clamp(68px, 8.6vw, 108px) !important;
           display: flex !important;
           align-items: center !important;
           justify-content: flex-start !important;
           cursor: pointer !important;
           box-sizing: border-box !important;
+          padding: clamp(2px, 0.5vw, 4px) clamp(3px, 0.8vw, 6px) !important;
         }
 
         .wb-c8-right-img {
           max-width: 100% !important;
-          max-height: 115px !important;
+          max-height: clamp(72px, 10vw, 115px) !important;
           width: auto !important;
           height: auto !important;
           object-fit: contain !important;
@@ -292,18 +295,18 @@ export default function WB_Unit3_Page8_QC() {
 
         .wb-c8-wrong {
           position: absolute !important;
-          right: -28px !important;
+          right: clamp(-24px, -2vw, -28px) !important;
           top: 50% !important;
           transform: translateY(-50%) !important;
-          width: 22px !important;
-          height: 22px !important;
+          width: clamp(18px, 2vw, 22px) !important;
+          height: clamp(18px, 2vw, 22px) !important;
           border-radius: 50% !important;
           background-color: #ef4444 !important;
           color: #fff !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          font-size: 12px !important;
+          font-size: clamp(10px, 1vw, 12px) !important;
           font-weight: 700 !important;
           border: 2px solid #fff !important;
           box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
@@ -312,18 +315,18 @@ export default function WB_Unit3_Page8_QC() {
         .wb-c8-buttons {
           display: flex !important;
           justify-content: center !important;
-          margin-top: 8px !important;
+          margin-top: clamp(6px, 1vw, 8px) !important;
         }
 
         @media (max-width: 900px) {
           .wb-c8-grid {
-            grid-template-columns: 1fr !important;
-            gap: 18px !important;
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: clamp(16px, 2vw, 18px) !important;
           }
 
           .wb-c8-left-col,
           .wb-c8-right-col {
-            gap: 18px !important;
+            gap: clamp(14px, 2vw, 18px) !important;
           }
 
           .wb-c8-left-row,
@@ -334,10 +337,48 @@ export default function WB_Unit3_Page8_QC() {
           .wb-c8-right-img-wrap {
             justify-content: flex-start !important;
           }
+
+          .wb-c8-wrong {
+            right: 0 !important;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .wb-c8-text {
+            font-size: clamp(15px, 4vw, 18px) !important;
+            line-height: 1.5 !important;
+          }
+
+          .wb-c8-num {
+            font-size: clamp(17px, 4.2vw, 20px) !important;
+          }
+
+          .wb-c8-left-row {
+            grid-template-columns: 20px minmax(0, 1fr) 14px !important;
+            gap: 8px !important;
+          }
+
+          .wb-c8-right-row {
+            grid-template-columns: 14px 1fr !important;
+            gap: 8px !important;
+          }
+
+          .wb-c8-right-img {
+            max-height: clamp(66px, 18vw, 95px) !important;
+          }
         }
       `}</style>
 
-      <div className="wb-c8-wrapper">
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "28px",
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
+      >
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
           <span className="WB-ex-A">C</span>
           Read, look, and match.

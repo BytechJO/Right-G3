@@ -2,51 +2,222 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
+// عدلي المسارات حسب مشروعك
+import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 7.svg";
+import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 8.svg";
+import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 9.svg";
+import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 10.svg";
+import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 11.svg";
+import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 12.svg";
+import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 13.svg";
+import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 14.svg";
+
+const RED_COLOR = "#d62828";
+const BORDER_COLOR = "#a8a8a8";
+const ACTIVE_BORDER = "#f39b42";
+const TEXT_COLOR = "#111";
+const WRONG_COLOR = "#ef4444";
+
 const ITEMS = [
   {
     id: 1,
-    text: "The car is faster than the skateboard.",
-    correct: "true",
+    sentence: "She usually rides a bike to school.",
+    images: [
+      { key: "bike", src: img1a, alt: "bike to school" },
+      { key: "walk", src: img1b, alt: "walk to school" },
+    ],
+    correct: "bike",
+    bars: [4, 0],
   },
   {
     id: 2,
-    text: "The grandpa is younger than the grandson.",
-    correct: "false",
+    sentence: "He never rides a taxi to work.",
+    images: [
+      { key: "work", src: img2a, alt: "go to work" },
+      { key: "taxi", src: img2b, alt: "taxi" },
+    ],
+    correct: "taxi",
+    bars: [1, 0],
   },
   {
     id: 3,
-    text: "The lion is larger than the cat.",
-    correct: "true",
+    sentence: "She always rides the bus to school.",
+    images: [
+      { key: "bus", src: img3a, alt: "bus to school" },
+      { key: "car", src: img3b, alt: "car" },
+    ],
+    correct: "bus",
+    bars: [5, 0],
   },
   {
     id: 4,
-    text: "The truck is smaller than the car.",
-    correct: "false",
-  },
-  {
-    id: 5,
-    text: "The snake is longer than the worm.",
-    correct: "true",
-  },
-  {
-    id: 6,
-    text: "The book is heavier than the pen.",
-    correct: "true",
+    sentence: "She sometimes walks to school.",
+    images: [
+      { key: "walk", src: img4a, alt: "walk to school" },
+      { key: "car", src: img4b, alt: "car" },
+    ],
+    correct: "walk",
+    bars: [2, 0],
   },
 ];
 
-export default function SB_AtTheBasketballGame_Page210_QA() {
+const styles = {
+  pageWrap: {
+    width: "100%",
+  },
+
+  gridWrap: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "clamp(18px, 3vw, 42px) clamp(18px, 4vw, 54px)",
+    width: "100%",
+  },
+
+  itemCard: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "clamp(10px, 1.4vw, 16px)",
+    minWidth: 0,
+  },
+
+  topLine: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "clamp(8px, 1vw, 12px)",
+    minWidth: 0,
+  },
+
+  number: {
+    fontSize: "clamp(18px, 2vw, 30px)",
+    fontWeight: 700,
+    color: TEXT_COLOR,
+    lineHeight: 1,
+    minWidth: "clamp(18px, 2vw, 28px)",
+    flexShrink: 0,
+    paddingTop: "clamp(2px, 0.4vw, 4px)",
+  },
+
+  sentence: {
+    fontSize: "clamp(14px, 2vw, 22px)",
+    color: TEXT_COLOR,
+    lineHeight: 1.25,
+    fontWeight: 500,
+    minWidth: 0,
+    wordBreak: "break-word",
+  },
+
+  imagesRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "0",
+    width: "100%",
+    borderRadius: "clamp(10px, 1.3vw, 16px)",
+    overflow: "hidden",
+  },
+
+  imageOption: {
+    position: "relative",
+    border: `2px solid ${BORDER_COLOR}`,
+    background: "#fff",
+    cursor: "pointer",
+    minWidth: 0,
+    aspectRatio: "1.18 / 1",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+
+  image: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+
+  topOverlay: {
+    position: "absolute",
+    top: "clamp(6px, 0.8vw, 8px)",
+    left: "clamp(6px, 0.8vw, 8px)",
+    right: "clamp(6px, 0.8vw, 8px)",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    pointerEvents: "none",
+  },
+
+  barsWrap: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 0,
+  },
+
+  bar: {
+    width: "clamp(12px, 1.8vw, 22px)",
+    height: "clamp(10px, 1.5vw, 18px)",
+    border: "1.5px solid #9e9e9e",
+    boxSizing: "border-box",
+    background: "#fff",
+  },
+
+  emptyBox: {
+    width: "clamp(18px, 3vw, 30px)",
+    height: "clamp(18px, 3vw, 30px)",
+    border: "1.5px solid #9e9e9e",
+    background: "#fff",
+    borderRadius: "clamp(4px, 0.5vw, 6px)",
+  },
+
+  checkMark: {
+    position: "absolute",
+    top: "clamp(4px, 0.4vw, 6px)",
+    right: "clamp(8px, 1vw, 10px)",
+    fontSize: "clamp(30px, 4.5vw, 54px)",
+    lineHeight: 1,
+    fontWeight: 700,
+    color: RED_COLOR,
+    zIndex: 2,
+  },
+
+  wrongBadge: {
+    position: "absolute",
+    top: "clamp(6px, 0.8vw, 8px)",
+    right: "clamp(6px, 0.8vw, 8px)",
+    width: "clamp(18px, 2vw, 24px)",
+    height: "clamp(18px, 2vw, 24px)",
+    borderRadius: "50%",
+    backgroundColor: WRONG_COLOR,
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "clamp(10px, 1vw, 12px)",
+    fontWeight: 700,
+    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+    zIndex: 3,
+  },
+
+  buttonsWrap: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "clamp(8px, 1vw, 12px)",
+  },
+};
+
+export default function WB_Unit2_Page12_QH() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
-  const handleSelect = (id, value) => {
+  const handleSelect = (itemId, optionKey) => {
     if (showAns) return;
 
     setAnswers((prev) => ({
       ...prev,
-      [id]: value,
+      [itemId]: optionKey,
     }));
+
+    setChecked(false);
   };
 
   const handleCheck = () => {
@@ -55,7 +226,7 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
     if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
+      ValidationAlert.info("Please answer all items first.");
       return;
     }
 
@@ -63,7 +234,7 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
 
     ITEMS.forEach((item) => {
       if (answers[item.id] === item.correct) {
-        score++;
+        score += 1;
       }
     });
 
@@ -79,132 +250,54 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
   };
 
   const handleShowAnswer = () => {
-    const filled = {};
+    const filledAnswers = {};
 
     ITEMS.forEach((item) => {
-      filled[item.id] = item.correct;
+      filledAnswers[item.id] = item.correct;
     });
 
-    setAnswers(filled);
+    setAnswers(filledAnswers);
     setChecked(true);
     setShowAns(true);
   };
 
-  const handleReset = () => {
+  const handleStartAgain = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
   };
 
-  const isWrongCell = (item, choice) => {
+  const isWrong = (itemId, optionKey, correctKey) => {
     if (!checked || showAns) return false;
-    return answers[item.id] === choice && answers[item.id] !== item.correct;
+    return answers[itemId] === optionKey && optionKey !== correctKey;
   };
 
-  const shouldShowCheck = (item, choice) => {
-    if (showAns) return item.correct === choice;
-    if (!checked) return false;
-    return answers[item.id] === choice && answers[item.id] === item.correct;
-  };
-
-  const renderBookCheck = () => {
+  const renderBars = (filledCount) => {
     return (
-      <svg
-        viewBox="0 0 24 24"
-        style={{
-          width: "clamp(34px, 3.3vw, 54px)",
-          height: "clamp(34px, 3.3vw, 54px)",
-          transform: "rotate(-12deg)",
-          display: "inline-block",
-        }}
-      >
-        <path
-          d="M4 13 L9 18 L20 5"
-          stroke="#d82424"
-          strokeWidth="3.8"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  };
-
-  const renderChoiceCell = (item, choice) => {
-    const isSelected = answers[item.id] === choice;
-    const showCheck = shouldShowCheck(item, choice);
-    const showWrong = isWrongCell(item, choice);
-
-    return (
-      <td
-        onClick={() => handleSelect(item.id, choice)}
-        style={{
-          width: "12.2%",
-          minWidth: "92px",
-          borderLeft: "2px solid #a6a6a6",
-          borderTop: "2px solid #a6a6a6",
-          textAlign: "center",
-          verticalAlign: "middle",
-          cursor: showAns ? "default" : "pointer",
-          position: "relative",
-          background: isSelected && !checked ? "#f6f6f6" : "#fff",
-          padding: 0,
-          height: "68px",
-        }}
-      >
-        {!checked && !showAns && (
-          <div
+      <span style={styles.barsWrap}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <span
+            key={n}
             style={{
-              width: "22px",
-              height: "22px",
-              margin: "0 auto",
-              borderRadius: "50%",
-              border: `2px solid ${isSelected ? "#7d7d7d" : "#b9b9b9"}`,
-              background: isSelected ? "#ececec" : "transparent",
-              boxSizing: "border-box",
+              ...styles.bar,
+              background: n <= filledCount ? RED_COLOR : "#fff",
             }}
           />
-        )}
-
-        {showCheck && renderBookCheck()}
-
-        {showWrong && (
-          <div
-            style={{
-              position: "absolute",
-              top: "6px",
-              right: "6px",
-              width: "19px",
-              height: "19px",
-              borderRadius: "50%",
-              background: "#ef4444",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "10px",
-              fontWeight: "700",
-            }}
-          >
-            ✕
-          </div>
-        )}
-      </td>
+        ))}
+      </span>
     );
   };
 
   return (
-    <div className="main-container-component" style={{ width: "100%" }}>
+    <div className="main-container-component">
       <div
+        className="div-forall"
         style={{
-          width: "100%",
-          maxWidth: "1380px",
-          margin: "0 auto",
-          padding: "12px clamp(10px, 2vw, 24px) 28px",
           display: "flex",
           flexDirection: "column",
-          gap: "22px",
-          boxSizing: "border-box",
+          gap: "18px",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
       >
         <h1
@@ -217,126 +310,64 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
             flexWrap: "wrap",
           }}
         >
-          <span className="WB-ex-A">A</span>
-          Read and write ✓.
+          <span className="WB-ex-A">H</span>
+          Read, look, and write ✓.
         </h1>
 
-        <div
-          style={{
-            width: "100%",
-            overflowX: "auto",
-            WebkitOverflowScrolling: "touch",
-            paddingBottom: "2px",
-          }}
-        >
+        <div style={styles.pageWrap}>
           <div
             style={{
-              minWidth: "760px",
-              maxWidth: "1188px",
-              width: "100%",
-              margin: "0 auto",
-              border: "2px solid #a6a6a6",
-              borderRadius: "18px",
-              overflow: "hidden",
-              background: "#fff",
+              ...styles.gridWrap,
             }}
           >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                tableLayout: "fixed",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      width: "75.6%",
-                      height: "58px",
-                      padding: 0,
-                      background: "#fff",
-                    }}
-                  />
-                  <th
-                    style={{
-                      width: "12.2%",
-                      minWidth: "92px",
-                      borderLeft: "2px solid #a6a6a6",
-                      textAlign: "center",
-                      fontSize: "clamp(18px, 2vw, 26px)",
-                      fontWeight: "400",
-                      color: "#222",
-                      padding: 0,
-                    }}
-                  >
-                    True
-                  </th>
-                  <th
-                    style={{
-                      width: "12.2%",
-                      minWidth: "92px",
-                      borderLeft: "2px solid #a6a6a6",
-                      textAlign: "center",
-                      fontSize: "clamp(18px, 2vw, 26px)",
-                      fontWeight: "400",
-                      color: "#222",
-                      padding: 0,
-                    }}
-                  >
-                    False
-                  </th>
-                </tr>
-              </thead>
+            {ITEMS.map((item) => (
+              <div key={item.id} style={styles.itemCard}>
+                <div style={styles.topLine}>
+                  <div style={styles.number}>{item.id}</div>
+                  <div style={styles.sentence}>{item.sentence}</div>
+                </div>
 
-              <tbody>
-                {ITEMS.map((item) => (
-                  <tr key={item.id}>
-                    <td
-                      style={{
-                        borderTop: "2px solid #a6a6a6",
-                        padding: "0 18px 0 20px",
-                        height: "68px",
-                        fontSize: "clamp(18px, 2.35vw, 28px)",
-                        color: "#222",
-                        verticalAlign: "middle",
-                        lineHeight: 1.15,
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      <span
+                <div style={styles.imagesRow}>
+                  {item.images.map((img, index) => {
+                    const selected = answers[item.id] === img.key;
+                    const wrong = isWrong(item.id, img.key, item.correct);
+                    const isCorrectShown = answers[item.id] === img.key && img.key === item.correct;
+
+                    return (
+                      <div
+                        key={img.key}
+                        onClick={() => handleSelect(item.id, img.key)}
                         style={{
-                          fontWeight: "700",
-                          display: "inline-block",
-                          minWidth: "28px",
-                          marginRight: "14px",
+                          ...styles.imageOption,
+                          borderColor: selected ? ACTIVE_BORDER : BORDER_COLOR,
+                          cursor: showAns ? "default" : "pointer",
+                          borderRight:
+                            index === 0 ? `1px solid ${BORDER_COLOR}` : `2px solid ${BORDER_COLOR}`,
                         }}
                       >
-                        {item.id}
-                      </span>
-                      <span>{item.text}</span>
-                    </td>
+                        <img src={img.src} alt={img.alt} style={styles.image} />
 
-                    {renderChoiceCell(item, "true")}
-                    {renderChoiceCell(item, "false")}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        <div style={styles.topOverlay}>
+                          {renderBars(item.bars[index])}
+                          <div style={styles.emptyBox} />
+                        </div>
+
+                        {isCorrectShown && <div style={styles.checkMark}>✓</div>}
+                        {wrong && <div style={styles.wrongBadge}>✕</div>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "6px",
-          }}
-        >
+        <div style={styles.buttonsWrap}>
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
+            handleStartAgain={handleStartAgain}
           />
         </div>
       </div>

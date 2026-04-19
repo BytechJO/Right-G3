@@ -1,58 +1,281 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-const ITEMS = [
-  {
-    id: 1,
-    text: "The car is faster than the skateboard.",
-    correct: "true",
-  },
-  {
-    id: 2,
-    text: "The grandpa is younger than the grandson.",
-    correct: "false",
-  },
-  {
-    id: 3,
-    text: "The lion is larger than the cat.",
-    correct: "true",
-  },
-  {
-    id: 4,
-    text: "The truck is smaller than the car.",
-    correct: "false",
-  },
-  {
-    id: 5,
-    text: "The snake is longer than the worm.",
-    correct: "true",
-  },
-  {
-    id: 6,
-    text: "The book is heavier than the pen.",
-    correct: "true",
-  },
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 1.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 3.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 4.svg";
+
+const ACTIVE_COLOR = "#f39b42";
+const SOFT_COLOR = "#ffca94";
+const BORDER_COLOR = "#f39b42";
+const WRONG_COLOR = "#ef4444";
+const ANSWER_COLOR = "#000000";
+
+const ANSWERS = [
+  { id: 1, correct: "take a subway", img: img1 },
+  { id: 2, correct: "ride a bike", img: img2 },
+  { id: 3, correct: "take a bus", img: img3 },
+  { id: 4, correct: "take a taxi", img: img4 },
 ];
 
-export default function SB_AtTheBasketballGame_Page210_QA() {
+const DRAG_ITEMS = [
+  { id: 1, value: "take a taxi" },
+  { id: 2, value: "take a subway" },
+  { id: 3, value: "take a bus" },
+  { id: 4, value: "ride a bike" },
+];
+
+const styles = {
+  pageWrap: {
+    width: "100%",
+  },
+
+  contentWrap: {
+    display: "grid",
+    gridTemplateColumns: "minmax(180px, 0.75fr) minmax(0, 1fr)",
+    gap: "clamp(16px, 2vw, 28px)",
+    alignItems: "start",
+    width: "100%",
+  },
+
+  bankWrap: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+  },
+
+  bankBox: {
+    width: "100%",
+    maxWidth: "clamp(180px, 22vw, 250px)",
+    border: `2px solid ${BORDER_COLOR}`,
+    borderRadius: "clamp(14px, 1.6vw, 22px)",
+    padding: "clamp(14px, 2vw, 24px) clamp(10px, 1.5vw, 18px)",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    gap: "clamp(10px, 1.2vw, 16px)",
+    background: "#fff",
+  },
+
+  dragItem: {
+    minHeight: "clamp(38px, 5vw, 56px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "clamp(6px, 1vw, 10px) clamp(8px, 1.1vw, 14px)",
+    borderRadius: "clamp(10px, 1.2vw, 16px)",
+    fontSize: "clamp(16px, 1.8vw, 24px)",
+    fontWeight: 500,
+    userSelect: "none",
+    transition: "0.2s ease",
+    boxSizing: "border-box",
+    touchAction: "none",
+    wordBreak: "break-word",
+  },
+
+  rightArea: {
+    width: "100%",
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "clamp(28px, 4vw, 56px) clamp(20px, 3vw, 46px)",
+    width: "100%",
+  },
+
+  card: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "clamp(10px, 1.5vw, 16px)",
+    minWidth: 0,
+  },
+
+  topRow: {
+    width: "100%",
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "clamp(8px, 1vw, 14px)",
+  },
+
+  number: {
+    fontSize: "clamp(20px, 2.4vw, 34px)",
+    fontWeight: "700",
+    color: "#111",
+    lineHeight: 1,
+    minWidth: "clamp(20px, 2vw, 34px)",
+    paddingTop: "2px",
+    flexShrink: 0,
+  },
+
+  imageBox: {
+    flex: 1,
+    width: "100%",
+    borderRadius: "clamp(14px, 1.5vw, 22px)",
+    overflow: "hidden",
+    border: `2px solid ${BORDER_COLOR}`,
+    background: "#f7f7f7",
+    aspectRatio: "1.85 / 1",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  image: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+
+  answerWrap: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+  },
+
+  dropBox: {
+    width: "100%",
+    maxWidth: "clamp(220px, 30vw, 430px)",
+    minHeight: "clamp(44px, 5vw, 58px)",
+    borderBottom: "3px solid #3f3f3f",
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "0 clamp(6px, 1vw, 10px) 3px",
+    boxSizing: "border-box",
+    position: "relative",
+    fontSize: "clamp(20px, 2.5vw, 28px)",
+    lineHeight: 1.1,
+    fontWeight: 500,
+    cursor: "pointer",
+    userSelect: "none",
+    wordBreak: "break-word",
+  },
+
+  wrongBadge: {
+    position: "absolute",
+    top: "clamp(-8px, -0.7vw, -4px)",
+    right: "clamp(-10px, -1vw, -6px)",
+    width: "clamp(18px, 2vw, 24px)",
+    height: "clamp(18px, 2vw, 24px)",
+    borderRadius: "50%",
+    backgroundColor: WRONG_COLOR,
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "clamp(10px, 1vw, 13px)",
+    fontWeight: 700,
+    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+  },
+
+  buttonsWrap: {
+    marginTop: "clamp(8px, 1.5vw, 14px)",
+    display: "flex",
+    justifyContent: "center",
+  },
+};
+
+export default function WB_Transport_DragDrop() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [touchItem, setTouchItem] = useState(null);
+  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
-  const handleSelect = (id, value) => {
+  const dropRefs = useRef({});
+
+  const usedDragIds = Object.values(answers)
+    .filter(Boolean)
+    .map((entry) => entry.dragId);
+
+  const applyDrop = (boxKey, item) => {
+    const newAnswers = { ...answers };
+
+    Object.keys(newAnswers).forEach((key) => {
+      if (newAnswers[key]?.dragId === item.id) {
+        delete newAnswers[key];
+      }
+    });
+
+    newAnswers[boxKey] = {
+      dragId: item.id,
+      value: item.value,
+    };
+
+    setAnswers(newAnswers);
+    setShowResults(false);
+  };
+
+  const handleDragStart = (item) => {
+    if (showAns || usedDragIds.includes(item.id)) return;
+    setDraggedItem(item);
+  };
+
+  const handleDrop = (boxKey) => {
+    if (showAns || !draggedItem) return;
+    applyDrop(boxKey, draggedItem);
+    setDraggedItem(null);
+  };
+
+  const handleTouchStart = (e, item) => {
+    if (showAns || usedDragIds.includes(item.id)) return;
+
+    const touch = e.touches[0];
+    setTouchItem(item);
+    setTouchPos({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchMove = (e) => {
+    if (!touchItem) return;
+    const touch = e.touches[0];
+    setTouchPos({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchItem) return;
+
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+
+      const rect = ref.getBoundingClientRect();
+
+      if (
+        touchPos.x >= rect.left &&
+        touchPos.x <= rect.right &&
+        touchPos.y >= rect.top &&
+        touchPos.y <= rect.bottom
+      ) {
+        applyDrop(key, touchItem);
+      }
+    });
+
+    setTouchItem(null);
+  };
+
+  const handleRemoveAnswer = (boxKey) => {
     if (showAns) return;
 
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setAnswers((prev) => {
+      const updated = { ...prev };
+      delete updated[boxKey];
+      return updated;
+    });
+
+    setShowResults(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
 
-    const allAnswered = ITEMS.every((item) => answers[item.id]);
+    const allAnswered = ANSWERS.every((item) => answers[`a-${item.id}`]?.value);
 
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -60,151 +283,91 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
     }
 
     let score = 0;
+    const total = ANSWERS.length;
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
+    ANSWERS.forEach((item) => {
+      if (answers[`a-${item.id}`]?.value === item.correct) {
         score++;
       }
     });
 
-    setChecked(true);
+    setShowResults(true);
 
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    if (score === total) {
+      ValidationAlert.success(`Score: ${score} / ${total}`);
     } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+      ValidationAlert.warning(`Score: ${score} / ${total}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+      ValidationAlert.error(`Score: ${score} / ${total}`);
     }
   };
 
   const handleShowAnswer = () => {
     const filled = {};
 
-    ITEMS.forEach((item) => {
-      filled[item.id] = item.correct;
+    ANSWERS.forEach((item) => {
+      const matched = DRAG_ITEMS.find((d) => d.value === item.correct);
+
+      filled[`a-${item.id}`] = {
+        dragId: matched?.id ?? item.id,
+        value: item.correct,
+      };
     });
 
     setAnswers(filled);
-    setChecked(true);
+    setShowResults(true);
     setShowAns(true);
   };
 
-  const handleReset = () => {
+  const handleStartAgain = () => {
     setAnswers({});
-    setChecked(false);
+    setDraggedItem(null);
+    setTouchItem(null);
+    setShowResults(false);
     setShowAns(false);
   };
 
-  const isWrongCell = (item, choice) => {
-    if (!checked || showAns) return false;
-    return answers[item.id] === choice && answers[item.id] !== item.correct;
+  const isWrong = (item) => {
+    if (!showResults) return false;
+    return answers[`a-${item.id}`]?.value !== item.correct;
   };
 
-  const shouldShowCheck = (item, choice) => {
-    if (showAns) return item.correct === choice;
-    if (!checked) return false;
-    return answers[item.id] === choice && answers[item.id] === item.correct;
-  };
-
-  const renderBookCheck = () => {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        style={{
-          width: "clamp(34px, 3.3vw, 54px)",
-          height: "clamp(34px, 3.3vw, 54px)",
-          transform: "rotate(-12deg)",
-          display: "inline-block",
-        }}
-      >
-        <path
-          d="M4 13 L9 18 L20 5"
-          stroke="#d82424"
-          strokeWidth="3.8"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  };
-
-  const renderChoiceCell = (item, choice) => {
-    const isSelected = answers[item.id] === choice;
-    const showCheck = shouldShowCheck(item, choice);
-    const showWrong = isWrongCell(item, choice);
+  const renderDropBox = (boxKey, wrong) => {
+    const value = answers[boxKey]?.value || "";
 
     return (
-      <td
-        onClick={() => handleSelect(item.id, choice)}
+      <div
+        ref={(el) => (dropRefs.current[boxKey] = el)}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={() => handleDrop(boxKey)}
+        onClick={() => handleRemoveAnswer(boxKey)}
         style={{
-          width: "12.2%",
-          minWidth: "92px",
-          borderLeft: "2px solid #a6a6a6",
-          borderTop: "2px solid #a6a6a6",
-          textAlign: "center",
-          verticalAlign: "middle",
-          cursor: showAns ? "default" : "pointer",
-          position: "relative",
-          background: isSelected && !checked ? "#f6f6f6" : "#fff",
-          padding: 0,
-          height: "68px",
+          ...styles.dropBox,
+          color: value ? ANSWER_COLOR : "#111",
+          cursor: value && !showAns ? "pointer" : showAns ? "default" : "pointer",
         }}
       >
-        {!checked && !showAns && (
-          <div
-            style={{
-              width: "22px",
-              height: "22px",
-              margin: "0 auto",
-              borderRadius: "50%",
-              border: `2px solid ${isSelected ? "#7d7d7d" : "#b9b9b9"}`,
-              background: isSelected ? "#ececec" : "transparent",
-              boxSizing: "border-box",
-            }}
-          />
-        )}
+        {value}
 
-        {showCheck && renderBookCheck()}
-
-        {showWrong && (
-          <div
-            style={{
-              position: "absolute",
-              top: "6px",
-              right: "6px",
-              width: "19px",
-              height: "19px",
-              borderRadius: "50%",
-              background: "#ef4444",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "10px",
-              fontWeight: "700",
-            }}
-          >
+        {wrong && (
+          <div style={styles.wrongBadge}>
             ✕
           </div>
         )}
-      </td>
+      </div>
     );
   };
 
   return (
-    <div className="main-container-component" style={{ width: "100%" }}>
+    <div className="main-container-component">
       <div
+        className="div-forall"
         style={{
-          width: "100%",
-          maxWidth: "1380px",
-          margin: "0 auto",
-          padding: "12px clamp(10px, 2vw, 24px) 28px",
           display: "flex",
           flexDirection: "column",
-          gap: "22px",
-          boxSizing: "border-box",
+          gap: "18px",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
       >
         <h1
@@ -217,129 +380,124 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
             flexWrap: "wrap",
           }}
         >
-          <span className="WB-ex-A">A</span>
-          Read and write ✓.
+          <span className="WB-ex-A">A</span> Look and write.
         </h1>
 
-        <div
-          style={{
-            width: "100%",
-            overflowX: "auto",
-            WebkitOverflowScrolling: "touch",
-            paddingBottom: "2px",
-          }}
-        >
+        <div style={styles.pageWrap}>
           <div
-            style={{
-              minWidth: "760px",
-              maxWidth: "1188px",
-              width: "100%",
-              margin: "0 auto",
-              border: "2px solid #a6a6a6",
-              borderRadius: "18px",
-              overflow: "hidden",
-              background: "#fff",
-            }}
+            style={styles.contentWrap}
           >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                tableLayout: "fixed",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      width: "75.6%",
-                      height: "58px",
-                      padding: 0,
-                      background: "#fff",
-                    }}
-                  />
-                  <th
-                    style={{
-                      width: "12.2%",
-                      minWidth: "92px",
-                      borderLeft: "2px solid #a6a6a6",
-                      textAlign: "center",
-                      fontSize: "clamp(18px, 2vw, 26px)",
-                      fontWeight: "400",
-                      color: "#222",
-                      padding: 0,
-                    }}
-                  >
-                    True
-                  </th>
-                  <th
-                    style={{
-                      width: "12.2%",
-                      minWidth: "92px",
-                      borderLeft: "2px solid #a6a6a6",
-                      textAlign: "center",
-                      fontSize: "clamp(18px, 2vw, 26px)",
-                      fontWeight: "400",
-                      color: "#222",
-                      padding: 0,
-                    }}
-                  >
-                    False
-                  </th>
-                </tr>
-              </thead>
+            <div style={styles.bankWrap}>
+              <div style={styles.bankBox}>
+                {DRAG_ITEMS.map((item) => {
+                  const isUsed = usedDragIds.includes(item.id);
 
-              <tbody>
-                {ITEMS.map((item) => (
-                  <tr key={item.id}>
-                    <td
+                  return (
+                    <div
+                      key={item.id}
+                      draggable={!isUsed && !showAns}
+                      onDragStart={() => handleDragStart(item)}
+                      onTouchStart={(e) => handleTouchStart(e, item)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
                       style={{
-                        borderTop: "2px solid #a6a6a6",
-                        padding: "0 18px 0 20px",
-                        height: "68px",
-                        fontSize: "clamp(18px, 2.35vw, 28px)",
-                        color: "#222",
-                        verticalAlign: "middle",
-                        lineHeight: 1.15,
-                        wordBreak: "break-word",
+                        ...styles.dragItem,
+                        border: `1.5px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
+                        backgroundColor: isUsed ? "#eeeeee" : SOFT_COLOR,
+                        color: isUsed ? "#999" : "#222",
+                        cursor: isUsed || showAns ? "not-allowed" : "grab",
+                        opacity: isUsed ? 0.6 : 1,
+                        boxShadow: isUsed
+                          ? "none"
+                          : "0 2px 8px rgba(0,0,0,0.06)",
                       }}
                     >
-                      <span
-                        style={{
-                          fontWeight: "700",
-                          display: "inline-block",
-                          minWidth: "28px",
-                          marginRight: "14px",
-                        }}
-                      >
-                        {item.id}
-                      </span>
-                      <span>{item.text}</span>
-                    </td>
+                      {item.value}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-                    {renderChoiceCell(item, "true")}
-                    {renderChoiceCell(item, "false")}
-                  </tr>
+            <div style={styles.rightArea}>
+              <div style={styles.grid}>
+                {ANSWERS.map((item) => (
+                  <div key={item.id} style={styles.card}>
+                    <div style={styles.topRow}>
+                      <span style={styles.number}>{item.id}</span>
+
+                      <div style={styles.imageBox}>
+                        <img
+                          src={item.img}
+                          alt={`transport-${item.id}`}
+                          style={styles.image}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={styles.answerWrap}>
+                      {renderDropBox(`a-${item.id}`, isWrong(item))}
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "6px",
-          }}
-        >
+        <div style={styles.buttonsWrap}>
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
+            handleStartAgain={handleStartAgain}
           />
         </div>
       </div>
+
+      {touchItem && (
+        <div
+          style={{
+            position: "fixed",
+            left: touchPos.x - 60,
+            top: touchPos.y - 22,
+            background: "#fff",
+            padding: "8px 12px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            pointerEvents: "none",
+            zIndex: 9999,
+            fontSize: "clamp(15px, 1.7vw, 18px)",
+            fontWeight: 600,
+            color: "#222",
+            maxWidth: "180px",
+            textAlign: "center",
+          }}
+        >
+          {touchItem.value}
+        </div>
+      )}
+
+      <style>
+        {`
+          @media (max-width: 900px) {
+            .div-forall-responsive-fix {}
+          }
+
+          @media (max-width: 820px) {
+            .main-container-component .transport-grid-mobile-fix {}
+          }
+
+          @media (max-width: 768px) {
+            .main-container-component .transport-grid-mobile-fix {}
+          }
+
+          @media (max-width: 760px) {
+            .main-container-component .transport-layout-stack {
+              display: block;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }

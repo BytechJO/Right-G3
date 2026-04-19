@@ -126,8 +126,8 @@ export default function WB_Unit3_Page6_QC() {
           minWidth: "180px",
           minHeight: "52px",
           padding: "8px 18px",
-          borderRadius: "999px",
           border: borderStyle,
+          borderRadius: "999px",
           background: "#fff",
           color: "#222",
           fontSize: "20px",
@@ -170,17 +170,18 @@ export default function WB_Unit3_Page6_QC() {
   };
 
   return (
-    <div className="main-container-component">
-      <div
+ <div className="main-container-component">
+<div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "28px",
+          gap: "18px",
           maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
+     
         <style>{`
           .wb-c6-grid {
             display: grid;
@@ -220,14 +221,15 @@ export default function WB_Unit3_Page6_QC() {
             width: 100%;
             max-width: 470px;
             height: 185px;
-            border: 2px solid #e5e5e5;
-            border-radius: 18px;
-            background: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             box-sizing: border-box;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
           }
 
           .wb-c6-img {
@@ -237,6 +239,8 @@ export default function WB_Unit3_Page6_QC() {
             height: auto;
             object-fit: contain;
             display: block;
+            border: none;
+            box-shadow: none;
           }
 
           .wb-c6-pairs {
@@ -267,6 +271,10 @@ export default function WB_Unit3_Page6_QC() {
           }
 
           @media (max-width: 768px) {
+            .div-forall {
+              padding: 0 20px;
+            }
+
             .wb-c6-item {
               gap: 10px;
             }
@@ -278,7 +286,6 @@ export default function WB_Unit3_Page6_QC() {
 
             .wb-c6-img-frame {
               height: 155px;
-              border-radius: 16px;
             }
 
             .wb-c6-pairs {
@@ -287,6 +294,10 @@ export default function WB_Unit3_Page6_QC() {
           }
 
           @media (max-width: 600px) {
+            .div-forall {
+              padding: 0 16px;
+            }
+
             .wb-c6-item {
               gap: 8px;
             }
@@ -311,6 +322,10 @@ export default function WB_Unit3_Page6_QC() {
           }
 
           @media (max-width: 420px) {
+            .div-forall {
+              padding: 0 12px;
+            }
+
             .wb-c6-num {
               font-size: 18px;
               min-width: 14px;
@@ -318,13 +333,20 @@ export default function WB_Unit3_Page6_QC() {
 
             .wb-c6-img-frame {
               height: 125px;
-              border-radius: 14px;
             }
           }
         `}</style>
 
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">C</span>
+ <h1
+          className="WB-header-title-page8"
+          style={{
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >          <span className="WB-ex-A">C</span>
           Look and read. Circle the correct pair.
         </h1>
 
