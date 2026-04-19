@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import backgroundImage from "../../../assets/imgs/test.png";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/G5_U1_Pg_04_05.png";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import MySVG from "../../../assets/imgs/test.png";
+import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/interactive svg.svg";
 
 const Page4_Interactive1 = () => {
   const [clickedPoint, setClickedPoint] = useState(null);
@@ -10,10 +10,10 @@ const Page4_Interactive1 = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   // ✅ منطقة المطعم (بالنسب المئوية)
   const targetArea = {
-    x1: 24,
-    y1: 8.5,
-    x2: 100,
-    y2: 34.5,
+    x1: 79.6,
+    y1: 17.2,
+    x2: 98.67,
+    y2: 46.4,
   };
 
   const handleImageClick = (e) => {
@@ -139,9 +139,9 @@ const Page4_Interactive1 = () => {
               alt="answer highlight"
               style={{
                 position: "absolute",
-                top: `${targetArea.y1}%`,
-                left: `${targetArea.x1}%`,
-                height: `${targetArea.y2}%`,
+                top: `16.5%`,
+                left: `80.5%`,
+                height: `30%`,
                 pointerEvents: "none",
               }}
             />
