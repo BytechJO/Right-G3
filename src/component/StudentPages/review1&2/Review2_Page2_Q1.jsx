@@ -14,7 +14,7 @@ import { CSS } from "@dnd-kit/utilities";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
-import sound from "../../../assets/audio/ClassBook/Unit 2/P 19/CD15.Pg19_Instruction1_Adult Lady.mp3";
+import sound from "../../../assets/audio/ClassBook/Unit 2/P 19/unit2-page19-EXC.mp3";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 19/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 19/Ex C 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 19/Ex C 3.svg";
@@ -57,19 +57,10 @@ const ITEMS = [
 ];
 const captions = [
   {
-    start: 0,
-    end: 4.23,
-    text: "Page 8. Right Activities. Exercise A, number 1. ",
+    start: 0.179,
+    end: 26.52,
+    text: "Page 19, review two, exercise C. Listen, read, and write the vowel sound. Toast, bite, five, knee, top, cap, cup, bike, cube, kitten, bed, soap, hen, music, boat",
   },
-  {
-    start: 4.25,
-    end: 8.28,
-    text: "Listen and write the missing letters. Number the pictures.  ",
-  },
-  { start: 8.3, end: 11.05, text: "1-tiger." },
-  { start: 11.07, end: 13.12, text: "2-taxi." },
-  { start: 13.14, end: 15.14, text: "3-duck." },
-  { start: 15.16, end: 17.13, text: "4-deer." },
 ];
 /* ===== draggable ===== */
 
@@ -107,7 +98,6 @@ function DraggableLetter({ item, locked }) {
 
 function DropSlot({ id, content }) {
   const { setNodeRef } = useSortable({ id });
-
 
   return (
     <div
@@ -216,7 +206,7 @@ const Review2_Page2_Q1 = () => {
           <QuestionAudioPlayer
             src={sound}
             captions={captions}
-            stopAtSecond={15}
+            stopAtSecond={7.6}
           />
 
           <div

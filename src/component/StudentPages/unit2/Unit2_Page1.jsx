@@ -2,89 +2,165 @@ import { useState, useRef } from "react";
 import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 10.png";
 import "./Unit2_Page1.css";
 // import unit2_page1_CD8 from "../../../assets/img_unit2/sounds-unit2/CD8.Pg10_U2.Intro_Adult Lady.mp3";
+import longAudio from "../../../assets/audio/ClassBook/Unit 2/P 10/unit2-page10-listen.mp3";
 import Unit2_Page1_find from "./Unit2_Page1_find";
 import Unit2_Page1_Vocab from "./Unit2_Page1_Vocab";
 import Unit2_Page1_Read from "./Unit2_Pag1_Read";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import allUnit2 from "../../../assets/audio/ClassBook//Unit 2/P 10/CD7.Pg10_U2.Intro_Adult Lady.mp3";
-// import sound1 from "../../../assets/img_unit2/sounds-unit2/U2-01.mp3";
-// import sound2 from "../../../assets/img_unit2/sounds-unit2/U2-02.mp3";
-// import sound3 from "../../../assets/img_unit2/sounds-unit2/U2-03.mp3";
-// import sound4 from "../../../assets/img_unit2/sounds-unit2/U2-04.mp3";
-// import sound5 from "../../../assets/img_unit2/sounds-unit2/U2-05.mp3";
-
+import allUnit2 from "../../../assets/audio/ClassBook/Unit 2/P 10/unit2-pg10-allunit.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound12.mp3";
+import Rabbit from "../../../assets/Page 01/Rabbit.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page10-11/1-01.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page10-11/1-02.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page10-11/1-03.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page10-11/1-04.svg";
+import sound1_letter from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.1_Adult Lady.mp3";
+import sound2_letter from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.2_Adult Lady.mp3";
+import sound3_letter from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.3_Adult Lady.mp3";
+import sound4_letter from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_1.4_Adult Lady.mp3";
+import FourImagesWithAudio from "../../FourImagesWithAudio";
 const Unit2_Page1 = ({ openPopup }) => {
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
   const captionsExample = [
-    { start: 0, end: 4.0, text: " Page 10, Unit 2, Summer Vacation. " },
-    { start: 4.05, end: 7.09, text: "Page 10, Unit 2, Vocabulary." },
-    { start: 7.12, end: 9.19, text: " 1. Party Hat. " },
-    { start: 9.22, end: 11.16, text: "2. Jello." },
-    { start: 11.2, end: 14.0, text: "3. Cake. " },
-    { start: 14.04, end: 16.23, text: "4. Happy Birthday." },
-    { start: 16.26, end: 19.1, text: " 5. Balloons." },
-    { start: 19.14, end: 21.17, text: " 6. Present. " },
-    { start: 21.2, end: 24.04, text: "7.card" },
-    { start: 24.08, end: 26.29, text: "Page 10. Listen and read along. " },
-    { start: 26.33, end: 30.12, text: "B, bird, ball, boy " },
-    { start: 30.16, end: 32.28, text: "Page 11. Birthday is fun" },
     {
-      start: 32.32,
-      end: 40.09,
-      text: "Hi, everyone. Today is my birthday. I'm seven years old. My friends are here. It's fun. ",
+      start: 0.659,
+      end: 6.559,
+      text: "Page ten, unit two, summer vacation. Page ten, unit two, vocabulary.",
     },
-    { start: 40.12, end: 43.18, text: "Page 11. Listen, read & repeat. " },
     {
-      start: 43.22,
-      end: 46.26,
-      text: "What's your name? My name is Lolo. ",
+      start: 7.819,
+      end: 55.179,
+      text: "One, France. Two, bus. Three, clock tower. Four, world map. Five, Nile River. Six, Egypt. Seven, pyramids. Eight, Australia. Nine, South America. Ten, Statue of Liberty. Eleven, tourist, tourists. Twelve, globe. Page ten. Listen and read along. Short U. Bug, runner, cup. Unit two, page eleven, reading. Listen and read along. Vacation in France.",
     },
-    { start: 46.3, end: 50.14, text: "Page 11. Listen and read along. " },
-    { start: 50.18, end: 53.25, text: "P, pencil, pink, pizza. " },
+    {
+      start: 56.299,
+      end: 89.139,
+      text: "Tom and his family love traveling. They always find exciting things when they travel. Often, they go to France during their summer vacation. They are never bored of France. They find that each part of France is different and interesting. Tom's family always spends two days in Paris. It is a beautiful city. They enjoy the food and places there. Sometimes they take a bus or train to other famous places in France too.",
+    },
+    {
+      start: 90.239,
+      end: 96.779,
+      text: "It is always fun to travel. Page eleven. Listen, read and repeat.",
+    },
+    {
+      start: 96.779,
+      end: 99.639,
+      text: "Where do you go on your summer vacation?",
+    },
+    {
+      start: 99.639,
+      end: 100.939,
+      text: "I usually go to Italy.",
+    },
+    {
+      start: 102.0,
+      end: 105.439,
+      text: "Page eleven. Listen and read along.",
+    },
   ];
-
+  const captions = [
+    { start: 0, end: 3.5, text: "Page 4. Listen and read along." },
+    { start: 3.8, end: 7.54, text: " Short U. Bug, runner, cup" },
+  ];
+  const imageSounds = [
+    null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
+    new Audio(sound1_letter),
+    new Audio(sound2_letter),
+    new Audio(sound3_letter),
+    new Audio(sound4_letter),
+  ];
   const areas = [
     // الصوت الأول – المنطقة الأساسية
-    { x1: 72.8, y1: 26.6, x2: 77.0, y2: 30.0, sound: 1, isPrimary: true },
+    { x1: 68.6, y1: 32.7, sound: 1, isPrimary: true },
 
-    // // الصوت الأول – منطقة إضافية
-    { x1: 69.5, y1: 25.8, x2: 75.9, y2: 33.4, sound: 1, isPrimary: false },
+    // الصوت الثاني – 27
+    { x1: 68.1, y1: 15.7, sound: 2, isPrimary: true },
 
-    // // الصوت الثاني – الأساسية
-    { x1: 63.2, y1: 56.35, x2: 67.2, y2: 59.3, sound: 2, isPrimary: true },
+    // الصوت الثاني – الإضافية
+    { x1: 65.77, y1: 18.66, x2: 79.65, y2: 26.27, sound: 2, isPrimary: false },
 
-    // // الصوت الثاني – الإضافية
-    { x1: 62.9, y1: 53.5, x2: 74.8, y2: 59.9, sound: 2, isPrimary: false },
+    // الصوت الثالث – الأساسية
+    { x1: 80.8, y1: 10.4, sound: 3, isPrimary: true },
 
-    // // الصوت الثالث – الأساسية
-    { x1: 60.8, y1: 47.9, x2: 64.9, y2: 50.9, sound: 3, isPrimary: true },
+    // الصوت الثالث – الإضافية
+    { x1: 77.84, y1: 12.23, x2: 81.28, y2: 17.48, sound: 3, isPrimary: false },
 
-    // // الصوت الثالث – الإضافية
-    { x1: 56.4, y1: 43.5, x2: 72.8, y2: 51.1, sound: 3, isPrimary: false },
-    // // الصوت الرابع – الأساسية
-    { x1: 88.2, y1: 11.45, x2: 92.1, y2: 14.4, sound: 4, isPrimary: true },
+    // الصوت الرابع – الأساسية
+    { x1: 60, y1: 37.9, sound: 4, isPrimary: true },
 
-    // // الصوت الرابع – الإضافية
-    { x1: 23.17, y1: 11.5, x2: 99.4, y2: 20.5, sound: 4, isPrimary: false },
+    // الصوت الخامس – الأساسية
+    { x1: 57.5, y1: 68.6, sound: 5, isPrimary: true },
 
-    // // الصوت الخامس – الأساسية
-    { x1: 13.4, y1: 23.7, x2: 17.3, y2: 26.7, sound: 5, isPrimary: true },
+    // الصوت الخامس – الإضافية
+    { x1: 56.51, y1: 65.2, x2: 60.42, y2: 75.63, sound: 5, isPrimary: false },
 
-    // // الصوت الخامس – الإضافية
-    { x1: 1.0, y1: 11.06, x2: 16.9, y2: 28.5, sound: 5, isPrimary: false },
+    // الصوت السادس – الأساسية
+    { x1: 51.8, y1: 56.9, sound: 6, isPrimary: true },
+
+    // الصوت السابع – الأساسية
+    { x1: 44.6, y1: 62.3, sound: 7, isPrimary: true },
+    { x1: 38.41, y1: 61.47, x2: 53.71, y2: 66.04, sound: 7, isPrimary: false },
+
+    // الصوت الثامن – الأساسية
+    { x1: 84.2, y1: 47.9, sound: 8, isPrimary: true },
+
+    // الصوت الثامن – الإضافية
+    { x1: 79.56, y1: 47.09, x2: 89.9, y2: 53.69, sound: 8, isPrimary: false },
+
+    // الصوت التاسع – الأساسية
+    { x1: 28.4, y1: 43.5, sound: 9, isPrimary: true },
+
+    // الصوت التاسع – الإضافية
+    { x1: 22.68, y1: 40.15, x2: 33.24, y2: 53.35, sound: 9, isPrimary: false },
+
+    // الصوت العاشر – الأساسية
+    { x1: 32.2, y1: 22.5, sound: 10, isPrimary: true },
+
+    // الصوت  العاشر – الإضافية
+    { x1: 20.96, y1: 20.69, x2: 34.31, y2: 30.84, sound: 10, isPrimary: false },
+
+    // الصوت الحادي عشر – الأساسية
+    { x1: 33.7, y1: 74.5, sound: 11, isPrimary: true },
+
+    // الصوت الحادي عشر – الإضافية
+    { x1: 32.38, y1: 70.95, x2: 49.61, y2: 80.43, sound: 11, isPrimary: false },
+
+    // الصوت الثاني عشر – الأساسية
+    { x1: 83.4, y1: 64.4, sound: 12, isPrimary: true },
+
+    // الصوت الثاني عشر – الإضافية
+    { x1: 75.68, y1: 55.72, x2: 91.84, y2: 67.23, sound: 12, isPrimary: false },
   ];
-  // const sounds = {
-  //   1: sound1,
-  //   2: sound2,
-  //   3: sound3,
-  //   4: sound4,
-  //   5: sound5,
-  // };
+  const sounds = {
+    1: sound1,
+    2: sound2,
+    3: sound3,
+    4: sound4,
+    5: sound5,
+    6: sound6,
+    7: sound7,
+    8: sound8,
+    9: sound9,
+    10: sound10,
+    11: sound11,
+    12: sound12,
+  };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -158,7 +234,7 @@ const Unit2_Page1 = ({ openPopup }) => {
             }}
             onClick={() => {
               setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-              // playSound(sounds[area.sound]);
+              playSound(sounds[area.sound]);
             }}
           ></div>
         );
@@ -266,9 +342,15 @@ const Unit2_Page1 = ({ openPopup }) => {
           onClick={() =>
             openPopup(
               "html",
-              <>
-                <Unit2_Page1_Read />
-              </>,
+              <FourImagesWithAudio
+                images={[Rabbit, img1, img2, img3, img4]}
+                audioSrc={longAudio}
+                checkpoints={[0, 3.2, 5.4, 6.52, 7.12]}
+                popupOpen={true}
+                titleQ={"Listen and read along."}
+                audioArr={imageSounds}
+                captions={captions}
+              />,
             )
           }
           style={{ overflow: "visible" }}
@@ -278,8 +360,9 @@ const Unit2_Page1 = ({ openPopup }) => {
             href={arrowBtn}
             x="0"
             y="0"
-            width="90"
-            height="90"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMid meet"
           />
         </svg>
       </div>

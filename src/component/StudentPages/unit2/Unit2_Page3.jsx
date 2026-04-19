@@ -1,14 +1,15 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 12.png";
 import "./Unit2_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound6 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
-import sound7 from "../../../assets/audio/ClassBook/Unit 2/P 12/CD10.Pg12_Grammar1_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 2/P 12/unit2-pg12-grammar1.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_1.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_2.1_Helen.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_2.2_Tom.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_3.1_Helen.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_3.2_Helen's Mom.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_4.1_Helen.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_4.2 _Tom.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -20,40 +21,102 @@ const Unit2_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 12, Exercise 1. Right Grammar." },
-    { start: 3.25, end: 7.11, text: " How old are you? I'm seven years old." },
     {
-      start: 7.15,
-      end: 11.02,
-      text: " When is your birthday? My birthday is in August.",
+      start: 0.399,
+      end: 9.0,
+      text: "Page 12, exercise 1. Write grammar. How do you/they/we go to school?",
     },
     {
-      start: 11.06,
-      end: 13.11,
-      text: "It is on Tuesday. ",
+      start: 10.179,
+      end: 14.899,
+      text: "How do you/they/we go to the mall?",
     },
-    { start: 13.15, end: 14.22, text: "How old are you, Sara? " },
-    { start: 14.26, end: 16.05, text: "I'm three years old. " },
-    { start: 16.09, end: 17.24, text: "When is your birthday party, Stella? " },
-    { start: 17.27, end: 19.16, text: "It is on Tuesday. " },
     {
-      start: 19.2,
-      end: 22.1,
-      text: "Happy birthday! This is for you, Stella. ",
+      start: 16.02,
+      end: 20.659,
+      text: "How does he/she/it go to school?",
     },
-    { start: 22.14, end: 23.1, text: "Thank you.  " },
-    { start: 23.14, end: 25.05, text: "You're welcome. Open it." },
+    {
+      start: 21.979,
+      end: 31.519,
+      text: "How does he/she/it go to the mall? I/they/we go to school by bus.",
+    },
+    {
+      start: 32.86,
+      end: 37.0,
+      text: "I/they/we go to school by car.",
+    },
+    {
+      start: 38.459,
+      end: 42.84,
+      text: "I/they/we go to the mall by taxi.",
+    },
+    {
+      start: 44.139,
+      end: 47.799,
+      text: "I/they/we go to the mall by bike.",
+    },
+    {
+      start: 48.919,
+      end: 52.899,
+      text: "He/she/it goes to school by bus.",
+    },
+    {
+      start: 53.959,
+      end: 58.279,
+      text: "He/she/it goes to school by car.",
+    },
+    {
+      start: 59.299,
+      end: 64.119,
+      text: "He/she/it goes to the mall by taxi.",
+    },
+    {
+      start: 65.199,
+      end: 69.799,
+      text: "He/she/it goes to the mall by bike.",
+    },
+    {
+      start: 71.059,
+      end: 72.159,
+      text: "How do they go to school?",
+    },
+    {
+      start: 73.26,
+      end: 75.919,
+      text: "They go to school by bus.",
+    },
+    {
+      start: 75.919,
+      end: 77.439,
+      text: "How do you go to the mall, mom?",
+    },
+    {
+      start: 78.659,
+      end: 80.459,
+      text: "I go to the mall by taxi.",
+    },
+    {
+      start: 81.559,
+      end: 82.939,
+      text: "How does she go to school?",
+    },
+    {
+      start: 84.04,
+      end: 85.639,
+      text: "She goes to school by car.",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
-    { x1: 54.2, y1: 17.0, x2: 74.1, y2: 20.4, sound: sound5 },
-    { x1: 14.08, y1: 27.0, x2: 29.6, y2: 31.7, sound: sound6 },
-    { x1: 7.0, y1: 47.5, x2: 29.2, y2: 50.4, sound: sound7 },
-    
+    { x1: 14.25, y1: 8, x2: 86.86, y2: 16.27, sound: sound1 },
+    { x1: 14.26, y1: 17.08, x2: 87.26, y2: 27.94, sound: sound2 },
+    { x1: 5.48, y1: 38.22, x2: 25.25, y2: 43.38, sound: sound3 },
+    { x1: 33.1, y1: 59.82, x2: 50.89, y2: 65.37, sound: sound4 },
+    { x1: 50.37, y1: 39.07, x2: 88.56, y2: 43.38, sound: sound5 },
+    { x1: 73.65, y1: 63.93, x2: 92.49, y2: 68.86, sound: sound6 },
+    { x1: 5.63, y1: 68.25, x2: 38.07, y2: 71.74, sound: sound7 },
+    { x1: 50.63, y1: 81.4, x2: 68.42, y2: 86.54, sound: sound8 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
