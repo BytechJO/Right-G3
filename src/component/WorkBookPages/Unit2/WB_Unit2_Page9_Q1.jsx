@@ -6,38 +6,38 @@ const ITEMS = [
   {
     id: 1,
     text: "The car is faster than the skateboard.",
-    correct: "True",
+    correct: "true",
   },
   {
     id: 2,
     text: "The grandpa is younger than the grandson.",
-    correct: "False",
+    correct: "false",
   },
   {
     id: 3,
     text: "The lion is larger than the cat.",
-    correct: "True",
+    correct: "true",
   },
   {
     id: 4,
     text: "The truck is smaller than the car.",
-    correct: "False",
+    correct: "false",
   },
   {
     id: 5,
     text: "The snake is longer than the worm.",
-    correct: "True",
+    correct: "true",
   },
   {
     id: 6,
     text: "The book is heavier than the pen.",
-    correct: "True",
+    correct: "true",
   },
 ];
 
-export default function WB_UnitX_TrueFalse() {
+export default function SB_AtTheBasketballGame_Page210_QA() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
@@ -55,7 +55,7 @@ export default function WB_UnitX_TrueFalse() {
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
     if (!allAnswered) {
-      ValidationAlert.info("Please answer all questions first.");
+      ValidationAlert.info("Please complete all answers first.");
       return;
     }
 
@@ -67,7 +67,7 @@ export default function WB_UnitX_TrueFalse() {
       }
     });
 
-    setShowResults(true);
+    setChecked(true);
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -79,82 +79,265 @@ export default function WB_UnitX_TrueFalse() {
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
+    const filled = {};
+
     ITEMS.forEach((item) => {
-      correctMap[item.id] = item.correct;
+      filled[item.id] = item.correct;
     });
 
-    setAnswers(correctMap);
-    setShowResults(true);
+    setAnswers(filled);
+    setChecked(true);
     setShowAns(true);
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
+    setChecked(false);
     setShowAns(false);
   };
 
-  const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[item.id] !== item.correct;
+  const isWrongCell = (item, choice) => {
+    if (!checked || showAns) return false;
+    return answers[item.id] === choice && answers[item.id] !== item.correct;
+  };
+
+  const shouldShowCheck = (item, choice) => {
+    if (showAns) return item.correct === choice;
+    if (!checked) return false;
+    return answers[item.id] === choice && answers[item.id] === item.correct;
+  };
+
+  const renderBookCheck = () => {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        style={{
+          width: "clamp(34px, 3.3vw, 54px)",
+          height: "clamp(34px, 3.3vw, 54px)",
+          transform: "rotate(-12deg)",
+          display: "inline-block",
+        }}
+      >
+        <path
+          d="M4 13 L9 18 L20 5"
+          stroke="#d82424"
+          strokeWidth="3.8"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  };
+
+  const renderChoiceCell = (item, choice) => {
+    const isSelected = answers[item.id] === choice;
+    const showCheck = shouldShowCheck(item, choice);
+    const showWrong = isWrongCell(item, choice);
+
+    return (
+      <td
+        onClick={() => handleSelect(item.id, choice)}
+        style={{
+          width: "12.2%",
+          minWidth: "92px",
+          borderLeft: "2px solid #a6a6a6",
+          borderTop: "2px solid #a6a6a6",
+          textAlign: "center",
+          verticalAlign: "middle",
+          cursor: showAns ? "default" : "pointer",
+          position: "relative",
+          background: isSelected && !checked ? "#f6f6f6" : "#fff",
+          padding: 0,
+          height: "68px",
+        }}
+      >
+        {!checked && !showAns && (
+          <div
+            style={{
+              width: "22px",
+              height: "22px",
+              margin: "0 auto",
+              borderRadius: "50%",
+              border: `2px solid ${isSelected ? "#7d7d7d" : "#b9b9b9"}`,
+              background: isSelected ? "#ececec" : "transparent",
+              boxSizing: "border-box",
+            }}
+          />
+        )}
+
+        {showCheck && renderBookCheck()}
+
+        {showWrong && (
+          <div
+            style={{
+              position: "absolute",
+              top: "6px",
+              right: "6px",
+              width: "19px",
+              height: "19px",
+              borderRadius: "50%",
+              background: "#ef4444",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "10px",
+              fontWeight: "700",
+            }}
+          >
+            ✕
+          </div>
+        )}
+      </td>
+    );
   };
 
   return (
-    <div className="main-container-component">
-      <div className="div-forall" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span> Read and write ✓.
+    <div className="main-container-component" style={{ width: "100%" }}>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "1380px",
+          margin: "0 auto",
+          padding: "12px clamp(10px, 2vw, 24px) 28px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "22px",
+          boxSizing: "border-box",
+        }}
+      >
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >
+          <span className="WB-ex-A">A</span>
+          Read and write ✓.
         </h1>
 
-        {ITEMS.map((item) => (
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            paddingBottom: "2px",
+          }}
+        >
           <div
-            key={item.id}
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderBottom: "1px solid #ccc",
-              padding: "10px 0",
+              minWidth: "760px",
+              maxWidth: "1188px",
+              width: "100%",
+              margin: "0 auto",
+              border: "2px solid #a6a6a6",
+              borderRadius: "18px",
+              overflow: "hidden",
+              background: "#fff",
             }}
           >
-            <div style={{ fontSize: "18px" }}>
-              {item.id}. {item.text}
-            </div>
-
-            <div style={{ display: "flex", gap: "10px" }}>
-              {["True", "False"].map((option) => {
-                const selected = answers[item.id] === option;
-
-                return (
-                  <div
-                    key={option}
-                    onClick={() => handleSelect(item.id, option)}
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                tableLayout: "fixed",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
                     style={{
-                      padding: "6px 14px",
-                      border: selected ? "3px solid #ef4444" : "2px solid #ccc",
-                      borderRadius: "8px",
-                      cursor: showAns ? "default" : "pointer",
-                      backgroundColor: "white",
+                      width: "75.6%",
+                      height: "58px",
+                      padding: 0,
+                      background: "#fff",
+                    }}
+                  />
+                  <th
+                    style={{
+                      width: "12.2%",
+                      minWidth: "92px",
+                      borderLeft: "2px solid #a6a6a6",
+                      textAlign: "center",
+                      fontSize: "clamp(18px, 2vw, 26px)",
+                      fontWeight: "400",
+                      color: "#222",
+                      padding: 0,
                     }}
                   >
-                    {option}
-                  </div>
-                );
-              })}
-            </div>
+                    True
+                  </th>
+                  <th
+                    style={{
+                      width: "12.2%",
+                      minWidth: "92px",
+                      borderLeft: "2px solid #a6a6a6",
+                      textAlign: "center",
+                      fontSize: "clamp(18px, 2vw, 26px)",
+                      fontWeight: "400",
+                      color: "#222",
+                      padding: 0,
+                    }}
+                  >
+                    False
+                  </th>
+                </tr>
+              </thead>
 
-            {isWrong(item) && (
-              <span style={{ color: "red", fontWeight: "bold" }}>✕</span>
-            )}
+              <tbody>
+                {ITEMS.map((item) => (
+                  <tr key={item.id}>
+                    <td
+                      style={{
+                        borderTop: "2px solid #a6a6a6",
+                        padding: "0 18px 0 20px",
+                        height: "68px",
+                        fontSize: "clamp(18px, 2.35vw, 28px)",
+                        color: "#222",
+                        verticalAlign: "middle",
+                        lineHeight: 1.15,
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: "700",
+                          display: "inline-block",
+                          minWidth: "28px",
+                          marginRight: "14px",
+                        }}
+                      >
+                        {item.id}
+                      </span>
+                      <span>{item.text}</span>
+                    </td>
+
+                    {renderChoiceCell(item, "true")}
+                    {renderChoiceCell(item, "false")}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
+        </div>
 
-        <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-          <Button text="Check" onClick={handleCheck} />
-          <Button text="Show Answer" onClick={handleShowAnswer} />
-          <Button text="Start Again" onClick={handleReset} />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "6px",
+          }}
+        >
+          <Button
+            checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+          />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import page_1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27.png";
+import page_1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11.png";
 import "./WB_unit1.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
@@ -7,7 +7,7 @@ const WB_Unit1_Page5 = ({ openPopup }) => {
   return (
     <div className="page1-img-wrapper"
             
-              style={{ backgroundImage: `url(${page})` }}>
+              style={{ backgroundImage: `url(${page_1})` }}>
       {/* <img src={page} /> */}
       <div
         className="wb-unit1-p5-q1 hover:scale-110 transition"
@@ -17,7 +17,7 @@ const WB_Unit1_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 5 })}
+          onClick={() => openPopup("exercise", { startIndex: 17 })}
           // className="click-icon-page8-1 hover:scale-110 transition"
           style={{ overflow: "visible" }}
         >
@@ -39,7 +39,7 @@ const WB_Unit1_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 6})}
+          onClick={() => openPopup("exercise", { startIndex: 18})}
           style={{ overflow: "visible" }}
           // className="click-icon-page8-2 hover:scale-110 transition"
         >

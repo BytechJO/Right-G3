@@ -1,6 +1,6 @@
-import React from "react";
-import page_1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27.png";
-import "./WB_unit1.css";
+import React , {useRef} from "react";
+import page_4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 4.png";
+import "./WB_unit5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
 const WB_Unit1_Page4 = ({ openPopup }) => {
@@ -56,28 +56,6 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
           height="22"
           viewBox="0 0 90 90"
           onClick={() => openPopup("exercise", { startIndex: 3 })}
-          style={{ overflow: "visible" }}
-        >
-          <image className="svg-img"
-            href={arrowBtn}
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid meet"
-          />
-        </svg>
-      </div>
-
-      <div
-        className="wb-unit1-p4-q3 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 4 })}
           style={{ overflow: "visible" }}
         >
           <image className="svg-img"
