@@ -280,8 +280,8 @@ const Unit10_Page5_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What kind of animal was in the park in the <br /> afternoon in A Brave
-          Mouse on page 77? the Farm on page 65?
+          What does Tom have to sell in order to buy a new <br /> bike in
+          Preparing for a Garage Sale on page 83?
         </h5>
 
         {/* Words List */}

@@ -3,6 +3,7 @@ import page_6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms 
 // import song from "../../../assets/img_unit5/sounds-unit5/Pg15.Sing_Adult Lady.mp3";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
+import "./Unit5_Page6.css";
 
 const Unit5_Page6 = ({ openPopup }) => {
 
