@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgA from "../../../assets/imgs/test6.png";
-import imgB from "../../../assets/imgs/test6.png";
-import imgC from "../../../assets/imgs/test6.png";
-import imgD from "../../../assets/imgs/test6.png";
+import imgA from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex D 1.svg";
+import imgB from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex D 2.svg";
+import imgC from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex D 3.svg";
+import imgD from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex D 4.svg";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
 
@@ -213,9 +213,9 @@ const Unit2_Page6_Q1 = () => {
                                   right: "-8px",
                                   bottom: "-5px",
                                   border:
-                                    selected[q.id] === q.options[0]
+                                    selected[q.id] === q.options[1]
                                       ? showResult
-                                        ? q.options[0] === q.correct
+                                        ? q.options[1] === q.correct
                                           ? "2px solid #1C398E"
                                           : "2px solid #ef4444"
                                         : "2px solid #1C398E"

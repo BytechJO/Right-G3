@@ -13,7 +13,7 @@ const Review10_Page2 = ({ openPopup }) => {
       {/* <img src={page_2} /> */}
 
       <div
-        className="click-icon-review6-page2-2 hover:scale-110 transition"
+        className="click-icon-review10-page2-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -34,7 +34,7 @@ const Review10_Page2 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="click-icon-review6-page2-3  hover:scale-110 transition"
+        className="click-icon-review10-page2-3  hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg

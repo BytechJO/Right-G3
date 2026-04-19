@@ -255,7 +255,7 @@ const Unit9_Page5_Q3 = () => {
             C
           </span>
           What kind of animal was in the park in the <br /> afternoon in A Brave
-          Mouse on page 77? the Farm on page 65?
+          Mouse on page 77?
         </h5>
 
         {/* Words List */}

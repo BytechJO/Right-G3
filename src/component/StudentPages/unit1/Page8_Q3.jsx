@@ -4,7 +4,13 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img from "../../../assets/imgs/test6.png";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
-
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 4.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 5.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 6.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 7.svg";
 const Page8_Q3 = () => {
   const [showResult, setShowResult] = useState(false);
   const questions = [
@@ -12,21 +18,25 @@ const Page8_Q3 = () => {
       id: 1,
       text: "Jad is older than his dad.",
       answer: "false",
+      images: [img1], // صورة وحدة
     },
     {
       id: 2,
       text: "The giraffe is taller than the bear.",
       answer: "true",
+      images: [img2, img3], // صورتين
     },
     {
       id: 3,
       text: "The bus is faster than the airplane.",
       answer: "false",
+      images: [img4, img5],
     },
     {
       id: 4,
       text: "The car is bigger than the bike.",
       answer: "true",
+      images: [img6, img7],
     },
   ];
 
@@ -175,16 +185,19 @@ const Page8_Q3 = () => {
               </div>
 
               {/* الصورة */}
-              <div className="w-[20%] flex justify-center relative">
-                <img
-                  src={img}
-                  alt=""
-                  style={{
-                    width: "100px",
-                    height: "auto",
-                    objectFit: "contain",
-                  }}
-                />
+                <div className="w-[50%] flex justify-center gap-2">
+                  {q.images.map((image, i) => (
+                    <img
+                      key={i}
+                      src={image}
+                      alt=""
+                      style={{
+                        width: q.images.length === 1 ? "100px" : "70px",
+                        height: "auto",
+                        objectFit: "contain",
+                      }}
+                    />
+                  ))}
               </div>
             </div>
           ))}

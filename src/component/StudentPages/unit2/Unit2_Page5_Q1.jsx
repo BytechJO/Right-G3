@@ -4,10 +4,9 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex A 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex A 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex A 3.svg";
 const Unit2_Page5_Q1 = () => {
   const questions = [
     { image: img1, answer: "glue" },
@@ -176,7 +175,7 @@ const Unit2_Page5_Q1 = () => {
                       style={{
                         width: "20vw",
                         height: "20vh",
-                        objectFit: "cover",
+                        objectFit: "contain",
                         marginBottom: "20px",
                       }}
                     />

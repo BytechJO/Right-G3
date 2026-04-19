@@ -1,4 +1,4 @@
-import page_1 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0018.jpg";
+import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 18.png";
 import "./Review2_Page1.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
@@ -12,7 +12,7 @@ const Review2_Page1 = ({ openPopup }) => {
       {/* <img src={page_1} /> */}
 
       <div
-        className="click-icon-review3-page1-2 hover:scale-110 transition"
+        className="click-icon-review2-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -33,7 +33,7 @@ const Review2_Page1 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="click-icon-review3-page1-3 hover:scale-110 transition"
+        className="click-icon-review2-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg

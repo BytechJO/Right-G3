@@ -117,7 +117,7 @@ const Unit4_Page6_Q1 = () => {
           style={{ width: "60%", marginBottom: "40px" }}
         >
           <h5 className="header-title-page8">
-            <span className="ex-A">D</span>Complete the conversations.
+            <span className="ex-A mr-3">D</span>Complete the conversations.
           </h5>
           <div
             style={{

@@ -1,4 +1,4 @@
-import page_5 from "../../../assets/imgs/pages/Right_3_student/Right Int SB G3_page-0014.jpg";
+import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 14.png";
 import "./Unit2_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 const Unit2_Page5 = ({ openPopup }) => {

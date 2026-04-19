@@ -10,7 +10,7 @@ const Unit9_Page5 = ({ openPopup }) => {
       {/* <img src={page_5} /> */}
 
       <div
-        className="click-icon-unit7-page5-1 hover:scale-110 transition"
+        className="click-icon-unit9-page5-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -32,7 +32,7 @@ const Unit9_Page5 = ({ openPopup }) => {
       </div>
 
       <div
-        className="click-icon-unit7-page5-2 hover:scale-110 transition"
+        className="click-icon-unit9-page5-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -54,7 +54,7 @@ const Unit9_Page5 = ({ openPopup }) => {
       </div>
 
       <div
-        className="click-icon-unit7-page5-3 hover:scale-110 transition"
+        className="click-icon-unit9-page5-3 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg

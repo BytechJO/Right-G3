@@ -250,14 +250,11 @@ const Unit5_Page5_Q3 = () => {
       }}
     >
       <div className="div-forall">
-        <h5
-          className="header-title-page8 pb-2.5"
-        >
+        <h5 className="header-title-page8 pb-2.5">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What do Tom and his family enjoy about France in Vacation in France on
-          page 11?
+          What things are in the yard in Tom Lives in a House on page 41? 
         </h5>
 
         {/* Words List */}

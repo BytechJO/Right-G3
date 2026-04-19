@@ -4,10 +4,10 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/test6.png";
-import img2 from "../../../assets/imgs/test6.png";
-import img3 from "../../../assets/imgs/test6.png";
-import img4 from "../../../assets/imgs/test6.png";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 1.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 2.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 3.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 4.svg";
 
 const Review2_Page1_Q2 = () => {
   const questions = [
@@ -163,7 +163,7 @@ const Review2_Page1_Q2 = () => {
                 alignItems: "flex-start",
                 gap: "20px",
                 marginBottom: "40px",
-                marginTop: "10px",
+                marginTop: "20px",
               }}
             >
               <div

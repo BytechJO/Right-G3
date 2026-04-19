@@ -159,9 +159,9 @@ export default function Unit3_Page5_Q2() {
           <div className="unscramble-container">
             <h5 className="header-title-page8 pb-2.5">
               <span className="ex-A" style={{ marginRight: "10px" }}>
-                A
+                B
               </span>
-              Look, read, and write.
+             Look, read, and write.
             </h5>
 
             {/* OPTIONS */}
