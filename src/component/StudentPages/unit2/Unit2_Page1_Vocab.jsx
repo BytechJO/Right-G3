@@ -1,50 +1,51 @@
 import React, { useState, useRef, useEffect } from "react";
-import backgroundImage from "../../../assets/imgs/test.png";
-import page2_2 from "../../../assets/imgs/test.png";
-import num1 from "../../../assets/imgs/test6.png";
-import num2 from "../../../assets/imgs/test6.png";
-import num3 from "../../../assets/imgs/test6.png";
-import num4 from "../../../assets/imgs/test6.png";
-import num5 from "../../../assets/imgs/test6.png";
-import num6 from "../../../assets/imgs/test6.png";
-import num8 from "../../../assets/imgs/test6.png";
-import num9 from "../../../assets/imgs/test6.png";
-import num10 from "../../../assets/imgs/test6.png";
-import num11 from "../../../assets/imgs/test6.png";
-import num12 from "../../../assets/imgs/test6.png";
-import { IoMdSettings } from "react-icons/io";
-import { TbMessageCircle } from "react-icons/tb";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/G5_U2_Pg_10.png";
+import vocabularyImg from "../../../assets/imgs/Voc.svg";
 import vocabulary from "../../../assets/audio/ClassBook/Unit 2/P 10/Pg10_Vocab_Adult Lady.mp3";
-
+import "./Unit2_Page1.css";
+import num1 from "../../../assets/imgs/num/1_1.svg";
+import num2 from "../../../assets/imgs/num/2_1.svg";
+import num3 from "../../../assets/imgs/num/3_1.svg";
+import num4 from "../../../assets/imgs/num/4_1.svg";
+import num5 from "../../../assets/imgs/num/5_1.svg";
+import num6 from "../../../assets/imgs/num/6_1.svg";
+import num7 from "../../../assets/imgs/num/7_1.svg";
+import num8 from "../../../assets/imgs/num/8_1.svg";
+import num9 from "../../../assets/imgs/num/9_1.svg";
+import num10 from "../../../assets/imgs/num/10_1.svg";
+import num11 from "../../../assets/imgs/num/11_1.svg";
+import num12 from "../../../assets/imgs/num/12_1.svg";
+import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound12.mp3";
+import { TbMessageCircle } from "react-icons/tb";
+import { IoMdSettings } from "react-icons/io";
 import { FaPlay, FaPause } from "react-icons/fa";
-import "../../../index.css";
-import sound1 from "../../../assets/imgs/test6.png";
-import sound4 from "../../../assets/imgs/test6.png";
-import sound5 from "../../../assets/imgs/test6.png";
-import sound2 from "../../../assets/imgs/test6.png";
-import sound3 from "../../../assets/imgs/test6.png";
-import sound6 from "../../../assets/imgs/test6.png";
-import sound7 from "../../../assets/imgs/test6.png";
-import sound8 from "../../../assets/imgs/test6.png";
-import sound9 from "../../../assets/imgs/test6.png";
-import sound10 from "../../../assets/imgs/test6.png";
-import sound11 from "../../../assets/imgs/test6.png";
-import sound12 from "../../../assets/imgs/test6.png";
-
 const Unit2_Page1_Vocab = () => {
   const mainAudioRef = useRef(null);
+  const clickAudioRef = useRef(null);
 
-  const [clickedIndex, setClickedIndex] = useState(null);
   const [paused, setPaused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeIndex2, setActiveIndex2] = useState(null);
   const [showContinue, setShowContinue] = useState(false);
-
-  const stopAtSecond = 2.5;
-
+  const stopAtSecond = 3.3;
+  const [clickedIndex, setClickedIndex] = useState(null);
+  // إعدادات الصوت
   const [showSettings, setShowSettings] = useState(false);
   const [volume, setVolume] = useState(1);
-
+  const [activeSpeed, setActiveSpeed] = useState(1);
+  const settingsRef = useRef(null);
+  const [forceRender, setForceRender] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -55,56 +56,42 @@ const Unit2_Page1_Vocab = () => {
   // ✔ Captions Array
   // ================================
   const captions = [
-    {
-      start: 0,
-      end: 3.0,
-      text: "Page 10, Unit 2. Vocabulary.",
-    },
-    { start: 2, end: 3, text: "1. France" },
-    { start: 3, end: 4, text: "2. bus" },
-    { start: 4, end: 5, text: "3. clock tower" },
-    { start: 5, end: 6, text: "4. world map" },
-    { start: 6, end: 7, text: "5. Nile River" },
-    { start: 7, end: 8, text: "6. Egypt" },
-    { start: 8, end: 9, text: "7. pyramids" },
-    { start: 9, end: 10, text: "8. Australia" },
-    { start: 10, end: 11, text: "9. South America" },
-    { start: 11, end: 12, text: "10. Statue of Liberty" },
-    { start: 12, end: 13, text: "11. tourist / tourists" },
-    { start: 13, end: 15, text: "12. globe" },
+    { start: 0.359, end: 2.679, text: "Page 10, Unit 2, Vocabulary." },
+
+    { start: 3.9, end: 4.8, text: "1. France." },
+    { start: 5.7, end: 7.59, text: "2. bus." },
+    { start: 7.9, end: 10.31, text: "3. clock tower." },
+    { start: 10.5, end: 12.8, text: "4. world map." },
+
+    { start: 13.23, end: 15.52, text: "5. Nile River." },
+    { start: 15.83, end: 17.97, text: "6. Egypt." },
+    { start: 18.48, end: 20.69, text: "7. pyramids." },
+    { start: 20.77, end: 22.91, text: "8. Australia." },
+
+    { start: 23.3, end: 25.87, text: "9. South America." },
+    { start: 26.06, end: 28.79, text: "10. Statue of Liberty." },
+    { start: 29.02, end: 31.43, text: "11. tourist, tourists." },
+    { start: 32.95, end: 35.79, text: "12. globe." },
   ];
-  console.log(current);
-  // ================================
-  // ✔ Word timings
-  // ================================
+  // 🎵 فترات الكلمات داخل الأوديو الرئيسي
   const wordTimings = [
-    { word: "1. scoreboard", start: 3, end: 5.2 }, //
-    { word: "2. young", start: 5.2, end: 7.3 }, //
-    { word: "3. old", start: 7.3, end: 9.5 }, //
-    { word: "4. small", start: 9.5, end: 11 }, //
-    { word: "5. big", start: 10.1, end: 12.0 }, //
-    { word: "6. referee", start: 12.0, end: 14.1 }, //
-    { word: "7. whistle", start: 14.1, end: 16.2 }, //
-    { word: "8. fast", start: 16.2, end: 18.2 }, //
-    { word: "9. slow", start: 18.2, end: 20.2 }, //
-    { word: "10. tall", start: 20.2, end: 22.3 }, //
-    { word: "11. short", start: 22.3, end: 24.3 }, //
-    { word: "12. basketball court", start: 24.3, end: 27.5 }, //
+    { start: 3.9, end: 4.8 }, // 1. scoreboard
+    { start: 5.7, end: 7.59 }, // 2. young
+    { start: 7.9, end: 10.31 }, // 3. old
+    { start: 10.5, end: 12.8 }, // 4. small
+
+    { start: 13.23, end: 15.52 }, // 5. big
+    { start: 15.83, end: 17.97 }, // 6. referee
+    { start: 18.48, end: 20.69 }, // 7. whistle
+    { start: 20.77, end: 22.91 }, // 8. fast
+
+    { start: 23.3, end: 25.87 }, // 9. slow
+    { start: 26.06, end: 28.79 }, // 10. tall
+
+    { start: 29.02, end: 31.43 }, // 11. short
+    { start: 32.95, end: 35.79 }, // 12. basketball court
   ];
-  const words = [
-    "France",
-    "bus",
-    "clock tower",
-    "world map",
-    "Nile River",
-    "Egypt",
-    "pyramids",
-    "Australia",
-    "South America",
-    "Statue of Liberty",
-    "tourist / tourists",
-    "globe",
-  ];
+
   // ================================
   // ✔ Update caption highlight
   // ================================
@@ -124,7 +111,6 @@ const Unit2_Page1_Vocab = () => {
     );
     setActiveIndex2(wordIndex);
   };
-
   // ================================
   // ✔ INITIAL PLAY & STOP AT SECOND
   // ================================
@@ -145,13 +131,14 @@ const Unit2_Page1_Vocab = () => {
       }
     }, 100);
 
+    // عند انتهاء الأوديو يرجع يبطل أنيميشن + يظهر Continue
     const handleEnded = () => {
-      mainAudioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setPaused(true);
-      setShowContinue(true);
+      audio.currentTime = 0;
       setActiveIndex(null);
       setActiveIndex2(null);
+      setPaused(true);
+      setShowContinue(true);
+      setIsPlaying(false);
     };
 
     audio.addEventListener("ended", handleEnded);
@@ -162,12 +149,19 @@ const Unit2_Page1_Vocab = () => {
     };
   }, []);
 
-  // ================================
-  // ✔ Play/Pause toggle
-  // ================================
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setForceRender((prev) => prev + 1);
+    }, 1000); // كل ثانية
+
+    return () => clearInterval(timer);
+  }, []);
+
   const togglePlay = () => {
     const audio = mainAudioRef.current;
+
     if (!audio) return;
+
     if (audio.paused) {
       audio.play();
       setPaused(false);
@@ -178,7 +172,6 @@ const Unit2_Page1_Vocab = () => {
       setIsPlaying(false);
     }
   };
-
   const wordAudios = [
     sound1,
     sound2,
@@ -221,8 +214,6 @@ const Unit2_Page1_Vocab = () => {
     };
   };
 
-  const wordRefs = useRef(wordAudios.map(() => React.createRef()));
-
   const nums = [
     num1,
     num2,
@@ -230,20 +221,32 @@ const Unit2_Page1_Vocab = () => {
     num4,
     num5,
     num6,
+    num7,
     num8,
     num9,
     num10,
     num11,
     num12,
   ];
-
+  const wordRefs = useRef(wordAudios.map(() => React.createRef()));
+  const positions = [
+    { top: "48.5%", left: "65%" }, //1
+    { top: "36%", left: "64%" }, //2
+    { top: "33%", left: "74%" }, //3
+    { top: "53%", left: "57%" }, //4
+    { top: "75%", left: "55.5%" }, //5
+    { top: "66.8%", left: "50.5%" }, //6
+    { top: "70%", left: "45.5%" }, //7
+    { top: "59.5%", left: "75%" }, // 8
+    { top: "55.5%", left: "30.5%" }, //9
+    { top: "41.5%", left: "35.5%" }, //10
+    { top: "79.5%", left: "37%" }, //11
+    { top: "71.5%", left: "77%" }, //12
+  ];
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* ============================
-           AUDIO PLAYER
-      ============================= */}
       <div
         className="audio-popup-vocab-container"
         style={{
@@ -262,10 +265,10 @@ const Unit2_Page1_Vocab = () => {
               ref={mainAudioRef}
               src={vocabulary}
               onTimeUpdate={(e) => {
-                const t = e.target.currentTime;
-                setCurrent(t);
-                updateCaption(t);
-                updateWord(t); // 🔥 أهم خطوة
+                const time = e.target.currentTime;
+                setCurrent(time);
+                updateCaption(time);
+                updateWord(time); // 🔥 أهم خطوة
               }}
               onLoadedMetadata={(e) => setDuration(e.target.duration)}
             ></audio>
@@ -341,11 +344,12 @@ const Unit2_Page1_Vocab = () => {
         </div>
       </div>
 
-      {/* ============================
-           IMAGE + WORDS
-      ============================= */}
       <div
-        style={{ position: "relative", marginTop: "5px", width: "fit-content" }}
+        style={{
+          position: "relative",
+          marginTop: "5px",
+          width: "fit-content",
+        }}
       >
         <div className={`caption-inPopup ${showCaption ? "show" : ""}`}>
           {captions.map((cap, i) => (
@@ -360,24 +364,43 @@ const Unit2_Page1_Vocab = () => {
             </p>
           ))}
         </div>
-        {/* Image + Words */}
+        {/* كلمة + صورة صغيرة */}
+
         <img
-          src={page2_2}
+          src={vocabularyImg}
           style={{
-            height: "170px",
+            height: "340px",
+            width: "auto",
             position: "absolute",
             bottom: "0%",
-            right: "0%",
+            right: "-39.5%",
             borderRadius: "5%",
           }}
         />
 
-        <div className="vocab_container" style={{ bottom: "2%", right: "6%" }}>
-          {words.map((text, i) => (
+        {/* النصوص */}
+        <div
+          className="vocab_container"
+          style={{ bottom: "2%", right: "-33%" }}
+        >
+          {[
+            "France",
+            "bus",
+            "clock tower",
+            "world map",
+            "Nile River",
+            "Egypt",
+            "pyramids",
+            "Australia",
+            "South America",
+            "Statue of Liberty",
+            "tourist ,tourists",
+            "globe",
+          ].map((text, i) => (
             <h6
               key={i}
               className={
-                (activeIndex2 === i && current >= 2.8) || clickedIndex === i
+                (activeIndex2 === i && current >= 3.2) || clickedIndex === i
                   ? "active"
                   : ""
               }
@@ -388,27 +411,30 @@ const Unit2_Page1_Vocab = () => {
           ))}
         </div>
 
-        {/* Numbers */}
+        {/* الأرقام */}
         {nums.map((num, i) => (
           <img
             key={i}
             src={num}
+            id={`num-${i + 1}`}
             className={`num-img ${
-              (activeIndex2 === i && current >= 2.8) || clickedIndex === i
+              (activeIndex2 === i && current >= 3.2) || clickedIndex === i
                 ? "active"
                 : ""
             }`}
             style={{
-              height: "20px",
+              height: "18px",
               position: "absolute",
-              top: ["43%", "44%", "42%", "27.5%", "24.5%"][i],
-              left: ["19%", "52%", "66%", "34%", "32%"][i],
+              ...positions[i], // 👈 أهم سطر
             }}
           />
         ))}
-
-        {/* Background */}
-        <img src={backgroundImage} style={{ height: "75vh" }} />
+        {/* الصورة الرئيسية */}
+        <img
+          src={backgroundImage}
+          alt="interactive"
+          style={{ height: "85vh" }}
+        />
       </div>
       {wordAudios.map((src, i) => (
         <audio key={i} ref={wordRefs.current[i]} src={src} />
