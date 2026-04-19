@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
 import page_7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 7.png";
-import grammarSound from "../../../assets/audio/ClassBook/Unit 1/P 7/CD5.Pg7_Grammar2_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 1/Pg7_2.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 1/Pg7_2.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 1/Pg7_2.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 1/Pg7_2.4_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 1/Pg7_2.5_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 1/P 7/unit1-pg7-grammer2.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_2.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_3.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_4.1_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_5.1_Adult Lady.mp3";
 import "./Page7.css";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 // import video2 from "../../../assets/unit1/sounds/p7 1920.mp4";
@@ -26,26 +25,38 @@ const Page7 = ({ openPopup }) => {
     checkAreaAndPlaySound(xPercent, yPercent);
   };
   const captionsExample = [
-    { start: 0, end: 4.05, text: "Page 7, exercise 2. Right grammar. " },
-    { start: 4.09, end: 4.45, text: "Good morning." },
-    { start: 4.47, end: 6.16, text: "Good afternoon." },
-    { start: 6.2, end: 7.27, text: "Good evening. " },
-    { start: 7.3, end: 9.01, text: "Goodbye. " },
-    { start: 9.05, end: 10.16, text: "Good morning, Mom. " },
-    { start: 10.2, end: 12.05, text: "Good morning, Stella. " },
-    { start: 12.09, end: 13.12, text: "Good afternoon. " },
-    { start: 13.16, end: 15.01, text: "Good afternoon." },
-    { start: 15.05, end: 16.13, text: "Good evening" },
-    { start: 16.17, end: 17.24, text: "Good evening" },
-    { start: 17.27, end: 19.04, text: "Goodbye, Stella." },
+    {
+      start: 0,
+      end: 9.88,
+      text: "Page seven, exercise two. Write grammar. Who is older, Stella or Sarah? Stella is older than Sarah. ",
+    },
+    {
+      start: 11.34,
+      end: 21.26,
+      text: "Stella and Helen are the same age. Which is heavier, the TV or the radio? The TV is heavier than the radio.",
+    },
+    {
+      start: 22.6,
+      end: 28.34,
+      text: "Which is the biggest sea animal? The whale is the biggest sea animal. ",
+    },
+    {
+      start: 29.6,
+      end: 33.7,
+      text: "Which barbell is bigger? They're both the same size. ",
+    },
+    {
+      start: 34.9,
+      end: 45.7,
+      text: "Which is the longest snake? The brown snake is the longest snake. Which is the fastest vehicle? The motorcycle is the fastest vehicle",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.33, y1: 9.4, x2: 28.43, y2: 13.3, sound: sound1 },
-    { x1: 29.25, y1: 9.4, x2: 50.14, y2: 13.3, sound: sound2 },
-    { x1: 51.0, y1: 9.4, x2: 72.0, y2: 13.3, sound: sound3 },
-    { x1: 73.0, y1: 9.4, x2: 89.0, y2: 13.3, sound: sound4 },
-    { x1: 6.5, y1: 16.3, x2: 31.7, y2: 19.6, sound: sound5 },
+    { x1: 5.893, y1: 9.27, x2: 87.26, y2: 20.98, sound: sound1 },
+    { x1: 10.08, y1:57.56, x2: 42.26, y2: 63.73, sound: sound2 },
+    { x1: 51.15, y1: 31.67, x2: 93.27, y2: 37.63, sound: sound3 },
+    { x1: 5.37, y1: 64.75, x2: 49.06, y2: 71.12, sound: sound4 },
   ];
 
   const checkAreaAndPlaySound = (x, y) => {

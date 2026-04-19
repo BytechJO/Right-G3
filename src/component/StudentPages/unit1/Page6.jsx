@@ -1,58 +1,34 @@
 import React, { useRef, useState } from "react";
 import page_6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 6.png";
-import grammarSound from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound2 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound3 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound4 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound5 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound6 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound7 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound8 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound9 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound10 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound11 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound12 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound13 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
-import sound14 from "../../../assets/audio/ClassBook/Unit 1/P 5/Pg5_1_1_Bebo_V1.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 1/P 6/unit1-pg6-grammar1.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 6/Pg6_1.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 1/P 6/Pg6_2.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 1/P 6/Pg6_3.1_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 1/P 6/Pg6_4.1_Adult Lady.mp3";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 // import video from "./ddddddddddd";
-import "./Page6.css"
+import "./Page6.css";
 const Page6 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 4.05, text: "Page 6, exercise 1. Right grammar. " },
-    { start: 4.09, end: 7.17, text: "Hello, I'm Stella. This is John." },
-    { start: 7.2, end: 8.15, text: "Hello. " },
-    { start: 8.19, end: 9.18, text: "How are you?  " },
-    { start: 9.2, end: 11.12, text: "Fine. Thank you." },
-    { start: 11.16, end: 13.02, text: "Goodbye, Harley. " },
-    { start: 13.06, end: 15.23, text: "Nice to meet you. Nice to meet you." },
-    { start: 15.27, end: 17.24, text: "Hello. How are you? " },
-    { start: 17.27, end: 18.24, text: "Fine. Thank you." },
+    {
+      start: 0,
+      end: 29.1,
+      text: "Page six, exercise one. Write grammar. The bear is shorter than the giraffe. The giraffe is taller than the bear. The elephant is the biggest animal in the zoo. The bear is shorter than the giraffe. The giraffe is taller than the bear. The bush is younger than the tree. The tree is older than the bush. Is the bicycle faster than the skateboard? Yes, it is",
+    },
   ];
 
   // 🟩 مناطق مستطيلة (x1,y1,x2,y2)
   const clickableAreas = [
-    { x1: 7.0, y1: 10.0, x2: 43.0, y2: 14.0, sound: sound1 },
-    { x1: 61.5, y1: 10.0, x2: 75.14, y2: 14.0, sound: sound2 },
-    { x1: 7.0, y1: 14.0, x2: 29.0, y2: 18.0, sound: sound3 },
-    { x1: 61.5, y1: 14.0, x2: 82.0, y2: 18.0, sound: sound4 },
-    { x1: 7.0, y1: 18.0, x2: 30.0, y2: 21.5, sound: sound5 },
-    { x1: 61.5, y1: 18.0, x2: 83.0, y2: 21.5, sound: sound6 },
-    { x1: 32.0, y1: 28.0, x2: 51.0, y2: 33.5, sound: sound7 },
-    { x1: 62.0, y1: 32.0, x2: 71.02, y2: 35.5, sound: sound8 },
-    { x1: 6.7, y1: 63.7, x2: 23.5, y2: 67.5, sound: sound9 },
-    { x1: 47.4, y1: 65.0, x2: 67.3, y2: 68.6, sound: sound10 },
-    { x1: 47.4, y1: 65.0, x2: 67.3, y2: 68.6, sound: sound11 },
-    { x1: 47.4, y1: 65.0, x2: 67.3, y2: 68.6, sound: sound12 },
-    { x1: 47.4, y1: 65.0, x2: 67.3, y2: 68.6, sound: sound13 },
-    { x1: 47.4, y1: 65.0, x2: 67.3, y2: 68.6, sound: sound14 },
+    { x1: 5.37, y1: 8.65, x2: 64.76, y2: 20.37, sound: sound1 },
+    { x1: 5.37, y1: 32.49, x2: 45.13, y2: 38.86, sound: sound2 },
+    { x1: 54.81, y1: 32.7, x2: 94.32, y2: 38.45, sound: sound3 },
+    { x1: 47.86, y1: 90.75, x2: 93.54, y2: 96.67, sound: sound4 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -81,8 +57,6 @@ const Page6 = ({ openPopup }) => {
       onClick={handleImageClick}
       style={{ backgroundImage: `url(${page_6})` }}
     >
-   
-
       {/* رسم المستطيلات التفاعلية */}
       {clickableAreas.map((area, index) => (
         <div
