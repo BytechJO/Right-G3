@@ -7,7 +7,7 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frien
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex E 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex E 4.svg";
 
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 4/P 37/full1.mp3";
 
 import Button from "../../Button";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
@@ -23,19 +23,15 @@ const Review4_Page2_Q2 = () => {
   const [locked, setLocked] = useState(false);
   const captions = [
     {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
+      start: 0.239,
+      end: 11.599,
+      text: "Page 37, review four, exercise E. Does the word have a voiced T-H sound? Listen and write check or X.",
     },
     {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
+      start: 11.599,
+      end: 19.739,
+      text: "One, thief. Two, weather. Three, thorn. Four, father.",
     },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
   ];
   const choose = (i, value) => {
     if (locked) return;
@@ -105,7 +101,7 @@ const Review4_Page2_Q2 = () => {
           write<span style={{ color: "#D52328" }}> ✓ </span>or
           <span style={{ color: "#D52328" }}> ✗</span>
         </h5>
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10.9} />
 
         {/* GRID */}
         <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center">

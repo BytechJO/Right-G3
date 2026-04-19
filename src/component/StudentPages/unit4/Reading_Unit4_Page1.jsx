@@ -1,11 +1,11 @@
 import page24 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 38.png";
 import React, { useState, useRef } from "react";
 import "./Reading_Unit4_Page1.css";
-import sound1 from "../../../assets/audio/ClassBook/U 4/CD2.Pg38_Reading1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 4/Pg38_1.1_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 4/Pg38_1.2_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 4/Pg38_1.3_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 4/Pg38_1.4_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 4/P 38/full.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 38/Pg38_1.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 38/Pg38_1.2_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 38/Pg38_1.3_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 4/P 38/Pg38_1.4_Adult Lady.mp3";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
@@ -17,53 +17,37 @@ const Reading_Unit4_Page1 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.17, text: "Page 20 Reading. It's a Bunny." },
     {
-      start: 3.2,
-      end: 7.18,
-      text: " Today is Stella's birthday. Her friends are at her party. ",
+      start: 0.259,
+      end: 30.139,
+      text: "Page thirty-eight, Reading: Our African Safari. Stella's mom and dad are planning a summer trip. The weather is warm. They are going on an African safari in June. The family is excited. Stella exclaims, Look, Mom, there is a lion. The lion growls. Does it want cookies? asks Sarah. No way! shouts John. Lions eat meat. Look, it's eating some meat now.",
     },
     {
-      start: 7.21,
-      end: 14.01,
-      text: "There is a big birthday cake. Harley asks Stella how old she is. She is seven years old. ",
+      start: 31.319,
+      end: 52.939,
+      text: "Wow, look at that peacock, says John. It has wonderful colors, adds Stella. Does it want some grapes? Sarah asks. Yes, give it some, answers Mom. Look at the monkeys in the trees, shouts John. Do they want some bananas? Sarah asks.",
     },
     {
-      start: 14.05,
-      end: 18.26,
-      text: "Harley, Hansel, and John see the cupcakes. They look delicious.",
+      start: 54.099,
+      end: 63.119,
+      text: "No, they have bananas in the trees, says Dad. They have plenty to eat. I want to feed them some apples, says Sarah.",
     },
     {
-      start: 18.3,
-      end: 26.09,
-      text: "Hansel eats a lot of cupcakes. His tummy hurts. John tells him it is not good to eat so many sweets.",
+      start: 65.379,
+      end: 75.519,
+      text: "They don't want any apples, Sarah. They only want bananas, replies Stella. Hey, here come some elephants. They're awesome, says John.",
     },
     {
-      start: 26.12,
-      end: 34.0,
-      text: "Now, it's time for presents. Mom gives Stella her present. Stella is so excited.",
-    },
-    {
-      start: 34.04,
-      end: 37.05,
-      text: "Stella opens the present. What can it be?  ",
-    },
-    {
-      start: 37.09,
-      end: 45.09,
-      text: "The present from mom is a bunny. It is very cute and white. Stella names her new bunny Tilly.",
-    },
-    {
-      start: 45.12,
-      end: 54.04,
-      text: "Tilly hops and chases Lolo. Lolo is surprised. Stella and Sara laugh and laugh. This is the best birthday.",
+      start: 77.379,
+      end: 101.699,
+      text: "Give them some peanuts, says Mom. Yes, Mom. Look, they're eating from the bucket, shouts Sarah and Stella. I'm hungry, Mom, Sarah says. I'm hungry too, adds John. Oh, no, cries Dad. We don't have any food. Well, it's fun. We don't have food, but we have friends, laughs Mom.",
     },
   ];
   const clickableAreas = [
-    { x1: 15.9, y1: 39.4, x2: 51.14, y2: 44.0, sound: sound2 },
-    { x1: 56.0, y1: 39.1, x2: 93.9, y2: 44.0, sound: sound3 },
-    { x1: 16.0, y1: 84.0, x2: 52.9, y2: 89.5, sound: sound4 },
-    { x1: 56.0, y1: 84.5, x2: 93.7, y2: 90.9, sound: sound5 },
+    { x1: 15.26, y1: 35.78, x2: 51.62, y2: 48.0, sound: sound2 },
+    { x1: 56.0, y1: 35.98, x2: 92.44, y2: 48.0, sound: sound3 },
+    { x1: 16.0, y1: 84.0, x2: 51.9, y2: 95.5, sound: sound4 },
+    { x1: 56.0, y1: 84.5, x2: 93.7, y2: 94.9, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -145,12 +129,19 @@ const Reading_Unit4_Page1 = ({ openPopup }) => {
                 }}
               >
                 <AudioWithCaption src={sound1} captions={captionsExample} />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
 
@@ -187,12 +178,19 @@ const Reading_Unit4_Page1 = ({ openPopup }) => {
                 >
                   {/* <source src={video3} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />

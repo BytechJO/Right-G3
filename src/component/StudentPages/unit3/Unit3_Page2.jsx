@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 23.png";
-import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-05.svg";
-import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-06.svg";
-import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-07.svg";
-import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/List Pa 22-23-08.svg";
+import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-05.svg";
+import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-06.svg";
+import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-07.svg";
+import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-08.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import main from "../../../assets/audio/ClassBook/Unit 3/P 23/main.mp3";
 import sound1_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound1.mp3";
@@ -15,9 +15,9 @@ import reapeatSound from "../../../assets/audio/ClassBook/Unit 3/P 23/repeat.mp3
 import Bebo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.1_Bebo.mp3";
 import Lolo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Lolo.mp3";
 import along from "../../../assets/audio/ClassBook/Unit 3/P 23/along.mp3";
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Page23-listen6.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Asset 30.svg";
 
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Page23-listen5.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Asset 30.svg";
 import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
 import shopkeeper1 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Shopkeeper.mp3";
 import Lala1 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.3_Lala.mp3";
