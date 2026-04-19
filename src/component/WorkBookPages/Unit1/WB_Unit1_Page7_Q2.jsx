@@ -3,13 +3,13 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 2.svg";
-import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 3.svg"
-import img2a from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 4.svg"
-import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 5.svg"
-import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 6.svg"
-import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 7.svg"
-import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 8.svg"
-import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 9.svg"
+import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 3.svg";
+import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 4.svg";
+import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 5.svg";
+import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 6.svg";
+import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 7.svg";
+import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 8.svg";
+import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 9.svg";
 
 const ITEMS = [
   {
@@ -145,45 +145,18 @@ export default function WB_Unit3_Page7_QJ() {
     );
   };
 
-  const renderSelect = (item, field, options, minWidth) => (
-    <div
-      style={{
-        position: "relative",
-        minWidth,
-        width: "fit-content",
-        maxWidth: "100%",
-        display: "inline-flex",
-        alignItems: "center",
-      }}
-    >
+  const renderSelect = (item, field, options, className = "") => (
+    <div className={`wb-j-select-wrap ${className}`}>
       <select
         value={getValue(item.id, field)}
         disabled={showAns}
         onChange={(e) => handleChange(item.id, field, e.target.value)}
-        style={{
-          width: "100%",
-          minWidth,
-          maxWidth: "100%",
-          height: "44px",
-          border: "none",
-          outline: "none",
-          background: "transparent",
-          appearance: "none",
-          WebkitAppearance: "none",
-          MozAppearance: "none",
-          color: "#d62828",
-          fontSize: "clamp(24px, 2vw, 32px)",
-          fontWeight: "500",
-          lineHeight: "1.1",
-          textAlign: "center",
-          textAlignLast: "center",
-          padding: "0 26px 0 8px",
-          cursor: showAns ? "default" : "pointer",
-          boxSizing: "border-box",
-        }}
+        className={`wb-j-select ${
+          getValue(item.id, field) ? "wb-j-select--filled" : ""
+        }`}
       >
         <option value="" disabled hidden>
-          —
+          Select
         </option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -192,21 +165,7 @@ export default function WB_Unit3_Page7_QJ() {
         ))}
       </select>
 
-      {!showAns && (
-        <span
-          style={{
-            position: "absolute",
-            right: "4px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            fontSize: "12px",
-            color: "#777",
-            pointerEvents: "none",
-          }}
-        >
-          ▼
-        </span>
-      )}
+      {!showAns && <span className="wb-j-arrow">▼</span>}
     </div>
   );
 
@@ -214,175 +173,317 @@ export default function WB_Unit3_Page7_QJ() {
     <div className="main-container-component">
       <style>{`
         .wb-j-wrapper {
-          width: 100% !important;
-          max-width: 1180px !important;
-          margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
-          box-sizing: border-box !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 28px !important;
+          width: 100%;
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 8px 0 24px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
         }
 
         .wb-j-title {
-          margin: 0 !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 12px !important;
-          flex-wrap: wrap !important;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
         }
 
         .wb-j-row {
-          display: grid !important;
-          grid-template-columns: 36px minmax(0, 1fr) clamp(220px, 24vw, 320px) !important;
-          gap: 18px !important;
-          align-items: start !important;
-          width: 100% !important;
+          display: grid;
+          grid-template-columns: 36px minmax(0, 1fr) clamp(220px, 24vw, 320px);
+          gap: 18px;
+          align-items: start;
+          width: 100%;
         }
 
         .wb-j-num {
-          font-size: 22px !important;
-          font-weight: 700 !important;
-          line-height: 1 !important;
-          color: #222 !important;
-          padding-top: 8px !important;
+          font-size: clamp(20px, 1.6vw, 24px);
+          font-weight: 700;
+          line-height: 1;
+          color: #222;
+          padding-top: 8px;
         }
 
         .wb-j-text-col {
-          min-width: 0 !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 12px !important;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
         }
 
         .wb-j-question {
-          font-size: clamp(24px, 2vw, 30px) !important;
-          line-height: 1.35 !important;
-          color: #111 !important;
-          font-weight: 500 !important;
+          font-size: clamp(20px, 2.1vw, 28px);
+          line-height: 1.35;
+          color: #111;
+          font-weight: 500;
         }
 
         .wb-j-line-wrap {
-          position: relative !important;
-          width: 100% !important;
+          position: relative;
+          width: 100%;
         }
 
         .wb-j-line {
-          width: 100% !important;
-          min-height: 56px !important;
-          border-bottom: 3px solid #2f2f2f !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 8px !important;
-          flex-wrap: wrap !important;
-          padding-bottom: 4px !important;
-          box-sizing: border-box !important;
+          width: 100%;
+          min-height: 58px;
+          border-bottom: 3px solid #2f2f2f;
+          display: flex;
+          align-items: center;
+          gap: clamp(6px, 1vw, 14px);
+          flex-wrap: nowrap;
+          padding-bottom: 6px;
+          box-sizing: border-box;
+          min-width: 0;
         }
 
         .wb-j-middle {
-          font-size: clamp(24px, 2vw, 32px) !important;
-          line-height: 1.2 !important;
-          color: #111 !important;
-          font-weight: 500 !important;
+          flex: 0 1 auto;
+          min-width: 0;
+          font-size: clamp(20px, 2vw, 30px);
+          line-height: 1.2;
+          color: #111;
+          font-weight: 500;
+          white-space: nowrap;
         }
 
         .wb-j-answer {
-          font-size: clamp(24px, 2vw, 30px) !important;
-          line-height: 1.35 !important;
-          color: #111 !important;
-          font-weight: 500 !important;
+          font-size: clamp(20px, 2vw, 28px);
+          line-height: 1.35;
+          color: #111;
+          font-weight: 500;
         }
 
         .wb-j-wrong {
-          position: absolute !important;
-          top: -7px !important;
-          right: -7px !important;
-          width: 22px !important;
-          height: 22px !important;
-          border-radius: 999px !important;
-          background: #ef4444 !important;
-          color: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 12px !important;
-          font-weight: 700 !important;
-          border: 2px solid #fff !important;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
-          box-sizing: border-box !important;
+          position: absolute;
+          top: -7px;
+          right: -7px;
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          background: #ef4444;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          box-sizing: border-box;
         }
 
         .wb-j-images {
-          width: 100% !important;
-          min-height: clamp(140px, 18vw, 220px) !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          gap: clamp(10px, 2vw, 24px) !important;
-          padding-top: 4px !important;
-          box-sizing: border-box !important;
+          width: 100%;
+          min-height: clamp(140px, 18vw, 220px);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: clamp(10px, 2vw, 24px);
+          padding-top: 4px;
+          box-sizing: border-box;
         }
 
         .wb-j-img-box {
-          flex: 1 1 0 !important;
-          min-width: 0 !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
+          flex: 1 1 0;
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .wb-j-img {
-          display: block !important;
-          width: 100% !important;
-          height: auto !important;
-          max-height: clamp(120px, 17vw, 210px) !important;
-          object-fit: contain !important;
+          display: block;
+          width: 100%;
+          height: auto;
+          max-height: clamp(120px, 17vw, 210px);
+          object-fit: contain;
         }
 
         .wb-j-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 4px !important;
+          display: flex;
+          justify-content: center;
+          margin-top: 4px;
+        }
+
+        .wb-j-select-wrap {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          flex: 1 1 0;
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .wb-j-select-wrap--small {
+          flex: 0 0 clamp(90px, 12vw, 120px);
+        }
+
+        .wb-j-select-wrap--medium {
+          flex: 0 1 clamp(120px, 18vw, 190px);
+        }
+
+        .wb-j-select-wrap--large {
+          flex: 0 1 clamp(150px, 24vw, 260px);
+        }
+
+        .wb-j-select {
+          width: 100%;
+          min-width: 0;
+          height: clamp(38px, 4vw, 46px);
+          border: 2px solid #c9c9c9;
+          border-radius: 10px;
+          background: #fff;
+          padding: 0 34px 0 12px;
+          font-size: clamp(15px, 1.55vw, 22px);
+          font-weight: 500;
+          color: #222;
+          outline: none;
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          box-sizing: border-box;
+          cursor: ${showAns ? "default" : "pointer"};
+          text-align: center;
+          text-align-last: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .wb-j-select--filled {
+          color: #222;
+        }
+
+        .wb-j-select:disabled {
+          opacity: 1;
+        }
+
+        .wb-j-arrow {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 12px;
+          color: #666;
+          pointer-events: none;
+        }
+
+        @media (max-width: 1100px) {
+          .wb-j-row {
+            grid-template-columns: 32px minmax(0, 1fr) minmax(180px, 260px);
+            gap: 16px;
+          }
+
+          .wb-j-line {
+            gap: 8px;
+          }
         }
 
         @media (max-width: 980px) {
           .wb-j-row {
-            grid-template-columns: 36px 1fr !important;
+            grid-template-columns: 32px 1fr;
           }
 
           .wb-j-images {
-            grid-column: 2 / 3 !important;
-            width: min(100%, 420px) !important;
-            min-height: auto !important;
-            margin-left: 0 !important;
-            margin-top: 2px !important;
+            grid-column: 2 / 3;
+            width: min(100%, 420px);
+            min-height: auto;
+            margin-top: 4px;
           }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .wb-j-wrapper {
-            gap: 22px !important;
+            gap: 24px;
+          }
+
+          .wb-j-text-col {
+            gap: 10px;
           }
 
           .wb-j-line {
-            gap: 6px !important;
+            flex-wrap: wrap;
+            align-items: center;
+            min-height: auto;
+            padding-bottom: 8px;
+          }
+
+          .wb-j-middle {
+            white-space: normal;
+          }
+
+          .wb-j-select-wrap--small,
+          .wb-j-select-wrap--medium,
+          .wb-j-select-wrap--large {
+            flex: 1 1 180px;
           }
 
           .wb-j-images {
-            width: min(100%, 320px) !important;
-            gap: 12px !important;
+            width: min(100%, 360px);
+            gap: 14px;
           }
 
           .wb-j-img {
-            max-height: 140px !important;
+            max-height: 150px;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .wb-j-row {
+            grid-template-columns: 28px 1fr;
+            gap: 12px;
+          }
+
+          .wb-j-line {
+            gap: 6px;
+          }
+
+          .wb-j-select {
+            height: 40px;
+            padding: 0 30px 0 10px;
+            font-size: 15px;
+          }
+
+          .wb-j-arrow {
+            right: 10px;
+            font-size: 11px;
+          }
+
+          .wb-j-images {
+            width: min(100%, 280px);
+          }
+
+          .wb-j-img {
+            max-height: 120px;
           }
         }
       `}</style>
 
-      <div className="wb-j-wrapper">
-        <h1 className="WB-header-title-page8 wb-j-title">
-          <span className="WB-ex-A">J</span>
-          Read and look. Write the questions or answers.
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
+      >
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >
+          
+     <span className="WB-ex-A">J</span>Read and look. Write the questions or answers.
         </h1>
 
         {ITEMS.map((item) => (
@@ -396,9 +497,9 @@ export default function WB_Unit3_Page7_QJ() {
 
                   <div className="wb-j-line-wrap">
                     <div className="wb-j-line">
-                      {renderSelect(item, "first", item.firstOptions, "190px")}
+                      {renderSelect(item, "first", item.firstOptions, "wb-j-select-wrap--medium")}
                       <span className="wb-j-middle">{item.middle}</span>
-                      {renderSelect(item, "last", item.lastOptions, "170px")}
+                      {renderSelect(item, "last", item.lastOptions, "wb-j-select-wrap--medium")}
                     </div>
 
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
@@ -408,9 +509,9 @@ export default function WB_Unit3_Page7_QJ() {
                 <>
                   <div className="wb-j-line-wrap">
                     <div className="wb-j-line">
-                      {renderSelect(item, "first", item.firstOptions, "120px")}
+                      {renderSelect(item, "first", item.firstOptions, "wb-j-select-wrap--small")}
                       <span className="wb-j-middle">{item.middle}</span>
-                      {renderSelect(item, "last", item.lastOptions, "280px")}
+                      {renderSelect(item, "last", item.lastOptions, "wb-j-select-wrap--large")}
                     </div>
 
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}

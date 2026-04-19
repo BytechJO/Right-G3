@@ -142,10 +142,15 @@ const styles = {
   selectBox: {
     position: "relative",
     minWidth: "150px",
-    height: "44px",
+    height: "50px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    background: "#fff",
+    border: "2px solid #bfbfbf",
+    borderRadius: "14px",
+    boxSizing: "border-box",
+    overflow: "hidden",
   },
 
   select: {
@@ -159,17 +164,17 @@ const styles = {
     MozAppearance: "none",
     textAlign: "center",
     textAlignLast: "center",
-    fontSize: "24px",
+    fontSize: "22px",
     fontWeight: 500,
-    color: "#d62828",
+    color: "#222",
     cursor: "pointer",
-    padding: "0 26px 0 6px",
+    padding: "0 42px 0 18px",
     boxSizing: "border-box",
   },
 
   arrow: {
     position: "absolute",
-    right: "4px",
+    right: "16px",
     top: "50%",
     transform: "translateY(-50%)",
     fontSize: "12px",
@@ -202,7 +207,7 @@ const styles = {
   },
 };
 
-export default function WB_Unit3_Page2_QD() {
+export default function WB_Unit1_Page4_Q2() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
@@ -290,17 +295,18 @@ export default function WB_Unit3_Page2_QD() {
   };
 
   return (
-<div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
-            style={{
+        style={{
           display: "flex",
           flexDirection: "column",
           gap: "28px",
           maxWidth: "1100px",
           margin: "0 auto",
         }}
-      >         <h1 className="WB-header-title-page8" style={styles.title}>
+      >
+        <h1 className="WB-header-title-page8" style={styles.title}>
           <span className="WB-ex-A">D</span>
           Look and write.
         </h1>
@@ -322,7 +328,7 @@ export default function WB_Unit3_Page2_QD() {
 
               <div style={styles.answerWrap}>
                 <div style={styles.answerLine}>
-                  <div style={{ ...styles.selectBox, minWidth: "170px" }}>
+                  <div style={{ ...styles.selectBox, minWidth: "220px" }}>
                     <select
                       value={getValue(item.id, "first")}
                       disabled={showAns}
@@ -335,7 +341,7 @@ export default function WB_Unit3_Page2_QD() {
                       }}
                     >
                       <option value="" disabled hidden>
-                        —
+                        Select
                       </option>
                       {item.firstOptions.map((option) => (
                         <option key={option} value={option}>
@@ -349,7 +355,7 @@ export default function WB_Unit3_Page2_QD() {
 
                   <span style={styles.middleText}>{item.middle}</span>
 
-                  <div style={{ ...styles.selectBox, minWidth: "150px" }}>
+                  <div style={{ ...styles.selectBox, minWidth: "190px" }}>
                     <select
                       value={getValue(item.id, "last")}
                       disabled={showAns}
@@ -362,7 +368,7 @@ export default function WB_Unit3_Page2_QD() {
                       }}
                     >
                       <option value="" disabled hidden>
-                        —
+                        Select
                       </option>
                       {item.lastOptions.map((option) => (
                         <option key={option} value={option}>

@@ -4,7 +4,7 @@ import Button from "../Button";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 2.svg";
-import img3 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 3.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 6.svg";
@@ -33,7 +33,6 @@ const EXERCISE_DATA = {
     { id: 6, text: "long o" },
   ],
 
-  // غيّريهم إذا ترتيبك مختلف
   correctMatches: {
     1: 4, // shell -> short u
     2: 6, // coat -> long o
@@ -45,130 +44,124 @@ const EXERCISE_DATA = {
 };
 
 const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "28px",
-    maxWidth: "1180px",
-    margin: "0 auto",
-    padding: "8px 14px 20px",
-    boxSizing: "border-box",
-    width: "100%",
-  },
-
-  title: {
-    margin: 0,
-  },
-
   matchArea: {
     position: "relative",
     width: "100%",
-    minHeight: "430px",
+    minHeight: "clamp(260px, 42vw, 430px)",
     display: "flex",
     flexDirection: "column",
-    gap: "34px",
+    gap: "clamp(18px, 3vw, 34px)",
   },
 
   topRow: {
     display: "grid",
-    gridTemplateColumns: "repeat(6, 1fr)",
-    gap: "22px",
+    gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+    gap: "clamp(8px, 1.8vw, 22px)",
     alignItems: "start",
     zIndex: 2,
+    width: "100%",
   },
 
   topItem: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px",
+    gap: "clamp(8px, 1.3vw, 10px)",
     position: "relative",
+    minWidth: 0,
   },
 
   topNumber: {
     width: "100%",
-    paddingLeft: "6px",
+    paddingLeft: "clamp(2px, 0.5vw, 6px)",
     boxSizing: "border-box",
-    fontSize: "22px",
+    fontSize: "clamp(16px, 2vw, 22px)",
     fontWeight: "700",
     color: "#111",
     lineHeight: 1,
   },
 
   topImageBox: {
-    width: "120px",
-    height: "120px",
+    width: "clamp(42px, 9vw, 120px)",
+    aspectRatio: "1 / 1",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    borderRadius: "14px",
+    borderRadius: "clamp(8px, 1vw, 14px)",
     border: "2px solid transparent",
     transition: "0.2s ease",
     boxSizing: "border-box",
+    padding: "4px",
+    maxWidth: "100%",
   },
 
   topImage: {
-    maxWidth: "100%",
-    maxHeight: "100%",
+    width: "100%",
+    height: "100%",
     objectFit: "contain",
     display: "block",
   },
 
   dot: {
-    width: "16px",
-    height: "16px",
+    width: "clamp(10px, 1.4vw, 16px)",
+    height: "clamp(10px, 1.4vw, 16px)",
     borderRadius: "50%",
     cursor: "pointer",
+    flexShrink: 0,
   },
 
   bottomRow: {
     display: "grid",
-    gridTemplateColumns: "repeat(6, 1fr)",
-    gap: "22px",
+    gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+    gap: "clamp(8px, 1.8vw, 22px)",
     alignItems: "start",
     zIndex: 2,
-    marginTop: "26px",
+    marginTop: "clamp(8px, 2vw, 26px)",
+    width: "100%",
   },
 
   bottomItem: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px",
+    gap: "clamp(8px, 1.3vw, 10px)",
     position: "relative",
+    minWidth: 0,
   },
 
   bottomLabel: {
-    minWidth: "120px",
-    minHeight: "54px",
-    padding: "0 10px",
+    width: "100%",
+    minHeight: "clamp(34px, 5vw, 54px)",
+    padding: "0 clamp(4px, 1vw, 10px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "26px",
+    fontSize: "clamp(12px, 2.1vw, 26px)",
     fontWeight: "500",
     color: "#222",
     textAlign: "center",
     lineHeight: 1.1,
-    borderRadius: "14px",
+    borderRadius: "clamp(8px, 1vw, 14px)",
     border: "2px solid transparent",
     cursor: "pointer",
     boxSizing: "border-box",
     background: "transparent",
+    wordBreak: "break-word",
+    overflowWrap: "anywhere",
   },
 
   wrongBadge: {
     position: "absolute",
-    width: "22px",
-    height: "22px",
+    width: "clamp(16px, 2vw, 22px)",
+    height: "clamp(16px, 2vw, 22px)",
     borderRadius: "50%",
     backgroundColor: WRONG_COLOR,
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "12px",
+    fontSize: "clamp(9px, 1vw, 12px)",
     fontWeight: "700",
     border: "2px solid #fff",
     boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
@@ -178,6 +171,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     marginTop: "4px",
+    width: "100%",
   },
 };
 
@@ -220,10 +214,25 @@ const WB_Unit3_Page215_QB = () => {
       setLines(newLines);
     };
 
-    updateLines();
-    window.addEventListener("resize", updateLines);
-    return () => window.removeEventListener("resize", updateLines);
-  }, [matches]);
+    const rafUpdate = () => requestAnimationFrame(updateLines);
+
+    rafUpdate();
+
+    window.addEventListener("resize", rafUpdate);
+
+    let resizeObserver;
+    if (containerRef.current && typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        rafUpdate();
+      });
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", rafUpdate);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, [matches, showAns, showResults]);
 
   const handleTopClick = (id) => {
     if (showAns) return;
@@ -317,12 +326,35 @@ const WB_Unit3_Page215_QB = () => {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={styles.container}>
-        <h1 className="WB-header-title-page8" style={styles.title}>
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
+      >
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >
           <span className="WB-ex-A">B</span> Listen and match.
         </h1>
 
-        <div ref={containerRef} style={styles.matchArea}>
+        <div
+          ref={containerRef}
+          style={{
+            ...styles.matchArea,
+          }}
+        >
           <svg
             style={{
               position: "absolute",
@@ -348,7 +380,6 @@ const WB_Unit3_Page215_QB = () => {
             ))}
           </svg>
 
-          {/* top row */}
           <div style={styles.topRow}>
             {EXERCISE_DATA.top.map((item) => {
               const wrong = isWrongMatch(item.id);
@@ -395,8 +426,8 @@ const WB_Unit3_Page215_QB = () => {
                     <div
                       style={{
                         ...styles.wrongBadge,
-                        right: "10px",
-                        top: "34px",
+                        right: "clamp(0px, 0.8vw, 10px)",
+                        top: "clamp(20px, 3vw, 34px)",
                       }}
                     >
                       ✕
@@ -407,7 +438,6 @@ const WB_Unit3_Page215_QB = () => {
             })}
           </div>
 
-          {/* bottom row */}
           <div style={styles.bottomRow}>
             {EXERCISE_DATA.bottom.map((item) => {
               const isConnected = Object.values(matches).includes(item.id);
@@ -417,7 +447,9 @@ const WB_Unit3_Page215_QB = () => {
               return (
                 <div key={item.id} style={styles.bottomItem}>
                   <div
-                    ref={(el) => (elementRefs.current[`bottom-dot-${item.id}`] = el)}
+                    ref={(el) =>
+                      (elementRefs.current[`bottom-dot-${item.id}`] = el)
+                    }
                     onClick={() => handleBottomClick(item.id)}
                     style={{
                       ...styles.dot,

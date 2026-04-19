@@ -120,13 +120,13 @@ export default function WB_Unit3_Page17_QJ() {
     return (
       <div
         onClick={() => handleSelect(item.id, option)}
-        className={`j-option ${
+        className={`wb-j-option ${
           selected || showCorrectAsSelected ? "selected" : ""
         } ${wrong ? "wrong" : ""} ${showAns ? "disabled" : ""}`}
       >
         {option}
 
-        {wrong && <div className="j-wrong-mark">✕</div>}
+        {wrong && <div className="wb-j-wrong-mark">✕</div>}
       </div>
     );
   };
@@ -134,184 +134,208 @@ export default function WB_Unit3_Page17_QJ() {
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-j-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 20px !important;
-          width: 100% !important;
-          max-width: 1120px !important;
-          margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
-          box-sizing: border-box !important;
-        }
-
-        .wb-j-title {
-          margin: 0 !important;
+        .wb-j-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(20px, 2.4vw, 28px);
+          width: 100%;
         }
 
         .wb-j-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          column-gap: 34px !important;
-          row-gap: 22px !important;
-          align-items: start !important;
-          width: 100% !important;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          column-gap: clamp(18px, 3vw, 34px);
+          row-gap: clamp(18px, 2.4vw, 22px);
+          align-items: start;
+          width: 100%;
         }
 
         .wb-j-card {
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: flex-start !important;
-          width: 100% !important;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          width: 100%;
+          min-width: 0;
         }
 
         .wb-j-number {
-          font-size: 22px !important;
-          font-weight: 700 !important;
-          color: #222 !important;
-          line-height: 1 !important;
-          margin: 0 0 8px 0 !important;
+          font-size: clamp(18px, 2vw, 22px);
+          font-weight: 700;
+          color: #222;
+          line-height: 1;
+          margin: 0 0 clamp(6px, 1vw, 8px) 0;
         }
 
         .wb-j-img-frame {
-          width: 100% !important;
-          max-width: 420px !important;
-          height: 150px !important;
-          border: 2px solid #a9a9a9 !important;
-          border-radius: 14px !important;
-          background: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          overflow: hidden !important;
-          box-sizing: border-box !important;
-          margin-bottom: 10px !important;
+          width: 100%;
+          max-width: clamp(260px, 38vw, 420px);
+          min-height: clamp(120px, 18vw, 150px);
+          height: clamp(120px, 18vw, 150px);
+          border: 2px solid #a9a9a9;
+          border-radius: clamp(12px, 1.8vw, 14px);
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          box-sizing: border-box;
+          margin-bottom: clamp(8px, 1.2vw, 10px);
+          padding: clamp(6px, 1vw, 8px);
         }
 
         .wb-j-img {
-          max-width: 100% !important;
-          max-height: 100% !important;
-          width: auto !important;
-          height: auto !important;
-          object-fit: contain !important;
-          display: block !important;
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+          display: block;
         }
 
         .wb-j-options {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 8px !important;
-          width: 100% !important;
-          padding-left: 0 !important;
+          display: flex;
+          flex-direction: column;
+          gap: clamp(8px, 1vw, 10px);
+          width: 100%;
+          padding-left: 0;
+          min-width: 0;
         }
 
-        .j-option {
-          position: relative !important;
-          display: inline-flex !important;
-          align-items: center !important;
-          width: fit-content !important;
-          max-width: 100% !important;
-          padding: 5px 16px !important;
-          border-radius: 999px !important;
-          border: 2px solid transparent !important;
-          background: transparent !important;
-          color: #111 !important;
-          font-size: 18px !important;
-          line-height: 1.35 !important;
-          cursor: pointer !important;
-          user-select: none !important;
-          transition: all 0.2s ease !important;
-          box-sizing: border-box !important;
-          white-space: normal !important;
-          word-break: break-word !important;
+        .wb-j-option-row {
+          width: 100%;
+          min-width: 0;
         }
 
-        .j-option.selected {
-          border: 2px solid #d62828 !important;
+        .wb-j-option {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          max-width: 100%;
+          padding: clamp(6px, 1vw, 8px) clamp(12px, 1.8vw, 16px);
+          border-radius: 999px;
+          border: 2px solid transparent;
+          background: transparent;
+          color: #111;
+          font-size: clamp(15px, 1.8vw, 18px);
+          line-height: 1.35;
+          cursor: pointer;
+          user-select: none;
+          transition: all 0.2s ease;
+          box-sizing: border-box;
+          white-space: normal;
+          word-break: break-word;
         }
 
-        .j-option.wrong {
-          border: 2px solid #ef4444 !important;
+        .wb-j-option.selected {
+          border: 2px solid #d62828;
         }
 
-        .j-option.disabled {
-          cursor: default !important;
+        .wb-j-option.wrong {
+          border: 2px solid #ef4444;
         }
 
-        .j-wrong-mark {
-          position: absolute !important;
-          top: -10px !important;
-          right: -10px !important;
-          width: 22px !important;
-          height: 22px !important;
-          border-radius: 50% !important;
-          background: #ef4444 !important;
-          color: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 12px !important;
-          font-weight: 700 !important;
-          border: 2px solid #fff !important;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important;
-          box-sizing: border-box !important;
+        .wb-j-option.disabled {
+          cursor: default;
+        }
+
+        .wb-j-wrong-mark {
+          position: absolute;
+          top: clamp(-10px, -1vw, -8px);
+          right: clamp(-10px, -1vw, -8px);
+          width: clamp(18px, 2vw, 22px);
+          height: clamp(18px, 2vw, 22px);
+          border-radius: 50%;
+          background: #ef4444;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(10px, 1vw, 12px);
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          box-sizing: border-box;
         }
 
         .wb-j-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 4px !important;
+          display: flex;
+          justify-content: center;
+          margin-top: clamp(2px, 0.8vw, 4px);
         }
 
         @media (max-width: 900px) {
           .wb-j-grid {
-            grid-template-columns: 1fr !important;
-            row-gap: 18px !important;
+            grid-template-columns: 1fr;
+            row-gap: 18px;
           }
 
           .wb-j-img-frame {
-            max-width: 100% !important;
+            max-width: 100%;
+            width: 100%;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .wb-j-img-frame {
+            height: clamp(140px, 42vw, 180px);
+            min-height: clamp(140px, 42vw, 180px);
+          }
+
+          .wb-j-option {
+            font-size: clamp(14px, 3.8vw, 16px);
+            width: 100%;
+            border-radius: 18px;
           }
         }
       `}</style>
 
       <div
         className="div-forall"
-            style={{
+        style={{
           display: "flex",
           flexDirection: "column",
           gap: "28px",
           maxWidth: "1100px",
           margin: "0 auto",
         }}
-      >     <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
+      >
+        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
           <span className="WB-ex-A"> J </span> Read, look, and circle.
         </h1>
 
-        <div className="wb-j-grid">
-          {ITEMS.map((item) => (
-            <div key={item.id} className="wb-j-card">
-              <div className="wb-j-number">{item.id}</div>
+        <div className="wb-j-wrap">
+          <div className="wb-j-grid">
+            {ITEMS.map((item) => (
+              <div key={item.id} className="wb-j-card">
+                <div className="wb-j-number">{item.id}</div>
 
-              <div className="wb-j-img-frame">
-                <img src={item.img} alt={`question-${item.id}`} className="wb-j-img" />
+                <div className="wb-j-img-frame">
+                  <img
+                    src={item.img}
+                    alt={`question-${item.id}`}
+                    className="wb-j-img"
+                  />
+                </div>
+
+                <div className="wb-j-options">
+                  {item.options.map((option) => (
+                    <div key={option} className="wb-j-option-row">
+                      {renderOption(item, option)}
+                    </div>
+                  ))}
+                </div>
               </div>
+            ))}
+          </div>
 
-              <div className="wb-j-options">
-                {item.options.map((option) => (
-                  <div key={option}>{renderOption(item, option)}</div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="wb-j-buttons">
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-          />
+          <div className="wb-j-buttons">
+            <Button
+              checkAnswers={handleCheck}
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleReset}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -241,15 +241,14 @@ export default function WB_Vocabulary_Page214_QI() {
 
   return (
     <div className="main-container-component">
-      <div
+  <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1200px",
+          gap: "18px",
+          maxWidth: "1100px",
           margin: "0 auto",
-          padding: "20px",
         }}
       >
         <h1
@@ -258,12 +257,11 @@ export default function WB_Vocabulary_Page214_QI() {
             margin: 0,
             display: "flex",
             alignItems: "center",
-            gap: "10px",
+            gap: "12px",
             flexWrap: "wrap",
           }}
         >
-          <span className="WB-ex-A">I</span>
-          Look and write a vocabulary word.
+          <span className="WB-ex-A">I</span>Look and write a vocabulary word.
         </h1>
 
         {/* main image */}
@@ -414,21 +412,6 @@ export default function WB_Vocabulary_Page214_QI() {
         </div>
       )}
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .div-forall {
-            padding: 14px !important;
-            gap: 22px !important;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .div-forall > div:nth-of-type(4) {
-            grid-template-columns: 1fr !important;
-            gap: 18px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

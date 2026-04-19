@@ -90,10 +90,175 @@ export default function WB_Unit3_Page18_QH() {
   };
 
   return (
-     <div className="main-container-component">
+    <div className="main-container-component">
+      <style>{`
+        .wb-h18-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(20px, 2.4vw, 28px);
+          width: 100%;
+        }
+
+        .wb-h18-top-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: clamp(14px, 2vw, 22px);
+          align-items: start;
+          justify-items: center;
+          width: 100%;
+        }
+
+        .wb-h18-shop {
+          text-align: center;
+          width: 100%;
+        }
+
+        .wb-h18-shop-img {
+          width: clamp(140px, 22vw, 240px);
+          height: clamp(110px, 16vw, 170px);
+          object-fit: contain;
+          display: block;
+          margin: 0 auto clamp(6px, 1vw, 8px);
+        }
+
+        .wb-h18-shop-label {
+          font-size: clamp(15px, 1.7vw, 18px);
+          color: #333;
+          font-weight: 500;
+        }
+
+        .wb-h18-list {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(16px, 2vw, 20px);
+          margin-top: 4px;
+        }
+
+        .wb-h18-row {
+          display: grid;
+          grid-template-columns: clamp(24px, 3vw, 34px) minmax(0, 1fr) minmax(180px, 260px);
+          gap: clamp(10px, 1.5vw, 14px);
+          align-items: center;
+          width: 100%;
+        }
+
+        .wb-h18-num {
+          font-size: clamp(18px, 2vw, 22px);
+          font-weight: 700;
+          color: #222;
+          line-height: 1;
+        }
+
+        .wb-h18-text {
+          font-size: clamp(15px, 1.8vw, 18px);
+          line-height: 1.5;
+          color: #333;
+          border: 2px solid #bfbfbf;
+          border-radius: clamp(12px, 1.6vw, 16px);
+          padding: clamp(10px, 1.5vw, 12px) clamp(12px, 1.7vw, 14px);
+          background: #fff;
+          min-width: 0;
+          word-break: break-word;
+        }
+
+        .wb-h18-select-wrap {
+          position: relative;
+          display: flex;
+          align-items: center;
+          min-height: clamp(42px, 5vw, 48px);
+          width: 100%;
+        }
+
+        .wb-h18-select {
+          width: 100%;
+          font-size: clamp(16px, 2vw, 20px);
+          color: #000;
+          border: none;
+          border-bottom: 2px solid #444;
+          outline: none;
+          background: transparent;
+          padding: 4px 0 6px;
+          appearance: auto;
+        }
+
+        .wb-h18-select.wrong {
+          border-bottom: 2px solid #000;
+        }
+
+        .wb-h18-wrong {
+          position: absolute;
+          top: clamp(-8px, -0.8vw, -6px);
+          right: clamp(-22px, -2vw, -18px);
+          width: clamp(18px, 2vw, 20px);
+          height: clamp(18px, 2vw, 20px);
+          border-radius: 50%;
+          background-color: #ef4444;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(10px, 1vw, 11px);
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+        }
+
+        .wb-h18-buttons {
+          display: flex;
+          justify-content: center;
+          margin-top: 6px;
+        }
+
+        @media (max-width: 900px) {
+          .wb-h18-top-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+          }
+
+          .wb-h18-row {
+            grid-template-columns: clamp(24px, 3vw, 34px) minmax(0, 1fr);
+          }
+
+          .wb-h18-select-wrap {
+            grid-column: 2 / 3;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .wb-h18-top-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+          }
+
+          .wb-h18-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+
+          .wb-h18-select-wrap {
+            grid-column: auto;
+          }
+
+          .wb-h18-shop-img {
+            width: clamp(160px, 55vw, 240px);
+            height: clamp(120px, 34vw, 170px);
+          }
+        }
+
+        @media (max-width: 480px) {
+          .wb-h18-select {
+            font-size: clamp(15px, 4vw, 18px);
+          }
+
+          .wb-h18-text {
+            font-size: clamp(14px, 3.8vw, 16px);
+          }
+        }
+      `}</style>
+
       <div
         className="div-forall"
-            style={{
+        style={{
           display: "flex",
           flexDirection: "column",
           gap: "28px",
@@ -105,202 +270,59 @@ export default function WB_Unit3_Page18_QH() {
           <span className="WB-ex-A">H</span> Look, read, and write.
         </h1>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "22px",
-            alignItems: "start",
-            justifyItems: "center",
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <img
-              src={img1}
-              alt="Shopkeeper 1"
-              style={{
-                width: "240px",
-                height: "170px",
-                objectFit: "contain",
-                display: "block",
-                margin: "0 auto 8px",
-              }}
-            />
-            <div
-              style={{
-                fontSize: "18px",
-                color: "#333",
-                fontWeight: "500",
-              }}
-            >
-              Shopkeeper 1
+        <div className="wb-h18-wrap">
+          <div className="wb-h18-top-grid">
+            <div className="wb-h18-shop">
+              <img src={img1} alt="Shopkeeper 1" className="wb-h18-shop-img" />
+              <div className="wb-h18-shop-label">Shopkeeper 1</div>
+            </div>
+
+            <div className="wb-h18-shop">
+              <img src={img2} alt="Shopkeeper 2" className="wb-h18-shop-img" />
+              <div className="wb-h18-shop-label">Shopkeeper 2</div>
+            </div>
+
+            <div className="wb-h18-shop">
+              <img src={img3} alt="Shopkeeper 3" className="wb-h18-shop-img" />
+              <div className="wb-h18-shop-label">Shopkeeper 3</div>
             </div>
           </div>
 
-          <div style={{ textAlign: "center" }}>
-            <img
-              src={img2}
-              alt="Shopkeeper 2"
-              style={{
-                width: "240px",
-                height: "170px",
-                objectFit: "contain",
-                display: "block",
-                margin: "0 auto 8px",
-              }}
-            />
-            <div
-              style={{
-                fontSize: "18px",
-                color: "#333",
-                fontWeight: "500",
-              }}
-            >
-              Shopkeeper 2
-            </div>
-          </div>
+          <div className="wb-h18-list">
+            {ITEMS.map((item) => (
+              <div key={item.id} className="wb-h18-row">
+                <div className="wb-h18-num">{item.id}</div>
 
-          <div style={{ textAlign: "center" }}>
-            <img
-              src={img3}
-              alt="Shopkeeper 3"
-              style={{
-                width: "240px",
-                height: "170px",
-                objectFit: "contain",
-                display: "block",
-                margin: "0 auto 8px",
-              }}
-            />
-            <div
-              style={{
-                fontSize: "18px",
-                color: "#333",
-                fontWeight: "500",
-              }}
-            >
-              Shopkeeper 3
-            </div>
-          </div>
-        </div>
+                <div className="wb-h18-text">{item.text}</div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-            marginTop: "4px",
-          }}
-        >
-          {ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "34px minmax(0, 1fr) 260px",
-                gap: "14px",
-                alignItems: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "22px",
-                  fontWeight: "700",
-                  color: "#222",
-                  lineHeight: "1",
-                }}
-              >
-                {item.id}
-              </div>
-
-              <div
-                style={{
-                  fontSize: "18px",
-                  lineHeight: "1.5",
-                  color: "#333",
-                  border: "2px solid #bfbfbf",
-                  borderRadius: "16px",
-                  padding: "12px 14px",
-                  background: "#fff",
-                }}
-              >
-                {item.text}
-              </div>
-
-              <div
-                style={{
-                  position: "relative",
-                  display: "flex",
-                  alignItems: "center",
-                  minHeight: "48px",
-                }}
-              >
-                <select
-                  value={answers[item.id] || ""}
-                  onChange={(e) => handleSelect(item.id, e.target.value)}
-                  disabled={showAns}
-                  style={{
-                    width: "100%",
-                    fontSize: "20px",
-                    color: showAns ? "#000000ff" : "#000000ff",
-                    border: "none",
-                    borderBottom: isWrong(item)
-                      ? "2px solid #000000ff"
-                      : "2px solid #444",
-                    outline: "none",
-                    background: "transparent",
-                    padding: "4px 0 6px",
-                    appearance: "auto",
-                  }}
-                >
-                  <option value=""></option>
-                  {OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-
-                {isWrong(item) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-24px",
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      border: "2px solid #fff",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-                    }}
+                <div className="wb-h18-select-wrap">
+                  <select
+                    value={answers[item.id] || ""}
+                    onChange={(e) => handleSelect(item.id, e.target.value)}
+                    disabled={showAns}
+                    className={`wb-h18-select ${isWrong(item) ? "wrong" : ""}`}
                   >
-                    ✕
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+                    <option value=""></option>
+                    {OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "6px",
-          }}
-        >
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleStartAgain}
-          />
+                  {isWrong(item) && <div className="wb-h18-wrong">✕</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="wb-h18-buttons">
+            <Button
+              checkAnswers={handleCheck}
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleStartAgain}
+            />
+          </div>
         </div>
       </div>
     </div>

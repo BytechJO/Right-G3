@@ -6,52 +6,50 @@ import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folde
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 4.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 5.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 6.svg";
+import img7 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 7.svg";
+import img8 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 8.svg";
 
 const ACTIVE_COLOR = "#f39b42";
 const LINE_COLOR = "#f39b42";
-const INACTIVE_COLOR = "#bdbdbd";
-const SOFT_COLOR = "#ffedd5";
-const WRONG_COLOR = "#ef4444";
+const INACTIVE_COLOR = "#a9a9a9";
 
 const exerciseData = {
   left: [
-    {
-      id: 1,
-      text: "The eagle flies higher than the dove.",
-    },
-    {
-      id: 2,
-      text: "The scooter is slower than the train.",
-    },
-    {
-      id: 3,
-      text: "The tortoise is smarter than the hare.",
-    },
-    {
-      id: 4,
-      text: "The pencil is lighter than the pencil case.",
-    },
+    { id: 1, text: "The eagle flies higher than the dove." },
+    { id: 2, text: "The scooter is slower than the train." },
+    { id: 3, text: "The tortoise is smarter than the hare." },
+    { id: 4, text: "The pencil is lighter than the pencil case." },
   ],
   right: [
     {
       id: 1,
-      img: img1, // scooter + train
-      alt: "Scooter and train",
+      images: [
+        { src: img1, alt: "scooter" },
+        { src: img2, alt: "train" },
+      ],
     },
     {
       id: 2,
-      img: img2, // tortoise + hare
-      alt: "Tortoise and hare",
+      images: [
+        { src: img3, alt: "tortoise" },
+        { src: img4, alt: "hare" },
+      ],
     },
     {
       id: 3,
-      img: img3, // pencil + pencil case
-      alt: "Pencil and pencil case",
+      images: [
+        { src: img5, alt: "pencil" },
+        { src: img6, alt: "pencil case" },
+      ],
     },
     {
       id: 4,
-      img: img4, // eagle + dove
-      alt: "Eagle and dove",
+      images: [
+        { src: img7, alt: "eagle" },
+        { src: img8, alt: "dove" },
+      ],
     },
   ],
   correctMatches: {
@@ -62,7 +60,7 @@ const exerciseData = {
   },
 };
 
-export default function WB_UnitX_PageXX_QF() {
+export default function WB_Unit3_Page5_QF() {
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -90,11 +88,9 @@ export default function WB_UnitX_PageXX_QF() {
 
           return {
             id: `${leftId}-${rightId}`,
-            leftId: Number(leftId),
-            rightId: Number(rightId),
-            x1: leftRect.right - containerRect.left,
+            x1: leftRect.left + leftRect.width / 2 - containerRect.left,
             y1: leftRect.top + leftRect.height / 2 - containerRect.top,
-            x2: rightRect.left - containerRect.left,
+            x2: rightRect.left + rightRect.width / 2 - containerRect.left,
             y2: rightRect.top + rightRect.height / 2 - containerRect.top,
           };
         })
@@ -132,7 +128,7 @@ export default function WB_UnitX_PageXX_QF() {
     setShowResults(false);
   };
 
-  const handleCheck = () => {
+  const checkAnswers = () => {
     if (showAns) return;
 
     const allConnected = exerciseData.left.every((item) => matches[item.id]);
@@ -142,53 +138,50 @@ export default function WB_UnitX_PageXX_QF() {
       return;
     }
 
-    let score = 0;
+    setShowResults(true);
 
+    let score = 0;
     Object.keys(exerciseData.correctMatches).forEach((leftId) => {
       if (matches[leftId] === exerciseData.correctMatches[leftId]) {
         score++;
       }
     });
 
-    setShowResults(true);
+    const totalQuestions = exerciseData.left.length;
 
-    const total = exerciseData.left.length;
-
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
+    if (score === totalQuestions) {
+      ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
     } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+      ValidationAlert.warning(`Score: ${score} / ${totalQuestions}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${score} / ${totalQuestions}`);
     }
   };
 
   const handleShowAnswer = () => {
     setMatches(exerciseData.correctMatches);
-    setSelectedLeft(null);
     setShowResults(true);
     setShowAns(true);
+    setSelectedLeft(null);
   };
 
   const handleStartAgain = () => {
-    setSelectedLeft(null);
     setMatches({});
+    setSelectedLeft(null);
     setShowResults(false);
     setShowAns(false);
     setLines([]);
   };
 
-  const isLeftSelected = (id) => selectedLeft === id;
-  const isLeftConnected = (id) => !!matches[id];
-  const isRightConnected = (id) => Object.values(matches).includes(id);
-
   const getDotColor = (side, id) => {
     if (side === "left" && selectedLeft === id) return ACTIVE_COLOR;
 
-    const connected =
+    const isConnected =
       side === "left" ? !!matches[id] : Object.values(matches).includes(id);
 
-    return connected ? ACTIVE_COLOR : INACTIVE_COLOR;
+    if (!isConnected) return INACTIVE_COLOR;
+
+    return ACTIVE_COLOR;
   };
 
   const isWrongMatch = (leftId) => {
@@ -197,34 +190,214 @@ export default function WB_UnitX_PageXX_QF() {
     return matches[leftId] !== exerciseData.correctMatches[leftId];
   };
 
+  const isLeftSelected = (id) => selectedLeft === id;
+  const isRightConnected = (id) => Object.values(matches).includes(id);
+  const isSelectedRightMatch = (id) =>
+    selectedLeft !== null && matches[selectedLeft] === id;
+
   return (
     <div className="main-container-component">
-      <div
+      <style>{`
+        .wb-f-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(18px, 2vw, 28px);
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: clamp(8px, 1.5vw, 16px) clamp(10px, 2vw, 18px) 20px;
+          box-sizing: border-box;
+          width: 100%;
+        }
+
+        .wb-f-board {
+          position: relative;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .wb-f-grid {
+          position: relative;
+          z-index: 2;
+          display: grid;
+          grid-template-columns: minmax(0, 1.45fr) minmax(250px, 0.95fr);
+          column-gap: clamp(18px, 2vw, 32px);
+          align-items: start;
+        }
+
+        .wb-f-left {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(22px, 3vw, 34px);
+        }
+
+        .wb-f-right {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(18px, 2.4vw, 28px);
+        }
+
+        .wb-f-left-row {
+          display: grid;
+          grid-template-columns: clamp(22px, 3vw, 34px) minmax(0, 1fr) clamp(18px, 2vw, 28px);
+          gap: clamp(8px, 1.4vw, 14px);
+          align-items: center;
+          min-height: clamp(52px, 7vw, 76px);
+          position: relative;
+        }
+
+        .wb-f-left-num {
+          font-size: clamp(18px, 2vw, 22px);
+          font-weight: 700;
+          color: #222;
+          line-height: 1;
+        }
+
+        .wb-f-left-text {
+          font-size: clamp(16px, 2.1vw, 24px);
+          font-weight: 500;
+          color: #111;
+          line-height: 1.35;
+        }
+
+        .wb-f-right-row {
+          display: grid;
+          grid-template-columns: clamp(18px, 2vw, 28px) minmax(0, 1fr);
+          gap: clamp(10px, 1.6vw, 16px);
+          align-items: center;
+          min-height: clamp(56px, 8vw, 84px);
+        }
+
+        .wb-f-dot {
+          width: clamp(14px, 1.8vw, 18px);
+          height: clamp(14px, 1.8vw, 18px);
+          border-radius: 50%;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+          cursor: pointer;
+          box-sizing: border-box;
+        }
+
+        .wb-f-dot.selected {
+          transform: scale(1.1);
+          box-shadow: 0 0 0 5px rgba(243, 155, 66, 0.22);
+        }
+
+        .wb-f-right-card {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          min-height: clamp(56px, 8vw, 84px);
+          padding: 4px 0;
+          box-sizing: border-box;
+        }
+
+        .wb-f-right-pair {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          gap: clamp(8px, 1.8vw, 18px);
+          width: 100%;
+          flex-wrap: nowrap;
+        }
+
+        .wb-f-right-img {
+          display: block;
+          width: auto;
+          height: auto;
+          max-width: clamp(56px, 8vw, 94px);
+          max-height: clamp(42px, 7vw, 74px);
+          object-fit: contain;
+          user-select: none;
+          pointer-events: none;
+          flex-shrink: 1;
+        }
+
+        .wb-f-wrong {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: #ef4444;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+        }
+
+        .wb-f-buttons {
+          display: flex;
+          justify-content: center;
+          margin-top: 8px;
+        }
+
+        @media (max-width: 900px) {
+          .wb-f-grid {
+            grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.95fr);
+          }
+        }
+
+        @media (max-width: 760px) {
+          .wb-f-grid {
+            grid-template-columns: 1fr;
+            row-gap: 24px;
+          }
+
+          .wb-f-right {
+            padding-left: 34px;
+          }
+
+          .wb-f-svg-lines {
+            display: none;
+          }
+
+          .wb-f-right-pair {
+            justify-content: flex-start;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .wb-f-right {
+            padding-left: 28px;
+          }
+
+          .wb-f-right-pair {
+            gap: 10px;
+          }
+        }
+      `}</style>
+ <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1180px",
+          gap: "18px",
+          maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">F</span> Read and match.
-        </h1>
-
-        <div
-          ref={containerRef}
+        <h1
+          className="WB-header-title-page8"
           style={{
-            position: "relative",
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1.2fr 140px 0.9fr",
-            gap: "24px",
-            alignItems: "start",
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
           }}
         >
+          <span className="WB-ex-A">F</span>
+          Read and match.
+        </h1>
+
+        <div ref={containerRef} className="wb-f-board">
           <svg
+            className="wb-f-svg-lines"
             style={{
               position: "absolute",
               inset: 0,
@@ -235,183 +408,99 @@ export default function WB_UnitX_PageXX_QF() {
               zIndex: 1,
             }}
           >
-            {lines.map((line) => {
-              const wrong = showResults
-                ? exerciseData.correctMatches[line.leftId] !== line.rightId
-                : false;
-
-              return (
-                <line
-                  key={line.id}
-                  x1={line.x1}
-                  y1={line.y1}
-                  x2={line.x2}
-                  y2={line.y2}
-                  stroke={wrong ? WRONG_COLOR : LINE_COLOR}
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              );
-            })}
+            {lines.map((line) => (
+              <line
+                key={line.id}
+                x1={line.x1}
+                y1={line.y1}
+                x2={line.x2}
+                y2={line.y2}
+                stroke={LINE_COLOR}
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            ))}
           </svg>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "44px",
-              zIndex: 2,
-            }}
-          >
-            {exerciseData.left.map((item) => {
-              const selected = isLeftSelected(item.id);
-              const connected = isLeftConnected(item.id);
-              const wrong = isWrongMatch(item.id);
+          <div className="wb-f-grid">
+            <div className="wb-f-left">
+              {exerciseData.left.map((item) => {
+                const selected = isLeftSelected(item.id);
+                const wrong = isWrongMatch(item.id);
 
-              return (
-                <div
-                  key={item.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "40px minmax(0, 1fr) 20px",
-                    alignItems: "center",
-                    gap: "14px",
-                    minHeight: "108px",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: "700",
-                      color: "#222",
-                      textAlign: "center",
-                    }}
-                  >
-                    {item.id}
-                  </div>
+                return (
+                  <div key={item.id} className="wb-f-left-row">
+                    <div className="wb-f-left-num">{item.id}</div>
 
-                  <div
-                    onClick={() => handleLeftClick(item.id)}
-                    style={{
-                      fontSize: "24px",
-                      lineHeight: "1.4",
-                      color: "#111",
-                      cursor: showAns ? "default" : "pointer",
-                      padding: "10px 14px",
-                      borderRadius: "14px",
-                      border: selected
-                        ? `3px solid ${ACTIVE_COLOR}`
-                        : connected
-                        ? `2px solid ${ACTIVE_COLOR}`
-                        : "2px solid transparent",
-                      backgroundColor: wrong ? SOFT_COLOR : "transparent",
-                      transition: "0.2s ease",
-                      userSelect: "none",
-                    }}
-                  >
-                    {item.text}
-                  </div>
+                    <div className="wb-f-left-text">{item.text}</div>
 
-                  <div
-                    ref={(el) => {
-                      elementRefs.current[`left-${item.id}`] = el;
-                    }}
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: getDotColor("left", item.id),
-                      boxShadow: "0 0 0 3px #fff",
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-
-          <div />
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "28px",
-              zIndex: 2,
-            }}
-          >
-            {exerciseData.right.map((item) => {
-              const connected = isRightConnected(item.id);
-
-              return (
-                <div
-                  key={item.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "20px minmax(0, 1fr)",
-                    alignItems: "center",
-                    gap: "14px",
-                    minHeight: "108px",
-                  }}
-                >
-                  <div
-                    ref={(el) => {
-                      elementRefs.current[`right-${item.id}`] = el;
-                    }}
-                    onClick={() => handleRightClick(item.id)}
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: getDotColor("right", item.id),
-                      boxShadow: "0 0 0 3px #fff",
-                      cursor:
-                        showAns || selectedLeft === null ? "default" : "pointer",
-                    }}
-                  />
-
-                  <div
-                    onClick={() => handleRightClick(item.id)}
-                    style={{
-                      cursor:
-                        showAns || selectedLeft === null ? "default" : "pointer",
-                      border: connected
-                        ? `2px solid ${ACTIVE_COLOR}`
-                        : "2px solid transparent",
-                      borderRadius: "16px",
-                      padding: "8px",
-                      transition: "0.2s ease",
-                    }}
-                  >
-                    <img
-                      src={item.img}
-                      alt={item.alt}
+                    <div
+                      ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
+                      className={`wb-f-dot ${selected ? "selected" : ""}`}
+                      onClick={() => handleLeftClick(item.id)}
                       style={{
-                        width: "100%",
-                        maxWidth: "260px",
-                        height: "88px",
-                        objectFit: "contain",
-                        display: "block",
+                        backgroundColor: getDotColor("left", item.id),
+                        cursor: showAns ? "default" : "pointer",
                       }}
                     />
+
+                    {wrong && <div className="wb-f-wrong">✕</div>}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            <div className="wb-f-right">
+              {exerciseData.right.map((item) => {
+                const selectedMatch = isSelectedRightMatch(item.id);
+                const connected = isRightConnected(item.id);
+
+                return (
+                  <div key={item.id} className="wb-f-right-row">
+                    <div
+                      ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
+                      className={`wb-f-dot ${selectedMatch ? "selected" : ""}`}
+                      onClick={() => handleRightClick(item.id)}
+                      style={{
+                        backgroundColor: getDotColor("right", item.id),
+                        cursor: showAns ? "default" : "pointer",
+                        boxShadow: connected
+                          ? "0 0 0 5px rgba(243, 155, 66, 0.18)"
+                          : "none",
+                      }}
+                    />
+
+                    <div
+                      className="wb-f-right-card"
+                      onClick={() => handleRightClick(item.id)}
+                      style={{
+                        cursor: showAns ? "default" : "pointer",
+                      }}
+                    >
+                      <div className="wb-f-right-pair">
+                        {item.images.map((img, index) => (
+                          <img
+                            key={`${item.id}-${index}`}
+                            src={img.src}
+                            alt={img.alt}
+                            className="wb-f-right-img"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "14px",
-            flexWrap: "wrap",
-            marginTop: "8px",
-          }}
-        >
-          <Button text="Check" onClick={handleCheck} />
-          <Button text="Show Answer" onClick={handleShowAnswer} />
-          <Button text="Start Again" onClick={handleStartAgain} />
+        <div className="wb-f-buttons">
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
     </div>

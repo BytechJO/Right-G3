@@ -2,42 +2,55 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 1.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 3.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 4.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 5.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 6.svg";
+
 const ITEMS = [
   {
     id: 1,
-    text: "The car is faster than the skateboard.",
-    correct: "true",
+    img: img1,
+    options: ["a ship", "a police car"],
+    correct: "a ship",
   },
   {
     id: 2,
-    text: "The grandpa is younger than the grandson.",
-    correct: "false",
+    img: img2,
+    options: ["a car", "a bike"],
+    correct: "a car",
   },
   {
     id: 3,
-    text: "The lion is larger than the cat.",
-    correct: "true",
+    img: img3,
+    options: ["a motorcycle", "a bike"],
+    correct: "a bike",
   },
   {
     id: 4,
-    text: "The truck is smaller than the car.",
-    correct: "false",
+    img: img4,
+    options: ["a taxi", "a truck"],
+    correct: "a taxi",
   },
   {
     id: 5,
-    text: "The snake is longer than the worm.",
-    correct: "true",
+    img: img5,
+    options: ["an airplane", "a bus"],
+    correct: "an airplane",
   },
   {
     id: 6,
-    text: "The book is heavier than the pen.",
-    correct: "true",
+    img: img6,
+    options: ["a scooter", "the subway"],
+    correct: "the subway",
   },
 ];
 
-export default function SB_AtTheBasketballGame_Page210_QA() {
+export default function WB_Unit3_Page19_QG() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
@@ -47,6 +60,8 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
       ...prev,
       [id]: value,
     }));
+
+    setShowResults(false);
   };
 
   const handleCheck = () => {
@@ -55,7 +70,7 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
     if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
+      ValidationAlert.info("Please answer all questions first.");
       return;
     }
 
@@ -67,7 +82,7 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
       }
     });
 
-    setChecked(true);
+    setShowResults(true);
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -79,132 +94,228 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
   };
 
   const handleShowAnswer = () => {
-    const filled = {};
-
+    const correctMap = {};
     ITEMS.forEach((item) => {
-      filled[item.id] = item.correct;
+      correctMap[item.id] = item.correct;
     });
 
-    setAnswers(filled);
-    setChecked(true);
+    setAnswers(correctMap);
+    setShowResults(true);
     setShowAns(true);
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
+    setShowResults(false);
     setShowAns(false);
   };
 
-  const isWrongCell = (item, choice) => {
-    if (!checked || showAns) return false;
-    return answers[item.id] === choice && answers[item.id] !== item.correct;
+  const isWrong = (item) => {
+    if (!showResults || showAns) return false;
+    return answers[item.id] !== item.correct;
   };
 
-  const shouldShowCheck = (item, choice) => {
-    if (showAns) return item.correct === choice;
-    if (!checked) return false;
-    return answers[item.id] === choice && answers[item.id] === item.correct;
-  };
-
-  const renderBookCheck = () => {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        style={{
-          width: "clamp(34px, 3.3vw, 54px)",
-          height: "clamp(34px, 3.3vw, 54px)",
-          transform: "rotate(-12deg)",
-          display: "inline-block",
-        }}
-      >
-        <path
-          d="M4 13 L9 18 L20 5"
-          stroke="#d82424"
-          strokeWidth="3.8"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  };
-
-  const renderChoiceCell = (item, choice) => {
-    const isSelected = answers[item.id] === choice;
-    const showCheck = shouldShowCheck(item, choice);
-    const showWrong = isWrongCell(item, choice);
+  const renderOption = (item, option) => {
+    const selected = answers[item.id] === option;
+    const wrong = isWrong(item) && selected;
+    const showCorrectAsSelected = showAns && item.correct === option;
 
     return (
-      <td
-        onClick={() => handleSelect(item.id, choice)}
-        style={{
-          width: "12.2%",
-          minWidth: "92px",
-          borderLeft: "2px solid #a6a6a6",
-          borderTop: "2px solid #a6a6a6",
-          textAlign: "center",
-          verticalAlign: "middle",
-          cursor: showAns ? "default" : "pointer",
-          position: "relative",
-          background: isSelected && !checked ? "#f6f6f6" : "#fff",
-          padding: 0,
-          height: "68px",
-        }}
+      <div
+        onClick={() => handleSelect(item.id, option)}
+        className={`g-option ${
+          selected || showCorrectAsSelected ? "selected" : ""
+        } ${wrong ? "wrong" : ""} ${showAns ? "disabled" : ""}`}
       >
-        {!checked && !showAns && (
-          <div
-            style={{
-              width: "22px",
-              height: "22px",
-              margin: "0 auto",
-              borderRadius: "50%",
-              border: `2px solid ${isSelected ? "#7d7d7d" : "#b9b9b9"}`,
-              background: isSelected ? "#ececec" : "transparent",
-              boxSizing: "border-box",
-            }}
-          />
-        )}
-
-        {showCheck && renderBookCheck()}
-
-        {showWrong && (
-          <div
-            style={{
-              position: "absolute",
-              top: "6px",
-              right: "6px",
-              width: "19px",
-              height: "19px",
-              borderRadius: "50%",
-              background: "#ef4444",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "10px",
-              fontWeight: "700",
-            }}
-          >
-            ✕
-          </div>
-        )}
-      </td>
+        {option}
+        {wrong && <div className="g-wrong-mark">✕</div>}
+      </div>
     );
   };
 
   return (
-    <div className="main-container-component" style={{ width: "100%" }}>
+    <div className="main-container-component">
+      <style>{`
+        .wb-g-wrapper * {
+          box-sizing: border-box !important;
+        }
+
+        .wb-g-grid {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          column-gap: clamp(18px, 2.5vw, 42px) !important;
+          row-gap: clamp(28px, 4vw, 60px) !important;
+          align-items: start !important;
+          width: 100% !important;
+        }
+
+        .wb-g-card {
+          display: flex !important;
+          align-items: flex-start !important;
+          gap: clamp(10px, 1.2vw, 16px) !important;
+          width: 100% !important;
+          min-width: 0 !important;
+        }
+
+        .wb-g-number {
+          font-size: clamp(18px, 2vw, 28px) !important;
+          font-weight: 700 !important;
+          color: #222 !important;
+          line-height: 1 !important;
+          min-width: clamp(18px, 2vw, 28px) !important;
+          margin-top: clamp(4px, 0.6vw, 8px) !important;
+          flex-shrink: 0 !important;
+        }
+
+        .wb-g-content {
+          display: flex !important;
+          align-items: flex-start !important;
+          gap: clamp(10px, 1.5vw, 18px) !important;
+          width: 100% !important;
+          min-width: 0 !important;
+        }
+
+        .wb-g-img-wrap {
+          width: clamp(100px, 15vw, 170px) !important;
+          height: clamp(80px, 11vw, 130px) !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          min-width: 0 !important;
+        }
+
+        .wb-g-img {
+          max-width: 100% !important;
+          max-height: 100% !important;
+          width: auto !important;
+          height: auto !important;
+          object-fit: contain !important;
+          display: block !important;
+        }
+
+        .wb-g-options {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: clamp(8px, 1vw, 12px) !important;
+          min-width: 0 !important;
+          width: 100% !important;
+          padding-top: clamp(2px, 0.4vw, 6px) !important;
+          flex: 1 1 auto !important;
+        }
+
+        .wb-g-option-row {
+          width: 100% !important;
+          min-width: 0 !important;
+        }
+
+        .g-option {
+          position: relative !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: auto !important;
+          max-width: 100% !important;
+          min-height: clamp(30px, 4vw, 42px) !important;
+          padding: clamp(4px, 0.6vw, 6px) clamp(12px, 1.4vw, 18px) !important;
+          border-radius: 999px !important;
+          border: 3px solid transparent !important;
+          background: transparent !important;
+          color: #111 !important;
+          font-size: clamp(15px, 1.6vw, 24px) !important;
+          line-height: 1.2 !important;
+          cursor: pointer !important;
+          user-select: none !important;
+          transition: all 0.2s ease !important;
+          box-sizing: border-box !important;
+          white-space: nowrap !important;
+          word-break: normal !important;
+          overflow-wrap: normal !important;
+          text-align: center !important;
+        }
+
+        .g-option.selected {
+          border-color: #d62828 !important;
+        }
+
+        .g-option.wrong {
+          border-color: #ef4444 !important;
+        }
+
+        .g-option.disabled {
+          cursor: default !important;
+        }
+
+        .g-wrong-mark {
+          position: absolute !important;
+          top: -10px !important;
+          right: -10px !important;
+          width: clamp(18px, 2vw, 24px) !important;
+          height: clamp(18px, 2vw, 24px) !important;
+          border-radius: 50% !important;
+          background: #ef4444 !important;
+          color: #fff !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: clamp(10px, 1vw, 12px) !important;
+          font-weight: 700 !important;
+          border: 2px solid #fff !important;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important;
+          box-sizing: border-box !important;
+          z-index: 2 !important;
+        }
+
+        .wb-g-buttons {
+          display: flex !important;
+          justify-content: center !important;
+          margin-top: 4px !important;
+        }
+
+        @media (max-width: 1024px) {
+          .wb-g-content {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+
+          .wb-g-img-wrap {
+            width: clamp(110px, 22vw, 180px) !important;
+            height: clamp(84px, 17vw, 135px) !important;
+          }
+
+          .wb-g-options {
+            width: 100% !important;
+          }
+
+          .g-option {
+            font-size: clamp(15px, 2vw, 22px) !important;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .wb-g-grid {
+            grid-template-columns: 1fr !important;
+            row-gap: clamp(22px, 4vw, 34px) !important;
+          }
+
+          .wb-g-card {
+            gap: 10px !important;
+          }
+
+          .wb-g-content {
+            gap: 10px !important;
+          }
+        }
+      `}</style>
+
       <div
+        className="div-forall wb-g-wrapper"
         style={{
-          width: "100%",
-          maxWidth: "1380px",
-          margin: "0 auto",
-          padding: "12px clamp(10px, 2vw, 24px) 28px",
           display: "flex",
           flexDirection: "column",
-          gap: "22px",
-          boxSizing: "border-box",
+          gap: "18px",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
       >
         <h1
@@ -217,122 +328,36 @@ export default function SB_AtTheBasketballGame_Page210_QA() {
             flexWrap: "wrap",
           }}
         >
-          <span className="WB-ex-A">A</span>
-          Read and write ✓.
+          <span className="WB-ex-A">G</span> Look, read, and circle.
         </h1>
 
-        <div
-          style={{
-            width: "100%",
-            overflowX: "auto",
-            WebkitOverflowScrolling: "touch",
-            paddingBottom: "2px",
-          }}
-        >
-          <div
-            style={{
-              minWidth: "760px",
-              maxWidth: "1188px",
-              width: "100%",
-              margin: "0 auto",
-              border: "2px solid #a6a6a6",
-              borderRadius: "18px",
-              overflow: "hidden",
-              background: "#fff",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                tableLayout: "fixed",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      width: "75.6%",
-                      height: "58px",
-                      padding: 0,
-                      background: "#fff",
-                    }}
+        <div className="wb-g-grid">
+          {ITEMS.map((item) => (
+            <div key={item.id} className="wb-g-card">
+              <div className="wb-g-number">{item.id}</div>
+
+              <div className="wb-g-content">
+                <div className="wb-g-img-wrap">
+                  <img
+                    src={item.img}
+                    alt={`question-${item.id}`}
+                    className="wb-g-img"
                   />
-                  <th
-                    style={{
-                      width: "12.2%",
-                      minWidth: "92px",
-                      borderLeft: "2px solid #a6a6a6",
-                      textAlign: "center",
-                      fontSize: "clamp(18px, 2vw, 26px)",
-                      fontWeight: "400",
-                      color: "#222",
-                      padding: 0,
-                    }}
-                  >
-                    True
-                  </th>
-                  <th
-                    style={{
-                      width: "12.2%",
-                      minWidth: "92px",
-                      borderLeft: "2px solid #a6a6a6",
-                      textAlign: "center",
-                      fontSize: "clamp(18px, 2vw, 26px)",
-                      fontWeight: "400",
-                      color: "#222",
-                      padding: 0,
-                    }}
-                  >
-                    False
-                  </th>
-                </tr>
-              </thead>
+                </div>
 
-              <tbody>
-                {ITEMS.map((item) => (
-                  <tr key={item.id}>
-                    <td
-                      style={{
-                        borderTop: "2px solid #a6a6a6",
-                        padding: "0 18px 0 20px",
-                        height: "68px",
-                        fontSize: "clamp(18px, 2.35vw, 28px)",
-                        color: "#222",
-                        verticalAlign: "middle",
-                        lineHeight: 1.15,
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontWeight: "700",
-                          display: "inline-block",
-                          minWidth: "28px",
-                          marginRight: "14px",
-                        }}
-                      >
-                        {item.id}
-                      </span>
-                      <span>{item.text}</span>
-                    </td>
-
-                    {renderChoiceCell(item, "true")}
-                    {renderChoiceCell(item, "false")}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                <div className="wb-g-options">
+                  {item.options.map((option) => (
+                    <div key={option} className="wb-g-option-row">
+                      {renderOption(item, option)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "6px",
-          }}
-        >
+        <div className="wb-g-buttons">
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
