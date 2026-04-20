@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 47.png";
-import img1_letter from "../../../assets/imgs/test.png";
-import img2_letter from "../../../assets/imgs/test.png";
-import img3_letter from "../../../assets/imgs/test.png";
-import img4_letter from "../../../assets/imgs/test.png";
+import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46-47/1-05.svg";
+import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46-47/1-06.svg";
+import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46-47/1-07.svg";
+import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46-47/1-08.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import soundListen from "../../../assets/audio/ClassBook/U 6/Pg47_1.1_Helen.mp3";
-import img1_conversation from "../../../assets/imgs/test.png";
-import img2_conversation from "../../../assets/imgs/test.png";
-import sound1_letter from "../../../assets/audio/ClassBook/U 6/Pg47_1.1_Adult Lady.mp3";
-import sound2_letter from "../../../assets/audio/ClassBook/U 6/Pg47_1.2_Adult Lady.mp3";
-import sound3_letter from "../../../assets/audio/ClassBook/U 6/Pg47_1.3_Adult Lady.mp3";
-import sound4_letter from "../../../assets/audio/ClassBook/U 6/Pg47_1.4_Adult Lady.mp3";
+import soundListen from "../../../assets/audio/ClassBook/Unit 6/P 47/unit6-pg47-reading.mp3";
+import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46-47/Asset 38.svg";
+import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46-47/Asset 37.svg";
+import sound1_letter from "../../../assets/audio/ClassBook/Unit 6/P 47/Pg47_2.1_Adult Lady.mp3";
+import sound2_letter from "../../../assets/audio/ClassBook/Unit 6/P 47/Pg47_2.2_Adult Lady.mp3";
+import sound3_letter from "../../../assets/audio/ClassBook/Unit 6/P 47/Pg47_2.3_Adult Lady.mp3";
+import sound4_letter from "../../../assets/audio/ClassBook/Unit 6/P 47/Pg47_2.4_Adult Lady.mp3";
+import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
 
-import letterSound from "../../../assets/audio/ClassBook/U 6/Pg47_Instruction1_Adult Lady.mp3";
+import letterSound from "../../../assets/audio/ClassBook/Unit 6/P 47/unit6-page47-listen.mp3";
 
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
@@ -21,6 +22,9 @@ import AudioWithCaption from "../../AudioWithCaption";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
 // import sound1 from "../../../assets/img_unit6/sounds-unit6/U2-06.mp3";
 // import sound2 from "../../../assets/img_unit6/sounds-unit6/U2-07.mp3";
+import Bebo from "../../../assets/audio/ClassBook/Unit 6/P 47/Pg47_1.1_Bebo.mp3";
+import Lolo from "../../../assets/audio/ClassBook/Unit 6/P 47/Pg47_1.2_Lolo.mp3";
+import repeat from "../../../assets/audio/ClassBook/Unit 6/P 47/unit6-page47-bebo&lolo.mp3";
 
 import "./Unit6_Page2.css";
 import ReadChoose from "../../ReadChoose";
@@ -37,32 +41,39 @@ const Unit6_Page2 = ({ openPopup }) => {
     new Audio(sound3_letter),
     new Audio(sound4_letter),
   ];
-
-  const readChooseData = {
-    title: "Read and choose.",
-    questions: [
-      {
-        text: "When does Helen go to school?",
-        options: ["She goes to school at eight o’clock.", "She goes to school at six o’clock." ,"She goes to school at nine o’clock."],
-        correct: "She goes to school at eight o’clock.",
-      },
-      {
-        text: "When does Helen go to sleep?",
-options: ["She goes to school at eight o’clock.", "She goes to school at six o’clock." ,"She goes to school at nine o’clock."],
-        correct: "She goes to school at nine o’clock.",
-      },
-    ],
-  };
+  const repeatSounds = [
+    null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
+    new Audio(Bebo),
+    new Audio(Lolo),
+  ];
+  const captions3 = [
+    {
+      start: 0.399,
+      end: 5.139,
+      text: "Page 47. Listen, read, and repeat.",
+    },
+    {
+      start: 5.139,
+      end: 9.259,
+      text: "We must water the plants. We must also give them sun",
+    },
+  ];
   const captionsExample = [
-    { start: 0, end: 2.0, text: "Page11. Birthdays Are Fun" },
-    { start: 2.05, end: 5.2, text: "Hi, everyone. Today is my birthday." },
-    { start: 5.24, end: 7.2, text: " I'm seven years old." },
-    { start: 7.24, end: 9.0, text: "  My friends are here. It's fun." },
+    {
+      start: 0.179,
+      end: 6.699,
+      text: "Page 47 reading. Listen and read along. I Love My Garden",
+    },
+    {
+      start: 6.699,
+      end: 41.359,
+      text: "Welcome to my garden. Do you like it? Gardening is one of my favorite hobbies. Seeing bright colors in my garden makes me feel happy. Today is Saturday, and I'm planting a young tree in my garden. I hope it will grow very tall. I usually begin planting a little before springtime. March and April are the perfect months for planting. I must water my garden regularly to keep my plants healthy. I recommend that everyone start a garden. It's so much fun",
+    },
   ];
 
   const captions2 = [
-    { start: 0, end: 3.18, text: "Page 11. Listen and read along. " },
-    { start: 3.2, end: 7.01, text: "P, pencil, pink, pizza. " },
+    { start: 0, end: 3.18, text: "Page 47. Listen and read along." },
+    { start: 3.2, end: 7.01, text: "FL, PL, SL. Fly, plum, slide" },
   ];
 
   const areas = [
@@ -192,7 +203,18 @@ options: ["She goes to school at eight o’clock.", "She goes to school at six o
           height="22"
           viewBox="0 0 90 90"
           onClick={() =>
-            openPopup("html", <ReadChoose data={readChooseData} />)
+            openPopup(
+              "html",
+              <FourImagesWithAudio
+                images={[read, img1_conversation, img2_conversation]}
+                audioSrc={repeat}
+                checkpoints={[0, 5.14, 7]}
+                popupOpen={true}
+                titleQ={`Listen, read, and repeat.`}
+                audioArr={repeatSounds}
+                captions={captions3}
+              />,
+            )
           }
           style={{ overflow: "visible" }}
         >
@@ -226,7 +248,7 @@ options: ["She goes to school at eight o’clock.", "She goes to school at six o
                   img4_letter,
                 ]}
                 audioSrc={letterSound}
-                checkpoints={[0, 3.4, 4, 4.9, 6]}
+                checkpoints={[0, 4.3, 7.82, 8.8, 9.52]}
                 popupOpen={true}
                 titleQ={"Listen and read along."}
                 audioArr={imageSounds}

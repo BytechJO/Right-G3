@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 40.png";
 import "./unit5_Page1.css";
-import Unit5_Page1_Read from "./Unit5_Pag1_Read";
 import Unit5_Page1_Vocab from "./Unit5_Page1_Vocab";
 import Unit5_Page1_find from "./Unit5_Page1_find";
 import AudioWithCaption from "../../AudioWithCaption";
@@ -134,7 +133,7 @@ const Unit2_Page1 = ({ openPopup }) => {
     { x1: 76.2, y1: 61.95, sound: 10, isPrimary: true },
 
     // الصوت  العاشر – الإضافية
-    { x1: 71.13, y1: 57.07, x2: 91.6, y2: 67.56, sound: 10, isPrimary: false },
+    { x1: 75.68, y1: 55.72, x2: 91.84, y2: 67.23, sound: 10, isPrimary: false },
 
     // الصوت الحادي عشر – الأساسية
     { x1: 26.2, y1: 72.45, sound: 11, isPrimary: true },
@@ -142,8 +141,6 @@ const Unit2_Page1 = ({ openPopup }) => {
     // الصوت الثاني عشر – الأساسية
     { x1: 34.2, y1: 72.4, sound: 12, isPrimary: true },
 
-    // الصوت الثاني عشر – الإضافية
-    { x1: 75.68, y1: 55.72, x2: 91.84, y2: 67.23, sound: 12, isPrimary: false },
     // الصوت الثالث عشر – الأساسية
 
     { x1: 87, y1: 73.5, sound: 13, isPrimary: true },

@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 48.png";
 import "./Unit6_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 6/CD34.Pg48_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 6/Pg48_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 6/Pg48_2.1_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 6/Pg48_3.1_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 6/Pg48_4.1_Adult Lady.mp3";
-
+import grammarSound from "../../../assets/audio/ClassBook/Unit 6/P 48/unit6-pg48-grammar1.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 6/P 48/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 6/P 48/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_2.1_Hansel.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_2.2_Tom.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_3.1_Stella.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_3.2_Jack.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -18,38 +19,40 @@ const Unit6_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 12, Exercise 1. Right Grammar." },
-    { start: 3.25, end: 7.11, text: " How old are you? I'm seven years old." },
     {
-      start: 7.15,
-      end: 11.02,
-      text: " When is your birthday? My birthday is in August.",
+      start: 0.079,
+      end: 14.199,
+      text: "Page 48, exercise one, write grammar. What month is it? It's February. Is it the first month of the year? Yes, it is. No, it isn't.",
     },
     {
-      start: 11.06,
-      end: 13.11,
-      text: "It is on Tuesday. ",
+      start: 14.199,
+      end: 16.039,
+      text: "What month is it?",
     },
-    { start: 13.15, end: 14.22, text: "How old are you, Sara? " },
-    { start: 14.26, end: 16.05, text: "I'm three years old. " },
-    { start: 16.09, end: 17.24, text: "When is your birthday party, Stella? " },
-    { start: 17.27, end: 19.16, text: "It is on Tuesday. " },
     {
-      start: 19.2,
-      end: 22.1,
-      text: "Happy birthday! This is for you, Stella. ",
+      start: 16.039,
+      end: 18.219,
+      text: "It's February.",
     },
-    { start: 22.14, end: 23.1, text: "Thank you.  " },
-    { start: 23.14, end: 25.05, text: "You're welcome. Open it." },
+    {
+      start: 18.219,
+      end: 20.18,
+      text: "Is it the fourth month of the year?",
+    },
+    {
+      start: 21.279,
+      end: 24.44,
+      text: "No, it isn't. It's the 11th month of the year",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
- 
-    
+    { x1: 6.28, y1: 8.67, x2:45.92, y2: 19.17, sound: sound1 },
+    { x1:58.20, y1: 8.67, x2:94.18, y2: 18.49, sound: sound2 },
+    { x1: 15.11, y1: 38.12, x2: 35.6, y2: 20.0, sound: sound3 },
+    { x1: 66.82, y1: 51.83, x2: 82.76, y2: 55.38, sound: sound4 },
+    { x1: 7.35 , y1: 62.83, x2:45.06, y2: 67.56, sound: sound5 },
+    { x1: 43.77, y1: 68.58, x2: 74.58, y2:74.33, sound: sound6 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
