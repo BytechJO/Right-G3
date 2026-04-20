@@ -148,7 +148,7 @@ export default function WB_UnitX_Page25_QI() {
           .months-card {
             width: 100%;
             background: linear-gradient(180deg, #fcfcfc 0%, #f5f5f5 100%);
-            border: 2px solid #d4d4d4;
+            border: 2px solid  #f39b42;
             border-radius: 24px;
             padding: 28px;
             box-sizing: border-box;
@@ -176,7 +176,7 @@ export default function WB_UnitX_Page25_QI() {
             width: 68px;
             min-width: 68px;
             height: 58px;
-            border: 2px solid #cfcfcf;
+            border: 2px solid #f39b42;
             border-radius: 16px;
             background: #ffffff;
             display: flex;
@@ -188,12 +188,12 @@ export default function WB_UnitX_Page25_QI() {
           }
 
           .select-box:focus-within {
-            border-color: #3b82f6;
+            border-color:  #f39b42;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
           }
 
           .select-box--wrong {
-            border-color: #ef4444;
+            border-color: # #f39b42;
             background: #fff7f7;
           }
 
@@ -280,6 +280,7 @@ font-size: clamp(16px, 1.6vw, 24px);            font-weight: 500;
             .months-card {
               padding: 20px 16px;
               border-radius: 20px;
+              border : 2px solid #f39b42
             }
 
             .months-grid {

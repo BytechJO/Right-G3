@@ -167,6 +167,8 @@ export default function WB_Unit3_Page16_QC() {
           object-fit: contain;
           display: block;
           justify-self: start;
+                              border: 2px solid #f39b42;
+object-fit: cover;
         }
 
         .wb-d16-content {

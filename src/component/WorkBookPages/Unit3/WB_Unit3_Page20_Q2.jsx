@@ -120,7 +120,7 @@ export default function WB_Unit3_Page18_QB() {
           width: "58px",
           height: "58px",
           borderRadius: "14px",
-          border: selected || correctSelected ? "2px solid #9f9f9f" : "2px solid #cfcfcf",
+          border: selected || correctSelected ? "2px solid #f39b42" : "2px solid #cfcfcf",
           background: "#fff",
           display: "flex",
           alignItems: "center",
@@ -160,7 +160,7 @@ export default function WB_Unit3_Page18_QB() {
               justifyContent: "center",
               fontSize: "12px",
               fontWeight: "700",
-              border: "2px solid #fff",
+              border: "2px solid #f39b42",
               boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
             }}
           >
@@ -213,7 +213,7 @@ export default function WB_Unit3_Page18_QB() {
         .wb-b-card {
           width: 100% !important;
           max-width: 430px !important;
-          border: 2px solid #a8a8a8 !important;
+          border: 2px solid #f39b42 !important;
           border-radius: 18px !important;
           background: #fff !important;
           display: grid !important;
@@ -233,7 +233,7 @@ export default function WB_Unit3_Page18_QB() {
         }
 
         .wb-b-half:first-child {
-          border-right: 2px solid #a8a8a8 !important;
+          border-right: 2px solid #f39b42 !important;
         }
 
         .wb-b-img {
@@ -252,7 +252,7 @@ export default function WB_Unit3_Page18_QB() {
           transform: translateX(-50%) !important;
           width: 54px !important;
           height: 42px !important;
-          border: 2px solid #a8a8a8 !important;
+          border: 2px solid #f39b42 !important;
           border-radius: 8px !important;
           background: #fff !important;
           display: flex !important;

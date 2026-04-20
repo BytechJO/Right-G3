@@ -2,18 +2,17 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-// عدلي المسارات حسب مشروعك
-import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 7.svg";
-import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 8.svg";
-import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 9.svg";
-import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 10.svg";
-import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 11.svg";
-import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 12.svg";
-import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 13.svg";
-import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12/SVG/Asset 14.svg";
+import img1a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 9.svg";
+import img1b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 11.svg";
+import img2a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 10.svg";
+import img2b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 12.svg";
+import img3a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 13.svg";
+import img3b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 14.svg";
+import img4a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 15.svg";
+import img4b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 16.svg";
 
 const RED_COLOR = "#d62828";
-const BORDER_COLOR = "#a8a8a8";
+const BORDER_COLOR = "#f39b42";
 const ACTIVE_BORDER = "#f39b42";
 const TEXT_COLOR = "#111";
 const WRONG_COLOR = "#ef4444";
@@ -22,42 +21,119 @@ const ITEMS = [
   {
     id: 1,
     sentence: "She usually rides a bike to school.",
-    images: [
-      { key: "bike", src: img1a, alt: "bike to school" },
-      { key: "walk", src: img1b, alt: "walk to school" },
-    ],
     correct: "bike",
-    bars: [4, 0],
+    images: [
+      {
+        key: "bike",
+        src: img1a,
+        alt: "bike to school",
+        bars: 3,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+      {
+        key: "walk",
+        src: img1b,
+        alt: "walk to school",
+        bars: 0,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+    ],
   },
   {
     id: 2,
     sentence: "He never rides a taxi to work.",
+    // التصحيح هنا: الصحيح ليس taxi
+    correct: "notTaxi",
     images: [
-      { key: "work", src: img2a, alt: "go to work" },
-      { key: "taxi", src: img2b, alt: "taxi" },
+      {
+        key: "notTaxi",
+        src: img2a,
+        alt: "not taxi to work",
+        bars: 1,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+      {
+        key: "taxi",
+        src: img2b,
+        alt: "taxi",
+        bars: 0,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
     ],
-    correct: "taxi",
-    bars: [1, 0],
   },
   {
     id: 3,
     sentence: "She always rides the bus to school.",
-    images: [
-      { key: "bus", src: img3a, alt: "bus to school" },
-      { key: "car", src: img3b, alt: "car" },
-    ],
     correct: "bus",
-    bars: [5, 0],
+    images: [
+      {
+        key: "bus",
+        src: img3a,
+        alt: "bus to school",
+        bars: 4,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+      {
+        key: "car",
+        src: img3b,
+        alt: "car",
+        bars: 3,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+    ],
   },
   {
     id: 4,
     sentence: "She sometimes walks to school.",
-    images: [
-      { key: "walk", src: img4a, alt: "walk to school" },
-      { key: "car", src: img4b, alt: "car" },
-    ],
     correct: "walk",
-    bars: [2, 0],
+    images: [
+      {
+        key: "walk",
+        src: img4a,
+        alt: "walk to school",
+        bars: 2,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+      {
+        key: "car",
+        src: img4b,
+        alt: "car",
+        bars: 2,
+        overlay: {
+          bars: { top: "8px", left: "8px" },
+          box: { top: "8px", right: "8px" },
+          check: { top: "2px", right: "10px" },
+        },
+      },
+    ],
   },
 ];
 
@@ -109,7 +185,7 @@ const styles = {
   imagesRow: {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: "0",
+    gap: 0,
     width: "100%",
     borderRadius: "clamp(10px, 1.3vw, 16px)",
     overflow: "hidden",
@@ -117,36 +193,34 @@ const styles = {
 
   imageOption: {
     position: "relative",
-    border: `2px solid ${BORDER_COLOR}`,
+    border: `1px solid ${BORDER_COLOR}`,
     background: "#fff",
     cursor: "pointer",
     minWidth: 0,
-    aspectRatio: "1.18 / 1",
+    aspectRatio: "1 / 1",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
+    userSelect: "none",
   },
 
   image: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    display: "block",
+        border: `2px solid ${BORDER_COLOR}`,
+
   },
 
-  topOverlay: {
+  overlayLayer: {
     position: "absolute",
-    top: "clamp(6px, 0.8vw, 8px)",
-    left: "clamp(6px, 0.8vw, 8px)",
-    right: "clamp(6px, 0.8vw, 8px)",
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    pointerEvents: "none",
+    inset: 0,
+    zIndex: 2,
   },
 
   barsWrap: {
+    position: "absolute",
     display: "inline-flex",
     alignItems: "center",
     gap: 0,
@@ -161,28 +235,34 @@ const styles = {
   },
 
   emptyBox: {
+    position: "absolute",
     width: "clamp(18px, 3vw, 30px)",
     height: "clamp(18px, 3vw, 30px)",
     border: "1.5px solid #9e9e9e",
     background: "#fff",
     borderRadius: "clamp(4px, 0.5vw, 6px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: 700,
+    fontSize: "clamp(12px, 1.2vw, 16px)",
+    lineHeight: 1,
   },
 
   checkMark: {
     position: "absolute",
-    top: "clamp(4px, 0.4vw, 6px)",
-    right: "clamp(8px, 1vw, 10px)",
-    fontSize: "clamp(30px, 4.5vw, 54px)",
+    fontSize: "clamp(28px, 4vw, 52px)",
     lineHeight: 1,
     fontWeight: 700,
     color: RED_COLOR,
-    zIndex: 2,
+    zIndex: 3,
+    pointerEvents: "none",
   },
 
   wrongBadge: {
     position: "absolute",
-    top: "clamp(6px, 0.8vw, 8px)",
-    right: "clamp(6px, 0.8vw, 8px)",
+    top: "8px",
+    right: "8px",
     width: "clamp(18px, 2vw, 24px)",
     height: "clamp(18px, 2vw, 24px)",
     borderRadius: "50%",
@@ -194,7 +274,8 @@ const styles = {
     fontSize: "clamp(10px, 1vw, 12px)",
     fontWeight: 700,
     boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-    zIndex: 3,
+    zIndex: 4,
+    pointerEvents: "none",
   },
 
   buttonsWrap: {
@@ -272,10 +353,15 @@ export default function WB_Unit2_Page12_QH() {
     return answers[itemId] === optionKey && optionKey !== correctKey;
   };
 
-  const renderBars = (filledCount) => {
+  const renderBars = (filledCount, position = {}) => {
     return (
-      <span style={styles.barsWrap}>
-        {[1, 2, 3, 4, 5].map((n) => (
+      <span
+        style={{
+          ...styles.barsWrap,
+          ...position,
+        }}
+      >
+        {[1, 2, 3, 4].map((n) => (
           <span
             key={n}
             style={{
@@ -315,11 +401,7 @@ export default function WB_Unit2_Page12_QH() {
         </h1>
 
         <div style={styles.pageWrap}>
-          <div
-            style={{
-              ...styles.gridWrap,
-            }}
-          >
+          <div style={styles.gridWrap}>
             {ITEMS.map((item) => (
               <div key={item.id} style={styles.itemCard}>
                 <div style={styles.topLine}>
@@ -331,7 +413,8 @@ export default function WB_Unit2_Page12_QH() {
                   {item.images.map((img, index) => {
                     const selected = answers[item.id] === img.key;
                     const wrong = isWrong(item.id, img.key, item.correct);
-                    const isCorrectShown = answers[item.id] === img.key && img.key === item.correct;
+                    const isCorrectShown =
+                      answers[item.id] === img.key && img.key === item.correct;
 
                     return (
                       <div
@@ -342,18 +425,37 @@ export default function WB_Unit2_Page12_QH() {
                           borderColor: selected ? ACTIVE_BORDER : BORDER_COLOR,
                           cursor: showAns ? "default" : "pointer",
                           borderRight:
-                            index === 0 ? `1px solid ${BORDER_COLOR}` : `2px solid ${BORDER_COLOR}`,
+                            index === 0
+                              ? `1px solid ${BORDER_COLOR}`
+                              : `2px solid ${BORDER_COLOR}`,
                         }}
                       >
                         <img src={img.src} alt={img.alt} style={styles.image} />
 
-                        <div style={styles.topOverlay}>
-                          {renderBars(item.bars[index])}
-                          <div style={styles.emptyBox} />
-                        </div>
+                        <div style={styles.overlayLayer}>
+                          {renderBars(img.bars, img.overlay?.bars)}
 
-                        {isCorrectShown && <div style={styles.checkMark}>✓</div>}
-                        {wrong && <div style={styles.wrongBadge}>✕</div>}
+                          <div
+                            style={{
+                              ...styles.emptyBox,
+                              ...img.overlay?.box,
+                            }}
+                          >
+                            {selected && !checked && "✓"}
+                          </div>
+
+                          {isCorrectShown && (
+                            <div
+                              style={{
+                                ...img.overlay?.check,
+                              }}
+                            >
+                              ✓
+                            </div>
+                          )}
+
+                          {wrong && <div style={styles.wrongBadge}>✕</div>}
+                        </div>
                       </div>
                     );
                   })}

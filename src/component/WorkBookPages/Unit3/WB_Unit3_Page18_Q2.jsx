@@ -116,8 +116,11 @@ export default function WB_Unit3_Page18_QH() {
         .wb-h18-shop-img {
           width: clamp(140px, 22vw, 240px);
           height: clamp(110px, 16vw, 170px);
-          object-fit: contain;
+          object-fit: cover;
           display: block;
+                              border: 2px solid #f39b42;
+                              border-radius: 10%;
+
           margin: 0 auto clamp(6px, 1vw, 8px);
         }
 

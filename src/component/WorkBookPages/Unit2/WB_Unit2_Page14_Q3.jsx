@@ -12,205 +12,46 @@ import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Fold
 import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 26.svg";
 
 
-const RED_COLOR = "#d62828";
-const BORDER_COLOR = "#a8a8a8";
-const WRONG_COLOR = "#ef4444";
-const TEXT_COLOR = "#111";
-
 const ITEMS = [
   {
     id: 1,
     leftImg: img1a,
     rightImg: img1b,
-    correct: "x",
+    correct: "✕",
   },
   {
     id: 2,
     leftImg: img2a,
     rightImg: img2b,
-    correct: "check",
+    correct: "✓",
   },
   {
     id: 3,
     leftImg: img3a,
     rightImg: img3b,
-    correct: "x",
+    correct: "✕",
   },
   {
     id: 4,
     leftImg: img4a,
     rightImg: img4b,
-    correct: "check",
+    correct: "✓",
   },
 ];
 
-const styles = {
-  pageWrap: {
-    width: "100%",
-  },
+const OPTIONS = ["✓", "✕"];
 
-  cardsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: "clamp(14px, 1.8vw, 24px)",
-    width: "100%",
-    alignItems: "start",
-  },
-
-  cardWrap: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "clamp(8px, 1vw, 12px)",
-    minWidth: 0,
-    width: "100%",
-  },
-
-  number: {
-    fontSize: "clamp(20px, 2.2vw, 34px)",
-    fontWeight: 700,
-    color: TEXT_COLOR,
-    lineHeight: 1,
-    minWidth: "clamp(18px, 2vw, 28px)",
-    paddingTop: "clamp(8px, 1vw, 12px)",
-    flexShrink: 0,
-  },
-
-  card: {
-    position: "relative",
-    flex: 1,
-    minWidth: 0,
-    border: `2px solid ${BORDER_COLOR}`,
-    borderRadius: "clamp(16px, 1.6vw, 24px)",
-    background: "#fff",
-    overflow: "visible",
-    aspectRatio: "1.16 / 1",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "stretch",
-    boxSizing: "border-box",
-  },
-
-  innerGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    width: "100%",
-    height: "100%",
-  },
-
-  imageCell: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "clamp(10px, 1.5vw, 18px)",
-    boxSizing: "border-box",
-    minWidth: 0,
-    minHeight: 0,
-  },
-
-  dividerCell: {
-    borderRight: `2px solid ${BORDER_COLOR}`,
-  },
-
-  image: {
-    maxWidth: "100%",
-    maxHeight: "100%",
-    width: "auto",
-    height: "auto",
-    objectFit: "contain",
-    display: "block",
-    pointerEvents: "none",
-    userSelect: "none",
-  },
-
-  answerBox: {
-    position: "absolute",
-    left: "50%",
-    bottom: "clamp(-14px, -1.1vw, -8px)",
-    transform: "translateX(-50%)",
-    width: "clamp(44px, 5vw, 58px)",
-    height: "clamp(34px, 4vw, 46px)",
-    border: `2px solid ${BORDER_COLOR}`,
-    borderRadius: "clamp(6px, 0.8vw, 10px)",
-    background: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    boxSizing: "border-box",
-    zIndex: 2,
-  },
-
-  mark: {
-    fontSize: "clamp(26px, 3.2vw, 52px)",
-    fontWeight: 700,
-    color: RED_COLOR,
-    lineHeight: 1,
-    transform: "translateY(-1px)",
-    userSelect: "none",
-  },
-
-  wrongBadge: {
-    position: "absolute",
-    top: "clamp(-8px, -1vw, -4px)",
-    right: "clamp(-8px, -1vw, -4px)",
-    width: "clamp(18px, 2vw, 24px)",
-    height: "clamp(18px, 2vw, 24px)",
-    borderRadius: "50%",
-    backgroundColor: WRONG_COLOR,
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "clamp(10px, 1vw, 12px)",
-    fontWeight: 700,
-    border: "2px solid #fff",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-    zIndex: 4,
-  },
-
-  hintWrap: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "clamp(14px, 1.6vw, 18px)",
-    marginTop: "clamp(16px, 2vw, 24px)",
-  },
-
-  hintBtn: {
-    width: "clamp(48px, 5vw, 62px)",
-    height: "clamp(48px, 5vw, 62px)",
-    borderRadius: "999px",
-    border: `2px solid #cfcfcf`,
-    background: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxSizing: "border-box",
-  },
-
-  buttonsWrap: {
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "4px",
-  },
-};
-
-export default function WB_Unit1_Page10_QC() {
+export default function WB_Unit3_Page18_QB() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
-  const getNextValue = (current) => {
-    if (!current) return "check";
-    if (current === "check") return "x";
-    return "";
-  };
-
-  const handleSelect = (id) => {
+  const handleSelect = (id, value) => {
     if (showAns) return;
 
     setAnswers((prev) => ({
       ...prev,
-      [id]: getNextValue(prev[id]),
+      [id]: value,
     }));
 
     setShowResults(false);
@@ -230,7 +71,7 @@ export default function WB_Unit1_Page10_QC() {
 
     ITEMS.forEach((item) => {
       if (answers[item.id] === item.correct) {
-        score += 1;
+        score++;
       }
     });
 
@@ -263,108 +104,259 @@ export default function WB_Unit1_Page10_QC() {
   };
 
   const isWrong = (item) => {
-    if (!showResults || showAns) return false;
+    if (!showResults) return false;
     return answers[item.id] !== item.correct;
   };
 
-  const renderMark = (value) => {
-    if (value === "check") return <span style={styles.mark}>✓</span>;
-    if (value === "x") return <span style={styles.mark}>✕</span>;
-    return null;
+  const renderChoice = (item, value) => {
+    const selected = answers[item.id] === value;
+    const wrong = isWrong(item) && selected;
+    const correctSelected = showAns && item.correct === value;
+
+    return (
+      <div
+        onClick={() => handleSelect(item.id, value)}
+        style={{
+          position: "relative",
+          width: "58px",
+          height: "58px",
+          borderRadius: "14px",
+          border: selected || correctSelected ? "2px solid #f39b42" : "2px solid #cfcfcf",
+          background: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: showAns ? "default" : "pointer",
+          boxSizing: "border-box",
+          userSelect: "none",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "34px",
+            fontWeight: "700",
+            color:
+              value === "✓"
+                ? "#000000ff"
+                : "#000000ff",
+            lineHeight: 1,
+          }}
+        >
+          {value}
+        </span>
+
+        {wrong && (
+          <div
+            style={{
+              position: "absolute",
+              top: "-8px",
+              right: "-8px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              backgroundColor: "#ff0000ff",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "700",
+              border: "2px solid #f39b42",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+            }}
+          >
+            ✕
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-c-root * {
+        .wb-b-wrapper {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 20px !important;
+          width: 100% !important;
+          max-width: 1120px !important;
+          margin: 0 auto !important;
+          padding: 8px 14px 20px !important;
           box-sizing: border-box !important;
         }
 
-        @media (max-width: 950px) {
-          .wb-c-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            row-gap: clamp(20px, 3vw, 28px) !important;
-          }
+        .wb-b-grid {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          column-gap: 44px !important;
+          row-gap: 18px !important;
+          width: 100% !important;
+          align-items: start !important;
         }
 
-        @media (max-width: 560px) {
-          .wb-c-grid {
+        .wb-b-item {
+          display: flex !important;
+          align-items: flex-start !important;
+          gap: 14px !important;
+          width: 100% !important;
+        }
+
+        .wb-b-num {
+          font-size: 22px !important;
+          font-weight: 700 !important;
+          color: #222 !important;
+          line-height: 1 !important;
+          min-width: 24px !important;
+          padding-top: 10px !important;
+        }
+
+        .wb-b-card {
+          width: 100% !important;
+          max-width: 430px !important;
+          border: 2px solid #f39b42 !important;
+          border-radius: 18px !important;
+          background: #fff !important;
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          position: relative !important;
+          overflow: visible !important;
+          box-sizing: border-box !important;
+        }
+
+        .wb-b-half {
+          min-height: 170px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 12px !important;
+          box-sizing: border-box !important;
+        }
+
+        .wb-b-half:first-child {
+          border-right: 2px solid #f39b42 !important;
+        }
+
+        .wb-b-img {
+          max-width: 100% !important;
+          max-height: 140px !important;
+          width: auto !important;
+          height: auto !important;
+          object-fit: contain !important;
+          display: block !important;
+        }
+
+        .wb-b-answer-box {
+          position: absolute !important;
+          left: 50% !important;
+          bottom: -2px !important;
+          transform: translateX(-50%) !important;
+          width: 54px !important;
+          height: 42px !important;
+          border: 2px solid #f39b42 !important;
+          border-radius: 8px !important;
+          background: #fff !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          box-sizing: border-box !important;
+          z-index: 2 !important;
+        }
+
+        .wb-b-answer-text {
+          font-size: 34px !important;
+          font-weight: 700 !important;
+          color: #000000ff !important;
+          line-height: 1 !important;
+        }
+
+        .wb-b-options-row {
+          display: flex !important;
+          justify-content: center !important;
+          gap: 14px !important;
+          margin-top: 8px !important;
+        }
+
+        .wb-b-buttons {
+          display: flex !important;
+          justify-content: center !important;
+          margin-top: 8px !important;
+        }
+
+        @media (max-width: 900px) {
+          .wb-b-grid {
             grid-template-columns: 1fr !important;
           }
         }
       `}</style>
 
-      <div
-        className="div-forall wb-c-root"
-        style={{
+       <div
+        className="div-forall"
+            style={{
           display: "flex",
           flexDirection: "column",
-          gap: "18px",
+          gap: "28px",
           maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
+        <h1    className="WB-header-title-page8"
           style={{
             margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
-          <span className="WB-ex-A">C</span>
-          Do they both have the same <b>u</b> sound? Listen and write ✓ or ✕.
+          }}>
+          <span className="WB-ex-A">B</span> Do they both have the same sound? Write ✓ or ✕.
         </h1>
 
-        <div style={styles.pageWrap}>
-          <div className="wb-c-grid" style={styles.cardsGrid}>
-            {ITEMS.map((item) => (
-              <div key={item.id} style={styles.cardWrap}>
-                <div style={styles.number}>{item.id}</div>
+        <div className="wb-b-grid">
+          {ITEMS.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+              }}
+            >
+              <div className="wb-b-item">
+                <div className="wb-b-num">{item.id}</div>
 
-                <div style={styles.card}>
-                  <div style={styles.innerGrid}>
-                    <div style={{ ...styles.imageCell, ...styles.dividerCell }}>
-                      <img
-                        src={item.leftImg}
-                        alt={`left-${item.id}`}
-                        style={styles.image}
-                      />
-                    </div>
-
-                    <div style={styles.imageCell}>
-                      <img
-                        src={item.rightImg}
-                        alt={`right-${item.id}`}
-                        style={styles.image}
-                      />
-                    </div>
+                <div className="wb-b-card">
+                  <div className="wb-b-half">
+                    <img
+                      src={item.leftImg}
+                      alt={`left-${item.id}`}
+                      className="wb-b-img"
+                    />
                   </div>
 
-                  <div
-                    onClick={() => handleSelect(item.id)}
-                    style={{
-                      ...styles.answerBox,
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  >
-                    {renderMark(answers[item.id])}
-                    {isWrong(item) && <div style={styles.wrongBadge}>✕</div>}
+                  <div className="wb-b-half">
+                    <img
+                      src={item.rightImg}
+                      alt={`right-${item.id}`}
+                      className="wb-b-img"
+                    />
                   </div>
+
+                  {(answers[item.id] || showAns) && (
+                    <div className="wb-b-answer-box">
+                      <span className="wb-b-answer-text">
+                        {answers[item.id]}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
 
-          <div style={styles.hintWrap}>
-            <div style={styles.hintBtn}>{renderMark("check")}</div>
-            <div style={styles.hintBtn}>{renderMark("x")}</div>
-          </div>
+              <div className="wb-b-options-row">
+                {OPTIONS.map((option) => (
+                  <div key={option}>{renderChoice(item, option)}</div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div style={styles.buttonsWrap}>
+        <div className="wb-b-buttons">
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}

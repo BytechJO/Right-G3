@@ -14,6 +14,9 @@ import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Fold
 import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 8.svg";
 import img3c from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 9.svg";
 
+const ACTIVE_COLOR = "#f39b42";
+const WRONG_COLOR = "#ef4444";
+
 const ITEMS = [
   {
     id: 1,
@@ -72,29 +75,19 @@ export default function WB_Unit3_Page3_QB() {
 
   const handleImageSelect = (itemId, imageKey) => {
     if (showAns) return;
-
     setAnswers((prev) => ({
       ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        image: imageKey,
-      },
+      [itemId]: { ...prev[itemId], image: imageKey },
     }));
-
     setChecked(false);
   };
 
   const handleTextSelect = (itemId, text) => {
     if (showAns) return;
-
     setAnswers((prev) => ({
       ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        text,
-      },
+      [itemId]: { ...prev[itemId], text },
     }));
-
     setChecked(false);
   };
 
@@ -115,7 +108,6 @@ export default function WB_Unit3_Page3_QB() {
     ITEMS.forEach((item) => {
       const imageCorrect = answers[item.id]?.image === item.correctImage;
       const textCorrect = answers[item.id]?.text === item.correctText;
-
       if (imageCorrect && textCorrect) {
         score += 1;
       }
@@ -134,14 +126,9 @@ export default function WB_Unit3_Page3_QB() {
 
   const handleShowAnswer = () => {
     const filled = {};
-
     ITEMS.forEach((item) => {
-      filled[item.id] = {
-        image: item.correctImage,
-        text: item.correctText,
-      };
+      filled[item.id] = { image: item.correctImage, text: item.correctText };
     });
-
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
@@ -153,12 +140,15 @@ export default function WB_Unit3_Page3_QB() {
     setShowAns(false);
   };
 
-  const isImageSelected = (itemId, imageKey) => {
-    return answers[itemId]?.image === imageKey;
-  };
+  const isImageSelected = (itemId, imageKey) =>
+    answers[itemId]?.image === imageKey;
 
-  const isTextChecked = (itemId, option) => {
-    return answers[itemId]?.text === option;
+  const isTextSelected = (itemId, option) =>
+    answers[itemId]?.text === option;
+
+  const isWrongImage = (item) => {
+    if (!checked || showAns) return false;
+    return answers[item.id]?.image !== item.correctImage;
   };
 
   const isWrongText = (item, option) => {
@@ -277,9 +267,36 @@ export default function WB_Unit3_Page3_QB() {
         .wb-qb-image-ring {
           position: absolute;
           inset: clamp(-8px, -1vw, -10px);
-          border: clamp(2px, 0.35vw, 4px) solid #d62828;
+          border: clamp(2px, 0.35vw, 4px) solid ${ACTIVE_COLOR};
           border-radius: 999px;
           pointer-events: none;
+        }
+
+        .wb-qb-image-ring-wrong {
+          position: absolute;
+          inset: clamp(-8px, -1vw, -10px);
+          border: clamp(2px, 0.35vw, 4px) solid ${WRONG_COLOR};
+          border-radius: 999px;
+          pointer-events: none;
+        }
+
+        .wb-qb-image-wrong-badge {
+          position: absolute;
+          top: clamp(-7px, -0.8vw, -8px);
+          right: clamp(-7px, -0.8vw, -8px);
+          width: clamp(16px, 2.2vw, 22px);
+          height: clamp(16px, 2.2vw, 22px);
+          border-radius: 50%;
+          background-color: ${WRONG_COLOR};
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(9px, 1vw, 12px);
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          z-index: 2;
         }
 
         .wb-qb-right-col {
@@ -311,8 +328,8 @@ export default function WB_Unit3_Page3_QB() {
         .wb-qb-checkbox {
           width: clamp(28px, 3.8vw, 40px);
           height: clamp(28px, 3.8vw, 40px);
-          border-radius: clamp(6px, 1vw, 10px);
-          border: 2px solid #f39b42;
+          border-radius: 6px;
+          border: 2px solid #bbb;
           background: #fff;
           display: flex;
           align-items: center;
@@ -320,13 +337,12 @@ export default function WB_Unit3_Page3_QB() {
           cursor: pointer;
           position: relative;
           flex-shrink: 0;
+          transition: all 0.2s ease;
         }
 
-        .wb-qb-checkmark {
-          font-size: clamp(18px, 2.6vw, 26px);
-          font-weight: 700;
-          color: #d62828;
-          line-height: 1;
+        .wb-qb-checkbox.wrong {
+          border-color: ${WRONG_COLOR};
+          background: rgba(239, 68, 68, 0.08);
         }
 
         .wb-qb-wrong {
@@ -336,7 +352,7 @@ export default function WB_Unit3_Page3_QB() {
           width: clamp(16px, 2.2vw, 22px);
           height: clamp(16px, 2.2vw, 22px);
           border-radius: 50%;
-          background-color: #ef4444;
+          background-color: ${WRONG_COLOR};
           color: #fff;
           display: flex;
           align-items: center;
@@ -365,9 +381,8 @@ export default function WB_Unit3_Page3_QB() {
         }
       `}</style>
 
-      
- <div
-        className="div-forall"
+      <div
+        className="div-forall "
         style={{
           display: "flex",
           flexDirection: "column",
@@ -391,71 +406,95 @@ export default function WB_Unit3_Page3_QB() {
         </h1>
 
         <div className="wb-qb-main-list">
-          {ITEMS.map((item) => (
-            <div key={item.id} className="wb-qb-row">
-              <div className="wb-qb-left-col">
-                <div className="wb-qb-question-wrap">
-                  <div className="wb-qb-number">{item.id}</div>
+          {ITEMS.map((item) => {
+            const wrongImage = isWrongImage(item);
 
-                  <div className="wb-qb-question">{item.question}</div>
+            return (
+              <div key={item.id} className="wb-qb-row">
+                <div className="wb-qb-left-col">
+                  <div className="wb-qb-question-wrap">
+                    <div className="wb-qb-number">{item.id}</div>
+                    <div className="wb-qb-question">{item.question}</div>
+                  </div>
+
+                  <div className="wb-qb-images-row">
+                    {item.images.map((img) => {
+                      const selected = isImageSelected(item.id, img.key);
+                      const isThisWrong = wrongImage && selected;
+
+                      return (
+                        <div
+                          key={img.key}
+                          className="wb-qb-image-click"
+                          onClick={() => handleImageSelect(item.id, img.key)}
+                          style={{ cursor: showAns ? "default" : "pointer" }}
+                        >
+                          {selected && !isThisWrong && (
+                            <div className="wb-qb-image-ring" />
+                          )}
+
+                          {isThisWrong && (
+                            <>
+                              <div className="wb-qb-image-ring-wrong" />
+                              <div className="wb-qb-image-wrong-badge">✕</div>
+                            </>
+                          )}
+
+                          <div className="wb-qb-image-holder">
+                            <img
+                              className="wb-qb-force-img"
+                              src={img.src}
+                              alt={img.alt}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="wb-qb-images-row">
-                  {item.images.map((img) => {
-                    const selected = isImageSelected(item.id, img.key);
+                <div className="wb-qb-right-col">
+                  {item.options.map((option) => {
+                    const selected = isTextSelected(item.id, option);
+                    const wrong = isWrongText(item, option);
+                    const showCorrect = showAns && item.correctText === option;
 
                     return (
-                      <div
-                        key={img.key}
-                        className="wb-qb-image-click"
-                        onClick={() => handleImageSelect(item.id, img.key)}
-                        style={{
-                          cursor: showAns ? "default" : "pointer",
-                        }}
-                      >
-                        {selected && <div className="wb-qb-image-ring" />}
+                      <div key={option} className="wb-qb-option-row">
+                        <div className="wb-qb-option-text">{option}</div>
 
-                        <div className="wb-qb-image-holder">
-                          <img
-                            className="wb-qb-force-img"
-                            src={img.src}
-                            alt={img.alt}
-                          />
+                        <div
+                          onClick={() => handleTextSelect(item.id, option)}
+                          className={`wb-qb-checkbox ${wrong ? "wrong" : ""}`}
+                          style={{ cursor: showAns ? "default" : "pointer" }}
+                        >
+                          {(selected || showCorrect) && (
+                            <svg
+                              width="65%"
+                              height="65%"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <polyline
+                                points="4,13 9,18 20,6"
+                                stroke="#e53935"
+                                strokeWidth="3.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+
+                          {wrong && <div className="wb-qb-wrong">✕</div>}
                         </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
-
-              <div className="wb-qb-right-col">
-                {item.options.map((option) => {
-                  const checkedOption = isTextChecked(item.id, option);
-                  const wrong = isWrongText(item, option);
-
-                  return (
-                    <div key={option} className="wb-qb-option-row">
-                      <div className="wb-qb-option-text">{option}</div>
-
-                      <div
-                        onClick={() => handleTextSelect(item.id, option)}
-                        className="wb-qb-checkbox"
-                        style={{
-                          cursor: showAns ? "default" : "pointer",
-                        }}
-                      >
-                        {checkedOption && (
-                          <span className="wb-qb-checkmark">✓</span>
-                        )}
-
-                        {wrong && <div className="wb-qb-wrong">✕</div>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div

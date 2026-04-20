@@ -1,6 +1,11 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
+import { TbMessageCircle } from "react-icons/tb";
+import { FaPlay, FaPause } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
+
+import sound from "../../../assets/audio/WorkBook/titel G2/Unit 1.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 2.svg";
@@ -10,18 +15,18 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 6.svg";
 
 const ACTIVE_COLOR = "#f39b42";
-const LINE_COLOR = "#dc2626";
+const LINE_COLOR = "#f39b42";
 const INACTIVE_COLOR = "#a3a3a3";
 const WRONG_COLOR = "#ef4444";
 
 const EXERCISE_DATA = {
   top: [
-    { id: 1, img: img1 }, // shell
-    { id: 2, img: img2 }, // coat
-    { id: 3, img: img3 }, // juice
-    { id: 4, img: img4 }, // bee
-    { id: 5, img: img5 }, // nuts
-    { id: 6, img: img6 }, // kite
+    { id: 1, img: img1 },
+    { id: 2, img: img2 },
+    { id: 3, img: img3 },
+    { id: 4, img: img4 },
+    { id: 5, img: img5 },
+    { id: 6, img: img6 },
   ],
 
   bottom: [
@@ -34,12 +39,12 @@ const EXERCISE_DATA = {
   ],
 
   correctMatches: {
-    1: 4, // shell -> short u
-    2: 6, // coat -> long o
-    3: 5, // juice -> long u
-    4: 3, // bee -> long e
-    5: 2, // nuts -> short a
-    6: 1, // kite -> long i
+    1: 4,
+    2: 6,
+    3: 5,
+    4: 3,
+    5: 2,
+    6: 1,
   },
 };
 
@@ -176,6 +181,7 @@ const styles = {
 };
 
 const WB_Unit3_Page215_QB = () => {
+  // ─── Matching state ───────────────────────────────────────────────
   const [selectedTop, setSelectedTop] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -185,6 +191,105 @@ const WB_Unit3_Page215_QB = () => {
   const containerRef = useRef(null);
   const elementRefs = useRef({});
 
+  // ─── Audio state ──────────────────────────────────────────────────
+  const audioRef = useRef(null);
+  const settingsRef = useRef(null);
+  const stopAtSecond = 6.35; // ← غيّر هذه القيمة حسب الأوديو الجديد
+
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [showContinue, setShowContinue] = useState(false);
+  const [showCaption, setShowCaption] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [forceRender, setForceRender] = useState(0);
+
+  // ─── Captions ─────────────────────────────────────────────────────
+  // ← عدّل النصوص والتوقيتات حسب أوديو هذا التمرين
+  const captions = [
+    { start: 0, end: 6.34, text: "Page 215, exercise B. Listen and match." },
+    { start: 7.0, end: 9.0, text: "1- shell." },
+    { start: 9.5, end: 11.5, text: "2- coat." },
+    { start: 12.0, end: 14.0, text: "3- juice." },
+    { start: 14.5, end: 16.5, text: "4- bee." },
+    { start: 17.0, end: 19.0, text: "5- nuts." },
+    { start: 19.5, end: 21.5, text: "6- kite." },
+  ];
+
+  const updateCaption = (time) => {
+    const index = captions.findIndex(
+      (cap) => time >= cap.start && time <= cap.end
+    );
+    setActiveIndex(index);
+  };
+
+  // ─── Auto-play on mount + stop at intro ───────────────────────────
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.currentTime = 0;
+    audio.play();
+
+    const interval = setInterval(() => {
+      if (audio.currentTime >= stopAtSecond) {
+        audio.pause();
+        setPaused(true);
+        setIsPlaying(false);
+        setShowContinue(true);
+        clearInterval(interval);
+      }
+    }, 100);
+
+    const handleEnded = () => {
+      audio.currentTime = 0;
+      setIsPlaying(false);
+      setPaused(false);
+      setActiveIndex(null);
+      setShowContinue(true);
+    };
+
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      clearInterval(interval);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, []);
+
+  // ─── Caption scroll + force re-render ────────────────────────────
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setForceRender((prev) => prev + 1);
+    }, 1000);
+
+    if (activeIndex !== -1 && activeIndex !== null) {
+      const el = document.getElementById(`caption-${activeIndex}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    return () => clearInterval(timer);
+  }, [activeIndex]);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) {
+      audio.play();
+      setPaused(false);
+      setIsPlaying(true);
+    } else {
+      audio.pause();
+      setPaused(true);
+      setIsPlaying(false);
+    }
+  };
+
+  // ─── Lines layout ─────────────────────────────────────────────────
   useLayoutEffect(() => {
     const updateLines = () => {
       if (!containerRef.current) return;
@@ -195,7 +300,6 @@ const WB_Unit3_Page215_QB = () => {
         .map(([topId, bottomId]) => {
           const topEl = elementRefs.current[`top-dot-${topId}`];
           const bottomEl = elementRefs.current[`bottom-dot-${bottomId}`];
-
           if (!topEl || !bottomEl) return null;
 
           const topRect = topEl.getBoundingClientRect();
@@ -215,16 +319,12 @@ const WB_Unit3_Page215_QB = () => {
     };
 
     const rafUpdate = () => requestAnimationFrame(updateLines);
-
     rafUpdate();
-
     window.addEventListener("resize", rafUpdate);
 
     let resizeObserver;
     if (containerRef.current && typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(() => {
-        rafUpdate();
-      });
+      resizeObserver = new ResizeObserver(rafUpdate);
       resizeObserver.observe(containerRef.current);
     }
 
@@ -234,6 +334,7 @@ const WB_Unit3_Page215_QB = () => {
     };
   }, [matches, showAns, showResults]);
 
+  // ─── Matching handlers ────────────────────────────────────────────
   const handleTopClick = (id) => {
     if (showAns) return;
     setSelectedTop(id);
@@ -244,13 +345,9 @@ const WB_Unit3_Page215_QB = () => {
     if (showAns || selectedTop === null) return;
 
     const newMatches = { ...matches };
-
     Object.keys(newMatches).forEach((key) => {
-      if (newMatches[key] === bottomId) {
-        delete newMatches[key];
-      }
+      if (newMatches[key] === bottomId) delete newMatches[key];
     });
-
     newMatches[selectedTop] = bottomId;
 
     setMatches(newMatches);
@@ -260,32 +357,22 @@ const WB_Unit3_Page215_QB = () => {
 
   const checkAnswers = () => {
     if (showAns) return;
-
     const allConnected = EXERCISE_DATA.top.every((item) => matches[item.id]);
-
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
 
     setShowResults(true);
-
     let score = 0;
     const total = EXERCISE_DATA.top.length;
-
     Object.keys(EXERCISE_DATA.correctMatches).forEach((topId) => {
-      if (matches[topId] === EXERCISE_DATA.correctMatches[topId]) {
-        score++;
-      }
+      if (matches[topId] === EXERCISE_DATA.correctMatches[topId]) score++;
     });
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
-    }
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
@@ -303,27 +390,22 @@ const WB_Unit3_Page215_QB = () => {
     setLines([]);
   };
 
-  const getTopDotColor = (topId) => {
-    if (selectedTop === topId) return ACTIVE_COLOR;
-    if (matches[topId]) return ACTIVE_COLOR;
-    return INACTIVE_COLOR;
-  };
+  // ─── Color helpers ────────────────────────────────────────────────
+  const getTopDotColor = (topId) =>
+    selectedTop === topId || matches[topId] ? ACTIVE_COLOR : INACTIVE_COLOR;
 
   const getBottomDotColor = (bottomId) => {
     const isConnected = Object.values(matches).includes(bottomId);
-    const isSelected =
-      selectedTop !== null && matches[selectedTop] === bottomId;
-
-    if (isSelected) return ACTIVE_COLOR;
-    if (isConnected) return ACTIVE_COLOR;
-    return INACTIVE_COLOR;
+    const isSelected = selectedTop !== null && matches[selectedTop] === bottomId;
+    return isSelected || isConnected ? ACTIVE_COLOR : INACTIVE_COLOR;
   };
 
-  const isWrongMatch = (topId) => {
-    if (!showResults || !matches[topId]) return false;
-    return matches[topId] !== EXERCISE_DATA.correctMatches[topId];
-  };
+  const isWrongMatch = (topId) =>
+    showResults &&
+    !!matches[topId] &&
+    matches[topId] !== EXERCISE_DATA.correctMatches[topId];
 
+  // ─── Render ───────────────────────────────────────────────────────
   return (
     <div className="main-container-component">
       <div
@@ -336,6 +418,7 @@ const WB_Unit3_Page215_QB = () => {
           margin: "0 auto",
         }}
       >
+        {/* Title */}
         <h1
           className="WB-header-title-page8"
           style={{
@@ -349,12 +432,121 @@ const WB_Unit3_Page215_QB = () => {
           <span className="WB-ex-A">B</span> Listen and match.
         </h1>
 
+        {/* ── Audio Player ── */}
         <div
-          ref={containerRef}
           style={{
-            ...styles.matchArea,
+            display: "flex",
+            justifyContent: "center",
+            margin: "30px 0px",
+            width: "100%",
           }}
         >
+          <div className="audio-popup-read" style={{ width: "50%" }}>
+            <div className="audio-inner player-ui">
+              <audio
+                ref={audioRef}
+                src={sound}
+                onTimeUpdate={(e) => {
+                  const time = e.target.currentTime;
+                  setCurrent(time);
+                  updateCaption(time);
+                }}
+                onLoadedMetadata={(e) => setDuration(e.target.duration)}
+              />
+
+              {/* Slider row */}
+              <div className="top-row">
+                <span className="audio-time">
+                  {new Date(current * 1000).toISOString().substring(14, 19)}
+                </span>
+
+                <input
+                  type="range"
+                  className="audio-slider"
+                  min="0"
+                  max={duration}
+                  value={current}
+                  onChange={(e) => {
+                    audioRef.current.currentTime = e.target.value;
+                    updateCaption(Number(e.target.value));
+                  }}
+                  style={{
+                    background: `linear-gradient(to right, #430f68 ${
+                      (current / duration) * 100
+                    }%, #d9d9d9ff ${(current / duration) * 100}%)`,
+                  }}
+                />
+
+                <span className="audio-time">
+                  {new Date(duration * 1000).toISOString().substring(14, 19)}
+                </span>
+              </div>
+
+              {/* Buttons row */}
+              <div className="bottom-row">
+                {/* Caption bubble */}
+                <div
+                  className={`round-btn ${showCaption ? "active" : ""}`}
+                  style={{ position: "relative" }}
+                  onClick={() => setShowCaption(!showCaption)}
+                >
+                  <TbMessageCircle size={36} />
+                  <div
+                    className={`caption-inPopup ${showCaption ? "show" : ""}`}
+                    style={{ top: "100%", left: "10%" }}
+                  >
+                    {captions.map((cap, i) => (
+                      <p
+                        key={i}
+                        id={`caption-${i}`}
+                        className={`caption-inPopup-line2 ${
+                          activeIndex === i ? "active" : ""
+                        }`}
+                      >
+                        {cap.text}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Play / Pause */}
+                <button className="play-btn2" onClick={togglePlay}>
+                  {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
+                </button>
+
+                {/* Settings */}
+                <div className="settings-wrapper" ref={settingsRef}>
+                  <button
+                    className={`round-btn ${showSettings ? "active" : ""}`}
+                    onClick={() => setShowSettings(!showSettings)}
+                  >
+                    <IoMdSettings size={36} />
+                  </button>
+
+                  {showSettings && (
+                    <div className="settings-popup">
+                      <label>Volume</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={volume}
+                        onChange={(e) => {
+                          setVolume(e.target.value);
+                          audioRef.current.volume = e.target.value;
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Matching Exercise ── */}
+        <div ref={containerRef} style={styles.matchArea}>
           <svg
             style={{
               position: "absolute",
@@ -380,6 +572,7 @@ const WB_Unit3_Page215_QB = () => {
             ))}
           </svg>
 
+          {/* Top row (images) */}
           <div style={styles.topRow}>
             {EXERCISE_DATA.top.map((item) => {
               const wrong = isWrongMatch(item.id);
@@ -413,7 +606,9 @@ const WB_Unit3_Page215_QB = () => {
                   </div>
 
                   <div
-                    ref={(el) => (elementRefs.current[`top-dot-${item.id}`] = el)}
+                    ref={(el) =>
+                      (elementRefs.current[`top-dot-${item.id}`] = el)
+                    }
                     onClick={() => handleTopClick(item.id)}
                     style={{
                       ...styles.dot,
@@ -438,6 +633,7 @@ const WB_Unit3_Page215_QB = () => {
             })}
           </div>
 
+          {/* Bottom row (text labels) */}
           <div style={styles.bottomRow}>
             {EXERCISE_DATA.bottom.map((item) => {
               const isConnected = Object.values(matches).includes(item.id);
@@ -466,11 +662,8 @@ const WB_Unit3_Page215_QB = () => {
                       border: isSelected
                         ? `3px solid ${ACTIVE_COLOR}`
                         : isConnected
-                        ? "2px solid #d1d5db"
+                        ? "2px solid #f5d0a8"
                         : "2px solid transparent",
-                      background: isSelected
-                        ? "rgba(243,155,66,0.08)"
-                        : "transparent",
                       cursor:
                         showAns || selectedTop === null ? "default" : "pointer",
                     }}
@@ -483,6 +676,7 @@ const WB_Unit3_Page215_QB = () => {
           </div>
         </div>
 
+        {/* Buttons */}
         <div style={styles.buttonsWrap}>
           <Button
             handleShowAnswer={handleShowAnswer}

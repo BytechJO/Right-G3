@@ -2,9 +2,11 @@ import { useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 7.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 8.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 9.svg";
+// استبدل هاي المسارات بالمسارات الحقيقية عندك
+import char1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 1.svg";
+import char2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 2.svg";
+import char3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 3.svg";
+import char4 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 4.svg";
 
 const LINE_COLOR = "#f39b42";
 const INACTIVE_COLOR = "#bdbdbd";
@@ -12,41 +14,26 @@ const ACTIVE_COLOR = "#f39b42";
 
 const exerciseData = {
   left: [
-    {
-      id: 1,
-      text: "Kate wants a bike, coat, and cake.",
-    },
-    {
-      id: 2,
-      text: "Hansel likes the cat and ducks.",
-    },
-    {
-      id: 3,
-      text: "There are two flags on the top of the boat.",
-    },
+    { id: 1, img: char1, text: "Does he have any ink?" },
+    { id: 2, img: char2, text: "Does she have any paper?" },
+    { id: 3, img: char3, text: "Does he have any eggplants?" },
+    { id: 4, img: char4, text: "Does he have any grapes?" },
   ],
   right: [
-    {
-      id: 1,
-      img: img1,
-    },
-    {
-      id: 2,
-      img: img2,
-    },
-    {
-      id: 3,
-      img: img3,
-    },
+    { id: 1, text: "Yes, he has some." },
+    { id: 2, text: "No, he hasn't any." },
+    { id: 3, text: "Yes, she has some." },
+    { id: 4, text: "Yes, he has a little." },
   ],
   correctMatches: {
-    1: 2,
-    2: 3,
-    3: 1,
+    1: 2, // Does he have any ink?       → No, he hasn't any.
+    2: 3, // Does she have any paper?    → Yes, she has some.
+    3: 1, // Does he have any eggplants? → Yes, he has some.
+    4: 4, // Does he have any grapes?    → Yes, he has a little.
   },
 };
 
-export default function WB_Unit3_Page8_QC() {
+export default function WB_Unit3_Page_QA() {
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -186,7 +173,7 @@ export default function WB_Unit3_Page8_QC() {
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-c8-wrapper {
+        .wb-qa-wrapper {
           display: flex !important;
           flex-direction: column !important;
           gap: clamp(18px, 2.4vw, 28px) !important;
@@ -197,58 +184,65 @@ export default function WB_Unit3_Page8_QC() {
           width: 100% !important;
         }
 
-        .wb-c8-grid {
+        .wb-qa-grid {
           position: relative !important;
           width: 100% !important;
           display: grid !important;
-          grid-template-columns: minmax(0, 1.35fr) minmax(110px, 14vw) minmax(200px, 0.95fr) !important;
+          grid-template-columns: minmax(0, 1.5fr) minmax(110px, 14vw) minmax(200px, 0.9fr) !important;
           gap: clamp(14px, 2vw, 24px) !important;
           align-items: start !important;
         }
 
-        .wb-c8-left-col {
+        .wb-qa-left-col {
           display: flex !important;
           flex-direction: column !important;
-          gap: clamp(18px, 3vw, 42px) !important;
+          gap: clamp(14px, 2.2vw, 32px) !important;
           z-index: 2 !important;
         }
 
-        .wb-c8-right-col {
+        .wb-qa-right-col {
           display: flex !important;
           flex-direction: column !important;
-          gap: clamp(16px, 2.2vw, 28px) !important;
+          gap: clamp(14px, 2.2vw, 32px) !important;
           z-index: 2 !important;
-          padding-top: 0 !important;
         }
 
-        .wb-c8-left-row {
+        .wb-qa-left-row {
           display: grid !important;
-          grid-template-columns: clamp(20px, 2.5vw, 28px) minmax(0, 1fr) clamp(14px, 1.8vw, 18px) !important;
+          grid-template-columns: clamp(20px, 2.5vw, 28px) clamp(48px, 6vw, 70px) minmax(0, 1fr) clamp(14px, 1.8vw, 18px) !important;
           align-items: center !important;
-          gap: clamp(8px, 1.4vw, 14px) !important;
-          min-height: clamp(62px, 8.5vw, 110px) !important;
+          gap: clamp(6px, 1.2vw, 12px) !important;
+          min-height: clamp(62px, 8.5vw, 90px) !important;
           position: relative !important;
         }
 
-        .wb-c8-right-row {
+        .wb-qa-right-row {
           display: grid !important;
           grid-template-columns: clamp(14px, 1.8vw, 18px) minmax(0, 1fr) !important;
           align-items: center !important;
           gap: clamp(8px, 1.4vw, 14px) !important;
-          min-height: clamp(68px, 9vw, 116px) !important;
+          min-height: clamp(62px, 8.5vw, 90px) !important;
           position: relative !important;
         }
 
-        .wb-c8-num {
-          font-size: clamp(18px, 2vw, 22px) !important;
-          font-weight: 700 !important;
+        .wb-qa-num {
+          font-size: clamp(18px, 2vw, 24px) !important;
+          font-weight: 900 !important;
           color: #222 !important;
           line-height: 1 !important;
           flex-shrink: 0 !important;
         }
 
-        .wb-c8-text {
-          font-size: clamp(16px, 1.9vw, 20px) !important;
+        .wb-qa-char-img {
+          width: clamp(48px, 6vw, 70px) !important;
+          height: clamp(48px, 6vw, 70px) !important;
+          object-fit: contain !important;
+          display: block !important;
+          flex-shrink: 0 !important;
+        }
+
+        .wb-qa-text {
+          font-size: clamp(15px, 1.8vw, 19px) !important;
           line-height: 1.45 !important;
           color: #222 !important;
           cursor: pointer !important;
@@ -258,7 +252,18 @@ export default function WB_Unit3_Page8_QC() {
           word-break: break-word !important;
         }
 
-        .wb-c8-dot {
+        .wb-qa-answer-text {
+          font-size: clamp(15px, 1.8vw, 19px) !important;
+          line-height: 1.45 !important;
+          color: #222 !important;
+          cursor: pointer !important;
+          padding: clamp(4px, 0.7vw, 6px) clamp(6px, 0.9vw, 8px) !important;
+          border-radius: 12px !important;
+          transition: all 0.2s ease !important;
+          word-break: break-word !important;
+        }
+
+        .wb-qa-dot {
           width: clamp(14px, 1.7vw, 18px) !important;
           height: clamp(14px, 1.7vw, 18px) !important;
           border-radius: 50% !important;
@@ -268,32 +273,12 @@ export default function WB_Unit3_Page8_QC() {
           flex-shrink: 0 !important;
         }
 
-        .wb-c8-dot.selected {
-          transform: scale(1.1) !important;
+        .wb-qa-dot.selected {
+          transform: scale(1.15) !important;
           box-shadow: 0 0 0 clamp(2px, 0.4vw, 4px) rgba(255, 202, 148, 0.45) !important;
         }
 
-        .wb-c8-right-img-wrap {
-          width: 100% !important;
-          min-height: clamp(68px, 8.6vw, 108px) !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: flex-start !important;
-          cursor: pointer !important;
-          box-sizing: border-box !important;
-          padding: clamp(2px, 0.5vw, 4px) clamp(3px, 0.8vw, 6px) !important;
-        }
-
-        .wb-c8-right-img {
-          max-width: 100% !important;
-          max-height: clamp(72px, 10vw, 115px) !important;
-          width: auto !important;
-          height: auto !important;
-          object-fit: contain !important;
-          display: block !important;
-        }
-
-        .wb-c8-wrong {
+        .wb-qa-wrong {
           position: absolute !important;
           right: clamp(-24px, -2vw, -28px) !important;
           top: 50% !important;
@@ -312,59 +297,56 @@ export default function WB_Unit3_Page8_QC() {
           box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
         }
 
-        .wb-c8-buttons {
+        .wb-qa-buttons {
           display: flex !important;
           justify-content: center !important;
           margin-top: clamp(6px, 1vw, 8px) !important;
         }
 
         @media (max-width: 900px) {
-          .wb-c8-grid {
+          .wb-qa-grid {
             grid-template-columns: minmax(0, 1fr) !important;
             gap: clamp(16px, 2vw, 18px) !important;
           }
 
-          .wb-c8-left-col,
-          .wb-c8-right-col {
-            gap: clamp(14px, 2vw, 18px) !important;
+          .wb-qa-left-col,
+          .wb-qa-right-col {
+            gap: clamp(12px, 2vw, 16px) !important;
           }
 
-          .wb-c8-left-row,
-          .wb-c8-right-row {
+          .wb-qa-left-row,
+          .wb-qa-right-row {
             min-height: auto !important;
           }
 
-          .wb-c8-right-img-wrap {
-            justify-content: flex-start !important;
-          }
-
-          .wb-c8-wrong {
+          .wb-qa-wrong {
             right: 0 !important;
           }
         }
 
         @media (max-width: 600px) {
-          .wb-c8-text {
-            font-size: clamp(15px, 4vw, 18px) !important;
-            line-height: 1.5 !important;
+          .wb-qa-text,
+          .wb-qa-answer-text {
+            font-size: clamp(14px, 3.8vw, 17px) !important;
           }
 
-          .wb-c8-num {
+          .wb-qa-num {
             font-size: clamp(17px, 4.2vw, 20px) !important;
           }
 
-          .wb-c8-left-row {
-            grid-template-columns: 20px minmax(0, 1fr) 14px !important;
-            gap: 8px !important;
+          .wb-qa-left-row {
+            grid-template-columns: 22px 44px minmax(0, 1fr) 14px !important;
+            gap: 6px !important;
           }
 
-          .wb-c8-right-row {
+          .wb-qa-right-row {
             grid-template-columns: 14px 1fr !important;
             gap: 8px !important;
           }
 
-          .wb-c8-right-img {
-            max-height: clamp(66px, 18vw, 95px) !important;
+          .wb-qa-char-img {
+            width: 44px !important;
+            height: 44px !important;
           }
         }
       `}</style>
@@ -380,11 +362,12 @@ export default function WB_Unit3_Page8_QC() {
         }}
       >
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">C</span>
+          <span className="WB-ex-A">A</span>
           Read, look, and match.
         </h1>
 
-        <div ref={containerRef} className="wb-c8-grid">
+        <div ref={containerRef} className="wb-qa-grid">
+          {/* SVG Lines */}
           <svg
             style={{
               position: "absolute",
@@ -411,19 +394,30 @@ export default function WB_Unit3_Page8_QC() {
             ))}
           </svg>
 
-          <div className="wb-c8-left-col">
+          {/* Left Column */}
+          <div className="wb-qa-left-col">
             {exerciseData.left.map((item) => {
               const wrong = isWrongMatch(item.id);
               const selected = isLeftSelected(item.id);
-              const connected = isLeftConnected(item.id);
 
               return (
-                <div key={item.id} className="wb-c8-left-row">
-                  <div className="wb-c8-num">{item.id}</div>
+                <div key={item.id} className="wb-qa-left-row">
+                  {/* Number */}
+                  <div className="wb-qa-num">{item.id}</div>
 
+                  {/* Character Image */}
+                  <img
+                    src={item.img}
+                    alt={`char-${item.id}`}
+                    className="wb-qa-char-img"
+                    onClick={() => handleLeftClick(item.id)}
+                    style={{ cursor: showAns ? "default" : "pointer" }}
+                  />
+
+                  {/* Question Text */}
                   <div
                     onClick={() => handleLeftClick(item.id)}
-                    className="wb-c8-text"
+                    className="wb-qa-text"
                     style={{
                       border: selected
                         ? `2px solid ${ACTIVE_COLOR}`
@@ -437,52 +431,55 @@ export default function WB_Unit3_Page8_QC() {
                     {item.text}
                   </div>
 
+                  {/* Left Dot */}
                   <div
                     ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
                     onClick={() => handleLeftClick(item.id)}
-                    className={`wb-c8-dot ${selected ? "selected" : ""}`}
+                    className={`wb-qa-dot ${selected ? "selected" : ""}`}
                     style={{
                       backgroundColor: getDotColor("left", item.id),
                       cursor: showAns ? "default" : "pointer",
                     }}
                   />
 
-                  {wrong && <div className="wb-c8-wrong">✕</div>}
+                  {/* Wrong Mark */}
+                  {wrong && <div className="wb-qa-wrong">✕</div>}
                 </div>
               );
             })}
           </div>
 
+          {/* Middle spacer */}
           <div />
 
-          <div className="wb-c8-right-col">
+          {/* Right Column */}
+          <div className="wb-qa-right-col">
             {exerciseData.right.map((item) => {
               const selectedMatch = isSelectedRightMatch(item.id);
               const connected = isRightConnected(item.id);
 
               return (
-                <div key={item.id} className="wb-c8-right-row">
+                <div key={item.id} className="wb-qa-right-row">
+                  {/* Right Dot */}
                   <div
                     ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
                     onClick={() => handleRightClick(item.id)}
-                    className={`wb-c8-dot ${selectedMatch ? "selected" : ""}`}
+                    className={`wb-qa-dot ${selectedMatch ? "selected" : ""}`}
                     style={{
                       backgroundColor: getDotColor("right", item.id),
                       cursor: showAns ? "default" : "pointer",
                     }}
                   />
 
+                  {/* Answer Text */}
                   <div
-                    className="wb-c8-right-img-wrap"
                     onClick={() => handleRightClick(item.id)}
+                    className="wb-qa-answer-text"
                     style={{
                       border: selectedMatch
                         ? `2px solid ${ACTIVE_COLOR}`
-                        : connected
-                        ? `2px solid transparent`
-                        : `2px solid transparent`,
+                        : "2px solid transparent",
                       borderRadius: "12px",
-                      padding: "4px 6px",
                       boxShadow: selectedMatch
                         ? `0 0 0 4px rgba(255, 202, 148, 0.35)`
                         : "none",
@@ -492,11 +489,7 @@ export default function WB_Unit3_Page8_QC() {
                       cursor: showAns ? "default" : "pointer",
                     }}
                   >
-                    <img
-                      src={item.img}
-                      alt={`match-${item.id}`}
-                      className="wb-c8-right-img"
-                    />
+                    {item.text}
                   </div>
                 </div>
               );
@@ -504,7 +497,8 @@ export default function WB_Unit3_Page8_QC() {
           </div>
         </div>
 
-        <div className="wb-c8-buttons">
+        {/* Buttons */}
+        <div className="wb-qa-buttons">
           <Button
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}

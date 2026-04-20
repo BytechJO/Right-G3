@@ -8,206 +8,218 @@ import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folde
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.5.svg";
 
-const ITEMS = [
-  { id: 1, img: img1, correct: "pl" }, // plate
-  { id: 2, img: img2, correct: "fl" }, // fly
-  { id: 3, img: img3, correct: "sl" }, // slide
-  { id: 4, img: img4, correct: "pl" }, // plant
-  { id: 5, img: img5, correct: "fl" }, // flag
-];
+const BORDER_COLOR = "#e0e0e0";
+const WRONG_COLOR  = "#ef4444";
+const SELECT_COLOR = "#f39b42";
 
 const OPTIONS = ["fl", "pl", "sl"];
 
-export default function WB_Unit6_Page38_QB() {
-  const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+const ITEMS = [
+  { id: 1, img: img1, correct: "pl" },
+  { id: 2, img: img2, correct: "fl" },
+  { id: 3, img: img3, correct: "sl" },
+  { id: 4, img: img4, correct: "pl" },
+  { id: 5, img: img5, correct: "fl" },
+];
+
+export default function WB_ListenAndCircle_PageB() {
+  const [answers,     setAnswers]     = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
   const handleSelect = (id, value) => {
     if (showAns) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: prev[id] === value ? undefined : value,
-    }));
+    setAnswers((prev) => ({ ...prev, [id]: value }));
+    setShowResults(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
-    const allAnswered = ITEMS.every((item) => answers[item.id] !== undefined);
-
+    const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
-      ValidationAlert.info("Please answer all items first.");
+      ValidationAlert.info("Please answer all questions first.");
       return;
     }
-
     let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
-    setChecked(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    ITEMS.forEach((i) => { if (answers[i.id] === i.correct) score++; });
+    setShowResults(true);
+    const total = ITEMS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
-    ITEMS.forEach((item) => {
-      correctMap[item.id] = item.correct;
-    });
-
-    setAnswers(correctMap);
-    setChecked(true);
+    const filled = {};
+    ITEMS.forEach((i) => { filled[i.id] = i.correct; });
+    setAnswers(filled);
+    setShowResults(true);
     setShowAns(true);
   };
 
-  const handleReset = () => {
+  const handleStartAgain = () => {
     setAnswers({});
-    setChecked(false);
+    setShowResults(false);
     setShowAns(false);
   };
 
-  const isWrong = (id) => {
-    if (!checked) return false;
-    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
-  };
-
-  const getOptionStyle = (selected) => ({
-    minWidth: "34px",
-    height: "30px",
-    padding: "0 8px",
-    borderRadius: "6px",
-    border: "1.5px solid #f59e0b",
-    backgroundColor: selected ? "#ef4444" : "#fff",
-    color: selected ? "#fff" : "#333",
-    fontSize: "17px",
-    fontWeight: "500",
-    cursor: showAns ? "default" : "pointer",
-  });
+  const isWrong = (item) =>
+    showResults && !showAns && answers[item.id] !== item.correct;
 
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "900px",
-          margin: "0 auto",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8">
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
           <span className="WB-ex-A">B</span>
-          Listen and circle fl, pl, or sl.
+          Listen and circle{" "}
+          <strong>fl</strong>, <strong>pl</strong>, or <strong>sl</strong>.
         </h1>
 
+        {/* ── Cards: 5 في صف ── */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap: "18px",
-            alignItems: "start",
+            display:             "grid",
+            gridTemplateColumns: "repeat(5, minmax(0,1fr))",
+            gap:                 "clamp(10px,1.5vw,20px)",
+            width:               "100%",
           }}
         >
-          {ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
+          {ITEMS.map((item) => {
+            const wrong = isWrong(item);
+
+            return (
               <div
+                key={item.id}
                 style={{
-                  alignSelf: "flex-start",
-                  fontSize: "20px",
-                  fontWeight: "700",
-                  color: "#111",
-                  marginLeft: "8px",
+                  display:       "flex",
+                  flexDirection: "column",
+                  alignItems:    "center",
+                  gap:           "clamp(8px,1vw,14px)",
                 }}
               >
-                {item.id}
-              </div>
+                {/* رقم */}
+                <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111" }}>
+                  {item.id}
+                </span>
 
-              <img
-                src={item.img}
-                alt={`item-${item.id}`}
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  objectFit: "contain",
-                  display: "block",
-                }}
-              />
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  border: "1.5px solid #f59e0b",
-                  borderRadius: "10px",
-                  padding: "6px 8px",
-                  backgroundColor: "#fff",
-                }}
-              >
-                {OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleSelect(item.id, option)}
-                    style={getOptionStyle(answers[item.id] === option)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-
-              {isWrong(item.id) && (
+                {/* الصورة */}
                 <div
                   style={{
-                    position: "absolute",
-                    top: "-4px",
-                    right: "2px",
-                    width: "22px",
-                    height: "22px",
-                    borderRadius: "50%",
-                    backgroundColor: "#ef4444",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
+                    width:        "100%",
+                    aspectRatio:  "1 / 1",
+                    border:       `2px solid ${wrong ? WRONG_COLOR : BORDER_COLOR}`,
+                    borderRadius: "clamp(10px,1.2vw,16px)",
+                    overflow:     "hidden",
+                    background:   "#f9f9f9",
+                    display:      "flex",
+                    alignItems:   "center",
                     justifyContent: "center",
-                    fontSize: "12px",
-                    fontWeight: "700",
+                    position:     "relative",
                   }}
                 >
-                  ✕
+                  <img
+                    src={item.img}
+                    alt={`item-${item.id}`}
+                    style={{ width: "85%", height: "85%", objectFit: "contain" }}
+                  />
+
+                  {/* Wrong badge */}
+                  {wrong && (
+                    <div style={{
+                      position:        "absolute",
+                      top:             "-8px",
+                      right:           "-8px",
+                      width:           "clamp(16px,1.8vw,22px)",
+                      height:          "clamp(16px,1.8vw,22px)",
+                      borderRadius:    "50%",
+                      backgroundColor: WRONG_COLOR,
+                      color:           "#fff",
+                      display:         "flex",
+                      alignItems:      "center",
+                      justifyContent:  "center",
+                      fontSize:        "clamp(9px,0.9vw,12px)",
+                      fontWeight:      700,
+                      boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
+                    }}>
+                      ✕
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* الخيارات: fl / pl / sl */}
+                <div
+                  style={{
+                    width:          "100%",
+                    border:         `2px solid ${BORDER_COLOR}`,
+                    borderRadius:   "999px",
+                    padding:        "clamp(4px,0.6vw,8px) clamp(6px,0.8vw,10px)",
+                    display:        "flex",
+                    alignItems:     "center",
+                    justifyContent: "space-around",
+                    background:     "#fff",
+                    boxSizing:      "border-box",
+                    gap:            "2px",
+                  }}
+                >
+                  {OPTIONS.map((opt) => {
+                    const isSelected = answers[item.id] === opt;
+                    const isCorrectShown = showAns && item.correct === opt;
+                    const isWrongSelected =
+                      showResults && !showAns && answers[item.id] === opt && opt !== item.correct;
+
+                    return (
+                      <button
+                        key={opt}
+                        onClick={() => handleSelect(item.id, opt)}
+                        style={{
+                          fontSize:     "clamp(13px,1.5vw,19px)",
+                          fontWeight:   isSelected || isCorrectShown ? 800 : 500,
+                          color:        isWrongSelected
+                            ? WRONG_COLOR
+                            : isSelected || isCorrectShown
+                            ? "#111"
+                            : "#555",
+                          background:   "transparent",
+                          border:       isSelected || isCorrectShown
+                            ? `2px solid ${isWrongSelected ? WRONG_COLOR : SELECT_COLOR}`
+                            : "2px solid transparent",
+                          borderRadius: "999px",
+                          padding:      "clamp(2px,0.4vw,5px) clamp(6px,0.8vw,10px)",
+                          cursor:       showAns ? "default" : "pointer",
+                          transition:   "all 0.15s",
+                          lineHeight:   1,
+                          userSelect:   "none",
+                        }}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "6px" }}>
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
           <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
             checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
           />
         </div>
       </div>

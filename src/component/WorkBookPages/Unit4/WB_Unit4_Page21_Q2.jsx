@@ -13,7 +13,7 @@ import bottomImg3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4
 import bottomImg4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex B 4.svg";
 
 const ACTIVE_COLOR = "#f39b42";
-const LINE_COLOR = "#dc2626";
+const LINE_COLOR = "#f39b42";
 const INACTIVE_COLOR = "#a3a3a3";
 const WRONG_COLOR = "#ef4444";
 
@@ -514,8 +514,8 @@ const WB_UnitX_Page21_QB = () => {
                         selectedMiddle === item.id || topSelectedMatch
                           ? `3px solid ${ACTIVE_COLOR}`
                           : bottomMatches[item.id] || Object.values(topMatches).includes(item.id)
-                          ? "2px solid #a3a3a3"
-                          : "2px solid #a3a3a3",
+                          ? "2px solid #f39b42"
+                          : "2px solid #f39b42",
                       background:
                         selectedMiddle === item.id || topSelectedMatch
                           ? "rgba(243,155,66,0.08)"
@@ -624,8 +624,8 @@ const WB_UnitX_Page21_QB = () => {
                       border: isSelected
                         ? `3px solid ${ACTIVE_COLOR}`
                         : isConnected
-                        ? "2px solid #d1d5db"
-                        : "2px solid #d1d5db",
+                        ? "2px solid #f39b42"
+                        : "2px solid #f39b42",
                       background:
                         isSelected ? "rgba(243,155,66,0.08)" : "#fff",
                       cursor:

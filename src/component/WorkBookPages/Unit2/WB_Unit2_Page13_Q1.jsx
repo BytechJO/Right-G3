@@ -57,9 +57,8 @@ const DRAG_NUMBERS = [1, 2, 3, 4];
 
 const WRONG_COLOR = "#ef4444";
 const TEXT_COLOR = "#111";
-const NUMBER_COLOR = "#d62828";
-const DRAG_BG = "#bfc3cf";
-const DRAG_ACTIVE_BG = "#8d8d93";
+const NUMBER_COLOR = "#000000ff";
+const DRAG_BG = "#f29a1f";
 
 const styles = {
   pageWrap: {
@@ -105,17 +104,25 @@ const styles = {
     wordBreak: "break-word",
   },
 
+  cardsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: "clamp(10px, 1.4vw, 18px)",
+    width: "100%",
+    alignItems: "start",
+  },
+
   cardDropArea: {
     position: "relative",
     width: "100%",
     minWidth: 0,
-    borderRadius: "clamp(12px, 1.4vw, 18px)",
-    cursor: "default",
+    cursor: "pointer",
     transition: "0.2s ease",
-    overflow: "hidden",
+    borderRadius: "clamp(12px, 1.4vw, 18px)",
   },
 
   imageWrap: {
+    position: "relative",
     width: "100%",
     display: "flex",
     alignItems: "center",
@@ -133,37 +140,36 @@ const styles = {
 
   numberOverlay: {
     position: "absolute",
-    top: "clamp(8px, 1vw, 14px)",
-    right: "clamp(8px, 1vw, 14px)",
-    width: "clamp(36px, 4.6vw, 54px)",
-    height: "clamp(36px, 4.6vw, 54px)",
+    top: "0.01%",
+    right: "1.2%",
+    width: "14%",
+    aspectRatio: "1 / 1",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     color: NUMBER_COLOR,
-    fontSize: "clamp(20px, 2.4vw, 34px)",
-    fontWeight: 700,
+    fontSize: "clamp(22px, 2.5vw, 38px)",
+    fontWeight: 500,
     lineHeight: 1,
-    background: "rgba(255,255,255,0.9)",
-    borderRadius: "50%",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+    background: "transparent",
+    border: "none",
     boxSizing: "border-box",
-    zIndex: 2,
+    pointerEvents: "none",
   },
 
   wrongBadge: {
     position: "absolute",
-    top: "-4px",
-    right: "-4px",
-    width: "18px",
-    height: "18px",
+    top: "-6px",
+    right: "-6px",
+    width: "clamp(18px, 2vw, 24px)",
+    height: "clamp(18px, 2vw, 24px)",
     borderRadius: "50%",
     backgroundColor: WRONG_COLOR,
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "11px",
+    fontSize: "clamp(10px, 1vw, 12px)",
     fontWeight: 700,
     border: "2px solid #fff",
     boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
@@ -216,33 +222,23 @@ export default function WB_Unit3_Page21_QI() {
   const usedNumbers = useMemo(() => Object.values(imageAnswers), [imageAnswers]);
 
   const applyDrop = (cardId, num) => {
-    if (showAns || num === null || num === undefined) return;
+    const updated = { ...imageAnswers };
 
-    setImageAnswers((prev) => {
-      const updated = { ...prev };
-
-      Object.keys(updated).forEach((key) => {
-        if (updated[key] === num) {
-          delete updated[key];
-        }
-      });
-
-      updated[cardId] = num;
-      return updated;
+    Object.keys(updated).forEach((key) => {
+      if (updated[key] === num) {
+        delete updated[key];
+      }
     });
 
+    updated[cardId] = num;
+    setImageAnswers(updated);
     setDraggedNumber(null);
-    setTouchItem(null);
     setChecked(false);
   };
 
   const handleDragStart = (num) => {
     if (showAns || usedNumbers.includes(num)) return;
     setDraggedNumber(num);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedNumber(null);
   };
 
   const handleDrop = (cardId) => {
@@ -261,7 +257,6 @@ export default function WB_Unit3_Page21_QI() {
 
   const handleTouchMove = (e) => {
     if (touchItem === null) return;
-    e.preventDefault();
 
     const touch = e.touches[0];
     setTouchPos({ x: touch.clientX, y: touch.clientY });
@@ -270,10 +265,8 @@ export default function WB_Unit3_Page21_QI() {
   const handleTouchEnd = () => {
     if (touchItem === null) return;
 
-    let dropped = false;
-
     Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref || dropped) return;
+      if (!ref) return;
 
       const rect = ref.getBoundingClientRect();
 
@@ -284,7 +277,6 @@ export default function WB_Unit3_Page21_QI() {
         touchPos.y <= rect.bottom
       ) {
         applyDrop(Number(key), touchItem);
-        dropped = true;
       }
     });
 
@@ -385,14 +377,11 @@ export default function WB_Unit3_Page21_QI() {
         }
 
         .wb-i-card-wrong {
-          outline: 2px solid #ef4444;
-          outline-offset: -2px;
-          border-radius: clamp(12px, 1.4vw, 18px);
+          filter: drop-shadow(0 0 0 rgba(0,0,0,0));
         }
 
         .wb-i-drag-selected {
           transform: scale(1.08);
-          background: ${DRAG_ACTIVE_BG} !important;
           box-shadow: 0 0 0 3px rgba(141, 141, 147, 0.2);
         }
 
@@ -407,7 +396,7 @@ export default function WB_Unit3_Page21_QI() {
           width: clamp(40px, 5vw, 52px);
           height: clamp(40px, 5vw, 52px);
           border-radius: 50%;
-          background: ${DRAG_ACTIVE_BG};
+          background: #8d8d93;
           color: #fff;
           display: flex;
           align-items: center;
@@ -471,16 +460,14 @@ export default function WB_Unit3_Page21_QI() {
               {IMAGE_CARDS.map((item) => (
                 <div
                   key={item.id}
-                  ref={(el) => {
-                    dropRefs.current[item.id] = el;
-                  }}
+                  ref={(el) => (dropRefs.current[item.id] = el)}
                   style={styles.cardDropArea}
                   className={`${draggedNumber !== null ? "wb-i-card-active" : ""} ${
                     isCardWrong(item.id) ? "wb-i-card-wrong" : ""
                   }`}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop(item.id)}
-                  onDoubleClick={() => handleRemoveNumber(item.id)}
+                  onClick={() => handleRemoveNumber(item.id)}
                 >
                   <div style={styles.imageWrap}>
                     <img
@@ -489,13 +476,13 @@ export default function WB_Unit3_Page21_QI() {
                       style={styles.image}
                       draggable={false}
                     />
-                  </div>
 
-                  <div style={styles.numberOverlay}>
-                    {imageAnswers[item.id] || ""}
-                    {isCardWrong(item.id) && (
-                      <span style={styles.wrongBadge}>✕</span>
-                    )}
+                    <div style={styles.numberOverlay}>
+                      {imageAnswers[item.id] || ""}
+                      {isCardWrong(item.id) && (
+                        <span style={styles.wrongBadge}>✕</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -511,7 +498,6 @@ export default function WB_Unit3_Page21_QI() {
                     key={num}
                     draggable={!disabled && !showAns}
                     onDragStart={() => handleDragStart(num)}
-                    onDragEnd={handleDragEnd}
                     onTouchStart={(e) => handleTouchStart(e, num)}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}

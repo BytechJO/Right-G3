@@ -276,7 +276,7 @@ export default function WB_LookAndWrite_PageC() {
             style={{
               width: "100%",
               maxWidth: "920px",
-              border: "2px solid #b8b8b8",
+              border: "2px solid #f39b42",
               borderRadius: "18px",
               padding: "8px 12px",
               boxSizing: "border-box",
@@ -326,7 +326,7 @@ export default function WB_LookAndWrite_PageC() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
             gap: "34px 26px",
             width: "100%",
             maxWidth: "1100px",

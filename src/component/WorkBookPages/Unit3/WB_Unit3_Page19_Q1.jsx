@@ -120,10 +120,8 @@ export default function WB_Unit3_Page17_QI() {
 
         .wb-i19-image-card {
           background: #fff;
-          border: 2px solid #d9d9d9;
           border-radius: clamp(14px, 2vw, 18px);
           padding: clamp(8px, 1.2vw, 10px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
           width: 100%;
           max-width: clamp(320px, 70vw, 620px);
           box-sizing: border-box;
@@ -133,6 +131,9 @@ export default function WB_Unit3_Page17_QI() {
           width: 100%;
           height: auto;
           display: block;
+                              border: 2px solid #f39b42;
+                              border-radius: 10%;
+
           border-radius: clamp(10px, 1.6vw, 12px);
         }
 

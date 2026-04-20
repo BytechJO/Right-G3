@@ -1,259 +1,560 @@
-import React, { useState } from "react";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  DragOverlay,
-} from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import React, { useRef, useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 
 import imgHouse from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/B1.svg";
 
-const ACTIVITIES = [
-  { id: "act1", text: "bedroom" },
-  { id: "act2", text: "garage" },
-  { id: "act3", text: "living room" },
-  { id: "act4", text: "office" },
-  { id: "act5", text: "basement" },
-  { id: "act6", text: "kitchen" },
-  { id: "act7", text: "dining room" },
-  { id: "act8", text: "bathroom" },
+const DRAG_ITEMS = [
+  { id: "act1", value: "bedroom" },
+  { id: "act2", value: "basement" },
+  { id: "act3", value: "garage" },
+  { id: "act4", value: "kitchen" },
+  { id: "act5", value: "living room" },
+  { id: "act6", value: "dining room" },
+  { id: "act7", value: "office" },
+  { id: "act8", value: "bathroom" },
 ];
 
-const CORRECT_ANSWERS = {
-  q1: "act1",
-  q2: "act2",
-  q3: "act3",
-  q4: "act4",
-  q5: "act5",
-  q6: "act6",
-  q7: "act7",
-  q8: "act8",
-};
-
-const QUESTIONS = [
-  { id: "q1", text: "1." },
-  { id: "q2", text: "2." },
-  { id: "q3", text: "3." },
-  { id: "q4", text: "4." },
-  { id: "q5", text: "5." },
-  { id: "q6", text: "6." },
-  { id: "q7", text: "7." },
-  { id: "q8", text: "8." },
+const ITEMS = [
+  { id: 1, correct: "bedroom", fixed: true },
+  { id: 2, correct: "basement" },
+  { id: 3, correct: "garage" },
+  { id: 4, correct: "kitchen" },
+  { id: 5, correct: "living room" },
+  { id: 6, correct: "dining room" },
+  { id: 7, correct: "office" },
+  { id: 8, correct: "bathroom" },
 ];
 
-function DraggableActivity({ item, isUsed }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
+export default function WB_Unit5_Page27_Q2() {
+  const [answers, setAnswers] = useState({
+    "a-1": { dragId: "act1", value: "bedroom" },
+  });
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [touchItem, setTouchItem] = useState(null);
+  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging || isUsed ? 0.5 : 1,
-  };
+  const dropRefs = useRef({});
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`p-2 bg-white border-2 border-gray-200 rounded-xl shadow-sm text-blue-700 font-medium text-sm text-center
-        ${
-          isUsed
-            ? "bg-gray-50 text-gray-300 pointer-events-none cursor-default"
-            : "cursor-grab hover:border-blue-400 hover:shadow-md transition-all"
-        }`}
-    >
-      {item.text}
-    </div>
-  );
-}
+  const usedDragIds = Object.entries(answers)
+    .filter(([key, entry]) => key !== "a-1" && entry)
+    .map(([, entry]) => entry.dragId);
 
-function DropSlot({ id, content, isCorrect, isSubmitted }) {
-  const { setNodeRef, isOver } = useSortable({ id });
+  const applyDrop = (boxKey, item) => {
+    const targetItem = ITEMS.find((q) => `a-${q.id}` === boxKey);
+    if (!targetItem || targetItem.fixed || showAns) return;
 
-  const borderColor = isSubmitted
-    ? isCorrect
-      ? "border-gray-300 bg-white"
-      : "border-red-500 bg-red-50"
-    : isOver
-    ? "border-blue-400 bg-blue-50"
-    : "border-gray-300";
+    const newAnswers = { ...answers };
 
-  return (
-    <div
-      ref={setNodeRef}
-      className={`relative w-full min-h-[40px] border-b-2 flex items-center justify-center px-2 transition-all rounded-sm ${borderColor}`}
-    >
-      {isSubmitted && content && !isCorrect && (
-        <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow">
-          ✕
-        </div>
-      )}
-
-      {content ? (
-        <span className="text-blue-900 font-bold text-sm text-center py-1">
-          {ACTIVITIES.find((a) => a.id === content)?.text}
-        </span>
-      ) : (
-        <span className="text-gray-300 italic text-xs">
-          Drop answer here...
-        </span>
-      )}
-    </div>
-  );
-}
-
-const WB_Unit5_Page27_Q2 = () => {
-  const initialAnswers = Object.fromEntries(
-    QUESTIONS.map((q) => [q.id, null])
-  );
-
-  const [answers, setAnswers] = useState(initialAnswers);
-  const [activeId, setActiveId] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const checkAnswers = () => {
-    // 🔴 منع التحقق إذا المستخدم مظهر الإجابات
-    if (showResults) return;
-
-    const unanswered = QUESTIONS.filter((q) => !answers[q.id]);
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
-      return;
-    }
-    setShowResults(true);
-
-    let score = 0;
-    const total = QUESTIONS.length;
-
-    QUESTIONS.forEach((q) => {
-      if (answers[q.id] === CORRECT_ANSWERS[q.id]) score++;
+    Object.keys(newAnswers).forEach((key) => {
+      if (key !== "a-1" && newAnswers[key]?.dragId === item.id) {
+        delete newAnswers[key];
+      }
     });
 
-    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else ValidationAlert.error(`Score: ${score} / ${total}`);
+    newAnswers[boxKey] = {
+      dragId: item.id,
+      value: item.value,
+    };
+
+    setAnswers(newAnswers);
+    setChecked(false);
   };
 
-  const handleReset = () => {
-    setAnswers(initialAnswers);
-    setShowResults(false);
+  const handleDragStart = (item) => {
+    if (showAns || usedDragIds.includes(item.id)) return;
+    setDraggedItem(item);
+  };
+
+  const handleDrop = (boxKey) => {
+    if (showAns || !draggedItem) return;
+    applyDrop(boxKey, draggedItem);
+    setDraggedItem(null);
+  };
+
+  const handleTouchStart = (e, item) => {
+    if (showAns || usedDragIds.includes(item.id)) return;
+
+    const touch = e.touches[0];
+    setTouchItem(item);
+    setTouchPos({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchMove = (e) => {
+    if (!touchItem) return;
+    const touch = e.touches[0];
+    setTouchPos({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchItem) return;
+
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+
+      const rect = ref.getBoundingClientRect();
+
+      if (
+        touchPos.x >= rect.left &&
+        touchPos.x <= rect.right &&
+        touchPos.y >= rect.top &&
+        touchPos.y <= rect.bottom
+      ) {
+        applyDrop(key, touchItem);
+      }
+    });
+
+    setTouchItem(null);
+  };
+
+  const handleRemoveAnswer = (boxKey) => {
+    const targetItem = ITEMS.find((q) => `a-${q.id}` === boxKey);
+    if (!targetItem || targetItem.fixed || showAns) return;
+
+    setAnswers((prev) => {
+      const updated = { ...prev };
+      delete updated[boxKey];
+      return updated;
+    });
+
+    setChecked(false);
+  };
+
+  const handleCheck = () => {
+    if (showAns) return;
+
+    const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all answers first.");
+      return;
+    }
+
+    let score = 0;
+    const total = ITEMS.length;
+
+    ITEMS.forEach((item) => {
+      if (answers[`a-${item.id}`]?.value === item.correct) {
+        score++;
+      }
+    });
+
+    setChecked(true);
+
+    if (score === total) {
+      ValidationAlert.success(`Score: ${score} / ${total}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${total}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${total}`);
+    }
   };
 
   const handleShowAnswer = () => {
-    setAnswers(CORRECT_ANSWERS);
-    setShowResults(true);
+    const filled = {};
+
+    ITEMS.forEach((item) => {
+      const matched = DRAG_ITEMS.find((d) => d.value === item.correct);
+      filled[`a-${item.id}`] = {
+        dragId: matched?.id ?? `act-${item.id}`,
+        value: item.correct,
+      };
+    });
+
+    setAnswers(filled);
+    setChecked(true);
+    setShowAns(true);
+  };
+
+  const handleReset = () => {
+    setAnswers({
+      "a-1": { dragId: "act1", value: "bedroom" },
+    });
+    setDraggedItem(null);
+    setTouchItem(null);
+    setChecked(false);
+    setShowAns(false);
+  };
+
+  const isWrong = (item) => {
+    if (!checked || showAns || item.fixed) return false;
+    return answers[`a-${item.id}`]?.value !== item.correct;
+  };
+
+  const renderDropBox = (item) => {
+    const boxKey = `a-${item.id}`;
+    const value = answers[boxKey]?.value || "";
+
+    return (
+      <div className="wb-house-line-wrap">
+        <div
+          ref={(el) => (dropRefs.current[boxKey] = el)}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={() => handleDrop(boxKey)}
+          onClick={() => handleRemoveAnswer(boxKey)}
+          className={`wb-house-line ${item.fixed ? "wb-house-line--fixed" : ""}`}
+          style={{
+            cursor:
+              item.fixed || showAns
+                ? "default"
+                : value
+                ? "pointer"
+                : "pointer",
+          }}
+        >
+          {value ? (
+            <span
+              className={`wb-house-answer ${
+                item.fixed ? "wb-house-answer--fixed" : ""
+              }`}
+            >
+              {value}
+            </span>
+          ) : (
+            <span className="wb-house-placeholder"></span>
+          )}
+        </div>
+
+        {isWrong(item) && <div className="wb-house-wrong">✕</div>}
+      </div>
+    );
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={(e) => setActiveId(e.active.id)}
-      onDragEnd={(e) => {
-        if (e.over && !showResults) {
-          setAnswers((prev) => ({ ...prev, [e.over.id]: e.active.id }));
+    <div className="main-container-component">
+      <style>{`
+        .wb-house-wrap {
+          width: 100%;
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 8px 0 24px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          gap: 22px;
         }
-        setActiveId(null);
-      }}
-    >
-      <div className="main-container-component">
-        <div className="div-forall" style={{ gap: "15px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">B</span>Label the rooms in Tom’s house.
-          </h1>
 
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            
-            <div className="flex-1 flex flex-col gap-6">
-              {QUESTIONS.slice(0, 4).map((q) => (
-                <div key={q.id} className="space-y-2">
-                  <p className="text-gray-700 font-bold text-sm">{q.text}</p>
-                  <DropSlot
-                    id={q.id}
-                    content={answers[q.id]}
-                    isCorrect={answers[q.id] === CORRECT_ANSWERS[q.id]}
-                    isSubmitted={showResults}
-                  />
-                </div>
-              ))}
-            </div>
+        .wb-house-title {
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
 
-            <div className="flex-1 flex justify-center items-center">
-              <img
-                src={imgHouse}
-                alt="house scene"
-                className="w-full max-h-[520px] object-contain"
-              />
-            </div>
+        .wb-house-chips {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+        }
 
-            <div className="flex-1 flex flex-col gap-6">
-              {QUESTIONS.slice(4).map((q) => (
-                <div key={q.id} className="space-y-2">
-                  <p className="text-gray-700 font-bold text-sm">{q.text}</p>
-                  <DropSlot
-                    id={q.id}
-                    content={answers[q.id]}
-                    isCorrect={answers[q.id] === CORRECT_ANSWERS[q.id]}
-                    isSubmitted={showResults}
-                  />
-                </div>
-              ))}
-            </div>
+        .wb-house-chip {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 7px 16px;
+          border-radius: 15px;
+          font-size: clamp(15px, 1.4vw, 22px);
+          font-weight: 500;
+          user-select: none;
+          box-sizing: border-box;
+          transition: 0.2s ease;
+          touch-action: none;
+          word-break: break-word;
+          background: #ffd09b;
+          color: #111;
+          border: 1.5px solid #ee9a42;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
 
+        .wb-house-chip--used {
+          background: #ececec;
+          color: #b7b7b7;
+          border-color: #dadada;
+          box-shadow: none;
+          opacity: 0.95;
+          cursor: not-allowed;
+        }
+
+        .wb-house-chip--active {
+          cursor: grab;
+        }
+
+        .wb-house-layout {
+          display: grid;
+          grid-template-columns: minmax(210px, 1fr) minmax(260px, 0.95fr) minmax(210px, 1fr);
+          gap: clamp(20px, 3vw, 42px);
+          align-items: center;
+          width: 100%;
+        }
+
+        .wb-house-col {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(16px, 2vw, 26px);
+          min-width: 0;
+        }
+
+        .wb-house-item {
+          display: grid;
+          grid-template-columns: 32px minmax(0, 1fr);
+          gap: 12px;
+          align-items: center;
+          width: 100%;
+        }
+
+        .wb-house-num {
+          font-size: clamp(22px, 1.9vw, 34px);
+          font-weight: 700;
+          line-height: 1;
+          color: #1f1f1f;
+        }
+
+        .wb-house-line-wrap {
+          position: relative;
+          width: 100%;
+        }
+
+        .wb-house-line {
+          width: 100%;
+          min-height: 48px;
+          border-bottom: 3px solid #2c2c2c;
+          display: flex;
+          align-items: center;
+          padding: 0 4px 4px;
+          box-sizing: border-box;
+          user-select: none;
+        }
+
+        .wb-house-line--fixed {
+          cursor: default !important;
+        }
+
+        .wb-house-answer {
+          font-size: clamp(20px, 2.3vw, 34px);
+          line-height: 1.1;
+          color: #d72626;
+          font-weight: 500;
+          word-break: break-word;
+        }
+
+        .wb-house-answer--fixed {
+          color: #1f1f1f;
+        }
+
+        .wb-house-placeholder {
+          display: block;
+          width: 100%;
+          min-height: 26px;
+        }
+
+        .wb-house-wrong {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          background: #ef4444;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          box-sizing: border-box;
+        }
+
+        .wb-house-image-wrap {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .wb-house-image {
+          display: block;
+          width: 100%;
+          max-width: clamp(260px, 30vw, 430px);
+          height: auto;
+          object-fit: contain;
+        }
+
+        .wb-house-buttons {
+          display: flex;
+          justify-content: center;
+          margin-top: 4px;
+        }
+
+        @media (max-width: 980px) {
+          .wb-house-layout {
+            grid-template-columns: 1fr;
+            gap: 22px;
+          }
+
+          .wb-house-image-wrap {
+            order: -1;
+          }
+
+          .wb-house-image {
+            max-width: min(100%, 360px);
+          }
+
+          .wb-house-col {
+            gap: 16px;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .wb-house-item {
+            grid-template-columns: 26px minmax(0, 1fr);
+            gap: 10px;
+          }
+
+          .wb-house-line {
+            min-height: 42px;
+          }
+
+          .wb-house-chips {
+            justify-content: flex-start;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .wb-house-wrap {
+            gap: 18px;
+          }
+
+          .wb-house-chip {
+            font-size: 14px;
+            padding: 7px 12px;
+          }
+
+          .wb-house-wrong {
+            right: -4px;
+          }
+        }
+      `}</style>
+
+      <div
+        className="div-forall"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "28px",
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
+      >
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >
+          <span className="WB-ex-A">B</span>
+          Label the rooms in Tom’s house.
+        </h1>
+
+        <div className="wb-house-chips">
+          {DRAG_ITEMS.map((item) => {
+            const isUsed =
+              item.id === "act1"
+                ? true
+                : usedDragIds.includes(item.id);
+
+            return (
+              <div
+                key={item.id}
+                draggable={!isUsed && !showAns}
+                onDragStart={() => handleDragStart(item)}
+                onTouchStart={(e) => handleTouchStart(e, item)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                className={`wb-house-chip ${
+                  isUsed || showAns
+                    ? "wb-house-chip--used"
+                    : "wb-house-chip--active"
+                }`}
+              >
+                {item.value}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="wb-house-layout">
+          <div className="wb-house-col">
+            {ITEMS.filter((item) => [1, 3, 5, 7].includes(item.id)).map((item) => (
+              <div key={item.id} className="wb-house-item">
+                <div className="wb-house-num">{item.id}</div>
+                {renderDropBox(item)}
+              </div>
+            ))}
           </div>
 
-          <div className="bg-blue-50 p-5 rounded-2xl border-2 border-blue-100 mt-4">
-            <h3 className="font-bold text-blue-800 mb-4 text-center text-sm">
-              Answers Bank
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <SortableContext items={ACTIVITIES.map((a) => a.id)}>
-                {ACTIVITIES.map((act) => (
-                  <DraggableActivity
-                    key={act.id}
-                    item={act}
-                    isUsed={Object.values(answers).includes(act.id)}
-                  />
-                ))}
-              </SortableContext>
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-center">
-            <Button
-              handleShowAnswer={handleShowAnswer}
-              handleStartAgain={handleReset}
-              checkAnswers={checkAnswers}
+          <div className="wb-house-image-wrap">
+            <img
+              src={imgHouse}
+              alt="house scene"
+              className="wb-house-image"
             />
           </div>
+
+          <div className="wb-house-col">
+            {ITEMS.filter((item) => [2, 4, 6, 8].includes(item.id)).map((item) => (
+              <div key={item.id} className="wb-house-item">
+                <div className="wb-house-num">{item.id}</div>
+                {renderDropBox(item)}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="wb-house-buttons">
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+            checkAnswers={handleCheck}
+          />
         </div>
       </div>
 
-      <DragOverlay>
-        {activeId ? (
-          <div className="p-3 bg-white border-2 border-blue-500 rounded-xl shadow-2xl text-blue-700 font-bold text-xs scale-105 max-w-xs text-center">
-            {ACTIVITIES.find((a) => a.id === activeId)?.text}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+      {touchItem && (
+        <div
+          style={{
+            position: "fixed",
+            left: touchPos.x - 60,
+            top: touchPos.y - 20,
+            background: "#fff",
+            padding: "8px 12px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            pointerEvents: "none",
+            zIndex: 9999,
+            fontSize: "17px",
+            fontWeight: 600,
+            color: "#d72626",
+            maxWidth: "180px",
+            textAlign: "center",
+            border: "1px solid #f5c28a",
+          }}
+        >
+          {touchItem.value}
+        </div>
+      )}
+    </div>
   );
-};
-
-export default WB_Unit5_Page27_Q2;
+}

@@ -73,19 +73,14 @@ export default function WB_Unit3_Page5_QF() {
   useLayoutEffect(() => {
     const updateLines = () => {
       if (!containerRef.current) return;
-
       const containerRect = containerRef.current.getBoundingClientRect();
-
       const newLines = Object.entries(matches)
         .map(([leftId, rightId]) => {
           const leftEl = elementRefs.current[`left-${leftId}`];
           const rightEl = elementRefs.current[`right-${rightId}`];
-
           if (!leftEl || !rightEl) return null;
-
           const leftRect = leftEl.getBoundingClientRect();
           const rightRect = rightEl.getBoundingClientRect();
-
           return {
             id: `${leftId}-${rightId}`,
             x1: leftRect.left + leftRect.width / 2 - containerRect.left,
@@ -95,7 +90,6 @@ export default function WB_Unit3_Page5_QF() {
           };
         })
         .filter(Boolean);
-
       setLines(newLines);
     };
 
@@ -106,23 +100,17 @@ export default function WB_Unit3_Page5_QF() {
 
   const handleLeftClick = (id) => {
     if (showAns) return;
-    setSelectedLeft(id);
+    setSelectedLeft((prev) => (prev === id ? null : id));
     setShowResults(false);
   };
 
   const handleRightClick = (rightId) => {
     if (showAns || selectedLeft === null) return;
-
     const newMatches = { ...matches };
-
     Object.keys(newMatches).forEach((key) => {
-      if (newMatches[key] === rightId) {
-        delete newMatches[key];
-      }
+      if (newMatches[key] === rightId) delete newMatches[key];
     });
-
     newMatches[selectedLeft] = rightId;
-
     setMatches(newMatches);
     setSelectedLeft(null);
     setShowResults(false);
@@ -130,25 +118,17 @@ export default function WB_Unit3_Page5_QF() {
 
   const checkAnswers = () => {
     if (showAns) return;
-
     const allConnected = exerciseData.left.every((item) => matches[item.id]);
-
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
-
     setShowResults(true);
-
     let score = 0;
     Object.keys(exerciseData.correctMatches).forEach((leftId) => {
-      if (matches[leftId] === exerciseData.correctMatches[leftId]) {
-        score++;
-      }
+      if (matches[leftId] === exerciseData.correctMatches[leftId]) score++;
     });
-
     const totalQuestions = exerciseData.left.length;
-
     if (score === totalQuestions) {
       ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
     } else if (score > 0) {
@@ -175,18 +155,14 @@ export default function WB_Unit3_Page5_QF() {
 
   const getDotColor = (side, id) => {
     if (side === "left" && selectedLeft === id) return ACTIVE_COLOR;
-
     const isConnected =
       side === "left" ? !!matches[id] : Object.values(matches).includes(id);
-
     if (!isConnected) return INACTIVE_COLOR;
-
     return ACTIVE_COLOR;
   };
 
   const isWrongMatch = (leftId) => {
-    if (!showResults) return false;
-    if (!matches[leftId]) return false;
+    if (!showResults || !matches[leftId]) return false;
     return matches[leftId] !== exerciseData.correctMatches[leftId];
   };
 
@@ -195,54 +171,52 @@ export default function WB_Unit3_Page5_QF() {
   const isSelectedRightMatch = (id) =>
     selectedLeft !== null && matches[selectedLeft] === id;
 
+  const count = exerciseData.left.length;
+
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-f-wrap {
-          display: flex;
-          flex-direction: column;
-          gap: clamp(18px, 2vw, 28px);
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: clamp(8px, 1.5vw, 16px) clamp(10px, 2vw, 18px) 20px;
-          box-sizing: border-box;
-          width: 100%;
-        }
-
         .wb-f-board {
           position: relative;
           width: 100%;
           box-sizing: border-box;
         }
 
-        .wb-f-grid {
+        .wb-f-master-grid {
           position: relative;
           z-index: 2;
           display: grid;
-          grid-template-columns: minmax(0, 1.45fr) minmax(250px, 0.95fr);
-          column-gap: clamp(18px, 2vw, 32px);
-          align-items: start;
+          grid-template-columns: minmax(0, 1.45fr) clamp(18px, 2vw, 28px) clamp(18px, 2vw, 28px) minmax(200px, 0.95fr);
+          width: 100%;
         }
 
-        .wb-f-left {
+        .wb-f-cell {
           display: flex;
-          flex-direction: column;
-          gap: clamp(22px, 3vw, 34px);
-        }
-
-        .wb-f-right {
-          display: flex;
-          flex-direction: column;
-          gap: clamp(18px, 2.4vw, 28px);
-        }
-
-        .wb-f-left-row {
-          display: grid;
-          grid-template-columns: clamp(22px, 3vw, 34px) minmax(0, 1fr) clamp(18px, 2vw, 28px);
-          gap: clamp(8px, 1.4vw, 14px);
           align-items: center;
-          min-height: clamp(52px, 7vw, 76px);
+          min-height: clamp(80px, 10vw, 110px);
+          box-sizing: border-box;
+        }
+
+        .wb-f-cell-text {
+          padding: clamp(6px, 1vw, 10px) clamp(8px, 1.2vw, 14px);
+          border-radius: 12px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: clamp(8px, 1.4vw, 14px);
+          transition: border 0.2s ease, background 0.2s ease;
           position: relative;
+          cursor: pointer;
+        }
+
+        .wb-f-cell-text.is-selected {
+          border: 2.5px solid ${ACTIVE_COLOR};
+          background: rgba(243, 155, 66, 0.06);
+        }
+
+        .wb-f-cell-text.not-selected {
+          border: 2.5px solid transparent;
+          background: transparent;
         }
 
         .wb-f-left-num {
@@ -250,21 +224,25 @@ export default function WB_Unit3_Page5_QF() {
           font-weight: 700;
           color: #222;
           line-height: 1;
+          flex-shrink: 0;
+          min-width: clamp(18px, 2.5vw, 28px);
         }
 
         .wb-f-left-text {
-          font-size: clamp(16px, 2.1vw, 24px);
+          font-size: clamp(14px, 1.9vw, 22px);
           font-weight: 500;
           color: #111;
           line-height: 1.35;
         }
 
-        .wb-f-right-row {
-          display: grid;
-          grid-template-columns: clamp(18px, 2vw, 28px) minmax(0, 1fr);
-          gap: clamp(10px, 1.6vw, 16px);
-          align-items: center;
-          min-height: clamp(56px, 8vw, 84px);
+        .wb-f-cell-dot {
+          justify-content: center;
+        }
+
+        .wb-f-cell-right {
+          justify-content: flex-start;
+          padding-left: clamp(8px, 1vw, 14px);
+          cursor: pointer;
         }
 
         .wb-f-dot {
@@ -282,34 +260,25 @@ export default function WB_Unit3_Page5_QF() {
           box-shadow: 0 0 0 5px rgba(243, 155, 66, 0.22);
         }
 
-        .wb-f-right-card {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          min-height: clamp(56px, 8vw, 84px);
-          padding: 4px 0;
-          box-sizing: border-box;
-        }
-
         .wb-f-right-pair {
           display: flex;
           align-items: center;
-          justify-content: flex-start;
-          gap: clamp(8px, 1.8vw, 18px);
-          width: 100%;
+          gap: clamp(10px, 2vw, 22px);
           flex-wrap: nowrap;
+          width: 100%;
         }
 
         .wb-f-right-img {
           display: block;
           width: auto;
           height: auto;
-          max-width: clamp(56px, 8vw, 94px);
-          max-height: clamp(42px, 7vw, 74px);
+          max-width: clamp(60px, 12vw, 130px);
+          max-height: clamp(55px, 10vw, 100px);
           object-fit: contain;
           user-select: none;
           pointer-events: none;
-          flex-shrink: 1;
+          flex: 1 1 0;
+          min-width: 0;
         }
 
         .wb-f-wrong {
@@ -328,6 +297,7 @@ export default function WB_Unit3_Page5_QF() {
           font-weight: 700;
           border: 2px solid #fff;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+          z-index: 3;
         }
 
         .wb-f-buttons {
@@ -336,42 +306,34 @@ export default function WB_Unit3_Page5_QF() {
           margin-top: 8px;
         }
 
-        @media (max-width: 900px) {
-          .wb-f-grid {
-            grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.95fr);
-          }
-        }
-
         @media (max-width: 760px) {
-          .wb-f-grid {
-            grid-template-columns: 1fr;
-            row-gap: 24px;
-          }
-
-          .wb-f-right {
-            padding-left: 34px;
+          .wb-f-master-grid {
+            grid-template-columns: minmax(0, 1fr) clamp(14px, 2vw, 20px) clamp(14px, 2vw, 20px) minmax(140px, 0.7fr);
           }
 
           .wb-f-svg-lines {
             display: none;
           }
 
-          .wb-f-right-pair {
-            justify-content: flex-start;
+          .wb-f-right-img {
+            max-width: clamp(44px, 10vw, 80px);
+            max-height: clamp(40px, 9vw, 70px);
           }
         }
 
         @media (max-width: 480px) {
-          .wb-f-right {
-            padding-left: 28px;
+          .wb-f-master-grid {
+            grid-template-columns: 1fr auto auto minmax(100px, auto);
           }
 
-          .wb-f-right-pair {
-            gap: 10px;
+          .wb-f-right-img {
+            max-width: clamp(32px, 9vw, 55px);
+            max-height: clamp(28px, 8vw, 48px);
           }
         }
       `}</style>
- <div
+
+      <div
         className="div-forall"
         style={{
           display: "flex",
@@ -422,76 +384,80 @@ export default function WB_Unit3_Page5_QF() {
             ))}
           </svg>
 
-          <div className="wb-f-grid">
-            <div className="wb-f-left">
-              {exerciseData.left.map((item) => {
-                const selected = isLeftSelected(item.id);
-                const wrong = isWrongMatch(item.id);
+          <div className="wb-f-master-grid">
+            {Array.from({ length: count }, (_, i) => {
+              const leftItem = exerciseData.left[i];
+              const rightItem = exerciseData.right[i];
+              const selected = isLeftSelected(leftItem.id);
+              const wrong = isWrongMatch(leftItem.id);
+              const selectedMatch = isSelectedRightMatch(rightItem.id);
+              const connected = isRightConnected(rightItem.id);
 
-                return (
-                  <div key={item.id} className="wb-f-left-row">
-                    <div className="wb-f-left-num">{item.id}</div>
-
-                    <div className="wb-f-left-text">{item.text}</div>
-
+              return (
+                <>
+                  {/* col 1: النص */}
+                  <div className="wb-f-cell" key={`text-${leftItem.id}`}>
                     <div
-                      ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
+                      className={`wb-f-cell-text ${selected ? "is-selected" : "not-selected"}`}
+                      onClick={() => handleLeftClick(leftItem.id)}
+                      style={{ cursor: showAns ? "default" : "pointer" }}
+                    >
+                      <div className="wb-f-left-num">{leftItem.id}</div>
+                      <div className="wb-f-left-text">{leftItem.text}</div>
+                      {wrong && <div className="wb-f-wrong">✕</div>}
+                    </div>
+                  </div>
+
+                  {/* col 2: نقطة اليسار */}
+                  <div className="wb-f-cell wb-f-cell-dot" key={`ldot-${leftItem.id}`}>
+                    <div
+                      ref={(el) => (elementRefs.current[`left-${leftItem.id}`] = el)}
                       className={`wb-f-dot ${selected ? "selected" : ""}`}
-                      onClick={() => handleLeftClick(item.id)}
+                      onClick={() => handleLeftClick(leftItem.id)}
                       style={{
-                        backgroundColor: getDotColor("left", item.id),
+                        backgroundColor: getDotColor("left", leftItem.id),
                         cursor: showAns ? "default" : "pointer",
                       }}
                     />
-
-                    {wrong && <div className="wb-f-wrong">✕</div>}
                   </div>
-                );
-              })}
-            </div>
 
-            <div className="wb-f-right">
-              {exerciseData.right.map((item) => {
-                const selectedMatch = isSelectedRightMatch(item.id);
-                const connected = isRightConnected(item.id);
-
-                return (
-                  <div key={item.id} className="wb-f-right-row">
+                  {/* col 3: نقطة اليمين */}
+                  <div className="wb-f-cell wb-f-cell-dot" key={`rdot-${rightItem.id}`}>
                     <div
-                      ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
+                      ref={(el) => (elementRefs.current[`right-${rightItem.id}`] = el)}
                       className={`wb-f-dot ${selectedMatch ? "selected" : ""}`}
-                      onClick={() => handleRightClick(item.id)}
+                      onClick={() => handleRightClick(rightItem.id)}
                       style={{
-                        backgroundColor: getDotColor("right", item.id),
+                        backgroundColor: getDotColor("right", rightItem.id),
                         cursor: showAns ? "default" : "pointer",
                         boxShadow: connected
                           ? "0 0 0 5px rgba(243, 155, 66, 0.18)"
                           : "none",
                       }}
                     />
+                  </div>
 
-                    <div
-                      className="wb-f-right-card"
-                      onClick={() => handleRightClick(item.id)}
-                      style={{
-                        cursor: showAns ? "default" : "pointer",
-                      }}
-                    >
-                      <div className="wb-f-right-pair">
-                        {item.images.map((img, index) => (
-                          <img
-                            key={`${item.id}-${index}`}
-                            src={img.src}
-                            alt={img.alt}
-                            className="wb-f-right-img"
-                          />
-                        ))}
-                      </div>
+                  {/* col 4: الصور */}
+                  <div
+                    className="wb-f-cell wb-f-cell-right"
+                    key={`imgs-${rightItem.id}`}
+                    onClick={() => handleRightClick(rightItem.id)}
+                    style={{ cursor: showAns ? "default" : "pointer" }}
+                  >
+                    <div className="wb-f-right-pair">
+                      {rightItem.images.map((img, index) => (
+                        <img
+                          key={`${rightItem.id}-${index}`}
+                          src={img.src}
+                          alt={img.alt}
+                          className="wb-f-right-img"
+                        />
+                      ))}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </>
+              );
+            })}
           </div>
         </div>
 

@@ -79,7 +79,7 @@ const styles = {
     width: "100%",
     maxWidth: "160px",
     minHeight: "290px",
-    border: "2px solid #b9b9b9",
+    border: "2px solid  #f39b42",
     borderRadius: "20px",
     background: "#fff",
     padding: "16px 10px",

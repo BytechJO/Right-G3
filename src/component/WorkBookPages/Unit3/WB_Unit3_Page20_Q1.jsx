@@ -374,7 +374,7 @@ export default function WB_Phonics_Page227_QA() {
           position: relative;
           width: clamp(110px, 20vw, 230px);
           height: clamp(78px, 12vw, 145px);
-          border: 3px solid #a3a3a3;
+          border: 3px solid #f39b42;
           border-radius: clamp(10px, 2vw, 18px);
           background: #fff;
           overflow: hidden;
@@ -397,8 +397,8 @@ export default function WB_Phonics_Page227_QA() {
           bottom: 0;
           width: clamp(24px, 3.4vw, 38px);
           height: clamp(24px, 3.4vw, 38px);
-          border-top: 3px solid #a3a3a3;
-          border-left: 3px solid #a3a3a3;
+          border-top: 3px solid #f39b42;
+          border-left: 3px solid #f39b42;
           border-top-left-radius: 8px;
           background: #f8f8f8;
           display: flex;
@@ -530,11 +530,11 @@ export default function WB_Phonics_Page227_QA() {
           }
 
           .wb-a20-left {
-            gap: 14px;
+            gap: 30px;
           }
 
           .wb-a20-sentence-row {
-            gap: 6px;
+            gap: 23px;
           }
 
           .wb-a20-sentence-text {

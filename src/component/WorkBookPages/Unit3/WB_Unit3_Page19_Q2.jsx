@@ -171,7 +171,7 @@ export default function WB_Unit3_Page17_QJ() {
           max-width: clamp(260px, 38vw, 420px);
           min-height: clamp(120px, 18vw, 150px);
           height: clamp(120px, 18vw, 150px);
-          border: 2px solid #a9a9a9;
+          border: 2px solid #f39b42;
           border-radius: clamp(12px, 1.8vw, 14px);
           background: #fff;
           display: flex;
