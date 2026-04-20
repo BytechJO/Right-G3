@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
@@ -7,46 +7,72 @@ import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folde
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/5.svg";
 
+// ── ثوابت ──────────────────────────────────────────────────────
+const WRONG_COLOR = "#ef4444";
+const DRAG_COLOR  = "#ffca94";
+
+// ── بيانات ─────────────────────────────────────────────────────
 const ITEMS = [
   {
-    id: 1,
-    img: img1,
-    lines: ["Where’s Helen’s mom?", "She’s in a taxi."],
+    id: 1, img: img1,
+    lines: ["Where's Helen's mom?", "She's in a taxi."],
   },
   {
-    id: 2,
-    img: img2,
-    lines: ["Where’s Stella’s mom?", "She’s in the kitchen."],
+    id: 2, img: img2,
+    lines: ["Where's Stella's mom?", "She's in the kitchen."],
   },
   {
-    id: 3,
-    img: img3,
-    lines: ["Where are Jack and Sarah?", "They’re on the playground."],
+    id: 3, img: img3,
+    lines: ["Where are Jack and Sarah?", "They're on the playground."],
   },
   {
-    id: 4,
-    img: img4,
-    lines: ["Where is Tom?", "He’s at school."],
+    id: 4, img: img4,
+    lines: ["Where is Tom?", "He's at school."],
   },
 ];
 
-const correctAnswers = {
-  1: 3,
-  2: 4,
-  3: 1,
-  4: 2,
-};
+const CORRECT_ANSWERS = { 1: 3, 2: 4, 3: 1, 4: 2 };
+const NUMBERS         = [1, 2, 3, 4];
 
-const NUMBERS = [1, 2, 3, 4];
+// ── بادج الخطأ ─────────────────────────────────────────────────
+const ErrorBadge = ({ top = -8, right = -8 }) => (
+  <div
+    style={{
+      position:        "absolute",
+      top,
+      right,
+      width:           18,
+      height:          18,
+      borderRadius:    "50%",
+      backgroundColor: WRONG_COLOR,
+      color:           "#fff",
+      display:         "flex",
+      alignItems:      "center",
+      justifyContent:  "center",
+      fontSize:        9,
+      fontWeight:      700,
+      border:          "1.5px solid #fff",
+      pointerEvents:   "none",
+      zIndex:          5,
+    }}
+  >
+    ✕
+  </div>
+);
 
+// ── المكوّن الرئيسي ─────────────────────────────────────────────
 export default function WB_Unit9_Page55_QI() {
-  const [answers, setAnswers] = useState({});
+  const [answers,       setAnswers]       = useState({});
   const [draggedNumber, setDraggedNumber] = useState(null);
-  const [checked, setChecked] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  const [touchItem,     setTouchItem]     = useState(null);
+  const [touchPos,      setTouchPos]      = useState({ x: 0, y: 0 });
+  const [checked,       setChecked]       = useState(false);
+  const [showAns,       setShowAns]       = useState(false);
 
+  const dropRefs   = useRef({});
   const usedNumbers = Object.values(answers);
 
+  // ── Drag (desktop) ──
   const handleDragStart = (num) => {
     if (showAns || usedNumbers.includes(num)) return;
     setDraggedNumber(num);
@@ -54,126 +80,149 @@ export default function WB_Unit9_Page55_QI() {
 
   const handleDrop = (id) => {
     if (showAns || draggedNumber === null) return;
-
-    const newAnswers = { ...answers };
-
-    Object.keys(newAnswers).forEach((key) => {
-      if (newAnswers[key] === draggedNumber) {
-        delete newAnswers[key];
-      }
-    });
-
-    newAnswers[id] = draggedNumber;
-
-    setAnswers(newAnswers);
+    applyDrop(id, draggedNumber);
     setDraggedNumber(null);
   };
 
+  // ── Touch (mobile) ──
+  const handleTouchStart = (e, num) => {
+    if (showAns || usedNumbers.includes(num)) return;
+    const t = e.touches[0];
+    setTouchItem(num);
+    setDraggedNumber(num);
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+
+  const handleTouchMove = (e) => {
+    if (touchItem === null) return;
+    const t = e.touches[0];
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+
+  const handleTouchEnd = () => {
+    if (touchItem === null) return;
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+      const r = ref.getBoundingClientRect();
+      if (
+        touchPos.x >= r.left && touchPos.x <= r.right &&
+        touchPos.y >= r.top  && touchPos.y <= r.bottom
+      ) applyDrop(Number(key), touchItem);
+    });
+    setTouchItem(null);
+    setDraggedNumber(null);
+  };
+
+  const applyDrop = (id, num) => {
+    setChecked(false);
+    const updated = { ...answers };
+    Object.keys(updated).forEach((k) => { if (updated[k] === num) delete updated[k]; });
+    updated[id] = num;
+    setAnswers(updated);
+  };
+
+  const handleRemove = (id) => {
+    if (showAns) return;
+    setChecked(false);
+    setAnswers((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
+  };
+
+  // ── Check / Show / Reset ──
   const handleCheck = () => {
     if (showAns) return;
-
     const allAnswered = ITEMS.every((item) => answers[item.id]);
-
     if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
+      ValidationAlert.error("Please complete all answers first! ✏️");
       return;
     }
-
-    let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === correctAnswers[item.id]) {
-        score++;
-      }
-    });
-
+    let correct = 0;
+    ITEMS.forEach((item) => { if (answers[item.id] === CORRECT_ANSWERS[item.id]) correct++; });
     setChecked(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    const total = ITEMS.length;
+    if (correct === total) ValidationAlert.success("Excellent! All correct! 🎉");
+    else                   ValidationAlert.error(`${correct} / ${total} correct. Try again! 💪`);
   };
 
   const handleShowAnswer = () => {
-    setAnswers(correctAnswers);
-    setChecked(true);
+    setAnswers({ ...CORRECT_ANSWERS });
+    setChecked(false);
     setShowAns(true);
   };
 
   const handleReset = () => {
     setAnswers({});
     setDraggedNumber(null);
+    setTouchItem(null);
     setChecked(false);
     setShowAns(false);
   };
 
-  const isWrong = (id) => {
-    if (!checked) return false;
-    return answers[id] !== correctAnswers[id];
-  };
+  const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
 
   return (
-    <div className="main-container-component">
+        <div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "980px",
+          gap: "clamp(20px,3vw,36px)",
+          maxWidth: "1100px",
           margin: "0 auto",
-          padding: "10px 18px 20px 18px",
-          boxSizing: "border-box",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-          }}
-        >
-          <span className="WB-ex-A">I</span>
+
+        {/* ── العنوان ── */}
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">I</span>{" "}
           Read, look, and number.
         </h1>
 
-        {/* numbers */}
+        {/* ── الأرقام للسحب ── */}
         <div
           style={{
-            display: "flex",
+            display:        "flex",
             justifyContent: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-            marginBottom: "4px",
+            gap:            "clamp(10px,1.5vw,16px)",
+            flexWrap:       "wrap",
           }}
         >
           {NUMBERS.map((num) => {
             const disabled = usedNumbers.includes(num);
+            const selected = draggedNumber === num || touchItem === num;
 
             return (
               <div
                 key={num}
                 draggable={!disabled && !showAns}
                 onDragStart={() => handleDragStart(num)}
+                onTouchStart={(e) => handleTouchStart(e, num)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 style={{
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "50%",
-                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
+                  width:          "clamp(40px,5vw,56px)",
+                  height:         "clamp(40px,5vw,56px)",
+                  borderRadius:   "50%",
+                  backgroundColor: disabled || showAns ? "#cfcfd4" : DRAG_COLOR,
+                  color:          "#fff",
+                  display:        "flex",
+                  alignItems:     "center",
                   justifyContent: "center",
-                  fontWeight: "700",
-                  fontSize: "20px",
-                  cursor: disabled ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.5 : 1,
-                  userSelect: "none",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                  fontWeight:     700,
+                  fontSize:       "clamp(18px,2.4vw,28px)",
+                  cursor:         disabled || showAns ? "not-allowed" : "grab",
+                  opacity:        disabled ? 0.55 : 1,
+                  userSelect:     "none",
+                  touchAction:    "none",
+                  transition:     "0.2s ease",
+                  transform:      selected ? "scale(1.1)" : "scale(1)",
+                  boxShadow:      selected
+                    ? `0 0 0 3px rgba(242,154,31,0.35)`
+                    : "0 3px 10px rgba(0,0,0,0.12)",
                 }}
               >
                 {num}
@@ -182,165 +231,177 @@ export default function WB_Unit9_Page55_QI() {
           })}
         </div>
 
-        {/* aligned rows */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "14px",
-            width: "100%",
-          }}
-        >
-          {ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 210px",
-                gap: "20px",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              {/* text side */}
+        {/* ── الأسئلة ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(12px,1.8vw,20px)" }}>
+          {ITEMS.map((item) => {
+            const wrong = isWrong(item.id);
+            const num   = answers[item.id];
+
+            return (
               <div
+                key={item.id}
                 style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "14px",
+                  display:     "flex",
+                  alignItems:  "center",
+                  gap:         "clamp(10px,2vw,24px)",
+                  flexWrap:    "wrap",
                 }}
               >
-                <span
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: "700",
-                    color: "#222",
-                    minWidth: "18px",
-                    lineHeight: "1.4",
-                    marginTop: "2px",
-                  }}
-                >
-                  {item.id}
-                </span>
-
+                {/* رقم السؤال + النص */}
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "4px",
+                    display:    "flex",
+                    alignItems: "flex-start",
+                    gap:        "clamp(8px,1vw,14px)",
+                    flex:       1,
+                    minWidth:   "200px",
                   }}
                 >
-                  {item.lines.map((line, index) => (
-                    <p
-                      key={index}
-                      style={{
-                        margin: 0,
-                        fontSize: "18px",
-                        color: "#222",
-                        lineHeight: "1.45",
-                      }}
-                    >
-                      {line}
-                    </p>
-                  ))}
-                </div>
-              </div>
-
-              {/* image side */}
-              <div
-                style={{
-                  position: "relative",
-                  width: "195px",
-                  height: "130px",
-                  backgroundColor: "#fff",
-                  borderRadius: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "2px solid #bdbdbd",
-                  overflow: "hidden",
-                  justifySelf: "end",
-                }}
-              >
-                {isWrong(item.id) && (
-                  <div
+                  <span
                     style={{
-                      position: "absolute",
-                      top: "-6px",
-                      left: "-6px",
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      zIndex: 3,
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                      fontSize:   "clamp(16px,1.9vw,24px)",
+                      fontWeight: 700,
+                      color:      "#111",
+                      minWidth:   "clamp(16px,1.9vw,24px)",
+                      flexShrink: 0,
+                      marginTop:  "2px",
                     }}
                   >
-                    ✕
+                    {item.id}
+                  </span>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                    {item.lines.map((line, i) => (
+                      <p
+                        key={i}
+                        style={{
+                          margin:     0,
+                          fontSize:   "clamp(14px,1.7vw,20px)",
+                          color:      "#222",
+                          lineHeight: 1.45,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {line}
+                      </p>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                <img
-                  src={item.img}
-                  alt={`item-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-
+                {/* الصورة + صندوق الإجابة */}
                 <div
+                  ref={(el) => (dropRefs.current[item.id] = el)}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop(item.id)}
                   style={{
-                    position: "absolute",
-                    top: "6px",
-                    right: "6px",
-                    width: "40px",
-                    height: "40px",
-                    backgroundColor: "#fff",
-                    border: "2px solid #cfcfcf",
-                    borderRadius: "6px",
-                    color: answers[item.id] ? "#ef4444" : "#bdbdbd",
-                    fontWeight: "700",
-                    fontSize: "24px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxSizing: "border-box",
-                    zIndex: 2,
+                    position:        "relative",
+                    width:           "clamp(160px,22vw,220px)",
+                    aspectRatio:     "3 / 2",
+                    border:          `2px solid "#f39b42"}`,
+                    borderRadius:    "clamp(10px,1.2vw,16px)",
+                    overflow:        "visible",
+                    backgroundColor: "#f7f7f7",
+                    flexShrink:      0,
+                    transition:      "border-color 0.2s",
                   }}
                 >
-                  {answers[item.id] || ""}
+                  {/* الصورة داخل clip */}
+                  <div
+                    style={{
+                      position:     "absolute",
+                      inset:        0,
+                      borderRadius: "clamp(10px,1.2vw,16px)",
+                      overflow:     "hidden",
+                    }}
+                  >
+                    <img
+                      src={item.img}
+                      alt={`item-${item.id}`}
+                      style={{
+                        width:         "100%",
+                        height:        "100%",
+                        objectFit:     "cover",
+                        display:       "block",
+                        userSelect:    "none",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </div>
+
+                  {/* صندوق الرقم - top right */}
+                  <div
+                    onClick={() => handleRemove(item.id)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleDrop(item.id)}
+                    style={{
+                      position:        "absolute",
+                      top:             "clamp(4px,0.8vw,8px)",
+                      right:           "clamp(4px,0.8vw,8px)",
+                      width:           "clamp(28px,3.8vw,44px)",
+                      height:          "clamp(28px,3.8vw,44px)",
+                      borderRadius:    "clamp(5px,0.7vw,8px)",
+                      border:          `2px solid  "#f39b42"}`,
+                      backgroundColor: "#fff",
+                      display:         "flex",
+                      alignItems:      "center",
+                      justifyContent:  "center",
+                      fontSize:        "clamp(14px,2.2vw,28px)",
+                      fontWeight:      700,
+                      color:           wrong ? WRONG_COLOR : DRAG_COLOR,
+                      boxShadow:       "0 2px 6px rgba(0,0,0,0.15)",
+                      zIndex:          4,
+                      cursor:          num && !showAns ? "pointer" : "default",
+                      transition:      "border-color 0.2s, color 0.2s",
+                      boxSizing:       "border-box",
+                    }}
+                  >
+                    {num || ""}
+                  </div>
+
+                  {/* بادج الخطأ */}
+                  {wrong && <ErrorBadge top={-8} right={-8} />}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* buttons */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        {/* ── الأزرار ── */}
+        <div className="mt-4 flex justify-center">
           <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
             checkAnswers={handleCheck}
+            handleStartAgain={handleReset}
+            handleShowAnswer={handleShowAnswer}
           />
         </div>
+
       </div>
+
+      {/* ── Ghost للمس ── */}
+      {touchItem !== null && (
+        <div
+          style={{
+            position:        "fixed",
+            left:            touchPos.x - 28,
+            top:             touchPos.y - 28,
+            width:           "clamp(40px,5vw,56px)",
+            height:          "clamp(40px,5vw,56px)",
+            borderRadius:    "50%",
+            backgroundColor: DRAG_COLOR,
+            color:           "#fff",
+            display:         "flex",
+            alignItems:      "center",
+            justifyContent:  "center",
+            fontSize:        "clamp(18px,2.4vw,28px)",
+            fontWeight:      700,
+            pointerEvents:   "none",
+            zIndex:          9999,
+            boxShadow:       "0 4px 10px rgba(0,0,0,0.2)",
+          }}
+        >
+          {touchItem}
+        </div>
+      )}
     </div>
   );
 }

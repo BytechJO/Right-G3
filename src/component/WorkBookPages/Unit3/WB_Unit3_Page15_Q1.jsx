@@ -1,508 +1,364 @@
-import { useState, useRef, useLayoutEffect } from "react";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import Button from "../Button";
-
-// استبدل هاي المسارات بالمسارات الحقيقية عندك
+import ValidationAlert from "../../Popup/ValidationAlert";
 import char1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 1.svg";
 import char2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 2.svg";
 import char3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 3.svg";
-import char4 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 4.svg";
+import char4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 4.svg";
 
-const LINE_COLOR = "#f39b42";
-const INACTIVE_COLOR = "#bdbdbd";
+
+const DOT_COLOR = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
+const BORDER_COLOR = "#e0e0e0";
+const WRONG_COLOR = "#ef4444";
+const PATH_COLOR = "#f39b42";
+const TEXT_COLOR = "#111";
 
-const exerciseData = {
-  left: [
-    { id: 1, img: char1, text: "Does he have any ink?" },
-    { id: 2, img: char2, text: "Does she have any paper?" },
-    { id: 3, img: char3, text: "Does he have any eggplants?" },
-    { id: 4, img: char4, text: "Does he have any grapes?" },
-  ],
-  right: [
-    { id: 1, text: "Yes, he has some." },
-    { id: 2, text: "No, he hasn't any." },
-    { id: 3, text: "Yes, she has some." },
-    { id: 4, text: "Yes, he has a little." },
-  ],
-  correctMatches: {
-    1: 2, // Does he have any ink?       → No, he hasn't any.
-    2: 3, // Does she have any paper?    → Yes, she has some.
-    3: 1, // Does he have any eggplants? → Yes, he has some.
-    4: 4, // Does he have any grapes?    → Yes, he has a little.
-  },
-};
+const LEFT_ITEMS = [
+  { id: 1, img: char1, text: "Does he have any ink?" },
+  { id: 2, img: char2, text: "Does she have any paper?" },
+  { id: 3, img: char3, text: "Does he have any eggplants?" },
+  { id: 4, img: char4, text: "Does he have any grapes?" },
+];
 
-export default function WB_Unit3_Page_QA() {
+const RIGHT_ITEMS = [
+  { id: 1, text: "Yes, he has some." },
+  { id: 2, text: "No, he hasn't any." },
+  { id: 3, text: "Yes, she has some." },
+  { id: 4, text: "Yes, he has a little." },
+];
+
+const CORRECT_MATCHES = { 1: 2, 2: 3, 3: 1, 4: 4 };
+
+export default function WB_ReadLookMatch_PageA() {
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
-  const [lines, setLines] = useState([]);
+  const [paths, setPaths] = useState([]);
 
-  const containerRef = useRef(null);
-  const elementRefs = useRef({});
+  const boardRef = useRef(null);
+  const pointRefs = useRef({});
 
   useLayoutEffect(() => {
-    const updateLines = () => {
-      if (!containerRef.current) return;
+    const update = () => {
+      if (!boardRef.current) return;
+      const br = boardRef.current.getBoundingClientRect();
 
-      const containerRect = containerRef.current.getBoundingClientRect();
+      const newPaths = Object.entries(matches).map(([leftId, rightId]) => {
+        const s = pointRefs.current[`left-${leftId}`];
+        const e = pointRefs.current[`right-${rightId}`];
+        if (!s || !e) return null;
 
-      const newLines = Object.entries(matches)
-        .map(([leftId, rightId]) => {
-          const leftEl = elementRefs.current[`left-${leftId}`];
-          const rightEl = elementRefs.current[`right-${rightId}`];
+        const sr = s.getBoundingClientRect();
+        const er = e.getBoundingClientRect();
+        const x1 = sr.left + sr.width / 2 - br.left;
+        const y1 = sr.top + sr.height / 2 - br.top;
+        const x2 = er.left + er.width / 2 - br.left;
+        const y2 = er.top + er.height / 2 - br.top;
+        const dx = Math.abs(x2 - x1);
+        const isWrong = showResults && matches[leftId] !== CORRECT_MATCHES[Number(leftId)];
 
-          if (!leftEl || !rightEl) return null;
+        return {
+          id: `path-${leftId}-${rightId}`,
+          d: `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
+          color: isWrong ? WRONG_COLOR : PATH_COLOR,
+        };
+      }).filter(Boolean);
 
-          const leftRect = leftEl.getBoundingClientRect();
-          const rightRect = rightEl.getBoundingClientRect();
-
-          return {
-            id: `${leftId}-${rightId}`,
-            x1: leftRect.right - containerRect.left,
-            y1: leftRect.top + leftRect.height / 2 - containerRect.top,
-            x2: rightRect.left - containerRect.left,
-            y2: rightRect.top + rightRect.height / 2 - containerRect.top,
-          };
-        })
-        .filter(Boolean);
-
-      setLines(newLines);
+      setPaths(newPaths);
     };
 
-    updateLines();
-    window.addEventListener("resize", updateLines);
-    return () => window.removeEventListener("resize", updateLines);
-  }, [matches]);
+    update();
+    window.addEventListener("resize", update);
+    let obs;
+    if (boardRef.current && typeof ResizeObserver !== "undefined") {
+      obs = new ResizeObserver(update);
+      obs.observe(boardRef.current);
+    }
+    return () => { window.removeEventListener("resize", update); obs?.disconnect(); };
+  }, [matches, showResults]);
 
-  const handleLeftClick = (id) => {
+  const handleLeftSelect = (id) => {
     if (showAns) return;
-    setSelectedLeft(id);
+    setSelectedLeft((prev) => prev === id ? null : id);
     setShowResults(false);
   };
 
-  const handleRightClick = (rightId) => {
+  const handleRightSelect = (rightId) => {
     if (showAns || selectedLeft === null) return;
-
-    const newMatches = { ...matches };
-
-    Object.keys(newMatches).forEach((key) => {
-      if (newMatches[key] === rightId) {
-        delete newMatches[key];
-      }
-    });
-
-    newMatches[selectedLeft] = rightId;
-
-    setMatches(newMatches);
+    const upd = { ...matches };
+    Object.keys(upd).forEach((k) => { if (upd[k] === rightId) delete upd[k]; });
+    upd[selectedLeft] = rightId;
+    setMatches(upd);
     setSelectedLeft(null);
     setShowResults(false);
   };
 
-  const checkAnswers = () => {
+  const handleCheck = () => {
     if (showAns) return;
+    const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
+    if (!allConnected) { ValidationAlert.info("Please connect all items first."); return; }
 
-    const allConnected = exerciseData.left.every((item) => matches[item.id]);
-
-    if (!allConnected) {
-      ValidationAlert.info("Please connect all items first.");
-      return;
-    }
-
+    let score = 0;
+    LEFT_ITEMS.forEach((i) => { if (matches[i.id] === CORRECT_MATCHES[i.id]) score++; });
     setShowResults(true);
-
-    let currentScore = 0;
-
-    Object.keys(exerciseData.correctMatches).forEach((leftId) => {
-      if (matches[leftId] === exerciseData.correctMatches[leftId]) {
-        currentScore++;
-      }
-    });
-
-    const totalQuestions = exerciseData.left.length;
-
-    if (currentScore === totalQuestions) {
-      ValidationAlert.success(`Score: ${currentScore} / ${totalQuestions}`);
-    } else if (currentScore > 0) {
-      ValidationAlert.warning(`Score: ${currentScore} / ${totalQuestions}`);
-    } else {
-      ValidationAlert.error(`Score: ${currentScore} / ${totalQuestions}`);
-    }
+    const total = LEFT_ITEMS.length;
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    setMatches(exerciseData.correctMatches);
+    setMatches({ ...CORRECT_MATCHES });
     setShowResults(true);
     setShowAns(true);
     setSelectedLeft(null);
   };
 
   const handleStartAgain = () => {
-    setMatches({});
     setSelectedLeft(null);
+    setMatches({});
     setShowResults(false);
     setShowAns(false);
-    setLines([]);
+    setPaths([]);
   };
 
-  const getDotColor = (side, id) => {
-    if (side === "left" && selectedLeft === id) return ACTIVE_COLOR;
+  const getLeftConn = (id) => !!matches[id];
+  const getRightConn = (id) => Object.values(matches).includes(id);
+  const isWrongMatch = (leftId) =>
+    showResults && !showAns && !!matches[leftId] && matches[leftId] !== CORRECT_MATCHES[leftId];
 
-    const isConnected =
-      side === "left" ? !!matches[id] : Object.values(matches).includes(id);
+  const WrongBadge = () => (
+    <div
+      style={{
+        position: "absolute",
+        top: "-8px",
+        right: "-8px",
+        width: "clamp(16px,1.8vw,22px)",
+        height: "clamp(16px,1.8vw,22px)",
+        borderRadius: "50%",
+        border: `1px solid #fff`,
 
-    if (!isConnected) return INACTIVE_COLOR;
-
-    return ACTIVE_COLOR;
-  };
-
-  const isLeftSelected = (id) => selectedLeft === id;
-  const isLeftConnected = (id) => !!matches[id];
-  const isRightConnected = (id) => Object.values(matches).includes(id);
-  const isSelectedRightMatch = (id) =>
-    selectedLeft !== null && matches[selectedLeft] === id;
-
-  const isWrongMatch = (leftId) => {
-    if (!showResults) return false;
-    if (!matches[leftId]) return false;
-    return matches[leftId] !== exerciseData.correctMatches[leftId];
-  };
+        backgroundColor: WRONG_COLOR,
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "clamp(9px,0.9vw,12px)",
+        fontWeight: 700,
+        boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+        zIndex: 5,
+        pointerEvents: "none",
+      }}
+    >
+      ✕
+    </div>
+  );
 
   return (
     <div className="main-container-component">
-      <style>{`
-        .wb-qa-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: clamp(18px, 2.4vw, 28px) !important;
-          max-width: 1150px !important;
-          margin: 0 auto !important;
-          padding: clamp(8px, 1vw, 12px) clamp(10px, 1.6vw, 14px) 20px !important;
-          box-sizing: border-box !important;
-          width: 100% !important;
-        }
-
-        .wb-qa-grid {
-          position: relative !important;
-          width: 100% !important;
-          display: grid !important;
-          grid-template-columns: minmax(0, 1.5fr) minmax(110px, 14vw) minmax(200px, 0.9fr) !important;
-          gap: clamp(14px, 2vw, 24px) !important;
-          align-items: start !important;
-        }
-
-        .wb-qa-left-col {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: clamp(14px, 2.2vw, 32px) !important;
-          z-index: 2 !important;
-        }
-
-        .wb-qa-right-col {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: clamp(14px, 2.2vw, 32px) !important;
-          z-index: 2 !important;
-        }
-
-        .wb-qa-left-row {
-          display: grid !important;
-          grid-template-columns: clamp(20px, 2.5vw, 28px) clamp(48px, 6vw, 70px) minmax(0, 1fr) clamp(14px, 1.8vw, 18px) !important;
-          align-items: center !important;
-          gap: clamp(6px, 1.2vw, 12px) !important;
-          min-height: clamp(62px, 8.5vw, 90px) !important;
-          position: relative !important;
-        }
-
-        .wb-qa-right-row {
-          display: grid !important;
-          grid-template-columns: clamp(14px, 1.8vw, 18px) minmax(0, 1fr) !important;
-          align-items: center !important;
-          gap: clamp(8px, 1.4vw, 14px) !important;
-          min-height: clamp(62px, 8.5vw, 90px) !important;
-          position: relative !important;
-        }
-
-        .wb-qa-num {
-          font-size: clamp(18px, 2vw, 24px) !important;
-          font-weight: 900 !important;
-          color: #222 !important;
-          line-height: 1 !important;
-          flex-shrink: 0 !important;
-        }
-
-        .wb-qa-char-img {
-          width: clamp(48px, 6vw, 70px) !important;
-          height: clamp(48px, 6vw, 70px) !important;
-          object-fit: contain !important;
-          display: block !important;
-          flex-shrink: 0 !important;
-        }
-
-        .wb-qa-text {
-          font-size: clamp(15px, 1.8vw, 19px) !important;
-          line-height: 1.45 !important;
-          color: #222 !important;
-          cursor: pointer !important;
-          padding: clamp(4px, 0.7vw, 6px) clamp(6px, 0.9vw, 8px) !important;
-          border-radius: 12px !important;
-          transition: all 0.2s ease !important;
-          word-break: break-word !important;
-        }
-
-        .wb-qa-answer-text {
-          font-size: clamp(15px, 1.8vw, 19px) !important;
-          line-height: 1.45 !important;
-          color: #222 !important;
-          cursor: pointer !important;
-          padding: clamp(4px, 0.7vw, 6px) clamp(6px, 0.9vw, 8px) !important;
-          border-radius: 12px !important;
-          transition: all 0.2s ease !important;
-          word-break: break-word !important;
-        }
-
-        .wb-qa-dot {
-          width: clamp(14px, 1.7vw, 18px) !important;
-          height: clamp(14px, 1.7vw, 18px) !important;
-          border-radius: 50% !important;
-          transition: all 0.2s ease !important;
-          box-sizing: border-box !important;
-          cursor: pointer !important;
-          flex-shrink: 0 !important;
-        }
-
-        .wb-qa-dot.selected {
-          transform: scale(1.15) !important;
-          box-shadow: 0 0 0 clamp(2px, 0.4vw, 4px) rgba(255, 202, 148, 0.45) !important;
-        }
-
-        .wb-qa-wrong {
-          position: absolute !important;
-          right: clamp(-24px, -2vw, -28px) !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          width: clamp(18px, 2vw, 22px) !important;
-          height: clamp(18px, 2vw, 22px) !important;
-          border-radius: 50% !important;
-          background-color: #ef4444 !important;
-          color: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: clamp(10px, 1vw, 12px) !important;
-          font-weight: 700 !important;
-          border: 2px solid #fff !important;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
-        }
-
-        .wb-qa-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: clamp(6px, 1vw, 8px) !important;
-        }
-
-        @media (max-width: 900px) {
-          .wb-qa-grid {
-            grid-template-columns: minmax(0, 1fr) !important;
-            gap: clamp(16px, 2vw, 18px) !important;
-          }
-
-          .wb-qa-left-col,
-          .wb-qa-right-col {
-            gap: clamp(12px, 2vw, 16px) !important;
-          }
-
-          .wb-qa-left-row,
-          .wb-qa-right-row {
-            min-height: auto !important;
-          }
-
-          .wb-qa-wrong {
-            right: 0 !important;
-          }
-        }
-
-        @media (max-width: 600px) {
-          .wb-qa-text,
-          .wb-qa-answer-text {
-            font-size: clamp(14px, 3.8vw, 17px) !important;
-          }
-
-          .wb-qa-num {
-            font-size: clamp(17px, 4.2vw, 20px) !important;
-          }
-
-          .wb-qa-left-row {
-            grid-template-columns: 22px 44px minmax(0, 1fr) 14px !important;
-            gap: 6px !important;
-          }
-
-          .wb-qa-right-row {
-            grid-template-columns: 14px 1fr !important;
-            gap: 8px !important;
-          }
-
-          .wb-qa-char-img {
-            width: 44px !important;
-            height: 44px !important;
-          }
-        }
-      `}</style>
-
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+        style={{ display: "flex", flexDirection: "column", gap: "18px", maxWidth: "1100px", margin: "0 auto" }}
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">A</span>
-          Read, look, and match.
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">A</span> Read, look, and match.
         </h1>
 
-        <div ref={containerRef} className="wb-qa-grid">
-          {/* SVG Lines */}
+        {/* Board */}
+        <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
+
+          {/* SVG lines */}
           <svg
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              pointerEvents: "none",
-              overflow: "visible",
-              zIndex: 1,
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              pointerEvents: "none", overflow: "visible", zIndex: 1,
             }}
           >
-            {lines.map((line) => (
-              <line
-                key={line.id}
-                x1={line.x1}
-                y1={line.y1}
-                x2={line.x2}
-                y2={line.y2}
-                stroke={LINE_COLOR}
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
+            {paths.map((p) => (
+              <path key={p.id} d={p.d} fill="none"
+                stroke={p.color} strokeWidth="2.4" strokeLinecap="round" />
             ))}
           </svg>
 
-          {/* Left Column */}
-          <div className="wb-qa-left-col">
-            {exerciseData.left.map((item) => {
-              const wrong = isWrongMatch(item.id);
-              const selected = isLeftSelected(item.id);
+          {/* Grid: number | image | sentence | left-dot ‖ right-dot | answer-text */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "auto auto 1fr auto auto 1fr",
+              columnGap: "clamp(8px,1.5vw,20px)",
+              rowGap: "clamp(14px,2vw,28px)",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            {LEFT_ITEMS.map((lItem, idx) => {
+              const rItem = RIGHT_ITEMS[idx];
+              const lConn = getLeftConn(lItem.id);
+              const rConn = getRightConn(rItem.id);
+              const lSelected = selectedLeft === lItem.id;
+              const wrong = isWrongMatch(lItem.id);
 
               return (
-                <div key={item.id} className="wb-qa-left-row">
-                  {/* Number */}
-                  <div className="wb-qa-num">{item.id}</div>
+                <React.Fragment key={lItem.id}>
 
-                  {/* Character Image */}
-                  <img
-                    src={item.img}
-                    alt={`char-${item.id}`}
-                    className="wb-qa-char-img"
-                    onClick={() => handleLeftClick(item.id)}
-                    style={{ cursor: showAns ? "default" : "pointer" }}
-                  />
-
-                  {/* Question Text */}
-                  <div
-                    onClick={() => handleLeftClick(item.id)}
-                    className="wb-qa-text"
+                  {/* ── number ── */}
+                  <span
                     style={{
-                      border: selected
-                        ? `2px solid ${ACTIVE_COLOR}`
-                        : "2px solid transparent",
-                      backgroundColor: selected
-                        ? "rgba(243, 155, 66, 0.08)"
-                        : "transparent",
-                      cursor: showAns ? "default" : "pointer",
+                      fontSize: "clamp(16px,1.9vw,26px)",
+                      fontWeight: 700,
+                      color: TEXT_COLOR,
+                      lineHeight: 1,
+                      flexShrink: 0,
+                      zIndex: 2,
                     }}
                   >
-                    {item.text}
-                  </div>
+                    {lItem.id}
+                  </span>
 
-                  {/* Left Dot */}
+                  {/* ── image ── */}
                   <div
-                    ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
-                    onClick={() => handleLeftClick(item.id)}
-                    className={`wb-qa-dot ${selected ? "selected" : ""}`}
+                    onClick={() => handleLeftSelect(lItem.id)}
                     style={{
-                      backgroundColor: getDotColor("left", item.id),
+                      width: "clamp(52px,7vw,90px)",
+                      aspectRatio: "1 / 1",
+                      flexShrink: 0,
+                      zIndex: 2,
                       cursor: showAns ? "default" : "pointer",
-                    }}
-                  />
-
-                  {/* Wrong Mark */}
-                  {wrong && <div className="wb-qa-wrong">✕</div>}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Middle spacer */}
-          <div />
-
-          {/* Right Column */}
-          <div className="wb-qa-right-col">
-            {exerciseData.right.map((item) => {
-              const selectedMatch = isSelectedRightMatch(item.id);
-              const connected = isRightConnected(item.id);
-
-              return (
-                <div key={item.id} className="wb-qa-right-row">
-                  {/* Right Dot */}
-                  <div
-                    ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
-                    onClick={() => handleRightClick(item.id)}
-                    className={`wb-qa-dot ${selectedMatch ? "selected" : ""}`}
-                    style={{
-                      backgroundColor: getDotColor("right", item.id),
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  />
-
-                  {/* Answer Text */}
-                  <div
-                    onClick={() => handleRightClick(item.id)}
-                    className="wb-qa-answer-text"
-                    style={{
-                      border: selectedMatch
-                        ? `2px solid ${ACTIVE_COLOR}`
-                        : "2px solid transparent",
-                      borderRadius: "12px",
-                      boxShadow: selectedMatch
-                        ? `0 0 0 4px rgba(255, 202, 148, 0.35)`
-                        : "none",
-                      backgroundColor: selectedMatch
-                        ? "rgba(243, 155, 66, 0.06)"
-                        : "transparent",
-                      cursor: showAns ? "default" : "pointer",
+                      overflow: "hidden",
+                      borderRadius: "clamp(6px,0.8vw,12px)",
+                      border: `2px solid ${lSelected ? ACTIVE_COLOR : BORDER_COLOR}`,
+                      background: "#f7f7f7",
+                      transition: "border-color 0.2s",
+                      boxSizing: "border-box",
                     }}
                   >
-                    {item.text}
+                    <img
+                      src={lItem.img}
+                      alt={`img-${lItem.id}`}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", userSelect: "none", pointerEvents: "none" }}
+                    />
                   </div>
-                </div>
+
+                  {/* ── sentence ── */}
+                  <div
+                    onClick={() => handleLeftSelect(lItem.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      minWidth: 0,
+                      zIndex: 2,
+                      padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
+                      borderRadius: "clamp(8px,1vw,12px)",
+                      /* بوردر بس وقت الاختيار، بعد الوصل يروح */
+                      border: lSelected
+                        ? `2.5px solid ${ACTIVE_COLOR}`
+                        : "2px solid transparent",
+                      background: lSelected ? "rgba(243,155,66,0.08)" : "transparent",
+                      cursor: showAns ? "default" : "pointer",
+                      transition: "border-color 0.2s, background 0.2s",
+                      userSelect: "none",
+                      position: "relative",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "clamp(13px,1.6vw,21px)",
+                        fontWeight: 500,
+                        color: wrong ? WRONG_COLOR : lSelected ? ACTIVE_COLOR : TEXT_COLOR,
+                        lineHeight: 1.3,
+                        wordBreak: "break-word",
+                        transition: "color 0.2s",
+                      }}
+                    >
+                      {lItem.text}
+                    </span>
+
+                    {/* بادج ✕ على الجملة اليسار بس */}
+                    {wrong && <WrongBadge />}
+                  </div>
+
+                  {/* ── left dot ── */}
+                  <div
+                    ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
+                    onClick={() => handleLeftSelect(lItem.id)}
+                    style={{
+                      width: "clamp(10px,1.3vw,15px)",
+                      height: "clamp(10px,1.3vw,15px)",
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      background: lSelected
+                        ? ACTIVE_COLOR
+                        : lConn
+                          ? (wrong ? WRONG_COLOR : ACTIVE_COLOR)
+                          : DOT_COLOR,
+                      cursor: showAns ? "default" : "pointer",
+                      transition: "background 0.2s",
+                      boxShadow: lSelected ? `0 0 0 3px rgba(243,155,66,0.3)` : "none",
+                      zIndex: 2,
+                    }}
+                  />
+
+                  {/* ── right dot ── */}
+                  <div
+                    ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
+                    onClick={() => handleRightSelect(rItem.id)}
+                    style={{
+                      width: "clamp(10px,1.3vw,15px)",
+                      height: "clamp(10px,1.3vw,15px)",
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      background: rConn ? ACTIVE_COLOR : DOT_COLOR,
+                      cursor: showAns || selectedLeft === null ? "default" : "pointer",
+                      transition: "background 0.2s",
+                      zIndex: 2,
+                    }}
+                  />
+
+                  {/* ── answer text (right side) — بدون بوردر أو بادج ── */}
+                  <div
+                    onClick={() => handleRightSelect(rItem.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      minWidth: 0,
+                      zIndex: 2,
+                      padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
+                      cursor: showAns || selectedLeft === null ? "default" : "pointer",
+                      userSelect: "none",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "clamp(13px,1.6vw,21px)",
+                        fontWeight: 500,
+                        color: TEXT_COLOR,
+                        lineHeight: 1.3,
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {rItem.text}
+                    </span>
+                  </div>
+
+                </React.Fragment>
               );
             })}
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="wb-qa-buttons">
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(8px,1.5vw,16px)", zIndex: 100 }}>
           <Button
+            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}
-            checkAnswers={checkAnswers}
           />
         </div>
       </div>

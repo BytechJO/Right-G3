@@ -94,7 +94,7 @@ export default function Phonics_QA() {
         style={{
           width: "38px",
           height: "38px",
-          border: "2px solid #bdbdbd",
+          border: "2px solid #f39b42",
           borderRadius: "6px",
           backgroundColor: "#fff",
           display: "flex",
@@ -119,15 +119,18 @@ export default function Phonics_QA() {
   };
 
   return (
-    <div className="main-container-component">
+          <div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: "clamp(20px,3vw,36px)",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
       >
+
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
           Do the words ending in "s" have the same -s sound? Write ✓ or ✕.

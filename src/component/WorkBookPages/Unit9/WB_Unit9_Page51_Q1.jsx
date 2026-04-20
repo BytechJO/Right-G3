@@ -131,13 +131,15 @@ export default function WB_Unit8_Page49_QA() {
   };
 
   return (
-    <div className="main-container-component">
+  <div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: "clamp(18px,2.5vw,28px)",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
       >
         <h1 className="WB-header-title-page8">
@@ -197,7 +199,7 @@ export default function WB_Unit8_Page49_QA() {
                 style={{
                   width: "100%",
                   height: "140px",
-                  border: "2px solid #a7a7a7",
+                  border: "2px solid #f39b42",
                   borderRadius: "16px",
                   backgroundColor: "#fff",
                   overflow: "hidden",
@@ -236,7 +238,7 @@ export default function WB_Unit8_Page49_QA() {
                     fontSize: "17px",
                     outline: "none",
                     backgroundColor: showAns ? "#f3f4f6" : "#fff",
-                    color: subjects[item.id] ? "#dc2626" : "#444",
+                    color: "#444",
                     cursor: showAns ? "default" : "pointer",
                   }}
                 >
@@ -268,7 +270,7 @@ export default function WB_Unit8_Page49_QA() {
                     fontSize: "17px",
                     outline: "none",
                     backgroundColor: showAns ? "#f3f4f6" : "#fff",
-                    color: places[item.id] ? "#dc2626" : "#444",
+                    color:"#444",
                     cursor: showAns ? "default" : "pointer",
                     minWidth: "140px",
                   }}

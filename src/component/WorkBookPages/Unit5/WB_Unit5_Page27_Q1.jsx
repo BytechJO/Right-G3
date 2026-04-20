@@ -1,13 +1,13 @@
 import { useState } from "react";
+
+import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../Button";
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A6.svg";
-
-import ValidationAlert from "../../Popup/ValidationAlert";
-import Button from "../Button";
 
 const YELLOW_COLOR = "#f39b42";
 const RED_COLOR = "#ef4444";

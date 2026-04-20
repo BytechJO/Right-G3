@@ -1,450 +1,398 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-// الصور
 import boyImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/2.svg";
-import sheep from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/3.svg";
-import cat from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/4.svg";
-import dogs from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/5.svg";
-import fish from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/6.svg";
-import horse from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/7.svg";
-import goats from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/8.svg";
-import tv from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/9.svg";
+import sheep  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/3.svg";
+import cat    from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/4.svg";
+import dogs   from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/5.svg";
+import fish   from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/6.svg";
+import horse  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/7.svg";
+import goats  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/8.svg";
+import tv     from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/9.svg";
+
+const BORDER_COLOR = "#f39b42";
+const SOFT_COLOR   = "#ffca94";
+const WRONG_COLOR  = "#ef4444";
+const RED_COLOR    = "#000000ff";
+const LINE_COLOR   = "#333";
 
 const DRAG_ITEMS = [
-  "a horse",
-  "a TV on the farm",
-  "dogs, sheep, and goats",
-  "a cat on the farm",
+  { id: "d1", value: "a horse"              },
+  { id: "d2", value: "a TV on the farm"     },
+  { id: "d3", value: "dogs, sheep, and goats" },
+  { id: "d4", value: "a cat on the farm"    },
 ];
 
 const QUESTIONS = [
-  {
-    id: 1,
-    before: "There was",
-    after: "on the farm.",
-    correct: "a horse",
-  },
-  {
-    id: 2,
-    before: "There wasn’t",
-    after: ".",
-    correct: "a TV on the farm",
-  },
-  {
-    id: 3,
-    before: "They had",
-    after: ".",
-    correct: "dogs, sheep, and goats",
-  },
-  {
-    id: 4,
-    before: "They didn’t have",
-    after: ".",
-    correct: "a cat on the farm",
-  },
+  { id: 1, before: "There was",      after: "on the farm.", correct: "a horse"               },
+  { id: 2, before: "There wasn't",   after: ".",            correct: "a TV on the farm"      },
+  { id: 3, before: "They had",       after: ".",            correct: "dogs, sheep, and goats" },
+  { id: 4, before: "They didn't have", after: ".",          correct: "a cat on the farm"     },
+];
+
+const SCENE_IMGS = [
+  { src: sheep, alt: "sheep",  w: "clamp(60px,9vw,110px)"  },
+  { src: cat,   alt: "cat",    w: "clamp(40px,6vw,76px)"   },
+  { src: dogs,  alt: "dogs",   w: "clamp(90px,14vw,180px)" },
+  { src: fish,  alt: "fish",   w: "clamp(28px,4vw,52px)"   },
+  { src: horse, alt: "horse",  w: "clamp(65px,10vw,130px)" },
+  { src: goats, alt: "goats",  w: "clamp(60px,9vw,110px)"  },
+  { src: tv,    alt: "tv",     w: "clamp(58px,9vw,110px)"  },
 ];
 
 export default function WB_Page47_F() {
-  const [answers, setAnswers] = useState({});
-  const [dragged, setDragged] = useState(null);
+  const [answers,     setAnswers]     = useState({});
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [touchItem,   setTouchItem]   = useState(null);
+  const [touchPos,    setTouchPos]    = useState({ x: 0, y: 0 });
   const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-  const usedValues = Object.values(answers);
+  const dropRefs = useRef({});
+  const usedIds  = Object.values(answers).filter(Boolean).map((e) => e.dragId);
+
+  const applyDrop = (boxKey, item) => {
+    const upd = { ...answers };
+    Object.keys(upd).forEach((k) => { if (upd[k]?.dragId === item.id) delete upd[k]; });
+    upd[boxKey] = { dragId: item.id, value: item.value };
+    setAnswers(upd);
+    setShowResults(false);
+  };
 
   const handleDragStart = (item) => {
-    if (showAns || usedValues.includes(item)) return;
-    setDragged(item);
+    if (showAns || usedIds.includes(item.id)) return;
+    setDraggedItem(item);
+  };
+  const handleDrop = (boxKey) => {
+    if (showAns || !draggedItem) return;
+    applyDrop(boxKey, draggedItem);
+    setDraggedItem(null);
   };
 
-  const handleDrop = (id) => {
-    if (!dragged || showAns) return;
-
-    const newAnswers = { ...answers };
-
-    Object.keys(newAnswers).forEach((key) => {
-      if (newAnswers[key] === dragged) {
-        delete newAnswers[key];
-      }
+  const handleTouchStart = (e, item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    const t = e.touches[0];
+    setTouchItem(item);
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchMove = (e) => {
+    if (!touchItem) return;
+    const t = e.touches[0];
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchEnd = () => {
+    if (!touchItem) return;
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+      const r = ref.getBoundingClientRect();
+      if (
+        touchPos.x >= r.left && touchPos.x <= r.right &&
+        touchPos.y >= r.top  && touchPos.y <= r.bottom
+      ) applyDrop(key, touchItem);
     });
-
-    newAnswers[id] = dragged;
-    setAnswers(newAnswers);
-    setDragged(null);
+    setTouchItem(null);
   };
 
-  const checkAnswers = () => {
+  const handleRemove = (boxKey) => {
     if (showAns) return;
+    setAnswers((prev) => { const u = { ...prev }; delete u[boxKey]; return u; });
+    setShowResults(false);
+  };
 
-    const all = QUESTIONS.every((q) => answers[q.id]);
-    if (!all) {
-      ValidationAlert.info("Complete all answers first.");
-      return;
-    }
-
+  const handleCheck = () => {
+    if (showAns) return;
+    const allFilled = QUESTIONS.every((q) => answers[`a-${q.id}`]?.value);
+    if (!allFilled) { ValidationAlert.info("Please complete all answers first."); return; }
     let score = 0;
-    QUESTIONS.forEach((q) => {
-      if (answers[q.id] === q.correct) score++;
-    });
-
+    QUESTIONS.forEach((q) => { if (answers[`a-${q.id}`]?.value === q.correct) score++; });
     setShowResults(true);
-
-    if (score === QUESTIONS.length) {
-      ValidationAlert.success(`Score: ${score} / ${QUESTIONS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${QUESTIONS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${QUESTIONS.length}`);
-    }
+    const total = QUESTIONS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const correct = {};
+    const filled = {};
     QUESTIONS.forEach((q) => {
-      correct[q.id] = q.correct;
+      const d = DRAG_ITEMS.find((d) => d.value === q.correct);
+      filled[`a-${q.id}`] = { dragId: d?.id ?? `ans-${q.id}`, value: q.correct };
     });
-    setAnswers(correct);
+    setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDragged(null);
+    setDraggedItem(null);
+    setTouchItem(null);
     setShowResults(false);
     setShowAns(false);
   };
 
-  const isWrong = (id) =>
-    showResults && answers[id] !== QUESTIONS.find((q) => q.id === id).correct;
+  const isWrong = (q) =>
+    showResults && !showAns && answers[`a-${q.id}`]?.value !== q.correct;
 
-  const renderDropBox = (id, width) => (
-    <span
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={() => handleDrop(id)}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        minWidth: width,
-        minHeight: "30px",
-        borderBottom: "2px solid #555",
-        padding: "0 4px 2px 4px",
-        color: answers[id] ? "#d92d20" : "#999",
-        fontSize: "18px",
-        lineHeight: "1.4",
-        backgroundColor: answers[id] ? "transparent" : "transparent",
-        verticalAlign: "middle",
-      }}
-    >
-      {answers[id] || ""}
-    </span>
-  );
+  const renderDropZone = (q) => {
+    const boxKey = `a-${q.id}`;
+    const value  = answers[boxKey]?.value || "";
+    const wrong  = isWrong(q);
+
+    return (
+      <div
+        ref={(el) => (dropRefs.current[boxKey] = el)}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={() => handleDrop(boxKey)}
+        onClick={() => handleRemove(boxKey)}
+        style={{
+          position:      "relative",
+          minWidth:      "clamp(100px,18vw,280px)",
+          minHeight:     "clamp(26px,3vw,36px)",
+          borderBottom:  `2px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
+          display:       "inline-flex",
+          alignItems:    "flex-end",
+          paddingBottom: "2px",
+          cursor:        value && !showAns ? "pointer" : "default",
+          boxSizing:     "border-box",
+        }}
+      >
+        {value && (
+          <span style={{
+            fontSize:  "clamp(14px,1.7vw,22px)",
+            fontWeight: 700,
+            color:      wrong ? WRONG_COLOR : RED_COLOR,
+            lineHeight: 1.2,
+            wordBreak:  "break-word",
+          }}>
+            {value}
+          </span>
+        )}
+        {wrong && (
+          <div style={{
+            position:        "absolute",
+            top:             "-8px",
+            left:            "-6px",
+            width:           "clamp(14px,1.6vw,18px)",
+            height:          "clamp(14px,1.6vw,18px)",
+            borderRadius:    "50%",
+            backgroundColor: WRONG_COLOR,
+            border:          "1px solid #fff",
+            color:           "#fff",
+            display:         "flex",
+            alignItems:      "center",
+            justifyContent:  "center",
+            fontSize:        "clamp(8px,0.8vw,10px)",
+            fontWeight:      700,
+            boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+            zIndex:          3,
+            pointerEvents:   "none",
+          }}>✕</div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div
-      className="main-container-component"
-      style={{
-        width: "100%",
-      }}
-    >
+    <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "14px",
-          width: "100%",
-          maxWidth: "920px",
-          margin: "0 auto",
-          padding: "10px 18px 20px 18px",
-          boxSizing: "border-box",
+          gap:           "clamp(14px,2vw,22px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
-        {/* العنوان */}
+        {/* Title */}
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-          }}
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
         >
           <span className="WB-ex-A">F</span> Read and write.
         </h1>
 
         {/* الفقاعة + الولد */}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            gap: "6px",
-            marginTop: "0",
-            marginBottom: "0",
-          }}
-        >
-          <div
-            style={{
-              position: "relative",
-              width: "520px",
-              minHeight: "76px",
-              border: "2px solid #8a8a8a",
-              borderRadius: "14px",
-              backgroundColor: "#fff",
-              padding: "12px 16px",
-              boxSizing: "border-box",
-              fontSize: "18px",
-              lineHeight: "1.15",
-              color: "#222",
-            }}
-          >
-            My father was a farmer. We had dogs, sheep,
-            <br />
-            and goats. I had a horse.
-            <div
-              style={{
-                position: "absolute",
-                right: "-34px",
-                top: "44px",
-                width: "42px",
-                height: "2px",
-                backgroundColor: "#8a8a8a",
-                transform: "rotate(-16deg)",
-                transformOrigin: "left center",
-              }}
-            />
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(6px,1vw,14px)", justifyContent: "center" }}>
+          <div style={{
+            position:     "relative",
+            flex:         1,
+            maxWidth:     "clamp(260px,55vw,600px)",
+            border:       "2px solid #8a8a8a",
+            borderRadius: "clamp(10px,1.2vw,16px)",
+            background:   "#fff",
+            padding:      "clamp(10px,1.2vw,16px) clamp(12px,1.5vw,20px)",
+            fontSize:     "clamp(13px,1.6vw,20px)",
+            lineHeight:   1.5,
+            color:        "#222",
+            boxSizing:    "border-box",
+          }}>
+            My father was a farmer. We had dogs, sheep, and goats. I had a horse.
+            {/* ذيل الفقاعة */}
+            <div style={{
+              position:        "absolute",
+              right:           "clamp(-28px,-3.5vw,-18px)",
+              top:             "40%",
+              width:           "clamp(20px,3vw,40px)",
+              height:          "2px",
+              backgroundColor: "#8a8a8a",
+              transform:       "rotate(-16deg)",
+              transformOrigin: "left center",
+            }} />
           </div>
-
           <img
             src={boyImg}
             alt="boy"
             style={{
-              width: "118px",
-              height: "118px",
-              objectFit: "contain",
-              display: "block",
-              marginTop: "-6px",
+              width:        "clamp(70px,12vw,140px)",
+              height:       "auto",
+              objectFit:    "contain",
+              display:      "block",
+              flexShrink:   0,
+              userSelect:   "none",
+              pointerEvents:"none",
             }}
           />
         </div>
 
         {/* صف الصور */}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            gap: "10px",
-            flexWrap: "nowrap",
-            marginTop: "0",
-            marginBottom: "0",
-            overflowX: "auto",
-            paddingBottom: "2px",
-          }}
-        >
-          <img
-            src={sheep}
-            alt="sheep"
-            style={{
-              width: "86px",
-              height: "70px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
-          <img
-            src={cat}
-            alt="cat"
-            style={{
-              width: "58px",
-              height: "62px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
-          <img
-            src={dogs}
-            alt="dogs"
-            style={{
-              width: "140px",
-              height: "72px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
-          <img
-            src={fish}
-            alt="fish"
-            style={{
-              width: "40px",
-              height: "38px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
-          <img
-            src={horse}
-            alt="horse"
-            style={{
-              width: "98px",
-              height: "96px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
-          <img
-            src={goats}
-            alt="goats"
-            style={{
-              width: "86px",
-              height: "68px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
-          <img
-            src={tv}
-            alt="tv"
-            style={{
-              width: "84px",
-              height: "56px",
-              objectFit: "contain",
-              display: "block",
-              flexShrink: 0,
-            }}
-          />
+        <div style={{
+          display:        "flex",
+          justifyContent: "center",
+          alignItems:     "flex-end",
+          gap:            "clamp(6px,1.2vw,16px)",
+          flexWrap:       "wrap",
+          width:          "100%",
+        }}>
+          {SCENE_IMGS.map((img) => (
+            <img
+              key={img.alt}
+              src={img.src}
+              alt={img.alt}
+              style={{
+                width:         img.w,
+                height:        "auto",
+                objectFit:     "contain",
+                display:       "block",
+                userSelect:    "none",
+                pointerEvents: "none",
+              }}
+            />
+          ))}
         </div>
 
-        {/* بنك الإجابات */}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginTop: "2px",
-            marginBottom: "2px",
-          }}
-        >
-          {DRAG_ITEMS.map((item, i) => {
-            const disabled = usedValues.includes(item);
-
+        {/* Word Bank */}
+        <div style={{
+          width:          "100%",
+          border:         `2px solid ${BORDER_COLOR}`,
+          borderRadius:   "clamp(12px,1.4vw,18px)",
+          padding:        "clamp(10px,1.2vw,16px)",
+          boxSizing:      "border-box",
+          display:        "flex",
+          flexWrap:       "wrap",
+          gap:            "clamp(8px,1vw,12px)",
+          justifyContent: "center",
+          background:     "#fff",
+        }}>
+          {DRAG_ITEMS.map((item) => {
+            const isUsed = usedIds.includes(item.id);
             return (
               <div
-                key={i}
-                draggable={!disabled && !showAns}
+                key={item.id}
+                draggable={!isUsed && !showAns}
                 onDragStart={() => handleDragStart(item)}
+                onTouchStart={(e) => handleTouchStart(e, item)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 style={{
-                  backgroundColor: disabled ? "#cfcfcf" : "#ef4444",
-                  color: "#fff",
-                  padding: "8px 12px",
-                  borderRadius: "10px",
-                  cursor: disabled ? "not-allowed" : "grab",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  lineHeight: "1.2",
-                  userSelect: "none",
-                  opacity: disabled ? 0.55 : 1,
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.12)",
+                  padding:         "clamp(6px,0.8vw,10px) clamp(12px,1.4vw,18px)",
+                  borderRadius:    "14px",
+                  border:          `1.5px solid ${isUsed ? "#d9d9d9" : BORDER_COLOR}`,
+                  backgroundColor: isUsed ? "#eeeeee" : SOFT_COLOR,
+                  color:           isUsed ? "#999" : "#222",
+                  cursor:          isUsed || showAns ? "not-allowed" : "grab",
+                  opacity:         isUsed ? 0.6 : 1,
+                  userSelect:      "none",
+                  fontSize:        "clamp(13px,1.5vw,20px)",
+                  fontWeight:      600,
+                  boxShadow:       isUsed ? "none" : "0 2px 8px rgba(0,0,0,0.06)",
+                  transition:      "0.2s ease",
+                  touchAction:     "none",
+                  textAlign:       "center",
+                  lineHeight:      1.3,
                 }}
               >
-                {item}
+                {item.value}
               </div>
             );
           })}
         </div>
 
         {/* الأسئلة */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px",
-            width: "100%",
-            marginTop: "0",
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(10px,1.4vw,18px)", width: "100%" }}>
           {QUESTIONS.map((q) => (
             <div
               key={q.id}
               style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "6px",
-                fontSize: "19px",
-                color: "#222",
-                lineHeight: "1.5",
-                paddingLeft: "24px",
+                display:    "flex",
+                alignItems: "flex-end",
+                flexWrap:   "wrap",
+                gap:        "clamp(4px,0.6vw,8px)",
               }}
             >
-              <span
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  top: "1px",
-                  fontWeight: "700",
-                }}
-              >
+              {/* رقم */}
+              <span style={{ fontSize: "clamp(15px,1.8vw,24px)", fontWeight: 700, color: "#111", flexShrink: 0, minWidth: "clamp(14px,1.8vw,22px)" }}>
                 {q.id}
               </span>
-
-              <span>{q.before}</span>
-
-              {renderDropBox(q.id, q.id === 1 ? "165px" : "290px")}
-
-              <span>{q.after}</span>
-
-              {isWrong(q.id) && (
-                <span
-                  style={{
-                    position: "absolute",
-                    right: "-8px",
-                    top: "-6px",
-                    backgroundColor: "#ef4444",
-                    color: "#fff",
-                    borderRadius: "50%",
-                    width: "22px",
-                    height: "22px",
-                    textAlign: "center",
-                    lineHeight: "22px",
-                    fontSize: "12px",
-                    fontWeight: "700",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-                  }}
-                >
-                  ✕
-                </span>
-              )}
+              {/* before */}
+              <span style={{ fontSize: "clamp(14px,1.7vw,22px)", fontWeight: 500, color: "#111", whiteSpace: "nowrap" }}>
+                {q.before}
+              </span>
+              {/* drop zone */}
+              {renderDropZone(q)}
+              {/* after */}
+              <span style={{ fontSize: "clamp(14px,1.7vw,22px)", fontWeight: 500, color: "#111", whiteSpace: "nowrap" }}>
+                {q.after}
+              </span>
             </div>
           ))}
         </div>
 
-        {/* الأزرار */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
           <Button
-            checkAnswers={checkAnswers}
+            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}
           />
         </div>
       </div>
+
+      {/* Touch ghost */}
+      {touchItem && (
+        <div style={{
+          position:      "fixed",
+          left:          touchPos.x - 80,
+          top:           touchPos.y - 20,
+          background:    SOFT_COLOR,
+          padding:       "8px 14px",
+          borderRadius:  "10px",
+          border:        `1.5px solid ${BORDER_COLOR}`,
+          boxShadow:     "0 4px 10px rgba(0,0,0,0.2)",
+          pointerEvents: "none",
+          zIndex:        9999,
+          fontSize:      "clamp(13px,1.5vw,18px)",
+          fontWeight:    600,
+          color:         "#222",
+          maxWidth:      "260px",
+          textAlign:     "center",
+          lineHeight:    1.3,
+        }}>
+          {touchItem.value}
+        </div>
+      )}
     </div>
   );
 }

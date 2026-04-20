@@ -7,134 +7,120 @@ import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folde
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/4.svg";
 
-const ITEMS = [
+const YELLOW_COLOR = "#f39b42";
+const RED_COLOR = "#ef4444";
+const TEXT_COLOR = "#222";
+
+const DATA = [
   {
     id: 1,
-    img: img1,
     question: "Are they on the playground?",
-    options: ["Yes, they are.", "No, they aren’t."],
+    img: img1,
+    options: ["Yes, they are.", "No, they aren't."],
     correct: "Yes, they are.",
   },
   {
     id: 2,
-    img: img2,
     question: "Are they at the zoo?",
-    options: ["Yes, they are.", "No, they aren’t."],
-    correct: "No, they aren’t.",
+    img: img2,
+    options: ["Yes, they are.", "No, they aren't."],
+    correct: "No, they aren't.",
   },
   {
     id: 3,
-    img: img3,
     question: "Are they at the clinic?",
-    options: ["Yes, they are.", "No, they aren’t."],
+    img: img3,
+    options: ["Yes, they are.", "No, they aren't."],
     correct: "Yes, they are.",
   },
   {
     id: 4,
-    img: img4,
     question: "Are they at the circus?",
-    options: ["Yes, they are.", "No, they aren’t."],
-    correct: "No, they aren’t.",
+    img: img4,
+    options: ["Yes, they are.", "No, they aren't."],
+    correct: "No, they aren't.",
   },
 ];
 
-export default function WB_Unit8_Page53_QG() {
-  const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+const initialSelections = { 1: null, 2: null, 3: null, 4: null };
 
-  const handleSelect = (id, value) => {
-    if (showAns) return;
+const WB_Unit9_Page54_QG = () => {
+  const [userSelections, setUserSelections] = useState(initialSelections);
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [wrongAnswers, setWrongAnswers] = useState({});
+  const [checkedAnswers, setCheckedAnswers] = useState(false);
 
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+  const handleSelect = (id, option) => {
+    if (showAnswers) return;
+    setUserSelections((prev) => ({ ...prev, [id]: option }));
+    setCheckedAnswers(false);
+    setWrongAnswers({});
   };
 
-  const handleCheck = () => {
-    if (showAns) return;
-
-    const allAnswered = ITEMS.every((item) => answers[item.id]);
-
+  const checkAnswers = () => {
+    const allAnswered = DATA.every((item) => userSelections[item.id] !== null);
     if (!allAnswered) {
-      ValidationAlert.info("Please answer all questions first.");
+      ValidationAlert.info("Please answer all questions!");
       return;
     }
-
     let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
+    const newWrong = {};
+    DATA.forEach((item) => {
+      if (userSelections[item.id] === item.correct) {
         score++;
+        newWrong[item.id] = false;
+      } else {
+        newWrong[item.id] = true;
       }
     });
-
-    setShowResults(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    setWrongAnswers(newWrong);
+    setCheckedAnswers(true);
+    if (score === DATA.length) ValidationAlert.success(`Score: ${score} / ${DATA.length}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${DATA.length}`);
+    else ValidationAlert.error(`Score: ${score} / ${DATA.length}`);
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
-    ITEMS.forEach((item) => {
-      correctMap[item.id] = item.correct;
-    });
-
-    setAnswers(correctMap);
-    setShowResults(true);
-    setShowAns(true);
+    const answers = {};
+    DATA.forEach((item) => { answers[item.id] = item.correct; });
+    setUserSelections(answers);
+    setShowAnswers(true);
+    setCheckedAnswers(false);
+    setWrongAnswers({});
   };
 
-  const handleReset = () => {
-    setAnswers({});
-    setShowResults(false);
-    setShowAns(false);
+  const handleStartAgain = () => {
+    setUserSelections(initialSelections);
+    setShowAnswers(false);
+    setWrongAnswers({});
+    setCheckedAnswers(false);
   };
 
-  const isWrong = (id) => {
-    if (!showResults) return false;
-    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
-  };
-
+  // ── لون وشكل كل option ──
   const getOptionStyle = (item, option) => {
-    const selected = answers[item.id] === option;
-    const isCorrectOption = item.correct === option;
+    const isSelected = userSelections[item.id] === option;
+    const isCorrect = option === item.correct;
+    const isWrongSelected = checkedAnswers && wrongAnswers[item.id] && isSelected;
 
-    let border = "2px solid transparent";
-    let color = "#222";
-
-    if (selected) {
-      border = "3px solid #dc2626";
-    }
-
-    if (showAns && isCorrectOption) {
-      border = "3px solid #dc2626";
-    }
-
-    return {
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      minWidth: "190px",
-      minHeight: "44px",
-      padding: "4px 18px",
-      border,
+    const base = {
+      position: "relative",
+      background: "transparent",
+      border: "2.5px solid transparent",
       borderRadius: "999px",
-      cursor: showAns ? "default" : "pointer",
-      fontSize: "22px",
-      lineHeight: "1.2",
-      color,
-      backgroundColor: "transparent",
+      padding: "clamp(4px,0.6vw,8px) clamp(18px,2.5vw,32px)",
+      fontSize: "clamp(14px,1.8vw,20px)",
+      fontWeight: "500",
+      color: TEXT_COLOR,
+      cursor: showAnswers ? "default" : "pointer",
+      lineHeight: 1.3,
+      whiteSpace: "nowrap",
       transition: "all 0.2s ease",
-      textAlign: "center",
     };
+
+    if (showAnswers && isCorrect) return { ...base, border: `2.5px solid ${YELLOW_COLOR}` };
+    if (isWrongSelected) return { ...base, border: `2.5px solid ${RED_COLOR}` };
+    if (isSelected) return { ...base, border: `2.5px solid ${YELLOW_COLOR}` };
+    return base;
   };
 
   return (
@@ -144,151 +130,156 @@ export default function WB_Unit8_Page53_QG() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "980px",
+          gap: "clamp(20px,3vw,36px)",
+          maxWidth: "1100px",
           margin: "0 auto",
-          padding: "10px 18px 20px 18px",
-          boxSizing: "border-box",
         }}
       >
+        {/* Title */}
         <h1
           className="WB-header-title-page8"
-          style={{ margin: 0 }}
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
         >
-          <span className="WB-ex-A">G</span> Read, look, and circle.
+          <span className="WB-ex-A">G</span>
+          Read, look, and circle.
         </h1>
 
+        {/* Grid 2×2 */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "34px 42px",
-            alignItems: "start",
+            gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+            gap: "clamp(24px,4vw,48px) clamp(28px,5vw,60px)",
+            width: "100%",
           }}
         >
-          {ITEMS.map((item) => (
+          {DATA.map((item) => (
             <div
               key={item.id}
               style={{
-                position: "relative",
                 display: "flex",
                 flexDirection: "column",
-                gap: "10px",
+                alignItems: "flex-start",
+                gap: "clamp(8px,1.2vw,14px)",
+                minWidth: 0,
               }}
             >
+              {/* ── السؤال ── */}
               <div
                 style={{
                   display: "flex",
-                  alignItems: "flex-start",
-                  gap: "10px",
+                  alignItems: "baseline",
+                  gap: "clamp(6px,0.8vw,10px)",
                 }}
               >
                 <span
                   style={{
-                    fontSize: "22px",
+                    fontSize: "clamp(16px,2vw,24px)",
                     fontWeight: "700",
-                    color: "#222",
-                    minWidth: "18px",
-                    lineHeight: "1",
-                    marginTop: "6px",
+                    color: TEXT_COLOR,
+                    flexShrink: 0,
                   }}
                 >
                   {item.id}
                 </span>
-
-                <div
+                <span
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    flex: 1,
+                    fontSize: "clamp(14px,1.7vw,20px)",
+                    fontWeight: "500",
+                    color: TEXT_COLOR,
+                    lineHeight: 1.3,
                   }}
                 >
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "22px",
-                      lineHeight: "1.35",
-                      color: "#222",
-                    }}
-                  >
-                    {item.question}
-                  </p>
-
-                  <img
-                    src={item.img}
-                    alt={`question-${item.id}`}
-                    style={{
-                      width: "290px",
-                      height: "150px",
-                      objectFit: "contain",
-                      display: "block",
-                    }}
-                  />
-                </div>
+                  {item.question}
+                </span>
               </div>
 
+              {/* ── الصورة ── */}
+              <div
+                style={{
+                  width: "100%",
+                  aspectRatio: "4 / 3",
+                  overflow: "hidden",
+                  borderRadius: "clamp(8px,1vw,14px)",
+                  border: `2px solid #d4d4d4`,
+                  background: "#f5f5f5",
+                  flexShrink: 0,
+                }}
+              >
+                <img
+                  src={item.img}
+                  alt={`img-${item.id}`}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block"                           ,  border: "2px solid #f39b42", }}
+                />
+              </div>
+
+              {/* ── الخيارات تحت الصورة ── */}
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "8px",
-                  paddingLeft: "34px",
-                  marginTop: "2px",
+                  alignItems: "center",
+                  gap: "clamp(6px,1vw,10px)",
+                  width: "100%",
+                  marginTop: "clamp(2px,0.4vw,6px)",
                 }}
               >
-                {item.options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSelect(item.id, option)}
-                    style={getOptionStyle(item, option)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+                {item.options.map((option) => {
+                  const isWrongSelected =
+                    checkedAnswers && wrongAnswers[item.id] && userSelections[item.id] === option;
 
-              {isWrong(item.id) && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "-6px",
-                    right: "-6px",
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    backgroundColor: "#ef4444",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-                  }}
-                >
-                  ✕
-                </div>
-              )}
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => handleSelect(item.id, option)}
+                      style={getOptionStyle(item, option)}
+                    >
+                      {option}
+
+                      {/* ✕ badge للإجابة الخاطئة */}
+                      {isWrongSelected && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "-8px",
+                            right: "-8px",
+                            width: "clamp(16px,1.8vw,22px)",
+                            height: "clamp(16px,1.8vw,22px)",
+                            borderRadius: "50%",
+                            background: RED_COLOR,
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "clamp(9px,0.9vw,12px)",
+                            fontWeight: "700",
+                            border: "2px solid #fff",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          ✕
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(4px,1vw,12px)" }}>
           <Button
-            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
+            handleStartAgain={handleStartAgain}
+            checkAnswers={checkAnswers}
           />
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default WB_Unit9_Page54_QG;

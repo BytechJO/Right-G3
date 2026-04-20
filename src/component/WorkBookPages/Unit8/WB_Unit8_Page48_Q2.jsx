@@ -214,17 +214,15 @@ export default function WB_Unit8_Page48_QH() {
   };
 
   return (
-    <div className="main-container-component">
+      <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "980px",
-          margin: "0 auto",
-          paddingBottom: "50px",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
         <h1 className="WB-header-title-page8">

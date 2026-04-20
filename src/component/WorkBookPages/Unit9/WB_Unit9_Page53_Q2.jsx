@@ -173,12 +173,12 @@ const WB_Unit8_Page53_QF = () => {
   };
 
   const getLineColor = () => {
-    return "#ef4444";
+    return "#f39b42";
   };
 
   const getDotColor = (side, id) => {
     if (side === "left" && selectedLeft === id) {
-      return "#3b82f6";
+      return "#f39b42";
     }
 
     const isConnected =
@@ -186,21 +186,20 @@ const WB_Unit8_Page53_QF = () => {
 
     if (!isConnected) return "#9ca3af";
 
-    return "#3b82f6";
+    return "#f39b42";
   };
 
   const isLeftSelected = (id) => selectedLeft === id;
 
   return (
-    <div className="main-container-component">
+<div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
-          width: "100%",
-          maxWidth: "980px",
+          gap: "clamp(18px,2.5vw,28px)",
+          maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
@@ -253,8 +252,8 @@ const WB_Unit8_Page53_QF = () => {
                     width: "170px",
                     height: "130px",
                     border: isLeftSelected(item.id)
-                      ? "4px solid #3b82f6"
-                      : "2px solid #bdbdbd",
+                      ? "4px solid #f39b42"
+                      : "2px solid #f39b42",
                     borderRadius: "16px",
                     backgroundColor: "#fff",
                     overflow: "hidden",
@@ -302,6 +301,7 @@ const WB_Unit8_Page53_QF = () => {
                   style={{
                     display: "flex",
                     alignItems: "center",
+                   
                     gap: "14px",
                     width: "100%",
                   }}

@@ -6,7 +6,6 @@ import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folde
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.3.svg";
 
-
 const DOT_COLOR    = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
 const BORDER_COLOR = "#e0e0e0";
@@ -15,8 +14,8 @@ const PATH_COLOR   = "#f39b42";
 const TEXT_COLOR   = "#111";
 
 const LEFT_ITEMS = [
-  { id: 1, text: "The plums play on the plate."        },
-  { id: 2, text: "The slug sleeps on the slide."       },
+  { id: 1, text: "The plums play on the plate."            },
+  { id: 2, text: "The slug sleeps on the slide."           },
   { id: 3, text: "The fly and the flea float on the flag." },
 ];
 
@@ -26,8 +25,33 @@ const RIGHT_ITEMS = [
   { id: 3, img: img3 },
 ];
 
-// 1→flag img, 2→plums img, 3→slide img  — عدّل حسب ترتيب صورك
 const CORRECT_MATCHES = { 1: 2, 2: 3, 3: 1 };
+
+// ── Wrong badge يسار أعلى فقط بدون أي تأثير تاني
+const WrongBadge = () => (
+  <div
+    style={{
+      position:        "absolute",
+      top:             "-7px",
+      left:            "-7px",
+      width:           "clamp(15px,1.7vw,20px)",
+      height:          "clamp(15px,1.7vw,20px)",
+      borderRadius:    "50%",
+      backgroundColor: WRONG_COLOR,
+      color:           "#fff",
+      display:         "flex",
+      alignItems:      "center",
+      justifyContent:  "center",
+      fontSize:        "clamp(8px,0.9vw,11px)",
+      fontWeight:      700,
+      boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
+      zIndex:          5,
+      pointerEvents:   "none",
+    }}
+  >
+    ✕
+  </div>
+);
 
 export default function WB_ReadAndMatch_PageC() {
   const [selectedLeft, setSelectedLeft] = useState(null);
@@ -56,12 +80,11 @@ export default function WB_ReadAndMatch_PageC() {
         const x2 = er.left + er.width  / 2 - br.left;
         const y2 = er.top  + er.height / 2 - br.top;
         const dx = Math.abs(x2 - x1);
-        const isWrong = showResults && matches[Number(leftId)] !== CORRECT_MATCHES[Number(leftId)];
 
         return {
           id:    `path-${leftId}-${rightId}`,
           d:     `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
-          color: isWrong ? WRONG_COLOR : PATH_COLOR,
+          color: PATH_COLOR,
         };
       }).filter(Boolean);
 
@@ -128,32 +151,8 @@ export default function WB_ReadAndMatch_PageC() {
   const getLeftConn  = (id) => !!matches[id];
   const getRightConn = (id) => Object.values(matches).includes(id);
   const isWrongMatch = (leftId) =>
-    showResults && !!matches[leftId] && matches[leftId] !== CORRECT_MATCHES[leftId];
-
-  const WrongBadge = () => (
-    <div
-      style={{
-        position:        "absolute",
-        top:             "-7px",
-        right:           "-7px",
-        width:           "clamp(15px,1.7vw,20px)",
-        height:          "clamp(15px,1.7vw,20px)",
-        borderRadius:    "50%",
-        backgroundColor: WRONG_COLOR,
-        color:           "#fff",
-        display:         "flex",
-        alignItems:      "center",
-        justifyContent:  "center",
-        fontSize:        "clamp(8px,0.9vw,11px)",
-        fontWeight:      700,
-        boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
-        zIndex:          5,
-        pointerEvents:   "none",
-      }}
-    >
-      ✕
-    </div>
-  );
+    showResults && !showAns && !!matches[leftId] &&
+    matches[leftId] !== CORRECT_MATCHES[leftId];
 
   return (
     <div className="main-container-component">
@@ -208,7 +207,7 @@ export default function WB_ReadAndMatch_PageC() {
             ))}
           </svg>
 
-          {/* Grid: sentence | left-dot | right-dot | image */}
+          {/* Grid */}
           <div
             style={{
               display:             "grid",
@@ -243,8 +242,6 @@ export default function WB_ReadAndMatch_PageC() {
                       borderRadius: "clamp(8px,1vw,12px)",
                       border:       lSelected
                         ? `2.5px solid ${ACTIVE_COLOR}`
-                        : lConn
-                        ? `2px solid ${wrong ? WRONG_COLOR : "#d1d5db"}`
                         : "2px solid transparent",
                       background:   lSelected ? "rgba(243,155,66,0.08)" : "transparent",
                       cursor:       showAns ? "default" : "pointer",
@@ -252,7 +249,6 @@ export default function WB_ReadAndMatch_PageC() {
                       userSelect:   "none",
                     }}
                   >
-                    {/* number */}
                     <span
                       style={{
                         fontSize:   "clamp(16px,1.9vw,28px)",
@@ -265,16 +261,11 @@ export default function WB_ReadAndMatch_PageC() {
                       {lItem.id}
                     </span>
 
-                    {/* text */}
                     <span
                       style={{
                         fontSize:   "clamp(13px,1.6vw,22px)",
                         fontWeight: 500,
-                        color:      wrong
-                          ? WRONG_COLOR
-                          : lSelected
-                          ? ACTIVE_COLOR
-                          : TEXT_COLOR,
+                        color:      lSelected ? ACTIVE_COLOR : TEXT_COLOR,
                         lineHeight: 1.3,
                         wordBreak:  "break-word",
                         transition: "color 0.2s",
@@ -283,6 +274,7 @@ export default function WB_ReadAndMatch_PageC() {
                       {lItem.text}
                     </span>
 
+                    {/* ── wrong badge يسار فقط ── */}
                     {wrong && <WrongBadge />}
                   </div>
 
@@ -298,7 +290,7 @@ export default function WB_ReadAndMatch_PageC() {
                       background:   lSelected
                         ? ACTIVE_COLOR
                         : lConn
-                        ? (wrong ? WRONG_COLOR : ACTIVE_COLOR)
+                        ? ACTIVE_COLOR
                         : DOT_COLOR,
                       cursor:       showAns ? "default" : "pointer",
                       transition:   "background 0.2s",
@@ -323,28 +315,22 @@ export default function WB_ReadAndMatch_PageC() {
                     }}
                   />
 
-                  {/* ── image ── */}
+                  {/* ── image — بدون أي تأثير للخطأ ── */}
                   <div
                     onClick={() => handleRightSelect(rItem.id)}
                     style={{
-                      position:       "relative",
-                      width:          "clamp(90px,13vw,160px)",
-                      aspectRatio:    "1.2 / 1",
-                      overflow:       "hidden",
-                      borderRadius:   "clamp(8px,1vw,14px)",
-                      border:         `2px solid ${
-                        rConn
-                          ? isWrongMatch(Number(Object.keys(matches).find((k) => matches[k] === rItem.id)))
-                            ? WRONG_COLOR
-                            : ACTIVE_COLOR
-                          : BORDER_COLOR
-                      }`,
-                      background:     "#f7f7f7",
-                      flexShrink:     0,
-                      cursor:         showAns || selectedLeft === null ? "default" : "pointer",
-                      transition:     "border-color 0.2s",
-                      boxSizing:      "border-box",
-                      zIndex:         2,
+                      position:     "relative",
+                      width:        "clamp(90px,13vw,160px)",
+                      aspectRatio:  "1.2 / 1",
+                      overflow:     "hidden",
+                      borderRadius: "clamp(8px,1vw,14px)",
+                      border:       `2px solid ${rConn ? ACTIVE_COLOR : BORDER_COLOR}`,
+                      background:   "#f7f7f7",
+                      flexShrink:   0,
+                      cursor:       showAns || selectedLeft === null ? "default" : "pointer",
+                      transition:   "border-color 0.2s",
+                      boxSizing:    "border-box",
+                      zIndex:       2,
                     }}
                   >
                     <img
@@ -361,11 +347,6 @@ export default function WB_ReadAndMatch_PageC() {
                         pointerEvents: "none",
                       }}
                     />
-
-                    {/* wrong badge on image */}
-                    {isWrongMatch(
-                      Number(Object.keys(matches).find((k) => matches[k] === rItem.id))
-                    ) && <WrongBadge />}
                   </div>
 
                 </React.Fragment>

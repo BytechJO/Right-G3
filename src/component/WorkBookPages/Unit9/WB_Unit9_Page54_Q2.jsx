@@ -178,28 +178,27 @@ const WB_Unit8_Page54_QH = () => {
   };
 
   const getDotColor = (side, id) => {
-    if (side === "left" && selectedLeft === id) return "#3b82f6";
+    if (side === "left" && selectedLeft === id) return "#f39b42";
 
     const isConnected =
       side === "left" ? !!matches[id] : Object.values(matches).includes(id);
 
-    if (!isConnected) return "#9ca3af";
+    if (!isConnected) return "#f39b42";
 
-    return "#3b82f6";
+    return "#f39b42";
   };
 
   const isLeftSelected = (id) => selectedLeft === id;
 
   return (
-    <div className="main-container-component">
+<div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
-          width: "100%",
-          maxWidth: "980px",
+          gap: "clamp(18px,2.5vw,28px)",
+          maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
@@ -243,7 +242,7 @@ const WB_Unit8_Page54_QH = () => {
                   onClick={() => handleLeftClick(item.id)}
                   style={{
                     border: isLeftSelected(item.id)
-                      ? "3px solid #3b82f6"
+                      ? "3px solid #f39b42"
                       : "2px solid transparent",
                     borderRadius: "14px",
                     padding: "10px 12px",
@@ -292,7 +291,7 @@ const WB_Unit8_Page54_QH = () => {
                     width: "70px",
                     height: "70px",
                     border: isLeftSelected(item.id)
-                      ? "3px solid #3b82f6"
+                      ? "3px solid #f39b42"
                       : "2px solid transparent",
                     borderRadius: "14px",
                     overflow: "hidden",
@@ -399,7 +398,7 @@ const WB_Unit8_Page54_QH = () => {
                   style={{
                     width: "160px",
                     height: "100px",
-                    border: "2px solid #bdbdbd",
+                    border: "2px solid #f39b42",
                     borderRadius: "14px",
                     backgroundColor: "#fff",
                     overflow: "hidden",
@@ -441,7 +440,7 @@ const WB_Unit8_Page54_QH = () => {
                 y1={line.y1}
                 x2={line.x2}
                 y2={line.y2}
-                stroke="#ef4444"
+                stroke="#f39b42"
                 strokeWidth="2.5"
                 strokeLinecap="round"
               />

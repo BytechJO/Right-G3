@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
@@ -12,365 +12,515 @@ import imgBed    from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 
 import imgTable  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/G7.svg";
 import imgChair  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/G8.svg";
 
+const BORDER_COLOR = "#f39b42";
+
 const SENTENCES = [
-  { id: 1, itemImg: imgHat,   text: "The", itemName: "hat",   rest: "is under the table."   },
-  { id: 2, itemImg: imgCat,   text: "The", itemName: "cat",   rest: "is next to the chair." },
-  { id: 3, itemImg: imgBall,  text: "The", itemName: "ball",  rest: "is on the bed."        },
-  { id: 4, itemImg: imgApple, text: "The", itemName: "apple", rest: "is in the fridge."     },
+  { id: 1, before: "The hat",   img: imgHat,   after: "is under the table."      },
+  { id: 2, before: "The cat",   img: imgCat,   after: "is next to the chair."    },
+  { id: 3, before: "The ball",  img: imgBall,  after: "is on the bed."           },
+  { id: 4, before: "The apple", img: imgApple, after: "is in the fridge."        },
 ];
 
-const FURNITURE_IMAGES = [
-  { id: "fridge", img: imgFridge },
-  { id: "bed",    img: imgBed    },
-  { id: "table",  img: imgTable  },
-  { id: "chair",  img: imgChair  },
+const FURNITURE = [
+  { id: 1, img: imgFridge, alt: "fridge" },
+  { id: 2, img: imgBed,    alt: "bed"    },
+  { id: 3, img: imgTable,  alt: "table"  },
+  { id: 4, img: imgChair,  alt: "chair"  },
 ];
 
-const TOOLS  = [
-  { id: "pencil", label: "✏️ Pencil" },
-  { id: "eraser", label: "🧹 Eraser" },
+const COLORS = [
+  "#111827", "#ef4444", "#22c55e",
+  "#3b82f6", "#eab308", "#a855f7",
+  "#ec4899", "#ffffff",
 ];
-const COLORS = ["#1e293b","#ef4444","#f97316","#eab308","#22c55e","#3b82f6","#a855f7","#ec4899"];
-const SIZES  = [2, 4, 7, 12];
+const SIZES = [2, 4, 8, 12];
 
-// ─────────────────────────────────────────────
-// Canvas منفرد مع ref للمسح
-// ─────────────────────────────────────────────
-function SingleCanvas({ furniture, tool, color, size, registerRef }) {
+// ── Single canvas drawing box ──
+function DrawCanvas({ width, height, tool, color, size }) {
   const canvasRef = useRef(null);
-  const isDrawing = useRef(false);
+  const drawing   = useRef(false);
   const lastPos   = useRef(null);
 
   useEffect(() => {
-    loadImage();
-    registerRef({
-      clear: () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        loadImage();
-      },
-    });
-  }, []);
-
-  const loadImage = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.src   = furniture.img;
-    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  };
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
 
   const getPos = (e) => {
     const canvas = canvasRef.current;
     const rect   = canvas.getBoundingClientRect();
     const scaleX = canvas.width  / rect.width;
     const scaleY = canvas.height / rect.height;
-    if (e.touches) {
-      return {
-        x: (e.touches[0].clientX - rect.left) * scaleX,
-        y: (e.touches[0].clientY - rect.top)  * scaleY,
-      };
-    }
+    const src    = e.touches ? e.touches[0] : e;
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top)  * scaleY,
+      x: (src.clientX - rect.left) * scaleX,
+      y: (src.clientY - rect.top)  * scaleY,
     };
   };
 
-  const onStart = (e) => {
+  const startDraw = (e) => {
     e.preventDefault();
-    lastPos.current   = getPos(e);
-    isDrawing.current = true;
+    const canvas = canvasRef.current;
+    const ctx    = canvas.getContext("2d");
+
+    if (tool === "fill") {
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    const pos = getPos(e);
+    lastPos.current = pos;
+    drawing.current = true;
+
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, (tool === "eraser" ? size * 2 : size) / 2, 0, Math.PI * 2);
+    ctx.fillStyle = tool === "eraser" ? "#fff" : color;
+    ctx.fill();
   };
 
-  const onMove = (e) => {
+  const draw = (e) => {
     e.preventDefault();
-    if (!isDrawing.current) return;
+    if (!drawing.current) return;
+    if (tool !== "pencil" && tool !== "eraser") return;
+
     const canvas = canvasRef.current;
     const ctx    = canvas.getContext("2d");
     const pos    = getPos(e);
+    const prev   = lastPos.current;
+    if (!prev) return;
+
     ctx.beginPath();
-    ctx.moveTo(lastPos.current.x, lastPos.current.y);
+    ctx.moveTo(prev.x, prev.y);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = tool === "eraser" ? "#ffffff" : color;
-    ctx.lineWidth   = tool === "eraser" ? size * 4  : size;
+    ctx.strokeStyle = tool === "eraser" ? "#fff" : color;
+    ctx.lineWidth   = tool === "eraser" ? size * 3 : size;
     ctx.lineCap     = "round";
     ctx.lineJoin    = "round";
     ctx.stroke();
+
     lastPos.current = pos;
   };
 
-  const onStop = (e) => {
+  const endDraw = (e) => {
     e?.preventDefault();
-    isDrawing.current = false;
-    lastPos.current   = null;
+    drawing.current = false;
+    lastPos.current = null;
+  };
+
+  const clear = () => {
+    const canvas = canvasRef.current;
+    const ctx    = canvas.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
   return (
-    <div
-      style={{
-        borderRadius: "12px",
-        overflow: "hidden",
-        border: "1px solid #e5e7eb",
-        backgroundColor: "#ffffff",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        cursor: tool === "eraser" ? "cell" : "crosshair",
-      }}
-    >
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <canvas
         ref={canvasRef}
-        width={200}
-        height={160}
+        width={width}
+        height={height}
+        onMouseDown={startDraw}
+        onMouseMove={draw}
+        onMouseUp={endDraw}
+        onMouseLeave={endDraw}
+        onTouchStart={startDraw}
+        onTouchMove={draw}
+        onTouchEnd={endDraw}
         style={{
-          width: "100%",
-          height: "auto",
+          width:       "100%",
+          height:      "100%",
+          display:     "block",
+          cursor:      tool === "eraser" ? "cell" : tool === "fill" ? "crosshair" : "crosshair",
           touchAction: "none",
-          display: "block",
         }}
-        onMouseDown={onStart}
-        onMouseMove={onMove}
-        onMouseUp={onStop}
-        onMouseLeave={onStop}
-        onTouchStart={onStart}
-        onTouchMove={onMove}
-        onTouchEnd={onStop}
       />
+      {/* clear button */}
+      <button
+        onClick={clear}
+        style={{
+          position:     "absolute",
+          bottom:       "4px",
+          right:        "4px",
+          padding:      "2px 8px",
+          borderRadius: "6px",
+          border:       "1.5px solid #fca5a5",
+          background:   "#fef2f2",
+          color:        "#dc2626",
+          fontSize:     "11px",
+          fontWeight:   700,
+          cursor:       "pointer",
+          zIndex:       3,
+          lineHeight:   1.4,
+        }}
+      >
+        ✕
+      </button>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// المكوّن الرئيسي
-// ─────────────────────────────────────────────
-export default function WB_UNIT5_Page30_Q1() {
+export default function SB_ReadAndDraw_PageG() {
   const [tool,  setTool]  = useState("pencil");
-  const [color, setColor] = useState("#1e293b");
+  const [color, setColor] = useState("#111827");
   const [size,  setSize]  = useState(4);
-  const [hoveredTool,  setHoveredTool]  = useState(null);
-  const [hoveredColor, setHoveredColor] = useState(null);
-  const [hoveredSize,  setHoveredSize]  = useState(null);
-  const [hoveredClear, setHoveredClear] = useState(false);
-
-  const canvasRefs = useRef({});
-
-  const handleClear = () => {
-    Object.values(canvasRefs.current).forEach(ref => {
-      if (ref?.clear) ref.clear();
-    });
-  };
 
   const handleCheck = () => {
-    ValidationAlert.success("Great drawing! 🎨");
+    ValidationAlert.success("Great! Please review the drawings.");
+  };
+
+  const handleStartAgain = () => {
+    // reload page to clear all canvases
+    window.location.reload();
   };
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "15px" }}>
-
-        {/* العنوان */}
-        <h1 className="WB-header-title-page8">
+      <div
+        className="div-forall"
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "18px",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
+        }}
+      >
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin:     0,
+            display:    "flex",
+            alignItems: "center",
+            gap:        "12px",
+            flexWrap:   "wrap",
+          }}
+        >
           <span className="WB-ex-A">G</span> Read and draw.
         </h1>
 
-        {/* المحتوى الرئيسي: جمل + صور */}
-        <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-
-          {/* الجمل على اليسار */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", flex: 1 }}>
-            {SENTENCES.map((s) => (
-              <p
-                key={s.id}
-                style={{
-                  color: "#374151",
-                  fontSize: "18px",
-                  fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  margin: 0,
-                }}
-              >
-                <span style={{ color: "#f97316", fontWeight: 700, minWidth: "16px" }}>
-                  {s.id}
-                </span>
-                <span>{s.text}</span>
-                <img
-                  src={s.itemImg}
-                  alt={s.itemName}
-                  style={{ width: 50, height: 50, objectFit: "contain", verticalAlign: "middle" }}
-                />
-                <span>{s.rest}</span>
-              </p>
-            ))}
-          </div>
-
-          {/* صور الأثاث 2x2 على اليمين */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "8px",
-              width: "400px",
-            }}
-          >
-            {FURNITURE_IMAGES.map((f) => (
-              <SingleCanvas
-                key={f.id}
-                furniture={f}
-                tool={tool}
-                color={color}
-                size={size}
-                registerRef={(ref) => { canvasRefs.current[f.id] = ref; }}
-              />
-            ))}
-          </div>
-
-        </div>
-
-        {/* شريط الأدوات */}
+        {/* ── Toolbar ── */}
         <div
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            gap: "12px",
-            backgroundColor: "#f9fafb",
-            border: "1px solid #e5e7eb",
-            borderRadius: "16px",
-            padding: "12px",
+            display:      "flex",
+            flexWrap:     "wrap",
+            alignItems:   "center",
+            gap:          "clamp(8px,1vw,12px)",
+            padding:      "clamp(8px,1vw,14px) clamp(10px,1.2vw,16px)",
+            border:       "1px solid #e5e7eb",
+            borderRadius: "clamp(10px,1.2vw,16px)",
+            background:   "#f9fafb",
           }}
         >
-
-          {/* أدوات */}
-          <div style={{ display: "flex", gap: "8px" }}>
-            {TOOLS.map((t) => (
+          {/* tools */}
+          <div style={{ display: "flex", gap: "clamp(4px,0.6vw,8px)", flexWrap: "wrap" }}>
+            {[
+              { id: "pencil", label: "✏️" },
+              { id: "eraser", label: "🧽" },
+              { id: "fill",   label: "🪣" },
+            ].map((item) => (
               <button
-                key={t.id}
-                onClick={() => setTool(t.id)}
-                onMouseEnter={() => setHoveredTool(t.id)}
-                onMouseLeave={() => setHoveredTool(null)}
+                key={item.id}
+                onClick={() => setTool(item.id)}
+                title={item.id}
                 style={{
-                  padding: "6px 12px",
-                  borderRadius: "12px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  border: "2px solid",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                  borderColor: tool === t.id ? "#3b82f6" : hoveredTool === t.id ? "#d1d5db" : "#e5e7eb",
-                  backgroundColor: tool === t.id ? "#eff6ff" : "#ffffff",
-                  color: tool === t.id ? "#1d4ed8" : "#4b5563",
+                  padding:      "clamp(5px,0.7vw,9px) clamp(8px,1vw,12px)",
+                  borderRadius: "10px",
+                  border:       tool === item.id ? "2px solid #3b82f6" : "2px solid #d1d5db",
+                  background:   tool === item.id ? "#eff6ff" : "#fff",
+                  color:        tool === item.id ? "#1d4ed8" : "#374151",
+                  fontWeight:   700,
+                  cursor:       "pointer",
+                  fontSize:     "clamp(14px,1.6vw,20px)",
                 }}
               >
-                {t.label}
+                {item.label}
               </button>
             ))}
           </div>
 
-          {/* فاصل */}
-          <div style={{ width: "1px", height: "24px", backgroundColor: "#e5e7eb" }} />
+          <div style={{ width: "1px", height: "28px", background: "#d1d5db", flexShrink: 0 }} />
 
-          {/* الألوان */}
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          {/* colors */}
+          <div style={{ display: "flex", gap: "clamp(4px,0.6vw,8px)", flexWrap: "wrap" }}>
             {COLORS.map((c) => (
               <button
                 key={c}
-                onClick={() => { setColor(c); setTool("pencil"); }}
-                onMouseEnter={() => setHoveredColor(c)}
-                onMouseLeave={() => setHoveredColor(null)}
+                onClick={() => setColor(c)}
                 style={{
-                  width: "24px",
-                  height: "24px",
+                  width:        "clamp(22px,2.8vw,32px)",
+                  height:       "clamp(22px,2.8vw,32px)",
                   borderRadius: "50%",
-                  border: "2px solid",
-                  cursor: "pointer",
-                  backgroundColor: c,
-                  transition: "all 0.15s",
-                  borderColor: color === c && tool === "pencil" ? "#374151" : "transparent",
-                  transform: (color === c && tool === "pencil") || hoveredColor === c
-                    ? "scale(1.1)"
-                    : "scale(1)",
-                  padding: 0,
+                  border:       color === c
+                    ? "3px solid #111827"
+                    : c === "#ffffff"
+                    ? "2px solid #d1d5db"
+                    : "2px solid transparent",
+                  background:   c,
+                  cursor:       "pointer",
+                  flexShrink:   0,
                 }}
               />
             ))}
           </div>
 
-          {/* فاصل */}
-          <div style={{ width: "1px", height: "24px", backgroundColor: "#e5e7eb" }} />
+          <div style={{ width: "1px", height: "28px", background: "#d1d5db", flexShrink: 0 }} />
 
-          {/* حجم الفرشاة */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {/* sizes */}
+          <div style={{ display: "flex", gap: "clamp(4px,0.6vw,8px)", alignItems: "center" }}>
             {SIZES.map((s) => (
               <button
                 key={s}
                 onClick={() => setSize(s)}
-                onMouseEnter={() => setHoveredSize(s)}
-                onMouseLeave={() => setHoveredSize(null)}
                 style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "50%",
-                  border: "2px solid",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
+                  width:          "clamp(26px,3.2vw,36px)",
+                  height:         "clamp(26px,3.2vw,36px)",
+                  borderRadius:   "50%",
+                  border:         size === s ? "2px solid #3b82f6" : "2px solid #d1d5db",
+                  background:     "#fff",
+                  cursor:         "pointer",
+                  display:        "flex",
+                  alignItems:     "center",
                   justifyContent: "center",
-                  backgroundColor: "#ffffff",
-                  transition: "all 0.15s",
-                  borderColor: size === s ? "#3b82f6" : hoveredSize === s ? "#d1d5db" : "#e5e7eb",
-                  padding: 0,
+                  flexShrink:     0,
                 }}
               >
                 <span
                   style={{
+                    width:        `${Math.min(s * 2, 16)}px`,
+                    height:       `${Math.min(s * 2, 16)}px`,
                     borderRadius: "50%",
-                    backgroundColor: "#374151",
-                    display: "block",
-                    width: Math.min(s * 2, 20),
-                    height: Math.min(s * 2, 20),
+                    background:   "#111827",
+                    display:      "block",
+                    flexShrink:   0,
                   }}
                 />
               </button>
             ))}
           </div>
+        </div>
 
-          {/* فاصل */}
-          <div style={{ width: "1px", height: "24px", backgroundColor: "#e5e7eb" }} />
-
-          {/* مسح الكل */}
-          <button
-            onClick={handleClear}
-            onMouseEnter={() => setHoveredClear(true)}
-            onMouseLeave={() => setHoveredClear(false)}
+        {/* ── Main layout ── */}
+        <div
+          style={{
+            display:             "grid",
+            gridTemplateColumns: "1fr auto",
+            gap:                 "clamp(16px,2.5vw,32px)",
+            alignItems:          "start",
+            width:               "100%",
+          }}
+        >
+          {/* LEFT: sentences */}
+          <div
             style={{
-              padding: "6px 12px",
-              borderRadius: "12px",
-              fontSize: "14px",
-              fontWeight: 500,
-              border: "2px solid",
-              cursor: "pointer",
-              transition: "all 0.15s",
-              borderColor: hoveredClear ? "#f87171" : "#fecaca",
-              backgroundColor: "#fff1f2",
-              color: "#ef4444",
+              display:       "flex",
+              flexDirection: "column",
+              gap:           "clamp(14px,2vw,24px)",
+              minWidth:      0,
             }}
           >
-            🗑️ Clear
-          </button>
+            {SENTENCES.map((s) => (
+              <div
+                key={s.id}
+                style={{
+                  display:    "flex",
+                  alignItems: "center",
+                  gap:        "clamp(8px,1vw,14px)",
+                  flexWrap:   "wrap",
+                  minWidth:   0,
+                }}
+              >
+                {/* number */}
+                <span
+                  style={{
+                    fontSize:   "clamp(16px,1.9vw,28px)",
+                    fontWeight: 700,
+                    color:      "#111",
+                    lineHeight: 1,
+                    flexShrink: 0,
+                    minWidth:   "clamp(14px,1.8vw,24px)",
+                  }}
+                >
+                  {s.id}
+                </span>
+
+                {/* before text */}
+                <span
+                  style={{
+                    fontSize:   "clamp(14px,1.7vw,22px)",
+                    fontWeight: 500,
+                    color:      "#111",
+                    lineHeight: 1.3,
+                    flexShrink: 0,
+                  }}
+                >
+                  {s.before}
+                </span>
+
+                {/* inline small image */}
+                <img
+                  src={s.img}
+                  alt={s.before}
+                  style={{
+                    height:        "clamp(28px,4vw,48px)",
+                    width:         "auto",
+                    objectFit:     "contain",
+                    display:       "inline-block",
+                    flexShrink:    0,
+                    userSelect:    "none",
+                    pointerEvents: "none",
+                  }}
+                />
+
+                {/* after text */}
+                <span
+                  style={{
+                    fontSize:   "clamp(14px,1.7vw,22px)",
+                    fontWeight: 500,
+                    color:      "#111",
+                    lineHeight: 1.3,
+                    flexShrink: 0,
+                  }}
+                >
+                  {s.after}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* RIGHT: furniture images 2×2 */}
+          <div
+            style={{
+              display:             "grid",
+              gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+              gap:                 "clamp(8px,1.2vw,16px)",
+              flexShrink:          0,
+            }}
+          >
+            {FURNITURE.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  width:        "clamp(90px,13vw,160px)",
+                  aspectRatio:  "1 / 1",
+                  flexShrink:   0,
+                }}
+              >
+                <img
+                  src={item.img}
+                  alt={item.alt}
+                  style={{
+                    width:         "100%",
+                    height:        "100%",
+                    objectFit:     "contain",
+                    display:       "block",
+                    userSelect:    "none",
+                    pointerEvents: "none",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* الأزرار */}
-        <div style={{ marginTop: "24px", display: "flex", justifyContent: "center" }}>
+        {/* ── Drawing area — 4 canvas boxes ── */}
+        <div
+          style={{
+            display:             "grid",
+            gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+            gap:                 "clamp(12px,1.8vw,22px)",
+            width:               "100%",
+          }}
+        >
+          {SENTENCES.map((s) => (
+            <div
+              key={s.id}
+              style={{
+                display:       "flex",
+                flexDirection: "column",
+                gap:           "clamp(6px,0.8vw,10px)",
+              }}
+            >
+              {/* label */}
+              <div
+                style={{
+                  display:    "flex",
+                  alignItems: "center",
+                  gap:        "clamp(6px,0.8vw,10px)",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize:        "clamp(12px,1.4vw,18px)",
+                    fontWeight:      700,
+                    color:           "#fff",
+                    background:      BORDER_COLOR,
+                    borderRadius:    "50%",
+                    width:           "clamp(20px,2.4vw,30px)",
+                    height:          "clamp(20px,2.4vw,30px)",
+                    display:         "flex",
+                    alignItems:      "center",
+                    justifyContent:  "center",
+                    flexShrink:      0,
+                  }}
+                >
+                  {s.id}
+                </span>
+                <span
+                  style={{
+                    fontSize:   "clamp(12px,1.4vw,18px)",
+                    fontWeight: 500,
+                    color:      "#555",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {s.before} {s.after}
+                </span>
+              </div>
+
+              {/* canvas */}
+              <div
+                style={{
+                  width:        "100%",
+                  aspectRatio:  "2 / 1",
+                  border:       `2px solid ${BORDER_COLOR}`,
+                  borderRadius: "clamp(10px,1.2vw,16px)",
+                  overflow:     "hidden",
+                  background:   "#fff",
+                  position:     "relative",
+                  boxSizing:    "border-box",
+                }}
+              >
+                <DrawCanvas
+                  width={600}
+                  height={300}
+                  tool={tool}
+                  color={color}
+                  size={size}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Buttons */}
+        <div
+          style={{
+            display:        "flex",
+            justifyContent: "center",
+            marginTop:      "clamp(6px,1vw,12px)",
+          }}
+        >
           <Button
             checkAnswers={handleCheck}
-            handleStartAgain={handleClear}
+            handleStartAgain={handleStartAgain}
           />
         </div>
-
       </div>
     </div>
   );

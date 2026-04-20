@@ -4,273 +4,235 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/2.svg";
-import img3 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/3.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/4.svg";
 
+// ── ثوابت ──────────────────────────────────────────────────────
+const WRONG_COLOR  = "#ef4444";
+const SELECT_COLOR = "#dc2626";
+const CARD_BORDER  = "#a3a3a3";
+
+// ── بيانات ─────────────────────────────────────────────────────
 const ITEMS = [
-  {
-    id: 1,
-    img: img1,
-    options: ["dogs", "ducks"],
-    correct: "dogs",
-  },
-  {
-    id: 2,
-    img: img2,
-    options: ["bees", "beets"],
-    correct: "bees",
-  },
-  {
-    id: 3,
-    img: img3,
-    options: ["bags", "bats"],
-    correct: "bats",
-  },
-  {
-    id: 4,
-    img: img4,
-    options: ["cups", "cubs"],
-    correct: "cups",
-  },
+  { id: 1, img: img1, options: ["dogs",  "ducks"], correct: "dogs" },
+  { id: 2, img: img2, options: ["bees",  "beets"], correct: "bees" },
+  { id: 3, img: img3, options: ["bags",  "bats"],  correct: "bats" },
+  { id: 4, img: img4, options: ["cups",  "cubs"],  correct: "cups" },
 ];
 
+// ── بادج الخطأ ─────────────────────────────────────────────────
+const ErrorBadge = () => (
+  <div
+    style={{
+      position:        "absolute",
+      top:             -10,
+      right:           -10,
+      width:           "clamp(18px,2vw,24px)",
+      height:          "clamp(18px,2vw,24px)",
+      borderRadius:    "50%",
+      backgroundColor: WRONG_COLOR,
+      color:           "#fff",
+      display:         "flex",
+      alignItems:      "center",
+      justifyContent:  "center",
+      fontSize:        "clamp(10px,1vw,13px)",
+      fontWeight:      700,
+      border:          "1.5px solid #fff",
+      boxShadow:       "0 2px 6px rgba(0,0,0,0.2)",
+      zIndex:          5,
+      pointerEvents:   "none",
+    }}
+  >
+    ✕
+  </div>
+);
+
+// ── المكوّن الرئيسي ─────────────────────────────────────────────
 export default function WB_Unit9_Page56_QC() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
+  // ── handlers ──
   const handleSelect = (id, value) => {
     if (showAns) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setChecked(false);
+    setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
     const allAnswered = ITEMS.every((item) => answers[item.id]);
-
     if (!allAnswered) {
-      ValidationAlert.info("Please answer all questions first.");
+      ValidationAlert.error("Please answer all questions first! ✏️");
       return;
     }
-
-    let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
-    setShowResults(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    let correct = 0;
+    ITEMS.forEach((item) => { if (answers[item.id] === item.correct) correct++; });
+    setChecked(true);
+    const total = ITEMS.length;
+    if (correct === total) ValidationAlert.success("Excellent! All correct! 🎉");
+    else                   ValidationAlert.error(`${correct} / ${total} correct. Try again! 💪`);
   };
 
   const handleShowAnswer = () => {
     const correctMap = {};
-    ITEMS.forEach((item) => {
-      correctMap[item.id] = item.correct;
-    });
-
+    ITEMS.forEach((item) => { correctMap[item.id] = item.correct; });
     setAnswers(correctMap);
-    setShowResults(true);
+    setChecked(false);
     setShowAns(true);
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
+    setChecked(false);
     setShowAns(false);
   };
 
-  const isWrong = (id) => {
-    if (!showResults) return false;
-    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
-  };
+  const isWrong = (id) =>
+    checked && answers[id] !== ITEMS.find((item) => item.id === id)?.correct;
 
-  const getOptionStyle = (itemId, option) => {
+  // ── ستايل زر الاختيار ──
+  const optionStyle = (itemId, option) => {
     const selected = answers[itemId] === option;
+    const wrong    = isWrong(itemId) && selected;
 
     return {
-      minWidth: "110px",
-      minHeight: "48px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "24px",
-      lineHeight: "1.2",
-      color: "#222",
-      cursor: showAns ? "default" : "pointer",
-      border: selected ? "4px solid #dc2626" : "4px solid transparent",
-      borderRadius: "999px",
+      minWidth:        "clamp(80px,10vw,120px)",
+      minHeight:       "clamp(38px,4.5vw,52px)",
+      display:         "flex",
+      alignItems:      "center",
+      justifyContent:  "center",
+      fontSize:        "clamp(16px,2vw,24px)",
+      fontWeight:      selected ? 700 : 500,
+      color:           wrong ? WRONG_COLOR : selected ? SELECT_COLOR : "#555",
+      cursor:          showAns ? "default" : "pointer",
+      border:          selected
+        ? `3px solid ${wrong ? WRONG_COLOR : SELECT_COLOR}`
+        : "3px solid transparent",
+      borderRadius:    "999px",
       backgroundColor: "transparent",
-      transition: "all 0.2s ease",
-      boxSizing: "border-box",
-      padding: "0 10px",
+      transition:      "all 0.15s ease",
+      boxSizing:       "border-box",
+      padding:         "0 clamp(6px,0.8vw,12px)",
     };
   };
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "980px",
-          margin: "0 auto",
-          padding: "10px 18px 20px 18px",
-          boxSizing: "border-box",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0 }}
-        >
-          <span className="WB-ex-A">C</span> Look, read, and circle. Say.
+      <div className="div-forall" style={{ gap: "clamp(20px,3vw,36px)" }}>
+
+        {/* ── العنوان ── */}
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">C</span>{" "}
+          Look, read, and circle. Say.
         </h1>
 
+        {/* ── البطاقات 4 في صف ── */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "26px",
-            alignItems: "start",
-            justifyItems: "center",
+            display:             "grid",
+            gridTemplateColumns: "repeat(4, minmax(0,1fr))",
+            gap:                 "clamp(14px,2vw,26px)",
+            alignItems:          "start",
+            justifyItems:        "center",
           }}
         >
-          {ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
+          {ITEMS.map((item) => {
+            const wrong = isWrong(item.id);
+
+            return (
               <div
+                key={item.id}
                 style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  paddingLeft: "6px",
-                  boxSizing: "border-box",
+                  display:       "flex",
+                  flexDirection: "column",
+                  alignItems:    "center",
+                  gap:           "clamp(6px,0.8vw,10px)",
+                  width:         "100%",
                 }}
               >
+                {/* رقم */}
                 <span
                   style={{
-                    fontSize: "20px",
-                    fontWeight: "700",
-                    color: "#222",
+                    fontSize:   "clamp(16px,1.9vw,22px)",
+                    fontWeight: 700,
+                    color:      "#111",
+                    alignSelf:  "flex-start",
+                    paddingLeft: "4px",
                   }}
                 >
                   {item.id}
                 </span>
-              </div>
 
-              <div
-                style={{
-                  width: "270px",
-                  minHeight: "300px",
-                  border: "3px solid #a3a3a3",
-                  borderRadius: "24px",
-                  backgroundColor: "#fff",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "14px 14px 18px 14px",
-                  boxSizing: "border-box",
-                  position: "relative",
-                }}
-              >
-                <img
-                  src={item.img}
-                  alt={`item-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "165px",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-
+                {/* البطاقة */}
                 <div
                   style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    gap: "10px",
-                    marginTop: "10px",
+                    position:        "relative",
+                    width:           "100%",
+                    border:          `2.5px solid ${wrong ? WRONG_COLOR : CARD_BORDER}`,
+                    borderRadius:    "clamp(14px,1.8vw,24px)",
+                    backgroundColor: "#fff",
+                    display:         "flex",
+                    flexDirection:   "column",
+                    alignItems:      "center",
+                    padding:         "clamp(10px,1.2vw,16px) clamp(8px,1vw,14px) clamp(14px,1.6vw,20px)",
+                    boxSizing:       "border-box",
+                    gap:             "clamp(8px,1vw,14px)",
+                    transition:      "border-color 0.2s",
                   }}
                 >
-                  {item.options.map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSelect(item.id, option)}
-                      style={getOptionStyle(item.id, option)}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
+                  {/* الصورة */}
+                  <img
+                    src={item.img}
+                    alt={`item-${item.id}`}
+                    style={{
+                      width:      "100%",
+                      height:     "clamp(120px,15vw,180px)",
+                      objectFit:  "contain",
+                      display:    "block",
+                      userSelect: "none",
+                    }}
+                  />
 
-                {isWrong(item.id) && (
+                  {/* خيارات الاختيار */}
                   <div
                     style={{
-                      position: "absolute",
-                      top: "-10px",
-                      right: "-10px",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "13px",
-                      fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                      width:          "100%",
+                      display:        "flex",
+                      justifyContent: "space-around",
+                      alignItems:     "center",
+                      gap:            "clamp(4px,0.6vw,10px)",
                     }}
                   >
-                    ✕
+                    {item.options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSelect(item.id, option)}
+                        style={optionStyle(item.id, option)}
+                      >
+                        {option}
+                      </button>
+                    ))}
                   </div>
-                )}
+
+                  {/* بادج الخطأ */}
+                  {wrong && <ErrorBadge />}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        {/* ── الأزرار ── */}
+        <div className="mt-4 flex justify-center">
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
           />
         </div>
+
       </div>
     </div>
   );

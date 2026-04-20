@@ -132,15 +132,15 @@ export default function WB_Unit8_Page60_QI() {
   };
 
   return (
-    <div className="main-container-component">
+ <div className="main-container-component">
       <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-        }}
-      >
+       className="div-forall"
+            style={{
+          flexDirection:  "column",
+       gap: "28px",
+          maxWidth: "1100px",
+         margin: "0 auto",       }}
+      > 
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">I</span>
           Read, look, and write.
@@ -229,13 +229,13 @@ export default function WB_Unit8_Page60_QI() {
                       }
                       disabled={showAns}
                       style={{
-                        border: "1px solid #cfcfcf",
+                        border: "1px solid #f39b42",
                         borderRadius: "8px",
                         padding: "4px 8px",
                         fontSize: "17px",
                         outline: "none",
                         backgroundColor: showAns ? "#f3f4f6" : "#fff",
-                        color: current.subject ? "#dc2626" : "#444",
+                        color: "#444",
                         cursor: showAns ? "default" : "pointer",
                         minWidth: "94px",
                         flexShrink: 0,
@@ -267,13 +267,14 @@ export default function WB_Unit8_Page60_QI() {
                       }
                       disabled={showAns}
                       style={{
-                        border: "1px solid #cfcfcf",
+                        border: "1px solid #f39b42",
                         borderRadius: "8px",
                         padding: "4px 8px",
                         fontSize: "17px",
                         outline: "none",
                         backgroundColor: showAns ? "#f3f4f6" : "#fff",
-                        color: current.place ? "#dc2626" : "#444",
+                        color: 
+                        "#444",
                         cursor: showAns ? "default" : "pointer",
                         minWidth: "150px",
                         flexShrink: 0,
@@ -340,7 +341,7 @@ export default function WB_Unit8_Page60_QI() {
                 style={{
                   width: "220px",
                   height: "120px",
-                  border: "2px solid #bdbdbd",
+                  border: "2px solid #f39b42",
                   borderRadius: "14px",
                   overflow: "hidden",
                   backgroundColor: "#fff",
