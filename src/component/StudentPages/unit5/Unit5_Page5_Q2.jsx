@@ -2,26 +2,17 @@ import React, { useState } from "react";
 import "./Unit5_Page5_Q2.css";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 5/P 44/unit5-pg44-EXB.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
 const Unit5_Page5_Q2 = () => {
-  const captions = [
-    {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
-    },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
-  ];
+const captions = [
+  {
+    start: 0.419,
+    end: 26.739,
+    text: "Page 44, write activities. Exercise B. Do both words have the same Y sound? Listen and write check or X. Fly. Try. Funny. Cry. Dry. Sly. My. Honey. Why. Buy. Runny. Candy"
+  }
+];
 
   const groups = [
     { id: 1, word1: "fly", word2: "try", answer: "yes" },
@@ -187,7 +178,7 @@ const Unit5_Page5_Q2 = () => {
           <span style={{ color: "#D52328" }}>✗</span>.
         </h3>
 
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11.5} />
 
         <div
           style={{

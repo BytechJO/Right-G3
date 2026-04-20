@@ -1,16 +1,11 @@
 import React, { useState, useRef } from "react";
 import page_4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 43.png";
 import "./Unit5_Page4.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 5/CD30.Pg43_Grammar2_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 5/Pg43_2.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 5/Pg43_2.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 5/Pg43_2.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 5/Pg43_2.4_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 5/Pg43_2.5_Adult Lady.mp3";
-import sound6 from "../../../assets/audio/ClassBook/U 5/Pg43_2.6_Adult Lady.mp3";
-import sound7 from "../../../assets/audio/ClassBook/U 5/Pg43_3.1_Adult Lady.mp3";
-import sound8 from "../../../assets/audio/ClassBook/U 5/Pg43_4.1_Adult Lady.mp3";
-import sound9 from "../../../assets/audio/ClassBook/U 5/Pg43_5.1_Helen.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 5/P 43/unit5-page43-grammar2.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 5/P 43/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 5/P 43/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 5/P 43/Pg43_3.1_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 5/P 43/Pg43_4.1_Adult Lady.mp3";
 
 // import video from "../../../assets/img_unit5/sounds-unit5/p13.mp4";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -23,32 +18,23 @@ const Unit5_Page4 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 4.07, text: " Page 13, exercise 2. Right Grammar. " },
-    { start: 4.1, end: 5.12, text: " What is it? " },
-    { start: 5.15, end: 6.15, text: "It’s a cake." },
-    { start: 6.19, end: 7.21, text: "What are these?" },
-    { start: 7.25, end: 9.04, text: "These are presents. " },
-    { start: 9.07, end: 11.29, text: "What is it? It's a birthday cake. " },
-    { start: 11.32, end: 15.04, text: "What are these? These are presents." },
-    { start: 15.07, end: 18.22, text: "Is it a train? Yes, it is. " },
     {
-      start: 18.26,
-      end: 21.24,
-      text: "Is it a cake? No, it isn't.",
+      start: 0.399,
+      end: 25.739,
+      text: "Page forty-three, exercise two. Write grammar. Is there a sink in the bathroom? Yes, there is. No, there isn't. Are there sinks in the kitchen? Yes, there are. No, there aren't. Is there a telephone behind the chair in the living room? No, there isn't. The telephone is next to the chair.",
+    },
+    {
+      start: 27.0,
+      end: 30.8,
+      text: "Is there a sink in the kitchen? Yes, there is",
     },
   ];
 
   const clickableAreas = [
-    { x1: 6.53, y1: 10.4, x2: 23.43, y2: 14.2, sound: sound1 },
-    { x1: 54.19, y1: 10.4, x2: 71.5, y2: 14.5, sound: sound2 },
-    { x1: 6.53, y1: 15.27, x2: 30.7, y2: 19.4, sound: sound3 },
-    { x1: 54.2, y1: 15.27, x2: 78.3, y2: 19.5, sound: sound4 },
-    { x1: 6.7, y1: 32.3, x2: 21.8, y2: 36.2, sound: sound5 },
-    { x1: 23.3, y1: 25.5, x2: 39.8, y2: 30.7, sound: sound6 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound7 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound8 },
-    { x1: 55.0, y1: 30.7, x2: 74.1, y2: 33.9, sound: sound9 },
-
+    { x1: 6.33, y1: 9.01, x2: 45.12, y2: 17.98, sound: sound1 },
+    { x1: 55.03, y1: 8.84, x2: 94.46, y2: 17.47, sound: sound2 },
+    { x1: 39.52, y1: 32.7, x2: 93.81, y2: 41.17, sound: sound3 },
+    { x1: 57.18, y1: 66.04, x2: 90.15 , y2: 71.46, sound: sound4 },
   ];
 
   const handleImageClick = (e) => {
@@ -73,10 +59,11 @@ const Unit5_Page4 = ({ openPopup }) => {
   };
 
   return (
-    <div className="page1-img-wrapper"
-          onClick={handleImageClick}
-          style={{ backgroundImage: `url(${page_4})` }}>
-   
+    <div
+      className="page1-img-wrapper"
+      onClick={handleImageClick}
+      style={{ backgroundImage: `url(${page_4})` }}
+    >
       {clickableAreas.map((area, index) => (
         <div
           key={index}
@@ -114,7 +101,8 @@ const Unit5_Page4 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           onClick={() =>
             openPopup(
-             "audio", <div
+              "audio",
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -125,12 +113,19 @@ const Unit5_Page4 = ({ openPopup }) => {
                   src={grammarSound}
                   captions={captionsExample}
                 />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <div
@@ -143,7 +138,8 @@ const Unit5_Page4 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           onClick={() =>
             openPopup(
-             "video", <div
+              "video",
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -151,7 +147,6 @@ const Unit5_Page4 = ({ openPopup }) => {
                   alignItems: "center",
                   height: "100%",
                   width: "100%",
-                
                 }}
               >
                 <video
@@ -166,12 +161,19 @@ const Unit5_Page4 = ({ openPopup }) => {
                 >
                   {/* <source src={video} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />
