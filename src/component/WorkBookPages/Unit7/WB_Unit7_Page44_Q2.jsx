@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR  = "#ef4444";
@@ -32,7 +35,15 @@ export default function WB_ListenAndMatch_PageB() {
   const bottomRefs = useRef({});
   const svgRef     = useRef(null);
   const containerRef = useRef(null);
-
+const captions = [
+  { start: 0.52, end: 3.22, text: "Page 44, phonics exercise B." },
+  { start: 3.22, end: 5.18, text: "Listen and match." },
+  { start: 5.18, end: 7.96, text: "1- math." },
+  { start: 7.96, end: 10.66, text: "2- thick." },
+  { start: 10.66, end: 13.82, text: "3- this." },
+  { start: 13.82, end: 16.56, text: "4- father." },
+  { start: 16.56, end: 19.36, text: "5- bank." },
+];
   // تتبع الماوس لرسم الخط المؤقت
   useEffect(() => {
     const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
@@ -173,6 +184,9 @@ export default function WB_ListenAndMatch_PageB() {
         >
           <span className="WB-ex-A">B</span> Listen and match.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         {/* ── منطقة الـ match ── */}
         <div

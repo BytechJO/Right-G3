@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+import sound from "../../../assets/audio/ClassBook/Grade 3/cd3pg20instruction-adult-lady_6VKGQN60.mp3"; // ← غيّر المسار حسب ملف الأوديو
+
 
 const ITEMS = [
   {
@@ -39,7 +42,16 @@ export default function WB_Unit3_Page18_QC() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
+const captions = [
+  { start: 0.58, end: 4.06, text: "Page 20, phonics exercise C." },
+  { start: 4.06, end: 6.00, text: "Listen, read, and circle." },
+  { start: 7.18, end: 8.82, text: "1- chin." },
+  { start: 9.86, end: 12.70, text: "2- patch." },
+  { start: 12.70, end: 14.60, text: "3- latch." },
+  { start: 14.60, end: 17.22, text: "4- cheat." },
+  { start: 18.32, end: 20.92, text: "5- shop." },
+  { start: 20.92, end: 22.56, text: "6- dish." },
+];
   const handleSelect = (id, value) => {
     if (showAns) return;
 
@@ -285,7 +297,9 @@ export default function WB_Unit3_Page18_QC() {
           }}>
           <span className="WB-ex-A">C</span> Listen, read, and circle.
         </h1>
-      
+      <div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound} captions={captions} />
+</div>
 
         <div className="wb-c-grid">
           {ITEMS.map((item) => (

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd10pg50instruction1-adult-lady_B8YFlmMv.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/6.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/7.svg";
@@ -11,7 +14,15 @@ import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folde
 
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "#ef4444";
-
+const captions = [
+  { start: 0.44, end: 3.08, text: "Page 50, phonics exercise B." },
+  { start: 3.08, end: 4.90, text: "Listen and circle." },
+  { start: 5.98, end: 7.66, text: "1- princess." },
+  { start: 8.70, end: 10.50, text: "2- bracelet." },
+  { start: 11.54, end: 13.32, text: "3- present." },
+  { start: 13.32, end: 16.32, text: "4- grandfather." },
+  { start: 16.32, end: 19.02, text: "5- broom." },
+];
 const ITEMS = [
   {
     id: 1,
@@ -149,6 +160,9 @@ export default function WB_LookReadCircle_PageJ() {
         >
           <span className="WB-ex-A">J</span> Look, read, and circle.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         <div
           style={{

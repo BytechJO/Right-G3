@@ -5,7 +5,7 @@ import { TbMessageCircle } from "react-icons/tb";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 
-import sound from "../../../assets/audio/WorkBook/titel G2/Unit 1.mp3"; // ← غيّر المسار حسب ملف الأوديو
+import sound from "../../../assets/audio/ClassBook/Grade 3/cd1pg8instruction-adult-lady_nlyjQBM0.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 2.svg";
@@ -209,16 +209,16 @@ const WB_Unit3_Page215_QB = () => {
 
   // ─── Captions ─────────────────────────────────────────────────────
   // ← عدّل النصوص والتوقيتات حسب أوديو هذا التمرين
-  const captions = [
-    { start: 0, end: 6.34, text: "Page 215, exercise B. Listen and match." },
-    { start: 7.0, end: 9.0, text: "1- shell." },
-    { start: 9.5, end: 11.5, text: "2- coat." },
-    { start: 12.0, end: 14.0, text: "3- juice." },
-    { start: 14.5, end: 16.5, text: "4- bee." },
-    { start: 17.0, end: 19.0, text: "5- nuts." },
-    { start: 19.5, end: 21.5, text: "6- kite." },
-  ];
-
+const captions = [
+  { start: 0.60, end: 3.44, text: "Page eight. Phonics exercise B." },
+  { start: 4.48, end: 5.68, text: "Listen and match." },
+  { start: 6.74, end: 9.10, text: "1- tube." },
+  { start: 9.10, end: 11.62, text: "2- coat." },
+  { start: 11.62, end: 13.34, text: "3- jam." },
+  { start: 13.34, end: 15.98, text: "4- bee." },
+  { start: 15.98, end: 18.78, text: "5- nuts." },
+  { start: 19.80, end: 21.56, text: "6- kite." },
+];
   const updateCaption = (time) => {
     const index = captions.findIndex(
       (cap) => time >= cap.start && time <= cap.end

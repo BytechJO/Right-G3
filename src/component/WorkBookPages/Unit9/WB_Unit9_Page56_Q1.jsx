@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3"; 
 
 const ITEMS = [
   {
@@ -50,7 +53,14 @@ export default function Phonics_QA() {
       ValidationAlert.info("Please answer all questions!");
       return;
     }
-
+const captions = [
+  { start: 0.46, end: 3.42, text: "Page 56, phonics exercise A." },
+  { start: 3.42, end: 8.62, text: "Do the words ending in S have the same S sound?" },
+  { start: 8.62, end: 11.88, text: "Listen and write check or X." },
+  { start: 13.00, end: 17.42, text: "1- the cats have cups and bats." },
+  { start: 17.42, end: 21.58, text: "2- the bees and dogs see the trees." },
+  { start: 21.58, end: 27.88, text: "3- the girl has books, peas, and dogs." },
+];
     let score = 0;
 
     ITEMS.forEach((item) => {
@@ -135,6 +145,9 @@ export default function Phonics_QA() {
           <span className="WB-ex-A">A</span>
           Do the words ending in "s" have the same -s sound? Write ✓ or ✕.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         {ITEMS.map((item) => (
           <div

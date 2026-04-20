@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd6pg32instruction-adult-lady_xXPh6TKj.mp3"; // ← غيّر المسار حسب ملف الأوديو
+
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR  = "#ef4444";
 const CIRCLE_COLOR = "#ef4444";
@@ -49,7 +53,13 @@ export default function WB_YSound_PageC() {
       ValidationAlert.info("Please circle some words first.");
       return;
     }
-
+const captions = [
+  { start: 0.58, end: 4.22, text: "Page 32, phonics exercise D." },
+  { start: 4.22, end: 6.90, text: "Which words have the same Y sound?" },
+  { start: 6.90, end: 9.60, text: "Listen and circle." },
+  { start: 9.60, end: 16.52, text: "1- try, grumpy, fry, cry." },
+  { start: 16.52, end: 22.74, text: "2- sandy, hardy, party, spy." },
+];
     let score = 0;
     let total = 0;
 
@@ -99,7 +109,13 @@ export default function WB_YSound_PageC() {
     if (isSelected) return { circled: true, color: CIRCLE_COLOR, borderColor: CIRCLE_COLOR };
     return { circled: false, color: "#111", borderColor: "transparent" };
   };
-
+const captions = [
+  { start: 0.58, end: 4.22, text: "Page 32, phonics exercise D." },
+  { start: 4.22, end: 6.90, text: "Which words have the same Y sound?" },
+  { start: 6.90, end: 9.60, text: "Listen and circle." },
+  { start: 9.60, end: 16.52, text: "1- try, grumpy, fry, cry." },
+  { start: 16.52, end: 22.74, text: "2- sandy, hardy, party, spy." },
+];
   return (
     <div className="main-container-component">
       <div
@@ -128,6 +144,9 @@ export default function WB_YSound_PageC() {
           <strong style={{ fontWeight: 900 }}>-y sound</strong>?
           Listen and circle.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         {/* Questions */}
         <div

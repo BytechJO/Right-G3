@@ -1,6 +1,9 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/ccd13pg62instruction1-adult-lady_lYm3lMP5.mp3"; 
 
 const TOP_ITEMS = [
   { id: 1, text: "1" },
@@ -34,7 +37,15 @@ export default function WB_Unit8_Page62_QC() {
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [lines, setLines] = useState([]);
-
+const captions = [
+  { start: 0.40, end: 3.08, text: "Page 62, phonics exercise C." },
+  { start: 3.08, end: 4.82, text: "Listen and match." },
+  { start: 5.86, end: 7.32, text: "1- dragon." },
+  { start: 7.32, end: 10.12, text: "2- cranberry." },
+  { start: 11.14, end: 12.78, text: "3- trust." },
+  { start: 12.78, end: 15.38, text: "4- trace." },
+  { start: 15.38, end: 18.22, text: "5- drive." },
+];
   const containerRef = useRef(null);
   const elementRefs = useRef({});
 
@@ -193,6 +204,9 @@ export default function WB_Unit8_Page62_QC() {
           <span className="WB-ex-A">C</span>
           Listen and match.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         <div
           ref={containerRef}

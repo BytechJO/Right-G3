@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 19.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 20.svg";
@@ -85,7 +88,15 @@ export default function WB_Unit3_Page18_QB() {
       ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
     }
   };
-
+const captions = [
+  { start: 0.60, end: 3.42, text: "Page 14, phonics, exercise C." },
+  { start: 3.42, end: 6.32, text: "Do they both have the same U sound?" },
+  { start: 6.32, end: 9.68, text: "Listen and write check or X." },
+  { start: 10.84, end: 13.58, text: "1- duck, glue." },
+  { start: 13.58, end: 17.42, text: "2- tube, sue." },
+  { start: 17.42, end: 21.16, text: "3- cup, cube." },
+  { start: 21.16, end: 24.74, text: "4- sun, bug." },
+];
   const handleShowAnswer = () => {
     const correctMap = {};
     ITEMS.forEach((item) => {
@@ -304,10 +315,11 @@ export default function WB_Unit3_Page18_QB() {
           style={{
             margin: 0,
           }}>
-          <span className="WB-ex-A">B</span> Do they both have the same sound? Write ✓ or ✕.
+          <span className="WB-ex-A">C</span> Do they both have the same sound? Write ✓ or ✕.
         </h1>
-
-        <div className="wb-b-grid">
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>        <div className="wb-b-grid">
           {ITEMS.map((item) => (
             <div
               key={item.id}

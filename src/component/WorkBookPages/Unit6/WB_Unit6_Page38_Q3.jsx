@@ -5,7 +5,6 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.3.svg";
-
 const DOT_COLOR    = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
 const BORDER_COLOR = "#e0e0e0";

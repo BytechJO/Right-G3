@@ -7,6 +7,8 @@ import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folde
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.5.svg";
+import AudioWithCaption from "../../AudioWithCaption";
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd7pg38instruction-adult-lady_MkitoI5l.mp3";
 
 const BORDER_COLOR = "#e0e0e0";
 const WRONG_COLOR  = "#ef4444";
@@ -26,7 +28,15 @@ export default function WB_ListenAndCircle_PageB() {
   const [answers,     setAnswers]     = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns,     setShowAns]     = useState(false);
-
+const captions = [
+  { start: 0.58, end: 4.36, text: "Page 38, phonics exercise B." },
+  { start: 4.36, end: 8.74, text: "Listen and circle FL, PL, or SL." },
+  { start: 9.86, end: 11.78, text: "1- plate." },
+  { start: 11.78, end: 14.64, text: "2- fly." },
+  { start: 14.64, end: 17.70, text: "3- slide." },
+  { start: 17.70, end: 21.60, text: "4- plant." },
+  { start: 21.60, end: 23.60, text: "5- flag." },
+];
   const handleSelect = (id, value) => {
     if (showAns) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
@@ -87,6 +97,9 @@ export default function WB_ListenAndCircle_PageB() {
           Listen and circle{" "}
           <strong>fl</strong>, <strong>pl</strong>, or <strong>sl</strong>.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         {/* ── Cards: 5 في صف ── */}
         <div

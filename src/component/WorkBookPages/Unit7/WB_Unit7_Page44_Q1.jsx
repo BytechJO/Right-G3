@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd8pg44instruction1-adult-lady_BcSB6hth.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 44/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 44/SVG/2.svg";
@@ -22,7 +25,15 @@ export default function WB_ListenAndCircle_PageA() {
   const [answers,     setAnswers]     = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns,     setShowAns]     = useState(false);
-
+const captions = [
+  { start: 0.54, end: 3.20, text: "Page 44, phonics exercise A." },
+  { start: 3.20, end: 6.16, text: "Listen and circle the beginning sound." },
+  { start: 7.26, end: 8.94, text: "1- house." },
+  { start: 9.96, end: 11.74, text: "2- moon." },
+  { start: 12.80, end: 14.72, text: "3- tie." },
+  { start: 14.72, end: 17.54, text: "4- kite." },
+  { start: 18.60, end: 20.40, text: "5- net." },
+];
   const handleSelect = (id, value) => {
     if (showAns) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
@@ -88,6 +99,9 @@ export default function WB_ListenAndCircle_PageA() {
           <span className="WB-ex-A">A</span>
           Listen and circle the <strong>beginning sound</strong>.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         {/* ── Grid 5 في صف ── */}
         <div

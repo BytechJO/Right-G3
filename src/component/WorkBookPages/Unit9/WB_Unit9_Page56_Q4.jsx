@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3"; 
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const WRONG_COLOR  = "#ef4444";
@@ -15,7 +18,17 @@ const ITEMS = [
   { id: 5, correct: true  },
   { id: 6, correct: false },
 ];
-
+const captions = [
+  { start: 0.36, end: 4.58, text: "Page 56. Phonics. Exercise D." },
+  { start: 4.58, end: 7.96, text: "Do they both have the same S sound?" },
+  { start: 7.96, end: 11.62, text: "Listen and write check or X." },
+  { start: 13.56, end: 16.58, text: "1- please, trees." },
+  { start: 17.68, end: 20.64, text: "2- boxes, socks." },
+  { start: 21.70, end: 24.94, text: "3- ropes, boats." },
+  { start: 26.18, end: 29.54, text: "4- noses, caps." },
+  { start: 29.54, end: 34.10, text: "5- stones, bones." },
+  { start: 34.10, end: 38.10, text: "6- bats, cubs." },
+];
 // ── بادج الخطأ ─────────────────────────────────────────────────
 const ErrorBadge = () => (
   <div
@@ -123,6 +136,9 @@ export default function Phonics_Page56_QD() {
           <span className="WB-ex-A">D</span>{" "}
           Do they both have the same -s sound? Listen and write ✓ or ✕.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         {/* ── الصناديق ── */}
         <div
