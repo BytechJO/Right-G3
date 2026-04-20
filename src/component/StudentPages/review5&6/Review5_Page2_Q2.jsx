@@ -2,27 +2,17 @@ import React, { useState } from "react";
 import "./Review5_Page2_Q2.css";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 6/P 53/unit6-pg53-EXD.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
 const Review5_Page2_Q2 = () => {
   const captions = [
     {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
+      start: 0.659,
+      end: 33.34,
+      text: "Page 53, review five, exercise D. Do both words have the same Y sound? Listen and write check or X. One, try, fly. Two, bunny, spy. Three, cry, fry. Four, candy, baby. Five, sunny, sly. Six, fluffy, sky",
     },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
   ];
-
   const groups = [
     { id: 1, word1: "try", word2: "fly", answer: "yes" },
     { id: 2, word1: "bunny", word2: "spy", answer: "no" },
@@ -178,16 +168,13 @@ const Review5_Page2_Q2 = () => {
         }}
       >
         <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>
-            D
-          </span>{" "}
-          Do both words have the same{" "}
-          <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and write{" "}
-          <span style={{ color: "#D52328" }}>✓</span> or{" "}
+          <span style={{ marginRight: "10px" }}>D</span> Do both words have the
+          same <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and
+          write <span style={{ color: "#D52328" }}>✓</span> or{" "}
           <span style={{ color: "#D52328" }}>✗</span>.
         </h5>
 
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10.8} />
 
         <div
           style={{

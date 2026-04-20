@@ -1,11 +1,11 @@
 import page24 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 56.png";
 import React, { useState, useRef } from "react";
 import "./Reading_Unit6_Page1.css";
-import sound1 from "../../../assets/audio/ClassBook/U 4/CD2.Pg38_Reading1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 4/Pg38_1.1_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 4/Pg38_1.2_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 4/Pg38_1.3_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 4/Pg38_1.4_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 6/P 56/unit6-pg56-readingall.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 6/P 56/Pg56_1.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 6/P 56/Pg56_1.2_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 6/P 56/Pg56_1.3_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 6/P 56/Pg56_1.4_Adult Lady.mp3";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
@@ -17,53 +17,52 @@ const Reading_Unit6_Page1 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.17, text: "Page 20 Reading. It's a Bunny." },
     {
-      start: 3.2,
-      end: 7.18,
-      text: " Today is Stella's birthday. Her friends are at her party. ",
+      start: 0.079,
+      end: 3.379,
+      text: "Page 56, reading. Let's go to the beach.",
     },
     {
-      start: 7.21,
-      end: 14.01,
-      text: "There is a big birthday cake. Harley asks Stella how old she is. She is seven years old. ",
+      start: 4.42,
+      end: 24.359,
+      text: "It's a hot day. Harley is thinking about swimming to cool off. He asks his mom if they can go to the beach. That's a great idea. I'd like to go, too, adds Helen. Mom agrees. Mom, where are my swimming trunks? I can't find them, Harley asks, confused.",
     },
     {
-      start: 14.05,
-      end: 18.26,
-      text: "Harley, Hansel, and John see the cupcakes. They look delicious.",
+      start: 25.479,
+      end: 30.079,
+      text: "Where are my shoes? Mom, can you help me find them? Helen shouts.",
     },
     {
-      start: 18.3,
-      end: 26.09,
-      text: "Hansel eats a lot of cupcakes. His tummy hurts. John tells him it is not good to eat so many sweets.",
+      start: 31.719,
+      end: 45.36,
+      text: "I want to take my ball to the beach. Mom, do you know where it is? asks Hansel. Have you seen my sunglasses? Harley asks Hansel. They're next to the lamp in your bedroom, Hansel replies.",
     },
     {
-      start: 26.12,
-      end: 34.0,
-      text: "Now, it's time for presents. Mom gives Stella her present. Stella is so excited.",
+      start: 46.979,
+      end: 50.599,
+      text: "Have you seen my swimming trunks and goggles? Hansel asks.",
     },
     {
-      start: 34.04,
-      end: 37.05,
-      text: "Stella opens the present. What can it be?  ",
+      start: 52.02,
+      end: 72.339,
+      text: "Yeah, they're in the basement on the shelf above the washing machine, says Harley. Are you ready? Mom asks. We're ready, Mom! shout the three of them. Then let's go. Let's get the bags in the car, says Mom. Mom, let's take a picture of the boat, suggests Hansel.",
     },
     {
-      start: 37.09,
-      end: 45.09,
-      text: "The present from mom is a bunny. It is very cute and white. Stella names her new bunny Tilly.",
+      start: 73.579,
+      end: 89.86,
+      text: "Mom, can we take a ride on the boat? asks Harley. Sure, boys, answers Mom. Hansel looks scared. Mom is concerned. What's wrong, Hansel? she asks. Hansel replies, I'm afraid of the sea, Mom.",
     },
     {
-      start: 45.12,
-      end: 54.04,
-      text: "Tilly hops and chases Lolo. Lolo is surprised. Stella and Sara laugh and laugh. This is the best birthday.",
+      start: 90.939,
+      end: 107.399,
+      text: "Don't worry, comforts Harley. The sea is wonderful. It just takes time to get to know it. Hansel is no longer afraid of the sea. Dad drives the boat through the water. It's a beautiful day to be out on the water in a boat. Everyone is very happy.",
     },
   ];
   const clickableAreas = [
-    { x1: 15.9, y1: 39.4, x2: 51.14, y2: 44.0, sound: sound2 },
-    { x1: 56.0, y1: 39.1, x2: 93.9, y2: 44.0, sound: sound3 },
-    { x1: 16.0, y1: 84.0, x2: 52.9, y2: 89.5, sound: sound4 },
-    { x1: 56.0, y1: 84.5, x2: 93.7, y2: 90.9, sound: sound5 },
+    { x1: 15.11, y1: 34.57, x2: 51.31, y2: 48.61, sound: sound2 },
+    { x1: 55.62, y1: 35.07, x2: 92.03, y2: 48.61, sound: sound3 },
+    { x1: 15.11, y1: 84.49, x2: 51.52, y2: 95.15, sound: sound4 },
+    { x1: 55.62, y1: 80.09, x2: 92.67, y2: 95.66, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -145,12 +144,19 @@ const Reading_Unit6_Page1 = ({ openPopup }) => {
                 }}
               >
                 <AudioWithCaption src={sound1} captions={captionsExample} />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
 
@@ -187,12 +193,19 @@ const Reading_Unit6_Page1 = ({ openPopup }) => {
                 >
                   {/* <source src={video3} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />
