@@ -24,7 +24,7 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
         style={{ backgroundImage: `url(${page2})` }}
       >
         <div
-          className="wb-unit7-p1-q1 hover:scale-110 transition "
+          className="q5-3 hover:scale-110 transition "
           style={{ overflow: "visible" }}
         >
           <svg
@@ -48,7 +48,7 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
         </div>
   
         <div
-          className="wb-unit7-p1-q2 hover:scale-110 transition "
+          className="q6-3 hover:scale-110 transition "
           style={{ overflow: "visible" }}
         >
           <svg

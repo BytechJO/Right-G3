@@ -1,83 +1,86 @@
-.wb-unit7-p1-q1 {
+.q1-6{
   position: absolute;
   padding: 5px;
-  top: 14.5%;
-  left: 55.5%;
-}
+  top: 12%;
 
-.wb-unit7-p1-q2 {
+  left:80.5%;
+  
+}
+.q2-6{
   position: absolute;
   padding: 5px;
-  top: 49%;
-  left: 46%;
+  top: 63%;
+  left: 45.5%;
 }
-.wb-unit7-p2-q1 {
-  position: absolute;
+.q3-6{  position: absolute;
   padding: 5px;
-  top: 4%;
-  left: 40%;
-}
+  top: 2%;
+  left:79.5%;
 
-.wb-unit7-p2-q2 {
+}
+.q4-6{
   position: absolute;
   padding: 5px;
-  top: 46.5%;
-  left: 62.5%;
+  top: 63%;
+  left:38.5%;
 }
-.wb-unit7-p3-q1 {
-  position: absolute;
+.q5-6{  position: absolute;
   padding: 5px;
-  top: 3.5%;
-  left: 40%;
-}
+  top: 2%;
+  left:39.5%;
 
-.wb-unit7-p3-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 51%;
-  left: 74.5%;
 }
-.wb-unit7-p4-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 3.5%;
-  left: 52%;
-}
-
-.wb-unit7-p4-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 48%;
-  left:90%;
-}
-.wb-unit7-p5-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 4%;
-  left: 51%;
-}
-.wb-unit7-p5-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 56%;
-  left: 42%;
-}
-.wb-unit7-p6-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 10%;
-  left: 35.5%;
-}
-
-.wb-unit7-p6-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 57%;
-  left: 88%;
-}
-.wb-unit7-p6-q3 {
+.q6-6{
   position: absolute;
   padding: 5px;
   top: 72%;
-  left: 62%;
+  left:33.5%;
+}
+.q7-6{  
+position: absolute;
+  padding: 5px;
+  top: 2%;
+  left:36.5%;
+}
+.q8-6{
+ position: absolute;
+  padding: 5px;
+  top: 55%;
+  left:47.5%;
+}
+.q9-6{  
+ position: absolute;
+  padding: 5px;
+  top:2%;
+  left: 38.5%;
+}
+.q10-6{
+  position: absolute;
+  padding: 5px;
+  top:24%;
+  left: 63.5%;
+}
+.q11-6{  position: absolute;
+  padding: 5px;
+  top: 8%;
+  left:62.5%;
+
+}
+.q12-6{
+  position: absolute;
+  padding: 5px;
+  top:55%;
+  left: 38.5%;}
+.q13-6{position: absolute;
+  padding: 5px;
+  top:75%;
+  left:30.5%;
+} 
+ 
+
+.q14-6{
+  position: absolute;
+  padding: 5px;
+  top:80%;
+  left: 73.5%;
 }

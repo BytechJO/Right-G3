@@ -10,7 +10,7 @@ const WB_Unit1_Page5 = ({ openPopup }) => {
               style={{ backgroundImage: `url(${page_1})` }}>
       {/* <img src={page} /> */}
       <div
-        className="wb-unit1-p5-q1 hover:scale-110 transition"
+        className="q5-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -32,7 +32,7 @@ const WB_Unit1_Page5 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="wb-unit1-p5-q2 hover:scale-110 transition"
+        className="q6-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg

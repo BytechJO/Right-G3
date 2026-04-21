@@ -1,83 +1,86 @@
-w.wb-unit7-p1-q1 {
+.q1-5{
   position: absolute;
   padding: 5px;
-  top: 14.5%;
-  left: 55.5%;
-}
+  top: 12%;
 
-.wb-unit7-p1-q2 {
+  left:33.5%;
+  
+}
+.q2-5{
   position: absolute;
   padding: 5px;
-  top: 49%;
-  left: 46%;
+  top: 65%;
+  left: 45.5%;
 }
-.wb-unit7-p2-q1 {
-  position: absolute;
+.q3-5{  position: absolute;
   padding: 5px;
-  top: 4%;
-  left: 40%;
-}
+  top: 2%;
+  left:34.5%;
 
-.wb-unit7-p2-q2 {
+}
+.q4-5{
   position: absolute;
   padding: 5px;
-  top: 46.5%;
-  left: 62.5%;
+  top: 53%;
+  left:34.5%;
 }
-.wb-unit7-p3-q1 {
-  position: absolute;
+.q5-5{  position: absolute;
   padding: 5px;
-  top: 3.5%;
-  left: 40%;
-}
+  top: 2%;
+  left:35.5%;
 
-.wb-unit7-p3-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 51%;
-  left: 74.5%;
 }
-.wb-unit7-p4-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 3.5%;
-  left: 52%;
-}
-
-.wb-unit7-p4-q2 {
+.q6-5{
   position: absolute;
   padding: 5px;
   top: 48%;
-  left:90%;
+  left:33.5%;
 }
-.wb-unit7-p5-q1 {
-  position: absolute;
+.q7-5{  
+position: absolute;
   padding: 5px;
-  top: 4%;
-  left: 51%;
+  top: 2%;
+  left:27.5%;
 }
-.wb-unit7-p5-q2 {
-  position: absolute;
+.q8-5{
+ position: absolute;
   padding: 5px;
-  top: 56%;
-  left: 42%;
+  top: 33%;
+  left:47.5%;
 }
-.wb-unit7-p6-q1 {
-  position: absolute;
+.q9-5{  
+ position: absolute;
   padding: 5px;
-  top: 10%;
+  top:2%;
   left: 35.5%;
 }
-
-.wb-unit7-p6-q2 {
+.q10-5{
   position: absolute;
   padding: 5px;
-  top: 57%;
-  left: 88%;
+  top:38%;
+  left: 26.5%;
 }
-.wb-unit7-p6-q3 {
+.q11-5{  position: absolute;
+  padding: 5px;
+  top: 8%;
+  left:49.5%;
+
+}
+.q12-5{
   position: absolute;
   padding: 5px;
-  top: 72%;
-  left: 62%;
+  top:75%;
+  left: 68.5%;}
+.q13-5{position: absolute;
+  padding: 5px;
+  top:27%;
+  left:34.5%;
+} 
+ 
+
+.q14-5{
+  position: absolute;
+  padding: 5px;
+  top:80%;
+  left: 73.5%;
 }

@@ -27,7 +27,15 @@ export default function Phonics_QA() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
+const captions = [
+  { start: 0.44, end: 3.08, text: "Page 50, phonics exercise B." },
+  { start: 3.08, end: 4.90, text: "Listen and circle." },
+  { start: 5.98, end: 7.66, text: "1- princess." },
+  { start: 8.70, end: 10.50, text: "2- bracelet." },
+  { start: 11.54, end: 13.32, text: "3- present." },
+  { start: 13.32, end: 16.32, text: "4- grandfather." },
+  { start: 16.32, end: 19.02, text: "5- broom." },
+];
   const handleSelect = (id, value) => {
     if (showAns) return;
 

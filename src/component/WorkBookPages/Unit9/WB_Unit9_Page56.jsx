@@ -10,31 +10,7 @@ const WB_Unit9_Page56 = ({ openPopup }) => {
       style={{ backgroundImage: `url(${page2})` }}
     >
       <div
-        className="wb-unit9-p6-q1 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 113 })}
-          style={{ overflow: "visible" }}
-          // className="click-icon-page8-2 hover:scale-110 transition"
-        >
-          <image
-            className="svg-img"
-            href={arrowBtn}
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid meet"
-          />
-        </svg>
-      </div>
-
-      <div
-        className="wb-unit9-p6-q2 hover:scale-110 transition"
+        className="q11-9 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -56,8 +32,9 @@ const WB_Unit9_Page56 = ({ openPopup }) => {
           />
         </svg>
       </div>
-        <div
-        className="wb-unit9-p1-q3 hover:scale-110 transition"
+
+      <div
+        className="q12-9 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -80,7 +57,7 @@ const WB_Unit9_Page56 = ({ openPopup }) => {
         </svg>
       </div>
         <div
-        className="wb-unit9-p6-q4 hover:scale-110 transition"
+        className="q13-9 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -94,7 +71,7 @@ const WB_Unit9_Page56 = ({ openPopup }) => {
           <image
             className="svg-img"
             href={arrowBtn}
-            x="200"
+            x="0"
             y="0"
             width="100%"
             height="100%"
@@ -102,6 +79,7 @@ const WB_Unit9_Page56 = ({ openPopup }) => {
           />
         </svg>
       </div>
+    
     </div>
   );
 };

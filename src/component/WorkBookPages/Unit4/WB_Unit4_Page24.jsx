@@ -10,7 +10,7 @@ const WB_Unit4_Page24 = ({ openPopup }) => {
     >
       {/* <img src={page} /> */}
       <div
-        className="wb-unit1-p6-q1 hover:scale-110 transition"
+        className="q7-4 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg

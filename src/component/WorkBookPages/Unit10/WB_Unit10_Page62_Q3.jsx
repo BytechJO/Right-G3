@@ -3,7 +3,7 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import AudioWithCaption from "../../AudioWithCaption";
 
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/ccd13pg62instruction1-adult-lady_lYm3lMP5.mp3"; 
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd13pg62instruction1-adult-lady_lYm3lMP5.mp3"; 
 
 const TOP_ITEMS = [
   { id: 1, text: "1" },

@@ -10,31 +10,7 @@ const WB_Unit10_Page62 = ({ openPopup }) => {
       style={{ backgroundImage: `url(${page2})` }}
     >
       <div
-        className="wb-unit10-p6-q1 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 127 })}
-          style={{ overflow: "visible" }}
-          // className="click-icon-page8-2 hover:scale-110 transition"
-        >
-          <image
-            className="svg-img"
-            href={arrowBtn}
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid meet"
-          />
-        </svg>
-      </div>
-
-      <div
-        className="wb-unit10-p6-q2 hover:scale-110 transition"
+        className="q11-10 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -58,7 +34,7 @@ const WB_Unit10_Page62 = ({ openPopup }) => {
       </div>
 
       <div
-        className="wb-unit10-p6-q3 hover:scale-110 transition "
+        className="q12-10 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -80,6 +56,30 @@ const WB_Unit10_Page62 = ({ openPopup }) => {
           />
         </svg>
       </div>
+        <div
+        className="q13-10 hover:scale-110 transition"
+        style={{ overflow: "visible" }}
+      >
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 90 90"
+          onClick={() => openPopup("exercise", { startIndex: 130 })}
+          style={{ overflow: "visible" }}
+          // className="click-icon-page8-2 hover:scale-110 transition"
+        >
+          <image
+            className="svg-img"
+            href={arrowBtn}
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMid meet"
+          />
+        </svg>
+      </div>
+   
     </div>
   );
 };

@@ -62,95 +62,93 @@
   position: fixed!important; 
 }
 
-
-
-.q1-2 {
+.q1-1 {
   position: absolute !important;
   padding: 5px !important;
-  top: 12% !important;
-  left: 30.5% !important;
+  top: 11% !important;
+  left: 33.5% !important;
 }
 
-.q2-2 {
-  position: absolute !important;
-  padding: 5px !important;
-  top: 49% !important;
-  left: 38.5% !important;
-}
-
-.q3-2 {
-  position: absolute !important;
-  padding: 5px !important;
-  top: 2% !important;
-  left: 30.5% !important;
-}
-
-.q4-2{
+.q2-1 {
   position: absolute !important;
   padding: 5px !important;
   top: 45% !important;
-  left: 36.5% !important;
+  left: 47.5% !important;
 }
 
-.q5-2 {
+.q3-1 {
   position: absolute !important;
   padding: 5px !important;
   top: 2% !important;
-  left: 30.5% !important;
+  left: 60.5% !important;
 }
 
-.q6-2 {
+.q4-1{
   position: absolute !important;
   padding: 5px !important;
-  top: 53% !important;
-  left: 80.5% !important;
+  top: 39% !important;
+  left: 31.5% !important;
 }
 
-.q7-2 {
+.q5-1 {
   position: absolute !important;
   padding: 5px !important;
   top: 2% !important;
-  left: 35.5% !important;
+  left: 60.5% !important;
 }
 
-.q8-2 {
+.q6-1 {
   position: absolute !important;
   padding: 5px !important;
-  top: 50% !important;
+  top: 59% !important;
+  left: 31.5% !important;
+}
+
+.q7-1 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 2% !important;
+  left: 40.5% !important;
+}
+
+.q8-1 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 48% !important;
   left: 41.5% !important;
 }
 
-.q9-2 {
+.q9-1 {
   position: absolute !important;
   padding: 5px !important;
   top: 2% !important;
-  left: 30.5% !important;
+  left: 56.5% !important;
 }
 
-.q10-2 {
+.q10-1 {
   position: absolute !important;
   padding: 5px !important;
-  top: 47% !important;
-  left: 85.5% !important;
+  top: 50% !important;
+  left: 73.5% !important;
 }
 
-.q11-2 {
+.q11-1 {
   position: absolute !important;
   padding: 5px !important;
   top: 8% !important;
-  left: 82.5% !important;
+  left: 46.5% !important;
 }
 
-.q12-2{
+.q12-1 {
   position: absolute !important;
   padding: 5px !important;
-  top: 40% !important;
-  left: 30.5% !important;
+  top: 43% !important;
+  left: 32.5% !important;
 }
 
-.q13-2 {
+.q13-1{
   position: absolute !important;
   padding: 5px !important;
-  top: 75% !important;
-  left: 90.5% !important;
+  top: 68% !important;
+  left: 40.5% !important;
 }
