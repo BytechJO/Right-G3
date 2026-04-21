@@ -36,7 +36,7 @@ import FourImagesWithAudio from "../../FourImagesWithAudio";
 // import sound3 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
 // import sound4 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
 
-import "./unit3_Page2.css";
+import "./Unit3_Page2.css";
 import ReadChoose from "../../ReadChoose";
 const Unit3_Page2 = ({ openPopup }) => {
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);

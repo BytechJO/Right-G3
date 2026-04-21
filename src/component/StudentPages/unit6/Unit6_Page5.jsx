@@ -1,5 +1,5 @@
 import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50.png";
-import "./unit6_Page5.css";
+import "./Unit6_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 const Unit6_Page5 = ({ openPopup }) => {
   return (

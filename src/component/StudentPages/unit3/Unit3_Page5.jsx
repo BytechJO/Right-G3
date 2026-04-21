@@ -1,6 +1,6 @@
 
 import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26.png";
-import "./unit3_Page5.css";
+import "./Unit3_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 const Unit3_Page5 = ({ openPopup }) => {
   return (

@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 46.png";
-import "./unit6_Page1.css";
+import "./Unit6_Page1.css";
 import Unit6_Page1_find from "./Unit6_Page1_find";
 import Unit6_Page1_Vocab from "./Unit6_Page1_Vocab";
 import Unit6_Page1_Read from "./Unit6_Page1_Read";

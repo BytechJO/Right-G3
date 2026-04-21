@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 25.png";
-import "./unit3_Page3.css";
+import "./Unit3_Page3.css";
 import grammarSound from "../../../assets/audio/ClassBook/Unit 3/P 25/fullAudio.mp3";
 import sound1 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_2.1_Adult Lady.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_2.2_Adult Lady.mp3";
