@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import find_img from "../../../assets/imgs/test.png"; //======= should change ==========
-import Rabbit from "../../../assets/Page 01/Rabbit.svg";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/G5_U2_Pg_10.png";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import MySVG from "../../../assets/imgs/test.png";
+import Rabbit from "../../../assets/Page 01/Rabbit.svg";
+import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/interactive.svg";
 
 const Unit2_Page1_find = () => {
   const [clickedPoint, setClickedPoint] = useState(null);
@@ -10,16 +10,18 @@ const Unit2_Page1_find = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   // ✅ منطقة المطعم (بالنسب المئوية)
   const targetArea = {
-    x1: 18,
-    y1: 69,
-    x2: 24,
-    y2: 74,
+    x1: 36.53,
+    y1: 76.6,
+    x2: 60.7,
+    y2: 91.0,
   };
 
   const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+
+    console.log(xPercent, yPercent);
 
     setClickedPoint({
       x: xPercent,
@@ -34,20 +36,41 @@ const Unit2_Page1_find = () => {
 
   const handleCheck = () => {
     if (showAnswer) return;
+    // 1️⃣ إذا الطالب ما ضغط على الصورة
     if (!clickedPoint) {
       ValidationAlert.info(
-        "Pay attention!",
-        "Please click on the image first.",
+        "Pay Attention!",
+        "Please click on a spot in the image before checking.",
       );
       return;
     }
 
-    if (clickedPoint.inside) {
+    // 2️⃣ نحدد إنو الصواب / خطأ
+    const correct = clickedPoint.inside;
+    const total = 1;
+    const score = correct ? 1 : 0;
+
+    // 3️⃣ نحدد اللون حسب الإجابة
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+
+    // 4️⃣ نكتب رسالة العلامة
+    const scoreMessage = `
+    <div style="font-size: 20px; margin-top: 10px; text-align:center;">
+      <span style="color:${color}; font-weight:bold;">
+ Score: ${score} / ${total}
+      </span>
+    </div>
+  `;
+
+    // 5️⃣ نحدد نوع الإشعار حسب النتيجة
+    if (score === total) {
       setCheckResult("success");
       ValidationAlert.success("Bravo!", "You clicked on the restaurant! 🏆");
-    } else {
+    } else if (score === 0) {
       setCheckResult("fail");
       ValidationAlert.error("Oops!", "This is not the restaurant. Try again!");
+    } else {
+      ValidationAlert.warning(scoreMessage);
     }
   };
 
@@ -56,7 +79,6 @@ const Unit2_Page1_find = () => {
     setCheckResult(null);
     setShowAnswer(false);
   };
-
   const handleShowAnswer = () => {
     setShowAnswer(true);
     setClickedPoint(null); // نمسح النقطة اللي كبسها الطالب
@@ -78,20 +100,20 @@ const Unit2_Page1_find = () => {
         >
           <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
           <h5 className="header-title-page8">
-            I need your help. Can you help me find the carriage in the picture?
+            I need your help. Can you help me find carriage in the picture?
           </h5>
         </div>
-        <div style={{ position: "relative", display: "inline-block" }}>
+        <div style={{ position: "relative" }}>
           <img
-            src={find_img}
+            src={backgroundImage}
             alt="interactive"
+            onClick={handleImageClick}
             style={{
               width: "auto",
-              height: "75vh",
+              height: "70vh",
               cursor: "pointer",
               display: "block",
             }}
-            onClick={handleImageClick}
           />
 
           {/* ✅ الدائرة الحمراء في مكان الكبس */}
@@ -110,17 +132,15 @@ const Unit2_Page1_find = () => {
               }}
             ></div>
           )}
-
-          {/* ✅ تلوين المنطقة الصحيحة إذا الجواب صح */}
           {(checkResult === "success" || showAnswer) && (
             <img
               src={MySVG}
               alt="answer highlight"
               style={{
                 position: "absolute",
-                top: `67%`,
-                left: `18.5%`,
-                height: `7%`,
+                top: `76.5%`,
+                left: `35.5%`,
+                height: `15%`,
                 pointerEvents: "none",
               }}
             />

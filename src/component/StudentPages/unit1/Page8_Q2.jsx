@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import "./Page8_Q2.css";
-import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 8/CD6.Pg8_Instruction1_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 8/unit1-pg8-EX-A.mp3";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
@@ -20,20 +20,50 @@ const Page8_Q2 = () => {
   const [showResult, setShowResult] = useState(false);
   const [locked, setLocked] = useState(false);
 
-
   // ================================
   // ✔ Captions Array
   // ================================
   const captions = [
     {
-      start: 0,
-      end: 9.04,
-      text: "Page 8, exercise A number 2. Listen and circle the words with long vowel sounds.",
+      start: 0.259,
+      end: 18.899,
+      text: "Page eight. Write activities. Exercise A, Number 2. Listen and circle the words with long vowel sounds. One, may, lake, jam, paint. Two, bee, bed,",
     },
-    { start: 9.06, end: 13.14, text: "1. goose, gate, kiwi," },
-    { start: 13.16, end: 17.17, text: "2. kick, goat, kite," },
-    { start: 17.19, end: 22.06, text: "3. king, garlic, game,  " },
-    { start: 22.08, end: 27.09, text: "4. kangaroo, key, grapes. " },
+    {
+      start: 19.939,
+      end: 26.959,
+      text: "feet, tea. Three, kite, bike, light,",
+    },
+    {
+      start: 27.979,
+      end: 28.379,
+      text: "fish.",
+    },
+    {
+      start: 29.739,
+      end: 31.319,
+      text: "Four, home,",
+    },
+    {
+      start: 32.34,
+      end: 32.799,
+      text: "boat,",
+    },
+    {
+      start: 33.86,
+      end: 34.36,
+      text: "box,",
+    },
+    {
+      start: 35.419,
+      end: 39.779,
+      text: "note. Five, run, blue,",
+    },
+    {
+      start: 40.819,
+      end: 42.919,
+      text: "Sue, tube",
+    },
   ];
   const showAnswers = () => {
     const correctSelections = groups.map((g) => g.correct);
@@ -117,7 +147,7 @@ const Page8_Q2 = () => {
           <QuestionAudioPlayer
             src={sound1}
             captions={captions}
-            stopAtSecond={9}
+            stopAtSecond={9.2}
           />
 
           <div

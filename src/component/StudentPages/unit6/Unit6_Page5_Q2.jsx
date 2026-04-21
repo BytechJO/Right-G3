@@ -6,7 +6,7 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex B 4.svg";
-import sound1 from "../../../assets/audio/ClassBook/Unit 6/P 50/CD39.Pg50_Instruction_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 6/P 50/unit6-pg50-EXB.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 const Unit6_Page5_Q2 = () => {
@@ -38,32 +38,28 @@ const Unit6_Page5_Q2 = () => {
   const [showResult, setShowResult] = useState(false);
   const captions = [
     {
-      start: 0.5,
-      end: 8.34,
-      text: "Page 62, Write Activities. Exercise A, number 1. Listen, circle, and write.",
+      start: 0.14,
+      end: 16.02,
+      text: "Page 50, write activities. Exercise B. Look, listen, and choose. One, glass. Two, blender. Three, class. Four, float.",
     },
-    { start: 9.639, end: 10.859, text: "1, window." },
-    { start: 12.139, end: 13.279, text: "2, coat." },
-    { start: 14.559, end: 15.799, text: "3, note." },
-    { start: 17.219, end: 18.379, text: "5, boat" },
   ];
- const chooseOption = (i, value) => {
-  if (locked) return;
+  const chooseOption = (i, value) => {
+    if (locked) return;
 
-  const newSelected = [...selected];
-  newSelected[i] = value;
-  setSelected(newSelected);
-};
+    const newSelected = [...selected];
+    newSelected[i] = value;
+    setSelected(newSelected);
+  };
 
- const resetAll = () => {
-  setSelected(Array(items.length).fill(""));
-  setLocked(false);
-  setShowResult(false);
-};
+  const resetAll = () => {
+    setSelected(Array(items.length).fill(""));
+    setLocked(false);
+    setShowResult(false);
+  };
   const showAnswers = () => {
-  setSelected(items.map((i) => i.correct));
-  setLocked(true);
-};
+    setSelected(items.map((i) => i.correct));
+    setLocked(true);
+  };
   const checkAnswers = () => {
     if (locked) return;
 
@@ -112,7 +108,7 @@ const Unit6_Page5_Q2 = () => {
         <QuestionAudioPlayer
           src={sound1}
           captions={captions}
-          stopAtSecond={8.43}
+          stopAtSecond={6.9}
         />
         <div className="flex w-full">
           <div className="flex justify-center w-full">
