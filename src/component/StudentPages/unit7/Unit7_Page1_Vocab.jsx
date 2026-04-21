@@ -3,7 +3,7 @@ import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 7
 import page2_2 from "../../../assets/imgs/test.png";
 import vocabulary from "../../../assets/audio/ClassBook/Unit 7/P 58/Pg58_Vocab_Adult Lady.mp3";
 import vocabularyImg from "../../../assets/imgs/Voc.svg";
-import "./unit7_Page1.css";
+import "./Unit7_Page1.css";
 import num1 from "../../../assets/imgs/num/1_1.svg";
 import num2 from "../../../assets/imgs/num/2_1.svg";
 import num3 from "../../../assets/imgs/num/3_1.svg";
