@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import page_6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 27.png";
 // import song from "../../../assets/img_unit3/sounds-unit3/Pg15.Sing_Adult Lady.mp3";
-import "./unit3_Page6.css";
+import "./Unit3_Page6.css";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
