@@ -139,7 +139,7 @@ const captions = [
             flexWrap:   "wrap",
           }}
         >
-          <span className="WB-ex-A">C</span>
+          <span className="WB-ex-A">D</span>
           Which words have the same{" "}
           <strong style={{ fontWeight: 900 }}>-y sound</strong>?
           Listen and circle.

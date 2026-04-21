@@ -3,7 +3,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 import AudioWithCaption from "../../AudioWithCaption";
 
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/CD5.Pg26.Instruction2_Adult Lady.mp3"; // ← غيّر المسار حسب ملف الأوديو
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd5pg26instruction2-adult-lady_CHBq9E0z.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 const ACTIVE_COLOR = "#f39b42";
 const LINE_COLOR = "#ffca94";
