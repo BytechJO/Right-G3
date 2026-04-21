@@ -1,6 +1,6 @@
 import React from "react";
 import page_3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 8.png";
-import "./WB_Unit5.css";
+import "./WB_unit5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
 const WB_Unit1_Page8 = ({ openPopup }) => {
