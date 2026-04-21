@@ -37,7 +37,7 @@ const BOTTOM_ITEMS = [
   { id: 5, img: telephoneImg, alt: "telephone" },
 ];
 
-export default function SB_LabelRooms_PageH() {
+export default function WB_Unit5_Page30_Q2() {
   const [selected, setSelected] = useState({ 1: "", 2: "", 3: "", 4: "" });
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns]         = useState(false);
