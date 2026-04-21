@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import backgroundImage from "../../../assets/imgs/test.png";
 import page2_2 from "../../../assets/imgs/test.png";
 // import vocabulary from "../../../assets/img_unit3/sounds-unit3/Pg10_Vocabulary_Adult Lady.mp3";
-import "./unit8_Page1.css";
+import "./Unit8_Page1.css";
 import num1 from "../../../assets/imgs/test.png";
 import num2 from "../../../assets/imgs/test.png";
 import num3 from "../../../assets/imgs/test.png";

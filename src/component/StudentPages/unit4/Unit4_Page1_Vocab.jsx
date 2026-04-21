@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/G5_U4_Pg_28.png";
 import vocabularyImg from "../../../assets/imgs/Voc.svg";
 import vocabulary from "../../../assets/audio/ClassBook/Unit 4/P 28/Pg28_Vocab_Adult Lady.mp3";
-import "./unit4_Page1.css";
+import "./Unit4_Page1.css";
 import num1 from "../../../assets/imgs/num/1_1.svg";
 import num2 from "../../../assets/imgs/num/2_1.svg";
 import num3 from "../../../assets/imgs/num/3_1.svg";
