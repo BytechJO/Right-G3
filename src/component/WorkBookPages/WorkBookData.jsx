@@ -222,9 +222,9 @@ export const workBookData = [
   { component: WB_Unit5_Page30_Q1, unit: 5 },
   { component: WB_Unit5_Page30_Q2, unit: 5 },
   { component: WB_Unit5_Page31_Q1, unit: 5 },
-  { component: WB_Unit5_Page31_Q2, unit: 5 },  
-  { component: WB_Unit5_Page32_Q1, unit: 5 },  
-  { component: WB_Unit5_Page32_Q2, unit: 5 },  
+  { component: WB_Unit5_Page31_Q2, unit: 5 },
+  { component: WB_Unit5_Page32_Q1, unit: 5 },
+  { component: WB_Unit5_Page32_Q2, unit: 5 },
   { component: WB_Unit5_Page32_Q3, unit: 5, lastOfUnit: true },
 
   // UNIT 6
