@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/G5_U2_Pg_10.png";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/interactive.svg";
+import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Interactive.svg";
 
 const Unit2_Page1_find = () => {
   const [clickedPoint, setClickedPoint] = useState(null);
