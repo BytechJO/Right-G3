@@ -1,22 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
 import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
-import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
-import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
-import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
-import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
+import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.1_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.2_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.3_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.4_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.5_Adult Lady.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.6_Adult Lady.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.7_Adult Lady.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.8_Adult Lady.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.9_Adult Lady.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.10_Adult Lady.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.11_Adult Lady.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_2.12_Adult Lady.mp3";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-12.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-13.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-14.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-15.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-16.svg";
+import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-17.svg";
+import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-18.svg";
+import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-19.svg";
+import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-20.svg";
+import img10 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-21.svg";
+import img11 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-22.svg";
+import img12 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-23.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import soundListen from "../../../assets/audio/ClassBook/Unit 4/P 29/pg29-read1.mp3";
-import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
-import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 59.png";
-import sound1_letter from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_1.1_Bebo.mp3";
-import sound2_letter from "../../../assets/audio/ClassBook/Unit 4/P 29/Pg29_2.2_Adult Lady.mp3";
-import sound3_letter from "../../../assets/audio/ClassBook/Unit 4/P 29/Pg29_2.3_Adult Lady.mp3";
-import sound4_letter from "../../../assets/audio/ClassBook/Unit 4/P 29/Pg29_2.4_Adult Lady.mp3";
-import repeat from "../../../assets/audio/ClassBook/Unit 4/P 29/repeat_p29.mp3";
+import soundListen from "../../../assets/audio/ClassBook/Unit 7/P 59/unit7-pg59-reading.mp3";
+import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/Asset 40.svg";
+import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/Asset 39.svg";
+
+import repeat from "../../../assets/audio/ClassBook/Unit 7/P 59/unit7-pg59-bebo&lolo.mp3";
 import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
 import Bebo from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_1.1_Bebo.mp3";
-import Lolo from "../../../assets/audio/ClassBook/Unit 4/P 29/Pg29_1.2_Lolo.mp3";
-import letterSound from "../../../assets/audio/ClassBook/Unit 4/P 29/read2_p29.mp3";
+import Lolo from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_1.2_Lolo.mp3";
+import letterSound from "../../../assets/audio/ClassBook/Unit 7/P 59/unit7-pg59-listen.mp3";
 import long from "../../../assets/audio/ClassBook/Unit 7/P 59/Pg59_1.1_Adult Lady.mp3";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
@@ -33,10 +50,18 @@ const Unit4_Page2 = ({ openPopup }) => {
   // أصوات الصور
   const imageSounds = [
     null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
-    new Audio(sound1_letter),
-    new Audio(sound2_letter),
-    new Audio(sound3_letter),
-    new Audio(sound4_letter),
+    new Audio(sound1),
+    new Audio(sound2),
+    new Audio(sound3),
+    new Audio(sound4),
+    new Audio(sound5),
+    new Audio(sound6),
+    new Audio(sound7),
+    new Audio(sound8),
+    new Audio(sound9),
+    new Audio(sound10),
+    new Audio(sound11),
+    new Audio(sound12),
   ];
   const repeatSounds = [
     null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
@@ -44,36 +69,84 @@ const Unit4_Page2 = ({ openPopup }) => {
     new Audio(Lolo),
   ];
   const captionsExample = [
+    { start: 0.419, end: 3.0, text: "Page 59 reading. Listen and read along." },
+
+    { start: 3.0, end: 7.5, text: "The new boy in school." },
+    { start: 7.5, end: 11.5, text: "It is Tommy's first day in a new school." },
+    { start: 11.5, end: 14.5, text: "He doesn't know anyone." },
+
+    { start: 14.5, end: 18.5, text: "A boy walks up to him smiling." },
+    { start: 18.5, end: 22.5, text: "Hey, I'm Larry. What's your name?" },
+
+    { start: 22.5, end: 26.0, text: "I'm Tommy. I'm new here." },
+    { start: 26.0, end: 30.0, text: "I'm trying to find my class." },
+
+    { start: 30.0, end: 34.18, text: "I'll show you around, says Larry." },
+
     {
-      start: 0.519,
-      end: 4.179,
-      text: "Page 29 reading. Listen and read along.",
+      start: 36.04,
+      end: 39.5,
+      text: "Tommy smiles and follows Larry to a classroom on the left.",
     },
     {
-      start: 5.339,
-      end: 7.48,
-      text: "Helen and Stella get an email.",
+      start: 39.5,
+      end: 43.519,
+      text: "They go inside. This is your class, says Larry.",
+    },
+
+    {
+      start: 45.099,
+      end: 48.5,
+      text: "That's the teacher's desk next to the bookshelf.",
     },
     {
-      start: 8.53,
-      end: 27.739,
-      text: " Hey friends. How are you doing, Helen and Stella? This is Julia, your friend from London Court School. Our school is big. Look at the pictures of London. The weather is very rainy. London gets very cold in winter. However, in the spring, London is very pretty.",
+      start: 48.5,
+      end: 52.02,
+      text: "Students put their backpacks in the closet over there.",
+    },
+
+    {
+      start: 53.119,
+      end: 56.5,
+      text: "Where is the computer lab? asks Tommy.",
     },
     {
-      start: 28.819,
-      end: 37.599,
-      text: "What's the weather like where you live? Please send me an email when you can. I'm waiting to hear from you. Your friend, Julia",
+      start: 56.5,
+      end: 60.0,
+      text: "It's between the cafeteria and my class.",
     },
+
+    { start: 60.0, end: 64.0, text: "Is the gym room far from here?" },
+    {
+      start: 64.0,
+      end: 67.5,
+      text: "No, it's not. It's in front of the school library.",
+    },
+
+    { start: 67.5, end: 70.5, text: "What time is recess? asks Tommy." },
+    { start: 70.5, end: 73.5, text: "It's at one o'clock." },
+
+    { start: 73.5, end: 78.0, text: "The playground is behind the school." },
+    {
+      start: 78.0,
+      end: 83.0,
+      text: "I'll see you later. I have to get to my class.",
+    },
+
+    { start: 83.0, end: 87.0, text: "Thanks, Larry, says Tommy." },
   ];
 
   const captions2 = [
-    { start: 0, end: 3.8, text: "Page 29. Listen and read along. " },
-    { start: 4.3, end: 9.4, text: "Voiced TH ,Mother, That, This " },
+    { start: 0, end: 3.56, text: "Page 59. Listen and read along." },
+    {
+      start: 4.38,
+      end: 14.9,
+      text: "Consonant review. Rabbit, cake, queen, duck, six, fish, vet, sing, leg, zero, jacket",
+    },
   ];
   const captions3 = [
-    { start: 0, end: 4.4, text: "Page 29. Listen, read, and repeat. " },
-    { start: 4.6, end: 6, text: "Please send me an email." },
-    { start: 6.8, end: 7.48, text: "I will tomorrow." },
+    { start: 0.319, end: 4.399, text: "Page 59. Listen, read, and repeat." },
+    { start: 4.4, end: 7.159, text: "What time is it? It's 2 o'clock." },
   ];
 
   const handleImageClick = (e) => {
@@ -173,9 +246,9 @@ const Unit4_Page2 = ({ openPopup }) => {
             openPopup(
               "html",
               <FourImagesWithAudio
-                images={[read, img1_conversation, img2_conversation]}
+                images={[read, img2_conversation, img1_conversation]}
                 audioSrc={repeat}
-                checkpoints={[0, 4.6, 6.8]}
+                checkpoints={[0, 4.4, 6.04]}
                 popupOpen={true}
                 titleQ={`Listen, read, and repeat.`}
                 audioArr={repeatSounds}
@@ -209,13 +282,24 @@ const Unit4_Page2 = ({ openPopup }) => {
               <FourImagesWithAudio
                 images={[
                   Rabbit,
-                  img1_letter,
-                  img2_letter,
-                  img3_letter,
-                  img4_letter,
+                  img1,
+                  img2,
+                  img3,
+                  img4,
+                  img5,
+                  img6,
+                  img7,
+                  img8,
+                  img9,
+                  img10,
+                  img11,
+                  img12,
                 ]}
                 audioSrc={letterSound}
-                checkpoints={[0, 3.8, 6.4, 7.56, 8.68]}
+                checkpoints={[
+                  0, 4.44, 5.86, 6.84, 7.52, 8.42, 9.38, 10.20, 10.98, 11.86,
+                  12.8, 13.74,14.7,
+                ]}
                 popupOpen={true}
                 titleQ={"Listen and read along."}
                 audioArr={imageSounds}
