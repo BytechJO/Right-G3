@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-// عدلي المسارات حسب مشروعك
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 1.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 2.svg";
 import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 3.svg";
@@ -66,42 +65,30 @@ export default function WB_Unit3_Page19_QE() {
 
   const handleSelect = (id, field, value) => {
     if (showAns) return;
-
     setAnswers((prev) => ({
       ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value,
-      },
+      [id]: { ...prev[id], [field]: value },
     }));
-
     setChecked(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
     const allAnswered = ITEMS.every(
       (item) => answers[item.id]?.first && answers[item.id]?.last
     );
-
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
     let score = 0;
-
     ITEMS.forEach((item) => {
       const isCorrect =
         answers[item.id]?.first === item.correctFirst &&
         answers[item.id]?.last === item.correctLast;
-
       if (isCorrect) score += 1;
     });
-
     setChecked(true);
-
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
@@ -113,14 +100,12 @@ export default function WB_Unit3_Page19_QE() {
 
   const handleShowAnswer = () => {
     const filledAnswers = {};
-
     ITEMS.forEach((item) => {
       filledAnswers[item.id] = {
         first: item.correctFirst,
         last: item.correctLast,
       };
     });
-
     setAnswers(filledAnswers);
     setChecked(true);
     setShowAns(true);
@@ -134,58 +119,13 @@ export default function WB_Unit3_Page19_QE() {
 
   const isWrong = (item, field) => {
     if (!checked || showAns) return false;
-
-    if (field === "first") {
-      return answers[item.id]?.first !== item.correctFirst;
-    }
-
+    if (field === "first") return answers[item.id]?.first !== item.correctFirst;
     return answers[item.id]?.last !== item.correctLast;
   };
-
-  const selectStyle = (wrong = false, hasValue = false) => ({
-    height: "clamp(32px, 4vw, 42px)",
-    minWidth: "clamp(92px, 18vw, 150px)",
-    width: "clamp(92px, 18vw, 150px)",
-    maxWidth: "100%",
-    border: `2px solid ${wrong ? "#e53935" : "#c9c9c9"}`,
-    borderRadius: "clamp(7px, 1vw, 10px)",
-    background: "#fff",
-    padding: "0 clamp(26px, 3vw, 38px) 0 clamp(8px, 1vw, 12px)",
-    fontSize: "clamp(11px, 1.4vw, 18px)",
-    fontWeight: "500",
-    color: hasValue ? "#d62828" : "#333",
-    outline: "none",
-    appearance: "none",
-    WebkitAppearance: "none",
-    MozAppearance: "none",
-    cursor: showAns ? "default" : "pointer",
-    boxSizing: "border-box",
-    textAlignLast: "center",
-    lineHeight: 1.1,
-  });
 
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-e-wrap {
-          width: 100%;
-          max-width: 1100px;
-          margin: 0 auto;
-          padding: 8px 18px 24px;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          gap: 26px;
-        }
-
-        .wb-e-title {
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-
         .wb-e-grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -258,7 +198,7 @@ export default function WB_Unit3_Page19_QE() {
 
         .wb-e-question {
           font-size: clamp(13px, 1.7vw, 20px);
-          line-height: 1.25;
+          line-height: 1.3;
           color: #222;
           font-weight: 500;
           word-break: break-word;
@@ -269,6 +209,7 @@ export default function WB_Unit3_Page19_QE() {
           flex-direction: column;
           gap: clamp(8px, 1vw, 10px);
           width: 100%;
+          min-width: 0;
         }
 
         .wb-e-answer-line {
@@ -277,38 +218,75 @@ export default function WB_Unit3_Page19_QE() {
           min-height: clamp(34px, 6vw, 54px);
           display: flex;
           align-items: center;
-          flex-wrap: wrap;
-          gap: clamp(6px, 1vw, 10px);
+          flex-wrap: nowrap;
+          gap: clamp(4px, 0.8vw, 8px);
           width: 100%;
-        }
-
-        .wb-e-answer-line.second {
-          min-height: 28px;
-        }
-
-        .wb-e-middle {
-          font-size: clamp(11px, 1.4vw, 18px);
-          font-weight: 500;
-          color: #222;
-          white-space: nowrap;
-          line-height: 1.15;
+          min-width: 0;
+          overflow: hidden;
         }
 
         .wb-e-select-wrap {
           position: relative;
           display: inline-flex;
           align-items: center;
-          max-width: 100%;
+          flex: 1 1 0;
+          min-width: 0;
+        }
+
+        .wb-e-select {
+          width: 100%;
+          height: clamp(32px, 3.2vw, 42px);
+          min-width: 0;
+          border: 2px solid #c9c9c9;
+          border-radius: clamp(7px, 1vw, 10px);
+          background: #fff;
+          padding: 0 clamp(20px, 2.2vw, 32px) 0 clamp(6px, 0.8vw, 10px);
+          font-size: clamp(10px, 1.2vw, 16px);
+          font-weight: 500;
+          color: #333;
+          outline: none;
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          cursor: pointer;
+          box-sizing: border-box;
+          line-height: 1.1;
+          text-align: center;
+          text-align-last: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .wb-e-select.has-value {
+          color: #000000ff;
+        }
+
+        .wb-e-select.wrong {
+          border-color: #e53935;
+        }
+
+        .wb-e-select:disabled {
+          cursor: default;
         }
 
         .wb-e-arrow {
           position: absolute;
-          right: clamp(8px, 1vw, 12px);
+          right: clamp(5px, 0.7vw, 10px);
           top: 50%;
           transform: translateY(-50%);
-          font-size: clamp(9px, 1vw, 12px);
+          font-size: clamp(8px, 0.9vw, 11px);
           color: #666;
           pointer-events: none;
+        }
+
+        .wb-e-middle {
+          font-size: clamp(10px, 1.2vw, 16px);
+          font-weight: 500;
+          color: #222;
+          line-height: 1.2;
+          flex-shrink: 0;
+          white-space: nowrap;
         }
 
         .wb-e-buttons {
@@ -321,23 +299,50 @@ export default function WB_Unit3_Page19_QE() {
           .wb-e-grid {
             grid-template-columns: 1fr;
           }
-        }
-
-        @media (max-width: 600px) {
-          .wb-e-wrap {
-            padding: 8px 10px 20px;
-          }
-
-          .wb-e-question {
-            font-size: clamp(12px, 3.6vw, 18px);
-          }
 
           .wb-e-answer-line {
-            align-items: flex-start;
+            flex-wrap: nowrap;
           }
 
           .wb-e-middle {
-            white-space: normal;
+            font-size: clamp(12px, 2vw, 18px);
+          }
+
+          .wb-e-select {
+            font-size: clamp(12px, 2vw, 16px);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .wb-e-answer-line {
+            flex-wrap: wrap;
+          }
+
+          .wb-e-select-wrap {
+            flex: 1 1 40%;
+          }
+
+          .wb-e-middle {
+            width: 100%;
+            text-align: center;
+            font-size: 15px;
+          }
+
+          .wb-e-select {
+            font-size: 13px;
+            height: 36px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .wb-e-answer-line {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .wb-e-select-wrap {
+            width: 100%;
+            flex: 1 1 auto;
           }
         }
       `}</style>
@@ -347,7 +352,7 @@ export default function WB_Unit3_Page19_QE() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "18px",
+          gap: "28px",
           maxWidth: "1100px",
           margin: "0 auto",
         }}
@@ -381,7 +386,6 @@ export default function WB_Unit3_Page19_QE() {
                         className="wb-e-img"
                       />
                     </div>
-
                     <div className="wb-e-img-box">
                       <img
                         src={item.rightImg}
@@ -402,10 +406,7 @@ export default function WB_Unit3_Page19_QE() {
                           onChange={(e) =>
                             handleSelect(item.id, "first", e.target.value)
                           }
-                          style={selectStyle(
-                            isWrong(item, "first"),
-                            !!answers[item.id]?.first
-                          )}
+                          className={`wb-e-select ${isWrong(item, "first") ? "wrong" : ""} ${answers[item.id]?.first ? "has-value" : ""}`}
                         >
                           <option value="" disabled hidden>
                             Select
@@ -428,10 +429,7 @@ export default function WB_Unit3_Page19_QE() {
                           onChange={(e) =>
                             handleSelect(item.id, "last", e.target.value)
                           }
-                          style={selectStyle(
-                            isWrong(item, "last"),
-                            !!answers[item.id]?.last
-                          )}
+                          className={`wb-e-select ${isWrong(item, "last") ? "wrong" : ""} ${answers[item.id]?.last ? "has-value" : ""}`}
                         >
                           <option value="" disabled hidden>
                             Select

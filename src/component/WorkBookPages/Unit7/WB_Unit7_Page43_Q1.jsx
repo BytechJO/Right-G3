@@ -1,275 +1,297 @@
-import { useState } from "react";
-
+import React, { useState } from "react";
+import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import Button from "../../Button";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-const WB_Unit7_Page43_Q1 = () => {
-  const [userAnswers, setUserAnswers] = useState({
-    1: "",
-    2: "",
-    3: "",
-    4: "",
+import person1Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/1.svg";
+import person2Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/2.svg";
+import person3Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/3.svg";
+import person4Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/4.svg";
 
-  });
+const WRONG_COLOR  = "#ef4444";
+const RED_COLOR    = "#000000ff";
+const LINE_COLOR   = "#333";
+const OPTIONS      = ["me", "you", "it"];
 
-  const [checked, setChecked] = useState(false);
+// كل bubble: جهة الصورة (left/right) + جهة السهم
+const ITEMS = [
+  {
+    id:        1,
+    before:    "Look at",
+    after:     "!",
+    correct:   "me",
+    imgSrc:    person1Img,
+    imgSide:   "left",   // الصورة يسار والفقاعة يمين
+  },
+  {
+    id:        2,
+    before:    "Can I play with",
+    after:     "?",
+    correct:   "you",
+    imgSrc:    person2Img,
+    imgSide:   "right",  // الصورة يمين والفقاعة يسار
+  },
+  {
+    id:        3,
+    before:    "I can't draw",
+    after:     "!",
+    correct:   "you",
+    imgSrc:    person3Img,
+    imgSide:   "left",
+  },
+  {
+    id:        4,
+    before:    "Please play with",
+    after:     "!",
+    correct:   "me",
+    imgSrc:    person4Img,
+    imgSide:   "right",
+  },
+];
 
-  const words = ["you", "it",  "me"];
+export default function SB_LookReadWrite_PageI() {
+  const [selected,    setSelected]    = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-  const correctAnswers = {
-    1: "me",
-    2: "you",
-    3: "you",
-    4: "me",
- 
+  const handleChange = (id, value) => {
+    if (showAns) return;
+    setSelected((prev) => ({ ...prev, [id]: value }));
+    setShowResults(false);
   };
 
-  const questions = [
-    {
-      parts: [
-        { type: "text", value: "1. Look at" },
-        { type: "blank", id: "1" },
-        { type: "text", value: "!" },
-      ],
-    },
-    {
-      parts: [
-        { type: "text", value: "2. Can I play with" },
-        { type: "blank", id: "2" },
-        { type: "text", value: "?" },
-      ],
-    },
-    {
-      parts: [
-        { type: "text", value: "3. I can’t draw " },
-        { type: "blank", id: "3" },
-        { type: "text", value: "!" },
-      ],
-    },
-     {
-      parts: [
-        { type: "text", value: "3. Please play with " },
-        { type: "blank", id: "4" },
-        { type: "text", value: "!" },
-      ],
-    },
-    
-  ];
-
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination) return;
-
-    const inputId = destination.droppableId;
-
-    setUserAnswers((prev) => ({
-      ...prev,
-      [inputId]: draggableId,
-    }));
-  };
-
-  const checkAnswers = () => {
-    const hasEmptyInputs = Object.values(userAnswers).some(
-      (value) => !value || value.trim() === ""
-    );
-
-    if (hasEmptyInputs) {
-      ValidationAlert.info("Please complete all answers first.");
+  const handleCheck = () => {
+    if (showAns) return;
+    const allAnswered = ITEMS.every((i) => selected[i.id]);
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all questions first.");
       return;
     }
-
-    let currentScore = 0;
-    const totalQuestions = Object.keys(correctAnswers).length;
-
-    Object.keys(correctAnswers).forEach((id) => {
-      const userAnswer = userAnswers[id]?.toLowerCase().trim();
-      const correctAnswer = correctAnswers[id].toLowerCase();
-
-      if (userAnswer === correctAnswer) currentScore++;
-    });
-
-    setChecked(true);
-
-    if (currentScore === totalQuestions) {
-      ValidationAlert.success(`Perfect! ${currentScore} / ${totalQuestions}`);
-    } else if (currentScore > 1) {
-      ValidationAlert.warning(`Good job! You got ${currentScore} / ${totalQuestions}`);
-    } else {
-      ValidationAlert.error(`You got ${currentScore} / ${totalQuestions}`);
-    }
+    let score = 0;
+    ITEMS.forEach((i) => { if (selected[i.id] === i.correct) score++; });
+    setShowResults(true);
+    const total = ITEMS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    setUserAnswers(correctAnswers);
+    const filled = {};
+    ITEMS.forEach((i) => { filled[i.id] = i.correct; });
+    setSelected(filled);
+    setShowResults(true);
+    setShowAns(true);
   };
 
   const handleStartAgain = () => {
-    setUserAnswers({
-      1: "",
-      2: "",
-      3: "",
-      4: "",
-      5: "",
-      6: "",
-      7: "",
-      8: "",
-      9: "",
-    });
-    setChecked(false);
+    setSelected({});
+    setShowResults(false);
+    setShowAns(false);
   };
 
-  // ✅ FIX: حساب كم مرة مطلوب كل كلمة
-  const getRequiredCounts = () => {
-    const counts = {};
-    Object.values(correctAnswers).forEach((word) => {
-      const w = word.toLowerCase().trim();
-      counts[w] = (counts[w] || 0) + 1;
-    });
-    return counts;
-  };
+  const isWrong = (item) =>
+    showResults && !showAns && selected[item.id] !== item.correct;
 
-  // ✅ FIX: حساب كم مرة المستخدم استخدم كل كلمة
-  const getUsedCounts = () => {
-    const counts = {};
-    Object.values(userAnswers).forEach((word) => {
-      const w = word.toLowerCase().trim();
-      if (w) counts[w] = (counts[w] || 0) + 1;
-    });
-    return counts;
-  };
-
-  const requiredCounts = getRequiredCounts();
-  const usedCounts = getUsedCounts();
-
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
+  const renderBubble = (item) => {
+    const wrong = isWrong(item);
+    return (
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "30px",
+          display:      "flex",
+          alignItems:   "center",
+          gap:          "clamp(6px,1vw,14px)",
+          width:        "100%",
+          flexDirection: item.imgSide === "left" ? "row" : "row-reverse",
         }}
       >
+        {/* صورة الشخص */}
         <div
-          className="div-forall"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
+            width:        "clamp(70px,12vw,140px)",
+            flexShrink:   0,
+            display:      "flex",
+            alignItems:   "flex-end",
+            justifyContent: "center",
           }}
         >
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">D</span> Read and complete.
-          </h1>
+          <img
+            src={item.imgSrc}
+            alt={`person-${item.id}`}
+            style={{
+              width:         "100%",
+              height:        "auto",
+              objectFit:     "contain",
+              display:       "block",
+              userSelect:    "none",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
 
-          {/* الكلمات */}
-          <Droppable droppableId="words" direction="horizontal">
-            {(provided) => (
+     
+
+        {/* فقاعة الكلام */}
+        <div
+          style={{
+            position:     "relative",
+            flex:         1,
+            minWidth:     0,
+            border:       `2px solid #555`,
+            borderRadius: "clamp(10px,1.4vw,18px)",
+            padding:      "clamp(8px,1.2vw,16px) clamp(12px,1.6vw,20px)",
+            background:   "#fff",
+            display:      "flex",
+            alignItems:   "center",
+            flexWrap:     "wrap",
+            gap:          "clamp(4px,0.5vw,8px)",
+            boxSizing:    "border-box",
+            transition:   "border-color 0.2s",
+          }}
+        >
+          {/* before text */}
+          <span
+            style={{
+              fontSize:   "clamp(14px,1.9vw,26px)",
+              fontWeight: 500,
+              color:      "#111",
+              lineHeight: 1.3,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {item.before}
+          </span>
+
+          {/* dropdown */}
+          <div style={{ position: "relative", display: "inline-flex", alignItems: "flex-end" }}>
+            <select
+              disabled={showAns}
+              value={selected[item.id] || ""}
+              onChange={(e) => handleChange(item.id, e.target.value)}
+              style={{
+                minWidth:     "clamp(60px,10vw,130px)",
+                borderTop:    "none",
+                borderLeft:   "none",
+                borderRight:  "none",
+                borderBottom: `2.5px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
+                borderRadius: 0,
+                outline:      "none",
+                fontSize:     "clamp(14px,1.9vw,26px)",
+                fontWeight:   700,
+                color:         RED_COLOR,
+                padding:      "0 clamp(4px,0.5vw,6px) 2px 2px",
+                background:   "transparent",
+                cursor:       showAns ? "default" : "pointer",
+                appearance:   "auto",
+                boxSizing:    "border-box",
+              }}
+            >
+              <option value="" disabled hidden></option>
+              {OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+
+            {/* wrong badge — يسار أعلى */}
+            {wrong && (
               <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
                 style={{
-                  display: "flex",
-                  gap: "10px",
-                  padding: "10px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexWrap: "wrap",
+                  position:        "absolute",
+                  top:             "-8px",
+                  left:            "-8px",
+                  width:           "clamp(16px,1.8vw,22px)",
+                  height:          "clamp(16px,1.8vw,22px)",
+                  borderRadius:    "50%",
+                  backgroundColor: WRONG_COLOR,
+                  border:          "1px solid #fff",
+                  color:           "#fff",
+                  display:         "flex",
+                  alignItems:      "center",
+                  justifyContent:  "center",
+                  fontSize:        "clamp(9px,0.9vw,12px)",
+                  fontWeight:      700,
+                  boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+                  zIndex:          3,
+                  pointerEvents:   "none",
                 }}
               >
-                {words.map((word, index) => {
-                  const usedCount = usedCounts[word] || 0;
-                  const requiredCount = requiredCounts[word] || 0;
-
-                  const isUsed = usedCount >= requiredCount;
-
-                  return (
-                    <Draggable
-                      key={word}
-                      draggableId={word}
-                      index={index}
-                      isDragDisabled={checked || isUsed}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            padding: "7px 14px",
-                            border: "2px solid #2c5287",
-                            borderRadius: "8px",
-                            background: isUsed ? "#ccc" : "white",
-                            opacity: isUsed ? 0.6 : 1,
-                            cursor: isUsed ? "not-allowed" : "grab",
-                            fontSize: "15px",
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          {word}
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
+                ✕
               </div>
             )}
-          </Droppable>
-
-          {/* الأسئلة الديناميكية */}
-          <div className="flex-1 bg-white border-2 border-gray-300 rounded-2xl p-6 space-y-4 text-xl">
-            {questions.map((q, qIndex) => (
-              <div key={qIndex} className="flex items-center gap-2 flex-wrap">
-                {q.parts.map((part, i) => {
-                  if (part.type === "text") {
-                    return <span key={i}>{part.value}</span>;
-                  }
-
-                  return (
-                    <Droppable key={i} droppableId={part.id}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className={`relative border-b-2 w-30 text-center min-h-[30px] ${
-                            snapshot.isDraggingOver ? "bg-yellow-100" : ""
-                          }`}
-                        >
-                          {checked &&
-                            userAnswers[part.id] &&
-                            userAnswers[part.id].toLowerCase().trim() !==
-                              correctAnswers[part.id].toLowerCase() && (
-                              <div className="wb-wrong-icon-unit1-page6-q1">✕</div>
-                            )}
-
-                          {userAnswers[part.id]}
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  );
-                })}
-              </div>
-            ))}
           </div>
 
+          {/* after text */}
+          <span
+            style={{
+              fontSize:   "clamp(14px,1.9vw,26px)",
+              fontWeight: 500,
+              color:      "#111",
+              lineHeight: 1.3,
+            }}
+          >
+            {item.after}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "18px",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
+        }}
+      >
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin:     0,
+            display:    "flex",
+            alignItems: "center",
+            gap:        "12px",
+            flexWrap:   "wrap",
+          }}
+        >
+          <span className="WB-ex-A">I</span>
+          Look, read, and write{" "}
+          <strong style={{ fontWeight: 900 }}>me</strong>,{" "}
+          <strong style={{ fontWeight: 900 }}>you</strong>, or{" "}
+          <strong style={{ fontWeight: 900 }}>it</strong>.
+        </h1>
+
+        {/* Bubbles */}
+        <div
+          style={{
+            display:       "flex",
+            flexDirection: "column",
+            gap:           "clamp(18px,3vw,36px)",
+            width:         "100%",
+          }}
+        >
+          {ITEMS.map((item) => renderBubble(item))}
+        </div>
+
+        {/* Buttons */}
+        <div
+          style={{
+            display:        "flex",
+            justifyContent: "center",
+            marginTop:      "clamp(6px,1vw,12px)",
+          }}
+        >
           <Button
+            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}
-            checkAnswers={checkAnswers}
           />
         </div>
       </div>
-    </DragDropContext>
+    </div>
   );
-};
-
-export default WB_Unit7_Page43_Q1
+}

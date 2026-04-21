@@ -1,191 +1,422 @@
-import React, { useState } from "react";
-import {
-    DndContext,
-    useSensor,
-    useSensors,
-    PointerSensor,
-    DragOverlay,
-} from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useState, useRef } from "react";
 import Button from "../Button";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgBoy1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/2.svg";
-import imgGirl1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/3.svg";
-import imgBoy2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/4.svg";
-import imgGirl2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/5.svg";
-import imgBoy3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/6.svg";
-import imgGirl3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/7.svg"
-import imgBoy4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/8.svg";
-import imgGirl4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/9.svg";
+// صور الشخصيات — غيري المسارات
+import char1L from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/2.svg";
+import char1R from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/3.svg";
+import char2L from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/4.svg";
+import char2R from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/5.svg";
+import char3L from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/6.svg";
+import char3R from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/7.svg";
+import char4L from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/8.svg";
+import char4R from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/9.svg";
 
-const WORDS = [
-    { id: "w1", text: "him" },
-    { id: "w2", text: "her" },
-    { id: "w3", text: "you" },
-    { id: "w4", text: "me" },
-    { id: "w5", text: "it" },
+const BORDER_COLOR = "#f39b42";
+const WRONG_COLOR  = "#ef4444";
+const ANSWER_COLOR = "#000000ff";
+const LINE_COLOR   = "#2f2f2f";
+
+const DRAG_ITEMS = [
+  { id: "d1", value: "him" },
+  { id: "d2", value: "her" },
+  { id: "d3", value: "it"  },
+  { id: "d4", value: "you" },
+  { id: "d5", value: "me"  },
 ];
 
-const QUESTIONS = [
-    { id: "q1", num: 1, leftImg: imgBoy1, rightImg: imgBoy3, question: "Can you see Tom?", answerBefore: "No, I can't see", answerAfter: ".", correct: "him" },
-    { id: "q2", num: 2, leftImg: imgGirl1, rightImg: imgGirl3, question: "I like Sarah.", answerBefore: "Yes. I like", answerAfter: ", too.", correct: "her" },
-    { id: "q3", num: 3, leftImg: imgBoy2, rightImg: imgBoy4, question: "Do you like football?", answerBefore: "No, I don't like", answerAfter: ".", correct: "it" },
-    { id: "q4", num: 4, leftImg: imgGirl2, rightImg: imgGirl4, question: "Can you see me?", answerBefore: "No, I can hear", answerAfter: ".", correct: "you" },
+const ITEMS = [
+  {
+    id:      1,
+    charL:   char1L,
+    charR:   char1R,
+    bubble1: "Can you see Tom?",
+    before:  "No, I can't see",
+    after:   ".",
+    correct: "him",
+  },
+  {
+    id:      2,
+    charL:   char2L,
+    charR:   char2R,
+    bubble1: "I like Sarah.",
+    before:  "Yes. I like",
+    after:   ", too.",
+    correct: "her",
+  },
+  {
+    id:      3,
+    charL:   char3L,
+    charR:   char3R,
+    bubble1: "Do you like football?",
+    before:  "No, I don't like",
+    after:   ".",
+    correct: "it",
+  },
+  {
+    id:      4,
+    charL:   char4L,
+    charR:   char4R,
+    bubble1: "Can you see me?",
+    before:  "No, I can hear",
+    after:   ".",
+    correct: "you",
+  },
 ];
 
-function DraggableWord({ item, used }) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
-    const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging || used ? 0.4 : 1 };
-    return (
+export default function WB_CompleteTheSentences_PageB() {
+  const [answers,     setAnswers]     = useState({});
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [touchItem,   setTouchItem]   = useState(null);
+  const [touchPos,    setTouchPos]    = useState({ x: 0, y: 0 });
+  const [showResults, setShowResults] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
+
+  const dropRefs = useRef({});
+
+  const usedIds = Object.values(answers).filter(Boolean).map((e) => e.dragId);
+
+  const applyDrop = (boxKey, item) => {
+    const upd = { ...answers };
+    Object.keys(upd).forEach((k) => { if (upd[k]?.dragId === item.id) delete upd[k]; });
+    upd[boxKey] = { dragId: item.id, value: item.value };
+    setAnswers(upd);
+    setShowResults(false);
+  };
+
+  const handleDragStart = (item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    setDraggedItem(item);
+  };
+  const handleDrop = (boxKey) => {
+    if (showAns || !draggedItem) return;
+    applyDrop(boxKey, draggedItem);
+    setDraggedItem(null);
+  };
+
+  const handleTouchStart = (e, item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    const t = e.touches[0];
+    setTouchItem(item);
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchMove = (e) => {
+    if (!touchItem) return;
+    const t = e.touches[0];
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchEnd = () => {
+    if (!touchItem) return;
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+      const r = ref.getBoundingClientRect();
+      if (
+        touchPos.x >= r.left && touchPos.x <= r.right &&
+        touchPos.y >= r.top  && touchPos.y <= r.bottom
+      ) applyDrop(key, touchItem);
+    });
+    setTouchItem(null);
+  };
+
+  const handleRemove = (boxKey) => {
+    if (showAns) return;
+    setAnswers((prev) => { const u = { ...prev }; delete u[boxKey]; return u; });
+    setShowResults(false);
+  };
+
+  const handleCheck = () => {
+    if (showAns) return;
+    const allAnswered = ITEMS.every((i) => answers[`a-${i.id}`]?.value);
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all answers first.");
+      return;
+    }
+    let score = 0;
+    ITEMS.forEach((i) => { if (answers[`a-${i.id}`]?.value === i.correct) score++; });
+    setShowResults(true);
+    const total = ITEMS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+  };
+
+  const handleShowAnswer = () => {
+    const filled = {};
+    ITEMS.forEach((i) => {
+      const d = DRAG_ITEMS.find((d) => d.value === i.correct);
+      filled[`a-${i.id}`] = { dragId: d?.id, value: i.correct };
+    });
+    setAnswers(filled);
+    setShowResults(true);
+    setShowAns(true);
+  };
+
+  const handleStartAgain = () => {
+    setAnswers({});
+    setDraggedItem(null);
+    setTouchItem(null);
+    setShowResults(false);
+    setShowAns(false);
+  };
+
+  const isWrong = (item) =>
+    showResults && !showAns && answers[`a-${item.id}`]?.value !== item.correct;
+
+  // ── مكوّن الـ bubble
+  const Bubble = ({ text, side = "right" }) => (
+    <div
+      style={{
+        position:     "relative",
+        background:   "#fff",
+        border:       `2px solid ${BORDER_COLOR}`,
+        borderRadius: "clamp(10px,1.2vw,16px)",
+        padding:      "clamp(6px,0.8vw,10px) clamp(10px,1.3vw,16px)",
+        fontSize:     "clamp(13px,1.4vw,17px)",
+        fontWeight:   500,
+        color:        "#222",
+        whiteSpace:   "nowrap",
+        boxShadow:    "0 1px 4px rgba(0,0,0,0.07)",
+      }}
+    >
+      {text}
+      {/* ذيل الـ bubble */}
+      <div style={{
+        position:    "absolute",
+        top:         "50%",
+        transform:   "translateY(-50%)",
+        [side === "right" ? "right" : "left"]: "-10px",
+        width:       0,
+        height:      0,
+        borderTop:   "8px solid transparent",
+        borderBottom:"8px solid transparent",
+        [side === "right" ? "borderLeft" : "borderRight"]: `10px solid ${BORDER_COLOR}`,
+      }} />
+    </div>
+  );
+
+  return (
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
+        }}
+      >
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">B</span>
+          Complete the sentences and write{" "}
+          <strong>him</strong>, <strong>her</strong>, <strong>you</strong>,{" "}
+          <strong>me</strong>, and <strong>it</strong>.
+        </h1>
+
+        {/* ── Word Bank ── */}
         <div
-            ref={setNodeRef} style={style} {...attributes} {...listeners}
-            className={`px-5 py-2 border-2 rounded-xl text-center font-bold text-blue-700 bg-white text-sm select-none
-        ${used ? "pointer-events-none border-gray-200 text-gray-300" : "cursor-grab border-blue-200 hover:border-blue-500 hover:shadow-md transition-all"}`}
+          style={{
+            width:          "100%",
+            border:         `2px solid ${BORDER_COLOR}`,
+            borderRadius:   "clamp(12px,1.4vw,18px)",
+            padding:        "clamp(10px,1.2vw,16px)",
+            boxSizing:      "border-box",
+            display:        "flex",
+            flexWrap:       "wrap",
+            gap:            "clamp(8px,1vw,14px)",
+            justifyContent: "center",
+            background:     "#fff",
+          }}
         >
-            {item.text}
+          {DRAG_ITEMS.map((item) => {
+            const isUsed = usedIds.includes(item.id);
+            return (
+              <div
+                key={item.id}
+                draggable={!isUsed && !showAns}
+                onDragStart={() => handleDragStart(item)}
+                onTouchStart={(e) => handleTouchStart(e, item)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{
+                  padding:         "clamp(7px,0.9vw,11px) clamp(18px,2.2vw,30px)",
+                  borderRadius:    "14px",
+                  border:          `"#222"`,
+                  backgroundColor: isUsed ? "#eeeeee" : "#ffca94",
+                  color:           isUsed ? "#aaa" : "#222",
+                  cursor:          isUsed || showAns ? "not-allowed" : "grab",
+                  opacity:         isUsed ? 0.55 : 1,
+                  userSelect:      "none",
+                  fontSize:        "clamp(15px,1.7vw,22px)",
+                  fontWeight:      700,
+                  boxShadow:       isUsed ? "none" : "0 2px 6px rgba(0,0,0,0.07)",
+                  transition:      "0.2s ease",
+                  touchAction:     "none",
+                }}
+              >
+                {item.value}
+              </div>
+            );
+          })}
         </div>
-    );
-}
 
-// ✅ نفس منطق Q1 بالضبط:
-// الصح  → border عادي، نص عادي، بدون أي إضافة
-// الغلط → border أحمر + bg أحمر فاتح + علامة ✕
-function InlineDropSlot({ id, value, isSubmitted, isCorrect }) {
-    const { setNodeRef, isOver } = useSortable({ id });
+        {/* ── الأسطر الأربعة ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(14px,2vw,22px)", width: "100%" }}>
+          {ITEMS.map((item) => {
+            const boxKey = `a-${item.id}`;
+            const value  = answers[boxKey]?.value || "";
+            const wrong  = isWrong(item);
 
-    const borderClass = isSubmitted
-        ? isCorrect
-            ? "border-gray-400"
-            : "border-red-500 bg-red-50"
-        : isOver
-            ? "border-blue-500 bg-blue-50 rounded-sm"
-            : "border-gray-400";
-
-    return (
-        <span
-            ref={setNodeRef}
-            className={`relative inline-flex items-center justify-center border-b-2 mx-1 px-1 transition-all ${borderClass}`}
-            style={{ verticalAlign: "bottom", minHeight: "22px", minWidth: "52px" }}
-        >
-            {isSubmitted && value && !isCorrect && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow leading-none">
-                    ✕
-                </span>
-            )}
-            {value ? (
-                <span className={`font-bold text-sm ${isSubmitted ? (isCorrect ? "text-blue-900" : "text-red-600") : "text-blue-700"}`}>
-                    {value}
-                </span>
-            ) : (
-                <span className="text-gray-300 text-xs">___</span>
-            )}
-        </span>
-    );
-}
-
-export default function WB_Unit7_Page39_QB() {
-    const initialAnswers = Object.fromEntries(QUESTIONS.map((q) => [q.id, null]));
-    const [answers, setAnswers] = useState(initialAnswers);
-    const [activeId, setActiveId] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
-    const sensors = useSensors(useSensor(PointerSensor));
-
-    const checkAnswers = () => {
-        if (Object.values(answers).some((v) => !v)) return ValidationAlert.info();
-        setSubmitted(true);
-        const total = QUESTIONS.length;
-        const score = QUESTIONS.filter((q) => answers[q.id] === q.correct).length;
-        if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
-        else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
-        else ValidationAlert.error(`Score: ${score} / ${total}`);
-    };
-
-    const handleReset = () => { setAnswers(initialAnswers); setSubmitted(false); };
-    const handleShowAnswer = () => {
-        setAnswers(Object.fromEntries(QUESTIONS.map((q) => [q.id, q.correct])));
-        setSubmitted(true);
-    };
-
-    const usedWords = Object.values(answers).filter(Boolean);
-
-    return (
-        <DndContext
-            sensors={sensors}
-            onDragStart={(e) => setActiveId(e.active.id)}
-            onDragEnd={(e) => {
-                if (e.over) {
-                    const wordText = WORDS.find((w) => w.id === e.active.id)?.text;
-                    if (wordText) setAnswers((prev) => ({ ...prev, [e.over.id]: wordText }));
-                }
-                setActiveId(null);
-            }}
-        >
-            <div className="main-container-component">
-                <div className="div-forall" style={{ gap: "15px" }}>
-
-                    <h1 className="WB-header-title-page8">
-                        <span className="WB-ex-A">B</span>
-                        Complete the sentences and write{" "}
-                        <strong>him</strong>, <strong>her</strong>, <strong>you</strong>,{" "}
-                        <strong>me</strong>, and <strong>it</strong>.
-                    </h1>
-
-                    <div className="flex flex-col gap-6 mt-2 w-full">
-                        {QUESTIONS.map((q) => (
-                            <div key={q.id} className="flex items-center gap-3 w-full">
-
-                                <span className="w-4 flex-shrink-0 text-sm font-bold text-gray-500">{q.num}</span>
-
-                                <img src={q.leftImg} alt="" className="flex-shrink-0 object-contain" style={{ width: 48, height: 56 }} />
-
-                                {/* فقاعة السؤال */}
-                                <div className="relative flex-shrink-0 bg-white border border-gray-300 rounded-2xl px-3 py-2 text-sm font-medium text-gray-700 shadow-sm text-center" style={{ minWidth: 110, maxWidth: 150 }}>
-                                    {q.question}
-                                    <span style={{ position: "absolute", top: "50%", right: -9, transform: "translateY(-50%)", width: 0, height: 0, borderTop: "7px solid transparent", borderBottom: "7px solid transparent", borderLeft: "9px solid #d1d5db" }} />
-                                    <span style={{ position: "absolute", top: "50%", right: -7, transform: "translateY(-50%)", width: 0, height: 0, borderTop: "6px solid transparent", borderBottom: "6px solid transparent", borderLeft: "8px solid white" }} />
-                                </div>
-
-                                {/* فقاعة الجواب */}
-                                <div className="relative bg-white border border-gray-300 rounded-2xl px-3 py-2 text-sm font-medium text-gray-700 shadow-sm flex items-center flex-nowrap flex-1" style={{ minWidth: 170 }}>
-                                    <span style={{ position: "absolute", top: "50%", left: -9, transform: "translateY(-50%)", width: 0, height: 0, borderTop: "7px solid transparent", borderBottom: "7px solid transparent", borderRight: "9px solid #d1d5db" }} />
-                                    <span style={{ position: "absolute", top: "50%", left: -7, transform: "translateY(-50%)", width: 0, height: 0, borderTop: "6px solid transparent", borderBottom: "6px solid transparent", borderRight: "8px solid white" }} />
-                                    <span className="whitespace-nowrap">{q.answerBefore}</span>
-                                    <InlineDropSlot id={q.id} value={answers[q.id]} isSubmitted={submitted} isCorrect={answers[q.id] === q.correct} />
-                                    <span className="whitespace-nowrap">{q.answerAfter}</span>
-                                </div>
-
-                                <img src={q.rightImg} alt="" className="flex-shrink-0 object-contain" style={{ width: 48, height: 56 }} />
-
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* بنك الكلمات */}
-                    <div className="mt-4 bg-blue-50 rounded-2xl border-2 border-blue-100 p-4">
-                        <p className="text-xs text-blue-500 font-medium mb-3 text-center">Word Bank — drag to fill the blanks</p>
-                        <SortableContext items={WORDS.map((w) => w.id)}>
-                            <div className="flex flex-wrap justify-center gap-3">
-                                {WORDS.map((w) => <DraggableWord key={w.id} item={w} used={usedWords.includes(w.text)} />)}
-                            </div>
-                        </SortableContext>
-                    </div>
-
-                    <div className="mt-8 flex justify-center">
-                        <Button checkAnswers={checkAnswers} handleShowAnswer={handleShowAnswer} handleStartAgain={handleReset} />
-                    </div>
-
+            return (
+              <div
+                key={item.id}
+                style={{
+                  display:     "grid",
+                  gridTemplateColumns: "auto auto 1fr auto",
+                  alignItems:  "center",
+                  gap:         "clamp(8px,1.2vw,16px)",
+                  width:       "100%",
+                }}
+              >
+                {/* رقم + صورة يسار */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                  <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111" }}>
+                    {item.id}
+                  </span>
+                  <img
+                    src={item.charL}
+                    alt={`charL-${item.id}`}
+                    style={{ height: "clamp(44px,6vw,72px)", width: "auto", objectFit: "contain" }}
+                  />
                 </div>
-            </div>
 
-            <DragOverlay>
-                {activeId ? (
-                    <div className="px-4 py-2 bg-white border-2 border-blue-500 rounded-xl shadow-2xl font-bold text-blue-700 text-sm">
-                        {WORDS.find((w) => w.id === activeId)?.text}
-                    </div>
-                ) : null}
-            </DragOverlay>
-        </DndContext>
-    );
+                {/* Bubble يسار */}
+                <Bubble text={item.bubble1} side="right" />
+
+                {/* Bubble يمين مع drop zone */}
+                <div
+                  style={{
+                    background:   "#fff",
+                    border:       `2px solid ${wrong ? WRONG_COLOR : BORDER_COLOR}`,
+                    borderRadius: "clamp(10px,1.2vw,16px)",
+                    padding:      "clamp(6px,0.8vw,10px) clamp(10px,1.3vw,16px)",
+                    fontSize:     "clamp(13px,1.4vw,17px)",
+                    fontWeight:   500,
+                    color:        "#222",
+                    display:      "flex",
+                    alignItems:   "center",
+                    flexWrap:     "wrap",
+                    gap:          "5px",
+                    boxShadow:    "0 1px 4px rgba(0,0,0,0.07)",
+                    position:     "relative",
+                  }}
+                >
+                  <span>{item.before}</span>
+
+                  {/* Drop zone */}
+                  <div
+                    ref={(el) => (dropRefs.current[boxKey] = el)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleDrop(boxKey)}
+                    onClick={() => handleRemove(boxKey)}
+                    style={{
+                      position:       "relative",
+                      minWidth:       "clamp(50px,6vw,80px)",
+                      minHeight:      "clamp(24px,2.8vw,34px)",
+                      borderBottom:   `2.5px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
+                      display:        "flex",
+                      alignItems:     "flex-end",
+                      justifyContent: "center",
+                      paddingBottom:  "2px",
+                      cursor:         value && !showAns ? "pointer" : "default",
+                    }}
+                  >
+                    {value && (
+                      <span
+                        style={{
+                          fontSize:   "clamp(13px,1.4vw,18px)",
+                          fontWeight: 700,
+                          color:       ANSWER_COLOR,
+                          lineHeight: 1,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {value}
+                      </span>
+                    )}
+
+                    {wrong && (
+                      <div style={{
+                        position:        "absolute",
+                        top:             "-8px",
+                        right:           "-8px",
+                        width:           "18px",
+                        height:          "18px",
+                        borderRadius:    "50%",
+                                      border:"1px solid #fff",
+
+                        backgroundColor: WRONG_COLOR,
+                        color:           "#fff",
+                        display:         "flex",
+                        alignItems:      "center",
+                        justifyContent:  "center",
+                        fontSize:        "10px",
+                        fontWeight:      700,
+                        boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+                      }}>
+                        ✕
+                      </div>
+                    )}
+                  </div>
+
+                  <span>{item.after}</span>
+                </div>
+
+                {/* صورة يمين */}
+                <img
+                  src={item.charR}
+                  alt={`charR-${item.id}`}
+                  style={{ height: "clamp(44px,6vw,72px)", width: "auto", objectFit: "contain", flexShrink: 0 }}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
+          <Button
+            checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
+          />
+        </div>
+      </div>
+
+      {/* Touch ghost */}
+      {touchItem && (
+        <div style={{
+          position:      "fixed",
+          left:          touchPos.x - 40,
+          top:           touchPos.y - 20,
+          background:    "#ffca94",
+          padding:       "8px 16px",
+          borderRadius:  "10px",
+          border:        `1.5px solid ${BORDER_COLOR}`,
+          boxShadow:     "0 4px 10px rgba(0,0,0,0.2)",
+          pointerEvents: "none",
+          zIndex:        9999,
+          fontSize:      "18px",
+          fontWeight:    700,
+          color:         "#222",
+        }}>
+          {touchItem.value}
+        </div>
+      )}
+    </div>
+  );
 }

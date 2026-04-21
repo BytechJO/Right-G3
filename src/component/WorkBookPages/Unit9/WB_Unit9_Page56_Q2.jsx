@@ -118,20 +118,18 @@ export default function WB_Unit9_Page56_QB() {
   };
 
   return (
-    <div className="main-container-component">
+        <div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
-          width: "100%",
+          gap: "clamp(20px,3vw,36px)",
           maxWidth: "1100px",
           margin: "0 auto",
-          padding: "10px 18px 20px 18px",
-          boxSizing: "border-box",
         }}
       >
+
         <h1
           className="WB-header-title-page8"
           style={{ margin: 0 }}

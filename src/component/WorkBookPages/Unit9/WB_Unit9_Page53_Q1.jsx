@@ -125,7 +125,7 @@ export default function WB_Unit8_Page53_QE() {
           width: "38px",
           height: "38px",
           backgroundColor: "#fff",
-          border: "2px solid #bdbdbd",
+          border: "2px solid #f39b42",
           borderRadius: "6px",
           display: "flex",
           alignItems: "center",
@@ -152,13 +152,15 @@ export default function WB_Unit8_Page53_QE() {
   };
 
   return (
-    <div className="main-container-component">
+  <div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "24px",
+          gap: "clamp(18px,2.5vw,28px)",
+          maxWidth: "1100px",
+          margin: "0 auto",
         }}
       >
         <h1 className="WB-header-title-page8">
@@ -230,7 +232,7 @@ export default function WB_Unit8_Page53_QE() {
                       position: "relative",
                       width: "100%",
                       height: "160px",
-                      border: "2px solid #bdbdbd",
+                      border: "2px solid #f39b42",
                       borderRadius: "16px",
                       overflow: "hidden",
                       backgroundColor: "#fff",

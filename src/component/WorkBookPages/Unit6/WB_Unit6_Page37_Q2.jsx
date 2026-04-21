@@ -2,247 +2,196 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.1.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.2.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.3.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.4.svg";
-import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.5.svg";
+// صور الأنشطة (اليسار)
+import actImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.1.svg"; // swimming
+import actImg2 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.2.svg"; // tennis
+import actImg3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.3.svg"; // cooking
+import actImg4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.4.svg"; // biking
+import actImg5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.5.svg"; // running
+
+// صور الشخصيات (اليمين)
+import charImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.6.svg";
+import charImg2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.7.svg";
+import charImg3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.8.svg"
+import charImg4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.9.svg"
+import charImg5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.10.svg"
+
+const BORDER_COLOR = "#f39b42";
+const WRONG_COLOR  = "#ef4444";
+const CHECK_COLOR  = "#16a34a";
 
 const ITEMS = [
   {
-    id: 1,
-    img: img1,
-    options: ["swimsuit", "glasses"],
-    correctChecks: {
-      swimsuit: "must",
-      glasses: "mustNot",
-    },
-    correctFirst: "You must wear a swimsuit for swimming,",
-    correctSecond: "you mustn’t wear glasses.",
+    id:       1,
+    actImg:   actImg1,
+    charImg:  charImg1,
+    activity: "swimming",
+    must:     { word: "swimsuit", icon: "✓" },
+    mustnt:   { word: "glasses",  icon: "✕" },
+    options:  ["swimsuit", "glasses"],
+    correct1: "swimsuit",
+    correct2: "glasses",
   },
   {
-    id: 2,
-    img: img2,
-    options: ["socks", "necklace"],
-    correctChecks: {
-      socks: "must",
-      necklace: "mustNot",
-    },
-    correctFirst: "You must wear socks for tennis,",
-    correctSecond: "you mustn’t wear a necklace.",
+    id:       2,
+    actImg:   actImg2,
+    charImg:  charImg2,
+    activity: "tennis",
+    must:     { word: "socks",    icon: "✓" },
+    mustnt:   { word: "necklace", icon: "✕" },
+    options:  ["socks", "necklace"],
+    correct1: "socks",
+    correct2: "necklace",
   },
   {
-    id: 3,
-    img: img3,
-    options: ["apron", "boots"],
-    correctChecks: {
-      apron: "must",
-      boots: "mustNot",
-    },
-    correctFirst: "You must wear an apron for cooking,",
-    correctSecond: "you mustn’t wear boots.",
+    id:       3,
+    actImg:   actImg3,
+    charImg:  charImg3,
+    activity: "cooking",
+    must:     { word: "apron",    icon: "✓" },
+    mustnt:   { word: "boots",    icon: "✕" },
+    options:  ["apron", "boots"],
+    correct1: "apron",
+    correct2: "boots",
   },
   {
-    id: 4,
-    img: img4,
-    options: ["helmet", "scarf"],
-    correctChecks: {
-      helmet: "must",
-      scarf: "mustNot",
-    },
-    correctFirst: "You must wear a helmet for biking,",
-    correctSecond: "you mustn’t wear a scarf.",
+    id:       4,
+    actImg:   actImg4,
+    charImg:  charImg4,
+    activity: "biking",
+    must:     { word: "helmet",   icon: "✓" },
+    mustnt:   { word: "scarf",    icon: "✕" },
+    options:  ["helmet", "scarf"],
+    correct1: "helmet",
+    correct2: "scarf",
   },
   {
-    id: 5,
-    img: img5,
-    options: ["coat", "shoes"],
-    correctChecks: {
-      shoes: "must",
-      coat: "mustNot",
-    },
-    correctFirst: "You must wear shoes for running,",
-    correctSecond: "you mustn’t wear a coat.",
+    id:       5,
+    actImg:   actImg5,
+    charImg:  charImg5,
+    activity: "running",
+    must:     { word: "shoes",    icon: "✕" },
+    mustnt:   { word: "coat",     icon: "✓" },
+    options:  ["shoes", "coat"],
+    correct1: "shoes",
+    correct2: "coat",
   },
 ];
 
-const DRAG_ITEMS = [
-  { id: "1-a", value: "You must wear a swimsuit for swimming," },
-  { id: "1-b", value: "you mustn’t wear glasses." },
-
-  { id: "2-a", value: "You must wear socks for tennis," },
-  { id: "2-b", value: "you mustn’t wear a necklace." },
-
-  { id: "3-a", value: "You must wear an apron for cooking," },
-  { id: "3-b", value: "you mustn’t wear boots." },
-
-  { id: "4-a", value: "You must wear a helmet for biking," },
-  { id: "4-b", value: "you mustn’t wear a scarf." },
-
-  { id: "5-a", value: "You must wear shoes for running," },
-  { id: "5-b", value: "you mustn’t wear a coat." },
-];
-
-export default function WB_Unit6_Page37_Q2() {
-  const [checks, setChecks] = useState({});
-  const [answers, setAnswers] = useState({});
-  const [draggedText, setDraggedText] = useState(null);
+export default function WB_LookAndWrite_PageJ() {
+  const [answers,     setAnswers]     = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-  const usedValues = Object.values(answers);
-
-  const handleCheckSelect = (itemId, option, type) => {
+  const handleChange = (id, field, value) => {
     if (showAns) return;
-
-    setChecks((prev) => ({
-      ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        [option]: type,
-      },
-    }));
+    setAnswers((prev) => ({ ...prev, [`${id}-${field}`]: value }));
+    setShowResults(false);
   };
 
-  const handleDragStart = (value) => {
-    if (showAns || usedValues.includes(value)) return;
-    setDraggedText(value);
-  };
-
-  const handleDrop = (dropKey) => {
-    if (showAns || !draggedText) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [dropKey]: draggedText,
-    }));
-
-    setDraggedText(null);
-  };
-
-  const getItemResult = (item) => {
-    const checksCorrect = item.options.every(
-      (option) => checks[item.id]?.[option] === item.correctChecks[option]
-    );
-
-    const firstCorrect = answers[`${item.id}-first`] === item.correctFirst;
-    const secondCorrect = answers[`${item.id}-second`] === item.correctSecond;
-
-    return checksCorrect && firstCorrect && secondCorrect;
-  };
+  const getValue = (id, field) => answers[`${id}-${field}`] || "";
 
   const handleCheck = () => {
     if (showAns) return;
-
-    const allChecksDone = ITEMS.every((item) =>
-      item.options.every((option) => checks[item.id]?.[option])
+    const allAnswered = ITEMS.every(
+      (i) => getValue(i.id, "1") && getValue(i.id, "2")
     );
-
-    const allDropsDone = ITEMS.every(
-      (item) => answers[`${item.id}-first`] && answers[`${item.id}-second`]
-    );
-
-    if (!allChecksDone || !allDropsDone) {
+    if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
     let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (getItemResult(item)) {
-        score++;
-      }
+    ITEMS.forEach((i) => {
+      if (getValue(i.id, "1") === i.correct1 && getValue(i.id, "2") === i.correct2) score++;
     });
-
     setShowResults(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    const total = ITEMS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const correctChecksMap = {};
-    const correctAnswersMap = {};
-
-    ITEMS.forEach((item) => {
-      correctChecksMap[item.id] = item.correctChecks;
-      correctAnswersMap[`${item.id}-first`] = item.correctFirst;
-      correctAnswersMap[`${item.id}-second`] = item.correctSecond;
+    const filled = {};
+    ITEMS.forEach((i) => {
+      filled[`${i.id}-1`] = i.correct1;
+      filled[`${i.id}-2`] = i.correct2;
     });
-
-    setChecks(correctChecksMap);
-    setAnswers(correctAnswersMap);
+    setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
   };
 
-  const handleReset = () => {
-    setChecks({});
+  const handleStartAgain = () => {
     setAnswers({});
-    setDraggedText(null);
     setShowResults(false);
     setShowAns(false);
   };
 
-  const isItemWrong = (item) => {
-    if (!showResults) return false;
-    return !getItemResult(item);
-  };
+  const isWrong1 = (item) =>
+    showResults && !showAns && getValue(item.id, "1") !== item.correct1;
+  const isWrong2 = (item) =>
+    showResults && !showAns && getValue(item.id, "2") !== item.correct2;
 
-  const renderCheckButton = (itemId, option, type, symbol, color) => {
-    const active = checks[itemId]?.[option] === type;
-
+  const renderSelect = (item, field, isWrong) => {
+    const value = getValue(item.id, field);
     return (
-      <button
-        onClick={() => handleCheckSelect(itemId, option, type)}
-        style={{
-          width: "28px",
-          height: "28px",
-          border: "1px solid #bdbdbd",
-          borderRadius: "4px",
-          backgroundColor: "#fff",
-          color: active ? color : "#8f8f8f",
-          fontSize: "22px",
-          fontWeight: "700",
-          lineHeight: "1",
-          cursor: showAns ? "default" : "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {symbol}
-      </button>
-    );
-  };
+      <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+        <select
+          disabled={showAns}
+          value={value}
+          onChange={(e) => handleChange(item.id, field, e.target.value)}
+          style={{
+            height:          "clamp(28px,3vw,38px)",
+            border:          "none",
+            borderBottom:    `2.5px solid ${isWrong ? WRONG_COLOR : "#2f2f2f"}`,
+            background:      "transparent",
+            padding:         "0 22px 0 4px",
+            fontSize:        "clamp(13px,1.4vw,18px)",
+            fontWeight:      700,
+            color:           isWrong ?"#2f2f2f" : "#2f2f2f",
+            outline:         "none",
+            appearance:      "none",
+            WebkitAppearance:"none",
+            cursor:          showAns ? "default" : "pointer",
+            minWidth:        "clamp(70px,8vw,110px)",
+            textAlign:       "center",
+            textAlignLast:   "center",
+          }}
+        >
+          <option value="" disabled hidden />
+          {item.options.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
 
-  const renderDropBox = (dropKey, minWidth = "250px") => {
-    const value = answers[dropKey];
+        {!showAns && (
+          <span style={{ position: "absolute", right: "4px", top: "50%", transform: "translateY(-50%)", fontSize: "10px", color: "#666", pointerEvents: "none" }}>
+            ▼
+          </span>
+        )}
 
-    return (
-      <div
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(dropKey)}
-        style={{
-          minWidth,
-          minHeight: "30px",
-          padding: "2px 4px",
-          borderBottom: "2px solid #7f7f7f",
-          display: "flex",
-          alignItems: "center",
-          color: value ? "#dc2626" : "#9ca3af",
-          fontSize: "15px",
-          lineHeight: "1.4",
-          backgroundColor: value ? "#fff7ed" : "transparent",
-        }}
-      >
-        {value || ""}
+        {isWrong && (
+          <div style={{
+            position:        "absolute",
+            top:             "-8px",
+            right:           "-8px",
+            width:           "18px",
+            height:          "18px",
+            borderRadius:    "50%",
+            backgroundColor: WRONG_COLOR,
+            color:           "#fff",
+            display:         "flex",
+            alignItems:      "center",
+            justifyContent:  "center",
+            fontSize:        "10px",
+            fontWeight:      700,
+            boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+            pointerEvents:   "none",
+          }}>
+            ✕
+          </div>
+        )}
       </div>
     );
   };
@@ -252,253 +201,152 @@ export default function WB_Unit6_Page37_Q2() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "18px",
+          gap:           "clamp(16px,2.2vw,26px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span>
-          Look and write ✓ and ✗. Write sentences.
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">J</span> Look and write ✓ and ✕. Write sentences.
         </h1>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "8px",
-            flexWrap: "wrap",
-          }}
-        >
-          {DRAG_ITEMS.map((item) => {
-            const disabled = usedValues.includes(item.value);
+        {/* ── الأسطر الخمسة ── */}
+        {ITEMS.map((item) => {
+          const w1 = isWrong1(item);
+          const w2 = isWrong2(item);
 
-            return (
-              <div
-                key={item.id}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(item.value)}
-                style={{
-                  padding: "8px 10px",
-                  borderRadius: "10px",
-                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
-                  color: "#fff",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  cursor: disabled ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.5 : 1,
-                  userSelect: "none",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
-                }}
-              >
-                {item.value}
-              </div>
-            );
-          })}
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "18px",
-          }}
-        >
-          {ITEMS.map((item) => (
+          return (
             <div
               key={item.id}
               style={{
-                position: "relative",
-                display: "grid",
-                gridTemplateColumns: "180px 1fr",
-                gap: "18px",
-                alignItems: "center",
+                display:     "grid",
+                gridTemplateColumns: "auto 1fr auto",
+                gap:         "clamp(10px,1.5vw,20px)",
+                alignItems:  "center",
+                width:       "100%",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  alignItems: "flex-start",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "700",
-                    color: "#222",
-                    minWidth: "14px",
-                  }}
-                >
+              {/* ── يسار: رقم + صورة نشاط + الملابس ── */}
+              <div style={{ display: "flex", alignItems: "center", gap: "clamp(8px,1vw,14px)", flexShrink: 0 }}>
+                {/* رقم */}
+                <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111", minWidth: "18px" }}>
                   {item.id}
                 </span>
 
-                <div style={{ position: "relative" }}>
-                  <img
-                    src={item.img}
-                    alt={`item-${item.id}`}
-                    style={{
-                      width: "85px",
-                      height: "85px",
-                      objectFit: "contain",
-                      display: "block",
-                    }}
-                  />
+                {/* صورة النشاط */}
+                <div style={{
+                  width:        "clamp(60px,8vw,100px)",
+                  aspectRatio:  "1 / 1",
+                  border:       `2px solid ${BORDER_COLOR}`,
+                  borderRadius: "clamp(8px,1vw,12px)",
+                  overflow:     "hidden",
+                  background:   "#f9f9f9",
+                  flexShrink:   0,
+                }}>
+                  <img src={item.actImg} alt={`act-${item.id}`} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                </div>
 
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      display: "flex",
-                      gap: "14px",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    {item.options.map((option) => (
-                      <div
-                        key={option}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "4px",
-                          minWidth: "44px",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "14px",
-                            color: "#444",
-                          }}
-                        >
-                          {option}
-                        </span>
+                {/* الملابس + الأيقونات */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {/* must item */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "clamp(12px,1.3vw,16px)", fontWeight: 500, color: "#111" }}>
+                      {item.must.word}
+                    </span>
+                    <div style={{
+                      width:           "clamp(22px,2.8vw,32px)",
+                      height:          "clamp(22px,2.8vw,32px)",
+                      borderRadius:    "6px",
+                      border:          `2px solid ${CHECK_COLOR}`,
+                      backgroundColor: "rgba(22,163,74,0.1)",
+                      display:         "flex",
+                      alignItems:      "center",
+                      justifyContent:  "center",
+                      fontSize:        "clamp(12px,1.5vw,18px)",
+                      fontWeight:      900,
+                      color:           CHECK_COLOR,
+                    }}>
+                      {item.must.icon}
+                    </div>
+                  </div>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "6px",
-                          }}
-                        >
-                          {renderCheckButton(
-                            item.id,
-                            option,
-                            "must",
-                            "✓",
-                            "#16a34a"
-                          )}
-                          {renderCheckButton(
-                            item.id,
-                            option,
-                            "mustNot",
-                            "✕",
-                            "#dc2626"
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                  {/* mustn't item */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "clamp(12px,1.3vw,16px)", fontWeight: 500, color: "#111" }}>
+                      {item.mustnt.word}
+                    </span>
+                    <div style={{
+                      width:           "clamp(22px,2.8vw,32px)",
+                      height:          "clamp(22px,2.8vw,32px)",
+                      borderRadius:    "6px",
+                      border:          `2px solid ${WRONG_COLOR}`,
+                      backgroundColor: "rgba(239,68,68,0.1)",
+                      display:         "flex",
+                      alignItems:      "center",
+                      justifyContent:  "center",
+                      fontSize:        "clamp(12px,1.5vw,18px)",
+                      fontWeight:      900,
+                      color:           WRONG_COLOR,
+                    }}>
+                      {item.mustnt.icon}
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* ── وسط: الجملة ── */}
               <div
                 style={{
-                  position: "relative",
-                  border: "2px solid #707070",
-                  borderRadius: "16px",
-                  backgroundColor: "#fff",
-                  padding: "12px 14px",
-                  minHeight: "82px",
-                  display: "flex",
-                  alignItems: "center",
+                  border:       `2px solid ${BORDER_COLOR}`,
+                  borderRadius: "clamp(10px,1.2vw,16px)",
+                  padding:      "clamp(8px,1vw,14px) clamp(10px,1.2vw,16px)",
+                  background:   "#fff",
+                  display:      "flex",
+                  alignItems:   "center",
+                  flexWrap:     "wrap",
+                  gap:          "4px",
+                  fontSize:     "clamp(13px,1.4vw,18px)",
+                  fontWeight:   500,
+                  color:        "#111",
+                  lineHeight:   1.5,
+                  minWidth:     0,
                 }}
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: "-22px",
-                    bottom: "14px",
-                    width: "28px",
-                    height: "2px",
-                    backgroundColor: "#707070",
-                    transform: "rotate(-28deg)",
-                    transformOrigin: "right center",
-                  }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    left: "-7px",
-                    bottom: "6px",
-                    width: "0",
-                    height: "0",
-                    borderTop: "7px solid transparent",
-                    borderBottom: "7px solid transparent",
-                    borderRight: "10px solid #fff",
-                    zIndex: 2,
-                  }}
-                />
+                <span>You must wear a</span>
+                {renderSelect(item, "1", w1)}
+                <span>for {item.activity}, but you mustn't wear a</span>
+                {renderSelect(item, "2", w2)}
+                <span>.</span>
+              </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    gap: "6px",
-                    color: "#dc2626",
-                    fontSize: "15px",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  {renderDropBox(`${item.id}-first`, "255px")}
-                  <span
-                    style={{
-                      fontWeight: "700",
-                      color: "#333",
-                    }}
-                  >
-                    but
-                  </span>
-                  {renderDropBox(`${item.id}-second`, "220px")}
-                </div>
-
-                {isItemWrong(item) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-8px",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "13px",
-                      fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                    }}
-                  >
-                    ✕
-                  </div>
-                )}
+              {/* ── يمين: صورة الشخصية ── */}
+              <div style={{
+                width:       "clamp(50px,7vw,85px)",
+                aspectRatio: "0.6 / 1",
+                flexShrink:  0,
+              }}>
+                <img
+                  src={item.charImg}
+                  alt={`char-${item.id}`}
+                  style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                />
               </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
           <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
             checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
           />
         </div>
       </div>

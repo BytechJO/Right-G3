@@ -1,83 +1,156 @@
-.wb-unit7-p1-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 14.5%;
-  left: 55.5%;
+.input-wrapper-wb-unit1-page8-q1 {
+  width: 30px;
+  position: relative;
 }
 
-.wb-unit7-p1-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 49%;
-  left: 46%;
+.unscramble-row-wb-unit1-p8-q1 {
+  display: grid;
+  gap: 50px;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 30px;
+  grid-template-columns: repeat(3, 1fr);
 }
-.wb-unit7-p2-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 4%;
-  left: 40%;
-}
-
-.wb-unit7-p2-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 46.5%;
-  left: 62.5%;
-}
-.wb-unit7-p3-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 3.5%;
-  left: 40%;
+.img-box-wb-unit1-p8-q1 img {
+  width: 90px;
+  height: 90px;
+  /* object-fit: fill; */
 }
 
-.wb-unit7-p3-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 51%;
-  left: 74.5%;
+.WB-unit1-p8-q1-input {
+  flex: 1;
+  min-width: 35px; /* 🔥 كبر العرض */
+  min-height: 28px; /* 🔥 كبر الارتفاع */
+  border-bottom: 3px solid #000;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 20px;
+  padding: 2px 4px;
+  position: relative;
+  width: 100%;
 }
-.wb-unit7-p4-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 3.5%;
-  left: 52%;
-}
-
-.wb-unit7-p4-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 48%;
-  left:90%;
-}
-.wb-unit7-p5-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 4%;
-  left: 51%;
-}
-.wb-unit7-p5-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 56%;
-  left: 42%;
-}
-.wb-unit7-p6-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 10%;
-  left: 35.5%;
+.input-row-wb-unit1-p8-q1 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-.wb-unit7-p6-q2 {
+.error-icon-wb-unit1-p8-q1 {
   position: absolute;
-  padding: 5px;
-  top: 57%;
-  left: 88%;
+  right: -12px; /* يظهر بجانب الصندوق */
+  top: -3%;
+  transform: translateY(-50%);
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border: 2px solid white;
+  font-size: 14px;
+  font-weight: bold;
 }
-.wb-unit7-p6-q3 {
-  position: absolute;
-  padding: 5px;
-  top: 72%;
-  left: 62%;
+.wrong-line {
+  border-bottom: 3px solid red;
+}
+.wb-unit7-p2-q2{
+  top: 100px;
+  position: fixed!important; 
+}
+
+
+
+.q1-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 12% !important;
+  left: 30.5% !important;
+}
+
+.q2-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 49% !important;
+  left: 38.5% !important;
+}
+
+.q3-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 2% !important;
+  left: 30.5% !important;
+}
+
+.q4-2{
+  position: absolute !important;
+  padding: 5px !important;
+  top: 45% !important;
+  left: 36.5% !important;
+}
+
+.q5-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 2% !important;
+  left: 30.5% !important;
+}
+
+.q6-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 53% !important;
+  left: 80.5% !important;
+}
+
+.q7-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 2% !important;
+  left: 35.5% !important;
+}
+
+.q8-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 50% !important;
+  left: 41.5% !important;
+}
+
+.q9-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 2% !important;
+  left: 30.5% !important;
+}
+
+.q10-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 47% !important;
+  left: 85.5% !important;
+}
+
+.q11-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 8% !important;
+  left: 82.5% !important;
+}
+
+.q12-2{
+  position: absolute !important;
+  padding: 5px !important;
+  top: 40% !important;
+  left: 30.5% !important;
+}
+
+.q13-2 {
+  position: absolute !important;
+  padding: 5px !important;
+  top: 75% !important;
+  left: 90.5% !important;
 }

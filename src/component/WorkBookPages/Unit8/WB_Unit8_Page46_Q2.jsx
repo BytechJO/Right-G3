@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-// ====== 15 images exactly ======
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/2.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/3.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/4.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/5.svg";
-import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/6.svg";
-import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/7.svg";
-import img7 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/8.svg";
-import img8 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/9.svg";
-import img9 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/10.svg";
+import img1  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/2.svg";
+import img2  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/3.svg";
+import img3  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/4.svg";
+import img4  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/5.svg";
+import img5  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/6.svg";
+import img6  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/7.svg";
+import img7  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/8.svg";
+import img8  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/9.svg";
+import img9  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/10.svg";
 import img10 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/11.svg";
 import img11 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/12.svg";
 import img12 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/13.svg";
@@ -19,10 +18,15 @@ import img13 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Fold
 import img14 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/15.svg";
 import img15 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/16.svg";
 
+const BORDER_COLOR = "#f39b42";
+const WRONG_COLOR  = "#ef4444";
+const ANSWER_COLOR = "#000000ff";
+const LINE_COLOR   = "#2f2f2f";
+
 const LEFT_GROUP = [
-  { id: 1, person: img1, yesImg: img2, noImg: img3 },
-  { id: 2, person: img4, yesImg: img5, noImg: img6 },
-  { id: 3, person: img7, yesImg: img8, noImg: img9 },
+  { id: 1, person: img1,  yesImg: img2,  noImg: img3  },
+  { id: 2, person: img4,  yesImg: img5,  noImg: img6  },
+  { id: 3, person: img7,  yesImg: img8,  noImg: img9  },
 ];
 
 const RIGHT_GROUP = [
@@ -31,315 +35,268 @@ const RIGHT_GROUP = [
 ];
 
 const SENTENCES = [
-  {
-    id: 1,
-    first: "She had a doll,",
-    second: "she didn’t have a computer.",
-  },
-  {
-    id: 2,
-    first: "He had a kite,",
-    second: "he didn’t have a car.",
-  },
-  {
-    id: 3,
-    first: "He had a ball,",
-    second: "he didn’t have a train.",
-  },
-  {
-    id: 4,
-    first: "They had a radio,",
-    second: "they didn’t have a TV.",
-  },
-  {
-    id: 5,
-    first: "She had a book,",
-    second: "she didn’t have a robot.",
-  },
+  { id: 1, first: "She had a doll,",    second: "she didn't have a computer." },
+  { id: 2, first: "He had a kite,",     second: "he didn't have a car."       },
+  { id: 3, first: "He had a ball,",     second: "he didn't have a train."     },
+  { id: 4, first: "They had a radio,",  second: "they didn't have a TV."      },
+  { id: 5, first: "She had a book,",    second: "she didn't have a robot."    },
 ];
 
 const DRAG_ITEMS = [
-  { id: "1-a", value: "She had a doll," },
-  
-  
-  { id: "1-b", value: "she didn’t have a computer." },
-  { id: "3-a", value: "He had a ball," },
-  { id: "4-a", value: "They had a radio," },
-  { id: "2-a", value: "He had a kite," },
-  { id: "3-b", value: "he didn’t have a train." },
-  { id: "2-b", value: "he didn’t have a car." },
-  { id: "5-a", value: "She had a book," },
-  { id: "5-b", value: "she didn’t have a robot." },
-
-  { id: "4-b", value: "they didn’t have a TV." },
-
+  { id: "d1a", value: "She had a doll,"              },
+  { id: "d1b", value: "she didn't have a computer."  },
+  { id: "d2a", value: "He had a kite,"               },
+  { id: "d2b", value: "he didn't have a car."        },
+  { id: "d3a", value: "He had a ball,"               },
+  { id: "d3b", value: "he didn't have a train."      },
+  { id: "d4a", value: "They had a radio,"            },
+  { id: "d4b", value: "they didn't have a TV."       },
+  { id: "d5a", value: "She had a book,"              },
+  { id: "d5b", value: "she didn't have a robot."     },
 ];
 
-const GroupTable = ({ rows }) => {
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "76px 104px 104px",
-        gridTemplateRows: `36px repeat(${rows.length}, 90px)`,
-        borderRadius: "14px",
-        overflow: "visible",
+// ── جدول الصور
+const GroupTable = ({ rows }) => (
+  <div style={{
+    display:             "grid",
+    gridTemplateColumns: "clamp(60px,7vw,80px) clamp(80px,10vw,110px) clamp(80px,10vw,110px)",
+    gridTemplateRows:    `clamp(28px,3.5vw,38px) repeat(${rows.length}, clamp(72px,10vw,96px))`,
+    borderRadius:        "14px",
+    overflow:            "visible",
+  }}>
+    {/* Header */}
+    <div style={{ background: "transparent" }} />
+    {["✓", "✕"].map((sym) => (
+      <div key={sym} style={{
+        border:         `2px solid ${BORDER_COLOR}`,
+        borderBottom:   "none",
+        borderLeft:     sym === "✕" ? "none" : undefined,
+        borderTopLeftRadius:  sym === "✓" ? "14px" : 0,
+        borderTopRightRadius: sym === "✕" ? "14px" : 0,
+        display:        "flex",
+        alignItems:     "center",
+        justifyContent: "center",
+        fontSize:       "clamp(18px,2.5vw,28px)",
+        color:          "#7c7c7c",
+        fontWeight:     700,
+        background:     "#f9f9f9",
+      }}>{sym}</div>
+    ))}
 
-      }}
-    >
-      <div style={{ width: "76px", height: "36px"  }} />
+    {/* Rows */}
+    {rows.map((row, index) => (
+      <React.Fragment key={row.id}>
+        {/* صورة الشخص */}
+        <div style={{
+          position:             "relative",
+          border:               `2px solid #f39b42`,
+          borderTop:            index === 0 ? `2px solid #f39b42` : "none",
+          borderRight:          "none",
+          borderTopLeftRadius:  index === 0 ? "14px" : 0,
+          borderBottomLeftRadius: index === rows.length - 1 ? "14px" : 0,
+          display:              "flex",
+          alignItems:           "center",
+          justifyContent:       "center",
+          background:           "#fff",
+          overflow:             "hidden",
+        }}>
+          <div style={{
+            position:   "absolute",
+            top:        "5px",
+            left:       "5px",
+            width:      "clamp(18px,2.2vw,24px)",
+            height:     "clamp(18px,2.2vw,24px)",
+            borderRadius: "50%",
+            border:     "1.5px solid #f39b42",
+            background: "#fff",
+            display:    "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize:   "clamp(11px,1.3vw,14px)",
+            color:      "#555",
+            fontWeight: 700,
+            zIndex:     2,
+          }}>{row.id}</div>
+          <img src={row.person} alt={`person-${row.id}`}
+            style={{ width: "80%", height: "80%", objectFit: "contain" }} />
+        </div>
 
-      <div
-        style={{
-          height: "36px",
-          border: "2px solid #a7a7a7",
-          borderBottom: "none",
-          borderTopLeftRadius: "14px",
-          display: "flex",
+        {/* صورة ✓ */}
+        <div style={{
+          border:    `2px solid #f39b42`,
+          borderTop: index === 0 ? `2px solid #f39b42` : "none",
+          borderRight: "none",
+          display:   "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "28px",
-          color: "#7c7c7c",
-          fontWeight: "700",
-          background: "#f9f9f9",
-          lineHeight: 1,
-        }}
-      >
-        ✓
-      </div>
+          background: "#fff",
+          overflow:  "hidden",
+        }}>
+          <img src={row.yesImg} alt={`yes-${row.id}`}
+            style={{ width: "85%", height: "75%", objectFit: "contain" }} />
+        </div>
 
-      <div
-        style={{
-          height: "36px",
-          border: "2px solid #a7a7a7",
-          borderLeft: "none",
-          borderBottom: "none",
-          borderTopRightRadius: "14px",
-          display: "flex",
+        {/* صورة ✕ */}
+        <div style={{
+          border:    `2px solid #f39b42`,
+          borderTop: index === 0 ? `2px solid #f39b42` : "none",
+          borderBottomRightRadius: index === rows.length - 1 ? "14px" : 0,
+          display:   "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "28px",
-          color: "#7c7c7c",
-          fontWeight: "700",
-          background: "#f9f9f9",
-          lineHeight: 1,
-        }}
-      >
-        ✕
-      </div>
-
-      {rows.map((row, index) => (
-        <React.Fragment key={row.id}>
-          <div
-            style={{
-              position: "relative",
-              width: "76px",
-              height: "90px",
-              border: "2px solid #a7a7a7",
-              borderTop: index === 0 ? "2px solid #a7a7a7" : "none",
-              borderRight: "none",
-              borderTopLeftRadius: index === 0 ? "14px" : 0,
-              borderBottomLeftRadius: index === rows.length - 1 ? "14px" : 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "5px",
-                left: "5px",
-                width: "22px",
-                height: "22px",
-                borderRadius: "50%",
-                border: "1.5px solid #8d8d8d",
-                background: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "13px",
-                color: "#555",
-                fontWeight: "700",
-                zIndex: 2,
-              }}
-            >
-              {row.id}
-            </div>
-
-            <img
-              src={row.person}
-              alt={`person-${row.id}`}
-              style={{
-                width: "68px",
-                height: "74px",
-                objectFit: "contain",
-                display: "block",
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "104px",
-              height: "90px",
-              border: "2px solid #a7a7a7",
-              borderTop: index === 0 ? "2px solid #a7a7a7" : "none",
-              borderRight: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
-              overflow: "hidden",
-            }}
-          >
-            <img
-              src={row.yesImg}
-              alt={`yes-${row.id}`}
-              style={{
-                width: "84px",
-                height: "64px",
-                objectFit: "contain",
-                display: "block",
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "104px",
-              height: "90px",
-              border: "2px solid #a7a7a7",
-              borderTop: index === 0 ? "2px solid #a7a7a7" : "none",
-              borderBottomRightRadius: index === rows.length - 1 ? "14px" : 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
-              overflow: "hidden",
-            }}
-          >
-            <img
-              src={row.noImg}
-              alt={`no-${row.id}`}
-              style={{
-                width: "84px",
-                height: "64px",
-                objectFit: "contain",
-                display: "block",
-              }}
-            />
-          </div>
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
+          background: "#fff",
+          overflow:  "hidden",
+        }}>
+          <img src={row.noImg} alt={`no-${row.id}`}
+            style={{ width: "85%", height: "75%", objectFit: "contain" }} />
+        </div>
+      </React.Fragment>
+    ))}
+  </div>
+);
 
 export default function WB_Unit8_Page46_QD() {
-  const [answers, setAnswers] = useState({});
-  const [draggedText, setDraggedText] = useState(null);
+  const [answers,     setAnswers]     = useState({});
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [touchItem,   setTouchItem]   = useState(null);
+  const [touchPos,    setTouchPos]    = useState({ x: 0, y: 0 });
   const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-  const usedValues = Object.values(answers);
+  const dropRefs = useRef({});
 
-  const handleDragStart = (value) => {
-    if (showAns || usedValues.includes(value)) return;
-    setDraggedText(value);
+  const usedIds = Object.values(answers).filter(Boolean).map((e) => e.dragId);
+
+  const applyDrop = (boxKey, item) => {
+    const upd = { ...answers };
+    Object.keys(upd).forEach((k) => { if (upd[k]?.dragId === item.id) delete upd[k]; });
+    upd[boxKey] = { dragId: item.id, value: item.value };
+    setAnswers(upd);
+    setShowResults(false);
   };
 
-  const handleDrop = (dropKey) => {
-    if (showAns || !draggedText) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [dropKey]: draggedText,
-    }));
-
-    setDraggedText(null);
+  const handleDragStart = (item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    setDraggedItem(item);
+  };
+  const handleDrop = (boxKey) => {
+    if (showAns || !draggedItem) return;
+    applyDrop(boxKey, draggedItem);
+    setDraggedItem(null);
   };
 
-  const getItemResult = (item) => {
+  const handleTouchStart = (e, item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    const t = e.touches[0];
+    setTouchItem(item);
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchMove = (e) => {
+    if (!touchItem) return;
+    const t = e.touches[0];
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchEnd = () => {
+    if (!touchItem) return;
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+      const r = ref.getBoundingClientRect();
+      if (
+        touchPos.x >= r.left && touchPos.x <= r.right &&
+        touchPos.y >= r.top  && touchPos.y <= r.bottom
+      ) applyDrop(key, touchItem);
+    });
+    setTouchItem(null);
+  };
+
+  const handleRemove = (boxKey) => {
+    if (showAns) return;
+    setAnswers((prev) => { const u = { ...prev }; delete u[boxKey]; return u; });
+    setShowResults(false);
+  };
+
+  const isItemWrong = (item) => {
+    if (!showResults || showAns) return false;
     return (
-      answers[`${item.id}-first`] === item.first &&
-      answers[`${item.id}-second`] === item.second
+      answers[`${item.id}-first`]?.value  !== item.first ||
+      answers[`${item.id}-second`]?.value !== item.second
     );
   };
 
-  const isWrong = (item) => {
-    if (!showResults) return false;
-    return !getItemResult(item);
-  };
-
-  const checkAnswers = () => {
+  const handleCheck = () => {
+    if (showAns) return;
     const allAnswered = SENTENCES.every(
-      (item) => answers[`${item.id}-first`] && answers[`${item.id}-second`]
+      (i) => answers[`${i.id}-first`]?.value && answers[`${i.id}-second`]?.value
     );
-
     if (!allAnswered) {
       ValidationAlert.info("Please complete all sentences first.");
       return;
     }
-
     let score = 0;
-    SENTENCES.forEach((item) => {
-      if (getItemResult(item)) score++;
+    SENTENCES.forEach((i) => {
+      if (
+        answers[`${i.id}-first`]?.value  === i.first &&
+        answers[`${i.id}-second`]?.value === i.second
+      ) score++;
     });
-
     setShowResults(true);
-
-    if (score === SENTENCES.length) {
-      ValidationAlert.success(`Score: ${score} / ${SENTENCES.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${SENTENCES.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${SENTENCES.length}`);
-    }
+    const total = SENTENCES.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
-    SENTENCES.forEach((item) => {
-      correctMap[`${item.id}-first`] = item.first;
-      correctMap[`${item.id}-second`] = item.second;
+    const filled = {};
+    SENTENCES.forEach((i) => {
+      const d1 = DRAG_ITEMS.find((d) => d.value === i.first);
+      const d2 = DRAG_ITEMS.find((d) => d.value === i.second);
+      filled[`${i.id}-first`]  = { dragId: d1?.id, value: i.first  };
+      filled[`${i.id}-second`] = { dragId: d2?.id, value: i.second };
     });
-
-    setAnswers(correctMap);
-    setShowAns(true);
+    setAnswers(filled);
     setShowResults(true);
+    setShowAns(true);
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedText(null);
+    setDraggedItem(null);
+    setTouchItem(null);
     setShowResults(false);
     setShowAns(false);
   };
 
-  const renderDropBox = (dropKey, width) => {
-    const value = answers[dropKey];
-
+  const renderDropZone = (boxKey) => {
+    const value = answers[boxKey]?.value || "";
     return (
       <div
+        ref={(el) => (dropRefs.current[boxKey] = el)}
         onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(dropKey)}
+        onDrop={() => handleDrop(boxKey)}
+        onClick={() => handleRemove(boxKey)}
         style={{
-          minWidth: width,
-          minHeight: "28px",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 2px 2px 2px",
-          borderBottom: "2px solid #555",
-          color: value ? "#dc2626" : "#9ca3af",
-          fontSize: "17px",
-          lineHeight: "1.5",
-          backgroundColor: value ? "transparent" : "transparent",
+          minWidth:      "clamp(120px,18vw,240px)",
+          minHeight:     "clamp(26px,3vw,36px)",
+          borderBottom:  `2.5px solid ${LINE_COLOR}`,
+          display:       "flex",
+          alignItems:    "flex-end",
+          paddingBottom: "3px",
+          cursor:        value && !showAns ? "pointer" : "default",
+          flexShrink:    0,
         }}
       >
-        {value || ""}
+        {value && (
+          <span style={{
+            fontSize:   "clamp(13px,1.4vw,18px)",
+            fontWeight: 600,
+            color:      ANSWER_COLOR,
+            lineHeight: 1,
+            wordBreak:  "break-word",
+          }}>
+            {value}
+          </span>
+        )}
       </div>
     );
   };
@@ -349,61 +306,72 @@ export default function WB_Unit8_Page46_QD() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "18px",
-          maxWidth: "980px",
-          margin: "0 auto",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>
-          Find and write sentences.
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">D</span> Find and write sentences.
         </h1>
 
-        {/* top layout - close together */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            gap: "36px",
-            marginTop: "-4px",
-          }}
-        >
-          <GroupTable rows={LEFT_GROUP} />
+        {/* ── الجداول ── */}
+        <div style={{
+          display:        "flex",
+          justifyContent: "center",
+          alignItems:     "flex-start",
+          gap:            "clamp(16px,3vw,40px)",
+          flexWrap:       "wrap",
+        }}>
+          <GroupTable rows={LEFT_GROUP}  />
           <GroupTable rows={RIGHT_GROUP} />
         </div>
 
-        {/* sentence bank */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginTop: "2px",
-          }}
-        >
+        {/* ── Word Bank ── */}
+        <div style={{
+          width:          "100%",
+          border:         `2px solid ${BORDER_COLOR}`,
+          borderRadius:   "clamp(12px,1.4vw,18px)",
+          padding:        "clamp(10px,1.2vw,16px)",
+          boxSizing:      "border-box",
+          display:        "flex",
+          flexWrap:       "wrap",
+          gap:            "clamp(6px,0.8vw,10px)",
+          justifyContent: "center",
+          background:     "#fff",
+        }}>
           {DRAG_ITEMS.map((item) => {
-            const disabled = usedValues.includes(item.value);
-
+            const isUsed = usedIds.includes(item.id);
             return (
               <div
                 key={item.id}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(item.value)}
+                draggable={!isUsed && !showAns}
+                onDragStart={() => handleDragStart(item)}
+                onTouchStart={(e) => handleTouchStart(e, item)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 style={{
-                  padding: "8px 10px",
-                  borderRadius: "10px",
-                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
-                  color: "#fff",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  cursor: disabled ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.5 : 1,
-                  userSelect: "none",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                  padding:         "clamp(6px,0.8vw,10px) clamp(10px,1.2vw,14px)",
+                  borderRadius:    "14px",
+                  border:          `1.5px solid ${isUsed ? "#d9d9d9" : BORDER_COLOR}`,
+                  backgroundColor: isUsed ? "#eeeeee" : "#ffca94",
+                  color:           isUsed ? "#aaa" : "#222",
+                  cursor:          isUsed || showAns ? "not-allowed" : "grab",
+                  opacity:         isUsed ? 0.55 : 1,
+                  userSelect:      "none",
+                  fontSize:        "clamp(12px,1.3vw,17px)",
+                  fontWeight:      500,
+                  boxShadow:       isUsed ? "none" : "0 2px 6px rgba(0,0,0,0.07)",
+                  transition:      "0.2s ease",
+                  touchAction:     "none",
+                  textAlign:       "center",
+                  lineHeight:      1.3,
                 }}
               >
                 {item.value}
@@ -412,103 +380,96 @@ export default function WB_Unit8_Page46_QD() {
           })}
         </div>
 
-        {/* writing lines with fixed but */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            marginTop: "2px",
-          }}
-        >
-          {SENTENCES.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <span
-                style={{
-                  width: "20px",
-                  fontSize: "18px",
-                  fontWeight: "700",
-                  color: "#222",
-                  textAlign: "right",
-                }}
-              >
-                {item.id}
-              </span>
-
+        {/* ── الجمل ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(12px,1.8vw,20px)", width: "100%" }}>
+          {SENTENCES.map((item) => {
+            const wrong = isItemWrong(item);
+            return (
               <div
+                key={item.id}
                 style={{
-                  position: "relative",
-                  flex: 1,
-                  minHeight: "38px",
-                  display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "8px",
+                  position:   "relative",
+                  display:    "flex",
+                  alignItems: "flex-end",
+                  gap:        "clamp(6px,0.8vw,10px)",
+                  flexWrap:   "wrap",
                 }}
               >
-                {renderDropBox(`${item.id}-first`, "255px")}
+                {/* رقم */}
+                <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111", flexShrink: 0, paddingBottom: "4px" }}>
+                  {item.id}
+                </span>
 
-                <span
-                  style={{
-                    fontSize: "18px",
-                    color: "#222",
-                    fontWeight: "600",
-                  }}
-                >
+                {/* first drop zone */}
+                {renderDropZone(`${item.id}-first`)}
+
+                {/* but */}
+                <span style={{ fontSize: "clamp(13px,1.4vw,18px)", fontWeight: 600, color: "#111", paddingBottom: "4px", flexShrink: 0 }}>
                   but
                 </span>
 
-                {renderDropBox(`${item.id}-second`, "265px")}
+                {/* second drop zone */}
+                {renderDropZone(`${item.id}-second`)}
 
-                {isWrong(item) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-8px",
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                    }}
-                  >
-                    ✕
-                  </div>
+                {/* Wrong badge */}
+                {wrong && (
+                  <div style={{
+                    position:        "absolute",
+                    top:             "-8px",
+                    right:           "-8px",
+                    width:           "18px",
+                    height:          "18px",
+                    borderRadius:    "50%",
+                    border:          "1px solid #fff",
+                    backgroundColor: WRONG_COLOR,
+                    color:           "#fff",
+                    display:         "flex",
+                    alignItems:      "center",
+                    justifyContent:  "center",
+                    fontSize:        "10px",
+                    fontWeight:      700,
+                    boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+                    pointerEvents:   "none",
+                  }}>✕</div>
                 )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "10px",
-          }}
-        >
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
           <Button
+            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}
-            checkAnswers={checkAnswers}
           />
         </div>
       </div>
+
+      {/* Touch ghost */}
+      {touchItem && (
+        <div style={{
+          position:      "fixed",
+          left:          touchPos.x - 70,
+          top:           touchPos.y - 20,
+          background:    "#ffca94",
+          padding:       "8px 12px",
+          borderRadius:  "10px",
+          border:        `1.5px solid ${BORDER_COLOR}`,
+          boxShadow:     "0 4px 10px rgba(0,0,0,0.2)",
+          pointerEvents: "none",
+          zIndex:        9999,
+          fontSize:      "clamp(12px,1.3vw,16px)",
+          fontWeight:    600,
+          color:         "#222",
+          maxWidth:      "220px",
+          textAlign:     "center",
+          lineHeight:    1.3,
+        }}>
+          {touchItem.value}
+        </div>
+      )}
     </div>
   );
 }

@@ -219,7 +219,7 @@ export default function WB_Unit3_Page18_QD() {
         .wb-d-img-frame {
           width: 140px !important;
           height: 96px !important;
-          border: 2px solid #a9a9a9 !important;
+          border: 2px solid #f39b42 !important;
           border-radius: 18px !important;
           background: #fff !important;
           display: flex !important;

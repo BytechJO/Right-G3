@@ -2,9 +2,9 @@ import { useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 
-import imgBoat from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 1.svg";
-import imgKate from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 2.svg";
-import imgHansel from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 3.svg";
+import imgBoat from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 7.svg";
+import imgKate from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 8.svg";
+import imgHansel from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 9.svg";
 
 const ACTIVE_COLOR = "#f39b42";
 const LINE_COLOR = "#f39b42";

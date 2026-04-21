@@ -331,6 +331,10 @@ export default function WB_Unit3_Page16_QE() {
           object-fit: contain;
           display: block;
           justify-self: start;
+                              border: 2px solid #f39b42;
+object-fit: cover;
+                              border-radius: 10%;
+
         }
 
         .wb-e17-lines {

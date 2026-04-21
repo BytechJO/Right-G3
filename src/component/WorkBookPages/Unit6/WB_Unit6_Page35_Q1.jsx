@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
+
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.3.svg";
@@ -9,340 +10,269 @@ import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folde
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.6.svg";
 
+const BORDER_COLOR = "#f39b42";
+const WRONG_COLOR  = "#ef4444";
+
+const ICON = {
+  must:    { symbol: "✓", bg: "rgba(255, 255, 255, 1)", border: "#000000ff", color: "#000000ff" },
+  mustn_t: { symbol: "✕", bg: "rgba(255, 255, 255, 1)", border: "#000000ff", color: "#000000ff" },
+};
+
+const OPTIONS = ["must", "mustn't"];
+
 const ITEMS = [
-  {
-    id: 1,
-    img: img1,
-    correct: "She mustn’t eat the cake.",
-  },
-  {
-    id: 2,
-    img: img2,
-    correct: "She must go to school.",
-  },
-  {
-    id: 3,
-    img: img3,
-    correct: "They mustn’t play in the street.",
-  },
-  {
-    id: 4,
-    img: img4,
-    correct: "She must eat fruit.",
-  },
-  {
-    id: 5,
-    img: img5,
-    correct: "They must wash the dishes.",
-  },
-  {
-    id: 6,
-    img: img6,
-    correct: "He mustn’t watch TV.",
-  },
+  { id: 1, img: img1, icon: "mustn_t", before: "She",  after: "eat the cake.",        correct: "mustn't" },
+  { id: 2, img: img2, icon: "must",    before: "She",  after: "go to school.",         correct: "must"    },
+  { id: 3, img: img3, icon: "mustn_t", before: "They", after: "play in the street.",   correct: "mustn't" },
+  { id: 4, img: img4, icon: "must",    before: "She",  after: "eat fruit.",            correct: "must"    },
+  { id: 5, img: img5, icon: "must",    before: "They", after: "wash the dishes.",      correct: "must"    },
+  { id: 6, img: img6, icon: "mustn_t", before: "He",   after: "watch TV.",             correct: "mustn't" },
 ];
 
-const DRAG_ITEMS = [
-  { id: 1, value: "She mustn’t eat the cake." },
-  { id: 2, value: "She must go to school." },
-  { id: 3, value: "They mustn’t play in the street." },
-  { id: 4, value: "She must eat fruit." },
-  { id: 5, value: "They must wash the dishes." },
-  { id: 6, value: "He mustn’t watch TV." },
-];
+export default function WB_LookReadWrite_PageE() {
+  const [answers,     setAnswers]     = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-export default function WB_Unit6_Page35_Q1() {
-  const [answers, setAnswers] = useState({});
-  const [draggedText, setDraggedText] = useState(null);
-  const [checked, setChecked] = useState(false);
-  const [showAns, setShowAns] = useState(false);
-
-  const usedValues = Object.values(answers);
-
-  const handleDragStart = (value) => {
-    if (showAns || usedValues.includes(value)) return;
-    setDraggedText(value);
-  };
-
-  const handleDrop = (id) => {
-    if (showAns || !draggedText) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: draggedText,
-    }));
-
-    setDraggedText(null);
+  const handleChange = (id, value) => {
+    if (showAns) return;
+    setAnswers((prev) => ({ ...prev, [id]: value }));
+    setShowResults(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
-    const allAnswered = ITEMS.every((item) => answers[item.id]);
-
+    const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
     let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
-    setChecked(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    ITEMS.forEach((i) => { if (answers[i.id] === i.correct) score++; });
+    setShowResults(true);
+    const total = ITEMS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
-    ITEMS.forEach((item) => {
-      correctMap[item.id] = item.correct;
-    });
-
-    setAnswers(correctMap);
-    setChecked(true);
+    const filled = {};
+    ITEMS.forEach((i) => { filled[i.id] = i.correct; });
+    setAnswers(filled);
+    setShowResults(true);
     setShowAns(true);
   };
 
-  const handleReset = () => {
+  const handleStartAgain = () => {
     setAnswers({});
-    setDraggedText(null);
-    setChecked(false);
+    setShowResults(false);
     setShowAns(false);
   };
 
-  const isWrong = (id) => {
-    if (!checked) return false;
-    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
-  };
+  const isWrong = (item) =>
+    showResults && !showAns && answers[item.id] !== item.correct;
 
   return (
     <div className="main-container-component">
+      <style>{`
+        .wb-e-select-wrap {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+        }
+
+        .wb-e-select {
+          height: clamp(30px,3.5vw,42px);
+          border: none;
+          border-bottom: 2.5px solid #2f2f2f;
+          background: transparent;
+          padding: 0 24px 0 4px;
+          font-size: clamp(14px,1.6vw,20px);
+          font-weight: 700;
+          color: #000000ff;
+          outline: none;
+          appearance: none;
+          -webkit-appearance: none;
+          cursor: pointer;
+          min-width: clamp(80px,9vw,120px);
+          text-align: center;
+          text-align-last: center;
+        }
+
+        .wb-e-select.wrong {
+          border-bottom-color: #000000ff;
+          color: #000000ff;
+        }
+
+        .wb-e-select:disabled {
+          opacity: 1;
+          cursor: default;
+        }
+
+        .wb-e-arrow {
+          position: absolute;
+          right: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 10px;
+          color: #666;
+          pointer-events: none;
+        }
+
+        .wb-e-wrong-badge {
+          position: absolute;
+          top: -8px;
+          right: -10px;
+          width: clamp(16px,1.8vw,20px);
+          height: clamp(16px,1.8vw,20px);
+          border-radius: 50%;
+          background: #ef4444;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(9px,0.9vw,11px);
+          font-weight: 700;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+          pointer-events: none;
+        }
+      `}</style>
+
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-          Look, read, and write.
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">E</span> Look, read, and write.
         </h1>
 
-        {/* بنك الجمل */}
+        {/* ── Cards Grid 2×3 ── */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-            flexWrap: "wrap",
-            marginTop: "4px",
+            display:             "grid",
+            gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+            gap:                 "clamp(16px,2.5vw,30px)",
+            width:               "100%",
           }}
         >
-          {DRAG_ITEMS.map((item) => {
-            const disabled = usedValues.includes(item.value);
+          {ITEMS.map((item) => {
+            const value   = answers[item.id] || "";
+            const wrong   = isWrong(item);
+            const iconCfg = ICON[item.icon];
 
             return (
               <div
                 key={item.id}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(item.value)}
                 style={{
-                  padding: "8px 14px",
-                  borderRadius: "10px",
-                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
-                  color: "#fff",
-                  fontSize: "15px",
-                  fontWeight: "600",
-                  cursor: disabled ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.5 : 1,
-                  userSelect: "none",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                  display:       "flex",
+                  flexDirection: "column",
+                  gap:           "clamp(8px,1vw,12px)",
                 }}
               >
-                {item.value}
+                {/* رقم */}
+                <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111" }}>
+                  {item.id}
+                </span>
+
+                {/* الصورة + أيقونة */}
+                <div
+                  style={{
+                    position:     "relative",
+                    width:        "100%",
+                    aspectRatio:  "1.55 / 1",
+                    border:       `2px solid ${BORDER_COLOR}`,
+                    borderRadius: "clamp(10px,1.2vw,16px)",
+                    overflow:     "hidden",
+                    background:   "#f7f7f7",
+                  }}
+                >
+                  <img
+                    src={item.img}
+                    alt={`item-${item.id}`}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+
+                  {/* أيقونة ✓/✕ */}
+                  <div
+                    style={{
+                      position:        "absolute",
+                      bottom:          "8px",
+                      right:           "8px",
+                      width:           "clamp(26px,3.5vw,40px)",
+                      height:          "clamp(26px,3.5vw,40px)",
+                      borderRadius:    "8px",
+                      backgroundColor: iconCfg.bg,
+                      border:          `2px solid ${iconCfg.border}`,
+                      display:         "flex",
+                      alignItems:      "center",
+                      justifyContent:  "center",
+                      fontSize:        "clamp(14px,2vw,22px)",
+                      fontWeight:      900,
+                      color:           iconCfg.color,
+                    }}
+                  >
+                    {iconCfg.symbol}
+                  </div>
+                </div>
+
+                {/* الجملة مع select */}
+                <div
+                  style={{
+                    display:    "flex",
+                    alignItems: "flex-end",
+                    flexWrap:   "wrap",
+                    gap:        "6px",
+                  }}
+                >
+                  <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111", paddingBottom: "4px" }}>
+                    {item.before}
+                  </span>
+
+                  {/* Select */}
+                  <div className="wb-e-select-wrap" style={{ position: "relative" }}>
+                    <select
+                      disabled={showAns}
+                      value={value}
+                      onChange={(e) => handleChange(item.id, e.target.value)}
+                      className={`wb-e-select${wrong ? " wrong" : ""}`}
+                    >
+                      <option value="" disabled hidden />
+                      {OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+
+                    {!showAns && <span className="wb-e-arrow">▼</span>}
+
+                    {wrong && <div className="wb-e-wrong-badge">✕</div>}
+                  </div>
+
+                  <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111", paddingBottom: "4px" }}>
+                    {item.after}
+                  </span>
+                </div>
               </div>
             );
           })}
         </div>
 
-        {/* الصور والجمل */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)", gap: "26px 34px",
-            alignItems: "start",
-            marginBottom:"20px"
-          }}
-        >
-          {ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <div
-                style={{
-                  alignSelf: "flex-start",
-                  fontSize: "22px",
-                  fontWeight: "700",
-                  color: "#222",
-                  marginLeft: "8px",
-                }}
-              >
-                {item.id}
-              </div>
-
-              <div
-                style={{
-                  position: "relative",
-                  width: "180px",
-                  height: "120px",
-                  border: "2px solid #cfcfcf",
-                  borderRadius: "10px",
-                  backgroundColor: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                <img
-                  src={item.img}
-                  alt={`question-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-
-                {item.id === 1 || item.id === 3 || item.id === 6 ? (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: "4px",
-                      right: "4px",
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "4px",
-                      backgroundColor: "#fff",
-                      border: "1px solid #bdbdbd",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#777",
-                      fontSize: "24px",
-                      fontWeight: "700",
-                      lineHeight: "1",
-                    }}
-                  >
-                    ✕
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: "4px",
-                      right: "4px",
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "4px",
-                      backgroundColor: "#fff",
-                      border: "1px solid #bdbdbd",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#777",
-                      fontSize: "22px",
-                      fontWeight: "700",
-                      lineHeight: "1",
-                    }}
-                  >
-                    ✓
-                  </div>
-                )}
-              </div>
-
-              <div
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDrop(item.id)}
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  minHeight: "42px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 8px 6px 8px",
-                  borderBottom: "2px solid #8f8f8f",
-                  textAlign: "center",
-                  fontSize: "17px",
-                  color: answers[item.id] ? "#dc2626" : "#9ca3af",
-                  fontWeight: answers[item.id] ? "500" : "400",
-                  lineHeight: "1.5",
-                  backgroundColor: answers[item.id] ? "#fff7ed" : "transparent",
-                  borderRadius: "6px 6px 0 0",
-                }}
-              >
-                {answers[item.id] || ""}
-
-                {isWrong(item.id) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-10px",
-                      right: "-6px",
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    ✕
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
           <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
             checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
           />
         </div>
       </div>

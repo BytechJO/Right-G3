@@ -3,16 +3,16 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
 
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 1.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 2.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 3.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 4.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/123/Asset 5.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/123/Asset 6.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/123/Asset 7.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/123/Asset 8.svg";
 
 const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR = "#ffca94";
 const BORDER_COLOR = "#d9d9d9";
 const WRONG_COLOR = "#ef4444";
-const ANSWER_COLOR = "#d62828";
+const ANSWER_COLOR = "#000000ff";
 
 const DRAG_ITEMS = [
   { id: 1, value: "She usually irons the clothes." },
@@ -281,6 +281,8 @@ export default function WB_LookAndWrite_PageE() {
               height: "20px",
               borderRadius: "50%",
               backgroundColor: WRONG_COLOR,
+                        border:" 1px solid #ffffffff",
+
               color: "#fff",
               display: "flex",
               alignItems: "center",
@@ -336,7 +338,7 @@ export default function WB_LookAndWrite_PageE() {
             style={{
               width: "100%",
               maxWidth: "980px",
-              border: "2px solid #b8b8b8",
+              border: "2px solid #f39b42",
               borderRadius: "18px",
               padding: "10px 14px",
               boxSizing: "border-box",
@@ -431,7 +433,7 @@ export default function WB_LookAndWrite_PageE() {
                   style={{
                     flex: 1,
                     height: "clamp(105px, 17vw, 150px)",
-                    border: "2px solid #b8b8b8",
+                    border: "2px solid #f39b42",
                     borderRadius: "14px",
                     overflow: "hidden",
                     display: "flex",
@@ -447,6 +449,7 @@ export default function WB_LookAndWrite_PageE() {
                     src={item.img}
                     alt={`exercise-${item.id}`}
                     style={{
+
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
@@ -454,7 +457,6 @@ export default function WB_LookAndWrite_PageE() {
                     }}
                   />
 
-                  {renderFrequencyBars(item.frequencyLevel)}
                 </div>
               </div>
 

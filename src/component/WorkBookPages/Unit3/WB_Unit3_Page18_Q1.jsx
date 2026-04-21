@@ -263,6 +263,9 @@ export default function WB_Unit3_Page18_QB() {
           object-fit: contain;
           user-select: none;
           pointer-events: none;
+                              border: 2px solid #f39b42;
+                              border-radius: 2%;
+
         }
 
         .wb-g18-panel {

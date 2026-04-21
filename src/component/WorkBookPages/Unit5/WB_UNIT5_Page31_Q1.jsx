@@ -2,31 +2,20 @@ import React, { useState, useRef } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-// ✅ استبدل هذه المسارات بمسارات صور الغرف عندك
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I4.svg";
-import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I5.svg";
-import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I6.svg";
+import img5 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I5.svg";
+import img6 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I6.svg";
 
-// ─────────────────────────────────────────────
-// الكلمات المخفية + الصور المقابلة
-// ─────────────────────────────────────────────
-const WORDS = [
-  { word: "bathroom",   img: img1, num: 1 },
-  { word: "bedroom",    img: img2, num: 2 },
-  { word: "kitchen",    img: img3, num: 3 },
-  { word: "livingroom", img: img4, num: 4 },
-  { word: "garage",     img: img5, num: 5 },
-  { word: "garden",     img: img6, num: 6 },
-];
+const BORDER_COLOR = "#f39b42";
+const FOUND_COLOR  = "#ef4444";
+const SELECT_COLOR = "rgba(251,191,36,0.45)";
+const WRONG_BG     = "rgba(239,68,68,0.35)";
 
-// ─────────────────────────────────────────────
-// الـ Grid
-// ─────────────────────────────────────────────
 const GRID = [
-  ["l","r","b","a","t","h","r","o","o","m"],
+  ["l","b","a","t","h","r","o","o","m","m"],
   ["i","i","g","a","r","a","g","e","n","b"],
   ["v","o","e","e","k","a","n","m","n","a"],
   ["i","m","o","e","i","s","b","x","e","s"],
@@ -38,236 +27,337 @@ const GRID = [
   ["m","n","w","r","v","m","m","r","m","n"],
 ];
 
-// مواقع الكلمات الصحيحة
-const WORD_POSITIONS = {
-  bathroom:   [{r:0,c:2},{r:0,c:3},{r:0,c:4},{r:0,c:5},{r:0,c:6},{r:0,c:7},{r:0,c:8},{r:0,c:9}],
-  bedroom:    [{r:1,c:1},{r:2,c:1},{r:3,c:1},{r:4,c:1},{r:5,c:1},{r:6,c:1},{r:7,c:1}],
-  kitchen:    [{r:2,c:4},{r:3,c:4},{r:4,c:4},{r:5,c:3},{r:6,c:2},{r:7,c:5},{r:8,c:6}],
-  livingroom: [{r:2,c:0},{r:3,c:0},{r:4,c:0},{r:5,c:0},{r:6,c:0},{r:7,c:0},{r:8,c:0},{r:9,c:0},{r:0,c:0},{r:1,c:0}],
-  garage:     [{r:1,c:2},{r:1,c:3},{r:1,c:4},{r:1,c:5},{r:1,c:6},{r:1,c:7}],
-  garden:     [{r:1,c:8},{r:2,c:8},{r:3,c:8},{r:4,c:8},{r:5,c:8},{r:6,c:8}],
-};
+// الكلمات الـ 6 بالزبط من الصورة:
+// bathroom   → row0 أفقي  c1→c8
+// garage     → row1 أفقي  c2→c7
+// kitchen    → col4 عمودي r2→r8
+// bedroom    → col9 عمودي r1→r7
+// livingroom → col0 عمودي r0→r9
+// basement   → col6 عمودي r2→r7  (n,b,e,d,r,o... اضبط إذا الحروف مختلفة)
 
-// ألوان لكل كلمة
-const WORD_COLORS = [
-  "#f97316", "#3b82f6", "#22c55e",
-  "#a855f7", "#ef4444", "#eab308",
+const WORDS = [
+  {
+    id: 1,
+    word: "bathroom",
+    cells: [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8]],
+  },
+  {
+    id: 2,
+    word: "garage",
+    cells: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]],
+  },
+  {
+    id: 3,
+    word: "kitchen",
+    cells: [[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4]],
+  },
+  {
+    id: 4,
+    word: "bedroom",
+    cells: [[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,9]],
+  },
+  {
+    id: 5,
+    word: "living room",
+    cells: [[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]],
+  },
+  {
+    id: 6,
+    word: "basement",
+    cells: [[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6]],
+  },
 ];
 
-// ─────────────────────────────────────────────
-const WB_UNIT5_Page31_Q1 = ()=> {
-  const [selecting, setSelecting]       = useState(false);
-  const [selection, setSelection]       = useState([]);
-  const [foundWords, setFoundWords]     = useState([]);
-  const [circledCells, setCircledCells] = useState({});
-  const [checked, setChecked]           = useState(false);
-  const [answerShown, setAnswerShown]   = useState(false); // ✅ جديد
+const SIDE_IMAGES = [
+  { id: 1, img: img1, wordId: 4 },
+  { id: 2, img: img2, wordId: 2 },
+  { id: 3, img: img3, wordId: 6 },
+  { id: 4, img: img4, wordId: 3 },
+  { id: 5, img: img5, wordId: 5 },
+  { id: 6, img: img6, wordId: 1 },
+];
 
-  const startCell = useRef(null);
+const cellKey = (r, c) => `${r}-${c}`;
 
-  const key = (r, c) => `${r}-${c}`;
+const setsEqual = (a, b) => {
+  if (a.length !== b.length) return false;
+  const bSet = new Set(b.map(([r, c]) => cellKey(r, c)));
+  return a.every(([r, c]) => bSet.has(cellKey(r, c)));
+};
 
-  const getCellsBetween = (a, b) => {
-    const cells = [];
-    const dr = Math.sign(b.r - a.r);
-    const dc = Math.sign(b.c - a.c);
-    const rowDiff = Math.abs(b.r - a.r);
-    const colDiff = Math.abs(b.c - a.c);
-    if (dr !== 0 && dc !== 0 && rowDiff !== colDiff) return [a];
-    let cur = { ...a };
-    while (cur.r !== b.r || cur.c !== b.c) {
-      cells.push({ ...cur });
-      cur = { r: cur.r + dr, c: cur.c + dc };
-    }
-    cells.push({ ...b });
-    return cells;
-  };
+const getCellsBetween = (r1, c1, r2, c2) => {
+  const cells = [];
+  if (r1 === r2) {
+    const [from, to] = c1 < c2 ? [c1, c2] : [c2, c1];
+    for (let c = from; c <= to; c++) cells.push([r1, c]);
+  } else if (c1 === c2) {
+    const [from, to] = r1 < r2 ? [r1, r2] : [r2, r1];
+    for (let r = from; r <= to; r++) cells.push([r, c1]);
+  } else {
+    cells.push([r1, c1]);
+  }
+  return cells;
+};
+
+export default function SB_WordSearch_PageI() {
+  const [selecting,    setSelecting]    = useState(false);
+  const [startCell,    setStartCell]    = useState(null);
+  const [currentCells, setCurrentCells] = useState([]);
+  const [foundWords,   setFoundWords]   = useState([]);
+  const [wrongCells,   setWrongCells]   = useState([]);
+  const [showAns,      setShowAns]      = useState(false);
+  const gridRef = useRef(null);
+
+  const isCellFound     = (r, c) => foundWords.some((f) => f.cells.some(([fr, fc]) => fr === r && fc === c));
+  const isCellSelecting = (r, c) => currentCells.some(([sr, sc]) => sr === r && sc === c);
+  const isCellWrong     = (r, c) => wrongCells.includes(cellKey(r, c));
+  const isWordFound     = (wordId) => foundWords.some((f) => f.wordId === wordId);
 
   const checkSelection = (cells) => {
-    const selKeys = cells.map(c => key(c.r, c.c)).sort().join(",");
-    for (const [word, positions] of Object.entries(WORD_POSITIONS)) {
-      if (foundWords.includes(word)) continue;
-      const posKeys = positions.map(p => key(p.r, p.c)).sort().join(",");
-      if (selKeys === posKeys) return word;
+    if (cells.length < 2) return;
+    const match = WORDS.find(
+      (w) => setsEqual(w.cells, cells) && !foundWords.find((f) => f.wordId === w.id)
+    );
+    if (match) {
+      setFoundWords((prev) => [...prev, { wordId: match.id, cells: match.cells }]);
+    } else {
+      setWrongCells(cells.map(([r, c]) => cellKey(r, c)));
+      setTimeout(() => setWrongCells([]), 600);
+    }
+  };
+
+  const handleMouseDown  = (r, c) => {
+    if (showAns) return;
+    setSelecting(true);
+    setStartCell([r, c]);
+    setCurrentCells([[r, c]]);
+  };
+  const handleMouseEnter = (r, c) => {
+    if (!selecting || !startCell) return;
+    setCurrentCells(getCellsBetween(startCell[0], startCell[1], r, c));
+  };
+  const handleMouseUp = () => {
+    if (!selecting) return;
+    setSelecting(false);
+    checkSelection(currentCells);
+    setStartCell(null);
+    setCurrentCells([]);
+  };
+
+  const getCellFromTouch = (touch) => {
+    const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+    for (const el of els) {
+      if (el.dataset.row !== undefined && el.dataset.col !== undefined)
+        return [parseInt(el.dataset.row), parseInt(el.dataset.col)];
     }
     return null;
   };
-
-  const getCell = (e) => {
-    const el = e.target.closest("[data-cell]");
-    if (!el) return null;
-    return { r: +el.dataset.r, c: +el.dataset.c };
-  };
-
-  const onStart = (e) => {
-    if (answerShown) return; // ✅ لا تسمح بالتحديد بعد Show Answer
-    const cell = getCell(e);
+  const handleTouchStart = (e) => {
+    if (showAns) return;
+    const cell = getCellFromTouch(e.touches[0]);
     if (!cell) return;
-    startCell.current = cell;
     setSelecting(true);
-    setSelection([cell]);
+    setStartCell(cell);
+    setCurrentCells([cell]);
   };
-
-  const onMove = (e) => {
-    if (!selecting || !startCell.current) return;
-    e.preventDefault();
-    let cell;
-    if (e.touches) {
-      const touch = e.touches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("[data-cell]");
-      if (!el) return;
-      cell = { r: +el.dataset.r, c: +el.dataset.c };
-    } else {
-      cell = getCell(e);
-    }
+  const handleTouchMove = (e) => {
+    if (!selecting || !startCell) return;
+    const cell = getCellFromTouch(e.touches[0]);
     if (!cell) return;
-    setSelection(getCellsBetween(startCell.current, cell));
+    setCurrentCells(getCellsBetween(startCell[0], startCell[1], cell[0], cell[1]));
   };
-
-  const onEnd = () => {
+  const handleTouchEnd = () => {
     if (!selecting) return;
     setSelecting(false);
-    const matched = checkSelection(selection);
-    if (matched) {
-      const colorIdx = foundWords.length % WORD_COLORS.length;
-      const newCircled = { ...circledCells };
-      selection.forEach(c => { newCircled[key(c.r, c.c)] = colorIdx; });
-      setCircledCells(newCircled);
-      setFoundWords(prev => [...prev, matched]);
-    }
-    setSelection([]);
-    startCell.current = null;
+    checkSelection(currentCells);
+    setStartCell(null);
+    setCurrentCells([]);
   };
 
-  // ── Check ──
   const handleCheck = () => {
-    setChecked(true);
-    if (foundWords.length === WORDS.length) {
-      ValidationAlert.success("Excellent! All words found! 🎉");
-    } else {
-      ValidationAlert.error(`Found ${foundWords.length} of ${WORDS.length} words. Keep trying! 🔍`);
+    if (showAns) return;
+    if (foundWords.length === 0) {
+      ValidationAlert.info("Find at least one word first.");
+      return;
     }
+    const score = foundWords.length;
+    const total = WORDS.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
-  // ── Show Answer ✅ ──
   const handleShowAnswer = () => {
-    const newCircled = { ...circledCells };
-
-    WORDS.forEach((w, i) => {
-      if (foundWords.includes(w.word)) return; // الكلمات اللي اتوجدت ابقها بلونها
-      const positions = WORD_POSITIONS[w.word];
-      const colorIdx = i % WORD_COLORS.length;
-      positions.forEach(p => {
-        newCircled[key(p.r, p.c)] = colorIdx;
-      });
-    });
-
-    setCircledCells(newCircled);
-    setFoundWords(WORDS.map(w => w.word));
-    setAnswerShown(true);
-    setSelection([]);
+    setFoundWords(WORDS.map((w) => ({ wordId: w.id, cells: w.cells })));
+    setShowAns(true);
   };
 
-  // ── Reset ──
-  const handleReset = () => {
+  const handleStartAgain = () => {
+    setSelecting(false);
+    setStartCell(null);
+    setCurrentCells([]);
     setFoundWords([]);
-    setCircledCells({});
-    setSelection([]);
-    setChecked(false);
-    setAnswerShown(false); // ✅ reset الـ answerShown
+    setWrongCells([]);
+    setShowAns(false);
   };
 
-  // ── لون الخلية ──
-  const getCellStyle = (r, c) => {
-    const k = key(r, c);
-    if (selection.some(s => s.r === r && s.c === c)) {
-      return { background: "#bfdbfe", borderRadius: 4 };
-    }
-    if (circledCells[k] !== undefined) {
-      return {
-        background: WORD_COLORS[circledCells[k]] + "33",
-        outline: `2px solid ${WORD_COLORS[circledCells[k]]}`,
-        borderRadius: 4,
-      };
-    }
-    return {};
+  const getCellBg = (r, c) => {
+    if (isCellWrong(r, c))                 return WRONG_BG;
+    if (isCellFound(r, c))                 return "rgba(239,68,68,0.18)";
+    if (isCellSelecting(r, c) && !showAns) return SELECT_COLOR;
+    return "#fff";
   };
 
-  // ─────────────────────────────────────────────
+  const CELL = "clamp(30px,4.2vw,50px)";
+
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "15px" }}>
-
-        {/* العنوان */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">1</span> Find and circle the words.
+      <div
+        className="div-forall"
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "18px",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
+        }}
+      >
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{
+            margin:      0,
+            display:     "flex",
+            alignItems:  "center",
+            gap:         "12px",
+            flexWrap:    "wrap",
+          }}
+        >
+          <span className="WB-ex-A">I</span> Find and circle the words.
         </h1>
 
-        {/* المحتوى: grid + صور */}
-        <div className="flex gap-4 items-start flex-wrap">
-
-          {/* ── الـ Grid ── */}
+        {/* Main layout */}
+        <div
+          style={{
+            display:             "grid",
+            gridTemplateColumns: "auto 1fr",
+            gap:                 "clamp(20px,3vw,40px)",
+            alignItems:          "start",
+            width:               "100%",
+          }}
+        >
+          {/* ── Word Search Grid ── */}
           <div
-            className="select-none bg-white border-2 border-gray-200 rounded-2xl p-3 shadow-sm"
-            onMouseDown={onStart}
-            onMouseMove={onMove}
-            onMouseUp={onEnd}
-            onMouseLeave={onEnd}
-            onTouchStart={onStart}
-            onTouchMove={onMove}
-            onTouchEnd={onEnd}
-            style={{ touchAction: "none" }}
+            ref={gridRef}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+              display:             "inline-grid",
+              gridTemplateColumns: `repeat(${GRID[0].length}, ${CELL})`,
+              border:              `2px solid ${BORDER_COLOR}`,
+              borderRadius:        "clamp(10px,1.2vw,16px)",
+              overflow:            "hidden",
+              background:          "#fff",
+              touchAction:         "none",
+              userSelect:          "none",
+              flexShrink:          0,
+            }}
           >
-            {GRID.map((row, r) => (
-              <div key={r} className="flex">
-                {row.map((letter, c) => (
-                  <div
-                    key={c}
-                    data-cell
-                    data-r={r}
-                    data-c={c}
-                    className="flex items-center justify-center font-mono font-semibold text-gray-700 cursor-pointer"
-                    style={{
-                      width: 32, height: 32,
-                      fontSize: 14,
-                      ...getCellStyle(r, c),
-                    }}
-                  >
-                    {letter}
-                  </div>
-                ))}
-              </div>
-            ))}
+            {GRID.map((row, r) =>
+              row.map((letter, c) => (
+                <div
+                  key={`${r}-${c}`}
+                  data-row={r}
+                  data-col={c}
+                  onMouseDown={() => handleMouseDown(r, c)}
+                  onMouseEnter={() => handleMouseEnter(r, c)}
+                  onMouseUp={handleMouseUp}
+                  style={{
+                    width:          CELL,
+                    height:         CELL,
+                    display:        "flex",
+                    alignItems:     "center",
+                    justifyContent: "center",
+                    fontSize:       "clamp(13px,1.8vw,22px)",
+                    fontWeight:     600,
+                    color:          isCellFound(r, c) ? FOUND_COLOR : "#111",
+                    background:     getCellBg(r, c),
+                    border:         "1px solid #e5e7eb",
+                    cursor:         showAns ? "default" : "pointer",
+                    boxSizing:      "border-box",
+                    transition:     "background 0.12s ease, color 0.12s ease",
+                  }}
+                >
+                  {letter}
+                </div>
+              ))
+            )}
           </div>
 
-          {/* ── الصور الـ 6 ── */}
-          <div className="grid grid-cols-2 gap-2" style={{ flex: 1, minWidth: 200 }}>
-            {WORDS.map((w, i) => {
-              const found = foundWords.includes(w.word);
+          {/* ── Side images 2×3 — بدون أسماء ── */}
+          <div
+            style={{
+              display:             "grid",
+              gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+              gap:                 "clamp(10px,1.5vw,20px)",
+              width:               "100%",
+            }}
+          >
+            {SIDE_IMAGES.map((item) => {
+              const found = isWordFound(item.wordId);
               return (
                 <div
-                  key={w.word}
-                  className={`flex flex-col items-center rounded-xl border-2 p-1 transition-all
-                    ${found ? "border-green-400 bg-green-50" : "border-gray-200 bg-white"}`}
+                  key={item.id}
+                  style={{
+                    display:       "flex",
+                    flexDirection: "column",
+                    alignItems:    "flex-start",
+                    gap:           "clamp(4px,0.5vw,7px)",
+                  }}
                 >
-                  <div className="relative w-full">
+                  {/* number */}
+                  <span
+                    style={{
+                      fontSize:   "clamp(15px,1.8vw,26px)",
+                      fontWeight: 700,
+                      color:      "#111",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {item.id}
+                  </span>
+
+                  {/* image فقط بدون label */}
+                  <div
+                    style={{
+                      width:          "100%",
+                      aspectRatio:    "1.6 / 1",
+                      overflow:       "hidden",
+                      borderRadius:   "clamp(8px,1vw,14px)",
+                      border:         `2.5px solid ${found ? FOUND_COLOR : BORDER_COLOR}`,
+                      background:     "#f0f0f0",
+                      display:        "flex",
+                      alignItems:     "center",
+                      justifyContent: "center",
+                      boxSizing:      "border-box",
+                      boxShadow:      found ? `0 0 0 2px ${FOUND_COLOR}` : "none",
+                      transition:     "border-color 0.3s, box-shadow 0.3s",
+                    }}
+                  >
                     <img
-                      src={w.img}
-                      alt={w.word}
-                      className="w-full rounded-lg"
-                      style={{ height: 70, objectFit: "cover" }}
+                      src={item.img}
+                      alt={`room-${item.id}`}
+                      style={{
+                        width:      "100%",
+                        height:     "100%",
+                        objectFit:  "cover",
+                        display:    "block",
+                        opacity:    found ? 1 : 0.85,
+                        transition: "opacity 0.3s",
+                      }}
                     />
-                    {/* رقم */}
-                    <span
-                      className="absolute top-1 left-1 text-xs font-bold text-white rounded-full w-5 h-5 flex items-center justify-center"
-                      style={{ background: WORD_COLORS[i] }}
-                    >
-                      {w.num}
-                    </span>
-                    {/* ✅ إذا اتوجدت */}
-                    {found && (
-                      <span className="absolute top-1 right-1 text-green-500 text-lg">✅</span>
-                    )}
                   </div>
                 </div>
               );
@@ -275,23 +365,21 @@ const WB_UNIT5_Page31_Q1 = ()=> {
           </div>
         </div>
 
-        {/* عداد الكلمات */}
-        <p className="text-sm text-gray-500 text-center">
-          Found: <span className="font-bold text-orange-500">{foundWords.length}</span> / {WORDS.length} words
-        </p>
-
-        {/* الأزرار */}
-        <div className="mt-4 flex justify-center">
+        {/* Buttons */}
+        <div
+          style={{
+            display:        "flex",
+            justifyContent: "center",
+            marginTop:      "clamp(6px,1vw,12px)",
+          }}
+        >
           <Button
             checkAnswers={handleCheck}
-            handleStartAgain={handleReset}
-            showAnswer={handleShowAnswer}   
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
           />
         </div>
-
       </div>
     </div>
   );
 }
-
-export default WB_UNIT5_Page31_Q1

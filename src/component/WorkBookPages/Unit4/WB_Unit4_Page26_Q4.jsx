@@ -1,6 +1,9 @@
 import { useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
+import AudioWithCaption from "../../AudioWithCaption";
+
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/CD5.Pg26.Instruction2_Adult Lady.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 const ACTIVE_COLOR = "#f39b42";
 const LINE_COLOR = "#ffca94";
@@ -42,7 +45,16 @@ export default function WB_Unit5_Page26_QD() {
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
-
+const captions = [
+  { start: 0.30, end: 3.06, text: "Page 26, phonics." },
+  { start: 3.06, end: 6.54, text: "Exercise D. Listen and match." },
+  { start: 7.56, end: 9.40, text: "1- math." },
+  { start: 9.40, end: 12.10, text: "2- thick." },
+  { start: 13.40, end: 15.26, text: "3- this." },
+  { start: 16.38, end: 18.00, text: "4- father." },
+  { start: 19.34, end: 20.80, text: "5- bank." },
+  { start: 22.34, end: 23.60, text: "6- they." },
+];
   useLayoutEffect(() => {
     const updateLines = () => {
       if (!containerRef.current) return;
@@ -356,6 +368,9 @@ export default function WB_Unit5_Page26_QD() {
         >            <span className="WB-ex-A">D</span>
           Listen and match.
         </h1>
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <AudioWithCaption src={sound1} captions={captions} />
+</div>
 
         <div ref={containerRef} className="wb-d-board">
           <svg

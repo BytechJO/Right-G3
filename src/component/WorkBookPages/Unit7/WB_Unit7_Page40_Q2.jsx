@@ -1,229 +1,402 @@
-import React, { useState } from "react";
-import {
-  DndContext,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  DragOverlay,
-} from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useState, useRef } from "react";
 import Button from "../Button";
+import ValidationAlert from "../../Popup/ValidationAlert";
 
-import imgHouse from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 40/SVG/7.svg";
+import sceneImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 40/SVG/7.svg";
 
-const ACTIVITIES = [
-  { id: "act1", text: "Yes, I can see her in the living room." },
-  { id: "act2", text: "Yes, I can see him at the computer" },
-  { id: "act3", text: "Yes, I can see her in the living room ironing clothes." },
+const BORDER_COLOR = "#f39b42";
+const WRONG_COLOR  = "#ef4444";
+const ANSWER_COLOR = "#000000ff";
+const LINE_COLOR   = "#2f2f2f";
+
+const DRAG_ITEMS = [
+
+  { id: "d3", value: "in the living room"       },
+  { id: "d4", value: "at the computer"          },
+  { id: "d5", value: "in the living room ironing clothes" },
 ];
 
-const CORRECT_ANSWERS = {
-  q1: "act1",
-  q2: "act2",
-  q3: "act3",
-};
-
-const QUESTIONS = [
-  { id: "q1", text: "1. Can you see Helen?" },
-  { id: "q2", text: "2. Can you see Helen’s brother?" },
-  { id: "q3", text: "3. Can you see Helen’s mom?" },
-
+const ITEMS = [
+  {
+    id:      1,
+    fixed:   true,
+    question: "Can you see Helen?",
+    answer:  "Yes, I can see her in the living room.",
+  },
+  {
+    id:      2,
+    fixed:   false,
+    question: "Can you see Helen's brother?",
+    before:  "Yes, I can see",
+    middle:  "him",
+    middleFixed: true,
+    after:   "",
+    dropKey: "loc",
+    correct: "at the computer",
+    beforeDrop: "Yes, I can see him",
+    afterDrop:  ".",
+  },
+  {
+    id:      3,
+    fixed:   false,
+    question: "Can you see Helen's mom?",
+    beforeDrop: "Yes, I can see her",
+    afterDrop:  ".",
+    correct: "in the living room ironing clothes",
+  },
 ];
 
-function DraggableActivity({ item, isUsed }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging || isUsed ? 0.5 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`p-2 bg-white border-2 border-gray-200 rounded-xl shadow-sm text-blue-700 font-medium text-sm text-center
-        ${
-          isUsed
-            ? "bg-gray-50 text-gray-300 pointer-events-none cursor-default"
-            : "cursor-grab hover:border-blue-400 hover:shadow-md transition-all"
-        }`}
-    >
-      {item.text}
-    </div>
-  );
-}
-
-function DropSlot({ id, content, isCorrect, isSubmitted }) {
-  const { setNodeRef, isOver } = useSortable({ id });
-
-const borderColor = isSubmitted
-  ? isCorrect
-    ? "border-gray-300 bg-white"
-    : "border-red-500 bg-red-50"
-  : isOver
-  ? "border-blue-400 bg-blue-50"
-  : "border-gray-300";
-  return (
-    <div
-      ref={setNodeRef}
-      className={`relative w-full min-h-[40px] border-b-2 flex items-center justify-center px-2 transition-all rounded-sm ${borderColor}`}
-    >
-      {/* علامة الخطأ فقط */}
-      {isSubmitted && content && !isCorrect && (
-        <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow">
-          ✕
-        </div>
-      )}
-
-      {content ? (
-        <span className="text-blue-900 font-bold text-sm text-center py-1">
-          {ACTIVITIES.find((a) => a.id === content)?.text}
-        </span>
-      ) : (
-        <span className="text-gray-300 italic text-xs">Drop answer here...</span>
-      )}
-    </div>
-  );
-}
-
-const WB_Unit7_Page40_Q2 = () => {
-  const initialAnswers = Object.fromEntries(
-    QUESTIONS.map((q) => [q.id, null])
-  );
-
-  const [answers, setAnswers] = useState(initialAnswers);
-  const [activeId, setActiveId] = useState(null);
+export default function WB_LookReadFind_PageD() {
+  const [answers,     setAnswers]     = useState({});
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [touchItem,   setTouchItem]   = useState(null);
+  const [touchPos,    setTouchPos]    = useState({ x: 0, y: 0 });
   const [showResults, setShowResults] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const dropRefs = useRef({});
 
-  const checkAnswers = () => {
-    const unanswered = QUESTIONS.filter((q) => !answers[q.id]);
-    if (unanswered.length > 0) {
-      ValidationAlert.info();
-      return;
-    }
-    setShowResults(true);
+  const usedIds = Object.values(answers).filter(Boolean).map((e) => e.dragId);
 
-    let score = 0;
-    const total = QUESTIONS.length;
-
-    QUESTIONS.forEach((q) => {
-      if (answers[q.id] === CORRECT_ANSWERS[q.id]) score++;
-    });
-
-    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else ValidationAlert.error(`Score: ${score} / ${total}`);
-  };
-
-  const handleReset = () => {
-    setAnswers(initialAnswers);
+  const applyDrop = (boxKey, item) => {
+    const upd = { ...answers };
+    Object.keys(upd).forEach((k) => { if (upd[k]?.dragId === item.id) delete upd[k]; });
+    upd[boxKey] = { dragId: item.id, value: item.value };
+    setAnswers(upd);
     setShowResults(false);
   };
 
-  const handleShowAnswer = () => {
-    setAnswers(CORRECT_ANSWERS);
+  const handleDragStart = (item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    setDraggedItem(item);
+  };
+  const handleDrop = (boxKey) => {
+    if (showAns || !draggedItem) return;
+    applyDrop(boxKey, draggedItem);
+    setDraggedItem(null);
+  };
+
+  const handleTouchStart = (e, item) => {
+    if (showAns || usedIds.includes(item.id)) return;
+    const t = e.touches[0];
+    setTouchItem(item);
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchMove = (e) => {
+    if (!touchItem) return;
+    const t = e.touches[0];
+    setTouchPos({ x: t.clientX, y: t.clientY });
+  };
+  const handleTouchEnd = () => {
+    if (!touchItem) return;
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+      const r = ref.getBoundingClientRect();
+      if (
+        touchPos.x >= r.left && touchPos.x <= r.right &&
+        touchPos.y >= r.top  && touchPos.y <= r.bottom
+      ) applyDrop(key, touchItem);
+    });
+    setTouchItem(null);
+  };
+
+  const handleRemove = (boxKey) => {
+    if (showAns) return;
+    setAnswers((prev) => { const u = { ...prev }; delete u[boxKey]; return u; });
+    setShowResults(false);
+  };
+
+  const handleCheck = () => {
+    if (showAns) return;
+    const editables = ITEMS.filter((i) => !i.fixed);
+    const allAnswered = editables.every((i) => answers[`a-${i.id}`]?.value);
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all answers first.");
+      return;
+    }
+    let score = 0;
+    editables.forEach((i) => { if (answers[`a-${i.id}`]?.value === i.correct) score++; });
     setShowResults(true);
+    const total = editables.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+  };
+
+  const handleShowAnswer = () => {
+    const filled = {};
+    ITEMS.filter((i) => !i.fixed).forEach((i) => {
+      const d = DRAG_ITEMS.find((d) => d.value === i.correct);
+      filled[`a-${i.id}`] = { dragId: d?.id, value: i.correct };
+    });
+    setAnswers(filled);
+    setShowResults(true);
+    setShowAns(true);
+  };
+
+  const handleStartAgain = () => {
+    setAnswers({});
+    setDraggedItem(null);
+    setTouchItem(null);
+    setShowResults(false);
+    setShowAns(false);
+  };
+
+  const isWrong = (item) =>
+    showResults && !showAns && answers[`a-${item.id}`]?.value !== item.correct;
+
+  const renderDropZone = (item) => {
+    const boxKey = `a-${item.id}`;
+    const value  = answers[boxKey]?.value || "";
+    const wrong  = isWrong(item);
+
+    return (
+      <div
+        style={{
+          display:    "flex",
+          alignItems: "flex-end",
+          flexWrap:   "wrap",
+          gap:        "6px",
+          width:      "100%",
+        }}
+      >
+        <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111" }}>
+          {item.beforeDrop}
+        </span>
+
+        <div
+          ref={(el) => (dropRefs.current[boxKey] = el)}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={() => handleDrop(boxKey)}
+          onClick={() => handleRemove(boxKey)}
+          style={{
+            position:       "relative",
+            minWidth:       "clamp(120px,18vw,260px)",
+            minHeight:      "clamp(28px,3.2vw,38px)",
+            borderBottom:   `2.5px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
+            display:        "flex",
+            alignItems:     "flex-end",
+            paddingBottom:  "3px",
+            cursor:         value && !showAns ? "pointer" : "default",
+          }}
+        >
+          {value && (
+            <span style={{
+              fontSize:   "clamp(14px,1.6vw,20px)",
+              fontWeight: 600,
+              color:       ANSWER_COLOR,
+              lineHeight: 1,
+              wordBreak:  "break-word",
+            }}>
+              {value}
+            </span>
+          )}
+
+          {wrong && (
+            <div style={{
+              position:        "absolute",
+              top:             "-8px",
+              right:           "-8px",
+              width:           "18px",
+              height:          "18px",
+              borderRadius:    "50%",
+              border:          "1px solid #fff",
+              backgroundColor: WRONG_COLOR,
+              color:           "#fff",
+              display:         "flex",
+              alignItems:      "center",
+              justifyContent:  "center",
+              fontSize:        "10px",
+              fontWeight:      700,
+              boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+            }}>
+              ✕
+            </div>
+          )}
+        </div>
+
+        <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111" }}>
+          {item.afterDrop}
+        </span>
+      </div>
+    );
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={(e) => setActiveId(e.active.id)}
-      onDragEnd={(e) => {
-        if (e.over) {
-          setAnswers((prev) => ({ ...prev, [e.over.id]: e.active.id }));
-        }
-        setActiveId(null);
-      }}
-    >
-      <div className="main-container-component">
-        <div className="div-forall" style={{ gap: "15px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span>Look and answer the questions.
-          </h1>
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
+        }}
+      >
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">D</span> Look, read, and find. Write.
+        </h1>
 
-          {/* layout مضبوط */}
-          <div className="flex flex-col lg:flex-row gap-8 items-stretch">
+        {/* ── Layout: يسار أسئلة + يمين صورة ── */}
+        <div
+          style={{
+            display:             "grid",
+            gridTemplateColumns: "1fr auto",
+            gap:                 "clamp(16px,2.5vw,30px)",
+            alignItems:          "start",
+            width:               "100%",
+          }}
+        >
+          {/* ── يسار: Word Bank + الأسئلة ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(16px,2vw,24px)" }}>
 
-            {/* الصورة بدون wrapper زائد */}
-            <div className="flex-1 flex justify-center items-start">
-              <img
-                src={imgHouse}
-                alt="house scene"
-                className="w-full h-auto max-h-[520px] object-contain"
-              />
+            {/* Word Bank */}
+            <div
+              style={{
+                width:          "100%",
+                border:         `2px solid ${BORDER_COLOR}`,
+                borderRadius:   "clamp(12px,1.4vw,18px)",
+                padding:        "clamp(10px,1.2vw,16px)",
+                boxSizing:      "border-box",
+                display:        "flex",
+                flexWrap:       "wrap",
+                gap:            "clamp(8px,1vw,12px)",
+                justifyContent: "center",
+                background:     "#fff",
+              }}
+            >
+              {DRAG_ITEMS.map((item) => {
+                const isUsed = usedIds.includes(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    draggable={!isUsed && !showAns}
+                    onDragStart={() => handleDragStart(item)}
+                    onTouchStart={(e) => handleTouchStart(e, item)}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    style={{
+                      padding:         "clamp(6px,0.8vw,10px) clamp(12px,1.4vw,18px)",
+                      borderRadius:    "14px",
+                      border:          `1.5px solid ${isUsed ? "#d9d9d9" : BORDER_COLOR}`,
+                      backgroundColor: isUsed ? "#eeeeee" : "#ffca94",
+                      color:           isUsed ? "#aaa" : "#222",
+                      cursor:          isUsed || showAns ? "not-allowed" : "grab",
+                      opacity:         isUsed ? 0.55 : 1,
+                      userSelect:      "none",
+                      fontSize:        "clamp(13px,1.4vw,18px)",
+                      fontWeight:      500,
+                      boxShadow:       isUsed ? "none" : "0 2px 6px rgba(0,0,0,0.07)",
+                      transition:      "0.2s ease",
+                      touchAction:     "none",
+                      textAlign:       "center",
+                      lineHeight:      1.3,
+                    }}
+                  >
+                    {item.value}
+                  </div>
+                );
+              })}
             </div>
 
             {/* الأسئلة */}
-            <div className="flex-1 flex flex-col gap-6">
-              {QUESTIONS.map((q) => (
-                <div key={q.id} className="space-y-2">
-                  <p className="text-gray-700 font-bold text-sm">{q.text}</p>
-                  <DropSlot
-                    id={q.id}
-                    content={answers[q.id]}
-                    isCorrect={answers[q.id] === CORRECT_ANSWERS[q.id]}
-                    isSubmitted={showResults}
-                  />
+            <div style={{ display: "flex", flexDirection: "column", gap: "clamp(16px,2vw,24px)" }}>
+              {ITEMS.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display:       "flex",
+                    flexDirection: "column",
+                    gap:           "clamp(6px,0.8vw,10px)",
+                  }}
+                >
+                  {/* رقم + سؤال */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111", flexShrink: 0 }}>
+                      {item.id}
+                    </span>
+                    <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111" }}>
+                      {item.question}
+                    </span>
+                  </div>
+
+                  {/* الإجابة */}
+                  {item.fixed ? (
+                    <div style={{
+                      fontSize:     "clamp(14px,1.6vw,20px)",
+                      fontWeight:   500,
+                      color:        "#111",
+                      borderBottom: `2.5px solid ${LINE_COLOR}`,
+                      paddingBottom:"4px",
+                      width:        "100%",
+                    }}>
+                      {item.answer}
+                    </div>
+                  ) : (
+                    renderDropZone(item)
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* بنك الإجابات */}
-          <div className="bg-blue-50 p-5 rounded-2xl border-2 border-blue-100 mt-4">
-            <h3 className="font-bold text-blue-800 mb-4 text-center text-sm">
-              Answers Bank
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <SortableContext items={ACTIVITIES.map((a) => a.id)}>
-                {ACTIVITIES.map((act) => (
-                  <DraggableActivity
-                    key={act.id}
-                    item={act}
-                    isUsed={Object.values(answers).includes(act.id)}
-                  />
-                ))}
-              </SortableContext>
-            </div>
-          </div>
-
-          {/* الأزرار */}
-          <div className="mt-8 flex justify-center">
-            <Button
-              handleShowAnswer={handleShowAnswer}
-              handleStartAgain={handleReset}
-              checkAnswers={checkAnswers}
+          {/* ── يمين: الصورة ── */}
+          <div
+            style={{
+              width:        "clamp(220px,32vw,400px)",
+              border:       `2px solid ${BORDER_COLOR}`,
+              borderRadius: "clamp(12px,1.4vw,18px)",
+              overflow:     "hidden",
+              background:   "#f7f7f7",
+              flexShrink:   0,
+            }}
+          >
+            <img
+              src={sceneImg}
+              alt="scene"
+              style={{ width: "100%", height: "auto", display: "block", objectFit: "contain" }}
             />
           </div>
         </div>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
+          <Button
+            checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
+          />
+        </div>
       </div>
 
-      <DragOverlay>
-        {activeId ? (
-          <div className="p-3 bg-white border-2 border-blue-500 rounded-xl shadow-2xl text-blue-700 font-bold text-xs scale-105 max-w-xs text-center">
-            {ACTIVITIES.find((a) => a.id === activeId)?.text}
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+      {/* Touch ghost */}
+      {touchItem && (
+        <div style={{
+          position:      "fixed",
+          left:          touchPos.x - 60,
+          top:           touchPos.y - 20,
+          background:    "#ffca94",
+          padding:       "8px 14px",
+          borderRadius:  "10px",
+          border:        `1.5px solid ${BORDER_COLOR}`,
+          boxShadow:     "0 4px 10px rgba(0,0,0,0.2)",
+          pointerEvents: "none",
+          zIndex:        9999,
+          fontSize:      "clamp(13px,1.5vw,18px)",
+          fontWeight:    600,
+          color:         "#222",
+          maxWidth:      "220px",
+          textAlign:     "center",
+          lineHeight:    1.3,
+        }}>
+          {touchItem.value}
+        </div>
+      )}
+    </div>
   );
-};
-
-export default WB_Unit7_Page40_Q2;
+}

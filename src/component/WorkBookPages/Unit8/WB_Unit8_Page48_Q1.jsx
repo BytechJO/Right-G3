@@ -1,442 +1,416 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
-// الصور
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/4.svg";
-import img5 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/5.svg";
+import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/6.svg";
-import img7 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/7.svg";
+import img7 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/7.svg";// الأشكال هي الخيارات — والقيمة الصحيحة هي الشكل نفسه
+// ■ = a   ▲ = o   ◆ = e   ★ = i
+const SHAPE_MAP  = { "■": "a", "▲": "o", "◆": "e", "★": "i" };
+// الخيارات في الـ dropdown هي الأشكال نفسها
+const SHAPE_OPTIONS = ["■", "▲", "◆", "★"];
 
+const WRONG_COLOR  = "#ef4444";
+const RED_COLOR    = "#cc0000";
+const LINE_COLOR   = "#333";
+const BORDER_COLOR = "#f39b42";
+
+// كل shape في parts = dropdown — الإجابة الصحيحة هي الشكل نفسه
 const ITEMS = [
-  { id: 1, img: img1, pattern: "g■rd◆n", answer: "garden" },
-  { id: 2, img: img2, pattern: "r▲▲f", answer: "roof" },
-  { id: 3, img: img3, pattern: "ch★mn◆y", answer: "chimney" },
-  { id: 4, img: img4, pattern: "n◆st", answer: "nest" },
-  { id: 5, img: img5, pattern: "sw★ng", answer: "swing" },
-  { id: 6, img: img6, pattern: "w■ll", answer: "wall" },
-  { id: 7, img: img7, pattern: "fl▲▲r", answer: "floor" },
+  {
+    id: 1, img: img1,
+    parts: [{ text: "g" }, { shape: "■" }, { text: "rd" }, { shape: "◆" }, { text: "n" }],
+    answer: "garden",
+  },
+  {
+    id: 2, img: img2,
+    parts: [{ text: "r" }, { shape: "▲" }, { shape: "▲" }, { text: "f" }],
+    answer: "roof",
+  },
+  {
+    id: 3, img: img3,
+    parts: [{ text: "ch" }, { shape: "★" }, { text: "mn" }, { shape: "◆" }, { text: "y" }],
+    answer: "chimney",
+  },
+  {
+    id: 4, img: img4,
+    parts: [{ text: "n" }, { shape: "◆" }, { text: "st" }],
+    answer: "nest",
+  },
+  {
+    id: 5, img: img5,
+    parts: [{ text: "sw" }, { shape: "★" }, { text: "ng" }],
+    answer: "swing",
+  },
+  {
+    id: 6, img: img6,
+    parts: [{ text: "w" }, { shape: "■" }, { text: "ll" }],
+    answer: "wall",
+  },
+  {
+    id: 7, img: img7,
+    parts: [{ text: "fl" }, { shape: "▲" }, { shape: "▲" }, { text: "r" }],
+    answer: "floor",
+  },
 ];
 
-const WORD_BANK = [
-  "garden",
-  "roof",
-  "chimney",
-  "nest",
-  "swing",
-  "wall",
-  "floor",
-];
+// الإجابة الصحيحة لكل dropdown هي الشكل نفسه (مش الحرف)
+const buildCorrect = () => {
+  const correct = {};
+  ITEMS.forEach((item) =>
+    item.parts.forEach((part, idx) => {
+      if (part.shape) correct[`${item.id}-${idx}`] = part.shape;
+    })
+  );
+  return correct;
+};
+const CORRECT = buildCorrect();
 
-const SYMBOLS = [
-  { symbol: "■", letter: "a" },
-  { symbol: "▲", letter: "o" },
-  { symbol: "◆", letter: "e" },
-  { symbol: "★", letter: "i" },
-];
-
-export default function WB_Unit8_Page47_QG() {
-  const [answers, setAnswers] = useState({});
-  const [draggedWord, setDraggedWord] = useState(null);
+export default function WB_FindMissingLetters_PageG() {
+  const [selected,    setSelected]    = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
-  const usedWords = Object.values(answers);
-
-  const handleDragStart = (word) => {
-    if (showAns || usedWords.includes(word)) return;
-    setDraggedWord(word);
+  const handleChange = (key, value) => {
+    if (showAns) return;
+    setSelected((prev) => ({ ...prev, [key]: value }));
+    setShowResults(false);
   };
 
-  const handleDrop = (id) => {
-    if (showAns || !draggedWord) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: draggedWord,
-    }));
-
-    setDraggedWord(null);
-  };
-
-  const getItemResult = (item) => {
-    return answers[item.id] === item.answer;
-  };
-
-  const isWrong = (item) => {
-    if (!showResults) return false;
-    if (!answers[item.id]) return false;
-    return !getItemResult(item);
-  };
-
-  const checkAnswers = () => {
-    const allAnswered = ITEMS.every((item) => answers[item.id]);
-
-    if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
-      return;
-    }
-
+  const handleCheck = () => {
+    if (showAns) return;
+    const allKeys     = Object.keys(CORRECT);
+    const allAnswered = allKeys.every((k) => selected[k]);
+    if (!allAnswered) { ValidationAlert.info("Please complete all answers first."); return; }
     let score = 0;
-    ITEMS.forEach((item) => {
-      if (getItemResult(item)) score++;
-    });
-
+    allKeys.forEach((k) => { if (selected[k] === CORRECT[k]) score++; });
     setShowResults(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    const total = allKeys.length;
+    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
-    ITEMS.forEach((item) => {
-      correctMap[item.id] = item.answer;
-    });
-
-    setAnswers(correctMap);
+    setSelected({ ...CORRECT });
     setShowResults(true);
     setShowAns(true);
   };
 
   const handleStartAgain = () => {
-    setAnswers({});
-    setDraggedWord(null);
+    setSelected({});
     setShowResults(false);
     setShowAns(false);
   };
+
+  const isKeyWrong = (key) =>
+    showResults && !showAns && selected[key] !== CORRECT[key];
+
+  const isItemAllCorrect = (item) =>
+    item.parts
+      .map((part, idx) => ({ part, key: `${item.id}-${idx}` }))
+      .filter(({ part }) => part.shape)
+      .every(({ key }) => selected[key] === CORRECT[key]);
+
+  // ── رندر الكلمة: نص ثابت + dropdown بالأشكال ──
+  const renderWord = (item) => (
+    <div
+      style={{
+        display:        "flex",
+        alignItems:     "flex-end",
+        justifyContent: "center",
+        flexWrap:       "nowrap",
+        gap:            "0px",
+        width:          "100%",
+      }}
+    >
+      {item.parts.map((part, idx) => {
+        // نص ثابت
+        if (!part.shape) {
+          return (
+            <span
+              key={idx}
+              style={{
+                fontSize:      "clamp(14px,1.8vw,22px)",
+                fontWeight:    600,
+                color:         "#111",
+                paddingBottom: "3px",
+                lineHeight:    1,
+                whiteSpace:    "nowrap",
+              }}
+            >
+              {part.text}
+            </span>
+          );
+        }
+
+        // dropdown — الخيارات هي الأشكال ■ ▲ ◆ ★
+        const key   = `${item.id}-${idx}`;
+        const val   = selected[key] || "";
+        const wrong = isKeyWrong(key);
+
+        return (
+          <div
+            key={idx}
+            style={{
+              position:   "relative",
+              display:    "inline-flex",
+              alignItems: "flex-end",
+            }}
+          >
+            <select
+              disabled={showAns}
+              value={val}
+              onChange={(e) => handleChange(key, e.target.value)}
+              style={{
+                // ✅ appearance auto = سهم المتصفح يظهر
+                appearance:       "auto",
+                WebkitAppearance: "auto",
+                MozAppearance:    "menulist",
+                // عرض يكفي الشكل + السهم
+                width:            "clamp(52px,6vw,72px)",
+                borderTop:        "none",
+                borderLeft:       "none",
+                borderRight:      "none",
+                borderBottom:     `2.5px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
+                borderRadius:     0,
+                outline:          "none",
+                // حجم خط الشكل
+                fontSize:         "clamp(14px,1.8vw,22px)",
+                fontWeight:       700,
+                color:            wrong ? WRONG_COLOR : "#111",
+                padding:          "0 2px 3px 2px",
+                background:       "transparent",
+                cursor:           showAns ? "default" : "pointer",
+                textAlign:        "center",
+                boxSizing:        "border-box",
+              }}
+            >
+              <option value="" disabled hidden></option>
+              {SHAPE_OPTIONS.map((shape) => (
+                <option key={shape} value={shape}>{shape}</option>
+              ))}
+            </select>
+
+            {/* wrong badge */}
+            {wrong && (
+              <div
+                style={{
+                  position:        "absolute",
+                  top:             "-8px",
+                  left:            "-6px",
+                  width:           "clamp(14px,1.5vw,18px)",
+                  height:          "clamp(14px,1.5vw,18px)",
+                  borderRadius:    "50%",
+                  backgroundColor: WRONG_COLOR,
+                  border:          "1px solid #fff",
+                  color:           "#fff",
+                  display:         "flex",
+                  alignItems:      "center",
+                  justifyContent:  "center",
+                  fontSize:        "clamp(8px,0.8vw,10px)",
+                  fontWeight:      700,
+                  boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
+                  zIndex:          3,
+                  pointerEvents:   "none",
+                }}
+              >
+                ✕
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // ── card واحد ──
+  const renderItem = (item) => (
+    <div
+      key={item.id}
+      style={{
+        display:       "flex",
+        flexDirection: "column",
+        alignItems:    "center",
+        gap:           "clamp(4px,0.6vw,8px)",
+      }}
+    >
+      {/* رقم */}
+      <span
+        style={{
+          fontSize:   "clamp(15px,1.8vw,22px)",
+          fontWeight: 700,
+          color:      "#111",
+          alignSelf:  "flex-start",
+        }}
+      >
+        {item.id}
+      </span>
+
+      {/* صورة */}
+      <div
+        style={{
+          width:        "100%",
+          aspectRatio:  "1 / 1",
+          border:       `2px solid ${BORDER_COLOR}`,
+          borderRadius: "clamp(10px,1.2vw,16px)",
+          overflow:     "hidden",
+          background:   "#f7f7f7",
+        }}
+      >
+        <img
+          src={item.img}
+          alt={`item-${item.id}`}
+          style={{
+            width:         "100%",
+            height:        "100%",
+            objectFit:     "cover",
+            display:       "block",
+            userSelect:    "none",
+            pointerEvents: "none",
+          }}
+        />
+      </div>
+
+      {/* الكلمة مع dropdowns الأشكال */}
+      {renderWord(item)}
+
+      {/* سطر الكلمة الكاملة — تظهر لما تكون كل الأشكال صح */}
+      <div
+        style={{
+          width:         "100%",
+          borderBottom:  `2px solid ${LINE_COLOR}`,
+          textAlign:     "center",
+          fontSize:      "clamp(13px,1.6vw,20px)",
+          fontWeight:    700,
+          color:         RED_COLOR,
+          paddingBottom: "2px",
+          minHeight:     "clamp(20px,2.2vw,28px)",
+          lineHeight:    1.2,
+        }}
+      >
+        {(showAns || (showResults && isItemAllCorrect(item))) ? item.answer : ""}
+      </div>
+    </div>
+  );
 
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap:           "clamp(16px,2.2vw,26px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span>
-          Find the missing letters. Write the words.
+        {/* Title */}
+        <h1
+          className="WB-header-title-page8"
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+        >
+          <span className="WB-ex-A">G</span> Find the missing letters. Write the words.
         </h1>
 
-        {/* بنك الكلمات */}
+        {/* Layout: أسئلة يسار + legend يمين */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-            flexWrap: "wrap",
+            display:             "grid",
+            gridTemplateColumns: "1fr auto",
+            gap:                 "clamp(18px,2.5vw,36px)",
+            alignItems:          "center",
+            width:               "100%",
           }}
         >
-          {WORD_BANK.map((word) => {
-            const disabled = usedWords.includes(word);
+          {/* الأسئلة: صفين */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(18px,2.2vw,28px)" }}>
 
-            return (
-              <div
-                key={word}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(word)}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: "10px",
-                  backgroundColor: disabled ? "#d1d5db" : "#ef4444",
-                  color: "#fff",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  cursor: disabled ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.5 : 1,
-                  userSelect: "none",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
-                }}
-              >
-                {word}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* المحتوى الرئيسي */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "26px 22px",
-            alignItems: "start",
-          }}
-        >
-          {ITEMS.slice(0, 4).map((item) => (
+            {/* Row 1: 1-4 */}
             <div
-              key={item.id}
               style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
+                display:             "grid",
+                gridTemplateColumns: "repeat(4, minmax(0,1fr))",
+                gap:                 "clamp(10px,1.4vw,18px)",
               }}
             >
-              <div
-                style={{
-                  alignSelf: "flex-start",
-                  fontSize: "18px",
-                  fontWeight: "700",
-                  color: "#222",
-                }}
-              >
-                {item.id}
-              </div>
-
-              <div
-                style={{
-                  width: "180px",
-                  height: "150px",
-                  border: "2px solid #a7a7a7",
-                  borderRadius: "18px",
-                  backgroundColor: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                <img
-                  src={item.img}
-                  alt={`item-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  fontSize: "22px",
-                  color: "#222",
-                  letterSpacing: "1px",
-                  minHeight: "28px",
-                }}
-              >
-                {item.pattern}
-              </div>
-
-              <div
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDrop(item.id)}
-                style={{
-                  position: "relative",
-                  width: "210px",
-                  minHeight: "38px",
-                  borderBottom: "2px solid #444",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: answers[item.id] ? "#dc2626" : "#9ca3af",
-                  fontSize: "20px",
-                  lineHeight: "1.4",
-                }}
-              >
-                {answers[item.id] || ""}
-
-                {isWrong(item) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-10px",
-                      right: "-8px",
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    ✕
-                  </div>
-                )}
-              </div>
+              {ITEMS.slice(0, 4).map(renderItem)}
             </div>
-          ))}
-        </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "26px 22px",
-            alignItems: "start",
-          }}
-        >
-          {ITEMS.slice(4).map((item) => (
+            {/* Row 2: 5-7 + placeholder */}
             <div
-              key={item.id}
               style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
+                display:             "grid",
+                gridTemplateColumns: "repeat(4, minmax(0,1fr))",
+                gap:                 "clamp(10px,1.4vw,18px)",
               }}
             >
-              <div
-                style={{
-                  alignSelf: "flex-start",
-                  fontSize: "18px",
-                  fontWeight: "700",
-                  color: "#222",
-                }}
-              >
-                {item.id}
-              </div>
-
-              <div
-                style={{
-                  width: "180px",
-                  height: "150px",
-                  border: "2px solid #a7a7a7",
-                  borderRadius: "18px",
-                  backgroundColor: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                <img
-                  src={item.img}
-                  alt={`item-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  fontSize: "22px",
-                  color: "#222",
-                  letterSpacing: "1px",
-                  minHeight: "28px",
-                }}
-              >
-                {item.pattern}
-              </div>
-
-              <div
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDrop(item.id)}
-                style={{
-                  position: "relative",
-                  width: "210px",
-                  minHeight: "38px",
-                  borderBottom: "2px solid #444",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: answers[item.id] ? "#dc2626" : "#9ca3af",
-                  fontSize: "20px",
-                  lineHeight: "1.4",
-                }}
-              >
-                {answers[item.id] || ""}
-
-                {isWrong(item) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-10px",
-                      right: "-8px",
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    ✕
-                  </div>
-                )}
-              </div>
+              {ITEMS.slice(4).map(renderItem)}
+              <div />
             </div>
-          ))}
+          </div>
 
-          {/* legend */}
+          {/* Legend */}
           <div
             style={{
-              display: "flex",
+              display:       "flex",
               flexDirection: "column",
-              gap: "18px",
-              justifyContent: "center",
-              paddingTop: "30px",
+              gap:           "clamp(10px,1.2vw,18px)",
+              padding:       "clamp(12px,1.4vw,20px) clamp(16px,2vw,28px)",
+              border:        `2px solid ${BORDER_COLOR}`,
+              borderRadius:  "clamp(12px,1.4vw,18px)",
+              background:    "#fff",
+              alignSelf:     "center",
             }}
           >
-            {SYMBOLS.map((item) => (
+            {Object.entries(SHAPE_MAP).map(([shape, letter]) => (
               <div
-                key={item.symbol}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  fontSize: "22px",
-                  color: "#222",
-                }}
+                key={shape}
+                style={{ display: "flex", alignItems: "center", gap: "clamp(8px,1vw,14px)" }}
               >
-                <span style={{ minWidth: "28px", textAlign: "center" }}>
-                  {item.symbol}
-                </span>
-                <span>=</span>
-                <div
+                <span
                   style={{
-                    minWidth: "80px",
-                    borderBottom: "2px solid #444",
-                    color: "#222",
+                    fontSize:  "clamp(18px,2.2vw,28px)",
+                    lineHeight: 1,
+                    color:     "#111",
+                    minWidth:  "clamp(20px,2.4vw,32px)",
                     textAlign: "center",
-                    lineHeight: "1.2",
                   }}
                 >
-                  {item.letter}
-                </div>
+                  {shape}
+                </span>
+                <span style={{ fontSize: "clamp(16px,1.8vw,24px)", color: "#555", fontWeight: 500 }}>
+                  =
+                </span>
+                <span
+                  style={{
+                    fontSize:      "clamp(18px,2.2vw,28px)",
+                    fontWeight:    700,
+                    color:         RED_COLOR,
+                    borderBottom:  `2px solid ${LINE_COLOR}`,
+                    minWidth:      "clamp(28px,3.5vw,48px)",
+                    textAlign:     "center",
+                    paddingBottom: "2px",
+                    lineHeight:    1.2,
+                  }}
+                >
+                  {letter}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "10px",
-          }}
-        >
+        {/* Buttons */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
           <Button
+            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}
-            checkAnswers={checkAnswers}
           />
         </div>
       </div>

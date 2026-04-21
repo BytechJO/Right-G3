@@ -6,6 +6,7 @@ import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folde
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 4.svg";
+import { object } from "framer-motion/client";
 
 const WORDS = ["hot", "cold", "rainy", "windy"];
 
@@ -47,7 +48,7 @@ const styles = {
   wordBank: {
     minWidth: "min(100%, 520px)",
     maxWidth: "620px",
-    border: "2px solid #b9b9b9",
+    border: "2px solid #f39b42",
     borderRadius: "18px",
     padding: "14px 22px",
     display: "flex",
@@ -66,12 +67,12 @@ const styles = {
     fontWeight: 500,
   },
 
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))",
-    gap: "34px 42px",
-    alignItems: "start",
-  },
+grid: {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "34px 42px",
+  alignItems: "start",
+},
 
   card: {
     width: "100%",
@@ -93,7 +94,7 @@ const styles = {
     height: "34px",
     borderRadius: "999px",
     background: "#fff",
-    border: "2px solid #cfcfcf",
+    border: "2px solid #f39b42",
     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
     display: "flex",
     alignItems: "center",
@@ -107,7 +108,8 @@ const styles = {
   imageBox: {
     width: "100%",
     height: "170px",
-    border: "2px solid #b9b9b9",
+    border: "2px solid #f39b42",
+    objectfit:"contain",
     borderRadius: "18px",
     overflow: "hidden",
     background: "#fff",

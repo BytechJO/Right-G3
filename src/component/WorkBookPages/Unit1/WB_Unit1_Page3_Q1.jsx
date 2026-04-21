@@ -8,43 +8,16 @@ const TEXT_COLOR = "#2b2b2b";
 const HEADER_BG = "#ffffff";
 
 const EXERCISE_DATA = [
-  {
-    id: 1,
-    text: "The car is faster than the skateboard.",
-    correctAnswer: "true",
-  },
-  {
-    id: 2,
-    text: "The grandpa is younger than the grandson.",
-    correctAnswer: "false",
-  },
-  {
-    id: 3,
-    text: "The lion is larger than the cat.",
-    correctAnswer: "true",
-  },
-  {
-    id: 4,
-    text: "The truck is smaller than the car.",
-    correctAnswer: "false",
-  },
-  {
-    id: 5,
-    text: "The snake is longer than the worm.",
-    correctAnswer: "true",
-  },
-  {
-    id: 6,
-    text: "The book is heavier than the pen.",
-    correctAnswer: "true",
-  },
+  { id: 1, text: "The car is faster than the skateboard.",    correctAnswer: "true"  },
+  { id: 2, text: "The grandpa is younger than the grandson.", correctAnswer: "false" },
+  { id: 3, text: "The lion is larger than the cat.",          correctAnswer: "true"  },
+  { id: 4, text: "The truck is smaller than the car.",        correctAnswer: "false" },
+  { id: 5, text: "The snake is longer than the worm.",        correctAnswer: "true"  },
+  { id: 6, text: "The book is heavier than the pen.",         correctAnswer: "true"  },
 ];
 
 const styles = {
-  wrapper: {
-    width: "100%",
-    overflowX: "auto",
-  },
+  wrapper: { width: "100%", overflowX: "auto" },
 
   table: {
     width: "100%",
@@ -121,7 +94,6 @@ const styles = {
   checkMark: {
     fontSize: "clamp(34px, 5vw, 62px)",
     fontWeight: "900",
-    color: ACTIVE_COLOR,
     lineHeight: 1,
     transform: "rotate(-6deg)",
   },
@@ -134,57 +106,35 @@ const styles = {
 };
 
 const WB_TrueFalse_Table = () => {
-  const [answers, setAnswers] = useState({});
+  const [answers,     setAnswers]     = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  const [showAns,     setShowAns]     = useState(false);
 
   const handleSelect = (questionId, value) => {
     if (showAns) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
     setShowResults(false);
   };
 
   const checkAnswers = () => {
     if (showAns) return;
-
     const allAnswered = EXERCISE_DATA.every((item) => answers[item.id]);
-
-    if (!allAnswered) {
-      ValidationAlert.info("Please answer all items first.");
-      return;
-    }
+    if (!allAnswered) { ValidationAlert.info("Please answer all items first."); return; }
 
     setShowResults(true);
 
     let score = 0;
     const total = EXERCISE_DATA.length;
+    EXERCISE_DATA.forEach((item) => { if (answers[item.id] === item.correctAnswer) score++; });
 
-    EXERCISE_DATA.forEach((item) => {
-      if (answers[item.id] === item.correctAnswer) {
-        score++;
-      }
-    });
-
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
-    }
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)  ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                 ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
     const correctAnswers = {};
-    EXERCISE_DATA.forEach((item) => {
-      correctAnswers[item.id] = item.correctAnswer;
-    });
-
+    EXERCISE_DATA.forEach((item) => { correctAnswers[item.id] = item.correctAnswer; });
     setAnswers(correctAnswers);
     setShowResults(true);
     setShowAns(true);
@@ -196,102 +146,103 @@ const WB_TrueFalse_Table = () => {
     setShowAns(false);
   };
 
-  const renderMark = (questionId, optionValue) => {
-    const selectedValue = answers[questionId];
-    if (selectedValue !== optionValue) return null;
+  /* ── helpers ── */
+  const isWrong = (item) =>
+    showResults && !showAns && answers[item.id] && answers[item.id] !== item.correctAnswer;
 
-    return <span style={styles.checkMark}>✓</span>;
+  const getCheckColor = (item) => (isWrong(item) ? "#ef4444" : ACTIVE_COLOR);
+
+  const renderMark = (item, optionValue) => {
+    if (answers[item.id] !== optionValue) return null;
+    return (
+      <span style={{ ...styles.checkMark, color: getCheckColor(item) }}>✓</span>
+    );
   };
 
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+        style={{ display: "flex", flexDirection: "column", gap: "18px", maxWidth: "1100px", margin: "0 auto" }}
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
         >
           <span className="WB-ex-A">A</span> Read and write ✓.
         </h1>
 
         <div style={styles.wrapper}>
           <div style={styles.table}>
+            {/* Header */}
             <div style={styles.headerRow}>
               <div style={styles.headerCell}></div>
-
-              <div
-                style={{
-                  ...styles.headerCell,
-                  borderLeft: `1.5px solid ${BORDER_COLOR}`,
-                }}
-              >
-                True
-              </div>
-
-              <div
-                style={{
-                  ...styles.headerCell,
-                  borderLeft: `1.5px solid ${BORDER_COLOR}`,
-                }}
-              >
-                False
-              </div>
+              <div style={{ ...styles.headerCell, borderLeft: `1.5px solid ${BORDER_COLOR}` }}>True</div>
+              <div style={{ ...styles.headerCell, borderLeft: `1.5px solid ${BORDER_COLOR}` }}>False</div>
             </div>
 
+            {/* Rows */}
             {EXERCISE_DATA.map((item, index) => (
               <div
                 key={item.id}
                 style={{
                   ...styles.bodyRow,
-                  borderBottom:
-                    index === EXERCISE_DATA.length - 1
-                      ? "none"
-                      : `1.5px solid ${BORDER_COLOR}`,
+                  borderBottom: index === EXERCISE_DATA.length - 1 ? "none" : `1.5px solid ${BORDER_COLOR}`,
+                  background:  "transparent",
+                  transition: "background 0.2s",
                 }}
               >
+                {/* Sentence */}
                 <div style={styles.sentenceCell}>
                   <span style={styles.number}>{item.id}</span>
                   <span style={styles.sentenceText}>{item.text}</span>
+
+                  {/* ✗ badge */}
+                  {isWrong(item) && (
+                    <span
+                      style={{
+                        marginLeft:     "auto",
+                        flexShrink:     0,
+                        background:     "#ef4444",
+                        color:          "#fff",
+                        border : "1px solid #fff ",
+                        borderRadius:   "50%",
+                        width:          "clamp(18px,2vw,26px)",
+                        height:         "clamp(18px,2vw,26px)",
+                        fontSize:       "clamp(11px,1.2vw,15px)",
+                        fontWeight:     700,
+                        display:        "flex",
+                        alignItems:     "center",
+                        justifyContent: "center",
+                        boxShadow:      "0 1px 4px rgba(0,0,0,0.18)",
+                        flexShrink:     0,
+                      }}
+                    >
+                      X
+                    </span>
+                  )}
                 </div>
 
+                {/* True cell */}
                 <div
                   onClick={() => handleSelect(item.id, "true")}
                   style={{
                     ...styles.optionCell,
-                    background:
-                      answers[item.id] === "true"
-                        ? "rgba(255, 255, 255, 0.04)"
-                        : "transparent",
+                    cursor: showAns ? "default" : "pointer",
                   }}
                 >
-                  {renderMark(item.id, "true")}
+                  {renderMark(item, "true")}
                 </div>
 
+                {/* False cell */}
                 <div
                   onClick={() => handleSelect(item.id, "false")}
                   style={{
                     ...styles.optionCell,
-                    background:
-                      answers[item.id] === "false"
-                        ? "rgba(255, 255, 255, 0.04)"
-                        : "transparent",
+                    cursor: showAns ? "default" : "pointer",
                   }}
                 >
-                  {renderMark(item.id, "false")}
+                  {renderMark(item, "false")}
                 </div>
               </div>
             ))}

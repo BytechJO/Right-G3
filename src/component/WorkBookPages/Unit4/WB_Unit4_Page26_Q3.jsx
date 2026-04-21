@@ -121,7 +121,7 @@ export default function WB_Unit3_Page18_QC() {
           width: "62px",
           height: "62px",
           borderRadius: "16px",
-          border: selected ? "2px solid #9d9d9d" : "2px solid #cfcfcf",
+          border: selected ? "2px solid #9d9d9d" : "2px solid #f39b42",
           background: "#fff",
           display: "flex",
           alignItems: "center",
@@ -231,7 +231,7 @@ export default function WB_Unit3_Page18_QC() {
         .wb-c-card {
           width: 100%;
           min-height: 176px;
-          border: 2px solid #aaaaaa;
+          border: 2px solid #f39b42;
           border-radius: 18px;
           background: #fff;
           overflow: hidden;
@@ -251,7 +251,7 @@ export default function WB_Unit3_Page18_QC() {
         }
 
         .wb-c-half:first-child {
-          border-right: 2px solid #b1b1b1;
+          border-right: 2px solid #f39b42;
         }
 
         .wb-c-img {
@@ -270,7 +270,7 @@ export default function WB_Unit3_Page18_QC() {
           transform: translateX(-50%);
           width: 54px;
           height: 42px;
-          border: 2px solid #aaaaaa;
+          border: 2px solid #f39b42;
           border-radius: 8px;
           background: #fff;
           display: flex;
@@ -283,7 +283,7 @@ export default function WB_Unit3_Page18_QC() {
         .wb-c-answer-text {
           font-size: 34px;
           font-weight: 700;
-          color: #d72626;
+          color: #000000ff;
           line-height: 1;
           transform: translateY(-1px);
         }

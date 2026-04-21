@@ -117,7 +117,7 @@ export default function WB_Unit8_Page48_QI() {
         style={{
           width: "44px",
           height: "44px",
-          border: "2px solid #a3a3a3",
+          border: "2px solid #f39b42",
           borderRadius: "8px",
           backgroundColor: "#fff",
           color: selected ? "#dc2626" : "transparent",
@@ -142,14 +142,11 @@ export default function WB_Unit8_Page48_QI() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
+          display:       "flex",
           flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "980px",
-          margin: "0 auto",
-          padding: "10px 18px 20px 18px",
-          boxSizing: "border-box",
+          gap:           "clamp(18px,2.5vw,28px)",
+          maxWidth:      "1100px",
+          margin:        "0 auto",
         }}
       >
         <h1
@@ -208,7 +205,10 @@ export default function WB_Unit8_Page48_QI() {
                   style={{
                     width: "310px",
                     height: "150px",
-                    objectFit: "contain",
+                    objectFit: "cover",
+                              border: "2px solid #f39b42",
+                              borderRadius : "6%",
+
                     display: "block",
                     flexShrink: 0,
                   }}

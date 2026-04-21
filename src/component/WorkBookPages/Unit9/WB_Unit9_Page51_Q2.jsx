@@ -164,15 +164,14 @@ export default function WB_Unit8_Page45_QB() {
   };
 
   return (
-    <div className="main-container-component">
+  <div className="main-container-component">
       <div
         className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "18px",
-          width: "100%",
-          maxWidth: "980px",
+          gap: "clamp(18px,2.5vw,28px)",
+          maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
@@ -203,7 +202,7 @@ export default function WB_Unit8_Page45_QB() {
                   flexDirection: "column",
                   gap: "10px",
                   padding: "12px 14px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #f39b42",
                   borderRadius: "14px",
                   backgroundColor: "#fff",
                 }}
@@ -258,7 +257,7 @@ export default function WB_Unit8_Page45_QB() {
                         padding: "6px 10px",
                         borderRadius: "8px",
                         border: "none",
-                        backgroundColor: "#3b82f6",
+                        backgroundColor: "#f39b42",
                         color: "#fff",
                         fontSize: "15px",
                         fontWeight: "500",
@@ -310,6 +309,8 @@ export default function WB_Unit8_Page45_QB() {
                       height: "24px",
                       borderRadius: "50%",
                       backgroundColor: "#ef4444",
+                    borderBottom: "2px solid #ffffffff",
+
                       color: "#fff",
                       display: "flex",
                       alignItems: "center",

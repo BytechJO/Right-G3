@@ -278,6 +278,9 @@ export default function WB_Unit3_Page16_QC() {
           height: clamp(120px, 16vw, 170px);
           object-fit: contain;
           display: block;
+                    border: 2px solid #f39b42;
+object-fit: cover;
+
         }
 
         .wb-c16-sentence-wrap {

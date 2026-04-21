@@ -9,7 +9,7 @@ import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folde
 const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR = "#ffca94";
 const BORDER_COLOR = "#d9d9d9";
-const ANSWER_COLOR = "#d62828";
+const ANSWER_COLOR = "#000000ff";
 const WRONG_COLOR = "#ef4444";
 const LINE_COLOR = "#3f3f3f";
 

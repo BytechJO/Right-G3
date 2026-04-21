@@ -10,14 +10,14 @@ const WB_Unit10_Page59 = ({ openPopup }) => {
       style={{ backgroundImage: `url(${page_1})` }}
     >
       <div
-        className="wb-unit10-p3-q1 hover:scale-110 transition"
+        className="q5-10 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 121 })}
+          onClick={() => openPopup("exercise", { startIndex: 122 })}
           style={{ overflow: "visible" }}
           // className="click-icon-page8-2 hover:scale-110 transition"
         >
@@ -34,14 +34,14 @@ const WB_Unit10_Page59 = ({ openPopup }) => {
       </div>
 
       <div
-        className="wb-unit10-p3-q2 hover:scale-110 transition"
+        className="q6-10 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() => openPopup("exercise", { startIndex: 122 })}
+          onClick={() => openPopup("exercise", { startIndex: 123 })}
           style={{ overflow: "visible" }}
           // className="click-icon-page8-2 hover:scale-110 transition"
         >

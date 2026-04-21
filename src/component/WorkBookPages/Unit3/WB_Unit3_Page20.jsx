@@ -10,7 +10,7 @@ return (
         style={{ backgroundImage: `url(${page2})` }}
       >
         <div
-          className="wb-unit7-p1-q1 hover:scale-110 transition "
+          className="q11-3 hover:scale-110 transition "
           style={{ overflow: "visible" }}
         >
           <svg
@@ -34,7 +34,7 @@ return (
         </div>
   
         <div
-          className="wb-unit7-p1-q2 hover:scale-110 transition "
+          className="q12-3 hover:scale-110 transition "
           style={{ overflow: "visible" }}
         >
           <svg
@@ -57,7 +57,7 @@ return (
           </svg>
         </div>
         <div
-          className="wb-unit7-p1-q2 hover:scale-110 transition "
+          className="q13-3 hover:scale-110 transition "
           style={{ overflow: "visible" }}
         >
           <svg
@@ -80,7 +80,7 @@ return (
           </svg>
         </div>
         <div
-          className="wb-unit7-p1-q2 hover:scale-110 transition "
+          className="q14-3 hover:scale-110 transition "
           style={{ overflow: "visible" }}
         >
           <svg

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
@@ -48,34 +48,95 @@ const NUMBERS = [1, 2, 3, 4, 5];
 
 export default function WB_Unit_Months_Page232_QH() {
   const [answers, setAnswers] = useState({});
-  const [draggedNumber, setDraggedNumber] = useState(null);
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
-  const usedNumbers = Object.values(answers);
+  const [dragData, setDragData] = useState({
+    active: false,
+    number: null,
+    x: 0,
+    y: 0,
+  });
 
-  const handleDragStart = (num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-    setDraggedNumber(num);
-  };
+  const dropRefs = useRef({});
+  const activePointerIdRef = useRef(null);
 
-  const handleDrop = (sentenceId) => {
-    if (showAns || draggedNumber === null) return;
+  const usedNumbers = useMemo(() => Object.values(answers), [answers]);
+
+  const assignNumberToSentence = (sentenceId, number) => {
+    if (showAns || number == null) return;
 
     setAnswers((prev) => {
       const updated = { ...prev };
 
       Object.keys(updated).forEach((key) => {
-        if (updated[key] === draggedNumber) {
+        if (updated[key] === number) {
           delete updated[key];
         }
       });
 
-      updated[sentenceId] = draggedNumber;
+      updated[sentenceId] = number;
       return updated;
     });
+  };
 
-    setDraggedNumber(null);
+  const clearDrag = () => {
+    setDragData({
+      active: false,
+      number: null,
+      x: 0,
+      y: 0,
+    });
+    activePointerIdRef.current = null;
+  };
+
+  const handlePointerDownNumber = (e, num) => {
+    if (showAns || usedNumbers.includes(num)) return;
+
+    activePointerIdRef.current = e.pointerId;
+
+    setDragData({
+      active: true,
+      number: num,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handlePointerMove = (e) => {
+    if (!dragData.active) return;
+    if (activePointerIdRef.current !== e.pointerId) return;
+
+    setDragData((prev) => ({
+      ...prev,
+      x: e.clientX,
+      y: e.clientY,
+    }));
+  };
+
+  const handlePointerUp = (e) => {
+    if (!dragData.active) return;
+    if (activePointerIdRef.current !== e.pointerId) return;
+
+    const dropTarget = Object.entries(dropRefs.current).find(([, element]) => {
+      if (!element) return false;
+
+      const rect = element.getBoundingClientRect();
+
+      return (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      );
+    });
+
+    if (dropTarget) {
+      const sentenceId = Number(dropTarget[0]);
+      assignNumberToSentence(sentenceId, dragData.number);
+    }
+
+    clearDrag();
   };
 
   const handleCheck = () => {
@@ -116,13 +177,14 @@ export default function WB_Unit_Months_Page232_QH() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
+    clearDrag();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setDraggedNumber(null);
     setChecked(false);
     setShowAns(false);
+    clearDrag();
   };
 
   const isWrong = (sentenceId) => {
@@ -133,26 +195,31 @@ export default function WB_Unit_Months_Page232_QH() {
 
   const renderNumberBox = (sentenceId) => {
     const value = answers[sentenceId] || "";
+    const isDropActive = dragData.active;
 
     return (
       <div
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(sentenceId)}
+        ref={(el) => {
+          dropRefs.current[sentenceId] = el;
+        }}
         style={{
-          width: "42px",
-          height: "42px",
-          border: "2px solid #a8a8a8",
+          width: "clamp(38px, 5vw, 46px)",
+          height: "clamp(38px, 5vw, 46px)",
+          border: `2px solid ${
+            isDropActive ? "#f39b42" : "#f39b42"
+          }`,
           borderRadius: "8px",
           background: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "22px",
+          fontSize: "clamp(18px, 2.4vw, 22px)",
           fontWeight: "500",
-          color: value ? "#000000ff" : "#666",
+          color: value ? "#000" : "#666",
           position: "relative",
           flexShrink: 0,
           boxSizing: "border-box",
+          transition: "0.15s ease",
         }}
       >
         {value}
@@ -187,15 +254,22 @@ export default function WB_Unit_Months_Page232_QH() {
       key={item.id}
       style={{
         position: "relative",
-        width: item.id <= 2 ? "200px" : "180px",
-        height: item.id <= 2 ? "148px" : "160px",
-        border: "2px solid #a8a8a8",
+        width:
+          item.id <= 2
+            ? "clamp(150px, 22vw, 200px)"
+            : "clamp(135px, 20vw, 180px)",
+        height:
+          item.id <= 2
+            ? "clamp(110px, 17vw, 148px)"
+            : "clamp(120px, 18vw, 160px)",
+        border: "2px solid #f39b42",
         borderRadius: "14px",
         overflow: "visible",
         background: "#fff",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        boxSizing: "border-box",
       }}
     >
       <img
@@ -219,7 +293,7 @@ export default function WB_Unit_Months_Page232_QH() {
           width: "24px",
           height: "24px",
           borderRadius: "50%",
-          border: "2px solid #888",
+          border: "2px solid #f39b42",
           background: "#f7f7f7",
           display: "flex",
           alignItems: "center",
@@ -236,10 +310,18 @@ export default function WB_Unit_Months_Page232_QH() {
   );
 
   return (
-    <div className="main-container-component">
-   <div
+    <div
+      className="main-container-component"
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={clearDrag}
+      style={{
+        touchAction: "none",
+      }}
+    >
+      <div
         className="div-forall"
-            style={{
+        style={{
           display: "flex",
           flexDirection: "column",
           gap: "28px",
@@ -254,25 +336,33 @@ export default function WB_Unit_Months_Page232_QH() {
             display: "flex",
             alignItems: "center",
             gap: "12px",
+            flexWrap: "wrap",
           }}
         >
           <span className="WB-ex-A">H</span>
           Look, read, and match.
         </h1>
 
-        {/* numbers to drag */}
-        <div style={{ display: "flex",justifyContent: "center",gap: "14px", marginTop: "-6px",}} >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "14px",
+            marginTop: "-6px",
+            flexWrap: "wrap",
+          }}
+        >
           {NUMBERS.map((num) => {
             const disabled = usedNumbers.includes(num);
+            const isDragging = dragData.active && dragData.number === num;
 
             return (
               <div
                 key={num}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(num)}
+                onPointerDown={(e) => handlePointerDownNumber(e, num)}
                 style={{
-                  width: "42px",
-                  height: "42px",
+                  width: "clamp(38px, 5vw, 42px)",
+                  height: "clamp(38px, 5vw, 42px)",
                   borderRadius: "50%",
                   backgroundColor: disabled ? "#d1d5db" : "#f39b42",
                   color: "#fff",
@@ -280,11 +370,14 @@ export default function WB_Unit_Months_Page232_QH() {
                   alignItems: "center",
                   justifyContent: "center",
                   fontWeight: "700",
-                  fontSize: "21px",
+                  fontSize: "clamp(18px, 2.3vw, 21px)",
                   cursor: disabled || showAns ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.55 : 1,
+                  opacity: disabled ? 0.55 : isDragging ? 0.3 : 1,
                   userSelect: "none",
-                  boxShadow: disabled ? "none" : "0 2px 8px rgba(0,0,0,0.12)",
+                  boxShadow: disabled
+                    ? "none"
+                    : "0 2px 8px rgba(0,0,0,0.12)",
+                  touchAction: "none",
                 }}
               >
                 {num}
@@ -293,7 +386,6 @@ export default function WB_Unit_Months_Page232_QH() {
           })}
         </div>
 
-        {/* images */}
         <div
           style={{
             display: "flex",
@@ -325,7 +417,6 @@ export default function WB_Unit_Months_Page232_QH() {
           </div>
         </div>
 
-        {/* sentence list */}
         <div
           style={{
             display: "flex",
@@ -349,7 +440,7 @@ export default function WB_Unit_Months_Page232_QH() {
 
               <div
                 style={{
-                  fontSize: "18px",
+                  fontSize: "clamp(15px, 2vw, 18px)",
                   lineHeight: "1.5",
                   color: "#222",
                   paddingTop: "4px",
@@ -361,7 +452,6 @@ export default function WB_Unit_Months_Page232_QH() {
           ))}
         </div>
 
-        {/* buttons */}
         <div
           style={{
             display: "flex",
@@ -376,6 +466,32 @@ export default function WB_Unit_Months_Page232_QH() {
           />
         </div>
       </div>
+
+      {dragData.active && dragData.number !== null && (
+        <div
+          style={{
+            position: "fixed",
+            left: dragData.x,
+            top: dragData.y,
+            transform: "translate(-50%, -50%)",
+            width: "48px",
+            height: "48px",
+            borderRadius: "50%",
+            backgroundColor: "#f39b42",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: "700",
+            fontSize: "22px",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+            pointerEvents: "none",
+            zIndex: 9999,
+          }}
+        >
+          {dragData.number}
+        </div>
+      )}
     </div>
   );
 }

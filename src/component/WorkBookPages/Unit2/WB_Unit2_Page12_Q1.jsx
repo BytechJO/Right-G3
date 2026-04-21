@@ -47,8 +47,10 @@ const ITEMS = [
     correct: "the subway",
   },
 ];
+const ACTIVE_COLOR = "#f39b42";
+const WRONG_COLOR = "#ef4444";
 
-export default function WB_Unit3_Page19_QG() {
+export default function WB_Unit3_Page6_QG() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
@@ -94,17 +96,17 @@ export default function WB_Unit3_Page19_QG() {
   };
 
   const handleShowAnswer = () => {
-    const correctMap = {};
+    const filled = {};
     ITEMS.forEach((item) => {
-      correctMap[item.id] = item.correct;
+      filled[item.id] = item.correct;
     });
 
-    setAnswers(correctMap);
+    setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
   };
 
-  const handleReset = () => {
+  const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
@@ -112,7 +114,7 @@ export default function WB_Unit3_Page19_QG() {
 
   const isWrong = (item) => {
     if (!showResults || showAns) return false;
-    return answers[item.id] !== item.correct;
+    return answers[item.id] && answers[item.id] !== item.correct;
   };
 
   const renderOption = (item, option) => {
@@ -123,12 +125,13 @@ export default function WB_Unit3_Page19_QG() {
     return (
       <div
         onClick={() => handleSelect(item.id, option)}
-        className={`g-option ${
+        className={`wb-g6-option ${
           selected || showCorrectAsSelected ? "selected" : ""
         } ${wrong ? "wrong" : ""} ${showAns ? "disabled" : ""}`}
       >
         {option}
-        {wrong && <div className="g-wrong-mark">✕</div>}
+
+        {wrong && <div className="wb-g6-wrong-badge">✕</div>}
       </div>
     );
   };
@@ -136,233 +139,214 @@ export default function WB_Unit3_Page19_QG() {
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-g-wrapper * {
-          box-sizing: border-box !important;
+        .wb-g6-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(20px, 2.4vw, 28px);
+          width: 100%;
         }
 
-        .wb-g-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          column-gap: clamp(18px, 2.5vw, 42px) !important;
-          row-gap: clamp(28px, 4vw, 60px) !important;
-          align-items: start !important;
-          width: 100% !important;
+        .wb-g6-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          column-gap: clamp(28px, 4vw, 46px);
+          row-gap: clamp(18px, 2.4vw, 28px);
+          width: 100%;
+          align-items: start;
         }
 
-        .wb-g-card {
-          display: flex !important;
-          align-items: flex-start !important;
-          gap: clamp(10px, 1.2vw, 16px) !important;
-          width: 100% !important;
-          min-width: 0 !important;
+        .wb-g6-item {
+          display: grid;
+          grid-template-columns: clamp(20px, 2.4vw, 28px) clamp(70px, 11vw, 115px) minmax(0, 1fr);
+          gap: clamp(10px, 1.6vw, 18px);
+          align-items: center;
+          width: 100%;
         }
 
-        .wb-g-number {
-          font-size: clamp(18px, 2vw, 28px) !important;
-          font-weight: 700 !important;
-          color: #222 !important;
-          line-height: 1 !important;
-          min-width: clamp(18px, 2vw, 28px) !important;
-          margin-top: clamp(4px, 0.6vw, 8px) !important;
-          flex-shrink: 0 !important;
+        .wb-g6-number {
+          font-size: clamp(18px, 2vw, 22px);
+          font-weight: 700;
+          color: #222;
+          line-height: 1;
         }
 
-        .wb-g-content {
-          display: flex !important;
-          align-items: flex-start !important;
-          gap: clamp(10px, 1.5vw, 18px) !important;
-          width: 100% !important;
-          min-width: 0 !important;
+        .wb-g6-image-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: clamp(72px, 11vw, 120px);
         }
 
-        .wb-g-img-wrap {
-          width: clamp(100px, 15vw, 170px) !important;
-          height: clamp(80px, 11vw, 130px) !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
-          min-width: 0 !important;
+        .wb-g6-image {
+          max-width: 100%;
+          max-height: clamp(72px, 11vw, 120px);
+          width: auto;
+          height: auto;
+          object-fit: contain;
+          display: block;
         }
 
-        .wb-g-img {
-          max-width: 100% !important;
-          max-height: 100% !important;
-          width: auto !important;
-          height: auto !important;
-          object-fit: contain !important;
-          display: block !important;
+        .wb-g6-options {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(8px, 1vw, 12px);
+          min-width: 0;
         }
 
-        .wb-g-options {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: clamp(8px, 1vw, 12px) !important;
-          min-width: 0 !important;
-          width: 100% !important;
-          padding-top: clamp(2px, 0.4vw, 6px) !important;
-          flex: 1 1 auto !important;
+        .wb-g6-option {
+          position: relative;
+          width: fit-content;
+          max-width: 100%;
+          padding: clamp(4px, 0.6vw, 6px) clamp(16px, 2vw, 26px);
+          border: 3px solid transparent;
+          border-radius: 999px;
+          background: transparent;
+          color: #222;
+          font-size: clamp(16px, 2vw, 20px);
+          font-weight: 500;
+          line-height: 1.2;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          user-select: none;
+          box-sizing: border-box;
+          white-space: normal;
+          word-break: break-word;
         }
 
-        .wb-g-option-row {
-          width: 100% !important;
-          min-width: 0 !important;
+        .wb-g6-option.selected {
+          border-color: ${ACTIVE_COLOR};
         }
 
-        .g-option {
-          position: relative !important;
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          width: auto !important;
-          max-width: 100% !important;
-          min-height: clamp(30px, 4vw, 42px) !important;
-          padding: clamp(4px, 0.6vw, 6px) clamp(12px, 1.4vw, 18px) !important;
-          border-radius: 999px !important;
-          border: 3px solid transparent !important;
-          background: transparent !important;
-          color: #111 !important;
-          font-size: clamp(15px, 1.6vw, 24px) !important;
-          line-height: 1.2 !important;
-          cursor: pointer !important;
-          user-select: none !important;
-          transition: all 0.2s ease !important;
-          box-sizing: border-box !important;
-          white-space: nowrap !important;
-          word-break: normal !important;
-          overflow-wrap: normal !important;
-          text-align: center !important;
+        .wb-g6-option.wrong {
+          border-color: ${WRONG_COLOR};
         }
 
-        .g-option.selected {
-          border-color: #d62828 !important;
+        .wb-g6-option.disabled {
+          cursor: default;
         }
 
-        .g-option.wrong {
-          border-color: #ef4444 !important;
+        .wb-g6-wrong-badge {
+          position: absolute;
+          top: clamp(-8px, -0.8vw, -6px);
+          right: clamp(-8px, -0.8vw, -6px);
+          width: clamp(18px, 2vw, 22px);
+          height: clamp(18px, 2vw, 22px);
+          border-radius: 50%;
+          background: ${WRONG_COLOR};
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(10px, 1vw, 12px);
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          box-sizing: border-box;
         }
 
-        .g-option.disabled {
-          cursor: default !important;
+        .wb-g6-buttons {
+          display: flex;
+          justify-content: center;
+          margin-top: clamp(2px, 0.8vw, 6px);
         }
 
-        .g-wrong-mark {
-          position: absolute !important;
-          top: -10px !important;
-          right: -10px !important;
-          width: clamp(18px, 2vw, 24px) !important;
-          height: clamp(18px, 2vw, 24px) !important;
-          border-radius: 50% !important;
-          background: #ef4444 !important;
-          color: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: clamp(10px, 1vw, 12px) !important;
-          font-weight: 700 !important;
-          border: 2px solid #fff !important;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important;
-          box-sizing: border-box !important;
-          z-index: 2 !important;
-        }
-
-        .wb-g-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 4px !important;
-        }
-
-        @media (max-width: 1024px) {
-          .wb-g-content {
-            flex-direction: column !important;
-            align-items: flex-start !important;
+        @media (max-width: 900px) {
+          .wb-g6-grid {
+            column-gap: 22px;
+            row-gap: 20px;
           }
 
-          .wb-g-img-wrap {
-            width: clamp(110px, 22vw, 180px) !important;
-            height: clamp(84px, 17vw, 135px) !important;
+          .wb-g6-item {
+            grid-template-columns: 22px clamp(62px, 10vw, 90px) minmax(0, 1fr);
+            gap: 10px;
           }
 
-          .wb-g-options {
-            width: 100% !important;
-          }
-
-          .g-option {
-            font-size: clamp(15px, 2vw, 22px) !important;
+          .wb-g6-option {
+            font-size: clamp(14px, 1.8vw, 18px);
           }
         }
 
-        @media (max-width: 700px) {
-          .wb-g-grid {
-            grid-template-columns: 1fr !important;
-            row-gap: clamp(22px, 4vw, 34px) !important;
+        @media (max-width: 650px) {
+          .wb-g6-grid {
+            grid-template-columns: 1fr;
+            row-gap: 18px;
           }
 
-          .wb-g-card {
-            gap: 10px !important;
+          .wb-g6-item {
+            grid-template-columns: 22px clamp(70px, 16vw, 90px) minmax(0, 1fr);
           }
 
-          .wb-g-content {
-            gap: 10px !important;
+          .wb-g6-image-wrap {
+            min-height: 76px;
+          }
+
+          .wb-g6-image {
+            max-height: 76px;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .wb-g6-item {
+            grid-template-columns: 18px 58px minmax(0, 1fr);
+            gap: 8px;
+          }
+
+          .wb-g6-option {
+            font-size: 14px;
+            padding: 4px 14px;
+            border-width: 2px;
+          }
+
+          .wb-g6-number {
+            font-size: 17px;
           }
         }
       `}</style>
 
       <div
-        className="div-forall wb-g-wrapper"
+        className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "18px",
+          gap: "28px",
           maxWidth: "1100px",
           margin: "0 auto",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
           <span className="WB-ex-A">G</span> Look, read, and circle.
         </h1>
 
-        <div className="wb-g-grid">
-          {ITEMS.map((item) => (
-            <div key={item.id} className="wb-g-card">
-              <div className="wb-g-number">{item.id}</div>
+        <div className="wb-g6-wrap">
+          <div className="wb-g6-grid">
+            {ITEMS.map((item) => (
+              <div key={item.id} className="wb-g6-item">
+                <div className="wb-g6-number">{item.id}</div>
 
-              <div className="wb-g-content">
-                <div className="wb-g-img-wrap">
+                <div className="wb-g6-image-wrap">
                   <img
                     src={item.img}
                     alt={`question-${item.id}`}
-                    className="wb-g-img"
+                    className="wb-g6-image"
                   />
                 </div>
 
-                <div className="wb-g-options">
+                <div className="wb-g6-options">
                   {item.options.map((option) => (
-                    <div key={option} className="wb-g-option-row">
-                      {renderOption(item, option)}
-                    </div>
+                    <div key={option}>{renderOption(item, option)}</div>
                   ))}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="wb-g-buttons">
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-          />
+          <div className="wb-g6-buttons">
+            <Button
+              checkAnswers={handleCheck}
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleStartAgain}
+            />
+          </div>
         </div>
       </div>
     </div>

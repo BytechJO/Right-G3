@@ -1,83 +1,87 @@
-.wb-unit7-p1-q1 {
+.q1-7{
   position: absolute;
   padding: 5px;
-  top: 14.5%;
-  left: 55.5%;
-}
+  top: 11%;
 
-.wb-unit7-p1-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 49%;
-  left: 46%;
+  left:44.5%;
+  
 }
-.wb-unit7-p2-q1 {
+.q2-7{
   position: absolute;
   padding: 5px;
-  top: 4%;
-  left: 40%;
-}
-
-.wb-unit7-p2-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 46.5%;
-  left: 62.5%;
-}
-.wb-unit7-p3-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 3.5%;
-  left: 40%;
-}
-
-.wb-unit7-p3-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 51%;
+  top: 64%;
   left: 74.5%;
 }
-.wb-unit7-p4-q1 {
-  position: absolute;
+.q3-7{  position: absolute;
   padding: 5px;
-  top: 3.5%;
-  left: 52%;
-}
+  top: 2%;
+  left:49.5%;
 
-.wb-unit7-p4-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 48%;
-  left:90%;
 }
-.wb-unit7-p5-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 4%;
-  left: 51%;
-}
-.wb-unit7-p5-q2 {
-  position: absolute;
-  padding: 5px;
-  top: 56%;
-  left: 42%;
-}
-.wb-unit7-p6-q1 {
-  position: absolute;
-  padding: 5px;
-  top: 10%;
-  left: 35.5%;
-}
-
-.wb-unit7-p6-q2 {
+.q4-7{
   position: absolute;
   padding: 5px;
   top: 57%;
-  left: 88%;
+  left:40.5%;
 }
-.wb-unit7-p6-q3 {
+.q5-7{  position: absolute;
+  padding: 5px;
+  top: 2%;
+  left:55.5%;
+
+}
+.q6-7{
   position: absolute;
   padding: 5px;
-  top: 72%;
-  left: 62%;
+  top: 31%;
+  left:24.5%;
+}
+.q7-7{  
+position: absolute;
+  padding: 5px;
+  top: 2%;
+  left:36.5%;
+}
+.q8-7{
+ position: absolute;
+  padding: 5px;
+  top: 34%;
+  left:34.5%;
+}
+.q9-7{  
+ position: absolute;
+  padding: 5px;
+  top:2%;
+  left: 49.5%;
+}
+.q10-7{
+  position: absolute;
+  padding: 5px;
+  top:40%;
+  left: 34.5%;
+}
+.q11-7{  position: absolute;
+  padding: 5px;
+  top: 10%;
+  left:36.5%;
+
+}
+.q12-7{
+  position: absolute;
+  padding: 5px;
+  top:24%;
+  left: 29.5%;}
+  
+.q13-7{position: absolute;
+  padding: 5px;
+  top:58%;
+  left:88.5%;
+} 
+ 
+
+.q14-7{
+  position: absolute;
+  padding: 5px;
+  top:80%;
+  left: 73.5%;
 }
