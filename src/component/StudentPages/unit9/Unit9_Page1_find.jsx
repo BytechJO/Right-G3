@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import find_img from "../../../assets/imgs/test.png";//======= should change ==========
+import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Untitled-2 (1).png";//======= should change ==========
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import MySVG from "../../../assets/imgs/test.png";
+import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Interactive.svg";
 
 const Unit5_Page1_find = () => {
   const [clickedPoint, setClickedPoint] = useState(null);
@@ -10,16 +10,17 @@ const Unit5_Page1_find = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   // ✅ منطقة المطعم (بالنسب المئوية)
   const targetArea = {
-    x1: 18,
-    y1: 69,
-    x2: 24,
-    y2: 74,
+    x1: 50.99,
+    y1: 73.8,
+    x2: 59.05,
+    y2: 78.44,
   };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+    console.log(xPercent, yPercent);
 
     setClickedPoint({
       x: xPercent,
@@ -78,7 +79,7 @@ const Unit5_Page1_find = () => {
         >
           <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
           <h5 className="header-title-page8">
-            I need your help. Can you help me find the boat in the picture?
+            I need your help. Can you help me find the seesaw in the picture?
           </h5>
         </div>
         <div style={{ position: "relative", display: "inline-block" }}>
@@ -118,9 +119,9 @@ const Unit5_Page1_find = () => {
               alt="answer highlight"
               style={{
                 position: "absolute",
-                top: `67%`,
-                left: `18.5%`,
-                height: `7%`,
+                top: `73.4%`,
+                left: `49.8%`,
+                height: `4.5%`,
                 pointerEvents: "none",
               }}
             /> 

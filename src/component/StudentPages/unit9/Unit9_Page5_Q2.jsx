@@ -6,7 +6,7 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad 
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 80/Asset 52.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 80/Asset 53.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 80/Asset 54.svg";
-import sound1 from "../../../assets/audio/ClassBook/Unit 6/P 50/CD39.Pg50_Instruction_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 9/P 80/unit9-pg80-EXB.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 const Unit9_Page5_Q2 = () => {
@@ -36,16 +36,16 @@ const Unit9_Page5_Q2 = () => {
   const [selected, setSelected] = useState(Array(items.length).fill([]));
   const [locked, setLocked] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  const captions = [
+   const captions = [
     {
-      start: 0.5,
-      end: 8.34,
-      text: "Page 62, Write Activities. Exercise A, number 1. Listen, circle, and write.",
+      start: 0.119,
+      end: 11.699,
+      text: "Page 80. Write activities. Exercise B. Listen and circle the words with the same final S sound. One, socks,",
     },
-    { start: 9.639, end: 10.859, text: "1, window." },
-    { start: 12.139, end: 13.279, text: "2, coat." },
-    { start: 14.559, end: 15.799, text: "3, note." },
-    { start: 17.219, end: 18.379, text: "5, boat" },
+    { start: 12.859, end: 17.739, text: "dogs, rocks, bumps. Two, spoons," },
+    { start: 18.979, end: 24.6, text: "frogs, racks, books. Three, folders," },
+    { start: 25.76, end: 31.679, text: "shoulders, bats, tacos. Four, caps," },
+    { start: 32.919, end: 35.399, text: "sacks, maps, chairs" },
   ];
   const chooseOption = (i, value) => {
     if (locked) return;
@@ -138,7 +138,7 @@ const Unit9_Page5_Q2 = () => {
         <QuestionAudioPlayer
           src={sound1}
           captions={captions}
-          stopAtSecond={8.43}
+          stopAtSecond={9.5}
         />
         <div className="flex w-full">
           <div className="flex justify-center w-full">
