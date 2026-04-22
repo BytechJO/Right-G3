@@ -52,12 +52,13 @@ export default function WB_ReadLookMatch_PageA() {
 
         const sr = s.getBoundingClientRect();
         const er = e.getBoundingClientRect();
-        const x1 = sr.left + sr.width / 2 - br.left;
+        const x1 = sr.right - br.left;               // ← من يمين الـ dot اليسار
         const y1 = sr.top + sr.height / 2 - br.top;
-        const x2 = er.left + er.width / 2 - br.left;
+        const x2 = er.left - br.left;                // ← من يسار الـ dot اليمين
         const y2 = er.top + er.height / 2 - br.top;
         const dx = Math.abs(x2 - x1);
-        const isWrong = showResults && matches[leftId] !== CORRECT_MATCHES[Number(leftId)];
+        const isWrong =
+          showResults && matches[leftId] !== CORRECT_MATCHES[Number(leftId)];
 
         return {
           id: `path-${leftId}-${rightId}`,
@@ -76,12 +77,15 @@ export default function WB_ReadLookMatch_PageA() {
       obs = new ResizeObserver(update);
       obs.observe(boardRef.current);
     }
-    return () => { window.removeEventListener("resize", update); obs?.disconnect(); };
+    return () => {
+      window.removeEventListener("resize", update);
+      obs?.disconnect();
+    };
   }, [matches, showResults]);
 
   const handleLeftSelect = (id) => {
     if (showAns) return;
-    setSelectedLeft((prev) => prev === id ? null : id);
+    setSelectedLeft((prev) => (prev === id ? null : id));
     setShowResults(false);
   };
 
@@ -98,10 +102,14 @@ export default function WB_ReadLookMatch_PageA() {
   const handleCheck = () => {
     if (showAns) return;
     const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
-    if (!allConnected) { ValidationAlert.info("Please connect all items first."); return; }
-
+    if (!allConnected) {
+      ValidationAlert.info("Please connect all items first.");
+      return;
+    }
     let score = 0;
-    LEFT_ITEMS.forEach((i) => { if (matches[i.id] === CORRECT_MATCHES[i.id]) score++; });
+    LEFT_ITEMS.forEach((i) => {
+      if (matches[i.id] === CORRECT_MATCHES[i.id]) score++;
+    });
     setShowResults(true);
     const total = LEFT_ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -124,10 +132,13 @@ export default function WB_ReadLookMatch_PageA() {
     setPaths([]);
   };
 
-  const getLeftConn = (id) => !!matches[id];
+  const getLeftConn  = (id) => !!matches[id];
   const getRightConn = (id) => Object.values(matches).includes(id);
   const isWrongMatch = (leftId) =>
-    showResults && !showAns && !!matches[leftId] && matches[leftId] !== CORRECT_MATCHES[leftId];
+    showResults &&
+    !showAns &&
+    !!matches[leftId] &&
+    matches[leftId] !== CORRECT_MATCHES[leftId];
 
   const WrongBadge = () => (
     <div
@@ -138,8 +149,7 @@ export default function WB_ReadLookMatch_PageA() {
         width: "clamp(16px,1.8vw,22px)",
         height: "clamp(16px,1.8vw,22px)",
         borderRadius: "50%",
-        border: `1px solid #fff`,
-
+        border: "1px solid #fff",
         backgroundColor: WRONG_COLOR,
         color: "#fff",
         display: "flex",
@@ -156,16 +166,47 @@ export default function WB_ReadLookMatch_PageA() {
     </div>
   );
 
+  /* ─────────────────────────────────────────────
+     Grid layout (6 cols):
+     [num] [img] [left-sentence] [left-dot]   [right-dot] [right-sentence]
+     ↑auto  ↑auto  ↑1fr           ↑dot-col      ↑dot-col    ↑1fr
+
+     المشكلة الأصلية: الـ dot-cols كانوا "auto" بدون gap كافي بينهم
+     الحل: نعطي المنطقة الوسطى عرض ثابت clamp يحكم المسافة بين النقطتين
+  ───────────────────────────────────────────── */
+  const GRID = {
+    display: "grid",
+    gridTemplateColumns:
+      "auto auto 1fr clamp(14px,2vw,22px) clamp(40px,5vw,72px) clamp(14px,2vw,22px) 1fr",
+    /*                                    ↑ left-dot             ↑ gap spacer          ↑ right-dot  */
+    columnGap: "clamp(8px,1.2vw,16px)",
+    rowGap: "clamp(14px,2vw,28px)",
+    alignItems: "center",
+    width: "100%",
+  };
+
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{ display: "flex", flexDirection: "column", gap: "18px", maxWidth: "1100px", margin: "0 auto" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "18px",
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
       >
         {/* Title */}
         <h1
           className="WB-header-title-page8"
-          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
+          style={{
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
         >
           <span className="WB-ex-A">A</span> Read, look, and match.
         </h1>
@@ -176,39 +217,39 @@ export default function WB_ReadLookMatch_PageA() {
           {/* SVG lines */}
           <svg
             style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              pointerEvents: "none", overflow: "visible", zIndex: 1,
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              overflow: "visible",
+              zIndex: 1,
             }}
           >
             {paths.map((p) => (
-              <path key={p.id} d={p.d} fill="none"
-                stroke={p.color} strokeWidth="2.4" strokeLinecap="round" />
+              <path
+                key={p.id}
+                d={p.d}
+                fill="none"
+                stroke={p.color}
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
             ))}
           </svg>
 
-          {/* Grid: number | image | sentence | left-dot ‖ right-dot | answer-text */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "auto auto 1fr auto auto 1fr",
-              columnGap: "clamp(8px,1.5vw,20px)",
-              rowGap: "clamp(14px,2vw,28px)",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
+          <div style={GRID}>
             {LEFT_ITEMS.map((lItem, idx) => {
-              const rItem = RIGHT_ITEMS[idx];
-              const lConn = getLeftConn(lItem.id);
-              const rConn = getRightConn(rItem.id);
+              const rItem    = RIGHT_ITEMS[idx];
+              const lConn    = getLeftConn(lItem.id);
+              const rConn    = getRightConn(rItem.id);
               const lSelected = selectedLeft === lItem.id;
-              const wrong = isWrongMatch(lItem.id);
+              const wrong    = isWrongMatch(lItem.id);
 
               return (
                 <React.Fragment key={lItem.id}>
 
-                  {/* ── number ── */}
+                  {/* col 1 – number */}
                   <span
                     style={{
                       fontSize: "clamp(16px,1.9vw,26px)",
@@ -222,7 +263,7 @@ export default function WB_ReadLookMatch_PageA() {
                     {lItem.id}
                   </span>
 
-                  {/* ── image ── */}
+                  {/* col 2 – image */}
                   <div
                     onClick={() => handleLeftSelect(lItem.id)}
                     style={{
@@ -242,11 +283,18 @@ export default function WB_ReadLookMatch_PageA() {
                     <img
                       src={lItem.img}
                       alt={`img-${lItem.id}`}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", userSelect: "none", pointerEvents: "none" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                        userSelect: "none",
+                        pointerEvents: "none",
+                      }}
                     />
                   </div>
 
-                  {/* ── sentence ── */}
+                  {/* col 3 – left sentence */}
                   <div
                     onClick={() => handleLeftSelect(lItem.id)}
                     style={{
@@ -256,11 +304,12 @@ export default function WB_ReadLookMatch_PageA() {
                       zIndex: 2,
                       padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
                       borderRadius: "clamp(8px,1vw,12px)",
-                      /* بوردر بس وقت الاختيار، بعد الوصل يروح */
                       border: lSelected
                         ? `2.5px solid ${ACTIVE_COLOR}`
                         : "2px solid transparent",
-                      background: lSelected ? "rgba(243,155,66,0.08)" : "transparent",
+                      background: lSelected
+                        ? "rgba(243,155,66,0.08)"
+                        : "transparent",
                       cursor: showAns ? "default" : "pointer",
                       transition: "border-color 0.2s, background 0.2s",
                       userSelect: "none",
@@ -271,7 +320,11 @@ export default function WB_ReadLookMatch_PageA() {
                       style={{
                         fontSize: "clamp(13px,1.6vw,21px)",
                         fontWeight: 500,
-                        color: wrong ? WRONG_COLOR : lSelected ? ACTIVE_COLOR : TEXT_COLOR,
+                        color: wrong
+                          ? WRONG_COLOR
+                          : lSelected
+                          ? ACTIVE_COLOR
+                          : TEXT_COLOR,
                         lineHeight: 1.3,
                         wordBreak: "break-word",
                         transition: "color 0.2s",
@@ -279,49 +332,57 @@ export default function WB_ReadLookMatch_PageA() {
                     >
                       {lItem.text}
                     </span>
-
-                    {/* بادج ✕ على الجملة اليسار بس */}
                     {wrong && <WrongBadge />}
                   </div>
 
-                  {/* ── left dot ── */}
+                  {/* col 4 – left dot */}
                   <div
                     ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
                     onClick={() => handleLeftSelect(lItem.id)}
                     style={{
-                      width: "clamp(10px,1.3vw,15px)",
-                      height: "clamp(10px,1.3vw,15px)",
+                      width: "clamp(10px,1.3vw,16px)",
+                      height: "clamp(10px,1.3vw,16px)",
                       borderRadius: "50%",
+                      justifySelf: "end",       // ← يلتصق بيمين الخلية
                       flexShrink: 0,
                       background: lSelected
                         ? ACTIVE_COLOR
                         : lConn
-                          ? (wrong ? WRONG_COLOR : ACTIVE_COLOR)
-                          : DOT_COLOR,
+                        ? wrong
+                          ? WRONG_COLOR
+                          : ACTIVE_COLOR
+                        : DOT_COLOR,
                       cursor: showAns ? "default" : "pointer",
                       transition: "background 0.2s",
-                      boxShadow: lSelected ? `0 0 0 3px rgba(243,155,66,0.3)` : "none",
+                      boxShadow: lSelected
+                        ? "0 0 0 3px rgba(243,155,66,0.3)"
+                        : "none",
                       zIndex: 2,
                     }}
                   />
 
-                  {/* ── right dot ── */}
+                  {/* col 5 – spacer (المسافة الفعلية بين النقطتين) */}
+                  <div style={{ height: "100%" }} />
+
+                  {/* col 6 – right dot */}
                   <div
                     ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
                     onClick={() => handleRightSelect(rItem.id)}
                     style={{
-                      width: "clamp(10px,1.3vw,15px)",
-                      height: "clamp(10px,1.3vw,15px)",
+                      width: "clamp(10px,1.3vw,16px)",
+                      height: "clamp(10px,1.3vw,16px)",
                       borderRadius: "50%",
+                      justifySelf: "start",     // ← يلتصق بيسار الخلية
                       flexShrink: 0,
                       background: rConn ? ACTIVE_COLOR : DOT_COLOR,
-                      cursor: showAns || selectedLeft === null ? "default" : "pointer",
+                      cursor:
+                        showAns || selectedLeft === null ? "default" : "pointer",
                       transition: "background 0.2s",
                       zIndex: 2,
                     }}
                   />
 
-                  {/* ── answer text (right side) — بدون بوردر أو بادج ── */}
+                  {/* col 7 – right sentence */}
                   <div
                     onClick={() => handleRightSelect(rItem.id)}
                     style={{
@@ -329,8 +390,10 @@ export default function WB_ReadLookMatch_PageA() {
                       alignItems: "center",
                       minWidth: 0,
                       zIndex: 2,
-                      padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
-                      cursor: showAns || selectedLeft === null ? "default" : "pointer",
+                      padding:
+                        "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
+                      cursor:
+                        showAns || selectedLeft === null ? "default" : "pointer",
                       userSelect: "none",
                     }}
                   >
@@ -354,7 +417,14 @@ export default function WB_ReadLookMatch_PageA() {
         </div>
 
         {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(8px,1.5vw,16px)", zIndex: 100 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "clamp(8px,1.5vw,16px)",
+            zIndex: 100,
+          }}
+        >
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}

@@ -52,19 +52,14 @@ export default function WB_Unit3_Page8_QC() {
   useLayoutEffect(() => {
     const updateLines = () => {
       if (!containerRef.current) return;
-
       const containerRect = containerRef.current.getBoundingClientRect();
-
       const newLines = Object.entries(matches)
         .map(([leftId, rightId]) => {
           const leftEl = elementRefs.current[`left-${leftId}`];
           const rightEl = elementRefs.current[`right-${rightId}`];
-
           if (!leftEl || !rightEl) return null;
-
           const leftRect = leftEl.getBoundingClientRect();
           const rightRect = rightEl.getBoundingClientRect();
-
           return {
             id: `${leftId}-${rightId}`,
             x1: leftRect.left + leftRect.width / 2 - containerRect.left,
@@ -74,7 +69,6 @@ export default function WB_Unit3_Page8_QC() {
           };
         })
         .filter(Boolean);
-
       setLines(newLines);
     };
 
@@ -91,17 +85,11 @@ export default function WB_Unit3_Page8_QC() {
 
   const handleRightClick = (rightId) => {
     if (showAns || selectedLeft === null) return;
-
     const newMatches = { ...matches };
-
     Object.keys(newMatches).forEach((key) => {
-      if (newMatches[key] === rightId) {
-        delete newMatches[key];
-      }
+      if (newMatches[key] === rightId) delete newMatches[key];
     });
-
     newMatches[selectedLeft] = rightId;
-
     setMatches(newMatches);
     setSelectedLeft(null);
     setShowResults(false);
@@ -109,25 +97,17 @@ export default function WB_Unit3_Page8_QC() {
 
   const checkAnswers = () => {
     if (showAns) return;
-
     const allConnected = exerciseData.rows.every((item) => matches[item.id]);
-
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
-
     setShowResults(true);
-
     let score = 0;
     Object.keys(exerciseData.correctMatches).forEach((leftId) => {
-      if (matches[leftId] === exerciseData.correctMatches[leftId]) {
-        score++;
-      }
+      if (matches[leftId] === exerciseData.correctMatches[leftId]) score++;
     });
-
     const totalQuestions = exerciseData.rows.length;
-
     if (score === totalQuestions) {
       ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
     } else if (score > 0) {
@@ -154,18 +134,14 @@ export default function WB_Unit3_Page8_QC() {
 
   const getDotColor = (side, id) => {
     if (side === "left" && selectedLeft === id) return ACTIVE_COLOR;
-
     const isConnected =
       side === "left" ? !!matches[id] : Object.values(matches).includes(id);
-
     if (!isConnected) return INACTIVE_COLOR;
-
     return ACTIVE_COLOR;
   };
 
   const isWrongMatch = (leftId) => {
-    if (!showResults) return false;
-    if (!matches[leftId]) return false;
+    if (!showResults || !matches[leftId]) return false;
     return matches[leftId] !== exerciseData.correctMatches[leftId];
   };
 
@@ -177,17 +153,6 @@ export default function WB_Unit3_Page8_QC() {
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-c-wrap {
-          display: flex;
-          flex-direction: column;
-          gap: clamp(18px, 2vw, 28px);
-          max-width: 1100px;
-          margin: 0 auto;
-          padding: clamp(8px, 1.5vw, 16px) 0 20px;
-          box-sizing: border-box;
-          width: 100%;
-        }
-
         .wb-c-board {
           position: relative;
           width: 100%;
@@ -202,32 +167,34 @@ export default function WB_Unit3_Page8_QC() {
           gap: clamp(18px, 2.6vw, 30px);
         }
 
+        /* ✅ الـ row: نص | نقطة يسار | spacer | نقطة يمين | صورة */
         .wb-c-row {
           display: grid;
-          grid-template-columns: minmax(0, 1.45fr) minmax(200px, 0.7fr);
-          column-gap: clamp(20px, 3vw, 52px);
+          grid-template-columns: minmax(0, 1.45fr) 28px clamp(60px, 8vw, 100px) 28px minmax(0, 0.7fr);
           align-items: center;
-          min-height: clamp(64px, 8vw, 92px);
+          min-height: clamp(70px, 9vw, 100px);
         }
 
-        .wb-c-left-row {
-          display: grid;
-          grid-template-columns: 28px minmax(0, 1fr) 18px;
-          gap: 12px;
+        /* col 1: رقم + نص */
+        .wb-c-left-cell {
+          display: flex;
           align-items: center;
+          gap: 12px;
           position: relative;
           min-width: 0;
+          padding-right: 4px;
         }
 
         .wb-c-left-num {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: 22px;
           font-weight: 700;
           color: #111;
           line-height: 1;
+          flex-shrink: 0;
         }
 
         .wb-c-left-text {
-          font-size: clamp(17px, 1.9vw, 24px);
+          font-size: 22px;
           font-weight: 500;
           color: #111;
           line-height: 1.4;
@@ -237,6 +204,7 @@ export default function WB_Unit3_Page8_QC() {
           transition: 0.2s ease;
           box-sizing: border-box;
           min-width: 0;
+          cursor: pointer;
         }
 
         .wb-c-left-text.active {
@@ -244,17 +212,33 @@ export default function WB_Unit3_Page8_QC() {
           background: ${ACTIVE_BG};
         }
 
-        .wb-c-right-row {
-          display: grid;
-          grid-template-columns: 18px minmax(0, 1fr);
-          gap: 12px;
+        /* col 2 & 4: نقطة */
+        .wb-c-dot-cell {
+          display: flex;
           align-items: center;
+          justify-content: center;
+          height: 100%;
+        }
+
+        /* col 3: spacer */
+        .wb-c-spacer {
+          height: 100%;
+        }
+
+        /* col 5: صورة */
+        .wb-c-right-cell {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          height: 100%;
           min-width: 0;
+          padding-left: clamp(8px, 1vw, 14px);
+          cursor: pointer;
         }
 
         .wb-c-dot {
-          width: 12px;
-          height: 12px;
+          width: 14px;
+          height: 14px;
           border-radius: 50%;
           transition: all 0.2s ease;
           flex-shrink: 0;
@@ -267,21 +251,12 @@ export default function WB_Unit3_Page8_QC() {
           box-shadow: 0 0 0 5px rgba(243, 155, 66, 0.22);
         }
 
-        .wb-c-right-card {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          min-height: clamp(54px, 7vw, 72px);
-          padding: 2px 0;
-          box-sizing: border-box;
-        }
-
+        /* ✅ الصورة: حجم واضح مع min-height */
         .wb-c-right-img {
           display: block;
           width: auto;
-          height: auto;
+          height: clamp(60px, 9vw, 100px);
           max-width: 100%;
-          max-height: clamp(52px, 8vw, 92px);
           object-fit: contain;
           user-select: none;
           pointer-events: none;
@@ -303,6 +278,7 @@ export default function WB_Unit3_Page8_QC() {
           font-weight: 700;
           border: 2px solid #fff;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+          z-index: 3;
         }
 
         .wb-c-buttons {
@@ -313,46 +289,31 @@ export default function WB_Unit3_Page8_QC() {
 
         @media (max-width: 820px) {
           .wb-c-row {
-            grid-template-columns: minmax(0, 1.3fr) minmax(170px, 0.75fr);
-            column-gap: 20px;
+            grid-template-columns: minmax(0, 1.3fr) 24px clamp(40px, 6vw, 70px) 24px minmax(0, 0.75fr);
           }
+          .wb-c-left-num,
+          .wb-c-left-text { font-size: 18px; }
+          .wb-c-right-img { height: clamp(50px, 8vw, 80px); }
         }
 
         @media (max-width: 640px) {
           .wb-c-row {
-            grid-template-columns: 1fr;
-            row-gap: 10px;
-            align-items: start;
+            grid-template-columns: minmax(0, 1fr) 20px clamp(30px, 5vw, 50px) 20px minmax(0, auto);
           }
-
-          .wb-c-right-row {
-            padding-left: 40px;
-          }
-
-          .wb-c-svg-lines {
-            display: none;
-          }
+          .wb-c-svg-lines { display: none; }
+          .wb-c-left-num,
+          .wb-c-left-text { font-size: 16px; }
+          .wb-c-right-img { height: clamp(44px, 7vw, 65px); }
         }
 
         @media (max-width: 480px) {
-          .wb-c-right-row {
-            padding-left: 32px;
+          .wb-c-row {
+            grid-template-columns: minmax(0, 1fr) 16px clamp(20px, 4vw, 36px) 16px minmax(80px, auto);
           }
-
-          .wb-c-left-row {
-            grid-template-columns: 24px minmax(0, 1fr) 16px;
-            gap: 10px;
-          }
-
-          .wb-c-right-row {
-            grid-template-columns: 16px minmax(0, 1fr);
-            gap: 10px;
-          }
-
-          .wb-c-dot {
-            width: 11px;
-            height: 11px;
-          }
+          .wb-c-dot { width: 11px; height: 11px; }
+          .wb-c-left-num,
+          .wb-c-left-text { font-size: 13px; }
+          .wb-c-right-img { height: clamp(36px, 6vw, 52px); }
         }
       `}</style>
 
@@ -416,19 +377,22 @@ export default function WB_Unit3_Page8_QC() {
 
               return (
                 <div key={row.id} className="wb-c-row">
-                  <div className="wb-c-left-row">
-                    <div className="wb-c-left-num">{row.id}</div>
 
+                  {/* col 1: رقم + نص */}
+                  <div className="wb-c-left-cell">
+                    <div className="wb-c-left-num">{row.id}</div>
                     <div
                       className={`wb-c-left-text ${selected ? "active" : ""}`}
                       onClick={() => handleLeftClick(row.id)}
-                      style={{
-                        cursor: showAns ? "default" : "pointer",
-                      }}
+                      style={{ cursor: showAns ? "default" : "pointer" }}
                     >
                       {row.text}
                     </div>
+                    {wrong && <div className="wb-c-wrong">✕</div>}
+                  </div>
 
+                  {/* col 2: نقطة اليسار */}
+                  <div className="wb-c-dot-cell">
                     <div
                       ref={(el) => (elementRefs.current[`left-${row.id}`] = el)}
                       className={`wb-c-dot ${selected ? "selected" : ""}`}
@@ -438,15 +402,15 @@ export default function WB_Unit3_Page8_QC() {
                         cursor: showAns ? "default" : "pointer",
                       }}
                     />
-
-                    {wrong && <div className="wb-c-wrong">✕</div>}
                   </div>
 
-                  <div className="wb-c-right-row">
+                  {/* col 3: spacer */}
+                  <div className="wb-c-spacer" />
+
+                  {/* col 4: نقطة اليمين */}
+                  <div className="wb-c-dot-cell">
                     <div
-                      ref={(el) =>
-                        (elementRefs.current[`right-${row.id}`] = el)
-                      }
+                      ref={(el) => (elementRefs.current[`right-${row.id}`] = el)}
                       className={`wb-c-dot ${selectedMatch ? "selected" : ""}`}
                       onClick={() => handleRightClick(row.id)}
                       style={{
@@ -457,21 +421,21 @@ export default function WB_Unit3_Page8_QC() {
                           : "none",
                       }}
                     />
-
-                    <div
-                      className="wb-c-right-card"
-                      onClick={() => handleRightClick(row.id)}
-                      style={{
-                        cursor: showAns ? "default" : "pointer",
-                      }}
-                    >
-                      <img
-                        src={row.image}
-                        alt={row.alt}
-                        className="wb-c-right-img"
-                      />
-                    </div>
                   </div>
+
+                  {/* col 5: الصورة */}
+                  <div
+                    className="wb-c-right-cell"
+                    onClick={() => handleRightClick(row.id)}
+                    style={{ cursor: showAns ? "default" : "pointer" }}
+                  >
+                    <img
+                      src={row.image}
+                      alt={row.alt}
+                      className="wb-c-right-img"
+                    />
+                  </div>
+
                 </div>
               );
             })}

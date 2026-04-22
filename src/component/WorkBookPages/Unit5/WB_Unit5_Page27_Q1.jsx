@@ -165,6 +165,7 @@ const WB_Unit7_Page27_Q1 = () => {
   };
 
   const checkAnswers = () => {
+    if (showAnswers) return;
     const allAnswered = Object.values(userSelections).every((val) => val !== null);
 
     if (!allAnswered) {

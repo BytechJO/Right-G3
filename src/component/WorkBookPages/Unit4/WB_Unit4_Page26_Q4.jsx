@@ -52,7 +52,7 @@ const captions = [
   { start: 9.40, end: 12.10, text: "2- thick." },
   { start: 13.40, end: 15.26, text: "3- this." },
   { start: 16.38, end: 18.00, text: "4- father." },
-  { start: 19.34, end: 20.80, text: "5- bank." },
+  { start: 19.34, end: 20.80, text: "5- thank." },
   { start: 22.34, end: 23.60, text: "6- they." },
 ];
   useLayoutEffect(() => {

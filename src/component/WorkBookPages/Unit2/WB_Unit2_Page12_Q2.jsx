@@ -11,11 +11,11 @@ import img3b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 14.s
 import img4a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 15.svg";
 import img4b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 16.svg";
 
-const RED_COLOR = "#d62828";
+const RED_COLOR    = "#d62828";
 const BORDER_COLOR = "#f39b42";
-const ACTIVE_BORDER = "#f39b42";
-const TEXT_COLOR = "#111";
-const WRONG_COLOR = "#ef4444";
+const ACTIVE_BORDER= "#f39b42";
+const TEXT_COLOR   = "#111";
+const WRONG_COLOR  = "#ef4444";
 
 const ITEMS = [
   {
@@ -23,58 +23,17 @@ const ITEMS = [
     sentence: "She usually rides a bike to school.",
     correct: "bike",
     images: [
-      {
-        key: "bike",
-        src: img1a,
-        alt: "bike to school",
-        bars: 3,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
-      {
-        key: "walk",
-        src: img1b,
-        alt: "walk to school",
-        bars: 0,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
+      { key: "bike", src: img1a, alt: "bike to school",    bars: 3, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
+      { key: "walk", src: img1b, alt: "walk to school",    bars: 0, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
     ],
   },
   {
     id: 2,
     sentence: "He never rides a taxi to work.",
-    // التصحيح هنا: الصحيح ليس taxi
-    correct: "notTaxi",
+    correct: "taxi",
     images: [
-      {
-        key: "notTaxi",
-        src: img2a,
-        alt: "not taxi to work",
-        bars: 1,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
-      {
-        key: "taxi",
-        src: img2b,
-        alt: "taxi",
-        bars: 0,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
+      { key: "notTaxi", src: img2a, alt: "not taxi to work", bars: 1, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
+      { key: "taxi",    src: img2b, alt: "taxi",             bars: 0, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
     ],
   },
   {
@@ -82,28 +41,8 @@ const ITEMS = [
     sentence: "She always rides the bus to school.",
     correct: "bus",
     images: [
-      {
-        key: "bus",
-        src: img3a,
-        alt: "bus to school",
-        bars: 4,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
-      {
-        key: "car",
-        src: img3b,
-        alt: "car",
-        bars: 3,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
+      { key: "bus", src: img3a, alt: "bus to school", bars: 4, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
+      { key: "car", src: img3b, alt: "car",           bars: 3, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
     ],
   },
   {
@@ -111,36 +50,14 @@ const ITEMS = [
     sentence: "She sometimes walks to school.",
     correct: "walk",
     images: [
-      {
-        key: "walk",
-        src: img4a,
-        alt: "walk to school",
-        bars: 2,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
-      {
-        key: "car",
-        src: img4b,
-        alt: "car",
-        bars: 2,
-        overlay: {
-          bars: { top: "8px", left: "8px" },
-          box: { top: "8px", right: "8px" },
-          check: { top: "2px", right: "10px" },
-        },
-      },
+      { key: "walk", src: img4a, alt: "walk to school", bars: 2, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
+      { key: "car",  src: img4b, alt: "car",            bars: 2, overlay: { bars: { top:"8px", left:"8px" }, box: { top:"8px", right:"8px" } } },
     ],
   },
 ];
 
 const styles = {
-  pageWrap: {
-    width: "100%",
-  },
+  pageWrap: { width: "100%" },
 
   gridWrap: {
     display: "grid",
@@ -164,19 +81,19 @@ const styles = {
   },
 
   number: {
-    fontSize: "clamp(18px, 2vw, 30px)",
+    fontSize: "22px",
     fontWeight: 700,
     color: TEXT_COLOR,
     lineHeight: 1,
-    minWidth: "clamp(18px, 2vw, 28px)",
+    minWidth: "28px",
     flexShrink: 0,
-    paddingTop: "clamp(2px, 0.4vw, 4px)",
+    paddingTop: "2px",
   },
 
   sentence: {
-    fontSize: "clamp(14px, 2vw, 22px)",
+    fontSize: "22px",
     color: TEXT_COLOR,
-    lineHeight: 1.25,
+    lineHeight: 1.3,
     fontWeight: 500,
     minWidth: 0,
     wordBreak: "break-word",
@@ -209,8 +126,7 @@ const styles = {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-        border: `2px solid ${BORDER_COLOR}`,
-
+    border: `2px solid ${BORDER_COLOR}`,
   },
 
   overlayLayer: {
@@ -234,6 +150,7 @@ const styles = {
     background: "#fff",
   },
 
+  // ✅ المربع الأبيض — دايماً موجود في نفس المكان
   emptyBox: {
     position: "absolute",
     width: "clamp(18px, 3vw, 30px)",
@@ -247,21 +164,13 @@ const styles = {
     fontWeight: 700,
     fontSize: "clamp(12px, 1.2vw, 16px)",
     lineHeight: 1,
-  },
-
-  checkMark: {
-    position: "absolute",
-    fontSize: "clamp(28px, 4vw, 52px)",
-    lineHeight: 1,
-    fontWeight: 700,
-    color: RED_COLOR,
     zIndex: 3,
-    pointerEvents: "none",
   },
 
+  // ✅ بادج الـ ✕ — تحت المربع الأبيض وليس فوقه
   wrongBadge: {
     position: "absolute",
-    top: "8px",
+    bottom: "8px",
     right: "8px",
     width: "clamp(18px, 2vw, 24px)",
     height: "clamp(18px, 2vw, 24px)",
@@ -292,51 +201,30 @@ export default function WB_Unit2_Page12_QH() {
 
   const handleSelect = (itemId, optionKey) => {
     if (showAns) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [itemId]: optionKey,
-    }));
-
+    setAnswers((prev) => ({ ...prev, [itemId]: optionKey }));
     setChecked(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
     const allAnswered = ITEMS.every((item) => answers[item.id]);
-
     if (!allAnswered) {
       ValidationAlert.info("Please answer all items first.");
       return;
     }
-
     let score = 0;
-
     ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score += 1;
-      }
+      if (answers[item.id] === item.correct) score += 1;
     });
-
     setChecked(true);
-
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
+    if (score === ITEMS.length)   ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    else if (score > 0)           ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+    else                          ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
   };
 
   const handleShowAnswer = () => {
     const filledAnswers = {};
-
-    ITEMS.forEach((item) => {
-      filledAnswers[item.id] = item.correct;
-    });
-
+    ITEMS.forEach((item) => { filledAnswers[item.id] = item.correct; });
     setAnswers(filledAnswers);
     setChecked(true);
     setShowAns(true);
@@ -353,48 +241,30 @@ export default function WB_Unit2_Page12_QH() {
     return answers[itemId] === optionKey && optionKey !== correctKey;
   };
 
-  const renderBars = (filledCount, position = {}) => {
-    return (
-      <span
-        style={{
-          ...styles.barsWrap,
-          ...position,
-        }}
-      >
-        {[1, 2, 3, 4].map((n) => (
-          <span
-            key={n}
-            style={{
-              ...styles.bar,
-              background: n <= filledCount ? RED_COLOR : "#fff",
-            }}
-          />
-        ))}
-      </span>
-    );
+  const renderBars = (filledCount, position = {}) => (
+    <span style={{ ...styles.barsWrap, ...position }}>
+      {[1, 2, 3, 4].map((n) => (
+        <span key={n} style={{ ...styles.bar, background: n <= filledCount ? RED_COLOR : "#fff" }} />
+      ))}
+    </span>
+  );
+
+  // ✅ FIX: المربع يظهر ✓ على الخيار المحدد دايماً
+  // عند Show Answer: الـ answers تتحدث للصحيح فبيظهر ✓ تلقائياً محله
+  const getBoxContent = (itemId, imgKey, selected) => {
+    if (selected) return "✓";
+    return "";
   };
 
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+        style={{ display:"flex", flexDirection:"column", gap:"18px", maxWidth:"1100px", margin:"0 auto" }}
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+          style={{ margin:0, display:"flex", alignItems:"center", gap:"12px", flexWrap:"wrap" }}
         >
           <span className="WB-ex-A">H</span>
           Read, look, and write ✓.
@@ -404,6 +274,7 @@ export default function WB_Unit2_Page12_QH() {
           <div style={styles.gridWrap}>
             {ITEMS.map((item) => (
               <div key={item.id} style={styles.itemCard}>
+
                 <div style={styles.topLine}>
                   <div style={styles.number}>{item.id}</div>
                   <div style={styles.sentence}>{item.sentence}</div>
@@ -412,9 +283,7 @@ export default function WB_Unit2_Page12_QH() {
                 <div style={styles.imagesRow}>
                   {item.images.map((img, index) => {
                     const selected = answers[item.id] === img.key;
-                    const wrong = isWrong(item.id, img.key, item.correct);
-                    const isCorrectShown =
-                      answers[item.id] === img.key && img.key === item.correct;
+                    const wrong    = isWrong(item.id, img.key, item.correct);
 
                     return (
                       <div
@@ -424,36 +293,23 @@ export default function WB_Unit2_Page12_QH() {
                           ...styles.imageOption,
                           borderColor: selected ? ACTIVE_BORDER : BORDER_COLOR,
                           cursor: showAns ? "default" : "pointer",
-                          borderRight:
-                            index === 0
-                              ? `1px solid ${BORDER_COLOR}`
-                              : `2px solid ${BORDER_COLOR}`,
+                          borderRight: index === 0
+                            ? `1px solid ${BORDER_COLOR}`
+                            : `2px solid ${BORDER_COLOR}`,
                         }}
                       >
                         <img src={img.src} alt={img.alt} style={styles.image} />
 
                         <div style={styles.overlayLayer}>
+                          {/* Bars */}
                           {renderBars(img.bars, img.overlay?.bars)}
 
-                          <div
-                            style={{
-                              ...styles.emptyBox,
-                              ...img.overlay?.box,
-                            }}
-                          >
-                            {selected && !checked && "✓"}
+                          {/* ✅ المربع دايماً موجود — ✓ يظهر على الخيار المحدد فقط */}
+                          <div style={{ ...styles.emptyBox, ...img.overlay?.box }}>
+                            {getBoxContent(item.id, img.key, selected)}
                           </div>
 
-                          {isCorrectShown && (
-                            <div
-                              style={{
-                                ...img.overlay?.check,
-                              }}
-                            >
-                              ✓
-                            </div>
-                          )}
-
+                          {/* ✅ بادج الـ ✕ في الأسفل حتى ما يغطي المربع */}
                           {wrong && <div style={styles.wrongBadge}>✕</div>}
                         </div>
                       </div>

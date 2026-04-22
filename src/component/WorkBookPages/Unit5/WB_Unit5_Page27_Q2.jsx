@@ -224,225 +224,225 @@ export default function WB_Unit5_Page27_Q2() {
 
   return (
     <div className="main-container-component">
-      <style>{`
-        .wb-house-wrap {
-          width: 100%;
-          max-width: 1100px;
-          margin: 0 auto;
-          padding: 8px 0 24px;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          gap: 22px;
-        }
+    <style>{`
+  .wb-house-wrap {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8px 0 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
 
-        .wb-house-title {
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          flex-wrap: wrap;
-        }
+  .wb-house-title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 
-        .wb-house-chips {
-          width: 100%;
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 10px;
-        }
+  .wb-house-chips {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
 
-        .wb-house-chip {
-          min-height: 42px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          padding: 7px 16px;
-          border-radius: 15px;
-          font-size: clamp(15px, 1.4vw, 22px);
-          font-weight: 500;
-          user-select: none;
-          box-sizing: border-box;
-          transition: 0.2s ease;
-          touch-action: none;
-          word-break: break-word;
-          background: #ffd09b;
-          color: #111;
-          border: 1.5px solid #ee9a42;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        }
+  .wb-house-chip {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: clamp(11px, 0.9vw, 15px);
+    font-weight: 500;
+    user-select: none;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+    touch-action: none;
+    word-break: break-word;
+    background: #ffd09b;
+    color: #111;
+    border: 1.5px solid #ee9a42;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
 
-        .wb-house-chip--used {
-          background: #ececec;
-          color: #b7b7b7;
-          border-color: #dadada;
-          box-shadow: none;
-          opacity: 0.95;
-          cursor: not-allowed;
-        }
+  .wb-house-chip--used {
+    background: #ececec;
+    color: #b7b7b7;
+    border-color: #dadada;
+    box-shadow: none;
+    opacity: 0.95;
+    cursor: not-allowed;
+  }
 
-        .wb-house-chip--active {
-          cursor: grab;
-        }
+  .wb-house-chip--active {
+    cursor: grab;
+  }
 
-        .wb-house-layout {
-          display: grid;
-          grid-template-columns: minmax(210px, 1fr) minmax(260px, 0.95fr) minmax(210px, 1fr);
-          gap: clamp(20px, 3vw, 42px);
-          align-items: center;
-          width: 100%;
-        }
+  .wb-house-layout {
+    display: grid;
+    grid-template-columns: minmax(210px, 1fr) minmax(260px, 0.95fr) minmax(210px, 1fr);
+    gap: clamp(20px, 3vw, 42px);
+    align-items: center;
+    width: 100%;
+  }
 
-        .wb-house-col {
-          display: flex;
-          flex-direction: column;
-          gap: clamp(16px, 2vw, 26px);
-          min-width: 0;
-        }
+  .wb-house-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 2vw, 26px);
+    min-width: 0;
+  }
 
-        .wb-house-item {
-          display: grid;
-          grid-template-columns: 32px minmax(0, 1fr);
-          gap: 12px;
-          align-items: center;
-          width: 100%;
-        }
+  .wb-house-item {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+  }
 
-        .wb-house-num {
-          font-size: clamp(22px, 1.9vw, 34px);
-          font-weight: 700;
-          line-height: 1;
-          color: #1f1f1f;
-        }
+  .wb-house-num {
+    font-size: clamp(14px, 1.2vw, 20px);
+    font-weight: 700;
+    line-height: 1;
+    color: #1f1f1f;
+  }
 
-        .wb-house-line-wrap {
-          position: relative;
-          width: 100%;
-        }
+  .wb-house-line-wrap {
+    position: relative;
+    width: 100%;
+  }
 
-        .wb-house-line {
-          width: 100%;
-          min-height: 48px;
-          border-bottom: 3px solid #2c2c2c;
-          display: flex;
-          align-items: center;
-          padding: 0 4px 4px;
-          box-sizing: border-box;
-          user-select: none;
-        }
+  .wb-house-line {
+    width: 100%;
+    min-height: 36px;
+    border-bottom: 3px solid #2c2c2c;
+    display: flex;
+    align-items: center;
+    padding: 0 4px 4px;
+    box-sizing: border-box;
+    user-select: none;
+  }
 
-        .wb-house-line--fixed {
-          cursor: default !important;
-        }
+  .wb-house-line--fixed {
+    cursor: default !important;
+  }
 
-        .wb-house-answer {
-          font-size: clamp(20px, 2.3vw, 34px);
-          line-height: 1.1;
-          color: #d72626;
-          font-weight: 500;
-          word-break: break-word;
-        }
+  .wb-house-answer {
+    font-size: clamp(13px, 1.4vw, 20px);
+    line-height: 1.1;
+    color: #000000ff;
+    font-weight: 500;
+    word-break: break-word;
+  }
 
-        .wb-house-answer--fixed {
-          color: #1f1f1f;
-        }
+  .wb-house-answer--fixed {
+    color: #1f1f1f;
+  }
 
-        .wb-house-placeholder {
-          display: block;
-          width: 100%;
-          min-height: 26px;
-        }
+  .wb-house-placeholder {
+    display: block;
+    width: 100%;
+    min-height: 26px;
+  }
 
-        .wb-house-wrong {
-          position: absolute;
-          top: -8px;
-          right: -8px;
-          width: 22px;
-          height: 22px;
-          border-radius: 999px;
-          background: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-          box-sizing: border-box;
-        }
+  .wb-house-wrong {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+  }
 
-        .wb-house-image-wrap {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+  .wb-house-image-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-        .wb-house-image {
-          display: block;
-          width: 100%;
-          max-width: clamp(260px, 30vw, 430px);
-          height: auto;
-          object-fit: contain;
-        }
+  .wb-house-image {
+    display: block;
+    width: 100%;
+    max-width: clamp(340px, 42vw, 600px);
+    height: auto;
+    object-fit: contain;
+  }
 
-        .wb-house-buttons {
-          display: flex;
-          justify-content: center;
-          margin-top: 4px;
-        }
+  .wb-house-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+  }
 
-        @media (max-width: 980px) {
-          .wb-house-layout {
-            grid-template-columns: 1fr;
-            gap: 22px;
-          }
+  @media (max-width: 980px) {
+    .wb-house-layout {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
 
-          .wb-house-image-wrap {
-            order: -1;
-          }
+    .wb-house-image-wrap {
+      order: -1;
+    }
 
-          .wb-house-image {
-            max-width: min(100%, 360px);
-          }
+    .wb-house-image {
+      max-width: min(100%, 480px);
+    }
 
-          .wb-house-col {
-            gap: 16px;
-          }
-        }
+    .wb-house-col {
+      gap: 16px;
+    }
+  }
 
-        @media (max-width: 700px) {
-          .wb-house-item {
-            grid-template-columns: 26px minmax(0, 1fr);
-            gap: 10px;
-          }
+  @media (max-width: 700px) {
+    .wb-house-item {
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 10px;
+    }
 
-          .wb-house-line {
-            min-height: 42px;
-          }
+    .wb-house-line {
+      min-height: 36px;
+    }
 
-          .wb-house-chips {
-            justify-content: flex-start;
-          }
-        }
+    .wb-house-chips {
+      justify-content: flex-start;
+    }
+  }
 
-        @media (max-width: 520px) {
-          .wb-house-wrap {
-            gap: 18px;
-          }
+  @media (max-width: 520px) {
+    .wb-house-wrap {
+      gap: 18px;
+    }
 
-          .wb-house-chip {
-            font-size: 14px;
-            padding: 7px 12px;
-          }
+    .wb-house-chip {
+      font-size: 11px;
+      padding: 5px 10px;
+    }
 
-          .wb-house-wrong {
-            right: -4px;
-          }
-        }
-      `}</style>
+    .wb-house-wrong {
+      right: -4px;
+    }
+  }
+`}</style>
 
       <div
         className="div-forall"

@@ -7,8 +7,8 @@ import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folde
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 9.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 10.svg";
 
-const DOT_COLOR   = "#9ca3af";
-const TEXT_COLOR  = "#111";
+const DOT_COLOR    = "#9ca3af";
+const TEXT_COLOR   = "#111";
 const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR   = "#ffca94";
 const BORDER_COLOR = "#d9d9d9";
@@ -24,10 +24,10 @@ const LEFT_ITEMS = [
 ];
 
 const RIGHT_ITEMS = [
-  { id: 1, bars: 4, prefixTop: "She",      correctAnswer: "usually rides a bike to the gym." },
-  { id: 2, bars: 0, prefixTop: "He",       correctAnswer: "never walks to summer camp." },
-  { id: 3, bars: 5, prefixTop: "He always",correctAnswer: "takes a bus to school." },
-  { id: 4, bars: 2, prefixTop: "He",       correctAnswer: "sometimes takes the train to the library." },
+  { id: 1, bars: 4, prefixTop: "She",       correctAnswer: "usually rides a bike to the gym." },
+  { id: 2, bars: 0, prefixTop: "He",        correctAnswer: "never walks to summer camp." },
+  { id: 3, bars: 5, prefixTop: "He always", correctAnswer: "takes a bus to school." },
+  { id: 4, bars: 2, prefixTop: "He",        correctAnswer: "sometimes takes the train to the library." },
 ];
 
 const DRAG_ITEMS = [
@@ -50,9 +50,9 @@ export default function WB_Unit2_Page10_QB() {
   const [showAns,      setShowAns]      = useState(false);
   const [paths,        setPaths]        = useState([]);
 
-  const boardRef   = useRef(null);
-  const pointRefs  = useRef({});
-  const dropRefs   = useRef({});
+  const boardRef  = useRef(null);
+  const pointRefs = useRef({});
+  const dropRefs  = useRef({});
 
   const usedDragIds = Object.values(answers).filter(Boolean).map((e) => e.dragId);
 
@@ -95,7 +95,7 @@ export default function WB_Unit2_Page10_QB() {
   }, [matches]);
 
   /* ── Handlers ── */
-  const handleLeftSelect  = (id)      => { if (showAns) return; setSelectedLeft(id); setShowResults(false); };
+  const handleLeftSelect  = (id) => { if (showAns) return; setSelectedLeft(id); setShowResults(false); };
   const handleRightSelect = (rightId) => {
     if (showAns || selectedLeft === null) return;
     const upd = { ...matches };
@@ -171,13 +171,13 @@ export default function WB_Unit2_Page10_QB() {
     setShowResults(false); setShowAns(false); setPaths([]);
   };
 
-  const isWrongMatch = (leftId)  => showResults && !!matches[leftId] && matches[leftId] !== CORRECT_MATCHES[leftId];
+  const isWrongMatch = (leftId)    => showResults && !!matches[leftId] && matches[leftId] !== CORRECT_MATCHES[leftId];
   const isWrongDrop  = (rightItem) => showResults && answers[`r-${rightItem.id}`]?.value !== rightItem.correctAnswer;
-  const getLeftConn  = (id)      => !!matches[id];
-  const getRightConn = (id)      => Object.values(matches).includes(id);
+  const getLeftConn  = (id)        => !!matches[id];
+  const getRightConn = (id)        => Object.values(matches).includes(id);
 
   const renderBars = (count) => (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:0, marginRight:"clamp(4px,0.6vw,8px)", verticalAlign:"middle" }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:0, marginRight:"6px", verticalAlign:"middle" }}>
       {[1,2,3,4,5].map((n) => (
         <span key={n} style={{
           width:"clamp(10px,1.6vw,18px)", height:"clamp(8px,1.3vw,14px)",
@@ -210,17 +210,17 @@ export default function WB_Unit2_Page10_QB() {
         }}
       >
         {value && (
-          <span style={{ fontSize:"clamp(11px,1.4vw,20px)", lineHeight:1.15, wordBreak:"break-word", color:ANSWER_COLOR }}>
+          <span style={{ fontSize:"22px", lineHeight:1.3, wordBreak:"break-word", color:ANSWER_COLOR }}>
             {value}
           </span>
         )}
         {wrong && (
           <div style={{
-            position:"absolute", top:"clamp(-8px,-1vw,-4px)", right:"clamp(-8px,-1vw,-4px)",
-            width:"clamp(14px,1.6vw,20px)", height:"clamp(14px,1.6vw,20px)",
+            position:"absolute", top:"-8px", right:"-8px",
+            width:"20px", height:"20px",
             borderRadius:"50%", backgroundColor:WRONG_COLOR, border:"1px solid #fff",
             color:"#fff", display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize:"clamp(7px,0.8vw,11px)", fontWeight:700, zIndex:3,
+            fontSize:"11px", fontWeight:700, zIndex:3,
           }}>✕</div>
         )}
       </div>
@@ -261,7 +261,10 @@ export default function WB_Unit2_Page10_QB() {
                     color: isUsed ? "#999" : "#222",
                     cursor: isUsed || showAns ? "not-allowed" : "grab",
                     opacity: isUsed ? 0.6 : 1,
-                    userSelect:"none", fontSize:"clamp(13px,1.4vw,18px)", fontWeight:500,
+                    userSelect:"none",
+                    /* ✅ font size ثابت 22px */
+                    fontSize:"22px",
+                    fontWeight:500,
                     boxShadow: isUsed ? "none" : "0 2px 8px rgba(0,0,0,0.06)",
                     transition:"0.2s ease", touchAction:"none",
                     display:"flex", alignItems:"center", justifyContent:"center",
@@ -273,11 +276,9 @@ export default function WB_Unit2_Page10_QB() {
           </div>
         </div>
 
-        {/* ── Main board: two columns side by side ── */}
-        <div
-          ref={boardRef}
-          style={{ position:"relative", width:"100%" }}
-        >
+        {/* ── Main board ── */}
+        <div ref={boardRef} style={{ position:"relative", width:"100%" }}>
+
           {/* SVG connector lines */}
           <svg style={{
             position:"absolute", inset:0, width:"100%", height:"100%",
@@ -289,13 +290,16 @@ export default function WB_Unit2_Page10_QB() {
             ))}
           </svg>
 
-          {/* Grid: left col | right col — 4 rows aligned */}
+          {/*
+            ✅ FIX: 4 columns بدل عمودين
+            left-content | left-dot | right-dot | right-content
+            مع spacer واسع في المنتصف بين النقطتين
+          */}
           <div style={{
             display:"grid",
-            gridTemplateColumns:"1fr 1fr",
-            columnGap:"clamp(20px,6vw,80px)",
+            gridTemplateColumns:"1fr clamp(20px,3vw,36px) clamp(80px,10vw,140px) clamp(20px,3vw,36px) 1fr",
             rowGap:"clamp(16px,2.4vw,30px)",
-            alignItems:"center",          /* ← كل صف متوازي */
+            alignItems:"center",
             width:"100%",
           }}>
             {LEFT_ITEMS.map((lItem, idx) => {
@@ -307,17 +311,18 @@ export default function WB_Unit2_Page10_QB() {
 
               return (
                 <React.Fragment key={lItem.id}>
-                  {/* ── LEFT cell ── */}
+
+                  {/* col 1: رقم + صورة + label */}
                   <div style={{ display:"flex", alignItems:"center", gap:"clamp(6px,0.9vw,12px)", minWidth:0, zIndex:2 }}>
 
                     {/* Number */}
                     <span style={{
-                      fontSize:"clamp(16px,1.9vw,28px)", fontWeight:700,
+                      fontSize:"22px", fontWeight:700,
                       color:TEXT_COLOR, lineHeight:1, flexShrink:0,
-                      minWidth:"clamp(14px,1.8vw,24px)",
+                      minWidth:"24px",
                     }}>{lItem.id}</span>
 
-                    {/* Card: image + label + dot */}
+                    {/* Card */}
                     <div style={{ display:"flex", flexDirection:"column", gap:"clamp(5px,0.8vw,9px)", minWidth:0, flex:1 }}>
 
                       {/* Image */}
@@ -337,61 +342,75 @@ export default function WB_Unit2_Page10_QB() {
                           style={{ width:"80%", height:"100%", objectFit:"contain", display:"block" }} />
                       </div>
 
-                      {/* Label + dot row */}
-                      <div style={{ display:"flex", alignItems:"center", gap:"clamp(6px,0.8vw,10px)", width:"100%" }}>
-                        <span style={{ fontSize:"clamp(11px,1.5vw,22px)", color:TEXT_COLOR, lineHeight:1.15, textAlign:"center", flex:1 }}>
+                      {/* Label */}
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", width:"100%" }}>
+                        <span style={{
+                          fontSize:"22px", color:TEXT_COLOR,
+                          lineHeight:1.3, textAlign:"center",
+                        }}>
                           {lItem.label}
                         </span>
-                        <div
-                          ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
-                          onClick={() => handleLeftSelect(lItem.id)}
-                          style={{
-                            width:"clamp(9px,1.2vw,14px)", height:"clamp(9px,1.2vw,14px)",
-                            borderRadius:"50%", flexShrink:0,
-                            background: lSelected || lConn ? ACTIVE_COLOR : DOT_COLOR,
-                            cursor: showAns ? "default" : "pointer",
-                          }}
-                        />
                       </div>
                     </div>
                   </div>
 
-                  {/* ── RIGHT cell ── */}
-                  <div style={{ display:"flex", alignItems:"flex-start", gap:"clamp(6px,0.9vw,12px)", minWidth:0, zIndex:2 }}>
+                  {/* col 2: نقطة اليسار */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", zIndex:2 }}>
+                    <div
+                      ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
+                      onClick={() => handleLeftSelect(lItem.id)}
+                      style={{
+                        width:"clamp(10px,1.4vw,16px)", height:"clamp(10px,1.4vw,16px)",
+                        borderRadius:"50%", flexShrink:0,
+                        background: lSelected || lConn ? ACTIVE_COLOR : DOT_COLOR,
+                        cursor: showAns ? "default" : "pointer",
+                        boxShadow: lSelected ? "0 0 0 4px rgba(243,155,66,0.25)" : "none",
+                        transition:"0.2s ease",
+                      }}
+                    />
+                  </div>
 
-                    {/* Dot */}
+                  {/* col 3: spacer — مساحة الخطوط المتقاطعة */}
+                  <div />
+
+                  {/* col 4: نقطة اليمين */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", zIndex:2 }}>
                     <div
                       ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
                       onClick={() => handleRightSelect(rItem.id)}
                       style={{
-                        width:"clamp(9px,1.2vw,14px)", height:"clamp(9px,1.2vw,14px)",
-                        borderRadius:"50%", flexShrink:0, marginTop:"clamp(4px,0.6vw,8px)",
+                        width:"clamp(10px,1.4vw,16px)", height:"clamp(10px,1.4vw,16px)",
+                        borderRadius:"50%", flexShrink:0,
                         background: rConn ? ACTIVE_COLOR : DOT_COLOR,
                         cursor: showAns || selectedLeft === null ? "default" : "pointer",
+                        boxShadow: rConn ? "0 0 0 4px rgba(243,155,66,0.18)" : "none",
+                        transition:"0.2s ease",
                       }}
                     />
-
-                    {/* Sentence + drop */}
-                    <div
-                      onClick={() => handleRightSelect(rItem.id)}
-                      style={{
-                        flex:1, minWidth:0,
-                        cursor: showAns || selectedLeft === null ? "default" : "pointer",
-                      }}
-                    >
-                      {/* prefix line */}
-                      <div style={{
-                        fontSize:"clamp(11px,1.4vw,22px)", color:TEXT_COLOR,
-                        lineHeight:1.15, borderBottom:"2px solid #444",
-                        display:"inline", paddingBottom:"2px", wordBreak:"break-word",
-                      }}>
-                        {renderBars(rItem.bars)}{rItem.prefixTop}
-                      </div>
-
-                      {/* drop zone */}
-                      {renderDropBox(rItem)}
-                    </div>
                   </div>
+
+                  {/* col 5: جملة + drop zone */}
+                  <div
+                    onClick={() => handleRightSelect(rItem.id)}
+                    style={{
+                      display:"flex", flexDirection:"column",
+                      justifyContent:"center", minWidth:0, zIndex:2,
+                      cursor: showAns || selectedLeft === null ? "default" : "pointer",
+                    }}
+                  >
+                    {/* prefix line */}
+                    <div style={{
+                      fontSize:"22px", color:TEXT_COLOR,
+                      lineHeight:1.3, borderBottom:"2px solid #444",
+                      display:"inline", paddingBottom:"2px", wordBreak:"break-word",
+                    }}>
+                      {renderBars(rItem.bars)}{rItem.prefixTop}
+                    </div>
+
+                    {/* drop zone */}
+                    {renderDropBox(rItem)}
+                  </div>
+
                 </React.Fragment>
               );
             })}
@@ -399,7 +418,7 @@ export default function WB_Unit2_Page10_QB() {
         </div>
 
         {/* Buttons */}
-        <div style={{ display:"flex", justifyContent:"center", marginTop:"clamp(14px,2vw,24px)"  , zIndex : "100"}}>
+        <div style={{ display:"flex", justifyContent:"center", marginTop:"clamp(14px,2vw,24px)", zIndex:"100" }}>
           <Button checkAnswers={handleCheck} handleShowAnswer={handleShowAnswer} handleStartAgain={handleStartAgain} />
         </div>
       </div>

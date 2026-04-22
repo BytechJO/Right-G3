@@ -300,7 +300,7 @@ export default function WB_Phonics_Page227_QA() {
         }
 
         .wb-a20-sentence-text {
-          font-size: clamp(14px, 2.1vw, 28px);
+          font-size: clamp(14px, 2.1vw, 22px);
           color: #222;
           line-height: 1.5;
           display: flex;
@@ -321,24 +321,22 @@ export default function WB_Phonics_Page227_QA() {
           min-width: clamp(42px, 6vw, 78px);
           width: clamp(42px, 6vw, 78px);
           height: clamp(28px, 4vw, 42px);
-          font-size: clamp(14px, 2vw, 28px);
+          font-size: clamp(14px, 2vw, 22);
           font-weight: 500;
           color: #000;
           border: none;
-          border-bottom: 3px solid #6b7280;
           outline: none;
           background: transparent;
           appearance: none;
           -webkit-appearance: none;
           -moz-appearance: none;
           text-align: center;
-          padding: 0 clamp(14px, 2vw, 22px) 2px 4px;
           line-height: 1;
         }
 
         .wb-a20-select-arrow {
           position: absolute;
-          right: 4px;
+          right: 0.2px;
           bottom: 10px;
           font-size: clamp(11px, 1.3vw, 14px);
           color: #666;

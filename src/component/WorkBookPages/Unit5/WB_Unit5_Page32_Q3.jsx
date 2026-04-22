@@ -1,121 +1,161 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import AudioWithCaption from "../../AudioWithCaption";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/B.1.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/B.2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/B.3.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/B.4.svg";
 
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd6pg32instruction-adult-lady_xXPh6TKj.mp3"; // ← غيّر المسار حسب ملف الأوديو
-
-const BORDER_COLOR = "#f39b42";
+const DOT_COLOR    = "#9ca3af";
+const ACTIVE_COLOR = "#f39b42";
+const BORDER_COLOR = "#e0e0e0";
 const WRONG_COLOR  = "#ef4444";
-const CIRCLE_COLOR = "#ef4444";
+const PATH_COLOR   = "#f39b42";
+const TEXT_COLOR   = "#111";
 
-const QUESTIONS = [
-  {
-    id: 1,
-    words: [
-      { id: "1-1", text: "try",   correct: true  },
-      { id: "1-2", text: "grumpy",correct: false },
-      { id: "1-3", text: "fry",   correct: true  },
-      { id: "1-4", text: "cry",   correct: true  },
-    ],
-  },
-  {
-    id: 2,
-    words: [
-      { id: "2-1", text: "sandy",  correct: true  },
-      { id: "2-2", text: "hearty", correct: true  },
-      { id: "2-3", text: "party",  correct: true  },
-      { id: "2-4", text: "spy",    correct: false },
-    ],
-  },
+const LEFT_ITEMS = [
+  { id: 1, text: "Sally eats candy on the ferry."     },
+  { id: 2, text: "The bunny goes to a party by ship." },
+  { id: 3, text: "Jenny and Mr. Sky cry and cry."     },
+  { id: 4, text: "It's hot and sunny in July."        },
 ];
 
-export default function WB_YSound_PageC() {
-  const [selected,    setSelected]    = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
+const RIGHT_ITEMS = [
+  { id: 1, img: img1 },
+  { id: 2, img: img2 },
+  { id: 3, img: img3 },
+  { id: 4, img: img4 },
+];
 
-  const toggleWord = (wordId) => {
+const CORRECT_MATCHES = { 1: 3, 2: 4, 3: 1, 4: 2 };
+
+const WrongBadge = () => (
+  <div
+    style={{
+      position:        "absolute",
+      top:             "-8px",
+      left:            "-8px",
+      width:           "clamp(16px,1.8vw,22px)",
+      height:          "clamp(16px,1.8vw,22px)",
+      borderRadius:    "50%",
+      backgroundColor: WRONG_COLOR,
+      color:           "#fff",
+      display:         "flex",
+      alignItems:      "center",
+      justifyContent:  "center",
+      fontSize:        "clamp(9px,0.9vw,12px)",
+      fontWeight:      700,
+      boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
+      zIndex:          5,
+      pointerEvents:   "none",
+    }}
+  >
+    ✕
+  </div>
+);
+
+export default function WB_ReadLookMatch_PageB() {
+  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [matches,      setMatches]      = useState({});
+  const [showResults,  setShowResults]  = useState(false);
+  const [showAns,      setShowAns]      = useState(false);
+  const [paths,        setPaths]        = useState([]);
+
+  const boardRef  = useRef(null);
+  const pointRefs = useRef({});
+
+  useLayoutEffect(() => {
+    const update = () => {
+      if (!boardRef.current) return;
+      const br = boardRef.current.getBoundingClientRect();
+
+      const newPaths = Object.entries(matches).map(([leftId, rightId]) => {
+        const s = pointRefs.current[`left-${leftId}`];
+        const e = pointRefs.current[`right-${rightId}`];
+        if (!s || !e) return null;
+
+        const sr = s.getBoundingClientRect();
+        const er = e.getBoundingClientRect();
+        const x1 = sr.left + sr.width  / 2 - br.left;
+        const y1 = sr.top  + sr.height / 2 - br.top;
+        const x2 = er.left + er.width  / 2 - br.left;
+        const y2 = er.top  + er.height / 2 - br.top;
+        const dx = Math.abs(x2 - x1);
+
+        return {
+          id:    `path-${leftId}-${rightId}`,
+          d:     `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
+          color: PATH_COLOR,
+        };
+      }).filter(Boolean);
+
+      setPaths(newPaths);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    let obs;
+    if (boardRef.current && typeof ResizeObserver !== "undefined") {
+      obs = new ResizeObserver(update);
+      obs.observe(boardRef.current);
+    }
+    return () => { window.removeEventListener("resize", update); obs?.disconnect(); };
+  }, [matches, showResults]);
+
+  const handleLeftSelect = (id) => {
     if (showAns) return;
-    setSelected((prev) => ({ ...prev, [wordId]: !prev[wordId] }));
+    setSelectedLeft((prev) => prev === id ? null : id);
+    setShowResults(false);
+  };
+
+  const handleRightSelect = (rightId) => {
+    if (showAns || selectedLeft === null) return;
+    const upd = { ...matches };
+    Object.keys(upd).forEach((k) => { if (upd[k] === rightId) delete upd[k]; });
+    upd[selectedLeft] = rightId;
+    setMatches(upd);
+    setSelectedLeft(null);
     setShowResults(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
-    // تأكد إن الطالب اختار شي على الأقل
-    const anySelected = QUESTIONS.every((q) =>
-      q.words.some((w) => selected[w.id])
-    );
-    if (!anySelected) {
-      ValidationAlert.info("Please circle some words first.");
+    const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
+    if (!allConnected) {
+      ValidationAlert.info("Please connect all sentences first.");
       return;
     }
-const captions = [
-  { start: 0.58, end: 4.22, text: "Page 32, phonics exercise D." },
-  { start: 4.22, end: 6.90, text: "Which words have the same Y sound?" },
-  { start: 6.90, end: 9.60, text: "Listen and circle." },
-  { start: 9.60, end: 16.52, text: "1- try, grumpy, fry, cry." },
-  { start: 16.52, end: 22.74, text: "2- sandy, hardy, party, spy." },
-];
     let score = 0;
-    let total = 0;
-
-    QUESTIONS.forEach((q) => {
-      q.words.forEach((w) => {
-        total++;
-        const isSelected = !!selected[w.id];
-        if (isSelected === w.correct) score++;
-      });
-    });
-
+    LEFT_ITEMS.forEach((i) => { if (matches[i.id] === CORRECT_MATCHES[i.id]) score++; });
     setShowResults(true);
+    const total = LEFT_ITEMS.length;
     if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
     else                  ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
-    const filled = {};
-    QUESTIONS.forEach((q) => {
-      q.words.forEach((w) => { filled[w.id] = w.correct; });
-    });
-    setSelected(filled);
+    setMatches({ ...CORRECT_MATCHES });
     setShowResults(true);
     setShowAns(true);
+    setSelectedLeft(null);
   };
 
   const handleStartAgain = () => {
-    setSelected({});
+    setSelectedLeft(null);
+    setMatches({});
     setShowResults(false);
     setShowAns(false);
+    setPaths([]);
   };
 
-  const getWordStyle = (word) => {
-    const isSelected = !!selected[word.id];
+  const getLeftConn  = (id) => !!matches[id];
+  const getRightConn = (id) => Object.values(matches).includes(id);
+  const isWrongMatch = (leftId) =>
+    showResults && !showAns && !!matches[leftId] &&
+    matches[leftId] !== CORRECT_MATCHES[leftId];
 
-    // بعد الفحص
-    if (showResults) {
-      const isCorrect = isSelected === word.correct;
-      if (isSelected && isCorrect)  return { circled: true,  color: CIRCLE_COLOR, borderColor: CIRCLE_COLOR };
-      if (isSelected && !isCorrect) return { circled: true,  color: WRONG_COLOR,  borderColor: WRONG_COLOR  };
-      if (!isSelected && word.correct) return { circled: false, color: WRONG_COLOR, borderColor: "transparent", underline: true };
-      return { circled: false, color: "#111", borderColor: "transparent" };
-    }
-
-    // قبل الفحص
-    if (isSelected) return { circled: true, color: CIRCLE_COLOR, borderColor: CIRCLE_COLOR };
-    return { circled: false, color: "#111", borderColor: "transparent" };
-  };
-const captions = [
-  { start: 0.58, end: 4.22, text: "Page 32, phonics exercise D." },
-  { start: 4.22, end: 6.90, text: "Which words have the same Y sound?" },
-  { start: 6.90, end: 9.60, text: "Listen and circle." },
-  { start: 9.60, end: 16.52, text: "1- try, grumpy, fry, cry." },
-  { start: 16.52, end: 22.74, text: "2- sandy, hardy, party, spy." },
-];
   return (
     <div className="main-container-component">
       <div
@@ -123,7 +163,7 @@ const captions = [
         style={{
           display:       "flex",
           flexDirection: "column",
-          gap:           "clamp(20px,3vw,36px)",
+          gap:           "18px",
           maxWidth:      "1100px",
           margin:        "0 auto",
         }}
@@ -137,115 +177,193 @@ const captions = [
             alignItems: "center",
             gap:        "12px",
             flexWrap:   "wrap",
+            fontSize:   "clamp(16px,1.8vw,24px)",
           }}
         >
-          <span className="WB-ex-A">D</span>
-          Which words have the same{" "}
-          <strong style={{ fontWeight: 900 }}>-y sound</strong>?
-          Listen and circle.
+          <span className="WB-ex-A">B</span> Read, look, and match.
         </h1>
-<div style={{ display: "flex", justifyContent: "center" }}>
-  <AudioWithCaption src={sound1} captions={captions} />
-</div>
 
-        {/* Questions */}
-        <div
-          style={{
-            display:       "flex",
-            flexDirection: "column",
-            gap:           "clamp(28px,4vw,50px)",
-            width:         "100%",
-          }}
-        >
-          {QUESTIONS.map((q) => (
-            <div
-              key={q.id}
-              style={{
-                display:    "flex",
-                alignItems: "center",
-                gap:        "clamp(16px,2.5vw,32px)",
-                width:      "100%",
-                flexWrap:   "wrap",
-              }}
-            >
-              {/* number */}
-              <span
-                style={{
-                  fontSize:   "clamp(18px,2.2vw,32px)",
-                  fontWeight: 700,
-                  color:      "#111",
-                  lineHeight: 1,
-                  minWidth:   "clamp(18px,2.2vw,32px)",
-                  flexShrink: 0,
-                }}
-              >
-                {q.id}
-              </span>
+        {/* Board */}
+        <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
 
-              {/* words */}
-              <div
-                style={{
-                  display:        "flex",
-                  alignItems:     "center",
-                  gap:            "clamp(20px,4vw,60px)",
-                  flex:           1,
-                  flexWrap:       "wrap",
-                  justifyContent: "space-around",
-                }}
-              >
-                {q.words.map((word) => {
-                  const ws = getWordStyle(word);
-                  return (
-                    <div
-                      key={word.id}
-                      onClick={() => toggleWord(word.id)}
+          {/* SVG lines */}
+          <svg
+            style={{
+              position:      "absolute",
+              inset:         0,
+              width:         "100%",
+              height:        "100%",
+              pointerEvents: "none",
+              overflow:      "visible",
+              zIndex:        1,
+            }}
+          >
+            {paths.map((p) => (
+              <path
+                key={p.id}
+                d={p.d}
+                fill="none"
+                stroke={p.color}
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            ))}
+          </svg>
+
+          {/* Grid — 5 columns: sentence | left-dot | gap | right-dot | image */}
+          <div
+            style={{
+              display:             "grid",
+              gridTemplateColumns: "1fr clamp(10px,1.3vw,15px) clamp(30px,5vw,60px) clamp(10px,1.3vw,15px) clamp(100px,14vw,170px)",
+              columnGap:           "clamp(8px,1.2vw,16px)",
+              rowGap:              "clamp(14px,2vw,28px)",
+              alignItems:          "center",
+              width:               "100%",
+            }}
+          >
+            {LEFT_ITEMS.map((lItem, idx) => {
+              const rItem     = RIGHT_ITEMS[idx];
+              const lConn     = getLeftConn(lItem.id);
+              const rConn     = getRightConn(rItem.id);
+              const lSelected = selectedLeft === lItem.id;
+              const wrong     = isWrongMatch(lItem.id);
+
+              return (
+                <React.Fragment key={lItem.id}>
+
+                  {/* ── sentence ── */}
+                  <div
+                    onClick={() => handleLeftSelect(lItem.id)}
+                    style={{
+                      display:      "flex",
+                      alignItems:   "center",
+                      gap:          "clamp(6px,0.9vw,12px)",
+                      minWidth:     0,
+                      zIndex:       2,
+                      padding:      "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
+                      borderRadius: "clamp(8px,1vw,12px)",
+                      border:       lSelected
+                        ? `2.5px solid ${ACTIVE_COLOR}`
+                        : "2px solid transparent",
+                      background:   lSelected ? "rgba(243,155,66,0.08)" : "transparent",
+                      cursor:       showAns ? "default" : "pointer",
+                      transition:   "border-color 0.2s, background 0.2s",
+                      userSelect:   "none",
+                      position:     "relative",
+                    }}
+                  >
+                    {/* number */}
+                    <span
                       style={{
-                        position:      "relative",
-                        padding:       "clamp(6px,0.9vw,12px) clamp(18px,2.8vw,38px)",
-                        borderRadius:  "999px",
-                        border:        `2.5px solid ${ws.borderColor}`,
-                        color:         ws.color,
-                        fontSize:      "clamp(16px,2.2vw,30px)",
-                        fontWeight:    600,
-                        cursor:        showAns ? "default" : "pointer",
-                        userSelect:    "none",
-                        transition:    "border-color 0.18s ease, color 0.18s ease",
-                        textDecoration: ws.underline ? "underline" : "none",
-                        textDecorationColor: WRONG_COLOR,
-                        whiteSpace:    "nowrap",
+                        fontSize:   "clamp(14px,1.5vw,22px)",
+                        fontWeight: 700,
+                        color:      TEXT_COLOR,
+                        lineHeight: 1,
+                        flexShrink: 0,
                       }}
                     >
-                      {word.text}
+                      {lItem.id}
+                    </span>
 
-                      {/* wrong badge — إذا اختار غلط */}
-                      {showResults && selected[word.id] && word.correct === false && (
-                        <div
-                          style={{
-                            position:        "absolute",
-                            top:             "-8px",
-                            right:           "-8px",
-                            width:           "clamp(16px,1.8vw,22px)",
-                            height:          "clamp(16px,1.8vw,22px)",
-                            borderRadius:    "50%",
-                            backgroundColor: WRONG_COLOR,
-                            color:           "#fff",
-                            display:         "flex",
-                            alignItems:      "center",
-                            justifyContent:  "center",
-                            fontSize:        "clamp(9px,0.9vw,12px)",
-                            fontWeight:      700,
-                            boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          ✕
-                        </div>
-                      )}
+                    {/* text */}
+                    <span
+                      style={{
+                        fontSize:   "clamp(13px,1.4vw,19px)",
+                        fontWeight: 500,
+                        color:      lSelected ? ACTIVE_COLOR : TEXT_COLOR,
+                        lineHeight: 1.3,
+                        wordBreak:  "break-word",
+                        transition: "color 0.2s",
+                      }}
+                    >
+                      {lItem.text}
+                    </span>
+
+                    {wrong && <WrongBadge />}
+                  </div>
+
+                  {/* ── left dot ── */}
+                  <div
+                    ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
+                    onClick={() => handleLeftSelect(lItem.id)}
+                    style={{
+                      width:        "clamp(10px,1.3vw,15px)",
+                      height:       "clamp(10px,1.3vw,15px)",
+                      borderRadius: "50%",
+                      flexShrink:   0,
+                      justifySelf:  "center",
+                      background:   lSelected || lConn ? ACTIVE_COLOR : DOT_COLOR,
+                      cursor:       showAns ? "default" : "pointer",
+                      transition:   "background 0.2s",
+                      boxShadow:    lSelected ? `0 0 0 3px rgba(243,155,66,0.3)` : "none",
+                      zIndex:       2,
+                    }}
+                  />
+
+                  {/* ── middle gap (empty) ── */}
+                  <div />
+
+                  {/* ── right dot ── */}
+                  <div
+                    ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
+                    onClick={() => handleRightSelect(rItem.id)}
+                    style={{
+                      width:        "clamp(10px,1.3vw,15px)",
+                      height:       "clamp(10px,1.3vw,15px)",
+                      borderRadius: "50%",
+                      flexShrink:   0,
+                      justifySelf:  "center",
+                      background:   rConn ? ACTIVE_COLOR : DOT_COLOR,
+                      cursor:       showAns || selectedLeft === null ? "default" : "pointer",
+                      transition:   "background 0.2s",
+                      zIndex:       2,
+                    }}
+                  />
+
+                  {/* ── image ── */}
+                  <div
+                    onClick={() => handleRightSelect(rItem.id)}
+                    style={{
+                      position:   "relative",
+                      width:      "clamp(100px,14vw,170px)",
+                      aspectRatio:"1.5 / 1",
+                      overflow:   "visible",
+                      flexShrink: 0,
+                      zIndex:     2,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width:        "100%",
+                        height:       "100%",
+                        overflow:     "hidden",
+                        borderRadius: "clamp(8px,1vw,14px)",
+                        border:       `2px solid ${rConn ? ACTIVE_COLOR : BORDER_COLOR}`,
+                        background:   "#f7f7f7",
+                        cursor:       showAns || selectedLeft === null ? "default" : "pointer",
+                        transition:   "border-color 0.2s",
+                        boxSizing:    "border-box",
+                      }}
+                    >
+                      <img
+                        src={rItem.img}
+                        alt={`img-${rItem.id}`}
+                        style={{
+                          width:         "100%",
+                          height:        "100%",
+                          objectFit:     "cover",
+                          display:       "block",
+                          userSelect:    "none",
+                          pointerEvents: "none",
+                        }}
+                      />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+                  </div>
+
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
 
         {/* Buttons */}
@@ -253,7 +371,8 @@ const captions = [
           style={{
             display:        "flex",
             justifyContent: "center",
-            marginTop:      "clamp(6px,1vw,12px)",
+            marginTop:      "clamp(8px,1.5vw,16px)",
+            zIndex:         100,
           }}
         >
           <Button

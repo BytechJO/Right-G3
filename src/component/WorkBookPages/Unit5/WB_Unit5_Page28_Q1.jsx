@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-// غيّري المسارات حسب ملفاتك
 import topImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C1.svg";
 import topImg2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C2.svg";
 import topImg3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C3.svg";
@@ -25,19 +24,19 @@ const ITEMS = [
       {
         key: "line1",
         type: "select",
-        options: ["Yes, he is.", "No, he isn’t."],
-        correct: "No, he isn’t.",
+        options: ["Yes, he is.", "No, he isn't."],
+        correct: "No, he isn't.",
       },
       {
         key: "line2",
         type: "select",
         options: [
-          "He’s in the bathroom.",
-          "He’s in the kitchen.",
-          "He’s in the bedroom.",
-          "He’s in the living room.",
+          "He's in the bathroom.",
+          "He's in the kitchen.",
+          "He's in the bedroom.",
+          "He's in the living room.",
         ],
-        correct: "He’s in the bathroom.",
+        correct: "He's in the bathroom.",
       },
     ],
   },
@@ -49,7 +48,7 @@ const ITEMS = [
       {
         key: "line1",
         type: "select",
-        options: ["Yes, he is.", "No, he isn’t."],
+        options: ["Yes, he is.", "No, he isn't."],
         correct: "Yes, he is.",
       },
       {
@@ -66,7 +65,7 @@ const ITEMS = [
       {
         key: "line1",
         type: "select",
-        options: ["Yes, she is.", "No, she isn’t."],
+        options: ["Yes, she is.", "No, she isn't."],
         correct: "Yes, she is.",
       },
       {
@@ -83,37 +82,37 @@ const ITEMS = [
       {
         key: "line1",
         type: "select",
-        options: ["Yes, she is.", "No, she isn’t."],
-        correct: "No, she isn’t.",
+        options: ["Yes, she is.", "No, she isn't."],
+        correct: "No, she isn't.",
       },
       {
         key: "line2",
         type: "select",
         options: [
-          "She’s in the kitchen.",
-          "She’s in the bedroom.",
-          "She’s in the bathroom.",
-          "She’s in the living room.",
+          "She's in the kitchen.",
+          "She's in the bedroom.",
+          "She's in the bathroom.",
+          "She's in the living room.",
         ],
-        correct: "She’s in the kitchen.",
+        correct: "She's in the kitchen.",
       },
     ],
   },
   {
     id: 5,
-    question: "Where’s the sofa?",
+    question: "Where's the sofa?",
     icon: iconSofa,
     lines: [
       {
         key: "line1",
         type: "select",
         options: [
-          "It’s in the living room.",
-          "It’s in the kitchen.",
-          "It’s in the bathroom.",
-          "It’s in the bedroom.",
+          "It's in the living room.",
+          "It's in the kitchen.",
+          "It's in the bathroom.",
+          "It's in the bedroom.",
         ],
-        correct: "It’s in the living room.",
+        correct: "It's in the living room.",
       },
       {
         key: "line2",
@@ -123,19 +122,19 @@ const ITEMS = [
   },
   {
     id: 6,
-    question: "Where’s the fridge?",
+    question: "Where's the fridge?",
     icon: iconFridge,
     lines: [
       {
         key: "line1",
         type: "select",
         options: [
-          "It’s in the kitchen.",
-          "It’s in the bathroom.",
-          "It’s in the living room.",
-          "It’s in the bedroom.",
+          "It's in the kitchen.",
+          "It's in the bathroom.",
+          "It's in the living room.",
+          "It's in the bedroom.",
         ],
-        correct: "It’s in the kitchen.",
+        correct: "It's in the kitchen.",
       },
       {
         key: "line2",
@@ -300,7 +299,6 @@ export default function WB_Unit5_Page28_QC() {
           grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: clamp(6px, 1vw, 12px);
           width: 100%;
-          
           max-width: 820px;
           margin: 0 auto;
         }
@@ -347,7 +345,7 @@ export default function WB_Unit5_Page28_QC() {
         }
 
         .wb-c-num {
-          font-size: clamp(18px, 2vw, 28px);
+          font-size: clamp(11px, 0.9vw, 15px);
           font-weight: 700;
           color: #222;
           line-height: 1;
@@ -355,14 +353,14 @@ export default function WB_Unit5_Page28_QC() {
         }
 
         .wb-c-icon {
-          width: clamp(34px, 4vw, 50px);
-          height: clamp(34px, 4vw, 50px);
+          width: clamp(28px, 3vw, 42px);
+          height: clamp(28px, 3vw, 42px);
           object-fit: contain;
           flex-shrink: 0;
         }
 
         .wb-c-question {
-          font-size: clamp(20px, 2.1vw, 27px);
+          font-size: clamp(13px, 1.4vw, 18px);
           line-height: 1.35;
           color: #111;
           font-weight: 500;
@@ -372,7 +370,7 @@ export default function WB_Unit5_Page28_QC() {
         .wb-c-answer-block {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
           padding-left: clamp(42px, 5vw, 58px);
         }
 
@@ -383,17 +381,17 @@ export default function WB_Unit5_Page28_QC() {
 
         .wb-c-line {
           width: 100%;
-          min-height: clamp(42px, 5vw, 54px);
+          min-height: clamp(32px, 3.5vw, 42px);
           border-bottom: 2.5px solid #3a3a3a;
           display: flex;
           align-items: center;
-          padding-bottom: 4px;
+          padding-bottom: 3px;
           box-sizing: border-box;
         }
 
         .wb-c-line--empty {
           width: 100%;
-          min-height: clamp(42px, 5vw, 54px);
+          min-height: clamp(32px, 3.5vw, 42px);
           border-bottom: 2.5px solid #3a3a3a;
         }
 
@@ -405,11 +403,11 @@ export default function WB_Unit5_Page28_QC() {
 
         .wb-c-select {
           width: 100%;
-          height: clamp(36px, 4vw, 44px);
+          height: clamp(28px, 3vw, 36px);
           border: none;
           background: transparent;
           padding: 0 30px 0 0;
-          font-size: clamp(17px, 2vw, 25px);
+          font-size: clamp(12px, 1.3vw, 17px);
           line-height: 1.2;
           color: #000000ff;
           font-weight: 500;
@@ -420,7 +418,11 @@ export default function WB_Unit5_Page28_QC() {
           box-sizing: border-box;
           text-align: center;
           text-align-last: center;
-          cursor: ${showAns ? "default" : "pointer"};
+          cursor: pointer;
+        }
+
+        .wb-c-select:disabled {
+          cursor: default;
         }
 
         .wb-c-select option {
@@ -499,11 +501,11 @@ export default function WB_Unit5_Page28_QC() {
           }
 
           .wb-c-question {
-            font-size: 18px;
+            font-size: 13px;
           }
 
           .wb-c-select {
-            font-size: 18px;
+            font-size: 13px;
           }
 
           .wb-c-wrong {
@@ -515,14 +517,13 @@ export default function WB_Unit5_Page28_QC() {
       `}</style>
 
       <div
-        className="div-forall "
+        className="div-forall"
         style={{
           display: "flex",
           flexDirection: "column",
           gap: "28px",
           maxWidth: "1100px",
           margin: "0 auto",
-        
         }}
       >
         <h1
@@ -533,6 +534,7 @@ export default function WB_Unit5_Page28_QC() {
             alignItems: "center",
             gap: "12px",
             flexWrap: "wrap",
+            fontSize: "clamp(16px, 1.8vw, 24px)",
           }}
         >
           <span className="WB-ex-A">C</span>

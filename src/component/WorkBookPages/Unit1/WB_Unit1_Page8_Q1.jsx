@@ -9,26 +9,26 @@ const TABLE_BORDER = "#f39b42";
 const FILLED_COLOR = "#000000ff";
 
 const DRAG_ITEMS = [
-  { id: 1, value: "cake" },
-  { id: 2, value: "Ted" },
-  { id: 3, value: "night" },
-  { id: 4, value: "coat" },
-  { id: 5, value: "blue" },
-  { id: 6, value: "glue" },
-  { id: 7, value: "ant" },
-  { id: 8, value: "feet" },
-  { id: 9, value: "cat" },
-  { id: 10, value: "sick" },
-  { id: 11, value: "box" },
-  { id: 12, value: "bee" },
-  { id: 13, value: "fish" },
-  { id: 14, value: "cup" },
-  { id: 15, value: "kite" },
-  { id: 16, value: "rain" },
-  { id: 17, value: "home" },
-  { id: 18, value: "bed" },
-  { id: 19, value: "run" },
-  { id: 20, value: "sock" },
+  { id: 1,  value: "cake"  },
+  { id: 2,  value: "Ted"   },
+  { id: 3,  value: "night" },
+  { id: 4,  value: "coat"  },
+  { id: 5,  value: "blue"  },
+  { id: 6,  value: "glue"  },
+  { id: 7,  value: "ant"   },
+  { id: 8,  value: "feet"  },
+  { id: 9,  value: "cat"   },
+  { id: 10, value: "sick"  },
+  { id: 11, value: "box"   },
+  { id: 12, value: "bee"   },
+  { id: 13, value: "fish"  },
+  { id: 14, value: "cup"   },
+  { id: 15, value: "kite"  },
+  { id: 16, value: "rain"  },
+  { id: 17, value: "home"  },
+  { id: 18, value: "bed"   },
+  { id: 19, value: "run"   },
+  { id: 20, value: "sock"  },
 ];
 
 const GROUPS = [
@@ -37,18 +37,18 @@ const GROUPS = [
     title: ["long a", "long e", "long i", "long o", "long u"],
     rows: [
       [
-        { key: "long-a-1", correct: "cake" },
-        { key: "long-e-1", correct: "bee" },
+        { key: "long-a-1", correct: "cake"  },
+        { key: "long-e-1", correct: "bee"   },
         { key: "long-i-1", correct: "night" },
-        { key: "long-o-1", correct: "coat" },
-        { key: "long-u-1", correct: "blue" },
+        { key: "long-o-1", correct: "coat"  },
+        { key: "long-u-1", correct: "blue"  },
       ],
       [
-        { key: "long-a-2", correct: "rain" },
-        { key: "long-e-2", correct: "feet" },
-        { key: "long-i-2", correct: "kite" },
-        { key: "long-o-2", correct: "home" },
-        { key: "long-u-2", correct: "glue" },
+        { key: "long-a-2", correct: "rain"  },
+        { key: "long-e-2", correct: "feet"  },
+        { key: "long-i-2", correct: "kite"  },
+        { key: "long-o-2", correct: "home"  },
+        { key: "long-u-2", correct: "glue"  },
       ],
     ],
   },
@@ -57,36 +57,36 @@ const GROUPS = [
     title: ["short a", "short e", "short i", "short o", "short u"],
     rows: [
       [
-        { key: "short-a-1", correct: "ant" },
-        { key: "short-e-1", correct: "Ted" },
+        { key: "short-a-1", correct: "ant"  },
+        { key: "short-e-1", correct: "Ted"  },
         { key: "short-i-1", correct: "fish" },
-        { key: "short-o-1", correct: "box" },
-        { key: "short-u-1", correct: "cup" },
+        { key: "short-o-1", correct: "box"  },
+        { key: "short-u-1", correct: "cup"  },
       ],
       [
-        { key: "short-a-2", correct: "cat" },
-        { key: "short-e-2", correct: "bed" },
+        { key: "short-a-2", correct: "cat"  },
+        { key: "short-e-2", correct: "bed"  },
         { key: "short-i-2", correct: "sick" },
         { key: "short-o-2", correct: "sock" },
-        { key: "short-u-2", correct: "run" },
+        { key: "short-u-2", correct: "run"  },
       ],
     ],
   },
 ];
 
+// جميع الخلايا في قائمة واحدة للاستخدام في الفحص
+const ALL_CELLS = GROUPS.flatMap((g) => g.rows.flatMap((r) => r));
+
 export default function WB_Vocabulary_Page_A() {
-  const [answers, setAnswers] = useState({});
+  const [answers,     setAnswers]     = useState({});
   const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [touchItem,   setTouchItem]   = useState(null);
+  const [touchPos,    setTouchPos]    = useState({ x: 0, y: 0 });
   const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
+  // ✅ FIX: نفصل showAns عن showResults تماماً
+  const [showAns,     setShowAns]     = useState(false);
 
   const dropRefs = useRef({});
-
-  const allBoxes = GROUPS.flatMap((group) =>
-    group.rows.flatMap((row) => row.map((cell) => cell))
-  );
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
@@ -94,18 +94,11 @@ export default function WB_Vocabulary_Page_A() {
 
   const applyDrop = (boxKey, item) => {
     const newAnswers = { ...answers };
-
+    // أزل نفس العنصر من أي خانة أخرى
     Object.keys(newAnswers).forEach((key) => {
-      if (newAnswers[key]?.dragId === item.id) {
-        delete newAnswers[key];
-      }
+      if (newAnswers[key]?.dragId === item.id) delete newAnswers[key];
     });
-
-    newAnswers[boxKey] = {
-      dragId: item.id,
-      value: item.value,
-    };
-
+    newAnswers[boxKey] = { dragId: item.id, value: item.value };
     setAnswers(newAnswers);
     setShowResults(false);
   };
@@ -123,7 +116,6 @@ export default function WB_Vocabulary_Page_A() {
 
   const handleTouchStart = (e, item) => {
     if (showAns || usedDragIds.includes(item.id)) return;
-
     const touch = e.touches[0];
     setTouchItem(item);
     setTouchPos({ x: touch.clientX, y: touch.clientY });
@@ -137,82 +129,62 @@ export default function WB_Vocabulary_Page_A() {
 
   const handleTouchEnd = () => {
     if (!touchItem) return;
-
     Object.entries(dropRefs.current).forEach(([key, ref]) => {
       if (!ref) return;
-
       const rect = ref.getBoundingClientRect();
-
       if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(key, touchItem);
-      }
+        touchPos.x >= rect.left && touchPos.x <= rect.right &&
+        touchPos.y >= rect.top  && touchPos.y <= rect.bottom
+      ) applyDrop(key, touchItem);
     });
-
     setTouchItem(null);
   };
 
   const handleRemoveAnswer = (boxKey) => {
     if (showAns) return;
-
     setAnswers((prev) => {
       const updated = { ...prev };
       delete updated[boxKey];
       return updated;
     });
-
     setShowResults(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
-    const allAnswered = allBoxes.every((item) => answers[item.key]?.value);
-
+    const allAnswered = ALL_CELLS.every((cell) => answers[cell.key]?.value);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
     let score = 0;
-    const total = allBoxes.length;
-
-    allBoxes.forEach((item) => {
-      if (answers[item.key]?.value === item.correct) {
-        score++;
-      }
+    ALL_CELLS.forEach((cell) => {
+      if (answers[cell.key]?.value === cell.correct) score++;
     });
-
     setShowResults(true);
-
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
-    }
+    const total = ALL_CELLS.length;
+    if (score === total)    ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0)     ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else                    ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
+  // ✅ FIX: نبني الإجابات الصحيحة مباشرة من ALL_CELLS بدون البحث في DRAG_ITEMS
+  // هذا يضمن أن كل خانة تحصل على القيمة الصحيحة بالضبط
   const handleShowAnswer = () => {
-    const filled = {};
-
-    allBoxes.forEach((item) => {
-      const matched = DRAG_ITEMS.find((d) => d.value === item.correct);
-
-      filled[item.key] = {
-        dragId: matched?.id ?? item.key,
-        value: item.correct,
+    const correct = {};
+    ALL_CELLS.forEach((cell) => {
+      const matched = DRAG_ITEMS.find((d) => d.value === cell.correct);
+      correct[cell.key] = {
+        // ✅ إذا ما وُجد العنصر في DRAG_ITEMS نستخدم الـ key كـ dragId مؤقت
+        dragId: matched ? matched.id : `auto-${cell.key}`,
+        value:  cell.correct,
       };
     });
-
-    setAnswers(filled);
-    setShowResults(true);
+    setAnswers(correct);
+    // ✅ FIX: نضع showAns=true أولاً ثم showResults=false
+    // لأن isWrong تتحقق من showResults فقط، وعند showAns=true لا نريد أي علامة خطأ
     setShowAns(true);
+    setShowResults(false); // ← لا نشغّل منطق الأخطاء أبداً عند Show Answer
   };
 
   const handleStartAgain = () => {
@@ -223,12 +195,14 @@ export default function WB_Vocabulary_Page_A() {
     setShowAns(false);
   };
 
+  // ✅ FIX: isWrong لا تُشغَّل أبداً عند showAns=true
   const isWrong = (cell) => {
-    if (!showResults) return false;
+    if (!showResults || showAns) return false;
     return answers[cell.key]?.value !== cell.correct;
   };
 
-  const renderDropBox = (cell, wrong) => {
+  const renderDropBox = (cell) => {
+    const wrong = isWrong(cell);
     const value = answers[cell.key]?.value || "";
 
     return (
@@ -237,16 +211,11 @@ export default function WB_Vocabulary_Page_A() {
         onDragOver={(e) => e.preventDefault()}
         onDrop={() => handleDrop(cell.key)}
         onClick={() => handleRemoveAnswer(cell.key)}
-        className={`wb-a-drop-box ${value ? "filled" : ""} ${
-          wrong ? "wrong" : ""
-        }`}
+        className={`wb-a-drop-box ${value ? "filled" : ""} ${wrong ? "wrong" : ""}`}
       >
         <span className="wb-a-drop-text">{value}</span>
-
         {wrong && (
-          <div className="wb-a-wrong-mark">
-            ✕
-          </div>
+          <div className="wb-a-wrong-mark">✕</div>
         )}
       </div>
     );
@@ -300,9 +269,7 @@ export default function WB_Vocabulary_Page_A() {
           touch-action: none;
         }
 
-        .wb-a-drag-item.available {
-          background: transparent;
-        }
+        .wb-a-drag-item.available { background: transparent; }
 
         .wb-a-drag-item.used {
           opacity: 0.35;
@@ -350,9 +317,7 @@ export default function WB_Vocabulary_Page_A() {
           grid-template-columns: repeat(5, minmax(0, 1fr));
         }
 
-        .wb-a-row + .wb-a-row {
-          border-top: 2px solid ${TABLE_BORDER};
-        }
+        .wb-a-row + .wb-a-row { border-top: 2px solid ${TABLE_BORDER}; }
 
         .wb-a-cell {
           min-height: clamp(52px, 7vw, 78px);
@@ -365,9 +330,7 @@ export default function WB_Vocabulary_Page_A() {
           background: #fff;
         }
 
-        .wb-a-cell + .wb-a-cell {
-          border-left: 2px solid ${TABLE_BORDER};
-        }
+        .wb-a-cell + .wb-a-cell { border-left: 2px solid ${TABLE_BORDER}; }
 
         .wb-a-drop-box {
           width: 100%;
@@ -383,20 +346,15 @@ export default function WB_Vocabulary_Page_A() {
           transition: 0.2s ease;
         }
 
-        .wb-a-drop-box.filled {
-          cursor: pointer;
-        }
-
-        .wb-a-drop-box.wrong {
-          background: rgba(239, 68, 68, 0.06);
-        }
+        .wb-a-drop-box.filled  { cursor: pointer; }
+        .wb-a-drop-box.wrong   { background: rgba(239, 68, 68, 0.06); }
 
         .wb-a-drop-text {
           font-size: clamp(18px, 2.2vw, 28px);
           font-weight: 500;
           line-height: 1.1;
           text-align: center;
-          color: ${showAns ? FILLED_COLOR : FILLED_COLOR};
+          color: ${FILLED_COLOR};
           word-break: break-word;
         }
 
@@ -423,82 +381,38 @@ export default function WB_Vocabulary_Page_A() {
           justify-content: center;
         }
 
-        .wb-a-touch-preview {
-          position: fixed;
-          background: #fff;
-          padding: 8px 12px;
-          borderRadius: 10px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-          pointer-events: none;
-          z-index: 9999;
-          font-size: 18px;
-          font-weight: 600;
-          color: #222;
-          border: 1.5px solid ${ACTIVE_COLOR};
-        }
-
         @media (max-width: 980px) {
-          .wb-a-word-grid {
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-          }
+          .wb-a-word-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
         }
-
         @media (max-width: 700px) {
-          .wb-a-word-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-          }
+          .wb-a-word-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
-
         @media (max-width: 560px) {
-          .wb-a-word-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-
-          .wb-a-head-cell {
-            font-size: 16px;
-          }
-
-          .wb-a-cell {
-            min-height: 48px;
-            padding: 4px;
-          }
-
-          .wb-a-drop-text {
-            font-size: 16px;
-          }
+          .wb-a-word-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .wb-a-head-cell { font-size: 16px; }
+          .wb-a-cell      { min-height: 48px; padding: 4px; }
+          .wb-a-drop-text { font-size: 16px; }
         }
       `}</style>
 
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+        style={{ display:"flex", flexDirection:"column", gap:"18px", maxWidth:"1100px", margin:"0 auto" }}
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+          style={{ margin:0, display:"flex", alignItems:"center", gap:"12px", flexWrap:"wrap" }}
         >
           <span className="WB-ex-A">A</span>
           Read and fill in the charts.
         </h1>
 
+        {/* Word Bank */}
         <div className="wb-a-word-bank">
           <div className="wb-a-word-grid">
             {DRAG_ITEMS.map((item) => {
-              const isUsed = usedDragIds.includes(item.id);
+              const isUsed    = usedDragIds.includes(item.id);
               const isTouching = touchItem?.id === item.id;
-
               return (
                 <div
                   key={item.id}
@@ -507,9 +421,7 @@ export default function WB_Vocabulary_Page_A() {
                   onTouchStart={(e) => handleTouchStart(e, item)}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
-                  className={`wb-a-drag-item ${
-                    isUsed || showAns ? "used" : "available"
-                  } ${isTouching ? "touching" : ""}`}
+                  className={`wb-a-drag-item ${isUsed || showAns ? "used" : "available"} ${isTouching ? "touching" : ""}`}
                 >
                   {item.value}
                 </div>
@@ -518,22 +430,20 @@ export default function WB_Vocabulary_Page_A() {
           </div>
         </div>
 
+        {/* Groups */}
         {GROUPS.map((group) => (
           <div key={group.id} className="wb-a-section">
             <div className="wb-a-head-row">
               {group.title.map((title) => (
-                <div key={title} className="wb-a-head-cell">
-                  {title}
-                </div>
+                <div key={title} className="wb-a-head-cell">{title}</div>
               ))}
             </div>
-
             <div className="wb-a-table">
               {group.rows.map((row, rowIndex) => (
                 <div key={`${group.id}-${rowIndex}`} className="wb-a-row">
                   {row.map((cell) => (
                     <div key={cell.key} className="wb-a-cell">
-                      {renderDropBox(cell, isWrong(cell))}
+                      {renderDropBox(cell)}
                     </div>
                   ))}
                 </div>
@@ -551,24 +461,23 @@ export default function WB_Vocabulary_Page_A() {
         </div>
       </div>
 
+      {/* Touch ghost */}
       {touchItem && (
-        <div
-          style={{
-            position: "fixed",
-            left: touchPos.x - 40,
-            top: touchPos.y - 20,
-            background: "#fff",
-            padding: "8px 12px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            pointerEvents: "none",
-            zIndex: 9999,
-            fontSize: "18px",
-            fontWeight: 600,
-            color: "#222",
-            border: `1.5px solid ${ACTIVE_COLOR}`,
-          }}
-        >
+        <div style={{
+          position:     "fixed",
+          left:         touchPos.x - 40,
+          top:          touchPos.y - 20,
+          background:   "#fff",
+          padding:      "8px 12px",
+          borderRadius: "10px",
+          boxShadow:    "0 4px 10px rgba(0,0,0,0.2)",
+          pointerEvents:"none",
+          zIndex:       9999,
+          fontSize:     "18px",
+          fontWeight:   600,
+          color:        "#222",
+          border:       `1.5px solid ${ACTIVE_COLOR}`,
+        }}>
           {touchItem.value}
         </div>
       )}

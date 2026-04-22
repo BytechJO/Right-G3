@@ -137,7 +137,7 @@ const styles = {
     border: "3px solid transparent",
     borderRadius: "999px",
     background: "transparent",
-    padding: "clamp(6px, 1vw, 10px)",
+    padding: "clamp(12px, 2vw, 21px)",
     cursor: "pointer",
     transition: "all 0.2s ease",
     boxSizing: "border-box",
@@ -263,14 +263,12 @@ export default function WB_Unit5_Page29_QF() {
     if (isWrongSelected) {
       return {
         border: `4px solid ${RED_COLOR}`,
-        background: "rgba(239, 68, 68, 0.05)",
       };
     }
 
     if (isSelected || isCorrectShown) {
       return {
         border: `4px solid ${YELLOW_COLOR}`,
-        background: "rgba(244, 180, 0, 0.06)",
       };
     }
 

@@ -22,9 +22,6 @@ const DRAG_ITEMS = [
   { id: 4, value: "trains?" },
   { id: 5, value: "kites?" },
 
-  { id: 6, value: "books?" },
-  { id: 7, value: "bananas?" },
-  { id: 8, value: "cookies?" },
 ];
 
 export default function WB_Unit3_Page18_QB() {

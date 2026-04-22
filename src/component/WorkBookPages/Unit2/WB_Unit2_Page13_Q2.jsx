@@ -7,7 +7,7 @@ import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folde
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 7.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 8.svg";
 
-const RED    = "#d62828";
+const RED    = "#000000ff";
 const ORANGE = "#f29a1f";
 const BORDER = "#b6b6b6";
 const WRONG  = "#ef4444";
@@ -198,7 +198,7 @@ export default function WB_Unit3_Page22_QJ() {
   // لون الرقم فوق الصورة بعد الفحص
   const getNumberColor = (cardId) => {
     if (!checked) return "#000";
-    return imageAnswers[cardId] === PICTURES.find((p) => p.id === cardId)?.correctNumber ? "#16a34a" : WRONG;
+    return imageAnswers[cardId] === PICTURES.find((p) => p.id === cardId)?.correctNumber ? "#000000ff" : WRONG;
   };
 
   return (

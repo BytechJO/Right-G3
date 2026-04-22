@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
-import ValidationAlert from "../../Popup/ValidationAlert";
 
 import imgHat   from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/G1.svg";
 import imgCat   from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/G2.svg";
@@ -135,11 +134,10 @@ function DrawCanvas({ width, height, tool, color, size }) {
           width:       "100%",
           height:      "100%",
           display:     "block",
-          cursor:      tool === "eraser" ? "cell" : tool === "fill" ? "crosshair" : "crosshair",
+          cursor:      tool === "eraser" ? "cell" : "crosshair",
           touchAction: "none",
         }}
       />
-      {/* clear button */}
       <button
         onClick={clear}
         style={{
@@ -169,12 +167,7 @@ export default function SB_ReadAndDraw_PageG() {
   const [color, setColor] = useState("#111827");
   const [size,  setSize]  = useState(4);
 
-  const handleCheck = () => {
-    ValidationAlert.success("Great! Please review the drawings.");
-  };
-
   const handleStartAgain = () => {
-    // reload page to clear all canvases
     window.location.reload();
   };
 
@@ -335,7 +328,6 @@ export default function SB_ReadAndDraw_PageG() {
                   minWidth:   0,
                 }}
               >
-                {/* number */}
                 <span
                   style={{
                     fontSize:   "clamp(16px,1.9vw,28px)",
@@ -348,8 +340,6 @@ export default function SB_ReadAndDraw_PageG() {
                 >
                   {s.id}
                 </span>
-
-                {/* before text */}
                 <span
                   style={{
                     fontSize:   "clamp(14px,1.7vw,22px)",
@@ -361,8 +351,6 @@ export default function SB_ReadAndDraw_PageG() {
                 >
                   {s.before}
                 </span>
-
-                {/* inline small image */}
                 <img
                   src={s.img}
                   alt={s.before}
@@ -376,8 +364,6 @@ export default function SB_ReadAndDraw_PageG() {
                     pointerEvents: "none",
                   }}
                 />
-
-                {/* after text */}
                 <span
                   style={{
                     fontSize:   "clamp(14px,1.7vw,22px)",
@@ -406,9 +392,9 @@ export default function SB_ReadAndDraw_PageG() {
               <div
                 key={item.id}
                 style={{
-                  width:        "clamp(90px,13vw,160px)",
-                  aspectRatio:  "1 / 1",
-                  flexShrink:   0,
+                  width:       "clamp(90px,13vw,160px)",
+                  aspectRatio: "1 / 1",
+                  flexShrink:  0,
                 }}
               >
                 <img
@@ -446,7 +432,6 @@ export default function SB_ReadAndDraw_PageG() {
                 gap:           "clamp(6px,0.8vw,10px)",
               }}
             >
-              {/* label */}
               <div
                 style={{
                   display:    "flex",
@@ -456,17 +441,17 @@ export default function SB_ReadAndDraw_PageG() {
               >
                 <span
                   style={{
-                    fontSize:        "clamp(12px,1.4vw,18px)",
-                    fontWeight:      700,
-                    color:           "#fff",
-                    background:      BORDER_COLOR,
-                    borderRadius:    "50%",
-                    width:           "clamp(20px,2.4vw,30px)",
-                    height:          "clamp(20px,2.4vw,30px)",
-                    display:         "flex",
-                    alignItems:      "center",
-                    justifyContent:  "center",
-                    flexShrink:      0,
+                    fontSize:       "clamp(12px,1.4vw,18px)",
+                    fontWeight:     700,
+                    color:          "#fff",
+                    background:     BORDER_COLOR,
+                    borderRadius:   "50%",
+                    width:          "clamp(20px,2.4vw,30px)",
+                    height:         "clamp(20px,2.4vw,30px)",
+                    display:        "flex",
+                    alignItems:     "center",
+                    justifyContent: "center",
+                    flexShrink:     0,
                   }}
                 >
                   {s.id}
@@ -483,7 +468,6 @@ export default function SB_ReadAndDraw_PageG() {
                 </span>
               </div>
 
-              {/* canvas */}
               <div
                 style={{
                   width:        "100%",
@@ -508,7 +492,7 @@ export default function SB_ReadAndDraw_PageG() {
           ))}
         </div>
 
-        {/* Buttons */}
+        {/* Buttons — Start Again only */}
         <div
           style={{
             display:        "flex",
@@ -517,7 +501,6 @@ export default function SB_ReadAndDraw_PageG() {
           }}
         >
           <Button
-            checkAnswers={handleCheck}
             handleStartAgain={handleStartAgain}
           />
         </div>

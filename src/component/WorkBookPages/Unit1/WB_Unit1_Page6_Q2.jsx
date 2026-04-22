@@ -15,9 +15,9 @@ const WORDS = [
 ];
 
 const IMAGES = [
-  { id: 3, img: img3, alt: "whistle" },
+  { id: 3, img: img2, alt: "whistle" },
   { id: 1, img: img1, alt: "scoreboard" },
-  { id: 2, img: img2, alt: "referee" },
+  { id: 2, img: img3, alt: "referee" },
   { id: 4, img: img4, alt: "bike" },
 ];
 
@@ -217,8 +217,8 @@ export default function WB_Vocabulary_Page213_H() {
                 key={item.id}
                 ref={(el) => (dropRefs.current[item.id] = el)}
                 className={`wb-image-card ${
-                  isImageWrong(item.id) ? "wb-image-card--wrong" : ""
-                } ${draggedNumber !== null ? "wb-image-card--active" : ""}`}
+                  draggedNumber !== null ? "wb-image-card--active" : ""
+                }`}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop(item.id)}
               >
@@ -241,11 +241,11 @@ export default function WB_Vocabulary_Page213_H() {
                   disabled={!imageAnswers[item.id] || showAns}
                 >
                   {imageAnswers[item.id] || ""}
-
-                  {isImageWrong(item.id) && (
-                    <span className="wb-wrong-badge">✕</span>
-                  )}
                 </button>
+
+                {isImageWrong(item.id) && (
+                  <span className="wb-wrong-badge">✕</span>
+                )}
               </div>
             ))}
           </div>
@@ -370,10 +370,6 @@ export default function WB_Vocabulary_Page213_H() {
           box-shadow: 0 0 0 3px rgba(141, 141, 147, 0.12);
         }
 
-        .wb-image-card--wrong {
-          border-color: #d63b3b;
-        }
-
         .wb-image {
           width: 100%;
           height: 100%;
@@ -412,8 +408,8 @@ export default function WB_Vocabulary_Page213_H() {
 
         .wb-wrong-badge {
           position: absolute;
-          top: -8px;
-          right: -8px;
+          top: 38px;
+          right: 0;
           width: 22px;
           height: 22px;
           border-radius: 50%;

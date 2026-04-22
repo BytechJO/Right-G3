@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-
 import imgDesk from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 1.svg";
 import imgBed from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 3.svg";
 import imgShelf from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 4.svg";
 import imgToyBox from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 2.svg";
 import imgChair from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 5.svg";
+
 const WORD_BANK = ["in", "on", "next to", "between", "under"];
 
 const SCENE_ITEMS = [
@@ -82,20 +82,16 @@ export default function WB_Unit5_Page28_QE() {
 
   const handleChange = (id, value) => {
     if (showAns) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setAnswers((prev) => ({ ...prev, [id]: value }));
     setChecked(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
 
-    const allAnswered = ITEMS.filter((item) => !item.fixed).every(
-      (item) => answers[item.id]
-    );
+    const nonFixedItems = ITEMS.filter((item) => !item.fixed);
+
+    const allAnswered = nonFixedItems.every((item) => answers[item.id]);
 
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -103,13 +99,10 @@ export default function WB_Unit5_Page28_QE() {
     }
 
     let score = 0;
-    const total = ITEMS.length;
+    const total = nonFixedItems.length;
 
-    ITEMS.forEach((item) => {
-      const userAnswer = item.fixed ? item.answer : answers[item.id];
-      const correctAnswer = item.fixed ? item.answer : item.correct;
-
-      if (userAnswer === correctAnswer) {
+    nonFixedItems.forEach((item) => {
+      if (answers[item.id] === item.correct) {
         score++;
       }
     });
@@ -127,13 +120,11 @@ export default function WB_Unit5_Page28_QE() {
 
   const handleShowAnswer = () => {
     const filled = {};
-
     ITEMS.forEach((item) => {
       if (!item.fixed) {
         filled[item.id] = item.correct;
       }
     });
-
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
@@ -159,9 +150,7 @@ export default function WB_Unit5_Page28_QE() {
           value={getValue(item.id)}
           disabled={showAns}
           onChange={(e) => handleChange(item.id, e.target.value)}
-          className={`wb-e-select ${
-            getValue(item.id) ? "wb-e-select--filled" : ""
-          }`}
+          className={`wb-e-select ${getValue(item.id) ? "wb-e-select--filled" : ""}`}
         >
           <option value="" disabled hidden>
             Select
@@ -172,7 +161,6 @@ export default function WB_Unit5_Page28_QE() {
             </option>
           ))}
         </select>
-
         {!showAns && <span className="wb-e-arrow">▼</span>}
       </div>
     );
@@ -181,7 +169,6 @@ export default function WB_Unit5_Page28_QE() {
   return (
     <div className="main-container-component">
       <style>{`
-        /* مهم جدًا: منع أي ستايل عام على img من تخريب هذا السؤال */
         .wb-e-scene-stage img,
         .wb-e-scene-item img {
           width: 100% !important;
@@ -251,21 +238,21 @@ export default function WB_Unit5_Page28_QE() {
         .wb-e-bank {
           width: 100%;
           max-width: 560px;
-          min-height: 64px;
-          border: 3px solid #aaaaaa;
+          min-height: 52px;
+          border: 3px solid #f39b42;
           border-radius: 18px;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: clamp(14px, 2vw, 34px);
-          padding: 12px 18px;
+          padding: 10px 18px;
           box-sizing: border-box;
           flex-wrap: wrap;
           background: #fff;
         }
 
         .wb-e-bank-word {
-          font-size: clamp(18px, 2vw, 28px);
+          font-size: clamp(13px, 1.4vw, 18px);
           line-height: 1.1;
           color: #222;
           font-weight: 500;
@@ -289,7 +276,7 @@ export default function WB_Unit5_Page28_QE() {
         }
 
         .wb-e-num {
-          font-size: clamp(20px, 1.7vw, 28px);
+          font-size: clamp(14px, 1.4vw, 20px);
           font-weight: 700;
           line-height: 1;
           color: #222;
@@ -300,35 +287,38 @@ export default function WB_Unit5_Page28_QE() {
           position: relative;
           width: 100%;
         }
-.wb-e-line {
-  width: 100%;
-  min-height: 58px;
-  border-bottom: 3px solid #2f2f2f;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 6px;
-  box-sizing: border-box;
-  min-width: 0;
-  flex-wrap: nowrap;
-}
-.wb-e-question {
-  font-size: clamp(20px, 2.1vw, 28px);
-  line-height: 1.3;
-  color: #111;
-  font-weight: 500;
-  white-space: nowrap;
-  flex: 0 1 auto;
-}
+
+        .wb-e-line {
+          width: 100%;
+          min-height: 40px;
+          border-bottom: 3px solid #2f2f2f;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding-bottom: 4px;
+          box-sizing: border-box;
+          min-width: 0;
+          flex-wrap: nowrap;
+        }
+
+        .wb-e-question {
+          font-size: clamp(13px, 1.4vw, 18px);
+          line-height: 1.3;
+          color: #111;
+          font-weight: 500;
+          white-space: nowrap;
+          flex: 0 1 auto;
+        }
+
         .wb-e-answer-fixed {
-          font-size: clamp(20px, 2.1vw, 28px);
+          font-size: clamp(13px, 1.4vw, 18px);
           line-height: 1.3;
           color: #111;
           font-weight: 500;
         }
 
         .wb-e-answer-show {
-          font-size: clamp(20px, 2.2vw, 28px);
+          font-size: clamp(13px, 1.4vw, 18px);
           line-height: 1.3;
           color: #d62828;
           font-weight: 500;
@@ -353,23 +343,25 @@ export default function WB_Unit5_Page28_QE() {
           box-shadow: 0 2px 8px rgba(0,0,0,0.15);
           box-sizing: border-box;
         }
-.wb-e-select-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  flex: 1 1 auto;
-  min-width: 220px;
-  max-width: 420px;
-}
+
+        .wb-e-select-wrap {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          flex: 1 1 auto;
+          min-width: 180px;
+          max-width: 380px;
+        }
+
         .wb-e-select {
           width: 100%;
           min-width: 0;
-          height: clamp(38px, 4vw, 46px);
+          height: clamp(30px, 3vw, 38px);
           border: 2px solid #c9c9c9;
           border-radius: 10px;
           background: #fff;
           padding: 0 34px 0 12px;
-          font-size: clamp(15px, 1.55vw, 22px);
+          font-size: clamp(12px, 1.3vw, 17px);
           font-weight: 500;
           color: #222;
           outline: none;
@@ -427,46 +419,48 @@ export default function WB_Unit5_Page28_QE() {
           }
 
           .wb-e-select-wrap {
-            flex: 1 1 220px;
+            flex: 1 1 180px;
           }
 
           .wb-e-bank {
             gap: 12px 18px;
             border-width: 2px;
             border-radius: 16px;
-            min-height: 56px;
-            padding: 10px 14px;
+            min-height: 48px;
+            padding: 8px 14px;
           }
         }
 
         @media (max-width: 560px) {
           .wb-e-select {
-            height: 40px;
-            padding: 0 30px 0 10px;
-            font-size: 15px;
+            height: 36px;
+            padding: 0 28px 0 10px;
+            font-size: 13px;
           }
-  .wb-e-line {
-    flex-wrap: wrap;
-    min-height: auto;
-    gap: 6px;
-    padding-bottom: 8px;
-  }
 
-  .wb-e-question {
-    white-space: normal;
-  }
+          .wb-e-line {
+            flex-wrap: wrap;
+            min-height: auto;
+            gap: 6px;
+            padding-bottom: 8px;
+          }
 
-  .wb-e-select-wrap {
-    flex: 1 1 220px;
-    max-width: 100%;
-  }
+          .wb-e-question {
+            white-space: normal;
+          }
+
+          .wb-e-select-wrap {
+            flex: 1 1 180px;
+            max-width: 100%;
+          }
+
           .wb-e-arrow {
             right: 10px;
             font-size: 11px;
           }
 
           .wb-e-bank-word {
-            font-size: 17px;
+            font-size: 13px;
           }
 
           .wb-e-wrong {
@@ -493,6 +487,7 @@ export default function WB_Unit5_Page28_QE() {
             alignItems: "center",
             gap: "12px",
             flexWrap: "wrap",
+            fontSize: "clamp(16px, 1.8vw, 24px)",
           }}
         >
           <span className="WB-ex-A">E</span>
@@ -502,10 +497,7 @@ export default function WB_Unit5_Page28_QE() {
         <div className="wb-e-scene-wrap">
           <div className="wb-e-scene-stage">
             {SCENE_ITEMS.map((item) => (
-              <div
-                key={item.id}
-                className={`wb-e-scene-item ${item.className}`}
-              >
+              <div key={item.id} className={`wb-e-scene-item ${item.className}`}>
                 <img src={item.img} alt={item.alt} />
               </div>
             ))}

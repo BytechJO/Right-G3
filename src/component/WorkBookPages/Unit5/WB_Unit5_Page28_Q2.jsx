@@ -231,7 +231,7 @@ export default function WB_Unit5_Page28_QD() {
         }
 
         .wb-room-num {
-          font-size: clamp(20px, 1.7vw, 28px);
+          font-size: clamp(14px, 1.4vw, 20px);
           font-weight: 700;
           line-height: 1;
           color: #222;
@@ -245,19 +245,19 @@ export default function WB_Unit5_Page28_QD() {
 
         .wb-room-line {
           width: 100%;
-          min-height: 56px;
+          min-height: 40px;
           border-bottom: 3px solid #2f2f2f;
           display: flex;
           align-items: center;
           gap: 8px;
-          padding-bottom: 6px;
+          padding-bottom: 4px;
           box-sizing: border-box;
           min-width: 0;
           flex-wrap: wrap;
         }
 
         .wb-room-prefix {
-          font-size: clamp(20px, 2vw, 28px);
+          font-size: clamp(14px, 1.5vw, 20px);
           line-height: 1.3;
           color: #111;
           font-weight: 500;
@@ -265,16 +265,16 @@ export default function WB_Unit5_Page28_QD() {
         }
 
         .wb-room-answer-fixed {
-          font-size: clamp(20px, 2.1vw, 28px);
+          font-size: clamp(14px, 1.5vw, 20px);
           line-height: 1.3;
           color: #111;
           font-weight: 500;
         }
 
         .wb-room-answer-show {
-          font-size: clamp(20px, 2.2vw, 28px);
+          font-size: clamp(14px, 1.5vw, 20px);
           line-height: 1.3;
-          color: #d62828;
+          color: #000000ff;
           font-weight: 500;
           word-break: break-word;
         }
@@ -310,12 +310,12 @@ export default function WB_Unit5_Page28_QD() {
         .wb-room-select {
           width: 100%;
           min-width: 0;
-          height: clamp(38px, 4vw, 46px);
+          height: clamp(32px, 3vw, 38px);
           border: 2px solid #c9c9c9;
           border-radius: 10px;
           background: #fff;
           padding: 0 34px 0 12px;
-          font-size: clamp(15px, 1.55vw, 22px);
+          font-size: clamp(13px, 1.3vw, 18px);
           font-weight: 500;
           color: #222;
           outline: none;
@@ -362,7 +362,7 @@ export default function WB_Unit5_Page28_QD() {
           }
 
           .wb-room-line {
-            min-height: 52px;
+            min-height: 38px;
           }
         }
 
@@ -378,7 +378,7 @@ export default function WB_Unit5_Page28_QD() {
 
           .wb-room-line {
             min-height: auto;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
             gap: 6px;
           }
 
@@ -435,6 +435,7 @@ export default function WB_Unit5_Page28_QD() {
             alignItems: "center",
             gap: "12px",
             flexWrap: "wrap",
+            fontSize: "clamp(16px, 1.8vw, 24px)",
           }}
         >
           <span className="WB-ex-A">D</span>

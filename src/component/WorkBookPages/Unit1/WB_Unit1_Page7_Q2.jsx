@@ -69,41 +69,29 @@ export default function WB_Unit3_Page7_QJ() {
 
   const handleChange = (id, field, value) => {
     if (showAns) return;
-
     setAnswers((prev) => ({
       ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value,
-      },
+      [id]: { ...prev[id], [field]: value },
     }));
-
     setChecked(false);
   };
 
   const handleCheck = () => {
     if (showAns) return;
-
     const allAnswered = ITEMS.every(
       (item) => answers[item.id]?.first && answers[item.id]?.last
     );
-
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
     let score = 0;
-
     ITEMS.forEach((item) => {
       const firstCorrect = answers[item.id]?.first === item.correctFirst;
       const lastCorrect = answers[item.id]?.last === item.correctLast;
-
       if (firstCorrect && lastCorrect) score += 1;
     });
-
     setChecked(true);
-
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
@@ -115,14 +103,9 @@ export default function WB_Unit3_Page7_QJ() {
 
   const handleShowAnswer = () => {
     const filled = {};
-
     ITEMS.forEach((item) => {
-      filled[item.id] = {
-        first: item.correctFirst,
-        last: item.correctLast,
-      };
+      filled[item.id] = { first: item.correctFirst, last: item.correctLast };
     });
-
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
@@ -138,7 +121,6 @@ export default function WB_Unit3_Page7_QJ() {
 
   const isWrong = (item) => {
     if (!checked || showAns) return false;
-
     return (
       answers[item.id]?.first !== item.correctFirst ||
       answers[item.id]?.last !== item.correctLast
@@ -164,7 +146,6 @@ export default function WB_Unit3_Page7_QJ() {
           </option>
         ))}
       </select>
-
       {!showAns && <span className="wb-j-arrow">▼</span>}
     </div>
   );
@@ -183,14 +164,6 @@ export default function WB_Unit3_Page7_QJ() {
           gap: 28px;
         }
 
-        .wb-j-title {
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          flex-wrap: wrap;
-        }
-
         .wb-j-row {
           display: grid;
           grid-template-columns: 36px minmax(0, 1fr) clamp(220px, 24vw, 320px);
@@ -200,7 +173,7 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-num {
-          font-size: clamp(20px, 1.6vw, 24px);
+          font-size: 22px;
           font-weight: 700;
           line-height: 1;
           color: #222;
@@ -215,7 +188,7 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-question {
-          font-size: clamp(20px, 2.1vw, 28px);
+          font-size: 22px;
           line-height: 1.35;
           color: #111;
           font-weight: 500;
@@ -242,7 +215,7 @@ export default function WB_Unit3_Page7_QJ() {
         .wb-j-middle {
           flex: 0 1 auto;
           min-width: 0;
-          font-size: clamp(20px, 2vw, 30px);
+          font-size: 22px;
           line-height: 1.2;
           color: #111;
           font-weight: 500;
@@ -250,7 +223,7 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-answer {
-          font-size: clamp(20px, 2vw, 28px);
+          font-size: 22px;
           line-height: 1.35;
           color: #111;
           font-weight: 500;
@@ -337,7 +310,7 @@ export default function WB_Unit3_Page7_QJ() {
           border-radius: 10px;
           background: #fff;
           padding: 0 34px 0 12px;
-          font-size: clamp(15px, 1.55vw, 22px);
+          font-size: 22px;
           font-weight: 500;
           color: #222;
           outline: none;
@@ -345,7 +318,7 @@ export default function WB_Unit3_Page7_QJ() {
           -webkit-appearance: none;
           -moz-appearance: none;
           box-sizing: border-box;
-          cursor: ${showAns ? "default" : "pointer"};
+          cursor: pointer;
           text-align: center;
           text-align-last: center;
           white-space: nowrap;
@@ -359,6 +332,7 @@ export default function WB_Unit3_Page7_QJ() {
 
         .wb-j-select:disabled {
           opacity: 1;
+          cursor: default;
         }
 
         .wb-j-arrow {
@@ -376,17 +350,13 @@ export default function WB_Unit3_Page7_QJ() {
             grid-template-columns: 32px minmax(0, 1fr) minmax(180px, 260px);
             gap: 16px;
           }
-
-          .wb-j-line {
-            gap: 8px;
-          }
+          .wb-j-line { gap: 8px; }
         }
 
         @media (max-width: 980px) {
           .wb-j-row {
             grid-template-columns: 32px 1fr;
           }
-
           .wb-j-images {
             grid-column: 2 / 3;
             width: min(100%, 420px);
@@ -396,39 +366,30 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         @media (max-width: 768px) {
-          .wb-j-wrapper {
-            gap: 24px;
-          }
-
-          .wb-j-text-col {
-            gap: 10px;
-          }
-
+          .wb-j-wrapper { gap: 24px; }
+          .wb-j-text-col { gap: 10px; }
           .wb-j-line {
             flex-wrap: wrap;
             align-items: center;
             min-height: auto;
             padding-bottom: 8px;
           }
-
-          .wb-j-middle {
-            white-space: normal;
-          }
-
+          .wb-j-middle { white-space: normal; }
           .wb-j-select-wrap--small,
           .wb-j-select-wrap--medium,
-          .wb-j-select-wrap--large {
-            flex: 1 1 180px;
-          }
-
+          .wb-j-select-wrap--large { flex: 1 1 180px; }
           .wb-j-images {
             width: min(100%, 360px);
             gap: 14px;
           }
+          .wb-j-img { max-height: 150px; }
 
-          .wb-j-img {
-            max-height: 150px;
-          }
+          /* ✅ تصغير الخط على الشاشات المتوسطة */
+          .wb-j-num,
+          .wb-j-question,
+          .wb-j-middle,
+          .wb-j-answer,
+          .wb-j-select { font-size: 18px; }
         }
 
         @media (max-width: 560px) {
@@ -436,28 +397,24 @@ export default function WB_Unit3_Page7_QJ() {
             grid-template-columns: 28px 1fr;
             gap: 12px;
           }
-
-          .wb-j-line {
-            gap: 6px;
-          }
-
-          .wb-j-select {
-            height: 40px;
-            padding: 0 30px 0 10px;
-            font-size: 15px;
-          }
-
+          .wb-j-line { gap: 6px; }
           .wb-j-arrow {
             right: 10px;
             font-size: 11px;
           }
+          .wb-j-images { width: min(100%, 280px); }
+          .wb-j-img { max-height: 120px; }
 
-          .wb-j-images {
-            width: min(100%, 280px);
-          }
+          /* ✅ تصغير الخط على الشاشات الصغيرة */
+          .wb-j-num,
+          .wb-j-question,
+          .wb-j-middle,
+          .wb-j-answer,
+          .wb-j-select { font-size: 15px; }
 
-          .wb-j-img {
-            max-height: 120px;
+          .wb-j-select {
+            height: 40px;
+            padding: 0 30px 0 10px;
           }
         }
       `}</style>
@@ -482,8 +439,8 @@ export default function WB_Unit3_Page7_QJ() {
             flexWrap: "wrap",
           }}
         >
-          
-     <span className="WB-ex-A">J</span>Read and look. Write the questions or answers.
+          <span className="WB-ex-A">J</span>
+          Read and look. Write the questions or answers.
         </h1>
 
         {ITEMS.map((item) => (
@@ -494,14 +451,12 @@ export default function WB_Unit3_Page7_QJ() {
               {item.type === "answer" ? (
                 <>
                   <div className="wb-j-question">{item.question}</div>
-
                   <div className="wb-j-line-wrap">
                     <div className="wb-j-line">
                       {renderSelect(item, "first", item.firstOptions, "wb-j-select-wrap--medium")}
                       <span className="wb-j-middle">{item.middle}</span>
                       {renderSelect(item, "last", item.lastOptions, "wb-j-select-wrap--medium")}
                     </div>
-
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
                   </div>
                 </>
@@ -513,10 +468,8 @@ export default function WB_Unit3_Page7_QJ() {
                       <span className="wb-j-middle">{item.middle}</span>
                       {renderSelect(item, "last", item.lastOptions, "wb-j-select-wrap--large")}
                     </div>
-
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
                   </div>
-
                   <div className="wb-j-answer">{item.fixedAnswer}</div>
                 </>
               )}
@@ -524,19 +477,10 @@ export default function WB_Unit3_Page7_QJ() {
 
             <div className="wb-j-images">
               <div className="wb-j-img-box">
-                <img
-                  src={item.leftImg}
-                  alt={`left-${item.id}`}
-                  className="wb-j-img"
-                />
+                <img src={item.leftImg} alt={`left-${item.id}`} className="wb-j-img" />
               </div>
-
               <div className="wb-j-img-box">
-                <img
-                  src={item.rightImg}
-                  alt={`right-${item.id}`}
-                  className="wb-j-img"
-                />
+                <img src={item.rightImg} alt={`right-${item.id}`} className="wb-j-img" />
               </div>
             </div>
           </div>

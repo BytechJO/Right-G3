@@ -265,7 +265,7 @@ export default function WB_Unit3_Page15_QB() {
         onClick={() => handleRemoveAnswer(boxKey)}
         className="wb-b15-line-box"
         style={{
-          color: showAns ? "#d93025" : "#111",
+          color: "#111",
           backgroundColor: isWrong ? "rgba(255, 255, 255, 0.08)" : "transparent",
           cursor: value && !showAns ? "pointer" : showAns ? "default" : "pointer",
         }}

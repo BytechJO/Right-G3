@@ -34,7 +34,7 @@ const ITEMS = [
     img: img4,
     question: "Does she have any ice cream?",
     options: ["Yes, she has some.", "No, she hasn’t any."],
-    correct: "No, she hasn’t any.",
+    correct: "Yes, she has some.",
   },
 ];
 

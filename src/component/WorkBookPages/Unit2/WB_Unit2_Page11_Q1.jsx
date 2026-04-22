@@ -25,25 +25,25 @@ const ANSWERS = [
   {
     id: 1,
     correct: "She usually irons the clothes.",
-    img: img1,
+    img: img2,
     frequencyLevel: 3, // usually
   },
   {
     id: 2,
     correct: "He sometimes reads the newspaper.",
-    img: img2,
+    img: img3,
     frequencyLevel: 2, // sometimes
   },
   {
     id: 3,
     correct: "They never play chess.",
-    img: img3,
+    img: img4,
     frequencyLevel: 0, // never
   },
   {
     id: 4,
     correct: "She always goes to bed.",
-    img: img4,
+    img: img1,
     frequencyLevel: 4, // always
   },
 ];

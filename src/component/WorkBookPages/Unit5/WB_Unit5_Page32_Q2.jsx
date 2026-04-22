@@ -30,7 +30,6 @@ const RIGHT_ITEMS = [
 
 const CORRECT_MATCHES = { 1: 3, 2: 4, 3: 1, 4: 2 };
 
-// ── Wrong badge — يسار أعلى فقط بدون أي تأثير تاني
 const WrongBadge = () => (
   <div
     style={{
@@ -84,7 +83,6 @@ export default function WB_ReadLookMatch_PageB() {
         const y2 = er.top  + er.height / 2 - br.top;
         const dx = Math.abs(x2 - x1);
 
-        // الخط دايماً برتقالي — ما في تأثير على الخط
         return {
           id:    `path-${leftId}-${rightId}`,
           d:     `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
@@ -158,6 +156,9 @@ export default function WB_ReadLookMatch_PageB() {
     showResults && !showAns && !!matches[leftId] &&
     matches[leftId] !== CORRECT_MATCHES[leftId];
 
+  /* ── DOT_SIZE: ثابت لكل الـ dots ── */
+  const DOT_SIZE = "clamp(12px,1.4vw,18px)";
+
   return (
     <div className="main-container-component">
       <div
@@ -211,12 +212,18 @@ export default function WB_ReadLookMatch_PageB() {
             ))}
           </svg>
 
-          {/* Grid */}
+          {/*
+            ── Grid: 5 columns ──
+            [sentence] [left-dot] [gap-spacer] [right-dot] [image]
+
+            الـ gap-spacer هو div فارغ بعرض ثابت يعطي مسافة واضحة ومتساوية
+            بين الـ dots اليسار واليمين — هذا هو حل مشكلة الـ spacing
+          */}
           <div
             style={{
               display:             "grid",
-              gridTemplateColumns: "1fr auto auto auto",
-              columnGap:           "clamp(8px,1.5vw,20px)",
+              gridTemplateColumns: "1fr auto clamp(80px,12vw,180px) auto auto",
+              columnGap:           "clamp(6px,1vw,14px)",
               rowGap:              "clamp(14px,2vw,24px)",
               alignItems:          "center",
               width:               "100%",
@@ -232,7 +239,7 @@ export default function WB_ReadLookMatch_PageB() {
               return (
                 <React.Fragment key={lItem.id}>
 
-                  {/* ── sentence — بدون أي تأثير للخطأ ── */}
+                  {/* col 1 — sentence */}
                   <div
                     onClick={() => handleLeftSelect(lItem.id)}
                     style={{
@@ -253,7 +260,6 @@ export default function WB_ReadLookMatch_PageB() {
                       position:     "relative",
                     }}
                   >
-                    {/* number */}
                     <span
                       style={{
                         fontSize:   "clamp(16px,1.9vw,26px)",
@@ -266,7 +272,6 @@ export default function WB_ReadLookMatch_PageB() {
                       {lItem.id}
                     </span>
 
-                    {/* text — بدون تغيير لون */}
                     <span
                       style={{
                         fontSize:   "clamp(13px,1.6vw,21px)",
@@ -280,48 +285,48 @@ export default function WB_ReadLookMatch_PageB() {
                       {lItem.text}
                     </span>
 
-                    {/* ── wrong badge يسار أعلى فقط ── */}
                     {wrong && <WrongBadge />}
                   </div>
 
-                  {/* ── left dot — بدون تغيير لون للخطأ ── */}
+                  {/* col 2 — left dot */}
                   <div
                     ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
                     onClick={() => handleLeftSelect(lItem.id)}
                     style={{
-                      width:        "clamp(10px,1.3vw,15px)",
-                      height:       "clamp(10px,1.3vw,15px)",
+                      width:        DOT_SIZE,
+                      height:       DOT_SIZE,
                       borderRadius: "50%",
                       flexShrink:   0,
-                      background:   lSelected
-                        ? ACTIVE_COLOR
-                        : lConn
-                        ? ACTIVE_COLOR
-                        : DOT_COLOR,
+                      background:   lSelected || lConn ? ACTIVE_COLOR : DOT_COLOR,
                       cursor:       showAns ? "default" : "pointer",
                       transition:   "background 0.2s",
                       boxShadow:    lSelected ? `0 0 0 3px rgba(243,155,66,0.3)` : "none",
                       zIndex:       2,
+                      justifySelf:  "center",
                     }}
                   />
 
-                  {/* ── right dot — بدون تغيير لون للخطأ ── */}
+                  {/* col 3 — spacer (the gap between left & right dots) */}
+                  <div style={{ width: "100%", height: "1px", pointerEvents: "none" }} />
+
+                  {/* col 4 — right dot */}
                   <div
                     ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
                     onClick={() => handleRightSelect(rItem.id)}
                     style={{
-                      width:        "clamp(10px,1.3vw,15px)",
-                      height:       "clamp(10px,1.3vw,15px)",
+                      width:        DOT_SIZE,
+                      height:       DOT_SIZE,
                       borderRadius: "50%",
                       flexShrink:   0,
                       background:   rConn ? ACTIVE_COLOR : DOT_COLOR,
                       cursor:       showAns || selectedLeft === null ? "default" : "pointer",
                       transition:   "background 0.2s",
                       zIndex:       2,
+                      justifySelf:  "center",
                     }}
                   />
 
-                  {/* ── image — بدون تغيير بوردر للخطأ ── */}
+                  {/* col 5 — image */}
                   <div
                     onClick={() => handleRightSelect(rItem.id)}
                     style={{
@@ -335,15 +340,15 @@ export default function WB_ReadLookMatch_PageB() {
                   >
                     <div
                       style={{
-                        width:          "100%",
-                        height:         "100%",
-                        overflow:       "hidden",
-                        borderRadius:   "clamp(8px,1vw,14px)",
-                        border:         `2px solid ${rConn ? ACTIVE_COLOR : BORDER_COLOR}`,
-                        background:     "#f7f7f7",
-                        cursor:         showAns || selectedLeft === null ? "default" : "pointer",
-                        transition:     "border-color 0.2s",
-                        boxSizing:      "border-box",
+                        width:        "100%",
+                        height:       "100%",
+                        overflow:     "hidden",
+                        borderRadius: "clamp(8px,1vw,14px)",
+                        border:       `2px solid ${rConn ? ACTIVE_COLOR : BORDER_COLOR}`,
+                        background:   "#f7f7f7",
+                        cursor:       showAns || selectedLeft === null ? "default" : "pointer",
+                        transition:   "border-color 0.2s",
+                        boxSizing:    "border-box",
                       }}
                     >
                       <img
@@ -359,8 +364,6 @@ export default function WB_ReadLookMatch_PageB() {
                         }}
                       />
                     </div>
-
-                
                   </div>
 
                 </React.Fragment>

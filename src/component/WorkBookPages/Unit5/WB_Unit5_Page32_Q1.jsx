@@ -9,9 +9,9 @@ import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folde
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/A.5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/A.6.svg";
 
-const BORDER_COLOR = "#e0e0e0";
+const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR  = "#ef4444";
-const CHECK_COLOR  = "#16a34a";
+const RIGHT_COLOR  = "#22c55e";
 
 const ITEMS = [
   { id: 1, img: img1, correct: true  },
@@ -23,26 +23,18 @@ const ITEMS = [
 ];
 
 export default function WB_YSound_PageA() {
-  const [answers,     setAnswers]     = useState({});
+  const [answers,     setAnswers]     = useState({});   // id → true | false
   const [showResults, setShowResults] = useState(false);
   const [showAns,     setShowAns]     = useState(false);
 
-  // كليك على الكارد — يبدّل بين ✓ و ✕ و فاضي
-  const handleCardClick = (id) => {
+  /* ── select ✓ or ✕ for a card ── */
+  const handleSelect = (id, value) => {
     if (showAns) return;
-    setAnswers((prev) => {
-      if (prev[id] === undefined) return { ...prev, [id]: true  };  // أول كليك → ✓
-      if (prev[id] === true)      return { ...prev, [id]: false };  // تاني كليك → ✕
-      const upd = { ...prev }; delete upd[id]; return upd;          // تالت كليك → فاضي
-    });
-    setShowResults(false);
-  };
-
-  // كليك على بوكس الـ ✓/✕ مباشرة
-  const handleBoxClick = (e, id, value) => {
-    e.stopPropagation();
-    if (showAns) return;
-    setAnswers((prev) => ({ ...prev, [id]: value }));
+    setAnswers((prev) =>
+      prev[id] === value
+        ? (() => { const upd = { ...prev }; delete upd[id]; return upd; })()  // deselect
+        : { ...prev, [id]: value }
+    );
     setShowResults(false);
   };
 
@@ -76,24 +68,37 @@ export default function WB_YSound_PageA() {
     setShowAns(false);
   };
 
+  /* ── helpers ── */
   const isWrong = (item) =>
     showResults && !showAns && answers[item.id] !== item.correct;
 
-  const getCardBorder = (item) => {
-    if (!showResults) return `2px solid ${BORDER_COLOR}`;
-    if (showAns)      return `2px solid ${BORDER_COLOR}`;
-    return answers[item.id] === item.correct
-      ? `2px solid ${BORDER_COLOR}`
-      : `2.5px solid ${WRONG_COLOR}`;
-  };
+  const getCardBorderColor = (item) =>
+    isWrong(item) ? WRONG_COLOR : BORDER_COLOR;
 
-  // لون رمز الـ ✓/✕ داخل البوكس
-  const getSymbolColor = (item, value) => {
-    if (!showResults) return value ? CHECK_COLOR : WRONG_COLOR;
-    if (answers[item.id] === value) {
-      return answers[item.id] === item.correct ? CHECK_COLOR : WRONG_COLOR;
+  /* colour of a box given which symbol it holds */
+  const getBoxStyle = (item, boxValue) => {
+    const selected   = answers[item.id] === boxValue;
+    const isCorrect  = item.correct === boxValue;
+
+    let bg      = "transparent";
+    let border  = `2px solid ${BORDER_COLOR}`;
+    let color   = boxValue ? RIGHT_COLOR : WRONG_COLOR;
+
+    if (selected) {
+      if (!showResults) {
+        // before check — highlight with symbol colour tint
+        bg = boxValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)";
+        border = `2px solid ${boxValue ? RIGHT_COLOR : WRONG_COLOR}`;
+      } else {
+        // after check — green if correct answer selected, red if wrong
+        const correct = answers[item.id] === item.correct;
+        bg     = correct ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)";
+        border = `2px solid ${correct ? RIGHT_COLOR : WRONG_COLOR}`;
+        color  = correct ? RIGHT_COLOR : WRONG_COLOR;
+      }
     }
-    return value ? CHECK_COLOR : WRONG_COLOR;
+
+    return { bg, border, color };
   };
 
   return (
@@ -108,7 +113,7 @@ export default function WB_YSound_PageA() {
           margin:        "0 auto",
         }}
       >
-        {/* Title */}
+        {/* ── Title ── */}
         <h1
           className="WB-header-title-page8"
           style={{
@@ -123,7 +128,7 @@ export default function WB_YSound_PageA() {
           Does it have a <strong style={{ fontWeight: 900 }}>-y sound</strong>? Write ✓ or ✕.
         </h1>
 
-        {/* Cards grid */}
+        {/* ── Cards grid ── */}
         <div
           style={{
             display:             "grid",
@@ -133,37 +138,39 @@ export default function WB_YSound_PageA() {
           }}
         >
           {ITEMS.map((item) => {
-            const answered = answers[item.id] !== undefined;
-            const wrong    = isWrong(item);
+            const wrong = isWrong(item);
+            const borderColor = getCardBorderColor(item);
 
             return (
               <div
                 key={item.id}
-                onClick={() => handleCardClick(item.id)}
                 style={{
                   position:     "relative",
                   width:        "100%",
-                  aspectRatio:  "1 / 1",
-                  border:       getCardBorder(item),
-                  borderRadius: "clamp(10px,1.2vw,16px)",
-                  background:   "#fff",
-                  overflow:     "visible",
-                  boxSizing:    "border-box",
-                  boxShadow:    "0 2px 8px rgba(0,0,0,0.07)",
-                  cursor:       showAns ? "default" : "pointer",
+                  display:      "flex",
+                  flexDirection:"column",
+                  gap:          "clamp(4px,0.6vw,8px)",
                   userSelect:   "none",
                 }}
               >
-                {/* inner clip */}
+                {/* ── Image card ── */}
                 <div
                   style={{
-                    position:     "absolute",
-                    inset:        0,
+                    position:     "relative",
+                    width:        "100%",
+                    aspectRatio:  "1 / 1",
+                    border:       `2px solid ${borderColor}`,
                     borderRadius: "clamp(10px,1.2vw,16px)",
+                    background:   "#fff",
                     overflow:     "hidden",
+                    boxSizing:    "border-box",
+                    boxShadow:    wrong
+                      ? `0 0 0 2px ${WRONG_COLOR}40`
+                      : "0 2px 8px rgba(0,0,0,0.07)",
+                    transition:   "border-color 0.2s, box-shadow 0.2s",
                   }}
                 >
-                  {/* Number badge — top left */}
+                  {/* Number badge */}
                   <div
                     style={{
                       position:       "absolute",
@@ -198,121 +205,84 @@ export default function WB_YSound_PageA() {
                       display:       "block",
                       padding:       "clamp(10px,1.6vw,20px)",
                       boxSizing:     "border-box",
-                      userSelect:    "none",
                       pointerEvents: "none",
                     }}
                   />
 
-                  {/* ── ✓ box — bottom right ── */}
-                  <div
-                    onClick={(e) => handleBoxClick(e, item.id, true)}
-                    style={{
-                      position:       "absolute",
-                      bottom:         0,
-                      right:          0,
-                      width:          "clamp(28px,4vw,52px)",
-                      height:         "clamp(28px,4vw,52px)",
-                      borderTop:      `2px solid ${BORDER_COLOR}`,
-                      borderLeft:     `2px solid ${BORDER_COLOR}`,
-                      borderBottomRightRadius: "clamp(10px,1.2vw,16px)",
-                      background:     answers[item.id] === true
-                        ? "rgba(22,163,74,0.08)"
-                        : "#fff",
-                      display:        "flex",
-                      alignItems:     "center",
-                      justifyContent: "center",
-                      cursor:         showAns ? "default" : "pointer",
-                      zIndex:         3,
-                      transition:     "background 0.15s",
-                    }}
-                  >
-                    {answers[item.id] === true && (
-                      <span
-                        style={{
-                          fontSize:   "clamp(16px,2.8vw,38px)",
-                          fontWeight: 900,
-                          color:      showResults
-                            ? (item.correct ? CHECK_COLOR : WRONG_COLOR)
-                            : CHECK_COLOR,
-                          lineHeight: 1,
-                          userSelect: "none",
-                        }}
-                      >
-                        ✓
-                      </span>
-                    )}
-                  </div>
-
-                  {/* ── ✕ box — جنب ✓ box (للخيار الثاني) ── */}
-                  {/* نحن ما عندنا بوكسين — بس بوكس وحد يعرض الاختيار */}
-                  {answers[item.id] === false && (
+                  {/* Wrong badge */}
+                  {wrong && (
                     <div
-                      onClick={(e) => handleBoxClick(e, item.id, false)}
                       style={{
-                        position:       "absolute",
-                        bottom:         0,
-                        right:          0,
-                        width:          "clamp(28px,4vw,52px)",
-                        height:         "clamp(28px,4vw,52px)",
-                        borderTop:      `2px solid ${BORDER_COLOR}`,
-                        borderLeft:     `2px solid ${BORDER_COLOR}`,
-                        borderBottomRightRadius: "clamp(10px,1.2vw,16px)",
-                        background:     "rgba(239,68,68,0.06)",
-                        display:        "flex",
-                        alignItems:     "center",
-                        justifyContent: "center",
-                        cursor:         showAns ? "default" : "pointer",
-                        zIndex:         3,
+                        position:        "absolute",
+                        top:             "-8px",
+                        right:           "-8px",
+                        width:           "clamp(16px,1.8vw,22px)",
+                        height:          "clamp(16px,1.8vw,22px)",
+                        borderRadius:    "50%",
+                        backgroundColor: WRONG_COLOR,
+                        color:           "#fff",
+                        display:         "flex",
+                        alignItems:      "center",
+                        justifyContent:  "center",
+                        fontSize:        "clamp(9px,0.9vw,12px)",
+                        fontWeight:      700,
+                        boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
+                        zIndex:          5,
+                        pointerEvents:   "none",
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize:   "clamp(16px,2.8vw,38px)",
-                          fontWeight: 900,
-                          color:      showResults
-                            ? (!item.correct ? CHECK_COLOR : WRONG_COLOR)
-                            : WRONG_COLOR,
-                          lineHeight: 1,
-                          userSelect: "none",
-                        }}
-                      >
-                        ✕
-                      </span>
+                      ✕
                     </div>
                   )}
                 </div>
 
-                {/* Wrong badge — خارج الـ clip */}
-                {wrong && (
-                  <div
-                    style={{
-                      position:        "absolute",
-                      top:             "-8px",
-                      right:           "-8px",
-                      width:           "clamp(16px,1.8vw,22px)",
-                      height:          "clamp(16px,1.8vw,22px)",
-                      borderRadius:    "50%",
-                      backgroundColor: WRONG_COLOR,
-                      color:           "#fff",
-                      display:         "flex",
-                      alignItems:      "center",
-                      justifyContent:  "center",
-                      fontSize:        "clamp(9px,0.9vw,12px)",
-                      fontWeight:      700,
-                      boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
-                      zIndex:          5,
-                      pointerEvents:   "none",
-                    }}
-                  >
-                    ✕
-                  </div>
-                )}
+                {/* ── Two answer boxes: ✓ | ✕ ── */}
+                <div
+                  style={{
+                    display:       "flex",
+                    gap:           "clamp(4px,0.5vw,6px)",
+                    width:         "100%",
+                  }}
+                >
+                  {[true, false].map((boxValue) => {
+                    const { bg, border, color } = getBoxStyle(item, boxValue);
+                    const symbol = boxValue ? "✓" : "✕";
+
+                    return (
+                      <button
+                        key={String(boxValue)}
+                        onClick={() => handleSelect(item.id, boxValue)}
+                        disabled={showAns}
+                        style={{
+                          flex:           1,
+                          height:         "clamp(28px,4vw,48px)",
+                          border,
+                          borderRadius:   "clamp(6px,0.8vw,10px)",
+                          background:     bg,
+                          display:        "flex",
+                          alignItems:     "center",
+                          justifyContent: "center",
+                          fontSize:       "clamp(14px,2.2vw,30px)",
+                          fontWeight:     900,
+                          color,
+                          cursor:         showAns ? "default" : "pointer",
+                          transition:     "background 0.15s, border 0.15s",
+                          outline:        "none",
+                          padding:        0,
+                          lineHeight:     1,
+                        }}
+                      >
+                        {symbol}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
         </div>
 
-        {/* Buttons */}
+        {/* ── Buttons ── */}
         <div
           style={{
             display:        "flex",

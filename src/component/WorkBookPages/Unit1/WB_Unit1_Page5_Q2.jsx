@@ -186,7 +186,7 @@ export default function WB_Unit3_Page5_QF() {
           position: relative;
           z-index: 2;
           display: grid;
-          grid-template-columns: minmax(0, 1.45fr) clamp(18px, 2vw, 28px) clamp(18px, 2vw, 28px) minmax(200px, 0.95fr);
+          grid-template-columns: minmax(0, 1.45fr) clamp(18px, 2vw, 28px) clamp(60px, 8vw, 100px) clamp(18px, 2vw, 28px) minmax(200px, 0.95fr);
           width: 100%;
         }
 
@@ -220,7 +220,7 @@ export default function WB_Unit3_Page5_QF() {
         }
 
         .wb-f-left-num {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: 22px;
           font-weight: 700;
           color: #222;
           line-height: 1;
@@ -229,7 +229,7 @@ export default function WB_Unit3_Page5_QF() {
         }
 
         .wb-f-left-text {
-          font-size: clamp(14px, 1.9vw, 22px);
+          font-size: 22px;
           font-weight: 500;
           color: #111;
           line-height: 1.35;
@@ -308,7 +308,7 @@ export default function WB_Unit3_Page5_QF() {
 
         @media (max-width: 760px) {
           .wb-f-master-grid {
-            grid-template-columns: minmax(0, 1fr) clamp(14px, 2vw, 20px) clamp(14px, 2vw, 20px) minmax(140px, 0.7fr);
+            grid-template-columns: minmax(0, 1fr) clamp(14px, 2vw, 20px) clamp(40px, 6vw, 70px) clamp(14px, 2vw, 20px) minmax(140px, 0.7fr);
           }
 
           .wb-f-svg-lines {
@@ -319,16 +319,26 @@ export default function WB_Unit3_Page5_QF() {
             max-width: clamp(44px, 10vw, 80px);
             max-height: clamp(40px, 9vw, 70px);
           }
+
+          .wb-f-left-num,
+          .wb-f-left-text {
+            font-size: 16px;
+          }
         }
 
         @media (max-width: 480px) {
           .wb-f-master-grid {
-            grid-template-columns: 1fr auto auto minmax(100px, auto);
+            grid-template-columns: 1fr auto clamp(30px, 5vw, 50px) auto minmax(100px, auto);
           }
 
           .wb-f-right-img {
             max-width: clamp(32px, 9vw, 55px);
             max-height: clamp(28px, 8vw, 48px);
+          }
+
+          .wb-f-left-num,
+          .wb-f-left-text {
+            font-size: 13px;
           }
         }
       `}</style>
@@ -421,7 +431,10 @@ export default function WB_Unit3_Page5_QF() {
                     />
                   </div>
 
-                  {/* col 3: نقطة اليمين */}
+                  {/* col 3: spacer */}
+                  <div className="wb-f-cell" key={`spacer-${leftItem.id}`} />
+
+                  {/* col 4: نقطة اليمين */}
                   <div className="wb-f-cell wb-f-cell-dot" key={`rdot-${rightItem.id}`}>
                     <div
                       ref={(el) => (elementRefs.current[`right-${rightItem.id}`] = el)}
@@ -437,7 +450,7 @@ export default function WB_Unit3_Page5_QF() {
                     />
                   </div>
 
-                  {/* col 4: الصور */}
+                  {/* col 5: الصور */}
                   <div
                     className="wb-f-cell wb-f-cell-right"
                     key={`imgs-${rightItem.id}`}

@@ -79,6 +79,7 @@ export default function SB_LookAndWrite_PageJ() {
 
   const handleTouchMove = (e) => {
     if (!touchItem) return;
+    e.preventDefault(); // بس نمنع السكرول لما يكون شايل عنصر فعلاً
     const t = e.touches[0];
     setTouchPos({ x: t.clientX, y: t.clientY });
   };
@@ -144,13 +145,17 @@ export default function SB_LookAndWrite_PageJ() {
     showResults && !showAns && answers[`a-${item.id}`]?.value !== item.answer;
 
   return (
-    <div className="main-container-component">
+    <div
+      className="main-container-component"
+      // السكرول مسموح دايماً على الـ container
+      // بس لما يكون touchItem موجود نمنع السكرول عبر handleTouchMove
+    >
       <div
         className="div-forall"
         style={{
           display:       "flex",
           flexDirection: "column",
-          gap:           "clamp(18px,2.5vw,28px)",
+          gap:           "clamp(14px,2vw,22px)",
           maxWidth:      "1100px",
           margin:        "0 auto",
         }}
@@ -164,6 +169,7 @@ export default function SB_LookAndWrite_PageJ() {
             alignItems: "center",
             gap:        "12px",
             flexWrap:   "wrap",
+            fontSize:   "clamp(16px,1.8vw,24px)",
           }}
         >
           <span className="WB-ex-A">J</span> Look and write.
@@ -174,12 +180,12 @@ export default function SB_LookAndWrite_PageJ() {
           style={{
             width:          "100%",
             border:         `2px solid ${BORDER_COLOR}`,
-            borderRadius:   "clamp(12px,1.4vw,18px)",
-            padding:        "clamp(10px,1.2vw,16px)",
+            borderRadius:   "clamp(10px,1.2vw,16px)",
+            padding:        "clamp(8px,1vw,14px)",
             boxSizing:      "border-box",
             display:        "flex",
             flexWrap:       "wrap",
-            gap:            "clamp(8px,1vw,12px)",
+            gap:            "clamp(6px,0.8vw,10px)",
             justifyContent: "center",
             background:     "#fff",
           }}
@@ -195,19 +201,20 @@ export default function SB_LookAndWrite_PageJ() {
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
                 style={{
-                  padding:         "clamp(8px,1vw,12px) clamp(12px,1.4vw,18px)",
-                  borderRadius:    "14px",
+                  padding:         "clamp(6px,0.8vw,10px) clamp(10px,1.2vw,16px)",
+                  borderRadius:    "12px",
                   border:          `1.5px solid ${isUsed ? "#d9d9d9" : ACTIVE_COLOR}`,
                   backgroundColor: isUsed ? "#eeeeee" : SOFT_COLOR,
                   color:           isUsed ? "#999" : "#222",
                   cursor:          isUsed || showAns ? "not-allowed" : "grab",
                   opacity:         isUsed ? 0.6 : 1,
                   userSelect:      "none",
-                  fontSize:        "clamp(13px,1.5vw,19px)",
+                  fontSize:        "clamp(12px,1.3vw,17px)",
                   fontWeight:      500,
                   boxShadow:       isUsed ? "none" : "0 2px 8px rgba(0,0,0,0.06)",
                   transition:      "0.2s ease",
-                  touchAction:     "none",
+                  // ← هنا الفرق: touchAction فقط لما يكون شايل عنصر
+                  touchAction:     touchItem?.id === item.id ? "none" : "auto",
                   textAlign:       "center",
                   lineHeight:      1.3,
                 }}
@@ -230,7 +237,7 @@ export default function SB_LookAndWrite_PageJ() {
               style={{
                 display:       "flex",
                 flexDirection: "column",
-                gap:           "clamp(10px,1.4vw,16px)",
+                gap:           "clamp(8px,1vw,14px)",
                 width:         "100%",
               }}
             >
@@ -239,18 +246,18 @@ export default function SB_LookAndWrite_PageJ() {
                 style={{
                   display:    "flex",
                   alignItems: "flex-start",
-                  gap:        "clamp(10px,1.4vw,16px)",
+                  gap:        "clamp(8px,1vw,14px)",
                 }}
               >
                 <span
                   style={{
-                    fontSize:   "clamp(18px,2vw,30px)",
+                    fontSize:   "clamp(14px,1.5vw,22px)",
                     fontWeight: 700,
                     color:      "#111",
                     lineHeight: 1,
                     paddingTop: "4px",
                     flexShrink: 0,
-                    minWidth:   "clamp(18px,2vw,28px)",
+                    minWidth:   "clamp(14px,1.5vw,22px)",
                   }}
                 >
                   {item.id}
@@ -258,10 +265,9 @@ export default function SB_LookAndWrite_PageJ() {
 
                 <div
                   style={{
-                    width:        "clamp(160px,25vw,260px)",
+                    width:        "clamp(140px,22vw,240px)",
                     aspectRatio:  "1.55 / 1",
-                    overflow:     "hidden",
-                    borderRadius: "clamp(8px,1vw,14px)",
+                    borderRadius: "clamp(8px,1vw,12px)",
                     border:       `2px solid ${BORDER_COLOR}`,
                     background:   "#f7f7f7",
                     flexShrink:   0,
@@ -284,7 +290,7 @@ export default function SB_LookAndWrite_PageJ() {
               {item.example ? (
                 <div
                   style={{
-                    fontSize:      "clamp(14px,1.8vw,22px)",
+                    fontSize:      "clamp(12px,1.4vw,18px)",
                     fontWeight:    500,
                     color:         ANSWER_COLOR,
                     borderBottom:  `2px solid ${LINE_COLOR}`,
@@ -296,7 +302,6 @@ export default function SB_LookAndWrite_PageJ() {
                   {item.answer}
                 </div>
               ) : (
-                /* drop zone */
                 <div
                   ref={(el) => (dropRefs.current[boxKey] = el)}
                   onDragOver={(e) => e.preventDefault()}
@@ -304,7 +309,7 @@ export default function SB_LookAndWrite_PageJ() {
                   onClick={() => handleRemove(boxKey)}
                   style={{
                     width:         "100%",
-                    minHeight:     "clamp(32px,4vw,46px)",
+                    minHeight:     "clamp(28px,3.5vw,40px)",
                     borderBottom:  `2px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
                     display:       "flex",
                     alignItems:    "flex-end",
@@ -317,9 +322,9 @@ export default function SB_LookAndWrite_PageJ() {
                   {value && (
                     <span
                       style={{
-                        fontSize:   "clamp(14px,1.8vw,22px)",
+                        fontSize:   "clamp(12px,1.4vw,18px)",
                         fontWeight: 500,
-                        color:      wrong ? WRONG_COLOR : ANSWER_COLOR,
+                        color:      ANSWER_COLOR,
                         lineHeight: 1.3,
                         wordBreak:  "break-word",
                       }}
@@ -361,7 +366,7 @@ export default function SB_LookAndWrite_PageJ() {
           style={{
             display:        "flex",
             justifyContent: "center",
-            marginTop:      "clamp(6px,1vw,12px)",
+            marginTop:      "clamp(4px,0.8vw,10px)",
           }}
         >
           <Button
@@ -376,21 +381,21 @@ export default function SB_LookAndWrite_PageJ() {
       {touchItem && (
         <div
           style={{
-            position:     "fixed",
-            left:         touchPos.x - 100,
-            top:          touchPos.y - 20,
-            background:   "#fff",
-            padding:      "8px 14px",
-            borderRadius: "10px",
-            boxShadow:    "0 4px 10px rgba(0,0,0,0.2)",
-            pointerEvents:"none",
-            zIndex:       9999,
-            fontSize:     "clamp(13px,1.5vw,18px)",
-            fontWeight:   600,
-            color:        "#222",
-            maxWidth:     "280px",
-            textAlign:    "center",
-            lineHeight:   1.3,
+            position:      "fixed",
+            left:          touchPos.x - 100,
+            top:           touchPos.y - 20,
+            background:    "#fff",
+            padding:       "6px 12px",
+            borderRadius:  "10px",
+            boxShadow:     "0 4px 10px rgba(0,0,0,0.2)",
+            pointerEvents: "none",
+            zIndex:        9999,
+            fontSize:      "clamp(12px,1.3vw,17px)",
+            fontWeight:    600,
+            color:         "#222",
+            maxWidth:      "260px",
+            textAlign:     "center",
+            lineHeight:    1.3,
           }}
         >
           {touchItem.value}
