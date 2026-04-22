@@ -10,7 +10,6 @@ import sound1_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound1.mp
 import sound2_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound2.mp3";
 import sound3_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound3.mp3";
 import sound4_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound4.mp3";
-import letterSound from "../../../assets/audio/ClassBook/U 3/Pg23_Instruction1_Adult Lady.mp3";
 import reapeatSound from "../../../assets/audio/ClassBook/Unit 3/P 23/repeat.mp3";
 import Bebo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.1_Bebo.mp3";
 import Lolo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Lolo.mp3";

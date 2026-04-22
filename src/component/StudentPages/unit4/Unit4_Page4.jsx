@@ -7,7 +7,7 @@ import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_1.2_Adult L
 import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_2.1_Boy.mp3";
 import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 31/Pg31_3.1_Boy.mp3";
 
-// import video from "../../../assets/img_unit4/sounds-unit4/p13.mp4";
+import video from "../../../assets/videos/grade 3 unit 4 page 31.mp4";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import AudioWithCaption from "../../AudioWithCaption";
@@ -174,7 +174,7 @@ const Unit4_Page4 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

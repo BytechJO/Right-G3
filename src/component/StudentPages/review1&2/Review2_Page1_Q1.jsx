@@ -3,10 +3,10 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import WrongMark from "../../WrongMark";
 
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 1.svg";
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 2.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex A 4.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Asset 18.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Asset 19.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Asset 21.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Asset 20.svg";
 import Button from "../../Button";
 
 const Review2_Page1_Q1 = () => {
@@ -200,7 +200,7 @@ const Review2_Page1_Q1 = () => {
                   style={{
                     width: "300px",
                     height: "150px",
-                    objectFit: "cover",
+                    objectFit: "contain",
                   }}
                 />
 

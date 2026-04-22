@@ -1,10 +1,10 @@
 import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 2.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 2.svg";
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex B 4.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 64.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 65.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 66.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 67.svg";
 
 const Unit10_Page5_Q3 = () => {
   const [userAnswers, setUserAnswers] = useState({});
@@ -198,6 +198,7 @@ const Unit10_Page5_Q3 = () => {
                       height: "auto",
                       objectFit: "cover",
                       marginTop: "10px",
+                      marginBottom:"20px"
                     }}
                   />
                   <div

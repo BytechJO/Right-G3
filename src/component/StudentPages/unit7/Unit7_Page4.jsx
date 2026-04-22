@@ -8,11 +8,7 @@ import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_4.1_Boy.mp3
 import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_4.2_Boy.mp3";
 import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_5.1_Adult Lady.mp3";
 import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_6.1_Adult Lady.mp3";
-import sound7 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_6.1_Adult Lady.mp3";
-import sound8 from "../../../assets/audio/ClassBook/U 5/Pg43_4.1_Adult Lady.mp3";
-import sound9 from "../../../assets/audio/ClassBook/U 5/Pg43_5.1_Helen.mp3";
-
-// import video from "../../../assets/img_unit5/sounds-unit5/p13.mp4";
+import video from "../../../assets/videos/grade 3 unit 7 page 61.mp4";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import AudioWithCaption from "../../AudioWithCaption";
@@ -193,7 +189,7 @@ const Unit7_Page4 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )
