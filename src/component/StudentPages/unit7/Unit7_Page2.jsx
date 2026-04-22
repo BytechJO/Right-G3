@@ -209,7 +209,7 @@ const Unit4_Page2 = ({ openPopup }) => {
       ))}
 
       <div
-        className="headset-icon-CD-unit4-page2-1 hover:scale-110 transition"
+        className="headset-icon-CD-unit5-page2-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -235,7 +235,7 @@ const Unit4_Page2 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="headset-icon-CD-unit4-page2-2 hover:scale-110 transition"
+        className="absolute bottom-[44%] right-[51%] hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -246,9 +246,9 @@ const Unit4_Page2 = ({ openPopup }) => {
             openPopup(
               "html",
               <FourImagesWithAudio
-                images={[read, img2_conversation, img1_conversation]}
+                images={[read, img1_conversation, img2_conversation]}
                 audioSrc={repeat}
-                checkpoints={[0, 4.4, 6.04]}
+                checkpoints={[0, 4.5, 6.1]}
                 popupOpen={true}
                 titleQ={`Listen, read, and repeat.`}
                 audioArr={repeatSounds}
@@ -269,7 +269,7 @@ const Unit4_Page2 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="click-icon-unit4-page2-1 hover:scale-110 transition"
+        className="absolute bottom-[25%] right-[42%] hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -297,8 +297,8 @@ const Unit4_Page2 = ({ openPopup }) => {
                 ]}
                 audioSrc={letterSound}
                 checkpoints={[
-                  0, 4.44, 5.86, 6.84, 7.52, 8.42, 9.38, 10.20, 10.98, 11.86,
-                  12.8, 13.74,14.7,
+                  0, 4.44, 5.86, 6.84, 7.52, 8.42, 9.38, 10.2, 10.98, 11.86,
+                  12.8, 13.74, 14.7,
                 ]}
                 popupOpen={true}
                 titleQ={"Listen and read along."}

@@ -8,7 +8,7 @@ import sound4 from "../../../assets/audio/ClassBook/Unit 1/P 6/Pg6_4.1_Adult Lad
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-// import video from "./ddddddddddd";
+import video from "../../../assets/videos/grade 3 unit 1 page 6.mp4";
 import "./Page6.css";
 const Page6 = ({ openPopup }) => {
   const audioRef = useRef(null);
@@ -156,7 +156,7 @@ const Page6 = ({ openPopup }) => {
                     display: "block",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

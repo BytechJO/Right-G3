@@ -167,7 +167,7 @@ const Unit10_Page1 = ({ openPopup }) => {
       })}
 
       <div
-        className="headset-icon-CD-unit5-page1-1 hover:scale-110 transition"
+        className="headset-icon-CD-unit10-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -202,7 +202,7 @@ const Unit10_Page1 = ({ openPopup }) => {
       </div>
 
       <div
-        className="click-icon-unit5-page1-1 hover:scale-110 transition"
+        className="click-icon-unit10-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -230,7 +230,7 @@ const Unit10_Page1 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="headset-icon-CD-unit5-page1-2 hover:scale-110 transition"
+        className="headset-icon-CD-unit10-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -258,7 +258,7 @@ const Unit10_Page1 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="click-icon-unit5-page1-2 hover:scale-110 transition"
+        className="click-icon-unit10-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg

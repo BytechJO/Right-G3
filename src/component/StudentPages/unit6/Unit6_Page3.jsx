@@ -12,7 +12,7 @@ import sound6 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_3.2_Jack.mp
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-// import video from "../../../assets/img_unit6/sounds-unit6/p12 1920.mp4";
+import video from "../../../assets/videos/grade 3 unit 6 page 48.mp4";
 const Unit6_Page3 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
@@ -182,7 +182,7 @@ const Unit6_Page3 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

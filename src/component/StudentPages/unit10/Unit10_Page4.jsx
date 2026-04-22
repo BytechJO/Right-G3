@@ -8,7 +8,7 @@ import sound3 from "../../../assets/audio/ClassBook/Unit 10/P 85/Pg85_3.1_Adult 
 import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 85/Pg85_3.2_Adult Lady.mp3";
 import sound5 from "../../../assets/audio/ClassBook/Unit 10/P 85/Pg85_4.1_Adult Lady.mp3";
 
-// import video from "../../../assets/img_unit5/sounds-unit5/p13.mp4";
+import video from "../../../assets/videos/grade 3 unit 10 page 85.mp4";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import AudioWithCaption from "../../AudioWithCaption";
@@ -104,7 +104,7 @@ const Unit10_Page4 = ({ openPopup }) => {
         ></div>
       ))}
       <div
-        className="headset-icon-CD-unit5-page4-1 hover:scale-110 transition"
+        className="headset-icon-CD-unit10-page4-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -138,7 +138,7 @@ const Unit10_Page4 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="pauseBtn-icon-CD-unit5-page4-1 hover:scale-110 transition"
+        className="pauseBtn-icon-CD-unit10-page4-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -168,7 +168,7 @@ const Unit10_Page4 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

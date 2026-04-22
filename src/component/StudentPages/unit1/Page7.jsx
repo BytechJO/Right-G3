@@ -7,7 +7,7 @@ import sound3 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_4.1_Adult Lad
 import sound4 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_5.1_Adult Lady.mp3";
 import "./Page7.css";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
-// import video2 from "../../../assets/unit1/sounds/p7 1920.mp4";
+import video from "../../../assets/videos/grade 3 unit 1 page 7.mp4";
 import AudioWithCaption from "../../AudioWithCaption";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 const Page7 = ({ openPopup }) => {
@@ -188,7 +188,7 @@ const Page7 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video2} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

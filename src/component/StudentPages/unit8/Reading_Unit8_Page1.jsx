@@ -9,7 +9,7 @@ import sound5 from "../../../assets/audio/ClassBook/Unit 8/P 74/Pg74_1.4_Adult L
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-// import video3 from "../../../assets/unit1/sounds/STORY (1).mp4";
+import video3 from "../../../assets/videos/reading/grade 3 unit 8 page 74-75 reading.mp4";
 
 const Reading_Unit8_Page1 = ({ openPopup }) => {
   const audioRef = useRef(null);
@@ -180,7 +180,7 @@ const Reading_Unit8_Page1 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video3} type="video/mp4" /> */}
+                  <source src={video3} type="video/mp4" />
                 </video>
               </div>,
             )

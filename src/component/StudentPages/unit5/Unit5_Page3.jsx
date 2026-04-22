@@ -11,7 +11,7 @@ import sound5 from "../../../assets/audio/ClassBook/Unit 5/P 42/Pg42_4.1_Adult L
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-// import video from "../../../assets/img_unit5/sounds-unit5/p12 1920.mp4";
+import video from "../../../assets/videos/grade 3 unit 5 page 42.mp4";
 const Unit5_Page3 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
@@ -165,7 +165,7 @@ const Unit5_Page3 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

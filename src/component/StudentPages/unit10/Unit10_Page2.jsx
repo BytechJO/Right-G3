@@ -257,7 +257,7 @@ const Unit10_Page2 = ({ openPopup }) => {
       })}
 
       <div
-        className="headset-icon-CD-unit5-page2-1 hover:scale-110 transition"
+        className="headset-icon-CD-unit10-page2-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -317,7 +317,7 @@ const Unit10_Page2 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="click-icon-unit5-page2-1 hover:scale-110 transition"
+        className=" absolute bottom-[14.5%] right-[41%]  hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -336,7 +336,7 @@ const Unit10_Page2 = ({ openPopup }) => {
                   img4_letter,
                 ]}
                 audioSrc={letterSound}
-                checkpoints={[0,3.8, 7.6, 8.4, 9.42]}
+                checkpoints={[0, 3.8, 7.6, 8.4, 9.42]}
                 popupOpen={true}
                 titleQ={"Listen and read along."}
                 audioArr={imageSounds}

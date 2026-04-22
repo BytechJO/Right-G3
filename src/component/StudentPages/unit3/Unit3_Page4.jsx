@@ -16,7 +16,7 @@ import sound10 from "../../../assets/audio/ClassBook/Unit 3/P 25/Pg25_5.2_Lala's
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-// import video from "../../../assets/img_unit3/sounds-unit3/p12 1920.mp4";
+import video from "../../../assets/videos/grade 3 unit 3 page 25.mp4";
 const Unit3_Page4 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
@@ -235,7 +235,7 @@ const Unit3_Page4 = ({ openPopup }) => {
                     borderRadius: "20px",
                   }}
                 >
-                  {/* <source src={video} type="video/mp4" /> */}
+                  <source src={video} type="video/mp4" />
                 </video>
               </div>,
             )

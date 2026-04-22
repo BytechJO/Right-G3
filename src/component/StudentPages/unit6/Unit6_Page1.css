@@ -12,25 +12,24 @@
   padding: 5px;
 }
 
-
 .headset-icon-CD-unit6-page1-1 {
-  top: 7%;
-  right: 14%;
+  top: 6%;
+  right: 36%;
 }
 
 .click-icon-unit6-page1-1 {
-  left: 19%;
-  top: 37%;
+  left: 21%;
+  top: 33.5%;
 }
 
 .headset-icon-CD-unit6-page1-2 {
-  bottom: 34.5%;
-  left: 26%;
+  bottom: 46.5%;
+  left: 26.5%;
 }
 
 .click-icon-unit6-page1-2 {
-  bottom: 11.5%;
-  right: 39%;
+  bottom: 10.5%;
+  right: 37%;
 }
 
 #num-1 {
@@ -69,18 +68,18 @@
 }
 
 @media screen and (max-width: 1024px) and (max-height: 600px) {
-      .headset-icon-CD-unit6-page1-1 {
-        top: 7% !important;
-        right: 12% !important;
-    }
-        .headset-icon-CD-unit6-page1-2 {
-        bottom: 32% !important;
-        left: 27% !important;
-    }
-    .click-icon-unit6-page1-2 {
-        bottom: 9% !important;
-        right: 35% !important;
-    }
+  .headset-icon-CD-unit6-page1-1 {
+    top: 7% !important;
+    right: 12% !important;
+  }
+  .headset-icon-CD-unit6-page1-2 {
+    bottom: 32% !important;
+    left: 27% !important;
+  }
+  .click-icon-unit6-page1-2 {
+    bottom: 9% !important;
+    right: 35% !important;
+  }
 }
 @media (max-width: 1024px) {
   .headset-icon-CD-unit6-page1-1 {
@@ -102,10 +101,10 @@
     top: 6.5%;
     right: 16%;
   }
- .headset-icon-CD-unit6-page1-2 {
-        bottom: 36.5%;
-        left: 25%;
-    }
+  .headset-icon-CD-unit6-page1-2 {
+    bottom: 36.5%;
+    left: 25%;
+  }
   .click-icon-unit6-page1-2 {
     bottom: 13%;
     right: 41%;

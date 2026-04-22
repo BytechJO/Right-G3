@@ -159,7 +159,7 @@ const Unit7_Page1 = ({ openPopup }) => {
       })}
 
       <div
-        className="headset-icon-CD-unit5-page1-1 hover:scale-110 transition"
+        className="headset-icon-CD-unit7-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -194,7 +194,7 @@ const Unit7_Page1 = ({ openPopup }) => {
       </div>
 
       <div
-        className="click-icon-unit5-page1-1 hover:scale-110 transition"
+        className="click-icon-unit7-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -214,15 +214,15 @@ const Unit7_Page1 = ({ openPopup }) => {
           <image
             className="svg-img"
             href={arrowBtn}
-            x="50"
-            y="-350"
+            x="0"
+            y="0"
             width="90"
             height="90"
           />
         </svg>
       </div>
       <div
-        className="headset-icon-CD-unit5-page1-2 hover:scale-110 transition"
+        className="headset-icon-CD-unit7-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -250,7 +250,7 @@ const Unit7_Page1 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="click-icon-unit5-page1-2 hover:scale-110 transition"
+        className="click-icon-unit7-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -270,8 +270,8 @@ const Unit7_Page1 = ({ openPopup }) => {
           <image
             className="svg-img"
             href={arrowBtn}
-            x="100"
-            y="-230"
+            x="0"
+            y="0"
             width="90"
             height="90"
           />
