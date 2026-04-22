@@ -1,12 +1,10 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 66.png";
 import "./Unit8_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 7/CD41.Pg60_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 5/Pg42_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 5/Pg41_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 5/Pg42_2.1_Helen.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 5/Pg42_3.1_John.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 5/Pg42_4.1_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 8/P 66/unit8-pg66-grammar1.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 8/P 66/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 8/P 66/Pg66_2.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 8/P 66/Pg66_3.1_Adult Lady.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -18,15 +16,40 @@ const Unit8_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 60, Exercise 1. Right Grammar." },
+    {
+      start: 0.299,
+      end: 9.96,
+      text: "Page 66, exercise one. Write grammar. I, he, she, it was.",
+    },
+    { start: 11.239, end: 12.699, text: "It was sunny yesterday." },
+    { start: 13.979, end: 17.879, text: "They, we, you were." },
+    {
+      start: 20.319,
+      end: 34.819,
+      text: "I, he, she, it, they, we, you had, plus noun. They, we, you were.",
+    },
+    {
+      start: 36.139,
+      end: 47.659,
+      text: "We were at the beach. I, he, she, it, they, we, you had, plus noun.",
+    },
+    {
+      start: 48.959,
+      end: 58.259,
+      text: "Did I, he, she, it, they, we, you have, plus noun?",
+    },
+    { start: 59.399, end: 60.619, text: "She had a kite." },
+    {
+      start: 61.799,
+      end: 84.279,
+      text: "Did she have a robot? She didn't have a robot. The farm was very old. The cottage on the farm was built a long time ago. It had several windows, a big door, and a chimney. Near the cottage was a mill. Tom's grandparents had a radio, but not a TV. There was a rug on the floor, but no carpet",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
-    { x1: 54.2, y1: 17.0, x2: 74.1, y2: 20.4, sound: sound5 },
+    { x1: 5.63, y1: 8.17, x2: 93.97, y2: 32.37, sound: sound1 },
+    { x1: 7.14, y1:55.72, x2: 68.54, y2: 64.35, sound: sound2 },
+    { x1: 7.14, y1: 66.55, x2: 45.27, y2: 75.0, sound: sound3 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
