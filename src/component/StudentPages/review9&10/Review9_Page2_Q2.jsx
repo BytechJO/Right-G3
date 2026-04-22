@@ -2,25 +2,21 @@ import React, { useState } from "react";
 import "./Review9_Page2_Q2.css";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 10/P 89/full.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
 const Review9_Page2_Q2 = () => {
   const captions = [
     {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
+      start: 0.399,
+      end: 3.859,
+      text: "Page 89, review nine, exercise D.",
     },
     {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
+      start: 5.119,
+      end: 27.559,
+      text: "Do both words have the same final S sound? Listen and write check or X. One, trees, vets. Two, keys, bees. Three, rabbits, maps. Four, ducks, tools",
     },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
   ];
 
   const groups = [
@@ -172,7 +168,7 @@ const Review9_Page2_Q2 = () => {
           <span style={{ color: "#D52328" }}>✗</span>.
         </h5>
 
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11.22} />
 
         <div
           style={{

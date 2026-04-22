@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 83.png";
-import img1_letter from "../../../assets/imgs/test.png";
-import img2_letter from "../../../assets/imgs/test.png";
-import img3_letter from "../../../assets/imgs/test.png";
-import img4_letter from "../../../assets/imgs/test.png";
+import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/1-05.svg";
+import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/1-06.svg";
+import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/1-07.svg";
+import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/1-08.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import soundListen from "../../../assets/audio/ClassBook/U 5/Pg41_1.1_Helen.mp3";
-import img1_conversation from "../../../assets/imgs/test.png";
-import img2_conversation from "../../../assets/imgs/test.png";
-import sound1_letter from "../../../assets/audio/ClassBook/U 5/Pg41_1.1_Adult Lady.mp3";
-import sound2_letter from "../../../assets/audio/ClassBook/U 5/Pg41_1.2_Adult Lady.mp3";
-import sound3_letter from "../../../assets/audio/ClassBook/U 5/Pg41_1.3_Adult Lady.mp3";
-import sound4_letter from "../../../assets/audio/ClassBook/U 5/Pg41_1.4_Adult Lady.mp3";
-import letterSound from "../../../assets/audio/ClassBook/U 5/Pg41_Instruction1_Adult Lady.mp3";
+import soundListen from "../../../assets/audio/ClassBook/Unit 10/P 83/unit10-pg83-reading.mp3";
+import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/Asset 46.svg";
+import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/Asset 45.svg";
+import sound1_letter from "../../../assets/audio/ClassBook/Unit 10/P 83/Pg83_2.1_Adult Lady.mp3";
+import sound2_letter from "../../../assets/audio/ClassBook/Unit 10/P 83/Pg83_2.2_Adult Lady.mp3";
+import sound3_letter from "../../../assets/audio/ClassBook/Unit 10/P 83/Pg83_2.3_Adult Lady.mp3";
+import sound4_letter from "../../../assets/audio/ClassBook/Unit 10/P 83/Pg83_2.4_Adult Lady.mp3";
+import letterSound from "../../../assets/audio/ClassBook/Unit 10/P 83/unit10-pg83-listen.mp3";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 import AudioWithCaption from "../../AudioWithCaption";
@@ -21,6 +21,10 @@ import FourImagesWithAudio from "../../FourImagesWithAudio";
 // import sound2 from "../../../assets/img_unit5/sounds-unit5/U2-07.mp3";
 // import sound3 from "../../../assets/img_unit5/sounds-unit5/U2-07.mp3";
 // import sound4 from "../../../assets/img_unit5/sounds-unit5/U2-07.mp3";
+import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
+import repeat from "../../../assets/audio/ClassBook/Unit 10/P 83/repeat.mp3";
+import Bebo from "../../../assets/audio/ClassBook/Unit 10/P 83/Pg83_1.1_Bebo.mp3";
+import Lolo from "../../../assets/audio/ClassBook/Unit 10/P 83/Pg83_1.2_Lolo.mp3";
 
 import "./Unit10_Page2.css";
 import ReadChoose from "../../ReadChoose";
@@ -37,32 +41,125 @@ const Unit10_Page2 = ({ openPopup }) => {
     new Audio(sound3_letter),
     new Audio(sound4_letter),
   ];
+  const repeatSounds = [
+    null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
+    new Audio(Bebo),
+    new Audio(Lolo),
+  ];
+  const captions3 = [
+    {
+      start: 0.359,
+      end: 4.719,
+      text: "Page 83, listen, read, and repeat.",
+    },
+    {
+      start: 4.719,
+      end: 6.639,
+      text: "I'm having a sale.",
+    },
+    {
+      start: 6.639,
+      end: 7.439,
+      text: "That's great",
+    },
+  ];
 
-  const readChooseData = {
-    title: "Read and circle.",
-    questions: [
-      {
-        text: "Helen likes",
-        options: ["grapes.", "carrots.","rice."],
-        correct: "rice.",
-      },
-      {
-        text: "Tom doesn’t like",
-        options: ["meat.", "apple juice.","fish."],
-        correct: "fish.",
-      },
-    ],
-  };
   const captionsExample = [
-    { start: 0, end: 2.0, text: "Page11. Birthdays Are Fun" },
-    { start: 2.05, end: 5.2, text: "Hi, everyone. Today is my birthday." },
-    { start: 5.24, end: 7.2, text: " I'm seven years old." },
-    { start: 7.24, end: 9.0, text: "  My friends are here. It's fun." },
+    {
+      start: 0.119,
+      end: 6.799,
+      text: "Page 83, reading. Listen and read along. Preparing for a garage sale.",
+    },
+    {
+      start: 6.799,
+      end: 8.979,
+      text: "Dad, what are you doing?",
+    },
+    {
+      start: 8.979,
+      end: 11.34,
+      text: "I'm going to clean out the basement.",
+    },
+    {
+      start: 11.34,
+      end: 13.519,
+      text: "There's a lot of things here, Dad.",
+    },
+    {
+      start: 13.519,
+      end: 16.879,
+      text: "Yes, there is. Why don't you help me, Tom?",
+    },
+    {
+      start: 16.879,
+      end: 18.059,
+      text: "Sure, Dad.",
+    },
+    {
+      start: 18.059,
+      end: 23.079,
+      text: "I will put these books in a box. You can dust some of those lamps over there.",
+    },
+    {
+      start: 23.079,
+      end: 26.139,
+      text: "Will we throw all of these things away?",
+    },
+    {
+      start: 26.139,
+      end: 27.879,
+      text: "No, we won't.",
+    },
+    {
+      start: 27.879,
+      end: 30.639,
+      text: "But I thought you were cleaning out the basement.",
+    },
+    {
+      start: 30.639,
+      end: 33.88,
+      text: "Yes, but we won't throw everything away.",
+    },
+    {
+      start: 33.88,
+      end: 35.899,
+      text: "What will you do with all of it?",
+    },
+    {
+      start: 35.899,
+      end: 41.919,
+      text: "I will keep some of things, and the rest I will sell in a garage sale next weekend.",
+    },
+    {
+      start: 41.919,
+      end: 45.259,
+      text: "That sounds great. Can I sell some of my things, too?",
+    },
+    {
+      start: 46.379,
+      end: 54.759,
+      text: "Sure, son. If there's anything you don't need anymore, we will sell it in the garage sale. You can make a little bit of money that way.",
+    },
+    {
+      start: 54.759,
+      end: 60.819,
+      text: "Maybe if I sell my skateboard and video game set, I will have enough money to buy a new bike.",
+    },
+    {
+      start: 60.819,
+      end: 63.079,
+      text: "Then let's get started.",
+    },
+    {
+      start: 63.079,
+      end: 63.619,
+      text: "Sure, Dad",
+    },
   ];
 
   const captions2 = [
-    { start: 0, end: 3.18, text: "Page 11. Listen and read along. " },
-    { start: 3.2, end: 7.01, text: "P, pencil, pink, pizza. " },
+    { start: 0, end: 3.04, text: "Page 83. Listen and read along." },
+    { start: 4.02, end: 7.01, text: " CR, DR, TR. Cry, dress, truck" },
   ];
 
   const areas = [
@@ -186,7 +283,7 @@ const Unit10_Page2 = ({ openPopup }) => {
         </svg>
       </div>
       <div
-        className="headset-icon-CD-unit5-page2-2 hover:scale-110 transition"
+        className="headset-icon-CD-unit10-page2-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -194,7 +291,18 @@ const Unit10_Page2 = ({ openPopup }) => {
           height="22"
           viewBox="0 0 90 90"
           onClick={() =>
-            openPopup("html", <ReadChoose data={readChooseData} />)
+            openPopup(
+              "html",
+              <FourImagesWithAudio
+                images={[read, img2_conversation, img1_conversation]}
+                audioSrc={repeat}
+                checkpoints={[0, 4.3, 6.64]}
+                popupOpen={true}
+                titleQ={`Listen, read, and repeat.`}
+                audioArr={repeatSounds}
+                captions={captions3}
+              />,
+            )
           }
           style={{ overflow: "visible" }}
         >
@@ -220,9 +328,15 @@ const Unit10_Page2 = ({ openPopup }) => {
             openPopup(
               "html",
               <FourImagesWithAudio
-                images={[Rabbit, img1_letter, img2_letter, img3_letter,img4_letter]}
+                images={[
+                  Rabbit,
+                  img1_letter,
+                  img2_letter,
+                  img3_letter,
+                  img4_letter,
+                ]}
                 audioSrc={letterSound}
-                checkpoints={[0, 3.4, 4, 4.9, 6]}
+                checkpoints={[0,3.8, 7.6, 8.4, 9.42]}
                 popupOpen={true}
                 titleQ={"Listen and read along."}
                 audioArr={imageSounds}
