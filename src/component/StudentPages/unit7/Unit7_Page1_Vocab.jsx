@@ -17,21 +17,19 @@ import num10 from "../../../assets/imgs/num/10_1.svg";
 import num11 from "../../../assets/imgs/num/11_1.svg";
 import num12 from "../../../assets/imgs/num/12_1.svg";
 import num13 from "../../../assets/imgs/num/13_1.svg";
-import num14 from "../../../assets/imgs/num/14_1.svg";
-import sound1 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound1.mp3";
-import sound2 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound2.mp3";
-import sound3 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound3.mp3";
-import sound4 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound4.mp3";
-import sound5 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound5.mp3";
-import sound6 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound6.mp3";
-import sound7 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound7.mp3";
-import sound8 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound8.mp3";
-import sound9 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound9.mp3";
-import sound10 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound10.mp3";
-import sound11 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound11.mp3";
-import sound12 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound12.mp3";
-import sound13 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound13.mp3";
-import sound14 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound14.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound12.mp3";
+import sound13 from "../../../assets/audio/ClassBook/Unit 7/P 58/sound13.mp3";
 import { TbMessageCircle } from "react-icons/tb";
 import { IoMdSettings } from "react-icons/io";
 import { FaPlay, FaPause } from "react-icons/fa";
@@ -187,7 +185,6 @@ const wordTimings = [
     sound11,
     sound12,
     sound13,
-    sound14,
   ];
   const playWordAudio = (index) => {
     // أوقفي الأوديو الرئيسي
@@ -372,11 +369,11 @@ const wordTimings = [
         <img
           src={vocabularyImg}
           style={{
-            height: "370px",
+            height: "350px",
             width: "auto",
             position: "absolute",
             bottom: "0%",
-            right: "-49%",
+            right: "-46.5%",
             borderRadius: "5%",
           }}
         />
@@ -384,7 +381,7 @@ const wordTimings = [
         {/* النصوص */}
         <div
           className="vocab_container"
-          style={{ bottom: "0.9%", right: "-33.5%" }}
+          style={{ bottom: "0.9%", right: "-31.5%" }}
         >
           {[
             "Soccer field",

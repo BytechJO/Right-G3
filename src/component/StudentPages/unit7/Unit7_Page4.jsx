@@ -1,13 +1,13 @@
 import React, { useState, useRef } from "react";
 import page_4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 61.png";
 import "./Unit7_Page4.css";
-import grammarSound from "../../../assets/audio/ClassBook/Unit 7/P 61/CD45.Pg61_Grammar2_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_2.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_2.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_2.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_4.1_Boy.mp3";
-import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_4.2_Boy.mp3";
-import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_5.1_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 7/P 61/unit7-pg61-grammar2.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 61/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 61/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_4.1_Boy.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_4.2_Boy.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_5.1_Adult Lady.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_6.1_Adult Lady.mp3";
 import sound7 from "../../../assets/audio/ClassBook/Unit 7/P 61/Pg61_6.1_Adult Lady.mp3";
 import sound8 from "../../../assets/audio/ClassBook/U 5/Pg43_4.1_Adult Lady.mp3";
 import sound9 from "../../../assets/audio/ClassBook/U 5/Pg43_5.1_Helen.mp3";
@@ -23,23 +23,52 @@ const Unit7_Page4 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 4.07, text: " Page 61, exercise 2. Right Grammar. " },
+    { start: 0.239, end: 4.859, text: "Page 61, exercise two. Write grammar." },
+
+    { start: 4.859, end: 6.019, text: "Can you see them?" },
+    { start: 6.019, end: 10.5, text: "Yes, I can see them next to the gym." },
+
+    { start: 10.5, end: 12.5, text: "Can you see us?" },
+    {
+      start: 12.5,
+      end: 14.619,
+      text: "Yes, I can see you behind the bus station.",
+    },
+
+    { start: 14.619, end: 15.679, text: "Can you see me?" },
+    {
+      start: 15.679,
+      end: 19.1,
+      text: "No, I can't see you between the trees.",
+    },
+
+    { start: 19.1, end: 21.059, text: "Can you see me?" },
+    {
+      start: 21.059,
+      end: 25.0,
+      text: "Yes, I can see you. You are between the trees.",
+    },
+
+    { start: 25.0, end: 27.5, text: "Where are Harley and Tom?" },
+    { start: 27.5, end: 30.0, text: "They are in the music room." },
+
+    { start: 30.0, end: 32.0, text: "Can you see them?" },
+    { start: 32.0, end: 33.5, text: "Yes, I can see them." },
+
+    { start: 33.5, end: 36.0, text: "Where are the soccer players?" },
+    { start: 36.0, end: 38.5, text: "They are playing on the soccer field." },
+
+    { start: 38.5, end: 40.44, text: "Can you see them?" },
+    { start: 40.44, end: 42.0, text: "Yes, I can see them." },
   ];
 
   const clickableAreas = [
-{ x1: 9.5, y1: 12.7, x2: 35.0, y2: 22.0, sound: sound1 },   //1
-  { x1: 39.5, y1: 11.8, x2: 91.6, y2: 23.0, sound: sound1 },
-  { x1: 61.5, y1: 26.8, x2: 91.6, y2: 36.0, sound: sound6},
-  {  x1: 11.5, y1: 61.8, x2: 50.6, y2: 70.0, sound: sound7 },
-  { x1: 17.5, y1: 54.8, x2: 46.6, y2: 61.0,  sound: sound5},
-  {  x1: 9.5,
-  y1: 31.8,
-  x2: 29.6,
-  y2: 36.0,  sound: sound4 },
-
-
-
-
+    { x1: 5.69, y1: 9.35, x2: 33.91, y2: 22.04, sound: sound1 }, //1
+    { x1: 38.22, y1: 9.52, x2: 93.60, y2: 21.53, sound: sound2 },
+    { x1: 6.77, y1: 31.35, x2: 27.66, y2:35.07, sound: sound3 },
+    { x1:15.38 , y1: 56.06, x2: 46.41 , y2: 62.15, sound: sound4 },
+    { x1: 62.14, y1: 25.6, x2: 94.24, y2: 36.09, sound: sound5 },
+    { x1: 8.70, y1: 63.5, x2: 50.07, y2: 72.8, sound: sound6 },
   ];
 
   const handleImageClick = (e) => {
@@ -64,10 +93,11 @@ const Unit7_Page4 = ({ openPopup }) => {
   };
 
   return (
-    <div className="page1-img-wrapper"
-          onClick={handleImageClick}
-          style={{ backgroundImage: `url(${page_4})` }}>
-   
+    <div
+      className="page1-img-wrapper"
+      onClick={handleImageClick}
+      style={{ backgroundImage: `url(${page_4})` }}
+    >
       {clickableAreas.map((area, index) => (
         <div
           key={index}
@@ -105,7 +135,8 @@ const Unit7_Page4 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           onClick={() =>
             openPopup(
-             "audio", <div
+              "audio",
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -116,12 +147,19 @@ const Unit7_Page4 = ({ openPopup }) => {
                   src={grammarSound}
                   captions={captionsExample}
                 />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <div
@@ -134,7 +172,8 @@ const Unit7_Page4 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           onClick={() =>
             openPopup(
-             "video", <div
+              "video",
+              <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -142,7 +181,6 @@ const Unit7_Page4 = ({ openPopup }) => {
                   alignItems: "center",
                   height: "100%",
                   width: "100%",
-                
                 }}
               >
                 <video
@@ -157,12 +195,19 @@ const Unit7_Page4 = ({ openPopup }) => {
                 >
                   {/* <source src={video} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />

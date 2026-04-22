@@ -1,11 +1,11 @@
 import page24 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 74.png";
 import React, { useState, useRef } from "react";
 import "./Reading_Unit8_Page1.css";
-import sound1 from "../../../assets/audio/ClassBook/U 2/CD1.Pg20_Reading_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 2/Pg20_1.1_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 2/Pg20_1.2_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 2/Pg20_1.3_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 2/Pg20_1.4_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 8/P 74/unit8-pg74-readingall.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 8/P 74/Pg74_1.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 8/P 74/Pg74_1.2_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 8/P 74/Pg74_1.3_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 8/P 74/Pg74_1.4_Adult Lady.mp3";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
@@ -17,53 +17,41 @@ const Reading_Unit8_Page1 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.17, text: "Page 20 Reading. It's a Bunny." },
     {
-      start: 3.2,
-      end: 7.18,
-      text: " Today is Stella's birthday. Her friends are at her party. ",
+      start: 0.26,
+      end: 63.66,
+      text: "Page 74, Reading. Where's Hansel's camera? Last week, Hansel was at his friend's birthday party. There were many children at the party for Philip's birthday. Hansel wanted to take a picture with his camera. Oh, no! cried Hansel. What's wrong? asked Philip. I want to take some pictures, but I can't find my camera anywhere. I forgot where I put it, complained Hansel. Philip said, I'll help you look for your camera. What does it look like? It's white, and it has a long band, replied Hansel. Can you help us, Mom? asked Philip. We are looking for Hansel's camera. Philip's mom said, Sure, boys. I saw Stella taking a picture of her friends with a camera. That might be Hansel's camera. Thanks, Mom, said Philip. Stella was looking at some pictures she had taken with her camera. She said happily, Look, Hansel, I took some nice pictures. Do you want to look at them?",
     },
+
     {
-      start: 7.21,
-      end: 14.01,
-      text: "There is a big birthday cake. Harley asks Stella how old she is. She is seven years old. ",
+      start: 64.67,
+      end: 78.12,
+      text: "No, Stella, not right now. I'm looking for my camera. Have you seen it? asked Hansel. Did you find your camera yet, Hansel? Philip asked. No, I didn't, answered Hansel. I guess it's lost.",
     },
+
     {
-      start: 14.05,
-      end: 18.26,
-      text: "Harley, Hansel, and John see the cupcakes. They look delicious.",
+      start: 79.37,
+      end: 93.98,
+      text: "Have you found your camera, Hansel? asked Philip's mom. No, Mrs. Dewey. I believe I saw Harley taking a picture of Sarah with a camera, said Mrs. Dewey. I'll go find them. Thanks, Mrs. Dewey, replied Hansel.",
     },
+
     {
-      start: 18.3,
-      end: 26.09,
-      text: "Hansel eats a lot of cupcakes. His tummy hurts. John tells him it is not good to eat so many sweets.",
+      start: 95.1,
+      end: 99.74,
+      text: "Sarah, that's my camera. How did you get it? asked Hansel, relieved.",
     },
+
     {
-      start: 26.12,
-      end: 34.0,
-      text: "Now, it's time for presents. Mom gives Stella her present. Stella is so excited.",
-    },
-    {
-      start: 34.04,
-      end: 37.05,
-      text: "Stella opens the present. What can it be?  ",
-    },
-    {
-      start: 37.09,
-      end: 45.09,
-      text: "The present from mom is a bunny. It is very cute and white. Stella names her new bunny Tilly.",
-    },
-    {
-      start: 45.12,
-      end: 54.04,
-      text: "Tilly hops and chases Lolo. Lolo is surprised. Stella and Sara laugh and laugh. This is the best birthday.",
+      start: 100.8,
+      end: 122.74,
+      text: "Harley found it in the grass. He took some pictures, then he gave it to me to hold. Here you are. We didn't know this was your camera, Sarah replied happily. Thank you. I'm so happy my camera is not lost, said Hansel.",
     },
   ];
   const clickableAreas = [
-    { x1: 15.9, y1: 39.4, x2: 51.14, y2: 44.0, sound: sound2 },
-    { x1: 56.0, y1: 39.1, x2: 93.9, y2: 44.0, sound: sound3 },
-    { x1: 16.0, y1: 84.0, x2: 52.9, y2: 89.5, sound: sound4 },
-    { x1: 56.0, y1: 84.5, x2: 93.7, y2: 90.9, sound: sound5 },
+    { x1: 15.32, y1: 36.26, x2: 53.03, y2: 49.97, sound: sound2 },
+    { x1: 55.4, y1: 31.86, x2: 93.32, y2: 49.97, sound: sound3 },
+    { x1: 15.11, y1: 81.1, x2: 52.6, y2: 94.98, sound: sound4 },
+    { x1: 55.62, y1: 81.1, x2: 93.54, y2: 95.32, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -145,12 +133,19 @@ const Reading_Unit8_Page1 = ({ openPopup }) => {
                 }}
               >
                 <AudioWithCaption src={sound1} captions={captionsExample} />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
 
@@ -187,12 +182,19 @@ const Reading_Unit8_Page1 = ({ openPopup }) => {
                 >
                   {/* <source src={video3} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />

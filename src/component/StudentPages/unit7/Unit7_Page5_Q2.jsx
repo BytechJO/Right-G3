@@ -9,7 +9,7 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My S
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-6.svg";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 7/P 62/unit7-pg62-EXA2.mp3";
 
 const Unit7_Page5_Q2 = () => {
   const [selectedImg, setSelectedImg] = useState(null);
@@ -22,20 +22,16 @@ const Unit7_Page5_Q2 = () => {
   const sentenceRefs = useRef([]);
   const containerRef = useRef(null);
   const captions = [
-    {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
-    },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
+    { start: 0.239, end: 4.0, text: "Page 62, write activities." },
+    { start: 4.0, end: 8.42, text: "Exercise A, number 2. Listen and match." },
+
+    { start: 8.42, end: 10.0, text: "One, pen." },
+    { start: 10.0, end: 12.0, text: "Two, mouse." },
+    { start: 12.0, end: 14.0, text: "Three, rabbit." },
+    { start: 14.0, end: 16.0, text: "Four, nurse." },
+    { start: 16.0, end: 19.379, text: "Five, zoo." },
+
+    { start: 20.559, end: 22.459, text: "Six, umbrella." },
   ];
   const images = [
     { id: 0, img: img1 },
@@ -184,7 +180,7 @@ const Unit7_Page5_Q2 = () => {
           <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
           Listen and match.
         </h5>
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={8} />
 
         <div className="w-full flex flex-col items-center gap-16">
           {/* 🔥 الصور فوق */}

@@ -9,7 +9,7 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Gra
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 6.svg";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 8/P 68/unit8-pg68-EXA2.mp3";
 
 const Unit8_Page5_Q2 = () => {
   const [locked, setLocked] = useState(false);
@@ -31,19 +31,15 @@ const Unit8_Page5_Q2 = () => {
   ];
   const captions = [
     {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
+      start: 0.459,
+      end: 13.119,
+      text: "Page sixty-eight, Write Activities. Exercise A, number two. Does it have the same E-S sound? Listen and write check or X.",
     },
     {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
+      start: 14.139,
+      end: 25.179,
+      text: "One, bikes, horses. Two, foxes, boxes. Three, buses, sandwiches",
     },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
   ];
   const [answers, setAnswers] = useState({});
   const [showResult, setShowResult] = useState([]);
@@ -136,7 +132,7 @@ const Unit8_Page5_Q2 = () => {
           <QuestionAudioPlayer
             src={blue}
             captions={captions}
-            stopAtSecond={10}
+            stopAtSecond={13.2}
           />
 
           <div className="grid grid-cols-3 gap-[30px] u8p5-grid">

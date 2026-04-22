@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 60.png";
 import "./Unit7_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 7/CD41.Pg60_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_5.1_Boy.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 7/P 60/unit7-pg60-grammar1.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 7/P 60/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 7/P 60/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_1.3_Adult Lady.mp3";
 import sound4 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_3.1_Adult Lady.mp3";
 import sound5 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_4.1_Adult Lady.mp3";
-import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_5.2_Girl.mp3";
-
+import sound6 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_5.1_Boy.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 7/P 60/Pg60_5.2_Girl.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -20,19 +20,52 @@ const Unit7_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 60, Exercise 1. Right Grammar." },
+    { start: 0.379, end: 3.5, text: "Page 60, exercise one. Write grammar." },
+
+    { start: 3.5, end: 6.5, text: "Can you see him?" },
+    {
+      start: 6.5,
+      end: 10.659,
+      text: "Yes, I can see him in the computer lab.",
+    },
+
+    { start: 11.859, end: 13.5, text: "Can you see her?" },
+    {
+      start: 13.5,
+      end: 16.659,
+      text: "Yes, I can see her sitting in the lunchroom.",
+    },
+
+    { start: 17.859, end: 19.5, text: "Can you see it?" },
+    {
+      start: 19.5,
+      end: 23.5,
+      text: "No, I can't see it in front of the library.",
+    },
+
+    { start: 23.5, end: 26.0, text: "Can you see Stella?" },
+    { start: 26.0, end: 27.8, text: "Yes, I can see her." },
+    { start: 27.8, end: 29.5, text: "Where is she?" },
+    { start: 29.5, end: 31.319, text: "She's in the school cafeteria." },
+
+    { start: 32.5, end: 34.5, text: "Can you see Hansel?" },
+    { start: 34.5, end: 36.5, text: "No, I can't see him." },
+    { start: 36.5, end: 38.52, text: "Where is he?" },
+    { start: 38.52, end: 40.5, text: "He is in the computer lab." },
+
+    { start: 40.5, end: 42.239, text: "Can you see the library?" },
+    { start: 42.239, end: 43.0, text: "I can't see it." },
+    { start: 43.0, end: 43.459, text: "It's on the first floor." },
   ];
 
   const clickableAreas = [
-{ x1: 9.5, y1: 12.7, x2: 35.0, y2: 22.0, sound: sound1 },   
-  { x1: 39.5, y1: 11.8, x2: 91.6, y2: 23.0, sound: sound2 },
-{ x1: 58.5, y1: 26.8, x2: 87.6, y2: 36.0, sound: sound5 },
-// { x1: 8.5, y1: 26.8, x2: 39.6, y2: 36.0, sound: sound2 },
-{ x1: 8.5, y1: 26.8, x2: 39.6, y2: 36.0, sound: sound4 },
-{ x1: 8.5, y1: 64.8, x2: 48.6, y2: 68.0, sound: sound3 },
-{ x1: 31.5, y1: 89.2, x2: 54.6, y2: 92.4, sound: sound6 }
-
-
+    { x1: 5.63, y1: 9.35, x2: 34.07, y2: 22.38, sound: sound1 },
+    { x1: 38.16, y1: 9.52, x2: 94.4, y2: 22.38, sound: sound2 },
+    { x1: 58.5, y1: 26.8, x2: 87.6, y2: 36.0, sound: sound3 },
+    { x1: 5.84, y1: 25.6, x2: 37.73, y2: 35.92, sound: sound4 },
+    { x1: 59.49, y1: 25.6, x2: 89.66, y2: 36.26, sound: sound5 },
+    { x1: 5.63, y1: 66.04, x2: 47.86, y2: 69.93, sound: sound6 },
+    { x1: 31.48, y1: 92.27, x2: 54.32, y2: 95.83, sound: sound7 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
