@@ -45,7 +45,7 @@ const Unit9_Page6_Q1 = () => {
   ];
   const correctAnswers = {
     1: { word1: "the train stop", word2: "were at" },
-    2: { word1: "the clinic", word2: "are in" },
+    2: { word1: "the clinic", word2: "are at" },
     3: { word1: "the bus stop", word2: "are at" },
     4: { word1: "the theater", word2: "were at" },
   };

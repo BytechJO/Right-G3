@@ -3,8 +3,8 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 13.svg";
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 14.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 15.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 15.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 14.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Asset 16.svg";
 import Button from "../../Button";
 
@@ -18,7 +18,7 @@ const Unit8_Page5_Q3 = () => {
     {
       img: img2,
       options: ["He was at the beach.", "He wasn’t at the beach."],
-      correct: " He wasn’t at the beach.",
+      correct: "He wasn’t at the beach.",
     },
     {
       img: img3,
