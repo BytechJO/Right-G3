@@ -38,7 +38,7 @@ const Unit8_Page6_Q2 = () => {
 
   const wordBank = [
     "Did Jack play soccer?",
-    "Yes, he did.",
+    "Did John watch TV?",
     "Did Tom help his mom?",
     "Did Stella clean her shoes?",
   ];
@@ -180,6 +180,7 @@ const Unit8_Page6_Q2 = () => {
                     key={word}
                     draggableId={`season-${word}`}
                     index={index}
+                    isDragDisabled={answers.includes(word)}
                   >
                     {(provided) => (
                       <span
@@ -193,7 +194,10 @@ const Unit8_Page6_Q2 = () => {
                           borderRadius: "8px",
                           background: "white",
                           fontWeight: "bold",
-                          cursor: "grab",
+                          cursor: answers.includes(word)
+                            ? "not-allowed"
+                            : "grab",
+                          opacity: answers.includes(word) ? 0.4 : 1,
                           fontSize: "16px",
                           ...provided.draggableProps.style,
                         }}

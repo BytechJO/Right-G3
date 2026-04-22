@@ -91,7 +91,17 @@ const Review6_Page1_Q2 = () => {
 
     setStartDot(null);
   };
+  const formatOrdinal = (word) => {
+    const match = word.match(/(\d+)(st|nd|rd|th)/);
+    if (!match) return word;
 
+    return (
+      <>
+        {match[1]}
+        <sup style={{ fontSize: "0.6em", marginLeft: "1px" }}>{match[2]}</sup>
+      </>
+    );
+  };
   const showAnswers = () => {
     if (isChecked) return;
 
@@ -280,10 +290,10 @@ const Review6_Page1_Q2 = () => {
                         : "transparent",
                   }}
                 >
-                  <span style={{ fontWeight: "bold", marginRight: 4 }}>
+                  <span style={{ fontWeight: "bold", marginRight: 10 }}>
                     {item.letter}
                   </span>
-                  {item.word}
+                  {formatOrdinal(item.word)}
                 </span>
               </div>
             ))}

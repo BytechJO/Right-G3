@@ -14,7 +14,7 @@ const Review9_Page1_Q1 = () => {
     { id: 1, img: img1, correct: "were", sentence: "at the park." },
     { id: 2, img: img2, correct: "wasn’t", sentence: "at the store." },
     { id: 3, img: img3, correct: "was", sentence: "at the farm." },
-    { id: 4, img: img4, correct: "wasn’t", sentence: "at the mall." },
+    { id: 4, img: img4, correct: "weren’t", sentence: "at the mall." },
   ];
 
   const words = ["was", "were", "wasn’t", "weren’t"];

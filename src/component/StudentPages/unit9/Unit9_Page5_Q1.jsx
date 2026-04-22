@@ -17,13 +17,24 @@ const Unit9_Page5_Q1 = () => {
       id: 1,
       image1: img1,
       image2: img2,
+      label1: "ducks",
+      label2: "girls",
       correct: "✗",
     },
-    { id: 2, image1: img3, image2: img4, correct: "✓" },
+    {
+      id: 2,
+      image1: img3,
+      image2: img4,
+      label1: "cats",
+      label2: "cups",
+      correct: "✓",
+    },
     {
       id: 3,
       image1: img5,
       image2: img6,
+      label1: "trees",
+      label2: "bees",
       correct: "✓",
     },
   ];
@@ -100,8 +111,7 @@ const Unit9_Page5_Q1 = () => {
           <h5 className="header-title-page8">
             <span className="ex-A mr-3">A</span>
             Do they both have the same final{" "}
-            <span style={{ color: "#2e3192" }}>-s sound </span>
-            sound? Listen and write
+            <span style={{ color: "#2e3192" }}>-s sound </span>? Write
             <span style={{ color: "#D52328" }}>✓</span> or{" "}
             <span style={{ color: "#D52328" }}>✗</span>.
           </h5>
@@ -140,7 +150,10 @@ const Unit9_Page5_Q1 = () => {
                       </div>
                     </div>
                   </div>
-
+                  <div className="flex w-full justify-between mt-2 px-4 text-[16px]">
+                    <span>{q.label1}</span>
+                    <span>{q.label2}</span>
+                  </div>
                   {/* الخيارات */}
                   <div className="u8p5-opts-row flex gap-5">
                     {/* ✓ */}

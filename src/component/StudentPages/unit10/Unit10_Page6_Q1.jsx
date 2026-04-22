@@ -12,10 +12,10 @@ const exerciseQuestions = [
     id: "g1",
     img: img1,
     questions: [
-      { id: "q1", text: "Mom is cooking.", correctAnswer: true },
+      { id: "q1", text: "She will go to the beach.", correctAnswer: true },
       {
         id: "q2",
-        text: "Grandpa is listening to the radio.",
+        text: "She will go to the library.",
         correctAnswer: false,
       },
     ],
@@ -24,18 +24,18 @@ const exerciseQuestions = [
     id: "g2",
     img: img2,
     questions: [
-      { id: "q3", text: "They are watching TV.", correctAnswer: false },
-      { id: "q4", text: "She is eating an apple.", correctAnswer: true },
+      { id: "q3", text: "He will plant a tree.", correctAnswer: false },
+      { id: "q4", text: "He will go to his grandparents’ farm.", correctAnswer: true },
     ],
   },
   {
     id: "g3",
     img: img3,
     questions: [
-      { id: "q5", text: "They aren’t studying.", correctAnswer: true },
+      { id: "q5", text: "She will go to the park.", correctAnswer: true },
       {
         id: "q6",
-        text: "Helen is working on the computer.",
+        text: "She will go to a restaurant.",
         correctAnswer: false,
       },
     ],
@@ -44,8 +44,8 @@ const exerciseQuestions = [
     id: "g4",
     img: img4,
     questions: [
-      { id: "q7", text: "They aren’t eating corn.", correctAnswer: true },
-      { id: "q8", text: "They aren’t eating corn.", correctAnswer: false },
+      { id: "q7", text: "She will do her homework.", correctAnswer: true },
+      { id: "q8", text: "She will watch TV.", correctAnswer: false },
     ],
   },
 ];
