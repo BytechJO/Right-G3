@@ -8,7 +8,7 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Gra
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 6.svg";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 8/P 71/unit8-pg71-EXD.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
@@ -27,20 +27,13 @@ const Review7_Page2_Q2 = () => {
 
   const words = ["s", "v", "w", "b", "m", "d"];
   const captions = [
+    { start: 0.119, end: 3.439, text: "Page 71, review seven, exercise D." },
     {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
+      start: 4.44,
+      end: 16.219,
+      text: "What is the beginning sound of the word? Listen and write. One, milkshake. Two, bike. Three, duck. Four,",
     },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
+    { start: 17.299, end: 23.159, text: "van. Five, star. Six, wheel" },
   ];
   const correctAnswers = {
     1: "m",
@@ -157,7 +150,7 @@ const Review7_Page2_Q2 = () => {
           <QuestionAudioPlayer
             src={blue}
             captions={captions}
-            stopAtSecond={10}
+            stopAtSecond={8.5}
           />
 
           <div

@@ -14,7 +14,7 @@ import { CSS } from "@dnd-kit/utilities";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
-import sound from "../../../assets/audio/ClassBook/Unit 2/P 19/CD15.Pg19_Instruction1_Adult Lady.mp3";
+import sound from "../../../assets/audio/ClassBook/Unit 8/P 73/unit8-pg73-EXC.mp3";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 3.svg";
@@ -86,19 +86,15 @@ const ITEMS = [
 ];
 const captions = [
   {
-    start: 0,
-    end: 4.23,
-    text: "Page 8. Right Activities. Exercise A, number 1. ",
+    start: 0.099,
+    end: 24.739,
+    text: "Page 73, review eight, exercise C. Listen and write the beginning sound for each word. Calendar, van, wagon, cat, yo-yo, jeep, nine, kite, bubbles, moon, fries, book,",
   },
   {
-    start: 4.25,
-    end: 8.28,
-    text: "Listen and write the missing letters. Number the pictures.  ",
+    start: 25.899,
+    end: 36.22,
+    text: "X-ray, elephant, snail, zebra, tomatoes, house, apple, dog",
   },
-  { start: 8.3, end: 11.05, text: "1-tiger." },
-  { start: 11.07, end: 13.12, text: "2-taxi." },
-  { start: 13.14, end: 15.14, text: "3-duck." },
-  { start: 15.16, end: 17.13, text: "4-deer." },
 ];
 /* ===== draggable ===== */
 
@@ -248,7 +244,7 @@ const Review8_Page2_Q1 = () => {
           <QuestionAudioPlayer
             src={sound}
             captions={captions}
-            stopAtSecond={15}
+            stopAtSecond={8}
           />
 
           <div

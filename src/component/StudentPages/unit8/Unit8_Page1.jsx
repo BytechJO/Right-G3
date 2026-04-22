@@ -7,12 +7,21 @@ import Unit5_Page1_find from "./Unit8_Page1_find";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import allunit3 from "../../../assets/audio/ClassBook/U 7/CD39.Pg58.U7_Intro1.mp3.mp3";
-// import sound1 from "../../../assets/img_unit3/sounds-unit3/U2-01.mp3";
-// import sound2 from "../../../assets/img_unit3/sounds-unit3/U2-02.mp3";
-// import sound3 from "../../../assets/img_unit3/sounds-unit3/U2-03.mp3";
-// import sound4 from "../../../assets/img_unit3/sounds-unit3/U2-04.mp3";
-// import sound5 from "../../../assets/img_unit3/sounds-unit3/U2-05.mp3";
+import allunit3 from "../../../assets/audio/ClassBook/Unit 8/P 64/unit8-pg64-allunit.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound12.mp3";
+import sound13 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound13.mp3";
+import sound14 from "../../../assets/audio/ClassBook/Unit 8/P 64/sound14.mp3";
 
 const Unit8_Page1 = ({ openPopup }) => {
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
@@ -20,47 +29,127 @@ const Unit8_Page1 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
   const captionsExample = [
-    { start: 0, end: 4.0, text: " Page 58, Unit 7, It’s Boarding Time. " },
+    {
+      start: 0.08,
+      end: 8.68,
+      text: "Page 64, unit 8. At our grandparents' farm. Page 64, unit 8, vocabulary.",
+    },
+
+    {
+      start: 9.98,
+      end: 13.7,
+      text: "One, cottage. Two, tractor.",
+    },
+
+    {
+      start: 14.72,
+      end: 16.219,
+      text: "Three, mill.",
+    },
+
+    {
+      start: 17.44,
+      end: 26.46,
+      text: "Four, barn. Five, horse. Six, dog. Seven, chick.",
+    },
+
+    {
+      start: 27.56,
+      end: 29.0,
+      text: "Eight, chicken.",
+    },
+
+    {
+      start: 30.04,
+      end: 42.12,
+      text: "Nine, sheep. 10, fence. 11, wheat. 12, farmer. 13, cow.",
+    },
+
+    {
+      start: 43.3,
+      end: 62.52,
+      text: "14, dog kennel. Page 64, listen and read along. E-S. Boxes, buses, brushes, sandwiches. Page 65, reading. Listen and read along. Helping out on the farm.",
+    },
+
+    {
+      start: 63.92,
+      end: 102.02,
+      text: "Tom and his sister were visiting their grandparents for one week. They live on a farm. Tom and his sister like it because it reminds them of the past. The weather was sunny. It didn't rain the whole week. There are many animals on the farm. Tom and his sister helped their grandparents on the farm. Tom's sister fed the horses. Tom milked the cows and fed corn to the chickens. They watched their grandpa ride the tractor. Tom would like to ride on the tractor one day. Page 65, listen, read and repeat.",
+    },
+
+    {
+      start: 102.02,
+      end: 104.04,
+      text: "Where were you last week?",
+    },
+
+    {
+      start: 104.04,
+      end: 104.9,
+      text: "I was on the farm.",
+    },
+
+    {
+      start: 106.1,
+      end: 119.04,
+      text: "Page 65, listen and read along. G-R, P-R, B-R. Grandmother, green, present, prize, brown.",
+    },
   ];
 
   const areas = [
     // الصوت الأول – المنطقة الأساسية
-    { x1: 72.8, y1: 26.6, x2: 77.0, y2: 30.0, sound: 1, isPrimary: true },
+    { x1: 45.4, y1: 16.5, sound: 1, isPrimary: true },
+    { x1: 28.47, y1: 15.59, x2: 52.17, y2: 27, sound: 1, isPrimary: false },
 
-    // // الصوت الأول – منطقة إضافية
-    { x1: 69.5, y1: 25.8, x2: 75.9, y2: 33.4, sound: 1, isPrimary: false },
+    { x1: 35.9, y1: 50.8, sound: 2, isPrimary: true },
+    { x1: 34.07, y1: 50.5, x2: 59.26, y2: 60, sound: 2, isPrimary: false },
 
-    // // الصوت الثاني – الأساسية
-    { x1: 63.2, y1: 56.35, x2: 67.2, y2: 59.3, sound: 2, isPrimary: true },
+    { x1: 54.26, y1: 13, sound: 3, isPrimary: true },
 
-    // // الصوت الثاني – الإضافية
-    { x1: 62.9, y1: 53.5, x2: 74.8, y2: 59.9, sound: 2, isPrimary: false },
+    { x1: 74.87, y1: 35, sound: 4, isPrimary: true },
+    { x1: 67.25, y1: 28.98, x2: 92.67, y2: 39.98, sound: 4, isPrimary: false },
 
-    // // الصوت الثالث – الأساسية
-    { x1: 60.8, y1: 47.9, x2: 64.9, y2: 50.9, sound: 3, isPrimary: true },
+    { x1: 71.13, y1: 47.8, sound: 5, isPrimary: true },
 
-    // // الصوت الثالث – الإضافية
-    { x1: 56.4, y1: 43.5, x2: 72.8, y2: 51.1, sound: 3, isPrimary: false },
-    // // الصوت الرابع – الأساسية
-    { x1: 88.2, y1: 11.45, x2: 92.1, y2: 14.4, sound: 4, isPrimary: true },
+    { x1: 86.4, y1: 53.3, sound: 6, isPrimary: true },
 
-    // // الصوت الرابع – الإضافية
-    { x1: 23.17, y1: 11.5, x2: 99.4, y2: 20.5, sound: 4, isPrimary: false },
+    { x1: 82.5, y1: 75.8, sound: 7, isPrimary: true },
+    { x1: 86.89, y1: 76.53, x2: 94.86, y2: 80.6, sound: 7, isPrimary: false },
 
-    // // الصوت الخامس – الأساسية
-    { x1: 13.4, y1: 23.7, x2: 17.3, y2: 26.7, sound: 5, isPrimary: true },
+    { x1: 65.4, y1: 54, sound: 8, isPrimary: true },
 
-    // // الصوت الخامس – الإضافية
-    { x1: 1.0, y1: 11.06, x2: 16.9, y2: 28.5, sound: 5, isPrimary: false },
+    { x1: 84.6, y1: 57.4, sound: 9, isPrimary: true },
+
+    { x1: 50.5, y1: 62.3, sound: 10, isPrimary: true },
+
+    { x1: 27, y1: 35.76, sound: 11, isPrimary: true },
+    { x1: 22.9, y1: 35.24, x2: 33.45, y2: 43.37, sound: 11, isPrimary: false },
+
+    { x1: 34.4, y1: 33, sound: 12, isPrimary: true },
+    { x1: 30.44, y1: 27.12, x2: 33.24, y2: 33.89, sound: 12, isPrimary: false },
+
+    { x1: 78.8, y1: 59.1, sound: 13, isPrimary: true },
+    { x1: 68.57, y1: 62.83, x2: 90.33, y2: 72, sound: 13, isPrimary: false },
+
+    { x1: 88.8, y1: 44.2, sound: 14, isPrimary: true },
+    { x1: 87.1, y1: 45.57, x2: 97.66, y2: 50.3, sound: 14, isPrimary: false },
   ];
-  // const sounds = {
-  //   1: sound1,
-  //   2: sound2,
-  //   3: sound3,
-  //   4: sound4,
-  //   5: sound5,
-
-  // };
+  const sounds = {
+    1: sound1,
+    2: sound2,
+    3: sound3,
+    4: sound4,
+    5: sound5,
+    6: sound6,
+    7: sound7,
+    8: sound8,
+    9: sound9,
+    10: sound10,
+    11: sound11,
+    12: sound12,
+    13: sound13,
+    14: sound14,
+  };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -130,7 +219,7 @@ const Unit8_Page1 = ({ openPopup }) => {
             }}
             onClick={() => {
               setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-              // playSound(sounds[area.sound]);
+              playSound(sounds[area.sound]);
             }}
           ></div>
         );
