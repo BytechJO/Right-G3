@@ -20,7 +20,6 @@ const Unit8_Page1_find = () => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-    console.log(xPercent, yPercent);
 
     setClickedPoint({
       x: xPercent,
