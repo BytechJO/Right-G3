@@ -1,12 +1,12 @@
 import React, { useState, useRef } from "react";
 import page_3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 84.png";
 import "./Unit10_Page3.css";
-import grammarSound from "../../../assets/audio/ClassBook/U 7/CD41.Pg60_Grammar1_Adult Lady.mp3";
-import sound1 from "../../../assets/audio/ClassBook/U 5/Pg42_1.1_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 5/Pg41_1.2_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 5/Pg42_2.1_Helen.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 5/Pg42_3.1_John.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 5/Pg42_4.1_Adult Lady.mp3";
+import grammarSound from "../../../assets/audio/ClassBook/Unit 10/P 84/unit10-pg84-grammar1.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 10/P 84/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 10/P 84/Pg84_2.1_Stella.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 10/P 84/Pg84_3.1_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 84/Pg84_4.1_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 10/P 84/Pg84_5.1_Adult Lady.mp3";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
@@ -18,15 +18,29 @@ const Unit10_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.22, text: "Page 60, Exercise 1. Right Grammar." },
+    {
+      start: 0.379,
+      end: 18.079,
+      text: "Page 84, exercise one, write grammar. She/he will/won't plant a tree. I/you/we/they will/won't water the plants.",
+    },
+    {
+      start: 18.079,
+      end: 20.779,
+      text: "I will plant flowers.",
+    },
+    {
+      start: 20.779,
+      end: 32.819,
+      text: "He will build a sandcastle. He won't swim in the sea. She will go to the mall. She won't go to the grocery store. She won't go to the park. She will play at home with Stella",
+    },
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10.7, x2: 30.0, y2: 15.0, sound: sound1 },
-    { x1: 54.2, y1: 9.5, x2: 78.3, y2: 13.0, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 54.2, y1: 13.5, x2: 83.5, y2: 16.7, sound: sound4 },
-    { x1: 54.2, y1: 17.0, x2: 74.1, y2: 20.4, sound: sound5 },
+    { x1: 5.41, y1: 7.83, x2: 81.69, y2: 20.69, sound: sound1 },
+    { x1: 25.88, y1: 56.23, x2: 49.58, y2: 60.12, sound: sound2 },
+    { x1: 53.03, y1: 55, x2: 83.19, y2: 60.6, sound: sound3 },
+    { x1: 5.63, y1: 89.06, x2: 44.20, y2: 94.64, sound: sound4 },
+    { x1: 53.03, y1: 89.90, x2:90.09, y2: 96.33, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

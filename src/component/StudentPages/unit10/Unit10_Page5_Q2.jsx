@@ -7,7 +7,7 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shal
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 7.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 8.svg";
 import Button from "../../Button";
-import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/CD13.Pg17_Instruction1_Adult Lady.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 10/P 86/unit10-pg86-EXA2.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 
@@ -35,21 +35,17 @@ const Unit10_Page5_Q2 = () => {
     },
   ];
   const captions = [
-    {
-      start: 0,
-      end: 4.23,
-      text: "Page 8. Right Activities. Exercise A, number 1. ",
-    },
-    {
-      start: 4.25,
-      end: 8.28,
-      text: "Listen and write the missing letters. Number the pictures.  ",
-    },
-    { start: 8.3, end: 11.05, text: "1-tiger." },
-    { start: 11.07, end: 13.12, text: "2-taxi." },
-    { start: 13.14, end: 15.14, text: "3-duck." },
-    { start: 15.16, end: 17.13, text: "4-deer." },
-  ];
+  {
+    start: 0.28,
+    end: 6.899,
+    text: "Page 86, write activities, exercise A, number two. Listen and choose."
+  },
+  {
+    start: 6.899,
+    end: 15.46,
+    text: "One, grapes. Two, train. Three, fries. Four, broom."
+  }
+];
   const [selected, setSelected] = useState(Array(items.length).fill(""));
   const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [locked, setLocked] = useState(false);
@@ -130,7 +126,7 @@ const Unit10_Page5_Q2 = () => {
           <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
           Listen and choose.
         </h5>
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10} />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={6.3} />
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-10 mb-10 px-2">
           {items.map((item, i) => (

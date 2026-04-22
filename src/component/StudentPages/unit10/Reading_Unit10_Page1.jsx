@@ -1,11 +1,11 @@
 import page24 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 92.png";
 import React, { useState, useRef } from "react";
 import "./Reading_Unit10_Page2.css";
-import sound1 from "../../../assets/audio/ClassBook/U 2/CD1.Pg20_Reading_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 2/Pg20_1.1_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 2/Pg20_1.2_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 2/Pg20_1.3_Adult Lady.mp3";
-import sound5 from "../../../assets/audio/ClassBook/U 2/Pg20_1.4_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 10/P 92/unit10-pg92-reading.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 10/P 92/Pg92_1.1_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 10/P 92/Pg92_1.2_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 92/Pg92_1.3_Adult Lady.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 10/P 92/Pg92_1.4_Adult Lady.mp3";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
@@ -17,53 +17,32 @@ const Reading_Unit10_Page1 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0, end: 3.17, text: "Page 20 Reading. It's a Bunny." },
     {
-      start: 3.2,
-      end: 7.18,
-      text: " Today is Stella's birthday. Her friends are at her party. ",
+      start: 0.2,
+      end: 82.98,
+      text: "Page 92 reading. Helen learns a lesson. It was winter. Everyone was outside. Stella and the boys had a snowball fight. Helen and her friend made a snowman. While Helen and her friend were making a snowman, Helen's cat, Mimi, walked into the woods. Helen couldn't find her cat anywhere. Helen was feeling sad. There was a man walking near the bridge. He called to Helen. Are you looking for something? Yes, I'm looking for my brown cat. Have you seen it? No, I haven't, the man answered. Helen saw her classmate, Lana. Hi, Helen. How are you? asked Lana. I'm okay, but I've lost my cat, Mimi. I've been looking everywhere for her. I'm sorry. I haven't seen your cat, but I'll help you look for her, said Lana. Helen and Lana saw cat tracks. They went up the hill. The snow was deep. They walked on and on. Hey, that's my grandma's house, shouted Helen excitedly. That's great, replied Lana. I can't wait to see my grandma, said Helen happily. Grandma said, Hello, Helen and Lana. It's good to see you both. Come inside. It's very cold outside.",
     },
     {
-      start: 7.21,
-      end: 14.01,
-      text: "There is a big birthday cake. Harley asks Stella how old she is. She is seven years old. ",
+      start: 84.1,
+      end: 101.7,
+      text: "Grandma, it's good to see you, too. I've lost Mimi. What should I do? I have some good news. Mimi is right here with me. Come and see her, said Grandma. Helen said, Thanks so much, Grandma. I'm so happy to see Mimi.",
     },
     {
-      start: 14.05,
-      end: 18.26,
-      text: "Harley, Hansel, and John see the cupcakes. They look delicious.",
+      start: 102.77,
+      end: 112.399,
+      text: "How was your day? Grandma asked. It was fun, Grandma. We played in the snow and made a snowman. Then we lost Mimi, said Helen.",
     },
     {
-      start: 18.3,
-      end: 26.09,
-      text: "Hansel eats a lot of cupcakes. His tummy hurts. John tells him it is not good to eat so many sweets.",
-    },
-    {
-      start: 26.12,
-      end: 34.0,
-      text: "Now, it's time for presents. Mom gives Stella her present. Stella is so excited.",
-    },
-    {
-      start: 34.04,
-      end: 37.05,
-      text: "Stella opens the present. What can it be?  ",
-    },
-    {
-      start: 37.09,
-      end: 45.09,
-      text: "The present from mom is a bunny. It is very cute and white. Stella names her new bunny Tilly.",
-    },
-    {
-      start: 45.12,
-      end: 54.04,
-      text: "Tilly hops and chases Lolo. Lolo is surprised. Stella and Sara laugh and laugh. This is the best birthday.",
+      start: 113.94,
+      end: 125.22,
+      text: "It's good that you had your friend to help you, said Grandma. We learned to help each other, said Lana. I learned to take better care of my cat, added Helen.",
     },
   ];
   const clickableAreas = [
-    { x1: 15.9, y1: 39.4, x2: 51.14, y2: 44.0, sound: sound2 },
-    { x1: 56.0, y1: 39.1, x2: 93.9, y2: 44.0, sound: sound3 },
-    { x1: 16.0, y1: 84.0, x2: 52.9, y2: 89.5, sound: sound4 },
-    { x1: 56.0, y1: 84.5, x2: 93.7, y2: 90.9, sound: sound5 },
+    { x1: 15.11, y1: 38.8, x2: 53.03, y2: 49.46, sound: sound2 },
+    { x1: 55.62, y1: 39.13, x2: 92.46, y2: 49.29, sound: sound3 },
+    { x1: 15.32, y1: 79.24, x2: 52.17, y2: 96, sound: sound4 },
+    { x1: 55.62, y1: 84.32, x2: 93.11, y2: 96.9, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -145,12 +124,19 @@ const Reading_Unit10_Page1 = ({ openPopup }) => {
                 }}
               >
                 <AudioWithCaption src={sound1} captions={captionsExample} />
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={audioBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={audioBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
 
@@ -187,12 +173,19 @@ const Reading_Unit10_Page1 = ({ openPopup }) => {
                 >
                   {/* <source src={video3} type="video/mp4" /> */}
                 </video>
-              </div>
+              </div>,
             )
           }
           style={{ overflow: "visible" }}
         >
-          <image className="svg-img" href={pauseBtn} x="0" y="0" width="90" height="90" />
+          <image
+            className="svg-img"
+            href={pauseBtn}
+            x="0"
+            y="0"
+            width="90"
+            height="90"
+          />
         </svg>
       </div>
       <audio ref={audioRef} style={{ display: "none" }} />

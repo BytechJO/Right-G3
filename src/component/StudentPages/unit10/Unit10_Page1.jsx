@@ -7,12 +7,22 @@ import Unit5_Page1_find from "./Unit10_Page1_find";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import allunit3 from "../../../assets/audio/ClassBook/U 7/CD39.Pg58.U7_Intro1.mp3.mp3";
-// import sound1 from "../../../assets/img_unit3/sounds-unit3/U2-01.mp3";
-// import sound2 from "../../../assets/img_unit3/sounds-unit3/U2-02.mp3";
-// import sound3 from "../../../assets/img_unit3/sounds-unit3/U2-03.mp3";
-// import sound4 from "../../../assets/img_unit3/sounds-unit3/U2-04.mp3";
-// import sound5 from "../../../assets/img_unit3/sounds-unit3/U2-05.mp3";
+import allunit3 from "../../../assets/audio/ClassBook/Unit 10/P 82/unit10-pg82-unitall.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound1.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound2.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound3.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound4.mp3";
+import sound5 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound5.mp3";
+import sound6 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound6.mp3";
+import sound7 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound7.mp3";
+import sound8 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound8.mp3";
+import sound9 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound9.mp3";
+import sound10 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound10.mp3";
+import sound11 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound11.mp3";
+import sound12 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound12.mp3";
+import sound13 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound13.mp3";
+import sound14 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound14.mp3";
+import sound15 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound15.mp3";
 
 const Unit10_Page1 = ({ openPopup }) => {
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
@@ -25,42 +35,62 @@ const Unit10_Page1 = ({ openPopup }) => {
 
   const areas = [
     // الصوت الأول – المنطقة الأساسية
-    { x1: 72.8, y1: 26.6, x2: 77.0, y2: 30.0, sound: 1, isPrimary: true },
+    { x1: 28.3, y1: 39.2, sound: 1, isPrimary: true },
 
-    // // الصوت الأول – منطقة إضافية
-    { x1: 69.5, y1: 25.8, x2: 75.9, y2: 33.4, sound: 1, isPrimary: false },
+    { x1: 22.4, y1: 22.4, sound: 2, isPrimary: true },
 
-    // // الصوت الثاني – الأساسية
-    { x1: 63.2, y1: 56.35, x2: 67.2, y2: 59.3, sound: 2, isPrimary: true },
+    { x1: 32.4, y1: 24.8, sound: 3, isPrimary: true },
+    { x1: 37.09, y1: 25.26, x2: 46.14, y2: 28.66, sound: 3, isPrimary: false },
 
-    // // الصوت الثاني – الإضافية
-    { x1: 62.9, y1: 53.5, x2: 74.8, y2: 59.9, sound: 2, isPrimary: false },
+    { x1: 56.9, y1: 20, sound: 4, isPrimary: true },
+    { x1: 49.37, y1: 14.77, x2: 77.59, y2: 25.43, sound: 4, isPrimary: false },
 
-    // // الصوت الثالث – الأساسية
-    { x1: 60.8, y1: 47.9, x2: 64.9, y2: 50.9, sound: 3, isPrimary: true },
+    { x1: 32, y1: 31.3, sound: 5, isPrimary: true },
+    { x1: 22.0, y1: 29.49, x2: 32.56, y2: 35.07, sound: 5, isPrimary: false },
 
-    // // الصوت الثالث – الإضافية
-    { x1: 56.4, y1: 43.5, x2: 72.8, y2: 51.1, sound: 3, isPrimary: false },
-    // // الصوت الرابع – الأساسية
-    { x1: 88.2, y1: 11.45, x2: 92.1, y2: 14.4, sound: 4, isPrimary: true },
+    { x1: 72.2, y1: 28.9, sound: 6, isPrimary: true },
+    { x1: 67.25, y1: 32.37, x2: 73.5, y2: 32.7, sound: 6, isPrimary: false },
 
-    // // الصوت الرابع – الإضافية
-    { x1: 23.17, y1: 11.5, x2: 99.4, y2: 20.5, sound: 4, isPrimary: false },
+    { x1: 58.7, y1: 34, sound: 7, isPrimary: true },
+    { x1: 63.37, y1: 35.07, x2: 66.82, y2: 41.84, sound: 7, isPrimary: false },
 
-    // // الصوت الخامس – الأساسية
-    { x1: 13.4, y1: 23.7, x2: 17.3, y2: 26.7, sound: 5, isPrimary: true },
+    { x1: 38.5, y1: 47.5, sound: 8, isPrimary: true },
 
-    // // الصوت الخامس – الإضافية
-    { x1: 1.0, y1: 11.06, x2: 16.9, y2: 28.5, sound: 5, isPrimary: false },
+    { x1: 46, y1: 42.7, sound: 9, isPrimary: true },
+
+    { x1: 48, y1: 58.2, sound: 10, isPrimary: true },
+    { x1: 47.86, y1: 53.69, x2: 62.08, y2: 62.49, sound: 10, isPrimary: false },
+
+    { x1: 28.9, y1: 78.1, sound: 11, isPrimary: true },
+
+    { x1: 38.5, y1: 61.6, sound: 12, isPrimary: true },
+    { x1: 30.41, y1: 61.3, x2: 40.1, y2: 67.9, sound: 12, isPrimary: false },
+
+    { x1: 71.6, y1: 68.7, sound: 13, isPrimary: true },
+    { x1: 65.96, y1: 63.84, x2: 82.98, y2: 75.2, sound: 13, isPrimary: false },
+
+    { x1: 53.9, y1: 66.1, sound: 14, isPrimary: true },
+
+    { x1: 34.3, y1: 56.45, sound: 15, isPrimary: true },
+    { x1: 26.31, y1: 55.21, x2: 33.21, y2: 59.44, sound: 15, isPrimary: false },
   ];
-  // const sounds = {
-  //   1: sound1,
-  //   2: sound2,
-  //   3: sound3,
-  //   4: sound4,
-  //   5: sound5,
-
-  // };
+  const sounds = {
+    1: sound1,
+    2: sound2,
+    3: sound3,
+    4: sound4,
+    5: sound5,
+    6: sound6,
+    7: sound7,
+    8: sound8,
+    9: sound9,
+    10: sound10,
+    11: sound11,
+    12: sound12,
+    13: sound13,
+    14: sound14,
+    15: sound15,
+  };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -130,7 +160,7 @@ const Unit10_Page1 = ({ openPopup }) => {
             }}
             onClick={() => {
               setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-              // playSound(sounds[area.sound]);
+              playSound(sounds[area.sound]);
             }}
           ></div>
         );

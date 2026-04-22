@@ -2,20 +2,20 @@ import React, { useRef,useState } from "react";
 import page25 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 93.png";
 import "./Reading_Unit10_Page2.css";
 import { FaHeadphones } from "react-icons/fa";
-import sound1 from "../../../assets/audio/ClassBook/U 2/Pg21_1.5_Adult Lady.mp3";
-import sound2 from "../../../assets/audio/ClassBook/U 2/Pg21_1.6_Adult Lady.mp3";
-import sound3 from "../../../assets/audio/ClassBook/U 2/Pg21_1.7_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/U 2/Pg21_1.8_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 10/P 93/Pg93_1.2_Adult Lady.mp3";
+import sound2 from "../../../assets/audio/ClassBook/Unit 10/P 93/Pg93_1.3_Adult Lady.mp3";
+import sound3 from "../../../assets/audio/ClassBook/Unit 10/P 93/Pg93_1.4_Adult Lady.mp3";
+import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 93/Pg93_1.5_Adult Lady.mp3";
 const Reading_Unit10_Page2 = () => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const clickableAreas = [
-    { x1: 9.0, y1: 39.0, x2: 45.8, y2: 43.9, sound: sound1 },
-    { x1: 49.0, y1: 39.2, x2: 85.4, y2: 43.1, sound: sound2 },
-    { x1: 9.0, y1: 84.5, x2: 45.0, y2: 91.2, sound: sound3 },
-    { x1: 49.0, y1: 84.5, x2: 86.5, y2: 91.0, sound: sound4 },
+    { x1: 8.27, y1: 38.8, x2: 45.76, y2: 49.97, sound: sound1 },
+    { x1: 48.35, y1:  38.29, x2: 86.70, y2: 50.64, sound: sound2 },
+    { x1: 8.06, y1: 83.13, x2: 45.33, y2: 96.33, sound: sound3 },
+    { x1: 48.35, y1: 79.58, x2: 85.84, y2: 96.84, sound: sound4 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
