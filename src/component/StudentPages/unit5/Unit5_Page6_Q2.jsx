@@ -6,6 +6,14 @@ import Button from "../../Button";
 
 const questions = [
   {
+    id: "q0",
+    qWords: ["Where", "is", "the"],
+    qEnd: ["bike", "?"],
+
+    aWords: ["It's", "in", "the", "garage"],
+    aEnd: ["."],
+  },
+  {
     id: "q1",
     qWords: ["Where", "is", "the"],
     qEnd: ["TV", "?"],
@@ -18,7 +26,7 @@ const questions = [
     qWords: ["Where", "is", "the"],
     qEnd: ["bed", "?"],
 
-    aWords: ["It's", "in", "the", "living", "bedroom"],
+    aWords: ["It's", "in", "the", "bedroom"],
     aEnd: ["."],
   },
   {
@@ -26,7 +34,7 @@ const questions = [
     qWords: ["Where", "is", "the"],
     qEnd: ["washing machine", "?"],
 
-    aWords: ["It's", "in", "the", "living", "basement"],
+    aWords: ["It's", "in", "the", "basement"],
     aEnd: ["."],
   },
 ];
@@ -34,12 +42,20 @@ const Unit5_Page6_Q2 = () => {
   const [locked, setLocked] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [wrongInputs, setWrongInputs] = useState({});
+  const shuffleArray = (arr) => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
   const [data, setData] = useState(() => {
     const obj = {};
     questions.forEach((q) => {
       obj[q.id] = {
-        qBank: [...q.qWords],
-        aBank: [...q.aWords],
+        qBank: shuffleArray(q.qWords), // ✅ عشوائي
+        aBank: shuffleArray(q.aWords), // ✅ عشوائي
         qLine: Array(q.qWords.length).fill(null),
         aLine: Array(q.aWords.length).fill(null),
       };
@@ -190,20 +206,14 @@ const Unit5_Page6_Q2 = () => {
           <div className="flex gap-10 items-start mb-7">
             {/* 🔵 LEFT SIDE */}
             <div className="flex flex-col gap-4">
-              {/* ✅ الجملة الثابتة */}
-              <div className="text-lg font-semibold mb-2">
-                <span className="font-bold mr-2">1.</span>
-                <div>Where is the bike?</div>
-                <div>It's in the garage.</div>
-              </div>
-
+              
               {/* 🔥 الأسئلة */}
               {questions.map((q, index) => (
                 <div
                   key={q.id}
                   className="bg-white p-2 rounded-2xl shadow w-full max-w-2xl"
                 >
-                  <div className="text-lg font-bold mb-1">{index + 2}.</div>
+                  <div className="text-lg font-bold mb-1">{index + 1}.</div>
                   {/* 🔵 QUESTION WORDS */}
                   <Droppable
                     droppableId={`${q.id}-qBank`}

@@ -156,12 +156,10 @@ const Review4_Page1_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div
-          className="div-forall"
-        >
+        <div className="div-forall">
           <h5 className="header-title-page8">
-            <span style={{marginRight:"10px"}}>A</span> Read and write the season. Number the pictures.
-            the pictures.
+            <span style={{ marginRight: "10px" }}>A</span> Read and write the
+            season. Number the pictures .
           </h5>
           <Droppable droppableId="mixed" direction="horizontal">
             {(provided) => (
