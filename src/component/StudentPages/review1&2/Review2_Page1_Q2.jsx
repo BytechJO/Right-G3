@@ -27,7 +27,7 @@ const Review2_Page1_Q2 = () => {
       subject: "She",
       questionEnd: "jump rope?",
       answerEnd: "jumps rope.",
-      words: ["often", "does", "she", "usually"],
+      words: ["does", "often", "usually", "she"],
       correct: [["often", "does", "she"], ["usually"]],
       fixedQuestion: ["How"],
     },
@@ -37,7 +37,7 @@ const Review2_Page1_Q2 = () => {
       subject: "He",
       questionEnd: "go to the store?",
       answerEnd: "goes to the store.",
-      words: ["often", "does", "he", "sometimes"],
+      words: ["does", "often", "sometimes", "he"],
       correct: [["often", "does", "he"], ["sometimes"]],
       fixedQuestion: ["How"],
     },
@@ -47,7 +47,7 @@ const Review2_Page1_Q2 = () => {
       subject: "He",
       questionEnd: "go to bed?",
       answerEnd: "goes to bed.",
-      words: ["often", "does", "he", "always"],
+      words: ["always", "often", "he", "does"],
       correct: [["often", "does", "he"], ["always"]],
       fixedQuestion: ["How"],
     },
@@ -274,7 +274,6 @@ const Review2_Page1_Q2 = () => {
                                 ✕
                               </div>
                             )}
-          
                           </span>
                         )}
                       </Droppable>

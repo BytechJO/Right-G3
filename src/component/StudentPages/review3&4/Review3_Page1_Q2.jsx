@@ -8,7 +8,7 @@ const Review3_Page1_Q2 = () => {
   const items = [
     { text: "Do they have any milkshakes?", answer: "Yes, they have some." },
     { text: "Does she have any potatoes?", answer: "No, she hasn’t any" },
-    { text: "It's often cool. We wear jackets.", answer: "No, he hasn’t any." },
+    { text: "Does he have any salad?", answer: "No, he hasn’t any." },
     { text: "Does she have any fruit?", answer: "Yes, she has some." },
   ];
 

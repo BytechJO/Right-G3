@@ -7,19 +7,19 @@ import WrongMark from "../../WrongMark";
 const Page9_Q2 = () => {
   const questions = [
     {
-      options: ["cat", "shorter", "bear"],
+      options: ["shorter", "cat", "bear"],
       correct: ["cat", "shorter", "bear"],
     },
     {
-      options: ["mouse", "smaller", "dog"],
+      options: ["mouse", "dog", "smaller"],
       correct: ["mouse", "smaller", "dog"],
     },
     {
-      options: ["basketball player", "younger", "referee"],
+      options: ["younger", "basketball player", "referee"],
       correct: ["basketball player", "younger", "referee"],
     },
     {
-      options: ["basketball court", "bigger", "scoreboard"],
+      options: ["bigger", "scoreboard", "basketball court"],
       correct: ["basketball court", "bigger", "scoreboard"],
     },
   ];
@@ -33,6 +33,11 @@ const Page9_Q2 = () => {
 
     const { draggableId, destination } = result;
 
+    // 🚫 إذا السحب داخل البنك (options) تجاهله
+    if (destination.droppableId.startsWith("bank")) return;
+
+    const word = draggableId.split("-").slice(1).join("-");
+
     const [qIndex, slotIndex] = destination.droppableId
       .replace("drop-", "")
       .split("-")
@@ -41,9 +46,9 @@ const Page9_Q2 = () => {
     setAnswers((prev) => {
       const copy = prev.map((row) => [...row]);
 
-      copy[qIndex] = copy[qIndex].map((w) => (w === draggableId ? "" : w));
+      copy[qIndex] = copy[qIndex].map((w) => (w === word ? "" : w));
 
-      copy[qIndex][slotIndex] = draggableId;
+      copy[qIndex][slotIndex] = word;
 
       return copy;
     });
@@ -72,11 +77,7 @@ const Page9_Q2 = () => {
     setLocked(true);
 
     const msg = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="font-weight:bold;">
           Score: ${score} / ${questions.length}
-        </span>
-      </div>
             `;
     if (score === questions.length) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
@@ -123,6 +124,7 @@ const Page9_Q2 = () => {
                   <Droppable
                     droppableId={`bank-${qIndex}`}
                     direction="horizontal"
+                    isDropDisabled={true}
                   >
                     {(provided) => (
                       <div
@@ -136,7 +138,7 @@ const Page9_Q2 = () => {
                           return (
                             <Draggable
                               key={word}
-                              draggableId={word}
+                              draggableId={`${qIndex}-${word}`}
                               index={i}
                               isDragDisabled={locked || isUsed}
                             >

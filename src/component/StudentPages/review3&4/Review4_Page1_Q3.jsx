@@ -24,13 +24,13 @@ const Review4_Page1_Q3 = () => {
     { image: img5 },
   ];
 
-  const words = [`cloudy`, `rainy`, `cold`, `warm`, `warm`];
+  const words = [`cloudy`, `rainy`, `cold`, `warm`, `hot`];
   const correctMatches = {
-    4: 0, // reading ← girl reading
-    3: 1, // drinking ← dog
-    0: 2, // jacket ← boy
-    2: 3,
-    1: 4,
+    4: 0, 
+    3: 1, 
+    0: 2,
+    1: 3,
+    2: 4,
   };
 
   const handleDotClick = (index, type) => {
