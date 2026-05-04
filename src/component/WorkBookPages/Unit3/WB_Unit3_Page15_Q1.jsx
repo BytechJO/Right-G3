@@ -6,11 +6,10 @@ import char2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Fold
 import char3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 3.svg";
 import char4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex A 4.svg";
 
-
 const DOT_COLOR = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
 const BORDER_COLOR = "#e0e0e0";
-const WRONG_COLOR = "#ef4444";
+const WRONG_COLOR = "red";
 const PATH_COLOR = "#f39b42";
 const TEXT_COLOR = "#111";
 
@@ -45,27 +44,29 @@ export default function WB_ReadLookMatch_PageA() {
       if (!boardRef.current) return;
       const br = boardRef.current.getBoundingClientRect();
 
-      const newPaths = Object.entries(matches).map(([leftId, rightId]) => {
-        const s = pointRefs.current[`left-${leftId}`];
-        const e = pointRefs.current[`right-${rightId}`];
-        if (!s || !e) return null;
+      const newPaths = Object.entries(matches)
+        .map(([leftId, rightId]) => {
+          const s = pointRefs.current[`left-${leftId}`];
+          const e = pointRefs.current[`right-${rightId}`];
+          if (!s || !e) return null;
 
-        const sr = s.getBoundingClientRect();
-        const er = e.getBoundingClientRect();
-        const x1 = sr.right - br.left;               // ← من يمين الـ dot اليسار
-        const y1 = sr.top + sr.height / 2 - br.top;
-        const x2 = er.left - br.left;                // ← من يسار الـ dot اليمين
-        const y2 = er.top + er.height / 2 - br.top;
-        const dx = Math.abs(x2 - x1);
-        const isWrong =
-          showResults && matches[leftId] !== CORRECT_MATCHES[Number(leftId)];
+          const sr = s.getBoundingClientRect();
+          const er = e.getBoundingClientRect();
+          const x1 = sr.right - br.left; // ← من يمين الـ dot اليسار
+          const y1 = sr.top + sr.height / 2 - br.top;
+          const x2 = er.left - br.left; // ← من يسار الـ dot اليمين
+          const y2 = er.top + er.height / 2 - br.top;
+          const dx = Math.abs(x2 - x1);
+          const isWrong =
+            showResults && matches[leftId] !== CORRECT_MATCHES[Number(leftId)];
 
-        return {
-          id: `path-${leftId}-${rightId}`,
-          d: `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
-          color: isWrong ? WRONG_COLOR : PATH_COLOR,
-        };
-      }).filter(Boolean);
+          return {
+            id: `path-${leftId}-${rightId}`,
+            d: `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
+            color: isWrong ? WRONG_COLOR : PATH_COLOR,
+          };
+        })
+        .filter(Boolean);
 
       setPaths(newPaths);
     };
@@ -84,15 +85,17 @@ export default function WB_ReadLookMatch_PageA() {
   }, [matches, showResults]);
 
   const handleLeftSelect = (id) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setSelectedLeft((prev) => (prev === id ? null : id));
     setShowResults(false);
   };
 
   const handleRightSelect = (rightId) => {
-    if (showAns || selectedLeft === null) return;
+    if (showAns || selectedLeft === null || showResults) return;
     const upd = { ...matches };
-    Object.keys(upd).forEach((k) => { if (upd[k] === rightId) delete upd[k]; });
+    Object.keys(upd).forEach((k) => {
+      if (upd[k] === rightId) delete upd[k];
+    });
     upd[selectedLeft] = rightId;
     setMatches(upd);
     setSelectedLeft(null);
@@ -100,7 +103,7 @@ export default function WB_ReadLookMatch_PageA() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
@@ -132,7 +135,7 @@ export default function WB_ReadLookMatch_PageA() {
     setPaths([]);
   };
 
-  const getLeftConn  = (id) => !!matches[id];
+  const getLeftConn = (id) => !!matches[id];
   const getRightConn = (id) => Object.values(matches).includes(id);
   const isWrongMatch = (leftId) =>
     showResults &&
@@ -144,22 +147,20 @@ export default function WB_ReadLookMatch_PageA() {
     <div
       style={{
         position: "absolute",
-        top: "-8px",
-        right: "-8px",
-        width: "clamp(16px,1.8vw,22px)",
-        height: "clamp(16px,1.8vw,22px)",
+        top: "-10px",
+        right: "-10px",
+        width: "22px",
+        height: "22px",
         borderRadius: "50%",
-        border: "1px solid #fff",
-        backgroundColor: WRONG_COLOR,
+        backgroundColor: "red",
         color: "#fff",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: "clamp(9px,0.9vw,12px)",
-        fontWeight: 700,
-        boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-        zIndex: 5,
-        pointerEvents: "none",
+        fontSize: "12px",
+        fontWeight: "700",
+        border: "2px solid white",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
       }}
     >
       ✕
@@ -177,7 +178,7 @@ export default function WB_ReadLookMatch_PageA() {
   const GRID = {
     display: "grid",
     gridTemplateColumns:
-      "auto auto 1fr clamp(14px,2vw,22px) clamp(40px,5vw,72px) clamp(14px,2vw,22px) 1fr",
+      "auto auto 1fr clamp(14px,2vw,22px) clamp(40px, 9vw, 88px) clamp(14px,2vw,22px) 1fr",
     /*                                    ↑ left-dot             ↑ gap spacer          ↑ right-dot  */
     columnGap: "clamp(8px,1.2vw,16px)",
     rowGap: "clamp(14px,2vw,28px)",
@@ -187,33 +188,14 @@ export default function WB_ReadLookMatch_PageA() {
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
+      <div className="div-forall" style={{gap:"40px"}}>
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span> Read, look, and match.
         </h1>
 
         {/* Board */}
         <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
-
           {/* SVG lines */}
           <svg
             style={{
@@ -240,19 +222,18 @@ export default function WB_ReadLookMatch_PageA() {
 
           <div style={GRID}>
             {LEFT_ITEMS.map((lItem, idx) => {
-              const rItem    = RIGHT_ITEMS[idx];
-              const lConn    = getLeftConn(lItem.id);
-              const rConn    = getRightConn(rItem.id);
+              const rItem = RIGHT_ITEMS[idx];
+              const lConn = getLeftConn(lItem.id);
+              const rConn = getRightConn(rItem.id);
               const lSelected = selectedLeft === lItem.id;
-              const wrong    = isWrongMatch(lItem.id);
+              const wrong = isWrongMatch(lItem.id);
 
               return (
                 <React.Fragment key={lItem.id}>
-
                   {/* col 1 – number */}
                   <span
                     style={{
-                      fontSize: "clamp(16px,1.9vw,26px)",
+                      fontSize: "clamp(16px,1.7vw,20px)",
                       fontWeight: 700,
                       color: TEXT_COLOR,
                       lineHeight: 1,
@@ -271,10 +252,10 @@ export default function WB_ReadLookMatch_PageA() {
                       aspectRatio: "1 / 1",
                       flexShrink: 0,
                       zIndex: 2,
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns ||showResults ? "default" : "pointer",
                       overflow: "hidden",
                       borderRadius: "clamp(6px,0.8vw,12px)",
-                      border: `2px solid ${lSelected ? ACTIVE_COLOR : BORDER_COLOR}`,
+                      border: `1px solid ${lSelected ? ACTIVE_COLOR : "transparent"}`,
                       background: "#f7f7f7",
                       transition: "border-color 0.2s",
                       boxSizing: "border-box",
@@ -305,12 +286,12 @@ export default function WB_ReadLookMatch_PageA() {
                       padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
                       borderRadius: "clamp(8px,1vw,12px)",
                       border: lSelected
-                        ? `2.5px solid ${ACTIVE_COLOR}`
+                        ? `1.5px solid ${ACTIVE_COLOR}`
                         : "2px solid transparent",
                       background: lSelected
                         ? "rgba(243,155,66,0.08)"
                         : "transparent",
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns ||showResults ? "default" : "pointer",
                       transition: "border-color 0.2s, background 0.2s",
                       userSelect: "none",
                       position: "relative",
@@ -318,13 +299,13 @@ export default function WB_ReadLookMatch_PageA() {
                   >
                     <span
                       style={{
-                        fontSize: "clamp(13px,1.6vw,21px)",
-                        fontWeight: 500,
+                        fontSize: "clamp(13px,1.4vw,18px)",
+                        // fontWeight: 500,
                         color: wrong
                           ? WRONG_COLOR
                           : lSelected
-                          ? ACTIVE_COLOR
-                          : TEXT_COLOR,
+                            ? ACTIVE_COLOR
+                            : TEXT_COLOR,
                         lineHeight: 1.3,
                         wordBreak: "break-word",
                         transition: "color 0.2s",
@@ -343,16 +324,16 @@ export default function WB_ReadLookMatch_PageA() {
                       width: "clamp(10px,1.3vw,16px)",
                       height: "clamp(10px,1.3vw,16px)",
                       borderRadius: "50%",
-                      justifySelf: "end",       // ← يلتصق بيمين الخلية
+                      justifySelf: "end", // ← يلتصق بيمين الخلية
                       flexShrink: 0,
                       background: lSelected
                         ? ACTIVE_COLOR
                         : lConn
-                        ? wrong
-                          ? WRONG_COLOR
-                          : ACTIVE_COLOR
-                        : DOT_COLOR,
-                      cursor: showAns ? "default" : "pointer",
+                          ? wrong
+                            ? WRONG_COLOR
+                            : ACTIVE_COLOR
+                          : DOT_COLOR,
+                      cursor: showAns||showResults ? "default" : "pointer",
                       transition: "background 0.2s",
                       boxShadow: lSelected
                         ? "0 0 0 3px rgba(243,155,66,0.3)"
@@ -372,11 +353,13 @@ export default function WB_ReadLookMatch_PageA() {
                       width: "clamp(10px,1.3vw,16px)",
                       height: "clamp(10px,1.3vw,16px)",
                       borderRadius: "50%",
-                      justifySelf: "start",     // ← يلتصق بيسار الخلية
+                      justifySelf: "start", // ← يلتصق بيسار الخلية
                       flexShrink: 0,
                       background: rConn ? ACTIVE_COLOR : DOT_COLOR,
                       cursor:
-                        showAns || selectedLeft === null ? "default" : "pointer",
+                        showAns || selectedLeft === null
+                          ? "default"
+                          : "pointer",
                       transition: "background 0.2s",
                       zIndex: 2,
                     }}
@@ -390,17 +373,18 @@ export default function WB_ReadLookMatch_PageA() {
                       alignItems: "center",
                       minWidth: 0,
                       zIndex: 2,
-                      padding:
-                        "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
+                      padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
                       cursor:
-                        showAns || selectedLeft === null ? "default" : "pointer",
+                        showAns || selectedLeft === null
+                          ? "default"
+                          : "pointer",
                       userSelect: "none",
                     }}
                   >
                     <span
                       style={{
-                        fontSize: "clamp(13px,1.6vw,21px)",
-                        fontWeight: 500,
+                        fontSize: "clamp(13px,1.4vw,18px)",
+                        // fontWeight: 500,
                         color: TEXT_COLOR,
                         lineHeight: 1.3,
                         wordBreak: "break-word",
@@ -409,7 +393,6 @@ export default function WB_ReadLookMatch_PageA() {
                       {rItem.text}
                     </span>
                   </div>
-
                 </React.Fragment>
               );
             })}
@@ -421,7 +404,7 @@ export default function WB_ReadLookMatch_PageA() {
           style={{
             display: "flex",
             justifyContent: "center",
-            marginTop: "clamp(8px,1.5vw,16px)",
+            // marginTop: "clamp(8px,1.5vw,16px)",
             zIndex: 100,
           }}
         >

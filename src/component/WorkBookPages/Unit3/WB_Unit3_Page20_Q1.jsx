@@ -2,6 +2,13 @@ import React, { useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+} from "@dnd-kit/core";
+
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex A  1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex A  2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex A  3.svg";
@@ -43,19 +50,14 @@ const NUMBERS = [1, 2, 3];
 export default function WB_Phonics_Page227_QA() {
   const [selectAnswers, setSelectAnswers] = useState({});
   const [imageAnswers, setImageAnswers] = useState({});
-  const [draggedNumber, setDraggedNumber] = useState(null);
+  const [activeNumber, setActiveNumber] = useState(null);
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
-
-  const dropRefs = useRef({});
 
   const usedNumbers = Object.values(imageAnswers);
 
   const handleSelectChange = (key, value) => {
-    if (showAns) return;
+    if (showAns || checked) return;
     setSelectAnswers((prev) => ({
       ...prev,
       [key]: value,
@@ -63,79 +65,85 @@ export default function WB_Phonics_Page227_QA() {
   };
 
   const applyDrop = (imageId, num) => {
-    if (showAns || num === null || num === undefined) return;
+    if (showAns || num === null) return;
 
-    setImageAnswers((prev) => {
-      const updated = { ...prev };
+    const updated = { ...imageAnswers };
 
-      Object.keys(updated).forEach((key) => {
-        if (updated[key] === num) {
-          delete updated[key];
-        }
-      });
-
-      updated[imageId] = num;
-      return updated;
+    Object.keys(updated).forEach((key) => {
+      if (updated[key] === num) delete updated[key];
     });
 
-    setDraggedNumber(null);
-    setTouchItem(null);
+    updated[imageId] = num;
+
+    setImageAnswers(updated);
+    setActiveNumber(null);
   };
 
-  const handleDragStart = (num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-    setDraggedNumber(num);
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    applyDrop(over.id, active.id);
   };
 
-  const handleDragEnd = () => {
-    setDraggedNumber(null);
-  };
-
-  const handleDrop = (imageId) => {
-    if (showAns || draggedNumber === null) return;
-    applyDrop(imageId, draggedNumber);
-  };
-
-  const handleTouchStart = (e, num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-
-    const touch = e.touches[0];
-    setTouchItem(num);
-    setDraggedNumber(num);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (touchItem === null) return;
-    e.preventDefault();
-
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (touchItem === null) return;
-
-    let dropped = false;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref || dropped) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(Number(key), touchItem);
-        dropped = true;
-      }
+  /* draggable */
+  const DraggableNumber = ({ num }) => {
+    const { attributes, listeners, setNodeRef } = useDraggable({
+      id: num,
     });
 
-    setTouchItem(null);
-    setDraggedNumber(null);
+    const disabled = usedNumbers.includes(num);
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={`wb-a20-number-chip ${disabled ? "disabled" : ""}`}
+        style={{
+          backgroundColor: disabled ? "#d1d5db" : "#f39b42",
+          cursor: disabled || showAns ? "not-allowed" : "grab",
+        }}
+      >
+        {num}
+      </div>
+    );
+  };
+
+  /* droppable */
+  const DroppableImage = ({ item }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: item.id,
+    });
+
+    return (
+      <div
+        ref={setNodeRef}
+        className="wb-a20-image-card"
+        style={{
+          /* 🔥 hover effect */
+          transform: isOver ? "scale(1.05)" : "scale(1)",
+          transition: "all 0.2s ease",
+          boxShadow: isOver
+            ? "0 0 0 3px rgba(243,155,66,0.25)"
+            : "none",
+        }}
+      >
+        <img
+          src={item.img}
+          alt={`phonics-${item.id}`}
+          className="wb-a20-image"
+        />
+
+        <div className="wb-a20-image-number">
+          {imageAnswers[item.id] || ""}
+        </div>
+
+        {isImageWrong(item.id) && (
+          <div className="wb-a20-image-wrong">✕</div>
+        )}
+      </div>
+    );
   };
 
   const getTotalBlanks = () =>
@@ -159,13 +167,17 @@ export default function WB_Phonics_Page227_QA() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || checked) return;
 
     const allSelectsAnswered = SENTENCES.every((sentence) =>
-      sentence.answers.every((_, idx) => selectAnswers[`s${sentence.id}-b${idx}`])
+      sentence.answers.every(
+        (_, idx) => selectAnswers[`s${sentence.id}-b${idx}`]
+      )
     );
 
-    const allImagesAnswered = IMAGES.every((img) => imageAnswers[img.id]);
+    const allImagesAnswered = IMAGES.every(
+      (img) => imageAnswers[img.id]
+    );
 
     if (!allSelectsAnswered || !allImagesAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -199,15 +211,13 @@ export default function WB_Phonics_Page227_QA() {
     setImageAnswers(correctImageAnswers);
     setChecked(true);
     setShowAns(true);
-    setDraggedNumber(null);
-    setTouchItem(null);
+    setActiveNumber(null);
   };
 
   const handleReset = () => {
     setSelectAnswers({});
     setImageAnswers({});
-    setDraggedNumber(null);
-    setTouchItem(null);
+    setActiveNumber(null);
     setChecked(false);
     setShowAns(false);
   };
@@ -231,16 +241,18 @@ export default function WB_Phonics_Page227_QA() {
       <span className="wb-a20-select-wrap">
         <select
           value={value}
-          disabled={showAns}
-          onChange={(e) => handleSelectChange(key, e.target.value)}
+          disabled={showAns || checked}
+          onChange={(e) =>
+            handleSelectChange(key, e.target.value)
+          }
           className="wb-a20-select"
           style={{
-            cursor: showAns ? "default" : "pointer",
+            borderBottom: wrong
+              ? "1px solid red"
+              : "1px solid #111111cf",
           }}
         >
-          <option value="" disabled>
-            —
-          </option>
+          <option value="" disabled></option>
           {OPTIONS.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -248,16 +260,25 @@ export default function WB_Phonics_Page227_QA() {
           ))}
         </select>
 
-        {!showAns && <span className="wb-a20-select-arrow">▼</span>}
+        {!showAns && (
+          <span className="wb-a20-select-arrow">▼</span>
+        )}
 
-        {wrong && <span className="wb-a20-wrong-badge">✕</span>}
+        {wrong && (
+          <span className="wb-a20-wrong-badge">✕</span>
+        )}
       </span>
     );
   };
 
   return (
-    <div className="main-container-component">
-      <style>{`
+    <DndContext
+      onDragStart={(e) => setActiveNumber(e.active.id)}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="main-container-component">
+        {/* 🔥 نفس CSS تبعك بدون تعديل */}
+ <style>{`
         .wb-a20-wrap {
           display: flex;
           flex-direction: column;
@@ -290,7 +311,7 @@ export default function WB_Phonics_Page227_QA() {
         }
 
         .wb-a20-sentence-num {
-          font-size: clamp(16px, 2vw, 28px);
+          font-size: clamp(16px, 1.7vw, 20px);
           font-weight: 700;
           color: #222;
           min-width: clamp(16px, 2vw, 24px);
@@ -300,7 +321,7 @@ export default function WB_Phonics_Page227_QA() {
         }
 
         .wb-a20-sentence-text {
-          font-size: clamp(14px, 2.1vw, 22px);
+          font-size: clamp(14px, 1.7vw, 18px);
           color: #222;
           line-height: 1.5;
           display: flex;
@@ -321,10 +342,10 @@ export default function WB_Phonics_Page227_QA() {
           min-width: clamp(42px, 6vw, 78px);
           width: clamp(42px, 6vw, 78px);
           height: clamp(28px, 4vw, 42px);
-          font-size: clamp(14px, 2vw, 22);
+          font-size: clamp(14px, 1.4vw, 18px);
           font-weight: 500;
           color: #000;
-          border: none;
+          border-bottom: 1px solid #000000ff;
           outline: none;
           background: transparent;
           appearance: none;
@@ -344,20 +365,21 @@ export default function WB_Phonics_Page227_QA() {
         }
 
         .wb-a20-wrong-badge {
-          position: absolute;
-          top: -8px;
+         position: absolute;
+          top: 0px;
           right: -10px;
-          width: clamp(18px, 2vw, 20px);
-          height: clamp(18px, 2vw, 20px);
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 11px);
+          font-size: 12px;
           font-weight: 700;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-a20-right {
@@ -370,10 +392,10 @@ export default function WB_Phonics_Page227_QA() {
 
         .wb-a20-image-card {
           position: relative;
-          width: clamp(110px, 20vw, 230px);
-          height: clamp(78px, 12vw, 145px);
-          border: 3px solid #f39b42;
-          border-radius: clamp(10px, 2vw, 18px);
+          // width: clamp(110px, 20vw, 230px);
+          // height: clamp(78px, 12vw, 145px);
+          // border: 3px solid #f39b42;
+          // border-radius: clamp(10px, 2vw, 18px);
           background: #fff;
           overflow: hidden;
           display: flex;
@@ -383,44 +405,46 @@ export default function WB_Phonics_Page227_QA() {
         }
 
         .wb-a20-image {
-          width: 100%;
-          height: 100%;
+          width: auto;
+          height: 120px;
           object-fit: cover;
           display: block;
         }
 
         .wb-a20-image-number {
           position: absolute;
-          right: 0;
-          bottom: 0;
-          width: clamp(24px, 3.4vw, 38px);
-          height: clamp(24px, 3.4vw, 38px);
-          border-top: 3px solid #f39b42;
-          border-left: 3px solid #f39b42;
+              right: 0px;
+    bottom: 0px;
+    width: clamp(24px, 3.4vw, 32px);
+    height: clamp(24px, 3.4vw, 32px);
+          // border-top: 3px solid #f39b42;
+          // border-left: 3px solid #f39b42;
           border-top-left-radius: 8px;
-          background: #f8f8f8;
+          // background: #f8f8f8;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(14px, 1.8vw, 22px);
+          font-size: clamp(14px, 1.7vw, 20px);
           font-weight: 700;
           color: #111;
         }
 
         .wb-a20-image-wrong {
           position: absolute;
-          top: 6px;
-          left: 6px;
-          width: clamp(18px, 2vw, 22px);
-          height: clamp(18px, 2vw, 22px);
+          top: 0px;
+          right: 1%;
+           width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 12px);
+          font-size: 12px;
           font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-a20-number-bank {
@@ -588,135 +612,66 @@ export default function WB_Phonics_Page227_QA() {
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">A</span>
-          Write ch, tch, or sh. Then number the pictures.
-        </h1>
+        <div className="div-forall" style={{ gap: "28px" }}>
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">A</span>
+            Write ch, tch, or sh. Then number the pictures.
+          </h1>
 
-        <div className="wb-a20-wrap">
-          <div className="wb-a20-main-grid">
-            <div className="wb-a20-left">
-              <div className="wb-a20-sentence-row">
-                <span className="wb-a20-sentence-num">1</span>
-                <div className="wb-a20-sentence-text">
-                  <span>{SENTENCES[0].parts[0]}</span>
-                  {renderSelect(1, 0, "ch")}
-                  <span>{SENTENCES[0].parts[1]}</span>
-                  {renderSelect(1, 1, "ch")}
-                  <span>{SENTENCES[0].parts[2]}</span>
-                  {renderSelect(1, 2, "ch")}
-                  <span>{SENTENCES[0].parts[3]}</span>
-                </div>
-              </div>
-
-              <div className="wb-a20-sentence-row">
-                <span className="wb-a20-sentence-num">2</span>
-                <div className="wb-a20-sentence-text">
-                  <span>{SENTENCES[1].parts[0]}</span>
-                  {renderSelect(2, 0, "sh")}
-                  <span>{SENTENCES[1].parts[1]}</span>
-                  {renderSelect(2, 1, "ch")}
-                  <span>{SENTENCES[1].parts[2]}</span>
-                </div>
-              </div>
-
-              <div className="wb-a20-sentence-row">
-                <span className="wb-a20-sentence-num">3</span>
-                <div className="wb-a20-sentence-text">
-                  <span>{SENTENCES[2].parts[0]}</span>
-                  {renderSelect(3, 0, "sh")}
-                  <span>{SENTENCES[2].parts[1]}</span>
-                  {renderSelect(3, 1, "tch")}
-                  <span>{SENTENCES[2].parts[2]}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="wb-a20-right">
-              {IMAGES.map((item) => (
-                <div
-                  key={item.id}
-                  ref={(el) => {
-                    dropRefs.current[item.id] = el;
-                  }}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => handleDrop(item.id)}
-                  className="wb-a20-image-card"
-                >
-                  <img
-                    src={item.img}
-                    alt={`phonics-${item.id}`}
-                    className="wb-a20-image"
-                  />
-
-                  <div className="wb-a20-image-number">
-                    {imageAnswers[item.id] || ""}
+          <div className="wb-a20-wrap">
+            <div className="wb-a20-main-grid">
+              <div className="wb-a20-left">
+                {/* sentences نفسهم */}
+                {SENTENCES.map((s) => (
+                  <div key={s.id} className="wb-a20-sentence-row">
+                    <span className="wb-a20-sentence-num">
+                      {s.id}
+                    </span>
+                    <div className="wb-a20-sentence-text">
+                      {s.parts.map((part, i) => (
+                        <React.Fragment key={i}>
+                          <span>{part}</span>
+                          {s.answers[i] &&
+                            renderSelect(s.id, i, s.answers[i])}
+                        </React.Fragment>
+                      ))}
+                    </div>
                   </div>
+                ))}
 
-                  {isImageWrong(item.id) && (
-                    <div className="wb-a20-image-wrong">✕</div>
-                  )}
+                <div className="wb-a20-number-bank">
+                  {NUMBERS.map((num) => (
+                    <DraggableNumber key={num} num={num} />
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div className="wb-a20-right">
+                {IMAGES.map((item) => (
+                  <DroppableImage key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+
+            <div className="wb-a20-buttons">
+              <Button
+                handleShowAnswer={handleShowAnswer}
+                handleStartAgain={handleReset}
+                checkAnswers={handleCheck}
+              />
             </div>
           </div>
-
-          <div className="wb-a20-number-bank">
-            {NUMBERS.map((num) => {
-              const disabled = usedNumbers.includes(num);
-
-              return (
-                <div
-                  key={num}
-                  draggable={!disabled && !showAns}
-                  onDragStart={() => handleDragStart(num)}
-                  onDragEnd={handleDragEnd}
-                  onTouchStart={(e) => handleTouchStart(e, num)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  className={`wb-a20-number-chip ${disabled ? "disabled" : ""}`}
-                  style={{
-                    backgroundColor: disabled ? "#d1d5db" : "#f39b42",
-                    cursor: disabled || showAns ? "not-allowed" : "grab",
-                  }}
-                >
-                  {num}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="wb-a20-buttons">
-            <Button
-              handleShowAnswer={handleShowAnswer}
-              handleStartAgain={handleReset}
-              checkAnswers={handleCheck}
-            />
-          </div>
         </div>
+
+        {/* 🔥 DragOverlay */}
+        <DragOverlay>
+          {activeNumber ? (
+            <div className="wb-a20-touch-preview">
+              {activeNumber}
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
-
-      {touchItem !== null && (
-        <div
-          className="wb-a20-touch-preview"
-          style={{
-            left: touchPos.x,
-            top: touchPos.y,
-          }}
-        >
-          {touchItem}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

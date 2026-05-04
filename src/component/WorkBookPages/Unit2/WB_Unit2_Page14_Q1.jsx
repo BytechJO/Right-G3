@@ -14,9 +14,9 @@ import sueImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Fol
 import juneImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 11.svg";
 import glueImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 10.svg";
 
-const CIRCLE_COLOR = "#d62828";
+const CIRCLE_COLOR = "red";
 const BORDER_COLOR = "#a9a9a9";
-const WRONG_COLOR = "#ef4444";
+const WRONG_COLOR = "red";
 const TEXT_COLOR = "#111";
 
 const SECTIONS = [
@@ -65,7 +65,8 @@ const styles = {
     border: `2px solid ${BORDER_COLOR}`,
     borderRadius: "clamp(12px, 1.4vw, 18px)",
     background: "#fff",
-    padding: "clamp(18px, 2.3vw, 30px) clamp(12px, 1.6vw, 18px) clamp(12px, 1.6vw, 18px)",
+    padding:
+      "clamp(18px, 2.3vw, 30px) clamp(12px, 1.6vw, 18px) clamp(12px, 1.6vw, 18px)",
     boxSizing: "border-box",
     minHeight: "clamp(260px, 38vw, 430px)",
   },
@@ -84,7 +85,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "clamp(18px, 2vw, 26px)",
+    fontSize: "clamp(18px, 1.7vw,20px)",
     fontWeight: 500,
     color: TEXT_COLOR,
     boxSizing: "border-box",
@@ -93,7 +94,7 @@ const styles = {
   itemsGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: "clamp(12px, 2vw, 22px) clamp(8px, 1.4vw, 18px)",
+    gap: "0px",
     alignItems: "end",
     width: "100%",
   },
@@ -109,7 +110,7 @@ const styles = {
 
   imgWrap: {
     width: "100%",
-    height: "clamp(72px, 12vw, 120px)",
+    height: "clamp(72px, 10vw, 90px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -118,12 +119,13 @@ const styles = {
   },
 
   img: {
-    maxWidth: "100%",
-    maxHeight: "100%",
-    width: "auto",
-    height: "auto",
+    // maxWidth: "100%",
+    // maxHeight: "100%",
+    width: "100px",
+    height: "70px",
     objectFit: "contain",
     display: "block",
+    cursor: "pointer",
   },
 
   wordBtn: {
@@ -134,11 +136,11 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "999px",
-    border: "3px solid transparent",
+    border: "2px solid transparent",
     background: "transparent",
     color: TEXT_COLOR,
-    fontSize: "clamp(18px, 2.2vw, 26px)",
-    fontWeight: 500,
+    fontSize: "clamp(16px, 1.4vw, 18px)",
+    // fontWeight: 500,
     lineHeight: 1.1,
     cursor: "pointer",
     boxSizing: "border-box",
@@ -160,7 +162,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     fontSize: "clamp(10px, 1vw, 12px)",
-    fontWeight: 700,
+    fontWeight: 600,
     border: "2px solid #fff",
     boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
     zIndex: 2,
@@ -181,7 +183,7 @@ export default function WB_Unit1_Page9_QA() {
   const allItems = SECTIONS.flatMap((section) => section.items);
 
   const handleSelect = (itemId) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -192,9 +194,9 @@ export default function WB_Unit1_Page9_QA() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
-    const total = allItems.length;
+    const total = allItems.length / 2;
     let score = 0;
 
     allItems.forEach((item) => {
@@ -206,12 +208,12 @@ export default function WB_Unit1_Page9_QA() {
 
     setShowResults(true);
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+    if (score/2 === total) {
+      ValidationAlert.success(`Score: ${Math.floor(score / 2)} / ${total}`);
+    } else if (score/2 > 0) {
+      ValidationAlert.warning(`Score: ${Math.floor(score / 2)} / ${total}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${Math.floor(score / 2)} / ${total}`);
     }
   };
 
@@ -254,26 +256,8 @@ export default function WB_Unit1_Page9_QA() {
         }
       `}</style>
 
-      <div
-        className="div-forall wb-a-root"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall" style={{ gap: "60px" }}>
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
           Does it have a <b>short u</b> or <b>long u</b> sound? Read and circle.
         </h1>
@@ -292,14 +276,21 @@ export default function WB_Unit1_Page9_QA() {
                     return (
                       <div key={item.id} style={styles.itemBox}>
                         <div style={styles.imgWrap}>
-                          <img src={item.img} alt={item.text} style={styles.img} />
+                          <img
+                            onClick={() => handleSelect(item.id)}
+                            src={item.img}
+                            alt={item.text}
+                            style={styles.img}
+                          />
                         </div>
 
                         <div
                           onClick={() => handleSelect(item.id)}
                           style={{
                             ...styles.wordBtn,
-                            borderColor: selected ? CIRCLE_COLOR : "transparent",
+                            borderColor: selected
+                              ? CIRCLE_COLOR
+                              : "transparent",
                             cursor: showAns ? "default" : "pointer",
                           }}
                         >

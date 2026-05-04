@@ -1,6 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 2.svg";
@@ -8,6 +19,7 @@ import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folde
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 6.svg";
+
 const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR = "#ffca94";
 const BORDER_COLOR = "#f39b42";
@@ -32,100 +44,108 @@ const ANSWERS = [
   { id: 6, correct: "Egypt", img: img6 },
 ];
 
+/* ================= DRAG ================= */
+const DraggableWord = ({ item, disabled }) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: item.value,
+    data: item,
+    disabled,
+  });
+
+  const style = transform
+    ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      // style={style}
+      className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition
+        ${
+          disabled
+            ? "bg-gray-200 text-gray-400 border-gray-200"
+            : "border-orange-400 cursor-grab hover:scale-105"
+        }
+      `}
+    >
+      {item.value}
+    </div>
+  );
+};
+
+/* ================= DROP ================= */
+const DropBox = ({ id, value, isWrong, showAns }) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`relative w-full h-[42px] flex items-end justify-center border-b-2 text-lg
+        ${isOver ? "border-orange-400 bg-orange-50" : "border-[#2e3192]"}
+        ${isWrong ? "border-red-500" : ""}
+      `}
+    >
+      {value}
+
+      {isWrong && (
+        <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
+          ✕
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function WB_LookAndWrite_PageC() {
   const [answers, setAnswers] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [activeWord, setActiveWord] = useState(null);
 
-  const dropRefs = useRef({});
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor)
+  );
 
-  const usedDragIds = Object.values(answers)
-    .filter(Boolean)
-    .map((entry) => entry.dragId);
+  const usedWords = Object.values(answers).map((a) => a.value);
 
-  const applyDrop = (boxKey, item) => {
-    const newAnswers = { ...answers };
+  /* ================= DROP LOGIC ================= */
+  const handleDragEnd = ({ active, over }) => {
+    if (!over || showAns) return;
 
-    Object.keys(newAnswers).forEach((key) => {
-      if (newAnswers[key]?.dragId === item.id) {
-        delete newAnswers[key];
-      }
-    });
-
-    newAnswers[boxKey] = {
-      dragId: item.id,
-      value: item.value,
-    };
-
-    setAnswers(newAnswers);
-    setShowResults(false);
-  };
-
-  const handleDragStart = (item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-    setDraggedItem(item);
-  };
-
-  const handleDrop = (boxKey) => {
-    if (showAns || !draggedItem) return;
-    applyDrop(boxKey, draggedItem);
-    setDraggedItem(null);
-  };
-
-  const handleTouchStart = (e, item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-
-    const touch = e.touches[0];
-    setTouchItem(item);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (!touchItem) return;
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchItem) return;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(key, touchItem);
-      }
-    });
-
-    setTouchItem(null);
-  };
-
-  const handleRemoveAnswer = (boxKey) => {
-    if (showAns) return;
+    const word = active.data.current;
+    const dropId = over.id;
 
     setAnswers((prev) => {
       const updated = { ...prev };
-      delete updated[boxKey];
+
+      // remove from old place
+      Object.keys(updated).forEach((key) => {
+        if (updated[key]?.value === word.value) {
+          delete updated[key];
+        }
+      });
+
+      updated[dropId] = word;
+
       return updated;
     });
 
+    setActiveWord(null);
     setShowResults(false);
   };
 
+  /* ================= CHECK ================= */
   const handleCheck = () => {
     if (showAns) return;
 
-    const allAnswered = ANSWERS.every((item) => answers[`a-${item.id}`]?.value);
+    const allAnswered = ANSWERS.every(
+      (item) => answers[`a-${item.id}`]?.value
+    );
 
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -133,35 +153,26 @@ export default function WB_LookAndWrite_PageC() {
     }
 
     let score = 0;
-    const total = ANSWERS.length;
 
     ANSWERS.forEach((item) => {
-      if (answers[`a-${item.id}`]?.value === item.correct) {
-        score++;
-      }
+      if (answers[`a-${item.id}`]?.value === item.correct) score++;
     });
 
     setShowResults(true);
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
-    }
+    const msg = `Score: ${score} / ${ANSWERS.length}`;
+
+    if (score === ANSWERS.length) ValidationAlert.success(msg);
+    else if (score > 0) ValidationAlert.warning(msg);
+    else ValidationAlert.error(msg);
   };
 
   const handleShowAnswer = () => {
     const filled = {};
 
     ANSWERS.forEach((item) => {
-      const matched = DRAG_ITEMS.find((d) => d.value === item.correct);
-
-      filled[`a-${item.id}`] = {
-        dragId: matched?.id ?? item.id,
-        value: item.correct,
-      };
+      const match = DRAG_ITEMS.find((d) => d.value === item.correct);
+      filled[`a-${item.id}`] = match;
     });
 
     setAnswers(filled);
@@ -171,8 +182,6 @@ export default function WB_LookAndWrite_PageC() {
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedItem(null);
-    setTouchItem(null);
     setShowResults(false);
     setShowAns(false);
   };
@@ -182,255 +191,64 @@ export default function WB_LookAndWrite_PageC() {
     return answers[`a-${item.id}`]?.value !== item.correct;
   };
 
-  const renderDropBox = (boxKey, wrong) => {
-    const value = answers[boxKey]?.value || "";
-
-    return (
-      <div
-        ref={(el) => (dropRefs.current[boxKey] = el)}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(boxKey)}
-        onClick={() => handleRemoveAnswer(boxKey)}
-        style={{
-          width: "100%",
-          maxWidth: "250px",
-          minHeight: "42px",
-          borderBottom: "3px solid #2f2f2f",
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "center",
-          textAlign: "center",
-          fontSize: "clamp(18px, 2.2vw, 28px)",
-          lineHeight: "1.1",
-          color: value ? ANSWER_COLOR : "#111",
-          padding: "0 6px 3px",
-          boxSizing: "border-box",
-          position: "relative",
-          fontWeight: 500,
-          cursor: value && !showAns ? "pointer" : "default",
-          userSelect: "none",
-          wordBreak: "break-word",
-        }}
-      >
-        {value}
-
-        {wrong && (
-          <div
-            style={{
-              position: "absolute",
-              top: "-10px",
-              right: "-10px",
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              backgroundColor: WRONG_COLOR,
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "11px",
-              fontWeight: 700,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-            }}
-          >
-            ✕
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
-    <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
-          <span className="WB-ex-A">C</span> Look and write.
-        </h1>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "920px",
-              border: "2px solid #f39b42",
-              borderRadius: "18px",
-              padding: "8px 12px",
-              boxSizing: "border-box",
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
-            }}
-          >
-            {DRAG_ITEMS.map((item) => {
-              const isUsed = usedDragIds.includes(item.id);
-
-              return (
-                <div
-                  key={item.id}
-                  draggable={!isUsed && !showAns}
-                  onDragStart={() => handleDragStart(item)}
-                  onTouchStart={(e) => handleTouchStart(e, item)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  style={{
-                    padding: "10px 18px",
-                    borderRadius: "16px",
-                    border: `1.5px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-                    backgroundColor: isUsed ? "#eeeeee" : SOFT_COLOR,
-                    color: isUsed ? "#999" : "#222",
-                    cursor: isUsed || showAns ? "not-allowed" : "grab",
-                    opacity: isUsed ? 0.6 : 1,
-                    userSelect: "none",
-                    fontSize: "clamp(15px, 1.6vw, 18px)",
-                    fontWeight: 500,
-                    boxShadow: isUsed ? "none" : "0 2px 8px rgba(0,0,0,0.06)",
-                    transition: "0.2s ease",
-                    touchAction: "none",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.value}
-                </div>
-              );
-            })}
+    <DndContext
+      sensors={sensors}
+      onDragStart={(e) => setActiveWord(e.active.data.current)}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="main-container-component">
+        <div className="div-forall">
+  <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">C</span> Look and write.
+          </h1>
+          <div>
+          {/* WORD BANK */}
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {DRAG_ITEMS.map((item) => (
+              <DraggableWord
+                key={item.id}
+                item={item}
+                disabled={usedWords.includes(item.value)}
+              />
+            ))}
           </div>
-        </div>
 
-        <div
-          style={{
-            display: "grid",
-gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-            gap: "34px 26px",
-            width: "100%",
-            maxWidth: "1100px",
-            margin: "0 auto",
-            alignItems: "start",
-          }}
-        >
-          {ANSWERS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "14px",
-                minWidth: 0,
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "clamp(18px, 2vw, 24px)",
-                    fontWeight: 700,
-                    color: "#111",
-                    lineHeight: 1,
-                    paddingLeft: "4px",
-                  }}
-                >
-                  {item.id}
-                </span>
-              </div>
+          {/* GRID */}
+          <div className="grid grid-cols-3 gap-6">
+            {ANSWERS.map((item) => (
+              <div key={item.id} className="flex flex-col items-center gap-3">
+                <img src={item.img} className="h-32 object-contain" style={{height:"150px"}} />
 
-              <div
-                style={{
-                  width: "100%",
-                  maxWidth: "250px",
-                  height: "140px",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#fff",
-                  boxSizing: "border-box",
-                }}
-              >
-                <img
-                  src={item.img}
-                  alt={`exercise-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
+                <DropBox
+                  id={`a-${item.id}`}
+                  value={answers[`a-${item.id}`]?.value}
+                  isWrong={isWrong(item)}
+                  showAns={showAns}
                 />
               </div>
+            ))}
+          </div>
+</div>
+          {/* BUTTONS */}
+          <div className="mt-6 flex justify-center">
+            <Button
+              checkAnswers={handleCheck}
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleStartAgain}
+            />
+          </div>
+        </div>
 
-              {renderDropBox(`a-${item.id}`, isWrong(item))}
+        {/* DRAG PREVIEW */}
+        <DragOverlay>
+          {activeWord && (
+            <div className="px-4 py-2 bg-white border rounded shadow">
+              {activeWord.value}
             </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            marginTop: "10px",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleStartAgain}
-          />
-        </div>
+          )}
+        </DragOverlay>
       </div>
-
-      {touchItem && (
-        <div
-          style={{
-            position: "fixed",
-            left: touchPos.x - 40,
-            top: touchPos.y - 20,
-            background: "#fff",
-            padding: "8px 12px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            pointerEvents: "none",
-            zIndex: 9999,
-            fontSize: "18px",
-            fontWeight: 600,
-            color: "#222",
-          }}
-        >
-          {touchItem.value}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

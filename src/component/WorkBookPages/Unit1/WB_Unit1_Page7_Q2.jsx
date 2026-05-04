@@ -18,80 +18,84 @@ const ITEMS = [
     question: "Which is bigger, the deer or the elephant?",
     leftImg: img1a,
     rightImg: img1b,
-    firstOptions: ["The elephant", "The deer"],
-    middle: "is bigger than",
-    lastOptions: ["the deer.", "the elephant."],
-    correctFirst: "The elephant",
-    correctLast: "the deer.",
+    options: [
+      "The elephant is bigger than the deer.",
+      "The deer is bigger than the elephant.",
+    ],
+    correct: "The elephant is bigger than the deer.",
   },
+
   {
     id: 2,
     type: "answer",
     question: "Who is taller, the girl or the man?",
     leftImg: img2a,
     rightImg: img2b,
-    firstOptions: ["The man", "The girl"],
-    middle: "is taller than",
-    lastOptions: ["the girl.", "the man."],
-    correctFirst: "The man",
-    correctLast: "the girl.",
+    options: [
+      "The man is taller than the girl.",
+      "The girl is taller than the man.",
+    ],
+    correct: "The man is taller than the girl.",
   },
+
   {
     id: 3,
     type: "question",
     leftImg: img3a,
     rightImg: img3b,
-    firstOptions: ["Which", "Who"],
-    middle: "is faster,",
-    lastOptions: ["the bike or the car?", "the car or the bike?"],
-    correctFirst: "Which",
-    correctLast: "the bike or the car?",
+    options: [
+      "Which is faster, the bike or the car?",
+      "Who is faster, the bike or the car?",
+    ],
+    correct: "Which is faster, the bike or the car?",
     fixedAnswer: "The car is faster than the bike.",
   },
+
   {
     id: 4,
     type: "answer",
     question: "Who is younger, John or Sarah?",
     leftImg: img4a,
     rightImg: img4b,
-    firstOptions: ["Sarah", "John"],
-    middle: "is younger than",
-    lastOptions: ["John.", "Sarah."],
-    correctFirst: "Sarah",
-    correctLast: "John.",
+    options: ["Sarah is younger than John.", "John is younger than Sarah."],
+    correct: "Sarah is younger than John.",
   },
 ];
-
 export default function WB_Unit3_Page7_QJ() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
-  const handleChange = (id, field, value) => {
-    if (showAns) return;
+  const handleChange = (id, value) => {
+    if (showAns || checked) return;
+
     setAnswers((prev) => ({
       ...prev,
-      [id]: { ...prev[id], [field]: value },
+      [id]: value,
     }));
+
     setChecked(false);
   };
-
   const handleCheck = () => {
-    if (showAns) return;
-    const allAnswered = ITEMS.every(
-      (item) => answers[item.id]?.first && answers[item.id]?.last
-    );
+    if (showAns || checked) return;
+
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
+
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
+
     let score = 0;
+
     ITEMS.forEach((item) => {
-      const firstCorrect = answers[item.id]?.first === item.correctFirst;
-      const lastCorrect = answers[item.id]?.last === item.correctLast;
-      if (firstCorrect && lastCorrect) score += 1;
+      if (answers[item.id] === item.correct) {
+        score++;
+      }
     });
+
     setChecked(true);
+
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
@@ -103,9 +107,11 @@ export default function WB_Unit3_Page7_QJ() {
 
   const handleShowAnswer = () => {
     const filled = {};
+
     ITEMS.forEach((item) => {
-      filled[item.id] = { first: item.correctFirst, last: item.correctLast };
+      filled[item.id] = item.correct;
     });
+
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
@@ -117,35 +123,32 @@ export default function WB_Unit3_Page7_QJ() {
     setShowAns(false);
   };
 
-  const getValue = (itemId, field) => answers[itemId]?.[field] || "";
-
   const isWrong = (item) => {
     if (!checked || showAns) return false;
-    return (
-      answers[item.id]?.first !== item.correctFirst ||
-      answers[item.id]?.last !== item.correctLast
-    );
+    return answers[item.id] !== item.correct;
   };
 
-  const renderSelect = (item, field, options, className = "") => (
-    <div className={`wb-j-select-wrap ${className}`}>
+  const renderSelect = (item) => (
+    <div className="wb-j-select-wrap">
       <select
-        value={getValue(item.id, field)}
+        value={answers[item.id] || ""}
         disabled={showAns}
-        onChange={(e) => handleChange(item.id, field, e.target.value)}
+        onChange={(e) => handleChange(item.id, e.target.value)}
         className={`wb-j-select ${
-          getValue(item.id, field) ? "wb-j-select--filled" : ""
-        }`}
+          answers[item.id] ? "wb-j-select--filled" : ""
+        } ${isWrong(item) ? "wb-j-select--wrong" : ""}`}
       >
         <option value="" disabled hidden>
           Select
         </option>
-        {options.map((option) => (
+
+        {item.options.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>
         ))}
       </select>
+
       {!showAns && <span className="wb-j-arrow">▼</span>}
     </div>
   );
@@ -173,11 +176,11 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-num {
-          font-size: 22px;
+          font-size: 20px;
           font-weight: 700;
           line-height: 1;
           color: #222;
-          padding-top: 8px;
+          // padding-top: 8px;
         }
 
         .wb-j-text-col {
@@ -188,7 +191,7 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-question {
-          font-size: 22px;
+          font-size: 18px;
           line-height: 1.35;
           color: #111;
           font-weight: 500;
@@ -202,7 +205,7 @@ export default function WB_Unit3_Page7_QJ() {
         .wb-j-line {
           width: 100%;
           min-height: 58px;
-          border-bottom: 3px solid #2f2f2f;
+          // border-bottom: 3px solid #2f2f2f;
           display: flex;
           align-items: center;
           gap: clamp(6px, 1vw, 14px);
@@ -212,23 +215,15 @@ export default function WB_Unit3_Page7_QJ() {
           min-width: 0;
         }
 
-        .wb-j-middle {
-          flex: 0 1 auto;
-          min-width: 0;
-          font-size: 22px;
-          line-height: 1.2;
-          color: #111;
-          font-weight: 500;
-          white-space: nowrap;
-        }
-
         .wb-j-answer {
-          font-size: 22px;
+          font-size: 18px;
           line-height: 1.35;
           color: #111;
-          font-weight: 500;
+          // font-weight: 500;
         }
-
+.wb-j-select--wrong {
+  border-color: red !important;
+}
         .wb-j-wrong {
           position: absolute;
           top: -7px;
@@ -236,7 +231,7 @@ export default function WB_Unit3_Page7_QJ() {
           width: 22px;
           height: 22px;
           border-radius: 999px;
-          background: #ef4444;
+          background: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -249,15 +244,15 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-images {
-          width: 100%;
-          min-height: clamp(140px, 18vw, 220px);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: clamp(10px, 2vw, 24px);
-          padding-top: 4px;
-          box-sizing: border-box;
-        }
+    width: auto;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(10px, 2vw, 24px);
+    padding-top: 4px;
+    box-sizing: border-box;
+}
 
         .wb-j-img-box {
           flex: 1 1 0;
@@ -268,12 +263,12 @@ export default function WB_Unit3_Page7_QJ() {
         }
 
         .wb-j-img {
-          display: block;
-          width: 100%;
-          height: auto;
-          max-height: clamp(120px, 17vw, 210px);
-          object-fit: contain;
-        }
+    display: block;
+    width: 150px;
+    height: 130px;
+    /* max-height: clamp(120px, 17vw, 210px); */
+    /* object-fit: contain; */
+}
 
         .wb-j-buttons {
           display: flex;
@@ -306,12 +301,12 @@ export default function WB_Unit3_Page7_QJ() {
           width: 100%;
           min-width: 0;
           height: clamp(38px, 4vw, 46px);
-          border: 2px solid #c9c9c9;
-          border-radius: 10px;
+          border-bottom: 2px solid #c9c9c9;
+          // border-radius: 10px;
           background: #fff;
           padding: 0 34px 0 12px;
-          font-size: 22px;
-          font-weight: 500;
+          font-size: 18px;
+          // font-weight: 500;
           color: #222;
           outline: none;
           appearance: none;
@@ -419,26 +414,8 @@ export default function WB_Unit3_Page7_QJ() {
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">J</span>
           Read and look. Write the questions or answers.
         </h1>
@@ -452,22 +429,14 @@ export default function WB_Unit3_Page7_QJ() {
                 <>
                   <div className="wb-j-question">{item.question}</div>
                   <div className="wb-j-line-wrap">
-                    <div className="wb-j-line">
-                      {renderSelect(item, "first", item.firstOptions, "wb-j-select-wrap--medium")}
-                      <span className="wb-j-middle">{item.middle}</span>
-                      {renderSelect(item, "last", item.lastOptions, "wb-j-select-wrap--medium")}
-                    </div>
+                    <div className="wb-j-line">{renderSelect(item)}</div>
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
                   </div>
                 </>
               ) : (
                 <>
                   <div className="wb-j-line-wrap">
-                    <div className="wb-j-line">
-                      {renderSelect(item, "first", item.firstOptions, "wb-j-select-wrap--small")}
-                      <span className="wb-j-middle">{item.middle}</span>
-                      {renderSelect(item, "last", item.lastOptions, "wb-j-select-wrap--large")}
-                    </div>
+                    <div className="wb-j-line">{renderSelect(item)}</div>
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
                   </div>
                   <div className="wb-j-answer">{item.fixedAnswer}</div>
@@ -477,10 +446,18 @@ export default function WB_Unit3_Page7_QJ() {
 
             <div className="wb-j-images">
               <div className="wb-j-img-box">
-                <img src={item.leftImg} alt={`left-${item.id}`} className="wb-j-img" />
+                <img
+                  src={item.leftImg}
+                  alt={`left-${item.id}`}
+                  className="wb-j-img"
+                />
               </div>
               <div className="wb-j-img-box">
-                <img src={item.rightImg} alt={`right-${item.id}`} className="wb-j-img" />
+                <img
+                  src={item.rightImg}
+                  alt={`right-${item.id}`}
+                  className="wb-j-img"
+                />
               </div>
             </div>
           </div>

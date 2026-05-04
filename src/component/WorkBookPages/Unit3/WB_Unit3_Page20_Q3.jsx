@@ -3,56 +3,62 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import AudioWithCaption from "../../AudioWithCaption";
 import sound from "../../../assets/audio/ClassBook/Grade 3/cd3pg20instruction-adult-lady_6VKGQN60.mp3";
-
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 const ITEMS = [
-  { id: 1, options: ["chin",  "shin"],  correct: "chin"  },
-  { id: 2, options: ["patch", "sash"],  correct: "patch" },
-  { id: 3, options: ["lash",  "latch"], correct: "latch" },
+  { id: 1, options: ["chin", "shin"], correct: "chin" },
+  { id: 2, options: ["patch", "sash"], correct: "patch" },
+  { id: 3, options: ["lash", "latch"], correct: "latch" },
   { id: 4, options: ["cheat", "sheet"], correct: "cheat" },
-  { id: 5, options: ["chop",  "shop"],  correct: "shop"  },
-  { id: 6, options: ["dish",  "ditch"], correct: "dish"  },
+  { id: 5, options: ["chop", "shop"], correct: "shop" },
+  { id: 6, options: ["dish", "ditch"], correct: "dish" },
 ];
 
 const captions = [
-  { start: 0.58,  end: 4.06,  text: "Page 20, phonics exercise C." },
-  { start: 4.06,  end: 6.00,  text: "Listen, read, and circle."    },
-  { start: 7.18,  end: 8.82,  text: "1- chin."                     },
-  { start: 9.86,  end: 12.70, text: "2- patch."                    },
-  { start: 12.70, end: 14.60, text: "3- latch."                    },
-  { start: 14.60, end: 17.22, text: "4- cheat."                    },
-  { start: 18.32, end: 20.92, text: "5- shop."                     },
-  { start: 20.92, end: 22.56, text: "6- dish."                     },
+  { start: 0.58, end: 4.06, text: "Page 20, phonics exercise C." },
+  { start: 4.06, end: 6.0, text: "Listen, read, and circle." },
+  { start: 7.18, end: 8.82, text: "1- chin." },
+  { start: 9.86, end: 12.7, text: "2- patch." },
+  { start: 12.7, end: 14.6, text: "3- latch." },
+  { start: 14.6, end: 17.22, text: "4- cheat." },
+  { start: 18.32, end: 20.92, text: "5- shop." },
+  { start: 20.92, end: 22.56, text: "6- dish." },
 ];
 
 export default function WB_Unit3_Page18_QC() {
-  const [answers,     setAnswers]     = useState({});
+  const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
     setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all words first.");
       return;
     }
     let score = 0;
-    ITEMS.forEach((item) => { if (answers[item.id] === item.correct) score++; });
+    ITEMS.forEach((item) => {
+      if (answers[item.id] === item.correct) score++;
+    });
     setShowResults(true);
-    if (score === ITEMS.length)   ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    else if (score > 0)           ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    else                          ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+    if (score === ITEMS.length)
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    else if (score > 0)
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+    else ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
   };
 
   const handleShowAnswer = () => {
     const filledAnswers = {};
-    ITEMS.forEach((item) => { filledAnswers[item.id] = item.correct; });
+    ITEMS.forEach((item) => {
+      filledAnswers[item.id] = item.correct;
+    });
     setAnswers(filledAnswers);
     setShowResults(true);
     setShowAns(true);
@@ -64,12 +70,14 @@ export default function WB_Unit3_Page18_QC() {
     setShowAns(false);
   };
 
-  const isWrong    = (item, option) => showResults && answers[item.id] === option && option !== item.correct;
-  const isSelected = (item, option) => showAns ? item.correct === option : answers[item.id] === option;
+  const isWrong = (item, option) =>
+    showResults && answers[item.id] === option && option !== item.correct;
+  const isSelected = (item, option) =>
+    showAns ? item.correct === option : answers[item.id] === option;
 
   const renderOption = (item, option) => {
     const selected = isSelected(item, option);
-    const wrong    = isWrong(item, option);
+    const wrong = isWrong(item, option);
 
     return (
       <div
@@ -83,11 +91,15 @@ export default function WB_Unit3_Page18_QC() {
           minHeight: "54px",
           padding: "6px 18px",
           borderRadius: "999px",
-          border: selected ? "4px solid #d62828" : "2px solid transparent",
+          border: selected
+            ? wrong
+              ? "2px solid red"
+              : "2px solid #f39b42"
+            : "2px solid transparent",
           background: "transparent",
           color: "#222",
-          fontSize: "24px",
-          fontWeight: "500",
+          fontSize: "18px",
+          // fontWeight: "500",
           cursor: showAns ? "default" : "pointer",
           boxSizing: "border-box",
           userSelect: "none",
@@ -96,18 +108,27 @@ export default function WB_Unit3_Page18_QC() {
       >
         {option}
         {wrong && (
-          <div style={{
-            position: "absolute",
-            top: "-8px", right: "-8px",
-            width: "22px", height: "22px",
-            borderRadius: "50%",
-            backgroundColor: "#ef4444",
-            color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "12px", fontWeight: "700",
-            border: "2px solid #fff",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-          }}>✕</div>
+          <div
+            style={{
+              position: "absolute",
+              top: "-8px",
+              right: "-8px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              background: "red",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "14px",
+              fontWeight: "bold",
+              border: "2px solid white",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            }}
+          >
+            ✕
+          </div>
         )}
       </div>
     );
@@ -128,9 +149,9 @@ export default function WB_Unit3_Page18_QC() {
         /* ✅ FIX: الـ item عمودي — رقم فوق، كارت تحت */
         .wb-c-item {
           display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
+          // flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
           min-width: 0;
         }
 
@@ -144,7 +165,7 @@ export default function WB_Unit3_Page18_QC() {
         }
 
         .wb-c-num {
-          font-size: 22px;
+          font-size: 20px;
           font-weight: 700;
           color: #222;
           line-height: 1;
@@ -152,8 +173,8 @@ export default function WB_Unit3_Page18_QC() {
 
         .wb-c-card {
           width: 126px;
-          min-height: 138px;
-          border: 2px solid #f39b42;
+          // min-height: 138px;
+          border: 1px solid #f39b42;
           border-radius: 18px;
           background: #fff;
           display: flex;
@@ -185,20 +206,27 @@ export default function WB_Unit3_Page18_QC() {
 
       <div
         className="div-forall"
-        style={{ display:"flex", flexDirection:"column", gap:"28px", maxWidth:"1100px", margin:"0 auto" }}
+        style={
+          {
+            // gap: "28px",
+          }
+        }
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span> Listen, read, and circle.
         </h1>
 
-        <div style={{ display:"flex", justifyContent:"center" }}>
-          <AudioWithCaption src={sound} captions={captions} />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <QuestionAudioPlayer
+            src={sound}
+            captions={captions}
+            stopAtSecond={6.0}
+          />
         </div>
 
         <div className="wb-c-grid">
           {ITEMS.map((item) => (
             <div key={item.id} className="wb-c-item">
-
               {/* ✅ الرقم فوق الكارت في صف مستقل */}
               <div className="wb-c-top-row">
                 <span className="wb-c-num">{item.id}</span>
@@ -212,7 +240,6 @@ export default function WB_Unit3_Page18_QC() {
                   </React.Fragment>
                 ))}
               </div>
-
             </div>
           ))}
         </div>

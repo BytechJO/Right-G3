@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
@@ -11,38 +11,26 @@ const ITEMS = [
   {
     id: 1,
     img: img1,
-    firstOptions: ["The fridge", "The TV"],
-    middle: "is bigger than",
-    lastOptions: ["the fridge.", "the TV."],
-    correctFirst: "The fridge",
-    correctLast: "the TV.",
+    correct: "The fridge is bigger than the TV.",
+    wrong: "The TV is bigger than the fridge.",
   },
   {
     id: 2,
     img: img2,
-    firstOptions: ["The car", "The bike"],
-    middle: "is faster than",
-    lastOptions: ["the car.", "the bike."],
-    correctFirst: "The car",
-    correctLast: "the bike.",
+    correct: "The car is faster than the bike.",
+    wrong: "The bike is faster than the car.",
   },
   {
     id: 3,
     img: img3,
-    firstOptions: ["Harley", "His dad"],
-    middle: "is younger than",
-    lastOptions: ["Harley.", "his dad."],
-    correctFirst: "Harley",
-    correctLast: "his dad.",
+    correct: "Harley is younger than his dad.",
+    wrong: "His dad is younger than Harley.",
   },
   {
     id: 4,
     img: img4,
-    firstOptions: ["The ball", "The feathers"],
-    middle: "is heavier than",
-    lastOptions: ["the ball.", "the feathers."],
-    correctFirst: "The ball",
-    correctLast: "the feathers.",
+    correct: "The ball is heavier than the feathers.",
+    wrong: "The feathers are heavier than the ball.",
   },
 ];
 
@@ -50,42 +38,34 @@ export default function WB_Unit1_Page4_Q2() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const handleChange = (id, value) => {
+    if (showAns || checked) return;
 
-  const handleChange = (id, field, value) => {
-    if (showAns) return;
     setAnswers((prev) => ({
       ...prev,
-      [id]: { ...prev[id], [field]: value },
+      [id]: value,
     }));
-    setChecked(false);
   };
 
   const handleCheck = () => {
-    if (showAns) return;
-    const allAnswered = ITEMS.every(
-      (item) => answers[item.id]?.first && answers[item.id]?.last
-    );
+    if (showAns || checked) return;
+
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
+
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
+
     let score = 0;
+
     ITEMS.forEach((item) => {
-      const firstCorrect = answers[item.id]?.first === item.correctFirst;
-      const lastCorrect = answers[item.id]?.last === item.correctLast;
-      if (firstCorrect && lastCorrect) score += 1;
+      if (answers[item.id] === item.correct) score++;
     });
+
     setChecked(true);
+
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
@@ -98,8 +78,9 @@ export default function WB_Unit1_Page4_Q2() {
   const handleShowAnswer = () => {
     const filled = {};
     ITEMS.forEach((item) => {
-      filled[item.id] = { first: item.correctFirst, last: item.correctLast };
+      filled[item.id] = item.correct;
     });
+
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
@@ -113,312 +94,61 @@ export default function WB_Unit1_Page4_Q2() {
 
   const isWrong = (item) => {
     if (!checked || showAns) return false;
-    return (
-      answers[item.id]?.first !== item.correctFirst ||
-      answers[item.id]?.last !== item.correctLast
-    );
+    return answers[item.id] !== item.correct;
   };
-
-  const getValue = (itemId, field) => answers[itemId]?.[field] || "";
 
   return (
     <div className="main-container-component">
-      <style>{`
-        .wd-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 28px 34px;
-          align-items: start;
-          width: 100%;
-        }
-
-        .wd-card {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-          width: 100%;
-          min-width: 0;
-        }
-
-        .wd-media-wrap {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          width: 100%;
-        }
-
-        .wd-number {
-          font-size: 22px;
-          font-weight: 700;
-          color: #222;
-          line-height: 1;
-          margin-top: 8px;
-          min-width: 20px;
-          flex-shrink: 0;
-        }
-
-        .wd-image-box {
-          width: 100%;
-          height: 220px;
-          border-radius: 18px;
-          overflow: hidden;
-          background: #fff;
-          box-sizing: border-box;
-          flex: 1;
-          min-width: 0;
-        }
-
-        .wd-image {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          display: block;
-        }
-
-        .wd-answer-wrap {
-          position: relative;
-          width: 100%;
-          padding-left: 32px;
-          box-sizing: border-box;
-        }
-
-        .wd-answer-line {
-          width: 100%;
-          border-bottom: 3px solid #4a4a4a;
-          padding-bottom: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: clamp(6px, 1vw, 10px);
-          flex-wrap: nowrap;
-          min-height: 58px;
-          box-sizing: border-box;
-          overflow: hidden;
-        }
-
-        .wd-select-box {
-          position: relative;
-          flex: 1 1 0;
-          min-width: 0;
-          height: 44px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #fff;
-          border: 2px solid #bfbfbf;
-          border-radius: 12px;
-          box-sizing: border-box;
-          overflow: hidden;
-        }
-
-        .wd-select {
-          width: 100%;
-          height: 100%;
-          border: none;
-          outline: none;
-          background: transparent;
-          appearance: none;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          text-align: center;
-          text-align-last: center;
-          font-size: clamp(12px, 1.4vw, 18px);
-          font-weight: 500;
-          color: #222;
-          cursor: pointer;
-          padding: 0 clamp(22px, 2.5vw, 36px) 0 clamp(6px, 1vw, 14px);
-          box-sizing: border-box;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .wd-arrow {
-          position: absolute;
-          right: clamp(6px, 1vw, 12px);
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: clamp(8px, 1vw, 12px);
-          color: #777;
-          pointer-events: none;
-          flex-shrink: 0;
-        }
-
-        .wd-middle-text {
-          font-size: clamp(12px, 1.4vw, 20px);
-          color: #111;
-          line-height: 1.3;
-          font-weight: 500;
-          white-space: nowrap;
-          flex-shrink: 0;
-        }
-
-        .wd-wrong-badge {
-          position: absolute;
-          top: -6px;
-          right: -6px;
-          width: 22px;
-          height: 22px;
-          border-radius: 999px;
-          background: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-          border: 2px solid #fff;
-        }
-
-        .wd-buttons-wrap {
-          display: flex;
-          justify-content: center;
-          margin-top: 8px;
-        }
-
-        @media (max-width: 950px) {
-          .wd-grid {
-            grid-template-columns: 1fr;
-            gap: 28px;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .wd-image-box {
-            height: 180px;
-          }
-
-          .wd-answer-wrap {
-            padding-left: 0;
-          }
-
-          .wd-answer-line {
-            flex-wrap: wrap;
-            justify-content: flex-start;
-          }
-
-          .wd-select-box {
-            flex: 1 1 40%;
-            min-width: 0;
-          }
-
-          .wd-middle-text {
-            width: 100%;
-            text-align: center;
-            font-size: 18px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .wd-image-box {
-            height: 150px;
-          }
-
-          .wd-select {
-            font-size: 12px;
-          }
-
-          .wd-answer-line {
-            gap: 8px;
-          }
-        }
-      `}</style>
-
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span>
-          Look and write.
+          Look and choose the correct sentence.
         </h1>
 
-        <div className="wd-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {ITEMS.map((item) => (
-            <div key={item.id} className="wd-card">
-              <div className="wd-media-wrap">
-                <div className="wd-number">{item.id}</div>
-                <div className="wd-image-box">
-                  <img
-                    src={item.img}
-                    alt={`comparison-${item.id}`}
-                    className="wd-image"
-                  />
-                </div>
+            <div key={item.id} className="flex flex-col gap-4 relative">
+
+              {/* Image */}
+              <div className="flex items-start gap-3">
+                <span className="font-bold text-lg">{item.id}</span>
+                <img src={item.img} className="h-[160px] object-contain" style={{height:"160px"}}/>
               </div>
 
-              <div className="wd-answer-wrap">
-                <div className="wd-answer-line">
-                  <div className="wd-select-box">
-                    <select
-                      value={getValue(item.id, "first")}
-                      disabled={showAns}
-                      onChange={(e) =>
-                        handleChange(item.id, "first", e.target.value)
-                      }
-                      className="wd-select"
-                      style={{ cursor: showAns ? "default" : "pointer" }}
-                    >
-                      <option value="" disabled hidden>
-                        Select
-                      </option>
-                      {item.firstOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    {!showAns && <span className="wd-arrow">▼</span>}
-                  </div>
+              {/* Select */}
+              <div className="relative">
+                <select
+                  value={answers[item.id] || ""}
+                  disabled={showAns}
+                  onChange={(e) => handleChange(item.id, e.target.value)}
+                  className={`w-full border-b-1 p-2 text-lg outline-none
+                    ${isWrong(item) ? "border-b-2 border-red-500" : "border-gray-400"}
+                  `}
+                >
+                  <option value="" disabled hidden>
+                    Select
+                  </option>
 
-                  <span className="wd-middle-text">{item.middle}</span>
+                  {/* خيارين فقط */}
+                  {[item.correct, item.wrong].sort(() => Math.random() - 0.5).map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
 
-                  <div className="wd-select-box">
-                    <select
-                      value={getValue(item.id, "last")}
-                      disabled={showAns}
-                      onChange={(e) =>
-                        handleChange(item.id, "last", e.target.value)
-                      }
-                      className="wd-select"
-                      style={{ cursor: showAns ? "default" : "pointer" }}
-                    >
-                      <option value="" disabled hidden>
-                        Select
-                      </option>
-                      {item.lastOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    {!showAns && <span className="wd-arrow">▼</span>}
-                  </div>
-                </div>
-
-                {isWrong(item) && <div className="wd-wrong-badge">✕</div>}
+                {/* ❌ */}
+                {isWrong(item) && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold border-2 border-white shadow">
+                    ✕
+                  </span>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="wd-buttons-wrap">
+        <div className="flex justify-center mt-10">
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}

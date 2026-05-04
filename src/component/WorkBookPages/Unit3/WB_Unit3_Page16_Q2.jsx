@@ -4,8 +4,8 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex D 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex D 2.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex D 3.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex D 4.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex D 4.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex D 3.svg";
 
 const ITEMS = [
   {
@@ -44,7 +44,7 @@ export default function WB_Unit3_Page16_QC() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -55,7 +55,7 @@ export default function WB_Unit3_Page16_QC() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -116,7 +116,7 @@ export default function WB_Unit3_Page16_QC() {
           wrong ? "wrong" : ""
         }`}
         style={{
-          cursor: showAns ? "default" : "pointer",
+          cursor: showAns||showResults ? "default" : "pointer",
         }}
       >
         {option}
@@ -126,49 +126,47 @@ export default function WB_Unit3_Page16_QC() {
     );
   };
 
-  return (
-    <div className="main-container-component">
+  return ( 
+    <div className="main-container-component mb-10">
       <style>{`
         .wb-d16-wrap {
           display: flex;
           flex-direction: column;
-          gap: clamp(20px, 2.4vw, 28px);
+          // gap: clamp(20px, 2.4vw, 28px);
           width: 100%;
+          align-items:center
         }
 
         .wb-d16-list {
-          display: flex;
-          flex-direction: column;
+          display: grid;
+        grid-template-columns: 1fr 1fr;
           gap: clamp(18px, 2.2vw, 26px);
           width: 100%;
         }
 
         .wb-d16-row {
-          display: grid;
-          grid-template-columns:
-            clamp(26px, 3vw, 38px)
-            minmax(150px, clamp(220px, 27vw, 330px))
-            minmax(0, 1fr);
+          display: flex;
+         
           gap: clamp(12px, 1.8vw, 18px);
           align-items: center;
           width: 100%;
         }
 
         .wb-d16-num {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: clamp(16px, 1.7vw,20px);
           font-weight: 700;
           color: #222;
           line-height: 1;
         }
 
         .wb-d16-img {
-          width: clamp(150px, 26vw, 320px);
-          height: clamp(90px, 15vw, 170px);
+          width: 250px;
+          height: auto;
           object-fit: contain;
           display: block;
           justify-self: start;
-                              border: 2px solid #f39b42;
-object-fit: cover;
+                              // border: 2px solid #f39b42;
+
         }
 
         .wb-d16-content {
@@ -180,7 +178,7 @@ object-fit: cover;
         }
 
         .wb-d16-question {
-          font-size: clamp(16px, 2vw, 20px);
+          font-size: clamp(12px, 1.4vw, 18px);
           color: #111;
           line-height: 1.4;
           margin-bottom: 2px;
@@ -189,50 +187,53 @@ object-fit: cover;
 
         .wb-d16-options {
           display: flex;
-          flex-wrap: wrap;
-          gap: clamp(10px, 1.5vw, 16px);
+          flex-direction:column;
+          // flex-wrap: wrap;
+          gap: 5px;
           align-items: center;
         }
 
         .wb-d16-option {
           position: relative;
-          padding: clamp(8px, 1vw, 10px) clamp(12px, 1.8vw, 18px);
+          padding: 5px 20px;
           border-radius: 999px;
-          border: 2px solid transparent;
+          border: 1px solid transparent;
           background-color: transparent;
           color: #111;
           font-size: clamp(14px, 1.5vw, 16px);
-          font-weight: 500;
+          // font-weight: 500;
           transition: all 0.2s ease;
           box-sizing: border-box;
           min-width: fit-content;
           line-height: 1.35;
         }
-
+.wb-d16-option:hover{
+ border-color: #f39b42;
+}
         .wb-d16-option.selected {
           border-color: #f39b42;
         }
 
         .wb-d16-option.wrong {
-          border-color: #dc2626;
+          border-color: red;
         }
 
         .wb-d16-wrong-badge {
-          position: absolute;
-          top: clamp(-8px, -0.8vw, -6px);
-          right: clamp(-8px, -0.8vw, -6px);
-          width: clamp(18px, 2vw, 20px);
-          height: clamp(18px, 2vw, 20px);
+         position: absolute;
+          top: -10px;
+          right: -10px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background-color: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 11px);
+          font-size: 12px;
           font-weight: 700;
           border: 2px solid #fff;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-d16-buttons {
@@ -295,35 +296,25 @@ object-fit: cover;
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
+      <div className="div-forall" style={{gap:"25px"}}>
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">C</span> Look, circle, and answer.
+          <span className="WB-ex-A">D</span> Look, circle, and answer.
         </h1>
 
         <div className="wb-d16-wrap">
           <div className="wb-d16-list">
             {ITEMS.map((item) => (
               <div key={item.id} className="wb-d16-row">
-                <div className="wb-d16-num">{item.id}</div>
-
-                <img
-                  src={item.img}
-                  alt={`question-${item.id}`}
-                  className="wb-d16-img"
-                />
-
                 <div className="wb-d16-content">
-                  <div className="wb-d16-question">{item.question}</div>
-
+                  <div className="flex gap-3">
+                    <div className="wb-d16-num">{item.id}</div>
+                    <div className="wb-d16-question">{item.question}</div>
+                  </div>
+                  <img
+                    src={item.img}
+                    alt={`question-${item.id}`}
+                    className="wb-d16-img"
+                  />
                   <div className="wb-d16-options">
                     {item.options.map((option) => (
                       <React.Fragment key={option}>

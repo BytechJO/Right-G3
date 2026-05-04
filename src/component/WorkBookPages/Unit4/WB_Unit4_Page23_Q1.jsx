@@ -27,7 +27,7 @@ const ITEMS = [
     id: 1,
     img: img1,
     correct: "February",
-    fixed: true,
+    fixed: false,
   },
   {
     id: 2,
@@ -57,7 +57,7 @@ const styles = {
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: "clamp(26px, 5vw, 48px) clamp(24px, 6vw, 80px)",
+    gap: "26px clamp(24px, 6vw, 80px)",
     alignItems: "start",
     justifyItems: "center",
     width: "100%",
@@ -65,11 +65,11 @@ const styles = {
 
   card: {
     width: "100%",
-    maxWidth: "clamp(280px, 44vw, 420px)",
+    // maxWidth: "clamp(280px, 44vw, 420px)",
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: "clamp(12px, 2vw, 18px)",
+    gap: "10px",
     minWidth: 0,
   },
 
@@ -82,7 +82,7 @@ const styles = {
   },
 
   qNumber: {
-    fontSize: "clamp(20px, 2.4vw, 28px)",
+    fontSize: "clamp(16px, 1.7vw, 20px)",
     fontWeight: "700",
     color: "#222",
     lineHeight: 1,
@@ -90,7 +90,7 @@ const styles = {
   },
 
   qText: {
-    fontSize: "clamp(20px, 2.8vw, 30px)",
+    fontSize: "clamp(16px, 1.4vw, 18px)",
     color: "#222",
     lineHeight: 1.2,
     fontWeight: "400",
@@ -104,8 +104,8 @@ const styles = {
   },
 
   image: {
-    width: "clamp(150px, 28vw, 220px)",
-    height: "clamp(150px, 28vw, 220px)",
+    width: "auto",
+    height: "110px",
     objectFit: "contain",
     display: "block",
     maxWidth: "100%",
@@ -133,7 +133,7 @@ const styles = {
     left: 0,
     right: 0,
     bottom: "8px",
-    borderBottom: "3px solid #333",
+    borderBottom: "1px solid #333",
   },
 
   answerInner: {
@@ -149,7 +149,7 @@ const styles = {
   },
 
   textStyle: {
-    fontSize: "clamp(20px, 3vw, 34px)",
+    fontSize: "clamp(14px, 1.4vw, 18px)",
     color: "#222",
     fontWeight: "400",
     lineHeight: 1.1,
@@ -164,8 +164,8 @@ const styles = {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    minWidth: "clamp(140px, 22vw, 190px)",
-    width: "fit-content",
+    // minWidth: "clamp(140px, 22vw, 190px)",
+    width: "70%",
     maxWidth: "100%",
     height: "clamp(34px, 6vw, 40px)",
   },
@@ -183,7 +183,7 @@ const styles = {
     MozAppearance: "none",
     textAlign: "center",
     textAlignLast: "center",
-    fontSize: "clamp(20px, 3vw, 34px)",
+    fontSize: "clamp(14px, 1.4vw, 18px)",
     lineHeight: 1.1,
     color: "#222",
     fontWeight: "400",
@@ -204,18 +204,20 @@ const styles = {
 
   wrongBadge: {
     position: "absolute",
-    top: "-2px",
-    right: "-10px",
-    width: "22px",
-    height: "22px",
+    top: "16px",
+    right: "1px",
+    width: "clamp(16px, 2vw, 22px)",
+    height: "clamp(16px, 2vw, 22px)",
     borderRadius: "50%",
-    background: "#ef4444",
+    backgroundColor: "red",
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "12px",
+    fontSize: "clamp(9px, 1vw, 12px)",
     fontWeight: "700",
+    border: "2px solid #fff",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
     zIndex: 3,
   },
 
@@ -244,7 +246,7 @@ export default function WB_Months_Page230_QE() {
   }, []);
 
   const handleChange = (id, value) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -253,10 +255,10 @@ export default function WB_Months_Page230_QE() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const allAnswered = ITEMS.filter((item) => !item.fixed).every(
-      (item) => answers[item.id]
+      (item) => answers[item.id],
     );
 
     if (!allAnswered) {
@@ -356,7 +358,12 @@ export default function WB_Months_Page230_QE() {
 
     return (
       <div style={styles.answerFieldOuter}>
-        <div style={styles.answerLine} />
+        <div
+          style={{
+            ...styles.answerLine,
+            borderBottom: isWrong(item) ? "1px solid red" : "1px solid #222",
+          }}
+        />
 
         <div style={styles.answerInner}>
           <span
@@ -368,19 +375,23 @@ export default function WB_Months_Page230_QE() {
             It’s
           </span>
 
-          <div style={styles.selectWrap}>
+          <div
+            style={{
+              ...styles.selectWrap,
+            }}
+          >
             <select
               value={answers[item.id] || ""}
-              disabled={showAns}
+              disabled={showAns || checked}
               onChange={(e) => handleChange(item.id, e.target.value)}
               style={{
                 ...styles.select,
                 color: showAns || answers[item.id] ? "#000000" : "#222",
-                cursor: showAns ? "default" : "pointer",
+                cursor: showAns || checked ? "default" : "pointer",
               }}
             >
               <option value="" disabled>
-                —
+               
               </option>
               {MONTHS.map((month) => (
                 <option key={month} value={month}>
@@ -412,19 +423,10 @@ export default function WB_Months_Page230_QE() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
           gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-          }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
           Read, look, and write.
         </h1>

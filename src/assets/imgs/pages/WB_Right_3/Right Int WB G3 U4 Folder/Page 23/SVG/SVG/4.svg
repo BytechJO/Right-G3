@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256.74 73.68">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-dasharray: 3.01 2.01;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14 {
+        stroke: #231f20;
+      }
+
+      .cls-2 {
+        stroke-dasharray: 3.09 2.09;
+      }
+
+      .cls-3 {
+        stroke-dasharray: 3.05 2.05;
+      }
+
+      .cls-15 {
+        fill: #231f20;
+      }
+
+      .cls-4 {
+        stroke-dasharray: 3.43 2.43;
+      }
+
+      .cls-5 {
+        stroke-dasharray: 2.95 1.95;
+      }
+
+      .cls-6 {
+        stroke-dasharray: 3.18 2.18;
+      }
+
+      .cls-16 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-9 {
+        stroke-dasharray: 2.52 1.52;
+      }
+
+      .cls-10 {
+        stroke-dasharray: 2.86 1.86;
+      }
+
+      .cls-17 {
+        clip-path: url(#clippath-3);
+      }
+
+      .cls-11 {
+        stroke-dasharray: 2.95 1.95;
+      }
+
+      .cls-12 {
+        stroke-dasharray: 3.18 2.18;
+      }
+
+      .cls-18 {
+        clip-path: url(#clippath-2);
+      }
+
+      .cls-13 {
+        stroke-dasharray: 3.28 2.28;
+      }
+
+      .cls-14 {
+        stroke-dasharray: 3.25 2.25;
+      }
+
+      .cls-19 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-8" x="98.1" y="19.03" width="71.61" height="45.53"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <rect class="cls-8" x="98.1" y="19.03" width="71.61" height="45.53"/>
+    </clipPath>
+    <clipPath id="clippath-2">
+      <rect class="cls-8" x="98.1" y="19.03" width="71.61" height="45.53"/>
+    </clipPath>
+    <clipPath id="clippath-3">
+      <rect class="cls-8" x="98.1" y="19.03" width="71.61" height="45.53"/>
+    </clipPath>
+  </defs>
+  <g class="cls-19">
+    <line class="cls-12" x1="98.56" y1="48.96" x2="109.52" y2="21.03"/>
+    <path class="cls-15" d="M109.52,23.03c1.1,0,2-.89,2-2s-.9-2-2-2-2,.9-2,2,.89,2,2,2"/>
+  </g>
+  <line class="cls-3" x1="120.72" y1="48.84" x2="109.84" y2="22.48"/>
+  <line class="cls-10" x1="117.89" y1="41.28" x2="100.9" y2="41.28"/>
+  <line class="cls-11" x1="159.9" y1="49.14" x2="159.9" y2="31.51"/>
+  <g class="cls-16">
+    <path class="cls-15" d="M160.01,26.8c.77,0,1.39-.62,1.39-1.39s-.62-1.39-1.39-1.39-1.39.62-1.39,1.39.62,1.39,1.39,1.39"/>
+    <path class="cls-7" d="M160.01,26.8c.77,0,1.39-.62,1.39-1.39s-.62-1.39-1.39-1.39-1.39.62-1.39,1.39.62,1.39,1.39,1.39,1.39-.62,1.39-1.39-.62-1.39-1.39-1.39-1.39.62-1.39,1.39.62,1.39,1.39,1.39M160.01,26.8c.77,0,1.39-.62,1.39-1.39s-.62-1.39-1.39-1.39-1.39.62-1.39,1.39.62,1.39,1.39,1.39"/>
+    <line class="cls-6" x1="126.61" y1="34.57" x2="126.61" y2="64.57"/>
+    <path class="cls-15" d="M126.61,32.57c1.1,0,2,.9,2,2s-.9,2-2,2-2-.89-2-2,.89-2,2-2"/>
+    <path class="cls-2" d="M128.16,35.78c.98-1.05,2.09-1.89,3.35-2.35"/>
+    <path class="cls-14" d="M137.62,34.44c1.13.85,2.04,2.05,2.54,3.48"/>
+    <path class="cls-4" d="M139.73,44.63c-.76,1.54-1.94,2.6-3.24,3.2"/>
+    <path class="cls-5" d="M130.35,47.6c-1.18-.61-2.11-1.52-2.94-2.56"/>
+    <path class="cls-7" d="M126.82,44.26c-.29-.39-.57-.8-.85-1.2M135.34,48.23c-.56.14-1.14.2-1.7.18-.52-.02-1.01-.08-1.46-.17M140.46,39c.1.52.15,1.06.15,1.61,0,.6-.06,1.17-.15,1.71M132.52,33.17c.49-.09,1-.12,1.54-.08.54.04,1.08.15,1.59.32M126.01,38.69c.27-.44.55-.87.84-1.29"/>
+  </g>
+  <line class="cls-13" x1="145.89" y1="49.14" x2="145.89" y2="34.74"/>
+  <g class="cls-18">
+    <path class="cls-15" d="M145.89,36.74c1.1,0,2-.89,2-2s-.9-2-2-2-2,.9-2,2,.89,2,2,2"/>
+    <path class="cls-9" d="M154.01,33.62s-5.92,1.7-8.86,5.53"/>
+  </g>
+  <line class="cls-1" x1="167.71" y1="49.14" x2="167.71" y2="21.03"/>
+  <g class="cls-17">
+    <path class="cls-15" d="M167.71,23.03c1.1,0,2-.89,2-2s-.9-2-2-2-2,.9-2,2,.89,2,2,2"/>
+  </g>
+</svg>

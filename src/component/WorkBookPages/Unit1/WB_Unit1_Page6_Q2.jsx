@@ -37,10 +37,13 @@ export default function WB_Vocabulary_Page213_H() {
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
+const [activeDropId, setActiveDropId] = useState(null);
   const dropRefs = useRef({});
 
-  const usedNumbers = useMemo(() => Object.values(imageAnswers), [imageAnswers]);
+  const usedNumbers = useMemo(
+    () => Object.values(imageAnswers),
+    [imageAnswers],
+  );
 
   const applyDrop = (imageId, num) => {
     const updated = { ...imageAnswers };
@@ -105,7 +108,7 @@ export default function WB_Vocabulary_Page213_H() {
   };
 
   const handleRemoveNumber = (imageId) => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     setImageAnswers((prev) => {
       const updated = { ...prev };
@@ -127,10 +130,11 @@ export default function WB_Vocabulary_Page213_H() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||checked) return;
+
 
     const allAnswered = Object.keys(CORRECT_ANSWERS).every(
-      (itemId) => imageAnswers[itemId]
+      (itemId) => imageAnswers[itemId],
     );
 
     if (!allAnswered) {
@@ -175,105 +179,92 @@ export default function WB_Vocabulary_Page213_H() {
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">H</span>
           Read, look, and number.
         </h1>
-
-        <div className="wb-content-grid">
-          <div className="wb-words-list">
-            {WORDS.map((word) => (
-              <div key={word.id} className="wb-word-row">
-                <div className="wb-word-box">
-                  <span className="wb-word-number-inline">{word.id}</span>
-                  <span className="wb-word-text">{word.text}</span>
+        <div>
+          <div className="wb-content-grid">
+            <div className="wb-words-list">
+              {WORDS.map((word) => (
+                <div key={word.id} className="wb-word-row">
+                  <div className="wb-word-box">
+                    <span className="wb-word-number-inline">{word.id}</span>
+                    <span className="wb-word-text">{word.text}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="wb-images-grid">
-            {IMAGES.map((item) => (
-              <div
-                key={item.id}
-                ref={(el) => (dropRefs.current[item.id] = el)}
-                className={`wb-image-card ${
-                  draggedNumber !== null ? "wb-image-card--active" : ""
-                }`}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDrop(item.id)}
-              >
-                <img
-                  src={item.img}
-                  alt={item.alt}
-                  className="wb-image"
-                  draggable={false}
-                />
-
-                <button
-                  type="button"
-                  className={`wb-corner-number ${
-                    imageAnswers[item.id] ? "wb-corner-number--filled" : ""
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveNumber(item.id);
-                  }}
-                  disabled={!imageAnswers[item.id] || showAns}
+            <div className="wb-images-grid">
+              {IMAGES.map((item) => (
+                <div
+                  key={item.id}
+                  ref={(el) => (dropRefs.current[item.id] = el)}
+                  className={`wb-image-card `}
+                 onDragEnter={() => setActiveDropId(item.id)}
+onDragLeave={() => setActiveDropId(null)}
+onDragOver={(e) => e.preventDefault()}
+onDrop={() => {
+  handleDrop(item.id);
+  setActiveDropId(null);
+}}
                 >
-                  {imageAnswers[item.id] || ""}
-                </button>
+                  <img
+                    src={item.img}
+                    alt={item.alt}
+                    className={`wb-image ${
+                 activeDropId === item.id ? "wb-image-card--active" : ""
+                  }`}
+                    draggable={false}
+                  />
 
-                {isImageWrong(item.id) && (
-                  <span className="wb-wrong-badge">✕</span>
-                )}
-              </div>
-            ))}
+                  <button
+                    type="button"
+                    className={`wb-corner-number ${
+                      imageAnswers[item.id] ? "wb-corner-number--filled" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveNumber(item.id);
+                    }}
+                    disabled={!imageAnswers[item.id] || showAns}
+                  >
+                    {imageAnswers[item.id] || ""}
+                  </button>
+
+                  {isImageWrong(item.id) && (
+                    <span className="wb-wrong-badge">✕</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="wb-drag-numbers">
+            {DRAG_NUMBERS.map((num) => {
+              const disabled = usedNumbers.includes(num);
+              const selected = draggedNumber === num || touchItem === num;
+
+              return (
+                <div
+                  key={num}
+                  draggable={!disabled && !showAns}
+                  onDragStart={() => handleDragStart(num)}
+                  onTouchStart={(e) => handleTouchStart(e, num)}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  className={`wb-drag-circle ${
+                    disabled || showAns ? "wb-drag-circle--disabled" : ""
+                  } ${selected ? "wb-drag-circle--selected" : ""}`}
+                >
+                  {num}
+                </div>
+              );
+            })}
           </div>
         </div>
-
-        <div className="wb-drag-numbers">
-          {DRAG_NUMBERS.map((num) => {
-            const disabled = usedNumbers.includes(num);
-            const selected = draggedNumber === num || touchItem === num;
-
-            return (
-              <div
-                key={num}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(num)}
-                onTouchStart={(e) => handleTouchStart(e, num)}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                className={`wb-drag-circle ${
-                  disabled || showAns ? "wb-drag-circle--disabled" : ""
-                } ${selected ? "wb-drag-circle--selected" : ""}`}
-              >
-                {num}
-              </div>
-            );
-          })}
-        </div>
-
         <div className="wb-buttons-wrap">
           <Button
             handleShowAnswer={handleShowAnswer}
@@ -300,14 +291,17 @@ export default function WB_Vocabulary_Page213_H() {
           display: grid;
           grid-template-columns: minmax(250px, 320px) 1fr;
           gap: 30px;
-          align-items: start;
+          align-items: center;
+          margin-bottom:60px
         }
 
         .wb-words-list {
-          display: flex;
-          flex-direction: column;
-          gap: 56px;
-          padding-top: 10px;
+            display: flex;
+    flex-direction: column;
+    /* gap: 56px; */
+    /* padding-top: 10px; */
+    height: 100%;
+    justify-content: space-between;
         }
 
         .wb-word-row {
@@ -353,11 +347,11 @@ export default function WB_Vocabulary_Page213_H() {
 
         .wb-image-card {
           position: relative;
-          min-height: 154px;
-          border: 2px solid #ec9b32;
+          height: 130px;
+          // border: 2px solid #ec9b32;
           border-radius: 14px;
           background: #fff;
-          overflow: hidden;
+          // overflow: hidden;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -367,13 +361,13 @@ export default function WB_Vocabulary_Page213_H() {
         }
 
         .wb-image-card--active {
-          box-shadow: 0 0 0 3px rgba(141, 141, 147, 0.12);
+          box-shadow: 0 0 2px 6px rgba(141, 141, 147, 0.12);
         }
 
         .wb-image {
-          width: 100%;
-          height: 100%;
-          max-height: 130px;
+          
+          height: 130px;
+          border-radius: 5px;
           object-fit: contain;
           display: block;
           user-select: none;
@@ -381,24 +375,24 @@ export default function WB_Vocabulary_Page213_H() {
         }
 
         .wb-corner-number {
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 38px;
-          height: 38px;
-          border: none;
-          border-left: 2px solid #ec9b32;
-          border-bottom: 2px solid #ec9b32;
-          border-bottom-left-radius: 10px;
-          background: #fff;
-          color: #000000;
-          font-size: 22px;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          line-height: 1;
+        position: absolute;
+    top: -3px;
+    right: 9px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    /* border-left: 2px solid #ec9b32; */
+    /* border-bottom: 2px solid #ec9b32; */
+    /* border-bottom-left-radius: 10px; */
+    /* background: #fff; */
+    color: #000000;
+    font-size: 22px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
         }
 
         .wb-corner-number:disabled {
@@ -408,7 +402,7 @@ export default function WB_Vocabulary_Page213_H() {
 
         .wb-wrong-badge {
           position: absolute;
-          top: 38px;
+          top: -11px;
           right: 0;
           width: 22px;
           height: 22px;
@@ -438,7 +432,7 @@ export default function WB_Vocabulary_Page213_H() {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: #ec9b32;
+          background: #2e3192;
           color: #fff;
           display: flex;
           align-items: center;

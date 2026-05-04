@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import AudioWithCaption from "../../AudioWithCaption";
-
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 19.svg";
@@ -13,7 +13,8 @@ import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Fold
 import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 24.svg";
 import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 25.svg";
 import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 26.svg";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 
 const ITEMS = [
   {
@@ -50,7 +51,7 @@ export default function WB_Unit3_Page18_QB() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -61,7 +62,7 @@ export default function WB_Unit3_Page18_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -88,15 +89,15 @@ export default function WB_Unit3_Page18_QB() {
       ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
     }
   };
-const captions = [
-  { start: 0.60, end: 3.42, text: "Page 14, phonics, exercise C." },
-  { start: 3.42, end: 6.32, text: "Do they both have the same U sound?" },
-  { start: 6.32, end: 9.68, text: "Listen and write check or X." },
-  { start: 10.84, end: 13.58, text: "1- duck, glue." },
-  { start: 13.58, end: 17.42, text: "2- tube, sue." },
-  { start: 17.42, end: 21.16, text: "3- cup, cube." },
-  { start: 21.16, end: 24.74, text: "4- sun, bug." },
-];
+  const captions = [
+    { start: 0.6, end: 3.42, text: "Page 14, phonics, exercise C." },
+    { start: 3.42, end: 6.32, text: "Do they both have the same U sound?" },
+    { start: 6.32, end: 9.68, text: "Listen and write check or X." },
+    { start: 10.84, end: 13.58, text: "1- duck, glue." },
+    { start: 13.58, end: 17.42, text: "2- tube, sue." },
+    { start: 17.42, end: 21.16, text: "3- cup, cube." },
+    { start: 21.16, end: 24.74, text: "4- sun, bug." },
+  ];
   const handleShowAnswer = () => {
     const correctMap = {};
     ITEMS.forEach((item) => {
@@ -126,18 +127,23 @@ const captions = [
 
     return (
       <div
-        onClick={() => handleSelect(item.id, value)}
+        onClick={() => {
+          handleSelect(item.id, value);
+        }}
         style={{
           position: "relative",
-          width: "58px",
-          height: "58px",
+          width: "45px",
+          height: "45px",
           borderRadius: "14px",
-          border: selected || correctSelected ? "2px solid #f39b42" : "2px solid #cfcfcf",
+          border:
+            selected || correctSelected
+              ? "2px solid #f39b42"
+              : "2px solid #cfcfcf",
           background: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: showAns ? "default" : "pointer",
+          cursor: showAns || showResults ? "default" : "pointer",
           boxSizing: "border-box",
           userSelect: "none",
         }}
@@ -146,34 +152,35 @@ const captions = [
           style={{
             fontSize: "34px",
             fontWeight: "700",
-            color:
-              value === "✓"
-                ? "#000000ff"
-                : "#000000ff",
+            color: value === "✓" ? "#000000ff" : "#000000ff",
             lineHeight: 1,
           }}
         >
-          {value}
+          {value === "✓" ? (
+            <img src={trueIcon} style={{ height: "25px" }} />
+          ) : (
+            <img src={falseIcon} style={{ height: "25px" }} />
+          )}
         </span>
 
         {wrong && (
           <div
             style={{
               position: "absolute",
-              top: "-8px",
-              right: "-8px",
+              top: "-10px",
+              right: "-10px",
               width: "22px",
               height: "22px",
               borderRadius: "50%",
-              backgroundColor: "#ff0000ff",
+              backgroundColor: "red",
               color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: "12px",
               fontWeight: "700",
-              border: "2px solid #f39b42",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+              border: "2px solid white",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
             }}
           >
             ✕
@@ -186,140 +193,132 @@ const captions = [
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-b-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 20px !important;
-          width: 100% !important;
-          max-width: 1120px !important;
-          margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
-          box-sizing: border-box !important;
-        }
+  .wb-b-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 8px 14px 20px;
+    box-sizing: border-box;
+  }
 
-        .wb-b-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          column-gap: 44px !important;
-          row-gap: 18px !important;
-          width: 100% !important;
-          align-items: start !important;
-        }
+  .wb-b-grid {
+    display: flex;
+    // grid-template-columns: repeat(2, minmax(0, 1fr));
+    // column-gap: 44px;
+    // row-gap: 18px;
+    width: 100%;
+    align-items: center;
+  }
 
-        .wb-b-item {
-          display: flex !important;
-          align-items: flex-start !important;
-          gap: 14px !important;
-          width: 100% !important;
-        }
+  .wb-b-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    width: 100%;
+  }
 
-        .wb-b-num {
-          font-size: 22px !important;
-          font-weight: 700 !important;
-          color: #222 !important;
-          line-height: 1 !important;
-          min-width: 24px !important;
-          padding-top: 10px !important;
-        }
+  .wb-b-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1;
+min-width: 16px;
+    padding-top: 10px;
+    margin-left: 20px;
+  }
 
-        .wb-b-card {
-          width: 100% !important;
-          max-width: 430px !important;
-          border: 2px solid #f39b42 !important;
-          border-radius: 18px !important;
-          background: #fff !important;
-          display: grid !important;
-          grid-template-columns: 1fr 1fr !important;
-          position: relative !important;
-          overflow: visible !important;
-          box-sizing: border-box !important;
-        }
+  .wb-b-card {
+    width: 100%;
+    /* max-width: 430px; */
+    border: 1px solid #f39b42;
+    border-radius: 18px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: visible;
+    box-sizing: border-box;
+  }
 
-        .wb-b-half {
-          min-height: 170px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          padding: 12px !important;
-          box-sizing: border-box !important;
-        }
+  .wb-b-half {
+    min-height: 135px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
 
-        .wb-b-half:first-child {
-          border-right: 2px solid #f39b42 !important;
-        }
+  .wb-b-half:first-child {
+    border-right: 1px solid #f39b42;
+  }
 
-        .wb-b-img {
-          max-width: 100% !important;
-          max-height: 140px !important;
-          width: auto !important;
-          height: auto !important;
-          object-fit: contain !important;
-          display: block !important;
-        }
+  .wb-b-img {
+    max-width: 100%;
+    max-height: 110px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
 
-        .wb-b-answer-box {
-          position: absolute !important;
-          left: 50% !important;
-          bottom: -2px !important;
-          transform: translateX(-50%) !important;
-          width: 54px !important;
-          height: 42px !important;
-          border: 2px solid #f39b42 !important;
-          border-radius: 8px !important;
-          background: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          box-sizing: border-box !important;
-          z-index: 2 !important;
-        }
+  .wb-b-answer-box {
+    position: absolute;
+    left: 50%;
+    bottom: -2px;
+    transform: translateX(-50%);
+    width: 54px;
+    height: 42px;
+    border: 1px solid #f39b42;
+    border-radius: 8px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    z-index: 2;
+  }
 
-        .wb-b-answer-text {
-          font-size: 34px !important;
-          font-weight: 700 !important;
-          color: #000000ff !important;
-          line-height: 1 !important;
-        }
+  .wb-b-answer-text {
+    font-size: 34px;
+    font-weight: 700;
+    color: #000000;
+    line-height: 1;
+  }
 
-        .wb-b-options-row {
-          display: flex !important;
-          justify-content: center !important;
-          gap: 14px !important;
-          margin-top: 8px !important;
-        }
+  .wb-b-options-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 8px;
+    margin-left: 20%;
+  }
 
-        .wb-b-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 8px !important;
-        }
+  .wb-b-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
 
-        @media (max-width: 900px) {
-          .wb-b-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
-
-       <div
-        className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1    className="WB-header-title-page8"
-          style={{
-            margin: 0,
-          }}>
-          <span className="WB-ex-A">C</span> Do they both have the same sound? Write ✓ or ✕.
+  @media (max-width: 900px) {
+    .wb-b-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+`}</style>
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">C</span> Do they both have the same{" "}
+          <span className="text-blue-800">u sound</span> ? Listen and write{" "}
+          <span className="text-red-500">✓</span> or
+          <span className="text-red-500">✕</span> .
         </h1>
-<div style={{ display: "flex", justifyContent: "center" }}>
-  <AudioWithCaption src={sound1} captions={captions} />
-</div>        <div className="wb-b-grid">
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <QuestionAudioPlayer src={sound1} captions={captions} />
+        </div>{" "}
+        <div className="wb-b-grid">
           {ITEMS.map((item) => (
             <div
               key={item.id}
@@ -327,6 +326,7 @@ const captions = [
                 display: "flex",
                 flexDirection: "column",
                 gap: "10px",
+                width: "100%",
               }}
             >
               <div className="wb-b-item">
@@ -352,7 +352,11 @@ const captions = [
                   {(answers[item.id] || showAns) && (
                     <div className="wb-b-answer-box">
                       <span className="wb-b-answer-text">
-                        {answers[item.id]}
+                        {answers[item.id] === "✓" ? (
+                          <img src={trueIcon} style={{ height: "25px" }} />
+                        ) : (
+                          <img src={falseIcon} style={{ height: "25px" }} />
+                        )}
                       </span>
                     </div>
                   )}
@@ -367,7 +371,6 @@ const captions = [
             </div>
           ))}
         </div>
-
         <div className="wb-b-buttons">
           <Button
             checkAnswers={handleCheck}

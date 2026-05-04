@@ -56,18 +56,18 @@ export default function WB_Unit3_Page6_QG() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showResults || showAns) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setShowResults(false);
+
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showResults || showAns) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -164,10 +164,11 @@ export default function WB_Unit3_Page6_QG() {
         }
 
         .wb-g6-number {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: clamp(12px, 1.4vw, 18px);
           font-weight: 700;
           color: #222;
           line-height: 1;
+              height: 100%;
         }
 
         .wb-g6-image-wrap {
@@ -198,11 +199,11 @@ export default function WB_Unit3_Page6_QG() {
           width: fit-content;
           max-width: 100%;
           padding: clamp(4px, 0.6vw, 6px) clamp(16px, 2vw, 26px);
-          border: 3px solid transparent;
+          border: 2px solid transparent;
           border-radius: 999px;
           background: transparent;
           color: #222;
-          font-size: clamp(16px, 2vw, 20px);
+          font-size: clamp(12px, 1.4vw, 18px);
           font-weight: 500;
           line-height: 1.2;
           cursor: pointer;
@@ -218,7 +219,7 @@ export default function WB_Unit3_Page6_QG() {
         }
 
         .wb-g6-option.wrong {
-          border-color: ${WRONG_COLOR};
+          border-color: red
         }
 
         .wb-g6-option.disabled {
@@ -232,7 +233,7 @@ export default function WB_Unit3_Page6_QG() {
           width: clamp(18px, 2vw, 22px);
           height: clamp(18px, 2vw, 22px);
           border-radius: 50%;
-          background: ${WRONG_COLOR};
+          background: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -262,7 +263,7 @@ export default function WB_Unit3_Page6_QG() {
           }
 
           .wb-g6-option {
-            font-size: clamp(14px, 1.8vw, 18px);
+            font-size: clamp(12px, 1.4vw, 18px);
           }
         }
 
@@ -303,16 +304,7 @@ export default function WB_Unit3_Page6_QG() {
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
+      <div className="div-forall">
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
           <span className="WB-ex-A">G</span> Look, read, and circle.
         </h1>

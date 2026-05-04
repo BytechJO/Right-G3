@@ -17,44 +17,44 @@ const ITEMS = [
     leftImg: img1a,
     rightImg: img1b,
     question: "Which one is lighter, the tiger or the cat?",
-    middleText: "is lighter than",
-    firstOptions: ["The tiger", "The cat"],
-    lastOptions: ["the tiger", "the cat"],
-    correctFirst: "The cat",
-    correctLast: "the tiger",
+    options: [
+      "The cat is lighter than the tiger",
+      "The tiger is lighter than the cat",
+    ],
+    correct: "The cat is lighter than the tiger",
   },
   {
     id: 2,
     leftImg: img2a,
     rightImg: img2b,
     question: "Which one is taller, the man or the boy?",
-    middleText: "is taller than",
-    firstOptions: ["The man", "The boy"],
-    lastOptions: ["the man", "the boy"],
-    correctFirst: "The man",
-    correctLast: "the boy",
+    options: [
+      "The man is taller than the boy",
+      "The boy is taller than the man",
+    ],
+    correct: "The man is taller than the boy",
   },
   {
     id: 3,
     leftImg: img3a,
     rightImg: img3b,
     question: "Which one is faster, the skateboard or the car?",
-    middleText: "is faster than",
-    firstOptions: ["The skateboard", "The car"],
-    lastOptions: ["the skateboard", "the car"],
-    correctFirst: "The car",
-    correctLast: "the skateboard",
+    options: [
+      "The car is faster than the skateboard",
+      "The skateboard is faster than the car",
+    ],
+    correct: "The car is faster than the skateboard",
   },
   {
     id: 4,
     leftImg: img4a,
     rightImg: img4b,
     question: "Which one is thinner, the tree or the flower?",
-    middleText: "is thinner than",
-    firstOptions: ["The tree", "The flower"],
-    lastOptions: ["the tree", "the flower"],
-    correctFirst: "The flower",
-    correctLast: "the tree",
+    options: [
+      "The flower is thinner than the tree",
+      "The tree is thinner than the flower",
+    ],
+    correct: "The flower is thinner than the tree",
   },
 ];
 
@@ -63,31 +63,33 @@ export default function WB_Unit3_Page19_QE() {
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
-  const handleSelect = (id, field, value) => {
-    if (showAns) return;
+  const handleSelect = (id, value) => {
+    if (showAns||checked) return;
+
     setAnswers((prev) => ({
       ...prev,
-      [id]: { ...prev[id], [field]: value },
+      [id]: value,
     }));
+
     setChecked(false);
   };
 
   const handleCheck = () => {
-    if (showAns) return;
-    const allAnswered = ITEMS.every(
-      (item) => answers[item.id]?.first && answers[item.id]?.last
-    );
+    if (showAns||checked) return;
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
+
     let score = 0;
+
     ITEMS.forEach((item) => {
-      const isCorrect =
-        answers[item.id]?.first === item.correctFirst &&
-        answers[item.id]?.last === item.correctLast;
-      if (isCorrect) score += 1;
+      if (answers[item.id] === item.correct) {
+        score++;
+      }
     });
+
     setChecked(true);
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -98,18 +100,17 @@ export default function WB_Unit3_Page19_QE() {
     }
   };
 
-  const handleShowAnswer = () => {
-    const filledAnswers = {};
-    ITEMS.forEach((item) => {
-      filledAnswers[item.id] = {
-        first: item.correctFirst,
-        last: item.correctLast,
-      };
-    });
-    setAnswers(filledAnswers);
-    setChecked(true);
-    setShowAns(true);
-  };
+const handleShowAnswer = () => {
+  const filled = {};
+
+  ITEMS.forEach((item) => {
+    filled[item.id] = item.correct;
+  });
+
+  setAnswers(filled);
+  setChecked(true);
+  setShowAns(true);
+};
 
   const handleReset = () => {
     setAnswers({});
@@ -117,12 +118,10 @@ export default function WB_Unit3_Page19_QE() {
     setShowAns(false);
   };
 
-  const isWrong = (item, field) => {
+  const isWrong = (item) => {
     if (!checked || showAns) return false;
-    if (field === "first") return answers[item.id]?.first !== item.correctFirst;
-    return answers[item.id]?.last !== item.correctLast;
+    return answers[item.id] !== item.correct;
   };
-
   return (
     <div className="main-container-component">
       <style>{`
@@ -130,7 +129,7 @@ export default function WB_Unit3_Page19_QE() {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
           column-gap: clamp(18px, 4vw, 54px);
-          row-gap: clamp(18px, 3vw, 34px);
+          row-gap: clamp(18px, 10vw, 60px);
           align-items: start;
           width: 100%;
         }
@@ -149,6 +148,7 @@ export default function WB_Unit3_Page19_QE() {
           align-items: flex-start;
           min-width: 0;
           width: 100%;
+          height: 265px
         }
 
         .wb-e-num {
@@ -167,6 +167,8 @@ export default function WB_Unit3_Page19_QE() {
           flex-direction: column;
           gap: clamp(8px, 1.2vw, 12px);
           min-width: 0;
+              height: 100%;
+    justify-content: space-between;
         }
 
         .wb-e-images {
@@ -188,19 +190,20 @@ export default function WB_Unit3_Page19_QE() {
         }
 
         .wb-e-img {
-          max-width: 100%;
-          max-height: clamp(56px, 12vw, 120px);
-          width: auto;
-          height: auto;
+          // max-width: 100%;
+          // max-height: clamp(56px, 12vw, 120px);
+          width: 130px;
+          height: 130px;
           object-fit: contain;
           display: block;
         }
 
         .wb-e-question {
-          font-size: clamp(13px, 1.7vw, 20px);
+          font-size: clamp(13px, 1.6vw, 17px);
           line-height: 1.3;
           color: #222;
-          font-weight: 500;
+          
+          // font-weight: 500;
           word-break: break-word;
         }
 
@@ -213,7 +216,7 @@ export default function WB_Unit3_Page19_QE() {
         }
 
         .wb-e-answer-line {
-          border-bottom: 3px solid #4a4a4a;
+          // border-bottom: 2px solid #c9c9c9;
           padding-bottom: clamp(4px, 0.8vw, 6px);
           min-height: clamp(34px, 6vw, 54px);
           display: flex;
@@ -222,7 +225,7 @@ export default function WB_Unit3_Page19_QE() {
           gap: clamp(4px, 0.8vw, 8px);
           width: 100%;
           min-width: 0;
-          overflow: hidden;
+          // overflow: hidden;
         }
 
         .wb-e-select-wrap {
@@ -237,12 +240,12 @@ export default function WB_Unit3_Page19_QE() {
           width: 100%;
           height: clamp(32px, 3.2vw, 42px);
           min-width: 0;
-          border: 2px solid #c9c9c9;
-          border-radius: clamp(7px, 1vw, 10px);
+          border-bottom: 2px solid #c9c9c9;
+          // border-radius: clamp(7px, 1vw, 10px);
           background: #fff;
           padding: 0 clamp(20px, 2.2vw, 32px) 0 clamp(6px, 0.8vw, 10px);
-          font-size: clamp(10px, 1.2vw, 16px);
-          font-weight: 500;
+          font-size: clamp(10px, 1.5vw, 17px);
+          // font-weight: 500;
           color: #333;
           outline: none;
           appearance: none;
@@ -251,19 +254,39 @@ export default function WB_Unit3_Page19_QE() {
           cursor: pointer;
           box-sizing: border-box;
           line-height: 1.1;
-          text-align: center;
-          text-align-last: center;
+          // text-align: center;
+          // text-align-last: center;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
+
+
+.wb-e-wrong-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: red;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 2;
+}
         .wb-e-select.has-value {
           color: #000000ff;
         }
 
         .wb-e-select.wrong {
-          border-color: #e53935;
+          border-color: red;
         }
 
         .wb-e-select:disabled {
@@ -275,14 +298,14 @@ export default function WB_Unit3_Page19_QE() {
           right: clamp(5px, 0.7vw, 10px);
           top: 50%;
           transform: translateY(-50%);
-          font-size: clamp(8px, 0.9vw, 11px);
+          font-size: clamp(8px, 0.9vw, 9px);
           color: #666;
           pointer-events: none;
         }
 
         .wb-e-middle {
-          font-size: clamp(10px, 1.2vw, 16px);
-          font-weight: 500;
+          font-size: clamp(10px, 1.6vw, 20px);
+          // font-weight: 500;
           color: #222;
           line-height: 1.2;
           flex-shrink: 0;
@@ -347,26 +370,8 @@ export default function WB_Unit3_Page19_QE() {
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
           Look and read. Answer the questions.
         </h1>
@@ -399,49 +404,35 @@ export default function WB_Unit3_Page19_QE() {
 
                   <div className="wb-e-answer-block">
                     <div className="wb-e-answer-line">
-                      <div className="wb-e-select-wrap">
-                        <select
-                          value={answers[item.id]?.first || ""}
-                          disabled={showAns}
-                          onChange={(e) =>
-                            handleSelect(item.id, "first", e.target.value)
-                          }
-                          className={`wb-e-select ${isWrong(item, "first") ? "wrong" : ""} ${answers[item.id]?.first ? "has-value" : ""}`}
-                        >
-                          <option value="" disabled hidden>
-                            Select
-                          </option>
-                          {item.firstOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                        {!showAns && <span className="wb-e-arrow">▼</span>}
-                      </div>
+                    <div className="wb-e-select-wrap">
+  <select
+    value={answers[item.id] || ""}
+    disabled={showAns}
+    onChange={(e) =>
+      handleSelect(item.id, e.target.value)
+    }
+    className={`wb-e-select 
+      ${isWrong(item) ? "wrong" : ""} 
+      ${answers[item.id] ? "has-value" : ""}`}
+  >
+    <option value="" disabled hidden>
+      Select
+    </option>
 
-                      <span className="wb-e-middle">{item.middleText}</span>
+    {item.options.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ))}
+  </select>
 
-                      <div className="wb-e-select-wrap">
-                        <select
-                          value={answers[item.id]?.last || ""}
-                          disabled={showAns}
-                          onChange={(e) =>
-                            handleSelect(item.id, "last", e.target.value)
-                          }
-                          className={`wb-e-select ${isWrong(item, "last") ? "wrong" : ""} ${answers[item.id]?.last ? "has-value" : ""}`}
-                        >
-                          <option value="" disabled hidden>
-                            Select
-                          </option>
-                          {item.lastOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                        {!showAns && <span className="wb-e-arrow">▼</span>}
-                      </div>
+  {!showAns && <span className="wb-e-arrow">▼</span>}
+
+  {/* ❌ WRONG BADGE */}
+  {isWrong(item) && (
+    <div className="wb-e-wrong-badge">✕</div>
+  )}
+</div>
                     </div>
                   </div>
                 </div>

@@ -47,32 +47,32 @@ const styles = {
 
   wordBank: {
     minWidth: "min(100%, 520px)",
-    maxWidth: "620px",
-    border: "2px solid #f39b42",
+    // maxWidth: "620px",
+    border: "1px solid #f39b42",
     borderRadius: "18px",
     padding: "14px 22px",
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
     alignItems: "center",
-    gap: "34px",
+    // gap: "34px",
     background: "#fff",
     flexWrap: "wrap",
     boxSizing: "border-box",
   },
 
   word: {
-    fontSize: "22px",
+    fontSize: "18px",
     color: "#222",
     lineHeight: 1.1,
     fontWeight: 500,
   },
 
-grid: {
-  display: "grid",
-  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-  gap: "34px 42px",
-  alignItems: "start",
-},
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "34px 42px",
+    alignItems: "start",
+  },
 
   card: {
     width: "100%",
@@ -84,21 +84,13 @@ grid: {
   mediaWrap: {
     position: "relative",
     width: "100%",
+    display: "flex",
+    alignItems: "flex-start",
+    // justifyContent: "center",
+    gap: "10px",
   },
 
   numberBadge: {
-    position: "absolute",
-    top: "-12px",
-    left: "-10px",
-    minWidth: "34px",
-    height: "34px",
-    borderRadius: "999px",
-    background: "#fff",
-    border: "2px solid #f39b42",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
     fontSize: "22px",
     fontWeight: 700,
     color: "#222",
@@ -107,17 +99,14 @@ grid: {
 
   imageBox: {
     width: "100%",
-    height: "170px",
-    border: "2px solid #f39b42",
-    objectfit:"contain",
-    borderRadius: "18px",
-    overflow: "hidden",
+    height: "120px",
+
     background: "#fff",
   },
 
   image: {
-    width: "100%",
-    height: "100%",
+    height: "auto",
+    width: "300px",
     objectFit: "cover",
     display: "block",
   },
@@ -126,27 +115,28 @@ grid: {
     position: "relative",
     width: "100%",
     paddingTop: "6px",
+    marginLeft: "20px",
   },
 
   answerLine: {
-    width: "100%",
-    borderBottom: "3px solid #4a4a4a",
-    paddingBottom: "8px",
+    width: "80%",
+    borderBottom: "1px solid #4a4a4a",
+    // paddingBottom: "8px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "68px",
+    minHeight: "40px",
     boxSizing: "border-box",
   },
 
   selectBox: {
     position: "relative",
-    width: "190px",
-    height: "48px",
+    width: "100%",
+    height: "30px",
     borderRadius: "12px",
     background: "#fff",
-    border: "1.5px solid #d4d4d4",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+    // border: "1.5px solid #d4d4d4",
+    // boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
     display: "flex",
     alignItems: "center",
   },
@@ -163,10 +153,10 @@ grid: {
     padding: "0 40px 0 14px",
     textAlign: "center",
     textAlignLast: "center",
-    fontSize: "27px",
-    fontWeight: 600,
+    fontSize: "18px",
+    // fontWeight: 600,
     cursor: "pointer",
-    borderRadius: "12px",
+    // borderRadius: "12px",
   },
 
   arrow: {
@@ -181,19 +171,20 @@ grid: {
 
   wrongBadge: {
     position: "absolute",
-    top: "-4px",
-    right: "-8px",
-    width: "24px",
-    height: "24px",
-    borderRadius: "999px",
-    background: "#ef4444",
+    top: "4px",
+    right: "64px",
+    width: "22px",
+    height: "22px",
+    borderRadius: "50%",
+    background: "red",
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "13px",
-    fontWeight: 700,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    fontSize: "14px",
+    fontWeight: "bold",
+    border: "2px solid white",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
   },
 
   buttonsWrap: {
@@ -278,15 +269,13 @@ export default function WB_Weather_Page228_QA() {
     <div className="main-container-component">
       <div
         className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+        style={{
+   
+          gap: "20px",
+        
         }}
       >
-        <h1 className="WB-header-title-page8" style={styles.title}>
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
           Look, read, and write.
         </h1>
@@ -317,21 +306,28 @@ export default function WB_Weather_Page228_QA() {
               </div>
 
               <div style={styles.answerWrap}>
-                <div style={styles.answerLine}>
-                  <div style={styles.selectBox}>
+                <div
+                  style={{
+                    ...styles.answerLine,
+                    borderBottom: isWrong(item) ? "2px solid red" : "1px solid #4a4a4a",
+                  }}
+                >
+                  <div
+                    style={{
+                      ...styles.selectBox,
+                    }}
+                  >
                     <select
                       value={answers[item.id] || ""}
-                      disabled={showAns}
+                      disabled={showAns || checked}
                       onChange={(e) => handleChange(item.id, e.target.value)}
                       style={{
                         ...styles.select,
                         color: getSelectColor(item),
-                        cursor: showAns ? "default" : "pointer",
+                        cursor: showAns || checked ? "default" : "pointer",
                       }}
                     >
-                      <option value="" disabled hidden>
-                        —
-                      </option>
+                      <option value="" disabled hidden></option>
                       {WORDS.map((word) => (
                         <option key={word} value={word}>
                           {word}

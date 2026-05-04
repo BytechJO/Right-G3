@@ -52,7 +52,7 @@ export default function WB_Unit3_Page17_QJ() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -62,7 +62,7 @@ export default function WB_Unit3_Page17_QJ() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -159,7 +159,7 @@ export default function WB_Unit3_Page17_QJ() {
         }
 
         .wb-j-number {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: clamp(16px, 1.7vw, 20px);
           font-weight: 700;
           color: #222;
           line-height: 1;
@@ -167,27 +167,26 @@ export default function WB_Unit3_Page17_QJ() {
         }
 
         .wb-j-img-frame {
-          width: 100%;
-          max-width: clamp(260px, 38vw, 420px);
-          min-height: clamp(120px, 18vw, 150px);
-          height: clamp(120px, 18vw, 150px);
-          border: 2px solid #f39b42;
-          border-radius: clamp(12px, 1.8vw, 14px);
-          background: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          box-sizing: border-box;
-          margin-bottom: clamp(8px, 1.2vw, 10px);
-          padding: clamp(6px, 1vw, 8px);
+            width: 100%;
+    /* max-width: clamp(260px, 38vw, 420px); */
+    /* min-height: clamp(120px, 18vw, 150px); */
+    // height: clamp(120px, 18vw, 150px);
+    border-radius: clamp(12px, 1.8vw, 14px);
+    background: #fff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin-bottom: clamp(8px, 1.2vw, 10px);
+    padding: clamp(6px, 1vw, 8px);
+    gap:20px
         }
 
         .wb-j-img {
-          max-width: 100%;
-          max-height: 100%;
+          
           width: auto;
-          height: auto;
+          height: 120px;
           object-fit: contain;
           display: block;
         }
@@ -214,10 +213,10 @@ export default function WB_Unit3_Page17_QJ() {
           max-width: 100%;
           padding: clamp(6px, 1vw, 8px) clamp(12px, 1.8vw, 16px);
           border-radius: 999px;
-          border: 2px solid transparent;
+          border: 1px solid transparent;
           background: transparent;
           color: #111;
-          font-size: clamp(15px, 1.8vw, 18px);
+          font-size: clamp(15px, 1vw, 18px);
           line-height: 1.35;
           cursor: pointer;
           user-select: none;
@@ -225,14 +224,18 @@ export default function WB_Unit3_Page17_QJ() {
           box-sizing: border-box;
           white-space: normal;
           word-break: break-word;
+            margin-left: 20px;
         }
 
         .wb-j-option.selected {
-          border: 2px solid #d62828;
+          border: 1px solid #f39b42
         }
+        .wb-j-option:hover{
+          border: 1px solid #f39b42
 
+        }
         .wb-j-option.wrong {
-          border: 2px solid #ef4444;
+          border: 2px solid red;
         }
 
         .wb-j-option.disabled {
@@ -240,22 +243,21 @@ export default function WB_Unit3_Page17_QJ() {
         }
 
         .wb-j-wrong-mark {
-          position: absolute;
-          top: clamp(-10px, -1vw, -8px);
-          right: clamp(-10px, -1vw, -8px);
-          width: clamp(18px, 2vw, 22px);
-          height: clamp(18px, 2vw, 22px);
+       position: absolute;
+          top: -10px;
+          right: -10px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 12px);
+          font-size: 12px;
           font-weight: 700;
           border: 2px solid #fff;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-          box-sizing: border-box;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-j-buttons {
@@ -308,9 +310,8 @@ export default function WB_Unit3_Page17_QJ() {
           <div className="wb-j-grid">
             {ITEMS.map((item) => (
               <div key={item.id} className="wb-j-card">
-                <div className="wb-j-number">{item.id}</div>
-
                 <div className="wb-j-img-frame">
+                  <div className="wb-j-number">{item.id}</div>
                   <img
                     src={item.img}
                     alt={`question-${item.id}`}

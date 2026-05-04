@@ -13,6 +13,7 @@ import img2c from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Fold
 import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 7.svg";
 import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 8.svg";
 import img3c from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 9.svg";
+import trueIcon from "../../../assets/imgs/true.svg";
 
 const ACTIVE_COLOR = "#f39b42";
 const WRONG_COLOR = "#ef4444";
@@ -74,7 +75,7 @@ export default function WB_Unit3_Page3_QB() {
   const [showAns, setShowAns] = useState(false);
 
   const handleImageSelect = (itemId, imageKey) => {
-    if (showAns) return;
+ if (showAns ||checked) return;
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { ...prev[itemId], image: imageKey },
@@ -83,7 +84,7 @@ export default function WB_Unit3_Page3_QB() {
   };
 
   const handleTextSelect = (itemId, text) => {
-    if (showAns) return;
+     if (showAns ||checked) return;
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { ...prev[itemId], text },
@@ -92,10 +93,10 @@ export default function WB_Unit3_Page3_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     const allAnswered = ITEMS.every(
-      (item) => answers[item.id]?.image && answers[item.id]?.text
+      (item) => answers[item.id]?.image && answers[item.id]?.text,
     );
 
     if (!allAnswered) {
@@ -143,8 +144,7 @@ export default function WB_Unit3_Page3_QB() {
   const isImageSelected = (itemId, imageKey) =>
     answers[itemId]?.image === imageKey;
 
-  const isTextSelected = (itemId, option) =>
-    answers[itemId]?.text === option;
+  const isTextSelected = (itemId, option) => answers[itemId]?.text === option;
 
   const isWrongImage = (item) => {
     if (!checked || showAns) return false;
@@ -177,7 +177,7 @@ export default function WB_Unit3_Page3_QB() {
 
         .wb-qb-row {
           display: grid !important;
-          grid-template-columns: minmax(0, 1fr) minmax(280px, 38%);
+          grid-template-columns: minmax(0, 1fr) minmax(330px, 38%);
           gap: clamp(16px, 2.6vw, 28px) !important;
           align-items: start !important;
           width: 100%;
@@ -209,7 +209,7 @@ export default function WB_Unit3_Page3_QB() {
         }
 
         .wb-qb-question {
-          font-size: clamp(16px, 2.2vw, 24px);
+          font-size: clamp(16px, 2.2vw, 19px);
           color: #111;
           line-height: 1.35;
           font-weight: 500;
@@ -219,9 +219,9 @@ export default function WB_Unit3_Page3_QB() {
         .wb-qb-images-row {
           display: flex !important;
           align-items: flex-end !important;
-          gap: clamp(10px, 1.8vw, 18px) !important;
+          gap: clamp(10px, 1.8vw, 5px) !important;
           flex-wrap: wrap !important;
-          padding-left: clamp(22px, 4vw, 34px) !important;
+          // padding-left: clamp(22px, 4vw, 34px) !important;
           overflow: visible !important;
           width: 100%;
         }
@@ -238,8 +238,8 @@ export default function WB_Unit3_Page3_QB() {
         }
 
         .wb-qb-image-holder {
-          width: clamp(72px, 13vw, 150px) !important;
-          height: clamp(68px, 12vw, 140px) !important;
+          width: clamp(72px, 13vw, 96px) !important;
+          height: clamp(68px, 12vw, 96px) !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
@@ -255,10 +255,9 @@ export default function WB_Unit3_Page3_QB() {
           opacity: 1 !important;
           width: auto !important;
           height: auto !important;
-          max-width: clamp(64px, 12vw, 140px) !important;
-          max-height: clamp(60px, 11vw, 130px) !important;
-          min-width: clamp(34px, 6vw, 70px) !important;
-          min-height: clamp(34px, 6vw, 70px) !important;
+          max-width: clamp(64px, 12vw, 120px) !important;
+          max-height: clamp(60px, 11vw, 120px) !important;
+         
           object-fit: contain !important;
           flex-shrink: 0 !important;
           overflow: visible !important;
@@ -287,7 +286,7 @@ export default function WB_Unit3_Page3_QB() {
           width: clamp(16px, 2.2vw, 22px);
           height: clamp(16px, 2.2vw, 22px);
           border-radius: 50%;
-          background-color: ${WRONG_COLOR};
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -317,12 +316,13 @@ export default function WB_Unit3_Page3_QB() {
         }
 
         .wb-qb-option-text {
-          font-size: clamp(14px, 2vw, 22px);
+          font-size: clamp(14px, 2vw, 19px);
           color: #222;
           line-height: 1.35;
-          font-weight: 500;
+          // font-weight: 500;
           min-width: 0;
           word-break: break-word;
+          text-wrap: nowrap
         }
 
         .wb-qb-checkbox {
@@ -352,7 +352,7 @@ export default function WB_Unit3_Page3_QB() {
           width: clamp(16px, 2.2vw, 22px);
           height: clamp(16px, 2.2vw, 22px);
           border-radius: 50%;
-          background-color: ${WRONG_COLOR};
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -381,28 +381,10 @@ export default function WB_Unit3_Page3_QB() {
         }
       `}</style>
 
-      <div
-        className="div-forall "
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall ">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>
-          Read, look, circle, and write ✓.
+          Read, look, circle, and write <img src={trueIcon} style={{height:"25px"}}/>.
         </h1>
 
         <div className="wb-qb-main-list">
@@ -469,21 +451,7 @@ export default function WB_Unit3_Page3_QB() {
                           style={{ cursor: showAns ? "default" : "pointer" }}
                         >
                           {(selected || showCorrect) && (
-                            <svg
-                              width="65%"
-                              height="65%"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <polyline
-                                points="4,13 9,18 20,6"
-                                stroke="#e53935"
-                                strokeWidth="3.2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                            <img src={trueIcon} style={{height:"25px"}}/>
                           )}
 
                           {wrong && <div className="wb-qb-wrong">✕</div>}

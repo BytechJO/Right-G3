@@ -11,26 +11,26 @@ const ITEMS = [
   {
     id: 1,
     img: img1,
-    pairs: ["slow fast", "young old"],
-    correct: "slow fast",
+    pairs: ["slow   fast", "young   old"],
+    correct: "slow   fast",
   },
   {
     id: 2,
     img: img2,
-    pairs: ["old young", "big small"],
-    correct: "big small",
+    pairs: ["old   young", "big   small"],
+    correct: "big   small",
   },
   {
     id: 3,
     img: img3,
-    pairs: ["fast slow", "short tall"],
-    correct: "short tall",
+    pairs: ["fast   slow", "short   tall"],
+    correct: "short   tall",
   },
   {
     id: 4,
     img: img4,
-    pairs: ["short tall", "heavy light"],
-    correct: "heavy light",
+    pairs: ["short   tall", "heavy   light"],
+    correct: "heavy   light",
   },
 ];
 
@@ -40,7 +40,8 @@ export default function WB_Unit3_Page6_QC() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+       if (showAns ||showResults) return;
+
 
     setAnswers((prev) => ({
       ...prev,
@@ -51,7 +52,7 @@ export default function WB_Unit3_Page6_QC() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -104,14 +105,14 @@ export default function WB_Unit3_Page6_QC() {
     let borderStyle = "2px solid transparent";
 
     if (selected && !showResults) {
-      borderStyle = "4px solid #f39d66";
+      borderStyle = "2px solid #f89631";
     }
 
     if (showResults) {
       if (selected && isCorrect) {
-        borderStyle = "4px solid #f39d66";
+        borderStyle = "2px solid #f89631";
       } else if (selected && !isCorrect) {
-        borderStyle = "4px solid #ef4444";
+        borderStyle = "2px solid red";
       }
     }
 
@@ -123,15 +124,15 @@ export default function WB_Unit3_Page6_QC() {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          minWidth: "180px",
-          minHeight: "52px",
-          padding: "8px 18px",
+          // minWidth: "180px",
+          // minHeight: "52px",
+          padding: "6px 14px",
           border: borderStyle,
           borderRadius: "999px",
           background: "#fff",
           color: "#222",
           fontSize: "20px",
-          fontWeight: "500",
+          // fontWeight: "500",
           lineHeight: "1.2",
           cursor: showAns ? "default" : "pointer",
           boxSizing: "border-box",
@@ -151,7 +152,7 @@ export default function WB_Unit3_Page6_QC() {
               width: "22px",
               height: "22px",
               borderRadius: "50%",
-              backgroundColor: "#ef4444",
+              backgroundColor: "red",
               color: "#fff",
               display: "flex",
               alignItems: "center",
@@ -170,23 +171,13 @@ export default function WB_Unit3_Page6_QC() {
   };
 
   return (
- <div className="main-container-component">
-<div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-     
+    <div className="main-container-component">
+      <div className="div-forall">
         <style>{`
           .wb-c6-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 32px 36px;
+                gap: 60px 75px;
             width: 100%;
             align-items: start;
           }
@@ -219,8 +210,8 @@ export default function WB_Unit3_Page6_QC() {
 
           .wb-c6-img-frame {
             width: 100%;
-            max-width: 470px;
-            height: 185px;
+            // max-width: 470px;
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -249,6 +240,7 @@ export default function WB_Unit3_Page6_QC() {
             gap: 12px 16px;
             width: 100%;
             padding-left: 0;
+            justify-content: space-around;
           }
 
           .wb-c6-buttons {
@@ -337,16 +329,9 @@ export default function WB_Unit3_Page6_QC() {
           }
         `}</style>
 
- <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >          <span className="WB-ex-A">C</span>
+        <h1 className="WB-header-title-page8">
+          {" "}
+          <span className="WB-ex-A">C</span>
           Look and read. Circle the correct pair.
         </h1>
 

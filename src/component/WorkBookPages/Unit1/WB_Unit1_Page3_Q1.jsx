@@ -1,19 +1,27 @@
 import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
-
+import trueIcon from "../../../assets/imgs/true.svg";
 const ACTIVE_COLOR = "#c81e1e";
 const BORDER_COLOR = "#f39b42";
 const TEXT_COLOR = "#2b2b2b";
 const HEADER_BG = "#ffffff";
 
 const EXERCISE_DATA = [
-  { id: 1, text: "The car is faster than the skateboard.",    correctAnswer: "true"  },
-  { id: 2, text: "The grandpa is younger than the grandson.", correctAnswer: "false" },
-  { id: 3, text: "The lion is larger than the cat.",          correctAnswer: "true"  },
-  { id: 4, text: "The truck is smaller than the car.",        correctAnswer: "false" },
-  { id: 5, text: "The snake is longer than the worm.",        correctAnswer: "true"  },
-  { id: 6, text: "The book is heavier than the pen.",         correctAnswer: "true"  },
+  {
+    id: 1,
+    text: "The car is faster than the skateboard.",
+    correctAnswer: "true",
+  },
+  {
+    id: 2,
+    text: "The grandpa is younger than the grandson.",
+    correctAnswer: "false",
+  },
+  { id: 3, text: "The lion is larger than the cat.", correctAnswer: "true" },
+  { id: 4, text: "The truck is smaller than the car.", correctAnswer: "false" },
+  { id: 5, text: "The snake is longer than the worm.", correctAnswer: "true" },
+  { id: 6, text: "The book is heavier than the pen.", correctAnswer: "true" },
 ];
 
 const styles = {
@@ -29,7 +37,8 @@ const styles = {
 
   headerRow: {
     display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) clamp(70px, 10vw, 95px) clamp(70px, 10vw, 95px)",
+    gridTemplateColumns:
+      "minmax(0, 1fr) clamp(70px, 10vw, 95px) clamp(70px, 10vw, 95px)",
     minHeight: "clamp(42px, 5vw, 58px)",
     background: HEADER_BG,
     borderBottom: `2px solid ${BORDER_COLOR}`,
@@ -48,8 +57,9 @@ const styles = {
 
   bodyRow: {
     display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) clamp(70px, 10vw, 95px) clamp(70px, 10vw, 95px)",
-    minHeight: "clamp(52px, 6vw, 78px)",
+    gridTemplateColumns:
+      "minmax(0, 1fr) clamp(70px, 10vw, 95px) clamp(70px, 10vw, 95px)",
+    minHeight: "clamp(52px, 6vw, 65px)",
     borderBottom: `1.5px solid ${BORDER_COLOR}`,
   },
 
@@ -72,7 +82,7 @@ const styles = {
   },
 
   sentenceText: {
-    fontSize: "clamp(14px, 2vw, 21px)",
+    fontSize: "clamp(14px, 2vw, 19px)",
     fontWeight: "500",
     color: TEXT_COLOR,
     lineHeight: 1.25,
@@ -106,35 +116,42 @@ const styles = {
 };
 
 const WB_TrueFalse_Table = () => {
-  const [answers,     setAnswers]     = useState({});
+  const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (questionId, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
     setShowResults(false);
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     const allAnswered = EXERCISE_DATA.every((item) => answers[item.id]);
-    if (!allAnswered) { ValidationAlert.info("Please answer all items first."); return; }
+    if (!allAnswered) {
+      ValidationAlert.info("Please answer all items first.");
+      return;
+    }
 
     setShowResults(true);
 
     let score = 0;
     const total = EXERCISE_DATA.length;
-    EXERCISE_DATA.forEach((item) => { if (answers[item.id] === item.correctAnswer) score++; });
+    EXERCISE_DATA.forEach((item) => {
+      if (answers[item.id] === item.correctAnswer) score++;
+    });
 
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)  ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else                 ValidationAlert.error(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
     const correctAnswers = {};
-    EXERCISE_DATA.forEach((item) => { correctAnswers[item.id] = item.correctAnswer; });
+    EXERCISE_DATA.forEach((item) => {
+      correctAnswers[item.id] = item.correctAnswer;
+    });
     setAnswers(correctAnswers);
     setShowResults(true);
     setShowAns(true);
@@ -148,28 +165,25 @@ const WB_TrueFalse_Table = () => {
 
   /* ── helpers ── */
   const isWrong = (item) =>
-    showResults && !showAns && answers[item.id] && answers[item.id] !== item.correctAnswer;
+    showResults &&
+    !showAns &&
+    answers[item.id] &&
+    answers[item.id] !== item.correctAnswer;
 
   const getCheckColor = (item) => (isWrong(item) ? "#ef4444" : ACTIVE_COLOR);
 
   const renderMark = (item, optionValue) => {
     if (answers[item.id] !== optionValue) return null;
     return (
-      <span style={{ ...styles.checkMark, color: getCheckColor(item) }}>✓</span>
+      <span style={{ ...styles.checkMark, color: getCheckColor(item) }}><img src={trueIcon} style={{height:"30px"}}/></span>
     );
   };
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{ display: "flex", flexDirection: "column", gap: "18px", maxWidth: "1100px", margin: "0 auto" }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
-        >
-          <span className="WB-ex-A">A</span> Read and write ✓.
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">A</span> Read and write <img src={trueIcon} style={{height:"25px"}}/>.
         </h1>
 
         <div style={styles.wrapper}>
@@ -177,8 +191,22 @@ const WB_TrueFalse_Table = () => {
             {/* Header */}
             <div style={styles.headerRow}>
               <div style={styles.headerCell}></div>
-              <div style={{ ...styles.headerCell, borderLeft: `1.5px solid ${BORDER_COLOR}` }}>True</div>
-              <div style={{ ...styles.headerCell, borderLeft: `1.5px solid ${BORDER_COLOR}` }}>False</div>
+              <div
+                style={{
+                  ...styles.headerCell,
+                  borderLeft: `1.5px solid ${BORDER_COLOR}`,
+                }}
+              >
+                True
+              </div>
+              <div
+                style={{
+                  ...styles.headerCell,
+                  borderLeft: `1.5px solid ${BORDER_COLOR}`,
+                }}
+              >
+                False
+              </div>
             </div>
 
             {/* Rows */}
@@ -187,8 +215,11 @@ const WB_TrueFalse_Table = () => {
                 key={item.id}
                 style={{
                   ...styles.bodyRow,
-                  borderBottom: index === EXERCISE_DATA.length - 1 ? "none" : `1.5px solid ${BORDER_COLOR}`,
-                  background:  "transparent",
+                  borderBottom:
+                    index === EXERCISE_DATA.length - 1
+                      ? "none"
+                      : `1.5px solid ${BORDER_COLOR}`,
+                  background: "transparent",
                   transition: "background 0.2s",
                 }}
               >
@@ -201,24 +232,23 @@ const WB_TrueFalse_Table = () => {
                   {isWrong(item) && (
                     <span
                       style={{
-                        marginLeft:     "auto",
-                        flexShrink:     0,
-                        background:     "#ef4444",
-                        color:          "#fff",
-                        border : "1px solid #fff ",
-                        borderRadius:   "50%",
-                        width:          "clamp(18px,2vw,26px)",
-                        height:         "clamp(18px,2vw,26px)",
-                        fontSize:       "clamp(11px,1.2vw,15px)",
-                        fontWeight:     700,
-                        display:        "flex",
-                        alignItems:     "center",
+                        marginLeft: "auto",
+                        flexShrink: 0,
+                        background: "red",
+                        color: "#fff",
+                        border: "2px solid #fff ",
+                        borderRadius: "50%",
+                        width: "clamp(18px,2vw,26px)",
+                        height: "clamp(18px,2vw,26px)",
+                        fontSize: "clamp(11px,1.2vw,15px)",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
                         justifyContent: "center",
-                        boxShadow:      "0 1px 4px rgba(0,0,0,0.18)",
-                        flexShrink:     0,
+                        boxShadow: "0 1px 5px rgba(0,0,0,0.18)",
                       }}
                     >
-                      X
+                      ✕
                     </span>
                   )}
                 </div>

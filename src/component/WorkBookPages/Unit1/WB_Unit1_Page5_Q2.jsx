@@ -99,13 +99,13 @@ export default function WB_Unit3_Page5_QF() {
   }, [matches]);
 
   const handleLeftClick = (id) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
     setSelectedLeft((prev) => (prev === id ? null : id));
     setShowResults(false);
   };
 
   const handleRightClick = (rightId) => {
-    if (showAns || selectedLeft === null) return;
+    if (showAns || selectedLeft === null ||showResults) return;
     const newMatches = { ...matches };
     Object.keys(newMatches).forEach((key) => {
       if (newMatches[key] === rightId) delete newMatches[key];
@@ -117,7 +117,7 @@ export default function WB_Unit3_Page5_QF() {
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
     const allConnected = exerciseData.left.every((item) => matches[item.id]);
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
@@ -186,7 +186,7 @@ export default function WB_Unit3_Page5_QF() {
           position: relative;
           z-index: 2;
           display: grid;
-          grid-template-columns: minmax(0, 1.45fr) clamp(18px, 2vw, 28px) clamp(60px, 8vw, 100px) clamp(18px, 2vw, 28px) minmax(200px, 0.95fr);
+          grid-template-columns: minmax(0, 1.45fr) clamp(18px, 2vw, 28px) clamp(60px, 20vw, 150px) clamp(18px, 2vw, 28px) minmax(200px, 0.95fr);
           width: 100%;
         }
 
@@ -202,7 +202,7 @@ export default function WB_Unit3_Page5_QF() {
           border-radius: 12px;
           width: 100%;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: clamp(8px, 1.4vw, 14px);
           transition: border 0.2s ease, background 0.2s ease;
           position: relative;
@@ -221,16 +221,16 @@ export default function WB_Unit3_Page5_QF() {
 
         .wb-f-left-num {
           font-size: 22px;
-          font-weight: 700;
+          font-weight: 500;
           color: #222;
           line-height: 1;
           flex-shrink: 0;
-          min-width: clamp(18px, 2.5vw, 28px);
+          // min-width: clamp(18px, 2.5vw, 28px);
         }
 
         .wb-f-left-text {
-          font-size: 22px;
-          font-weight: 500;
+          font-size: 18px;
+          // font-weight: 500;
           color: #111;
           line-height: 1.35;
         }
@@ -288,7 +288,7 @@ export default function WB_Unit3_Page5_QF() {
           width: 22px;
           height: 22px;
           border-radius: 50%;
-          background: #ef4444;
+          background: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -345,23 +345,11 @@ export default function WB_Unit3_Page5_QF() {
 
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+       
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+          
         >
           <span className="WB-ex-A">F</span>
           Read and match.

@@ -1,10 +1,8 @@
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
-import { TbMessageCircle } from "react-icons/tb";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
 
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import sound from "../../../assets/audio/ClassBook/Grade 3/cd1pg8instruction-adult-lady_nlyjQBM0.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page8/SVG/Asset 1.svg";
@@ -52,10 +50,10 @@ const styles = {
   matchArea: {
     position: "relative",
     width: "100%",
-    minHeight: "clamp(260px, 42vw, 430px)",
+    // minHeight: "clamp(260px, 42vw, 430px)",
     display: "flex",
     flexDirection: "column",
-    gap: "clamp(18px, 3vw, 34px)",
+    gap: "clamp(100px, 20vw, 150px)",
   },
 
   topRow: {
@@ -63,7 +61,7 @@ const styles = {
     gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
     gap: "clamp(8px, 1.8vw, 22px)",
     alignItems: "start",
-    zIndex: 2,
+    // zIndex: 2,
     width: "100%",
   },
 
@@ -80,7 +78,7 @@ const styles = {
     width: "100%",
     paddingLeft: "clamp(2px, 0.5vw, 6px)",
     boxSizing: "border-box",
-    fontSize: "clamp(16px, 2vw, 22px)",
+    fontSize: "clamp(14px, 1.4vw, 18px)",
     fontWeight: "700",
     color: "#111",
     lineHeight: 1,
@@ -90,7 +88,7 @@ const styles = {
     width: "clamp(42px, 9vw, 120px)",
     aspectRatio: "1 / 1",
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
     cursor: "pointer",
     borderRadius: "clamp(8px, 1vw, 14px)",
@@ -99,10 +97,11 @@ const styles = {
     boxSizing: "border-box",
     padding: "4px",
     maxWidth: "100%",
+    gap:"10px"
   },
 
   topImage: {
-    width: "100%",
+    width: "85%",
     height: "100%",
     objectFit: "contain",
     display: "block",
@@ -121,8 +120,8 @@ const styles = {
     gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
     gap: "clamp(8px, 1.8vw, 22px)",
     alignItems: "start",
-    zIndex: 2,
-    marginTop: "clamp(8px, 2vw, 26px)",
+    // zIndex: 2,
+    // marginTop: "clamp(8px, 2vw, 26px)",
     width: "100%",
   },
 
@@ -142,7 +141,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "clamp(12px, 2.1vw, 26px)",
+    fontSize: "clamp(12px, 1.4vw, 18px)",
     fontWeight: "500",
     color: "#222",
     textAlign: "center",
@@ -158,15 +157,15 @@ const styles = {
 
   wrongBadge: {
     position: "absolute",
-    width: "clamp(16px, 2vw, 22px)",
-    height: "clamp(16px, 2vw, 22px)",
+    width: "22px",
+    height: "22px",
     borderRadius: "50%",
-    backgroundColor: WRONG_COLOR,
+    backgroundColor:"red",
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "clamp(9px, 1vw, 12px)",
+    fontSize: "12px",
     fontWeight: "700",
     border: "2px solid #fff",
     boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
@@ -175,7 +174,7 @@ const styles = {
   buttonsWrap: {
     display: "flex",
     justifyContent: "center",
-    marginTop: "4px",
+    // marginTop: "4px",
     width: "100%",
   },
 };
@@ -192,102 +191,21 @@ const WB_Unit3_Page215_QB = () => {
   const elementRefs = useRef({});
 
   // ─── Audio state ──────────────────────────────────────────────────
-  const audioRef = useRef(null);
-  const settingsRef = useRef(null);
-  const stopAtSecond = 6.35; // ← غيّر هذه القيمة حسب الأوديو الجديد
 
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [paused, setPaused] = useState(false);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showContinue, setShowContinue] = useState(false);
-  const [showCaption, setShowCaption] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [forceRender, setForceRender] = useState(0);
+  const stopAtSecond = 6.35; // ← غيّر هذه القيمة حسب الأوديو الجديد
 
   // ─── Captions ─────────────────────────────────────────────────────
   // ← عدّل النصوص والتوقيتات حسب أوديو هذا التمرين
-const captions = [
-  { start: 0.60, end: 3.44, text: "Page eight. Phonics exercise B." },
-  { start: 4.48, end: 5.68, text: "Listen and match." },
-  { start: 6.74, end: 9.10, text: "1- tube." },
-  { start: 9.10, end: 11.62, text: "2- coat." },
-  { start: 11.62, end: 13.34, text: "3- jam." },
-  { start: 13.34, end: 15.98, text: "4- bee." },
-  { start: 15.98, end: 18.78, text: "5- nuts." },
-  { start: 19.80, end: 21.56, text: "6- kite." },
-];
-  const updateCaption = (time) => {
-    const index = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end
-    );
-    setActiveIndex(index);
-  };
-
-  // ─── Auto-play on mount + stop at intro ───────────────────────────
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = 0;
-    audio.play();
-
-    const interval = setInterval(() => {
-      if (audio.currentTime >= stopAtSecond) {
-        audio.pause();
-        setPaused(true);
-        setIsPlaying(false);
-        setShowContinue(true);
-        clearInterval(interval);
-      }
-    }, 100);
-
-    const handleEnded = () => {
-      audio.currentTime = 0;
-      setIsPlaying(false);
-      setPaused(false);
-      setActiveIndex(null);
-      setShowContinue(true);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      clearInterval(interval);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, []);
-
-  // ─── Caption scroll + force re-render ────────────────────────────
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setForceRender((prev) => prev + 1);
-    }, 1000);
-
-    if (activeIndex !== -1 && activeIndex !== null) {
-      const el = document.getElementById(`caption-${activeIndex}`);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-
-    return () => clearInterval(timer);
-  }, [activeIndex]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (audio.paused) {
-      audio.play();
-      setPaused(false);
-      setIsPlaying(true);
-    } else {
-      audio.pause();
-      setPaused(true);
-      setIsPlaying(false);
-    }
-  };
+  const captions = [
+    { start: 0.6, end: 3.44, text: "Page eight. Phonics exercise B." },
+    { start: 4.48, end: 5.68, text: "Listen and match." },
+    { start: 6.74, end: 9.1, text: "1- tube." },
+    { start: 9.1, end: 11.62, text: "2- coat." },
+    { start: 11.62, end: 13.34, text: "3- jam." },
+    { start: 13.34, end: 15.98, text: "4- bee." },
+    { start: 15.98, end: 18.78, text: "5- nuts." },
+    { start: 19.8, end: 21.56, text: "6- kite." },
+  ];
 
   // ─── Lines layout ─────────────────────────────────────────────────
   useLayoutEffect(() => {
@@ -336,13 +254,13 @@ const captions = [
 
   // ─── Matching handlers ────────────────────────────────────────────
   const handleTopClick = (id) => {
-    if (showAns) return;
+    if (showAns||showResults) return;
     setSelectedTop(id);
     setShowResults(false);
   };
 
   const handleBottomClick = (bottomId) => {
-    if (showAns || selectedTop === null) return;
+    if (showAns || selectedTop === null||showResults) return;
 
     const newMatches = { ...matches };
     Object.keys(newMatches).forEach((key) => {
@@ -356,7 +274,7 @@ const captions = [
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
     const allConnected = EXERCISE_DATA.top.every((item) => matches[item.id]);
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
@@ -396,7 +314,8 @@ const captions = [
 
   const getBottomDotColor = (bottomId) => {
     const isConnected = Object.values(matches).includes(bottomId);
-    const isSelected = selectedTop !== null && matches[selectedTop] === bottomId;
+    const isSelected =
+      selectedTop !== null && matches[selectedTop] === bottomId;
     return isSelected || isConnected ? ACTIVE_COLOR : INACTIVE_COLOR;
   };
 
@@ -408,143 +327,19 @@ const captions = [
   // ─── Render ───────────────────────────────────────────────────────
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
+      <div className="div-forall">
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span> Listen and match.
         </h1>
 
         {/* ── Audio Player ── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            margin: "30px 0px",
-            width: "100%",
-          }}
-        >
-          <div className="audio-popup-read" style={{ width: "50%" }}>
-            <div className="audio-inner player-ui">
-              <audio
-                ref={audioRef}
-                src={sound}
-                onTimeUpdate={(e) => {
-                  const time = e.target.currentTime;
-                  setCurrent(time);
-                  updateCaption(time);
-                }}
-                onLoadedMetadata={(e) => setDuration(e.target.duration)}
-              />
-
-              {/* Slider row */}
-              <div className="top-row">
-                <span className="audio-time">
-                  {new Date(current * 1000).toISOString().substring(14, 19)}
-                </span>
-
-                <input
-                  type="range"
-                  className="audio-slider"
-                  min="0"
-                  max={duration}
-                  value={current}
-                  onChange={(e) => {
-                    audioRef.current.currentTime = e.target.value;
-                    updateCaption(Number(e.target.value));
-                  }}
-                  style={{
-                    background: `linear-gradient(to right, #430f68 ${
-                      (current / duration) * 100
-                    }%, #d9d9d9ff ${(current / duration) * 100}%)`,
-                  }}
-                />
-
-                <span className="audio-time">
-                  {new Date(duration * 1000).toISOString().substring(14, 19)}
-                </span>
-              </div>
-
-              {/* Buttons row */}
-              <div className="bottom-row">
-                {/* Caption bubble */}
-                <div
-                  className={`round-btn ${showCaption ? "active" : ""}`}
-                  style={{ position: "relative" }}
-                  onClick={() => setShowCaption(!showCaption)}
-                >
-                  <TbMessageCircle size={36} />
-                  <div
-                    className={`caption-inPopup ${showCaption ? "show" : ""}`}
-                    style={{ top: "100%", left: "10%" }}
-                  >
-                    {captions.map((cap, i) => (
-                      <p
-                        key={i}
-                        id={`caption-${i}`}
-                        className={`caption-inPopup-line2 ${
-                          activeIndex === i ? "active" : ""
-                        }`}
-                      >
-                        {cap.text}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Play / Pause */}
-                <button className="play-btn2" onClick={togglePlay}>
-                  {isPlaying ? <FaPause size={26} /> : <FaPlay size={26} />}
-                </button>
-
-                {/* Settings */}
-                <div className="settings-wrapper" ref={settingsRef}>
-                  <button
-                    className={`round-btn ${showSettings ? "active" : ""}`}
-                    onClick={() => setShowSettings(!showSettings)}
-                  >
-                    <IoMdSettings size={36} />
-                  </button>
-
-                  {showSettings && (
-                    <div className="settings-popup">
-                      <label>Volume</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={volume}
-                        onChange={(e) => {
-                          setVolume(e.target.value);
-                          audioRef.current.volume = e.target.value;
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+<div className="flex flex-col gap-10">
+        <QuestionAudioPlayer
+          src={sound}
+          captions={captions}
+          stopAtSecond={stopAtSecond}
+        />
         {/* ── Matching Exercise ── */}
         <div ref={containerRef} style={styles.matchArea}>
           <svg
@@ -581,7 +376,7 @@ const captions = [
 
               return (
                 <div key={item.id} style={styles.topItem}>
-                  <div style={styles.topNumber}>{item.id}</div>
+                
 
                   <div
                     onClick={() => handleTopClick(item.id)}
@@ -590,14 +385,14 @@ const captions = [
                       border: isSelected
                         ? `3px solid ${ACTIVE_COLOR}`
                         : isConnected
-                        ? "2px solid #f5d0a8"
-                        : "2px solid transparent",
+                          ? "2px solid #f5d0a8"
+                          : "2px solid transparent",
                       background: isSelected
                         ? "rgba(243,155,66,0.08)"
                         : "transparent",
                       cursor: showAns ? "default" : "pointer",
                     }}
-                  >
+                  >  <div style={styles.topNumber}>{item.id}</div>
                     <img
                       src={item.img}
                       alt={`top-${item.id}`}
@@ -621,8 +416,8 @@ const captions = [
                     <div
                       style={{
                         ...styles.wrongBadge,
-                        right: "clamp(0px, 0.8vw, 10px)",
-                        top: "clamp(20px, 3vw, 34px)",
+                        right: "clamp(-9px, 0.8vw, -12px)",
+                        top: "clamp(-8px, 3vw, -15px)",
                       }}
                     >
                       ✕
@@ -662,8 +457,8 @@ const captions = [
                       border: isSelected
                         ? `3px solid ${ACTIVE_COLOR}`
                         : isConnected
-                        ? "2px solid #f5d0a8"
-                        : "2px solid transparent",
+                          ? "2px solid #f5d0a8"
+                          : "2px solid transparent",
                       cursor:
                         showAns || selectedTop === null ? "default" : "pointer",
                     }}
@@ -675,7 +470,7 @@ const captions = [
             })}
           </div>
         </div>
-
+</div>
         {/* Buttons */}
         <div style={styles.buttonsWrap}>
           <Button

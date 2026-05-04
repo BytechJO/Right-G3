@@ -39,7 +39,7 @@ export default function WB_Unit3_Page17_QI() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelectChange = (id, value) => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -50,7 +50,7 @@ export default function WB_Unit3_Page17_QI() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     const allAnswered = QUESTIONS.every((item) => answers[`a-${item.id}`]);
 
@@ -108,7 +108,7 @@ export default function WB_Unit3_Page17_QI() {
         .wb-i19-wrap {
           display: flex;
           flex-direction: column;
-          gap: clamp(20px, 2.4vw, 28px);
+          gap: clamp(20px, 2.4vw, 20px);
           width: 100%;
         }
 
@@ -122,39 +122,36 @@ export default function WB_Unit3_Page17_QI() {
           background: #fff;
           border-radius: clamp(14px, 2vw, 18px);
           padding: clamp(8px, 1.2vw, 10px);
-          width: 100%;
-          max-width: clamp(320px, 70vw, 620px);
+          // width: 100%;
+          // max-width: clamp(320px, 70vw, 620px);
           box-sizing: border-box;
         }
 
         .wb-i19-image {
-          width: 100%;
-          height: auto;
+          width: auto;
+          height: 200px;
           display: block;
-                              border: 2px solid #f39b42;
-                              border-radius: 10%;
-
-          border-radius: clamp(10px, 1.6vw, 12px);
+                
         }
 
         .wb-i19-list {
           display: flex;
           flex-direction: column;
-          gap: clamp(14px, 1.8vw, 16px);
+          gap: 10px;
           margin-top: clamp(4px, 1vw, 8px);
           width: 100%;
         }
 
         .wb-i19-row {
-          display: grid;
-          grid-template-columns: clamp(30px, 4vw, 46px) minmax(0, 1fr) minmax(180px, 340px);
+          display: flex;
+         
           align-items: center;
           gap: clamp(10px, 1.5vw, 14px);
           width: 100%;
         }
 
         .wb-i19-num {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: clamp(16px, 1.7vw, 20px);
           font-weight: 700;
           color: #222;
           text-align: center;
@@ -162,10 +159,10 @@ export default function WB_Unit3_Page17_QI() {
         }
 
         .wb-i19-question {
-          font-size: clamp(16px, 2.2vw, 24px);
+          font-size: clamp(14px, 1.4vw, 18px);
           color: #111;
           line-height: 1.3;
-          min-width: 0;
+          width: 60%;
           word-break: break-word;
         }
 
@@ -177,10 +174,10 @@ export default function WB_Unit3_Page17_QI() {
         .wb-i19-select {
           width: 100%;
           min-height: clamp(42px, 5vw, 50px);
-          font-size: clamp(16px, 2vw, 22px);
+          font-size: clamp(12px, 1.4vw, 18px);
           color: #000;
           border: none;
-          border-bottom: 2px solid #444;
+          border-bottom: 1px solid #444;
           outline: none;
           background: transparent;
           padding: 0 clamp(26px, 3vw, 32px) 4px 4px;
@@ -202,21 +199,21 @@ export default function WB_Unit3_Page17_QI() {
         }
 
         .wb-i19-wrong {
-          position: absolute;
-          top: clamp(-8px, -0.8vw, -6px);
-          right: clamp(-8px, -0.8vw, -6px);
-          width: clamp(18px, 2vw, 22px);
-          height: clamp(18px, 2vw, 22px);
+           position: absolute;
+          top: -10px;
+          right: -10px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background-color: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 12px);
+          font-size: 12px;
           font-weight: 700;
           border: 2px solid #fff;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-i19-buttons {
@@ -268,11 +265,9 @@ export default function WB_Unit3_Page17_QI() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+        
+          gap: "10px",
+          
         }}
       >
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
@@ -303,13 +298,14 @@ export default function WB_Unit3_Page17_QI() {
                   <div className="wb-i19-select-wrap">
                     <select
                       value={value}
-                      disabled={showAns}
+                      disabled={showAns||showResults}
                       onChange={(e) =>
                         handleSelectChange(item.id, e.target.value)
                       }
                       className="wb-i19-select"
                       style={{
                         cursor: showAns ? "default" : "pointer",
+                        borderBottom: isWrong(item) ? "2px solid red":"1px solid #1111118f"
                       }}
                     >
                       <option value="" disabled>

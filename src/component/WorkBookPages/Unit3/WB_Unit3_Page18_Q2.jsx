@@ -27,7 +27,7 @@ export default function WB_Unit3_Page18_QH() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -38,7 +38,7 @@ export default function WB_Unit3_Page18_QH() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -95,7 +95,7 @@ export default function WB_Unit3_Page18_QH() {
         .wb-h18-wrap {
           display: flex;
           flex-direction: column;
-          gap: clamp(20px, 2.4vw, 28px);
+          gap: 40px;
           width: 100%;
         }
 
@@ -109,19 +109,18 @@ export default function WB_Unit3_Page18_QH() {
         }
 
         .wb-h18-shop {
-          text-align: center;
-          width: 100%;
+        width:100%;
+         display: flex;
+    flex-direction: column;
+    align-items: center;
         }
 
         .wb-h18-shop-img {
-          width: clamp(140px, 22vw, 240px);
-          height: clamp(110px, 16vw, 170px);
+          width:250px;
+          height: auto;
           object-fit: cover;
           display: block;
-                              border: 2px solid #f39b42;
-                              border-radius: 10%;
-
-          margin: 0 auto clamp(6px, 1vw, 8px);
+                         
         }
 
         .wb-h18-shop-label {
@@ -138,25 +137,25 @@ export default function WB_Unit3_Page18_QH() {
         }
 
         .wb-h18-row {
-          display: grid;
-          grid-template-columns: clamp(24px, 3vw, 34px) minmax(0, 1fr) minmax(180px, 260px);
+          display: flex;
+          
           gap: clamp(10px, 1.5vw, 14px);
           align-items: center;
           width: 100%;
         }
 
         .wb-h18-num {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: clamp(16px, 1.7vw, 20px);
           font-weight: 700;
           color: #222;
           line-height: 1;
         }
 
         .wb-h18-text {
-          font-size: clamp(15px, 1.8vw, 18px);
+          font-size: clamp(15px, 1.4vw, 18px);
           line-height: 1.5;
           color: #333;
-          border: 2px solid #bfbfbf;
+          border: 1px solid #f39b42;
           border-radius: clamp(12px, 1.6vw, 16px);
           padding: clamp(10px, 1.5vw, 12px) clamp(12px, 1.7vw, 14px);
           background: #fff;
@@ -174,10 +173,10 @@ export default function WB_Unit3_Page18_QH() {
 
         .wb-h18-select {
           width: 100%;
-          font-size: clamp(16px, 2vw, 20px);
+          font-size: clamp(14px, 1.4vw, 18px);
           color: #000;
           border: none;
-          border-bottom: 2px solid #444;
+          border-bottom: 1px solid #444;
           outline: none;
           background: transparent;
           padding: 4px 0 6px;
@@ -185,25 +184,25 @@ export default function WB_Unit3_Page18_QH() {
         }
 
         .wb-h18-select.wrong {
-          border-bottom: 2px solid #000;
+          border-bottom: 2px solid red;
         }
 
         .wb-h18-wrong {
-          position: absolute;
-          top: clamp(-8px, -0.8vw, -6px);
-          right: clamp(-22px, -2vw, -18px);
-          width: clamp(18px, 2vw, 20px);
-          height: clamp(18px, 2vw, 20px);
+            position: absolute;
+          top: -10px;
+          right: -10px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background-color: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 11px);
+          font-size: 12px;
           font-weight: 700;
           border: 2px solid #fff;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-h18-buttons {
@@ -262,11 +261,7 @@ export default function WB_Unit3_Page18_QH() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "50px",
         }}
       >
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
@@ -294,7 +289,7 @@ export default function WB_Unit3_Page18_QH() {
           <div className="wb-h18-list">
             {ITEMS.map((item) => (
               <div key={item.id} className="wb-h18-row">
-                <div className="wb-h18-num">{item.id}</div>
+                <span className="wb-h18-num">{item.id}</span>
 
                 <div className="wb-h18-text">{item.text}</div>
 
@@ -302,7 +297,7 @@ export default function WB_Unit3_Page18_QH() {
                   <select
                     value={answers[item.id] || ""}
                     onChange={(e) => handleSelect(item.id, e.target.value)}
-                    disabled={showAns}
+                    disabled={showAns||showResults}
                     className={`wb-h18-select ${isWrong(item) ? "wrong" : ""}`}
                   >
                     <option value=""></option>

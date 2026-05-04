@@ -2,38 +2,34 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex A  4.svg";
-import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/1.svg";
-import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  3.svg";
-import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  4.svg";
-import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  2.svg";
-import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  6.svg";
-import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  7.svg";
-import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  8.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex A  4.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  3.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/Ex B  4.svg";
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
+
+// كمل باقي الصور هون
 
 const ITEMS = [
   {
     id: 1,
-    leftImg: img1a,
-    rightImg: img1b,
+    img: img1,
     correct: "✕",
   },
   {
     id: 2,
-    leftImg: img2a,
-    rightImg: img2b,
+    img: img2,
     correct: "✓",
   },
   {
     id: 3,
-    leftImg: img3a,
-    rightImg: img3b,
+    img: img3, // حطي الصورة المناسبة
     correct: "✓",
   },
   {
     id: 4,
-    leftImg: img4a,
-    rightImg: img4b,
+    img: img4, // حطي الصورة المناسبة
     correct: "✕",
   },
 ];
@@ -46,7 +42,7 @@ export default function WB_Unit3_Page18_QB() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -57,7 +53,7 @@ export default function WB_Unit3_Page18_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -117,51 +113,45 @@ export default function WB_Unit3_Page18_QB() {
         onClick={() => handleSelect(item.id, value)}
         style={{
           position: "relative",
-          width: "58px",
-          height: "58px",
+          width: "45px",
+          height: "45px",
           borderRadius: "14px",
-          border: selected || correctSelected ? "2px solid #f39b42" : "2px solid #cfcfcf",
+          border: selected
+            ? wrong
+              ? "2px solid red"
+              : "2px solid #f39b42"
+            : "1px solid #cfcfcf",
           background: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: showAns ? "default" : "pointer",
-          boxSizing: "border-box",
-          userSelect: "none",
+          cursor: showAns ||showResults? "default" : "pointer",
         }}
       >
-        <span
-          style={{
-            fontSize: "34px",
-            fontWeight: "700",
-            color:
-              value === "✓"
-                ? "#000000ff"
-                : "#000000ff",
-            lineHeight: 1,
-          }}
-        >
-          {value}
-        </span>
+        {value === "✓" ? (
+          <img src={trueIcon} style={{ height: "25px" }} />
+        ) : (
+          <img src={falseIcon} style={{ height: "25px" }} />
+        )}
 
         {wrong && (
           <div
             style={{
               position: "absolute",
-              top: "-8px",
+              top: "-10px",
               right: "-8px",
               width: "22px",
               height: "22px",
               borderRadius: "50%",
-              backgroundColor: "#ff0000ff",
+              background: "red",
               color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: "700",
-              border: "2px solid #f39b42",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+              fontSize: "14px",
+              fontWeight: "bold",
+              border: "2px solid white",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
             }}
           >
             ✕
@@ -174,194 +164,94 @@ export default function WB_Unit3_Page18_QB() {
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-b-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 20px !important;
-          width: 100% !important;
-          max-width: 1120px !important;
-          margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
-          box-sizing: border-box !important;
-        }
-
         .wb-b-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          column-gap: 44px !important;
-          row-gap: 18px !important;
-          width: 100% !important;
-          align-items: start !important;
-        }
-
-        .wb-b-item {
-          display: flex !important;
-          align-items: flex-start !important;
-          gap: 14px !important;
-          width: 100% !important;
-        }
-
-        .wb-b-num {
-          font-size: 22px !important;
-          font-weight: 700 !important;
-          color: #222 !important;
-          line-height: 1 !important;
-          min-width: 24px !important;
-          padding-top: 10px !important;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 50px;
         }
 
         .wb-b-card {
-          width: 100% !important;
-          max-width: 430px !important;
-          border: 2px solid #f39b42 !important;
-          border-radius: 18px !important;
-          background: #fff !important;
-          display: grid !important;
-          grid-template-columns: 1fr 1fr !important;
-          position: relative !important;
-          overflow: visible !important;
-          box-sizing: border-box !important;
-        }
-
-        .wb-b-half {
-          min-height: 170px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          padding: 12px !important;
-          box-sizing: border-box !important;
-        }
-
-        .wb-b-half:first-child {
-          border-right: 2px solid #f39b42 !important;
+          width: 100%;
+          // border: 2px solid #f39b42;
+          // border-radius: 18px;
+          // background: #fff;
+          position: relative;
+          // overflow: hidden;
+          display: flex;
+    justify-content: center;
         }
 
         .wb-b-img {
-          max-width: 100% !important;
-          max-height: 140px !important;
-          width: auto !important;
-          height: auto !important;
-          object-fit: contain !important;
-          display: block !important;
+          width: auto;
+          height: 120px;
+          object-fit: contain;
         }
 
         .wb-b-answer-box {
-          position: absolute !important;
-          left: 50% !important;
-          bottom: -2px !important;
-          transform: translateX(-50%) !important;
-          width: 54px !important;
-          height: 42px !important;
-          border: 2px solid #f39b42 !important;
-          border-radius: 8px !important;
-          background: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          box-sizing: border-box !important;
-          z-index: 2 !important;
-        }
-
-        .wb-b-answer-text {
-          font-size: 34px !important;
-          font-weight: 700 !important;
-          color: #000000ff !important;
-          line-height: 1 !important;
+          position: absolute;
+          left: 54%;
+          bottom: -2px;
+          transform: translateX(-50%);
+          width: 54px;
+          height: 42px;
+          border: 2px solid #f39b42;
+          border-radius: 8px;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          
         }
 
         .wb-b-options-row {
-          display: flex !important;
-          justify-content: center !important;
-          gap: 14px !important;
-          margin-top: 8px !important;
-        }
-
-        .wb-b-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 8px !important;
-        }
-
-        @media (max-width: 900px) {
-          .wb-b-grid {
-            grid-template-columns: 1fr !important;
-          }
+          display: flex;
+          justify-content: center;
+          gap: 14px;
+          margin-top: 10px;
+              margin-left: 30px;
         }
       `}</style>
 
-       <div
-        className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1    className="WB-header-title-page8"
-          style={{
-            margin: 0,
-          }}>
-          <span className="WB-ex-A">B</span> Do they both have the same sound? Write ✓ or ✕.
+      <div className="div-forall" style={{ gap: "50px" }}>
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">B</span> Do they both have the same sound? Write{" "}
+          <span className="text-red-500">✓</span> or
+          <span className="text-red-500">✕</span> .
         </h1>
 
         <div className="wb-b-grid">
           {ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-              }}
-            >
-              <div className="wb-b-item">
-                <div className="wb-b-num">{item.id}</div>
-
-                <div className="wb-b-card">
-                  <div className="wb-b-half">
-                    <img
-                      src={item.leftImg}
-                      alt={`left-${item.id}`}
-                      className="wb-b-img"
-                    />
-                  </div>
-
-                  <div className="wb-b-half">
-                    <img
-                      src={item.rightImg}
-                      alt={`right-${item.id}`}
-                      className="wb-b-img"
-                    />
-                  </div>
-
-                  {(answers[item.id] || showAns) && (
-                    <div className="wb-b-answer-box">
-                      <span className="wb-b-answer-text">
-                        {answers[item.id]}
-                      </span>
-                    </div>
-                  )}
+            <div key={item.id}>
+              <div className="wb-b-card">
+                <div className="flex gap-5">
+                  <span className="text-xl font-semibold">{item.id}</span>
+                  <img src={item.img} className="wb-b-img" />
                 </div>
+                {(answers[item.id] || showAns) && (
+                  <div className="wb-b-answer-box">
+                    {answers[item.id] === "✓" ? (
+                      <img src={trueIcon} style={{ height: "25px" }} />
+                    ) : (
+                      <img src={falseIcon} style={{ height: "25px" }} />
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="wb-b-options-row">
-                {OPTIONS.map((option) => (
-                  <div key={option}>{renderChoice(item, option)}</div>
+                {OPTIONS.map((opt) => (
+                  <div key={opt}>{renderChoice(item, opt)}</div>
                 ))}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="wb-b-buttons">
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-          />
-        </div>
+        <Button
+          checkAnswers={handleCheck}
+          handleShowAnswer={handleShowAnswer}
+          handleStartAgain={handleReset}
+        />
       </div>
     </div>
   );

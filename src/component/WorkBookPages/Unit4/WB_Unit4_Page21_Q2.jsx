@@ -126,14 +126,14 @@ const WB_UnitX_Page21_QB = () => {
   }, [topMatches, bottomMatches]);
 
   const handleTopClick = (id) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
     setSelectedTop(id);
     setSelectedMiddle(null);
     setShowResults(false);
   };
 
   const handleMiddleTopClick = (middleId) => {
-    if (showAns || selectedTop === null) return;
+    if (showAns || selectedTop === null ||showResults) return;
 
     const newMatches = { ...topMatches };
 
@@ -151,14 +151,14 @@ const WB_UnitX_Page21_QB = () => {
   };
 
   const handleMiddleBottomClick = (middleId) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
     setSelectedMiddle(middleId);
     setSelectedTop(null);
     setShowResults(false);
   };
 
   const handleBottomClick = (bottomId) => {
-    if (showAns || selectedMiddle === null) return;
+    if (showAns || selectedMiddle === null ||showResults) return;
 
     const newMatches = { ...bottomMatches };
 
@@ -176,11 +176,13 @@ const WB_UnitX_Page21_QB = () => {
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
-    const allTopConnected = EXERCISE_DATA.top.every((item) => topMatches[item.id]);
+    const allTopConnected = EXERCISE_DATA.top.every(
+      (item) => topMatches[item.id],
+    );
     const allBottomConnected = EXERCISE_DATA.middle.every(
-      (item) => bottomMatches[item.id]
+      (item) => bottomMatches[item.id],
     );
 
     if (!allTopConnected || !allBottomConnected) {
@@ -191,8 +193,7 @@ const WB_UnitX_Page21_QB = () => {
     setShowResults(true);
 
     let score = 0;
-    const total =
-      EXERCISE_DATA.top.length + EXERCISE_DATA.middle.length;
+    const total = EXERCISE_DATA.top.length + EXERCISE_DATA.middle.length;
 
     Object.keys(EXERCISE_DATA.correctTopMatches).forEach((topId) => {
       if (topMatches[topId] === EXERCISE_DATA.correctTopMatches[topId]) {
@@ -201,7 +202,9 @@ const WB_UnitX_Page21_QB = () => {
     });
 
     Object.keys(EXERCISE_DATA.correctBottomMatches).forEach((middleId) => {
-      if (bottomMatches[middleId] === EXERCISE_DATA.correctBottomMatches[middleId]) {
+      if (
+        bottomMatches[middleId] === EXERCISE_DATA.correctBottomMatches[middleId]
+      ) {
         score++;
       }
     });
@@ -243,7 +246,8 @@ const WB_UnitX_Page21_QB = () => {
 
   const getMiddleTopDotColor = (middleId) => {
     const isConnected = Object.values(topMatches).includes(middleId);
-    const isSelected = selectedTop !== null && topMatches[selectedTop] === middleId;
+    const isSelected =
+      selectedTop !== null && topMatches[selectedTop] === middleId;
 
     if (isSelected) return ACTIVE_COLOR;
     if (isConnected) return ACTIVE_COLOR;
@@ -274,22 +278,20 @@ const WB_UnitX_Page21_QB = () => {
 
   const isWrongBottomMatch = (middleId) => {
     if (!showResults || !bottomMatches[middleId]) return false;
-    return bottomMatches[middleId] !== EXERCISE_DATA.correctBottomMatches[middleId];
+    return (
+      bottomMatches[middleId] !== EXERCISE_DATA.correctBottomMatches[middleId]
+    );
   };
 
   return (
-   <div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
+        style={{
           gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
         }}
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span> Look, read, and match.
         </h1>
 
@@ -301,7 +303,7 @@ const WB_UnitX_Page21_QB = () => {
             minHeight: "560px",
             display: "flex",
             flexDirection: "column",
-            gap: "22px",
+            gap: "100px",
           }}
         >
           <svg
@@ -367,35 +369,21 @@ const WB_UnitX_Page21_QB = () => {
                   }}
                 >
                   <div
-                    style={{
-                      display: "flex",
-                      width: "100%",
-                      justifyContent: "flex-start",
-                      paddingLeft: "6px",
-                      fontSize: "22px",
-                      fontWeight: "700",
-                      color: "#111",
-                    }}
-                  >
-                    {item.id}
-                  </div>
-
-                  <div
                     onClick={() => handleTopClick(item.id)}
                     style={{
-                      width: "110px",
-                      height: "110px",
+                      width: "150px",
+                      height: "100px",
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: "flex-start",
                       justifyContent: "center",
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns ||showResults ? "default" : "pointer",
                       border:
                         selectedTop === item.id
-                          ? `3px solid ${ACTIVE_COLOR}`
+                          ? `1px solid ${ACTIVE_COLOR}`
                           : topMatches[item.id]
-                          ? `2px solid #f5d0a8`
-                          : "2px solid transparent",
-                      borderRadius: "14px",
+                            ? ``
+                            : "1px solid transparent",
+                      borderRadius: "8px",
                       background:
                         selectedTop === item.id
                           ? "rgba(243,155,66,0.08)"
@@ -403,12 +391,25 @@ const WB_UnitX_Page21_QB = () => {
                       transition: "0.2s ease",
                     }}
                   >
+                    <div
+                      style={{
+                        display: "flex",
+                        width: "100%",
+                        justifyContent: "flex-start",
+                        paddingLeft: "6px",
+                        fontSize: "20px",
+                        fontWeight: "700",
+                        color: "#111",
+                      }}
+                    >
+                      {item.id}
+                    </div>
                     <img
                       src={item.img}
                       alt={`top-${item.id}`}
                       style={{
-                        maxWidth: "100%",
-                        maxHeight: "100%",
+                        width: "auto",
+                        height: "95px",
                         objectFit: "contain",
                         display: "block",
                       }}
@@ -416,14 +417,16 @@ const WB_UnitX_Page21_QB = () => {
                   </div>
 
                   <div
-                    ref={(el) => (elementRefs.current[`top-dot-${item.id}`] = el)}
+                    ref={(el) =>
+                      (elementRefs.current[`top-dot-${item.id}`] = el)
+                    }
                     onClick={() => handleTopClick(item.id)}
                     style={{
                       width: "16px",
                       height: "16px",
                       borderRadius: "50%",
                       backgroundColor: getTopDotColor(item.id),
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns ||showResults? "default" : "pointer",
                     }}
                   />
 
@@ -431,20 +434,20 @@ const WB_UnitX_Page21_QB = () => {
                     <div
                       style={{
                         position: "absolute",
-                        right: "14px",
-                        top: "36px",
+                        right: "1px",
+                        top: "-1px",
                         width: "22px",
                         height: "22px",
                         borderRadius: "50%",
-                        backgroundColor: WRONG_COLOR,
+                        background: "red",
                         color: "#fff",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: "12px",
-                        fontWeight: "700",
-                        border: "2px solid #fff",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                       }}
                     >
                       ✕
@@ -493,7 +496,7 @@ const WB_UnitX_Page21_QB = () => {
                       borderRadius: "50%",
                       backgroundColor: getMiddleTopDotColor(item.id),
                       cursor:
-                        showAns || selectedTop === null ? "default" : "pointer",
+                        showAns || selectedTop === null ||showResults ? "default" : "pointer",
                     }}
                   />
 
@@ -506,16 +509,17 @@ const WB_UnitX_Page21_QB = () => {
                       }
                     }}
                     style={{
-                      minWidth: "130px",
-                      minHeight: "56px",
+                      width: "110px",
+                      height: "45px",
                       padding: "0 18px",
                       borderRadius: "16px",
                       border:
                         selectedMiddle === item.id || topSelectedMatch
-                          ? `3px solid ${ACTIVE_COLOR}`
-                          : bottomMatches[item.id] || Object.values(topMatches).includes(item.id)
-                          ? "2px solid #f39b42"
-                          : "2px solid #f39b42",
+                          ? `2px solid ${ACTIVE_COLOR}`
+                          : bottomMatches[item.id] ||
+                              Object.values(topMatches).includes(item.id)
+                            ? "1px solid #f39b42"
+                            : "1px solid #f39b42",
                       background:
                         selectedMiddle === item.id || topSelectedMatch
                           ? "rgba(243,155,66,0.08)"
@@ -523,10 +527,10 @@ const WB_UnitX_Page21_QB = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "24px",
+                      fontSize: "18px",
                       color: "#222",
                       lineHeight: "1",
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns ||showResults? "default" : "pointer",
                       boxSizing: "border-box",
                     }}
                   >
@@ -543,7 +547,7 @@ const WB_UnitX_Page21_QB = () => {
                       height: "16px",
                       borderRadius: "50%",
                       backgroundColor: getMiddleBottomDotColor(item.id),
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns ||showResults ? "default" : "pointer",
                     }}
                   />
 
@@ -551,20 +555,20 @@ const WB_UnitX_Page21_QB = () => {
                     <div
                       style={{
                         position: "absolute",
-                        right: "6px",
-                        bottom: "26px",
+                        right: "20px",
+                        bottom: "57px",
                         width: "22px",
                         height: "22px",
                         borderRadius: "50%",
-                        backgroundColor: WRONG_COLOR,
+                        background: "red",
                         color: "#fff",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: "12px",
-                        fontWeight: "700",
-                        border: "2px solid #fff",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                       }}
                     >
                       ✕
@@ -588,8 +592,11 @@ const WB_UnitX_Page21_QB = () => {
           >
             {EXERCISE_DATA.bottom.map((item) => {
               const isSelected =
-                selectedMiddle !== null && bottomMatches[selectedMiddle] === item.id;
-              const isConnected = Object.values(bottomMatches).includes(item.id);
+                selectedMiddle !== null &&
+                bottomMatches[selectedMiddle] === item.id;
+              const isConnected = Object.values(bottomMatches).includes(
+                item.id,
+              );
 
               return (
                 <div
@@ -602,7 +609,9 @@ const WB_UnitX_Page21_QB = () => {
                   }}
                 >
                   <div
-                    ref={(el) => (elementRefs.current[`bottom-dot-${item.id}`] = el)}
+                    ref={(el) =>
+                      (elementRefs.current[`bottom-dot-${item.id}`] = el)
+                    }
                     onClick={() => handleBottomClick(item.id)}
                     style={{
                       width: "16px",
@@ -610,26 +619,29 @@ const WB_UnitX_Page21_QB = () => {
                       borderRadius: "50%",
                       backgroundColor: getBottomDotColor(item.id),
                       cursor:
-                        showAns || selectedMiddle === null ? "default" : "pointer",
+                        showAns || selectedMiddle === null
+                          ? "default"
+                          : "pointer",
                     }}
                   />
 
                   <div
                     onClick={() => handleBottomClick(item.id)}
                     style={{
-                      width: "180px",
-                      height: "130px",
+                      width: "150px",
+                      height: "100px",
                       borderRadius: "16px",
                       overflow: "hidden",
                       border: isSelected
-                        ? `3px solid ${ACTIVE_COLOR}`
+                        ? `2px solid ${ACTIVE_COLOR}`
                         : isConnected
-                        ? "2px solid #f39b42"
-                        : "2px solid #f39b42",
-                      background:
-                        isSelected ? "rgba(243,155,66,0.08)" : "#fff",
+                          ? ""
+                          : "",
+                      background: isSelected ? "rgba(243,155,66,0.08)" : "#fff",
                       cursor:
-                        showAns || selectedMiddle === null ? "default" : "pointer",
+                        showAns || selectedMiddle === null
+                          ? "default"
+                          : "pointer",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -640,8 +652,8 @@ const WB_UnitX_Page21_QB = () => {
                       src={item.img}
                       alt={`bottom-${item.id}`}
                       style={{
-                        width: "100%",
-                        height: "100%",
+                        width: "auto",
+                        height: "100px",
                         objectFit: "cover",
                         display: "block",
                       }}

@@ -6,6 +6,7 @@ import busImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Fol
 import scooterImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 2.svg";
 import carImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 3.svg";
 import motorcycleImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 4.svg";
+import img from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 24.svg";
 
 const SENTENCES = [
   {
@@ -68,14 +69,14 @@ const styles = {
   contentWrap: {
     display: "flex",
     flexDirection: "column",
-    gap: "clamp(14px, 2vw, 22px)",
+    gap: "clamp(14px, 6vw, 30px)",
     width: "100%",
   },
 
   sentencesWrap: {
     display: "flex",
     flexDirection: "column",
-    gap: "clamp(12px, 2vw, 24px)",
+    gap: "clamp(12px, 2vw,16px)",
     width: "100%",
   },
 
@@ -87,7 +88,7 @@ const styles = {
   },
 
   sentenceNumber: {
-    fontSize: "clamp(18px, 2vw, 30px)",
+    fontSize: "clamp(12px, 1.4vw, 20px)",
     fontWeight: 700,
     color: TEXT_COLOR,
     lineHeight: 1,
@@ -97,7 +98,7 @@ const styles = {
   },
 
   sentenceText: {
-    fontSize: "clamp(16px, 2.2vw, 28px)",
+    fontSize: "clamp(12px, 1.4vw, 18px)",
     fontWeight: 500,
     color: TEXT_COLOR,
     lineHeight: 1.25,
@@ -142,13 +143,13 @@ const styles = {
     position: "absolute",
     top: "0.01%",
     right: "1.2%",
-    width: "14%",
+    width: "17%",
     aspectRatio: "1 / 1",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     color: NUMBER_COLOR,
-    fontSize: "clamp(22px, 2.5vw, 38px)",
+    fontSize: "clamp(18px, 1.7vw, 20px)",
     fontWeight: 500,
     lineHeight: 1,
     background: "transparent",
@@ -159,12 +160,12 @@ const styles = {
 
   wrongBadge: {
     position: "absolute",
-    top: "-6px",
-    right: "-6px",
+    top: "-10px",
+    right: "-14px",
     width: "clamp(18px, 2vw, 24px)",
     height: "clamp(18px, 2vw, 24px)",
     borderRadius: "50%",
-    backgroundColor: WRONG_COLOR,
+    backgroundColor: "red",
     color: "#fff",
     display: "flex",
     alignItems: "center",
@@ -186,16 +187,16 @@ const styles = {
   },
 
   dragCircle: {
-    width: "clamp(40px, 5vw, 52px)",
-    height: "clamp(40px, 5vw, 52px)",
+    width: "clamp(30px, 5vw, 40px)",
+    height: "clamp(30px, 5vw, 40px)",
     borderRadius: "50%",
     background: DRAG_BG,
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "clamp(20px, 2.4vw, 28px)",
-    fontWeight: 700,
+    fontSize: "clamp(20px, 2.4vw, 25px)",
+    fontWeight: 500,
     cursor: "grab",
     userSelect: "none",
     transition: "0.2s ease",
@@ -216,10 +217,13 @@ export default function WB_Unit3_Page21_QI() {
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
+  const [hoveredCard, setHoveredCard] = useState(null);
   const dropRefs = useRef({});
 
-  const usedNumbers = useMemo(() => Object.values(imageAnswers), [imageAnswers]);
+  const usedNumbers = useMemo(
+    () => Object.values(imageAnswers),
+    [imageAnswers],
+  );
 
   const applyDrop = (cardId, num) => {
     const updated = { ...imageAnswers };
@@ -237,12 +241,12 @@ export default function WB_Unit3_Page21_QI() {
   };
 
   const handleDragStart = (num) => {
-    if (showAns || usedNumbers.includes(num)) return;
+    if (showAns || usedNumbers.includes(num)||checked) return;
     setDraggedNumber(num);
   };
 
   const handleDrop = (cardId) => {
-    if (showAns || draggedNumber === null) return;
+    if (showAns || draggedNumber === null||checked) return;
     applyDrop(cardId, draggedNumber);
   };
 
@@ -285,7 +289,7 @@ export default function WB_Unit3_Page21_QI() {
   };
 
   const handleRemoveNumber = (cardId) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     setImageAnswers((prev) => {
       const updated = { ...prev };
@@ -309,7 +313,7 @@ export default function WB_Unit3_Page21_QI() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const allAnswered = IMAGE_CARDS.every((card) => imageAnswers[card.id]);
 
@@ -371,11 +375,7 @@ export default function WB_Unit3_Page21_QI() {
           align-items: start;
         }
 
-        .wb-i-card-active {
-          transform: translateY(-1px);
-          filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
-        }
-
+       
         .wb-i-card-wrong {
           filter: drop-shadow(0 0 0 rgba(0,0,0,0));
         }
@@ -390,7 +390,30 @@ export default function WB_Unit3_Page21_QI() {
           cursor: not-allowed !important;
           opacity: 0.6;
         }
+.wb-i-card-active {
+  transform: translateY(-4px) scale(1.03);
+  transition: all 0.25s ease;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.15));
+}
 
+.wb-i-card-hover {
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
         .wb-i-touch-preview {
           position: fixed;
           width: clamp(40px, 5vw, 52px);
@@ -421,29 +444,13 @@ export default function WB_Unit3_Page21_QI() {
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall" style={{ gap: "33px" }}>
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">I</span>
           Read, look, and number.
         </h1>
+        <div className="flex flex-col gap-3">
+       <img src={img} style={{ width: "auto", height: "120px" }} />
 
         <div style={styles.pageWrap}>
           <div style={styles.contentWrap}>
@@ -455,39 +462,6 @@ export default function WB_Unit3_Page21_QI() {
                 </div>
               ))}
             </div>
-
-            <div className="wb-i-cards-grid">
-              {IMAGE_CARDS.map((item) => (
-                <div
-                  key={item.id}
-                  ref={(el) => (dropRefs.current[item.id] = el)}
-                  style={styles.cardDropArea}
-                  className={`${draggedNumber !== null ? "wb-i-card-active" : ""} ${
-                    isCardWrong(item.id) ? "wb-i-card-wrong" : ""
-                  }`}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => handleDrop(item.id)}
-                  onClick={() => handleRemoveNumber(item.id)}
-                >
-                  <div style={styles.imageWrap}>
-                    <img
-                      src={item.img}
-                      alt={item.alt}
-                      style={styles.image}
-                      draggable={false}
-                    />
-
-                    <div style={styles.numberOverlay}>
-                      {imageAnswers[item.id] || ""}
-                      {isCardWrong(item.id) && (
-                        <span style={styles.wrongBadge}>✕</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             <div style={styles.dragNumbersWrap}>
               {DRAG_NUMBERS.map((num) => {
                 const disabled = usedNumbers.includes(num);
@@ -511,9 +485,45 @@ export default function WB_Unit3_Page21_QI() {
                 );
               })}
             </div>
+            <div className="wb-i-cards-grid">
+              {IMAGE_CARDS.map((item) => (
+                <div
+                  key={item.id}
+                  ref={(el) => (dropRefs.current[item.id] = el)}
+                  style={styles.cardDropArea}
+                 className={`
+  ${hoveredCard === item.id ? "wb-i-card-active" : ""}
+  ${imageAnswers[item.id] ? "wb-i-card-filled" : ""}
+`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(item.id)}
+                  onClick={() => handleRemoveNumber(item.id)}
+                 onDragEnter={() => setHoveredCard(item.id)}
+onDragLeave={() => setHoveredCard(null)}
+onMouseEnter={() => setHoveredCard(item.id)}
+onMouseLeave={() => setHoveredCard(null)}
+                >
+                  <div style={styles.imageWrap}>
+                    <img
+                      src={item.img}
+                      alt={item.alt}
+                      style={styles.image}
+                      draggable={false}
+                    />
+
+                    <div style={styles.numberOverlay}>
+                      {imageAnswers[item.id] || ""}
+                      {isCardWrong(item.id) && (
+                        <span style={styles.wrongBadge}>✕</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-
+</div>
         <div style={styles.buttonsWrap}>
           <Button
             handleShowAnswer={handleShowAnswer}

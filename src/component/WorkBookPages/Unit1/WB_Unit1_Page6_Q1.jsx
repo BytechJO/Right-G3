@@ -57,7 +57,8 @@ export default function WB_Unit3_Page6_QG() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns||showResults) return;
+
 
     setAnswers((prev) => ({
       ...prev,
@@ -68,7 +69,7 @@ export default function WB_Unit3_Page6_QG() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -160,7 +161,7 @@ export default function WB_Unit3_Page6_QG() {
           display: grid;
           grid-template-columns: clamp(20px, 2.4vw, 28px) clamp(70px, 11vw, 115px) minmax(0, 1fr);
           gap: clamp(10px, 1.6vw, 18px);
-          align-items: center;
+          align-items: flex-start;
           width: 100%;
         }
 
@@ -179,7 +180,7 @@ export default function WB_Unit3_Page6_QG() {
         }
 
         .wb-g6-image {
-          max-width: 100%;
+          max-width: 120px;
           max-height: clamp(72px, 11vw, 120px);
           width: auto;
           height: auto;
@@ -199,11 +200,11 @@ export default function WB_Unit3_Page6_QG() {
           width: fit-content;
           max-width: 100%;
           padding: clamp(4px, 0.6vw, 6px) clamp(16px, 2vw, 26px);
-          border: 3px solid transparent;
+          border: 2px solid transparent;
           border-radius: 999px;
           background: transparent;
           color: #222;
-          font-size: clamp(16px, 2vw, 20px);
+          font-size: clamp(16px, 2vw, 18px);
           font-weight: 500;
           line-height: 1.2;
           cursor: pointer;
@@ -219,7 +220,7 @@ export default function WB_Unit3_Page6_QG() {
         }
 
         .wb-g6-option.wrong {
-          border-color: ${WRONG_COLOR};
+          border-color: red;
         }
 
         .wb-g6-option.disabled {
@@ -233,7 +234,7 @@ export default function WB_Unit3_Page6_QG() {
           width: clamp(18px, 2vw, 22px);
           height: clamp(18px, 2vw, 22px);
           border-radius: 50%;
-          background: ${WRONG_COLOR};
+          background: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -306,15 +307,9 @@ export default function WB_Unit3_Page6_QG() {
 
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+       
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">G</span> Look, read, and circle.
         </h1>
 

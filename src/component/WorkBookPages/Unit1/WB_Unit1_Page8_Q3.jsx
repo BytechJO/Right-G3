@@ -170,7 +170,7 @@ export default function WB_Unit3_Page8_QC() {
         /* ✅ الـ row: نص | نقطة يسار | spacer | نقطة يمين | صورة */
         .wb-c-row {
           display: grid;
-          grid-template-columns: minmax(0, 1.45fr) 28px clamp(60px, 8vw, 100px) 28px minmax(0, 0.7fr);
+          grid-template-columns: minmax(0, 1.2fr) 28px clamp(60px, 8vw, 100px) 28px minmax(0, 0.7fr);
           align-items: center;
           min-height: clamp(70px, 9vw, 100px);
         }
@@ -179,7 +179,7 @@ export default function WB_Unit3_Page8_QC() {
         .wb-c-left-cell {
           display: flex;
           align-items: center;
-          gap: 12px;
+          // gap: 12px;
           position: relative;
           min-width: 0;
           padding-right: 4px;
@@ -194,8 +194,8 @@ export default function WB_Unit3_Page8_QC() {
         }
 
         .wb-c-left-text {
-          font-size: 22px;
-          font-weight: 500;
+          font-size: 18px;
+          // font-weight: 500;
           color: #111;
           line-height: 1.4;
           border: 2px solid transparent;
@@ -265,11 +265,11 @@ export default function WB_Unit3_Page8_QC() {
         .wb-c-wrong {
           position: absolute;
           top: -7px;
-          right: -7px;
+          left: 10px;
           width: 22px;
           height: 22px;
           border-radius: 50%;
-          background: #ef4444;
+          background: red;
           color: #fff;
           display: flex;
           align-items: center;
@@ -317,26 +317,8 @@ export default function WB_Unit3_Page8_QC() {
         }
       `}</style>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span>
           Read, look, and match.
         </h1>
@@ -377,7 +359,6 @@ export default function WB_Unit3_Page8_QC() {
 
               return (
                 <div key={row.id} className="wb-c-row">
-
                   {/* col 1: رقم + نص */}
                   <div className="wb-c-left-cell">
                     <div className="wb-c-left-num">{row.id}</div>
@@ -410,7 +391,9 @@ export default function WB_Unit3_Page8_QC() {
                   {/* col 4: نقطة اليمين */}
                   <div className="wb-c-dot-cell">
                     <div
-                      ref={(el) => (elementRefs.current[`right-${row.id}`] = el)}
+                      ref={(el) =>
+                        (elementRefs.current[`right-${row.id}`] = el)
+                      }
                       className={`wb-c-dot ${selectedMatch ? "selected" : ""}`}
                       onClick={() => handleRightClick(row.id)}
                       style={{
@@ -435,7 +418,6 @@ export default function WB_Unit3_Page8_QC() {
                       className="wb-c-right-img"
                     />
                   </div>
-
                 </div>
               );
             })}

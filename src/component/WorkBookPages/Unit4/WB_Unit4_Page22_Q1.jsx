@@ -56,7 +56,7 @@ export default function WB_Unit3_Page20_QC() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelectChange = (id, value) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -67,7 +67,7 @@ export default function WB_Unit3_Page20_QC() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -121,129 +121,127 @@ export default function WB_Unit3_Page20_QC() {
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-months-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 22px !important;
-          width: 100% !important;
-          max-width: 1120px !important;
-          margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
-          box-sizing: border-box !important;
-        }
+  .wb-months-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 8px 14px 20px;
+    box-sizing: border-box;
+  }
 
-        .wb-months-list {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 26px !important;
-          width: 100% !important;
-        }
+  .wb-months-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+  }
 
-        .wb-months-row {
-          display: grid !important;
-          grid-template-columns: 34px minmax(320px, 1fr) minmax(320px, 460px) !important;
-          gap: 16px !important;
-          align-items: center !important;
-          width: 100% !important;
-        }
+  .wb-months-row {
+    display: flex;
+  
+    gap: 16px;
+    align-items: center;
+    width: 100%;
+  }
 
-        .wb-months-num {
-          font-size: 22px !important;
-          font-weight: 700 !important;
-          color: #222 !important;
-          line-height: 1 !important;
-        }
+  .wb-months-num {
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1;
+  }
 
-        .wb-months-sentence {
-          font-size: 24px !important;
-          color: #111 !important;
-          line-height: 1.4 !important;
-        }
+  .wb-months-sentence {
+    font-size: 18px;
+    color: #111;
+    line-height: 1.4;
+    width:60%
+  }
 
-        .wb-months-answer-wrap {
-          position: relative !important;
-          width: 100% !important;
-        }
+  .wb-months-answer-wrap {
+    position: relative;
+    width: 60%;
+    display: flex;
+  }
 
-        .wb-months-select {
-          width: 100% !important;
-          min-height: 54px !important;
-          font-size: 28px !important;
-          color: #000000ff !important;
-          border: none !important;
-          border-bottom: 3px solid #222 !important;
-          outline: none !important;
-          background: transparent !important;
-          padding: 0 34px 2px 8px !important;
-          text-align: center !important;
-          text-align-last: center !important;
-          appearance: none !important;
-          -webkit-appearance: none !important;
-          -moz-appearance: none !important;
-          box-sizing: border-box !important;
-          cursor: pointer !important;
-        }
+  .wb-months-select {
+    width: 100%;
+    min-height: 54px;
+    font-size: 18px;
+    color: #000000ff;
+    border: none;
+    border-bottom: 1px solid #222;
+    outline: none;
+    background: transparent;
+    padding: 0 34px 2px 8px;
+    text-align: center;
+    text-align-last: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
 
-        .wb-months-select:disabled {
-          opacity: 1 !important;
-          cursor: default !important;
-        }
+  .wb-months-select:disabled {
+    opacity: 1;
+    cursor: default;
+  }
 
-        .wb-months-arrow {
-          position: absolute !important;
-          right: 8px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          font-size: 14px !important;
-          color: #666 !important;
-          pointer-events: none !important;
-        }
+  .wb-months-arrow {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #666;
+    pointer-events: none;
+  }
 
-        .wb-months-wrong {
-          position: absolute !important;
-          top: -8px !important;
-          right: -8px !important;
-          width: 22px !important;
-          height: 22px !important;
-          border-radius: 50% !important;
-          background: #ef4444 !important;
-          color: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 12px !important;
-          font-weight: 700 !important;
-          border: 2px solid #fff !important;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important;
-          box-sizing: border-box !important;
-        }
+  .wb-months-wrong {
+    position: absolute;
+    top: 6px;
+    right: -8px;
+       width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background-color: red;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
 
-        .wb-months-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 8px !important;
-        }
+  .wb-months-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
 
-        @media (max-width: 900px) {
-          .wb-months-row {
-            grid-template-columns: 34px 1fr !important;
-          }
+  @media (max-width: 900px) {
+    .wb-months-row {
+      grid-template-columns: 34px 1fr;
+    }
 
-          .wb-months-answer-wrap {
-            grid-column: 2 / 3 !important;
-          }
-        }
-      `}</style>
+    .wb-months-answer-wrap {
+      grid-column: 2 / 3;
+    }
+  }
+`}</style>
 
-      
-<div
+      <div
         className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+        style={{
+          
+          gap: "45px",
+       
         }}
       >
         <h1
@@ -268,8 +266,9 @@ export default function WB_Unit3_Page20_QC() {
                 <select
                   className="wb-months-select"
                   value={answers[item.id] || ""}
-                  disabled={showAns}
+                  disabled={showAns ||showResults}
                   onChange={(e) => handleSelectChange(item.id, e.target.value)}
+                  style={{borderBottom:isWrong(item) ? "2px solid red":"1px solid #222"}}
                 >
                   <option value="" disabled>
                     Select month

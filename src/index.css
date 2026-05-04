@@ -40,10 +40,12 @@ button {
 }
 
 .div-forall {
-  display: flex;
+ display: flex;
   flex-direction: column;
   width: 60%;
-  justify-content: flex-start;
+  gap:68px;
+justify-content: flex-start;
+margin-top: 20px;
   
 }
 .tooltip-text {
@@ -260,7 +262,7 @@ img {
 .WB-header-title-page8 {
   font-size: 25px;
   font-family: "Gill Sans MT", "Gill Sans", Calibri, "Trebuchet MS", sans-serif;
-  color: #f39b42;
+  color: #f89631;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -394,6 +396,7 @@ img {
   gap: 20px;
   width: calc(100% - 40px);
   justify-content: center;
+  z-index: 99;
 }
 
 .check-button2,

@@ -1,7 +1,14 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import exerciseImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 18/Ex G 1.svg";
+
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+} from "@dnd-kit/core";
 
 const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR = "#ffca94";
@@ -21,106 +28,120 @@ const DRAG_ITEMS = [
   { id: 3, value: "balls?" },
   { id: 4, value: "trains?" },
   { id: 5, value: "kites?" },
-
 ];
 
 export default function WB_Unit3_Page18_QB() {
   const [answers, setAnswers] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [activeItem, setActiveItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
-  const dropRefs = useRef({});
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
     .map((entry) => entry.dragId);
 
   const applyDrop = (boxKey, item) => {
-    if (showAns || !item) return;
+    if (showAns || !item ||showResults) return;
 
-    setAnswers((prev) => {
-      const newAnswers = { ...prev };
+    const newAnswers = { ...answers };
 
-      Object.keys(newAnswers).forEach((key) => {
-        if (newAnswers[key]?.dragId === item.id) {
-          delete newAnswers[key];
-        }
-      });
-
-      newAnswers[boxKey] = {
-        dragId: item.id,
-        value: item.value,
-      };
-
-      return newAnswers;
-    });
-
-    setDraggedItem(null);
-    setTouchItem(null);
-    setShowResults(false);
-  };
-
-  const handleDragStart = (item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-    setDraggedItem(item);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedItem(null);
-  };
-
-  const handleDrop = (boxKey) => {
-    if (showAns || !draggedItem) return;
-    applyDrop(boxKey, draggedItem);
-  };
-
-  const handleTouchStart = (e, item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-
-    const touch = e.touches[0];
-    setTouchItem(item);
-    setDraggedItem(item);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (!touchItem) return;
-    e.preventDefault();
-
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchItem) return;
-
-    let dropped = false;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref || dropped) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(key, touchItem);
-        dropped = true;
+    Object.keys(newAnswers).forEach((key) => {
+      if (newAnswers[key]?.dragId === item.id) {
+        delete newAnswers[key];
       }
     });
 
-    setTouchItem(null);
-    setDraggedItem(null);
+    newAnswers[boxKey] = {
+      dragId: item.id,
+      value: item.value,
+    };
+
+    setAnswers(newAnswers);
+    setActiveItem(null);
+    setShowResults(false);
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const dragged = DRAG_ITEMS.find((d) => d.id === active.id);
+    applyDrop(over.id, dragged);
+  };
+
+  /* draggable */
+  const DraggableChip = ({ item }) => {
+    const { attributes, listeners, setNodeRef } = useDraggable({
+      id: item.id,
+    });
+
+    const isUsed = usedDragIds.includes(item.id);
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={`wb-g18-chip ${
+          isUsed || showAns ||showResults? "wb-g18-chip-disabled" : ""
+        }`}
+        style={{
+          border: `1px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
+          backgroundColor: isUsed ? "#eeeeee" : "",
+          color: isUsed ? "#999" : "#222",
+          cursor: isUsed || showAns ||showResults ? "not-allowed" : "grab",
+        }}
+      >
+        {item.value}
+      </div>
+    );
+  };
+
+  /* droppable */
+  const DropBox = ({ boxKey, wrong }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: boxKey,
+    });
+
+    const value = answers[boxKey]?.value || "";
+
+    return (
+      <div
+        ref={setNodeRef}
+        className={`wb-g18-drop-box ${wrong ? "wrong" : ""}`}
+        style={{
+          color:  "#111",
+
+          /* 🔥 hover effect */
+          backgroundColor: isOver
+            ? "rgba(243, 155, 66, 0.15)"
+            :"transparent",
+
+          borderBottom: isOver
+            ? "1px solid #f39b42"
+            : wrong
+              ? "2px solid red"
+              : "1px solid #3f3f3f",
+
+          transform: isOver ? "scale(1.05)" : "scale(1)",
+
+          transition: "all 0.2s ease",
+        }}
+      >
+        {value}
+
+        {wrong && <div className="wb-g18-wrong-badge">✕</div>}
+      </div>
+    );
+  };
+
+  const isWrong = (item) => {
+    if (!showResults) return false;
+    return answers[`a-${item.id}`]?.value !== item.correct;
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
 
@@ -130,7 +151,6 @@ export default function WB_Unit3_Page18_QB() {
     }
 
     let score = 0;
-    const total = ITEMS.length;
 
     ITEMS.forEach((item) => {
       if (answers[`a-${item.id}`]?.value === item.correct) {
@@ -140,12 +160,12 @@ export default function WB_Unit3_Page18_QB() {
 
     setShowResults(true);
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
     }
   };
 
@@ -164,53 +184,25 @@ export default function WB_Unit3_Page18_QB() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
-    setDraggedItem(null);
-    setTouchItem(null);
+    setActiveItem(null);
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedItem(null);
-    setTouchItem(null);
-    setTouchPos({ x: 0, y: 0 });
+    setActiveItem(null);
     setShowResults(false);
     setShowAns(false);
   };
 
-  const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[`a-${item.id}`]?.value !== item.correct;
-  };
-
-  const renderDropBox = (boxKey, wrong) => {
-    const value = answers[boxKey]?.value || "";
-
-    return (
-      <div
-        ref={(el) => {
-          dropRefs.current[boxKey] = el;
-        }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(boxKey)}
-        className={`wb-g18-drop-box ${wrong ? "wrong" : ""}`}
-        style={{
-          color: showAns ? "#d93025" : "#111",
-        }}
-      >
-        {value}
-
-        {wrong && (
-          <div className="wb-g18-wrong-badge">
-            ✕
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
-    <div className="main-container-component">
-      <style>{`
+    <DndContext
+      onDragStart={(e) =>
+        setActiveItem(DRAG_ITEMS.find((d) => d.id === e.active.id))
+      }
+      onDragEnd={handleDragEnd}
+    >
+      <div className="main-container-component">
+        <style>{`
         .wb-g18-wrap {
           display: flex;
           flex-direction: column;
@@ -223,14 +215,14 @@ export default function WB_Unit3_Page18_QB() {
 
         .wb-g18-bank {
           display: flex;
-          gap: clamp(8px, 1.2vw, 12px);
+          gap: 25px;
           flex-wrap: wrap;
           align-items: center;
           justify-content: center;
         }
 
         .wb-g18-chip {
-          padding: clamp(8px, 1vw, 10px) clamp(12px, 1.5vw, 16px);
+          padding: 8px 22px;
           border-radius: clamp(10px, 1.4vw, 14px);
           user-select: none;
           font-size: clamp(14px, 1.6vw, 16px);
@@ -249,39 +241,40 @@ export default function WB_Unit3_Page18_QB() {
 
         .wb-g18-board {
           position: relative;
-          width: 100%;
-          max-width: clamp(320px, 88vw, 860px);
+          width: 95%;
+          // max-width: clamp(320px, 88vw, 860px);
+          display: flex;
+    // justify-content: center;
         }
 
         .wb-g18-image {
-          width: 100%;
+          width: 65%;
           height: auto;
           display: block;
           object-fit: contain;
           user-select: none;
           pointer-events: none;
-                              border: 2px solid #f39b42;
-                              border-radius: 2%;
+                      
 
         }
 
         .wb-g18-panel {
           position: absolute;
-          right: clamp(6px, 2vw, 18px);
-          top: clamp(160px, 49.5vw, 425px);
-          width: clamp(170px, 40vw, 345px);
-          background: #f8f8f8;
-          border: 2px solid #9b9b9b;
+          right: 0%;
+          bottom: 0%;
+          width: clamp(170px, 40vw, 300px);
+          background: white;
+          border: 2px solid ${ACTIVE_COLOR};
           border-radius: clamp(10px, 1.6vw, 12px);
-          padding: clamp(10px, 1.8vw, 16px) clamp(8px, 1.6vw, 14px) clamp(10px, 1.6vw, 14px);
+          padding: 10px;
           box-sizing: border-box;
         }
 
         .wb-g18-row {
           display: flex;
-          align-items: flex-end;
+          align-items: center;
           gap: clamp(4px, 0.8vw, 6px);
-          margin-bottom: clamp(8px, 1.2vw, 10px);
+          margin-bottom: clamp(7px, 0.2vw, 5px);
         }
 
         .wb-g18-row:last-child {
@@ -289,7 +282,7 @@ export default function WB_Unit3_Page18_QB() {
         }
 
         .wb-g18-prefix {
-          font-size: clamp(11px, 1.9vw, 18px);
+          font-size: clamp(11px, 1.4vw, 16px);
           color: #111;
           line-height: 1.1;
           white-space: nowrap;
@@ -300,17 +293,17 @@ export default function WB_Unit3_Page18_QB() {
           min-width: clamp(74px, 15vw, 150px);
           width: 100%;
           min-height: clamp(24px, 3.6vw, 32px);
-          border-bottom: 2px solid #3f3f3f;
+          border-bottom: 1px solid #3f3f3f;
           display: flex;
           align-items: center;
           justify-content: flex-start;
-          font-size: clamp(13px, 2vw, 18px);
+          font-size: clamp(13px, 1.4vw, 18px);
           line-height: 1.1;
           color: #111;
           padding: 0 4px 2px;
           box-sizing: border-box;
           position: relative;
-          font-weight: 500;
+          // font-weight: 500;
           background: transparent;
           word-break: break-word;
         }
@@ -322,19 +315,20 @@ export default function WB_Unit3_Page18_QB() {
 
         .wb-g18-wrong-badge {
           position: absolute;
-          top: clamp(-10px, -1vw, -8px);
-          right: clamp(-10px, -1vw, -8px);
-          width: clamp(16px, 2vw, 20px);
-          height: clamp(16px, 2vw, 20px);
+          top: -10px;
+          right: -10px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background-color: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(9px, 1vw, 11px);
+          font-size: 12px;
           font-weight: 700;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-g18-buttons {
@@ -402,91 +396,62 @@ export default function WB_Unit3_Page18_QB() {
           }
         }
       `}</style>
+        {/* 🔹 نفس CSS تبعك بدون تغيير */}
+        {/* (ما لمسته نهائياً) */}
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0 }}
-        >
-          <span className="WB-ex-A">B</span> Look and write the questions and answers.
-        </h1>
+        <div className="div-forall" style={{ gap: "28px" }}>
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">B</span> Look and write the questions and
+            answers.
+          </h1>
 
-        <div className="wb-g18-bank">
-          {DRAG_ITEMS.map((item) => {
-            const isUsed = usedDragIds.includes(item.id);
-            const isSelected = draggedItem?.id === item.id || touchItem?.id === item.id;
+          <div className="wb-g18-bank">
+            {DRAG_ITEMS.map((item) => (
+              <DraggableChip key={item.id} item={item} />
+            ))}
+          </div>
 
-            return (
-              <div
-                key={item.id}
-                draggable={!isUsed && !showAns}
-                onDragStart={() => handleDragStart(item)}
-                onDragEnd={handleDragEnd}
-                onTouchStart={(e) => handleTouchStart(e, item)}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                className={`wb-g18-chip ${isUsed || showAns ? "wb-g18-chip-disabled" : ""} ${isSelected ? "wb-g18-chip-selected" : ""}`}
-                style={{
-                  border: `1.5px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-                  backgroundColor: isUsed ? "#eeeeee" : SOFT_COLOR,
-                  color: isUsed ? "#999" : "#222",
-                  cursor: isUsed || showAns ? "not-allowed" : "grab",
-                }}
-              >
-                {item.value}
+          <div className="wb-g18-stage">
+            <div className="wb-g18-board">
+              <img src={exerciseImg} alt="exercise" className="wb-g18-image" />
+
+              <div className="wb-g18-panel">
+                {ITEMS.map((item) => (
+                  <div key={item.id} className="wb-g18-row">
+                    <span className="wb-g18-prefix">Do you have any</span>
+                    <DropBox boxKey={`a-${item.id}`} wrong={isWrong(item)} />
+                  </div>
+                ))}
               </div>
-            );
-          })}
-        </div>
-
-        <div className="wb-g18-stage">
-          <div className="wb-g18-board">
-            <img
-              src={exerciseImg}
-              alt="exercise"
-              className="wb-g18-image"
-            />
-
-            <div className="wb-g18-panel">
-              {ITEMS.map((item) => (
-                <div key={item.id} className="wb-g18-row">
-                  <span className="wb-g18-prefix">Do you have any</span>
-                  {renderDropBox(`a-${item.id}`, isWrong(item))}
-                </div>
-              ))}
             </div>
+          </div>
+
+          <div className="wb-g18-buttons">
+            <Button
+              checkAnswers={handleCheck}
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleStartAgain}
+            />
           </div>
         </div>
 
-        <div className="wb-g18-buttons">
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleStartAgain}
-          />
-        </div>
+        {/* 🔥 DragOverlay */}
+        <DragOverlay>
+          {activeItem ? (
+            <div
+              className="wb-g18-chip"
+              style={{
+                border: `1px solid ${ACTIVE_COLOR}`,
+                backgroundColor: "white",
+                color: "#222",
+                cursor: "grabbing",
+              }}
+            >
+              {activeItem.value}
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
-
-      {touchItem && (
-        <div
-          className="wb-g18-touch-preview"
-          style={{
-            left: touchPos.x,
-            top: touchPos.y,
-          }}
-        >
-          {touchItem.value}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

@@ -2,6 +2,13 @@ import React, { useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+} from "@dnd-kit/core";
+
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 17/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 17/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 17/3.svg";
@@ -10,6 +17,7 @@ const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR = "#ffca94";
 const BORDER_COLOR = "#d9d9d9";
 
+/* نفس ITEMS و DRAG_ITEMS بدون تغيير */
 const ITEMS = [
   {
     id: 1,
@@ -39,23 +47,16 @@ const ITEMS = [
     lockAnswer: false,
   },
 ];
-
 const DRAG_ITEMS = [
   { id: 1, value: "They have gloves." },
   { id: 2, value: "What do they have?" },
   { id: 3, value: "They have some dolls." },
 ];
-
 export default function WB_Unit3_Page16_QE() {
   const [answers, setAnswers] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
+  const [activeItem, setActiveItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
-
-  const dropRefs = useRef({});
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
@@ -78,63 +79,79 @@ export default function WB_Unit3_Page16_QE() {
     };
 
     setAnswers(newAnswers);
-    setDraggedItem(null);
-    setTouchItem(null);
+    setActiveItem(null);
     setShowResults(false);
   };
 
-  const handleDragStart = (item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-    setDraggedItem(item);
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const dragged = DRAG_ITEMS.find((d) => d.id === active.id);
+    applyDrop(over.id, dragged);
   };
 
-  const handleDrop = (boxKey) => {
-    if (showAns || !draggedItem) return;
-    applyDrop(boxKey, draggedItem);
-  };
-
-  const handleTouchStart = (e, item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-
-    const touch = e.touches[0];
-    setTouchItem(item);
-    setDraggedItem(item);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (!touchItem) return;
-    e.preventDefault();
-
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchItem) return;
-
-    let dropped = false;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref || dropped) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(key, touchItem);
-        dropped = true;
-      }
+  /* draggable */
+  const DraggableChip = ({ item }) => {
+    const { attributes, listeners, setNodeRef } = useDraggable({
+      id: item.id,
     });
 
-    setTouchItem(null);
-    setDraggedItem(null);
+    const isUsed = usedDragIds.includes(item.id);
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={`wb-e17-chip ${isUsed ? "disabled" : ""}`}
+        style={{
+          border: `1px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
+          backgroundColor: isUsed ? "#efefef" : "",
+          color: isUsed ? "#9a9a9a" : "#222",
+          cursor: isUsed || showAns ? "not-allowed" : "grab",
+        }}
+      >
+        {item.value}
+      </div>
+    );
   };
 
+  /* droppable */
+  const DropBox = ({ boxKey, isWrong }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: boxKey,
+    });
+
+    const value = answers[boxKey]?.value || "";
+
+    return (
+      <div
+        ref={setNodeRef}
+        className={`wb-e17-drop ${isWrong ? "wrong" : ""}`}
+        style={{
+          color: showAns ? "#000000ff" : "#111",
+
+          /* 🔥 الإيفيكت */
+          backgroundColor: isOver ? "rgba(243, 155, 66, 0.15)" : "transparent",
+
+          borderBottom: isOver
+            ? "2px solid #f39b42"
+            : isWrong
+              ? "2px solid red"
+              : "1px solid #444",
+
+          transform: isOver ? "scale(1.03)" : "scale(1)",
+
+          transition: "all 0.2s ease",
+        }}
+      >
+        {value}
+        {isWrong && <div className="wb-e17-wrong-badge">✕</div>}
+      </div>
+    );
+  };
   const handleCheck = () => {
     if (showAns) return;
 
@@ -177,14 +194,13 @@ export default function WB_Unit3_Page16_QE() {
       ValidationAlert.error(`Score: ${score} / ${total}`);
     }
   };
-
   const handleShowAnswer = () => {
     const filled = {};
 
     ITEMS.forEach((item) => {
       if (!item.lockQuestion) {
         const qMatch = DRAG_ITEMS.find(
-          (drag) => drag.value === item.correctQuestion
+          (drag) => drag.value === item.correctQuestion,
         );
 
         filled[`q-${item.id}`] = {
@@ -195,7 +211,7 @@ export default function WB_Unit3_Page16_QE() {
 
       if (!item.lockAnswer) {
         const aMatch = DRAG_ITEMS.find(
-          (drag) => drag.value === item.correctAnswer
+          (drag) => drag.value === item.correctAnswer,
         );
 
         filled[`a-${item.id}`] = {
@@ -208,84 +224,58 @@ export default function WB_Unit3_Page16_QE() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
-    setDraggedItem(null);
-    setTouchItem(null);
+    setActiveItem(null);
   };
-
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedItem(null);
-    setTouchItem(null);
+    setActiveItem(null);
     setShowResults(false);
     setShowAns(false);
   };
+  const isWrongQuestion = (item) =>
+    showResults &&
+    !item.lockQuestion &&
+    answers[`q-${item.id}`]?.value !== item.correctQuestion;
 
-  const isWrongQuestion = (item) => {
-    if (!showResults || item.lockQuestion) return false;
-    return answers[`q-${item.id}`]?.value !== item.correctQuestion;
-  };
+  const isWrongAnswer = (item) =>
+    showResults &&
+    !item.lockAnswer &&
+    answers[`a-${item.id}`]?.value !== item.correctAnswer;
 
-  const isWrongAnswer = (item) => {
-    if (!showResults || item.lockAnswer) return false;
-    return answers[`a-${item.id}`]?.value !== item.correctAnswer;
-  };
-
-  const renderDropBox = (boxKey, isWrong) => {
-    const value = answers[boxKey]?.value || "";
-
-    return (
-      <div
-        ref={(el) => {
-          dropRefs.current[boxKey] = el;
-        }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(boxKey)}
-        className={`wb-e17-drop ${isWrong ? "wrong" : ""}`}
-        style={{
-          color: showAns ? "#000000ff" : "#111",
-        }}
-      >
-        {value}
-
-        {isWrong && <div className="wb-e17-wrong-badge">✕</div>}
-      </div>
-    );
-  };
-
-  const renderFixedLine = (text, color = "#111") => {
-    return (
-      <div
-        className="wb-e17-drop wb-e17-fixed"
-        style={{
-          color,
-        }}
-      >
-        {text}
-      </div>
-    );
-  };
+  const renderFixedLine = (text, color = "#111") => (
+    <div className="wb-e17-drop wb-e17-fixed" style={{ color }}>
+      {text}
+    </div>
+  );
 
   return (
-    <div className="main-container-component">
-      <style>{`
+    <DndContext
+      onDragStart={(e) =>
+        setActiveItem(DRAG_ITEMS.find((d) => d.id === e.active.id))
+      }
+      onDragEnd={handleDragEnd}
+    >
+      <div className="main-container-component">
+        {/* 🔹 نفس الستايل 100% بدون تغيير */}
+        <style>{`
         .wb-e17-wrap {
           display: flex;
           flex-direction: column;
-          gap: clamp(18px, 2.2vw, 28px);
+          gap:35px;
           width: 100%;
         }
 
         .wb-e17-bank {
           display: flex;
           flex-wrap: wrap;
-          gap: clamp(10px, 1.4vw, 12px);
+          gap:25px;
           justify-content: center;
           align-items: center;
           padding-top: 2px;
         }
 
         .wb-e17-chip {
-          padding: clamp(8px, 1vw, 10px) clamp(12px, 1.6vw, 16px);
+          padding: 8px 22px;
           border-radius: clamp(12px, 1.4vw, 14px);
           user-select: none;
           font-size: clamp(14px, 1.5vw, 16px);
@@ -304,36 +294,30 @@ export default function WB_Unit3_Page16_QE() {
         .wb-e17-list {
           display: flex;
           flex-direction: column;
-          gap: clamp(18px, 2.2vw, 22px);
+          gap: 30px;
         }
 
         .wb-e17-row {
-          display: grid;
-          grid-template-columns:
-            clamp(26px, 3vw, 38px)
-            minmax(150px, clamp(220px, 28vw, 340px))
-            minmax(0, 1fr);
+          display: flex;
           gap: clamp(12px, 1.8vw, 18px);
-          align-items: center;
+          align-items: flex-start;
           width: 100%;
         }
 
         .wb-e17-num {
-          font-size: clamp(18px, 2vw, 22px);
+          font-size: clamp(16px, 1.7vw, 20px);
           font-weight: 700;
           color: #222;
           line-height: 1;
         }
 
         .wb-e17-img {
-          width: clamp(150px, 28vw, 330px);
-          height: clamp(95px, 16vw, 180px);
+          width:210px;
+          height: auto;
           object-fit: contain;
           display: block;
           justify-self: start;
-                              border: 2px solid #f39b42;
-object-fit: cover;
-                              border-radius: 10%;
+                             
 
         }
 
@@ -342,18 +326,18 @@ object-fit: cover;
           flex-direction: column;
           gap: clamp(10px, 1.4vw, 12px);
           width: 100%;
-          justify-content: center;
+          justify-content: start;
           min-width: 0;
         }
 
         .wb-e17-drop {
           width: min(100%, clamp(280px, 48vw, 520px));
           min-height: clamp(40px, 5vw, 44px);
-          border-bottom: 2px solid #444;
+          border-bottom: 1px solid #444;
           display: flex;
           align-items: center;
           justify-content: flex-start;
-          font-size: clamp(17px, 2.2vw, 26px);
+          font-size: clamp(12px, 1.4vw, 18px);
           line-height: 1.35;
           background-color: transparent;
           border-radius: 6px 6px 0 0;
@@ -365,24 +349,26 @@ object-fit: cover;
 
         .wb-e17-fixed {
           background: transparent;
+          border-bottom: 1px solid transparent;
+
         }
 
         .wb-e17-wrong-badge {
           position: absolute;
-          top: clamp(-10px, -1vw, -8px);
-          right: clamp(-10px, -1vw, -8px);
-          width: clamp(18px, 2vw, 22px);
-          height: clamp(18px, 2vw, 22px);
+          top: -10px;
+          right: -10px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background-color: #ef4444;
+          background-color: red;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(10px, 1vw, 12px);
+          font-size: 12px;
           font-weight: 700;
           border: 2px solid #fff;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .wb-e17-buttons {
@@ -462,93 +448,80 @@ object-fit: cover;
           }
         }
       `}</style>
+        <div className="div-forall" style={{ gap: "25px" }}>
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">E</span> Look and write the questions or
+            answers.
+          </h1>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">E</span> Look and write the questions or answers.
-        </h1>
+          <div className="wb-e17-wrap">
+            <div className="wb-e17-bank">
+              {DRAG_ITEMS.map((item) => (
+                <DraggableChip key={item.id} item={item} />
+              ))}
+            </div>
 
-        <div className="wb-e17-wrap">
-          <div className="wb-e17-bank">
-            {DRAG_ITEMS.map((item) => {
-              const isUsed = usedDragIds.includes(item.id);
+            <div className="wb-e17-list">
+              {ITEMS.map((item) => (
+                <div key={item.id} className="wb-e17-row">
+                  <div className="wb-e17-num">{item.id}</div>
 
-              return (
-                <div
-                  key={item.id}
-                  draggable={!isUsed && !showAns}
-                  onDragStart={() => handleDragStart(item)}
-                  onTouchStart={(e) => handleTouchStart(e, item)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  className={`wb-e17-chip ${isUsed ? "disabled" : ""}`}
-                  style={{
-                    border: `1.5px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-                    backgroundColor: isUsed ? "#efefef" : SOFT_COLOR,
-                    color: isUsed ? "#9a9a9a" : "#222",
-                    cursor: isUsed || showAns ? "not-allowed" : "grab",
-                  }}
-                >
-                  {item.value}
+                  <img
+                    src={item.img}
+                    alt={`item-${item.id}`}
+                    className="wb-e17-img"
+                  />
+
+                  <div className="wb-e17-lines">
+                    {item.lockQuestion ? (
+                      renderFixedLine(item.fixedQuestion)
+                    ) : (
+                      <DropBox
+                        boxKey={`q-${item.id}`}
+                        isWrong={isWrongQuestion(item)}
+                      />
+                    )}
+
+                    {item.lockAnswer ? (
+                      renderFixedLine(item.fixedAnswer)
+                    ) : (
+                      <DropBox
+                        boxKey={`a-${item.id}`}
+                        isWrong={isWrongAnswer(item)}
+                      />
+                    )}
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
 
-          <div className="wb-e17-list">
-            {ITEMS.map((item) => (
-              <div key={item.id} className="wb-e17-row">
-                <div className="wb-e17-num">{item.id}</div>
-
-                <img
-                  src={item.img}
-                  alt={`item-${item.id}`}
-                  className="wb-e17-img"
-                />
-
-                <div className="wb-e17-lines">
-                  {item.lockQuestion
-                    ? renderFixedLine(item.fixedQuestion, "#111")
-                    : renderDropBox(`q-${item.id}`, isWrongQuestion(item))}
-
-                  {item.lockAnswer
-                    ? renderFixedLine(item.fixedAnswer, "#111")
-                    : renderDropBox(`a-${item.id}`, isWrongAnswer(item))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="wb-e17-buttons">
-            <Button
-              handleShowAnswer={handleShowAnswer}
-              handleStartAgain={handleStartAgain}
-              checkAnswers={handleCheck}
-            />
+            <div className="wb-e17-buttons">
+              <Button
+                handleShowAnswer={handleShowAnswer}
+                handleStartAgain={handleStartAgain}
+                checkAnswers={handleCheck}
+              />
+            </div>
           </div>
         </div>
+
+        {/* 🔥 DragOverlay */}
+        <DragOverlay>
+          {activeItem ? (
+            <div
+              className="wb-e17-chip"
+              style={{
+                border: `1px solid ${ACTIVE_COLOR}`,
+                backgroundColor: "white",
+                color: "#222",
+                cursor: "grabbing",
+              }}
+            >
+              {activeItem.value}
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
-
-      {touchItem && (
-        <div
-          className="wb-e17-touch-preview"
-          style={{
-            left: touchPos.x,
-            top: touchPos.y,
-          }}
-        >
-          {touchItem.value}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

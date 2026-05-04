@@ -1,4 +1,6 @@
 import React, { useRef, useState } from "react";
+import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
+
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
@@ -10,9 +12,7 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 16.svg";
 
 const ACTIVE_COLOR = "#f39b42";
-const SOFT_COLOR = "#ffca94";
 const BORDER_COLOR = "#d9d9d9";
-const WRONG_COLOR = "#ef4444";
 const ANSWER_COLOR = "#d62828";
 
 const DRAG_ITEMS = [
@@ -33,15 +33,37 @@ const ANSWERS = [
   { id: 6, correct: "run", img: img6 },
 ];
 
+// ✅ draggable wrapper (بدون ما نغير الشكل)
+function DraggableWrapper({ item, disabled, showAns, children }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: item.id,
+    disabled: disabled || showAns,
+  });
+
+  const style = {
+    transform: transform
+      ? `translate(${transform.x}px, ${transform.y}px)`
+      : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      {children}
+    </div>
+  );
+}
+
+// ✅ drop wrapper (بدون تغيير renderDropBox)
+function DropWrapper({ id, children }) {
+  const { setNodeRef } = useDroppable({ id });
+
+  return <div ref={setNodeRef}>{children}</div>;
+}
+
 export default function WB_Unit3_Page17_QB() {
   const [answers, setAnswers] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
-  const dropRefs = useRef({});
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
@@ -65,50 +87,17 @@ export default function WB_Unit3_Page17_QB() {
     setShowResults(false);
   };
 
-  const handleDragStart = (item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-    setDraggedItem(item);
-  };
+  // ✅ dnd-kit handler
+  const handleDragEnd = (event) => {
+    if (showAns ||showResults) return;
 
-  const handleDrop = (boxKey) => {
-    if (showAns || !draggedItem) return;
-    applyDrop(boxKey, draggedItem);
-    setDraggedItem(null);
-  };
+    const { active, over } = event;
+    if (!over) return;
 
-  const handleTouchStart = (e, item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
+    const item = DRAG_ITEMS.find((i) => i.id === active.id);
+    if (!item) return;
 
-    const touch = e.touches[0];
-    setTouchItem(item);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (!touchItem) return;
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchItem) return;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(key, touchItem);
-      }
-    });
-
-    setTouchItem(null);
+    applyDrop(over.id, item);
   };
 
   const handleRemoveAnswer = (boxKey) => {
@@ -124,7 +113,7 @@ export default function WB_Unit3_Page17_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
 
     const allAnswered = ANSWERS.every((item) => answers[`a-${item.id}`]?.value);
 
@@ -172,8 +161,6 @@ export default function WB_Unit3_Page17_QB() {
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedItem(null);
-    setTouchItem(null);
     setShowResults(false);
     setShowAns(false);
   };
@@ -188,29 +175,20 @@ export default function WB_Unit3_Page17_QB() {
 
     return (
       <div
-        ref={(el) => (dropRefs.current[boxKey] = el)}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => handleDrop(boxKey)}
         onClick={() => handleRemoveAnswer(boxKey)}
         style={{
           width: "100%",
-          maxWidth: "220px",
+        minWidth: "220px",
           minHeight: "42px",
-          borderBottom: "3px solid #2f2f2f",
+          borderBottom: wrong ?"2px solid red":"1px solid #2f2f2f",
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "center",
           textAlign: "center",
-          fontSize: "clamp(18px, 2.2vw, 26px)",
-          lineHeight: "1.1",
-          color: value ? ANSWER_COLOR : "#111",
-          padding: "0 6px 3px",
-          boxSizing: "border-box",
-          position: "relative",
-          fontWeight: 500,
+          fontSize: "clamp(12px, 1.7vw, 18px)",
+          color: value ? "#111" : "#111",
           cursor: value && !showAns ? "pointer" : "default",
-          userSelect: "none",
-          wordBreak: "break-word",
+          position: "relative",
         }}
       >
         {value}
@@ -221,17 +199,18 @@ export default function WB_Unit3_Page17_QB() {
               position: "absolute",
               top: "-10px",
               right: "-10px",
-              width: "20px",
-              height: "20px",
+              width: "22px",
+              height: "22px",
               borderRadius: "50%",
-              backgroundColor: WRONG_COLOR,
+              backgroundColor: "red",
               color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "11px",
-              fontWeight: 700,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+              fontSize: "12px",
+              fontWeight:"700",
+              border:"2px solid white",
+              boxShadow:"0 2px 6px rgba(0,0,0,0.25)"
             }}
           >
             ✕
@@ -242,167 +221,65 @@ export default function WB_Unit3_Page17_QB() {
   };
 
   return (
-    <div className="main-container-component">
- <div
-        className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      > 
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
-          <span className="WB-ex-A">B</span> Look and write.
-        </h1>
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="main-container-component">
+        <div className="div-forall" style={{gap:"35px"}}>
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">B</span>
+            Look and write.
+          </h1>
+          {/* 🔹 نفس UI بدون تغيير */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ display: "flex", gap: "25px", flexWrap: "wrap" }}>
+              {DRAG_ITEMS.map((item) => {
+                const isUsed = usedDragIds.includes(item.id);
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
+                return (
+                  <DraggableWrapper
+                    key={item.id}
+                    item={item}
+                    disabled={isUsed}
+                    showAns={showAns}
+                  >
+                    <div
+                      style={{
+                        padding: "8px 25px",
+                        borderRadius: "16px",
+                        border: `1px solid ${
+                          isUsed ? BORDER_COLOR : ACTIVE_COLOR
+                        }`,
+                        opacity: isUsed ? 0.6 : 1,
+                        cursor: isUsed || showAns ? "not-allowed" : "grab",
+                      }}
+                    >
+                      {item.value}
+                    </div>
+                  </DraggableWrapper>
+                );
+              })}
+            </div>
+          </div>
+
           <div
             style={{
-              width: "100%",
-              maxWidth: "920px",
-              border: "2px solid #b8b8b8",
-              borderRadius: "18px",
-              padding: "8px 12px",
-              boxSizing: "border-box",
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
+              display: "grid",
+              gridTemplateColumns: "repeat(3,1fr)",
+              gap: "20px",
             }}
           >
-            {DRAG_ITEMS.map((item) => {
-              const isUsed = usedDragIds.includes(item.id);
-
-              return (
-                <div
-                  key={item.id}
-                  draggable={!isUsed && !showAns}
-                  onDragStart={() => handleDragStart(item)}
-                  onTouchStart={(e) => handleTouchStart(e, item)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  style={{
-                    padding: "10px 18px",
-                    borderRadius: "16px",
-                    border: `1.5px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-                    backgroundColor: isUsed ? "#eeeeee" : SOFT_COLOR,
-                    color: isUsed ? "#999" : "#222",
-                    cursor: isUsed || showAns ? "not-allowed" : "grab",
-                    opacity: isUsed ? 0.6 : 1,
-                    userSelect: "none",
-                    fontSize: "clamp(15px, 1.6vw, 18px)",
-                    fontWeight: 500,
-                    boxShadow: isUsed ? "none" : "0 2px 8px rgba(0,0,0,0.06)",
-                    transition: "0.2s ease",
-                    touchAction: "none",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.value}
-                </div>
-              );
-            })}
+            {ANSWERS.map((item) => (
+              <div key={item.id}className="flex flex-col gap-5 justify-center items-center w-full"> 
+                <div className="flex gap-5"> 
+                <span className="text-[20px] font-semibold">{item.id} </span>
+                <img src={item.img} style={{ width: "90px", height: "110px" }} />
+</div>
+                <DropWrapper id={`a-${item.id}`}>
+                  {renderDropBox(`a-${item.id}`, isWrong(item))}
+                </DropWrapper>
+              </div>
+            ))}
           </div>
-        </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-            gap: "clamp(28px, 4vw, 42px) clamp(20px, 2.5vw, 28px)",
-            width: "100%",
-            maxWidth: "1100px",
-            margin: "0 auto",
-            alignItems: "start",
-          }}
-        >
-          {ANSWERS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "clamp(10px, 1.5vw, 14px)",
-                minWidth: 0,
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "clamp(18px, 2vw, 24px)",
-                    fontWeight: 700,
-                    color: "#111",
-                    lineHeight: 1,
-                    paddingLeft: "4px",
-                  }}
-                >
-                  {item.id}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  width: "100%",
-                  maxWidth: "180px",
-                  height: "clamp(86px, 12vw, 120px)",
-                  overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#fff",
-                  boxSizing: "border-box",
-                }}
-              >
-                <img
-                  src={item.img}
-                  alt={`exercise-${item.id}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-              </div>
-
-              {renderDropBox(`a-${item.id}`, isWrong(item))}
-            </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            marginTop: "10px",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
@@ -410,27 +287,6 @@ export default function WB_Unit3_Page17_QB() {
           />
         </div>
       </div>
-
-      {touchItem && (
-        <div
-          style={{
-            position: "fixed",
-            left: touchPos.x - 40,
-            top: touchPos.y - 20,
-            background: "#fff",
-            padding: "8px 12px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            pointerEvents: "none",
-            zIndex: 9999,
-            fontSize: "18px",
-            fontWeight: 600,
-            color: "#222",
-          }}
-        >
-          {touchItem.value}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

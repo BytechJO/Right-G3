@@ -44,7 +44,7 @@ const styles = {
   matchArea: {
     position: "relative",
     width: "100%",
-    minHeight: "clamp(420px, 70vw, 760px)",
+    // minHeight: "clamp(420px, 70vw, 760px)",
   },
 
   rowsWrap: {
@@ -57,22 +57,22 @@ const styles = {
 
   row: {
     display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) clamp(40px, 8vw, 80px) minmax(0, 1fr)",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
     alignItems: "center",
-    gap: "clamp(8px, 2vw, 18px)",
+    gap: "150px",
     width: "100%",
   },
 
   leftSide: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-start",
-    gap: "clamp(8px, 1.5vw, 16px)",
+    justifyContent: "center",
+    gap: "clamp(8px, 1vw, 10px)",
     minWidth: 0,
   },
 
   leftNumber: {
-    fontSize: "clamp(18px, 2vw, 28px)",
+    fontSize: "20px",
     fontWeight: "700",
     color: "#111",
     width: "clamp(18px, 2vw, 28px)",
@@ -91,7 +91,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     minWidth: 0,
-    flex: 1,
+    // flex: 1,
   },
 
   bubbleRightWrap: {
@@ -103,15 +103,15 @@ const styles = {
 
   bubble: {
     position: "relative",
-    minHeight: "clamp(46px, 6vw, 72px)",
-    border: "2px solid #222",
+    minHeight: "45px",
+    border: "1px solid #222",
     borderRadius: "14px",
     background: "#fff",
     display: "flex",
     alignItems: "center",
     padding: "clamp(8px, 1.2vw, 14px) clamp(12px, 1.8vw, 20px)",
     boxSizing: "border-box",
-    fontSize: "clamp(14px, 2vw, 24px)",
+    fontSize: "18px",
     color: "#222",
     lineHeight: 1.15,
     gap: "clamp(8px, 1vw, 12px)",
@@ -119,12 +119,12 @@ const styles = {
   },
 
   leftBubble: {
-    width: "clamp(150px, 24vw, 280px)",
+    width: "110px",
     justifyContent: "flex-start",
   },
 
   rightBubble: {
-    width: "clamp(200px, 34vw, 420px)",
+    width: "250px",
     justifyContent: "flex-start",
   },
 
@@ -163,7 +163,7 @@ const styles = {
   rightItemWrap: {
     display: "flex",
     alignItems: "center",
-    gap: "clamp(8px, 1vw, 12px)",
+    // gap: "clamp(8px, 1vw, 12px)",
     minWidth: 0,
   },
 
@@ -183,7 +183,7 @@ const styles = {
     width: "clamp(16px, 2vw, 22px)",
     height: "clamp(16px, 2vw, 22px)",
     borderRadius: "50%",
-    backgroundColor: WRONG_COLOR,
+    backgroundColor:"red",
     color: "#fff",
     display: "flex",
     alignItems: "center",
@@ -191,7 +191,7 @@ const styles = {
     fontSize: "clamp(9px, 1vw, 12px)",
     fontWeight: "700",
     border: "2px solid #fff",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
   },
 
   buttonsWrap: {
@@ -285,13 +285,13 @@ const WB_ReadAndMatch_Page22 = () => {
   }, [matches, showAns, showResults]);
 
   const handleLeftClick = (id) => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
     setSelectedLeft(id);
     setShowResults(false);
   };
 
   const handleRightClick = (rightId) => {
-    if (showAns || selectedLeft === null) return;
+    if (showAns || selectedLeft === null ||showResults) return;
 
     const newMatches = { ...matches };
 
@@ -309,7 +309,7 @@ const WB_ReadAndMatch_Page22 = () => {
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns||showResults) return;
 
     const allConnected = EXERCISE_DATA.left.every((item) => matches[item.id]);
 
@@ -379,22 +379,14 @@ const WB_ReadAndMatch_Page22 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
+        
           gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          
         }}
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+        
         >
           <span className="WB-ex-A">D</span> Read and match.
         </h1>
@@ -450,14 +442,14 @@ const WB_ReadAndMatch_Page22 = () => {
                           ...styles.bubble,
                           ...styles.leftBubble,
                           border: isSelected
-                            ? `3px solid ${ACTIVE_COLOR}`
-                            : isConnected
-                            ? "2px solid #f5d0a8"
-                            : "2px solid #222",
+                            ? `1px solid ${ACTIVE_COLOR}`
+                            : wrong
+                            ? "1px solid red"
+                            : "1px solid #222",
                           background: isSelected
                             ? "rgba(243,155,66,0.08)"
                             : "#fff",
-                          cursor: showAns ? "default" : "pointer",
+                          cursor: showAns ||showResults? "default" : "pointer",
                         }}
                       >
                         <TailLeft />
@@ -475,10 +467,8 @@ const WB_ReadAndMatch_Page22 = () => {
                           </div>
                         )}
                       </div>
-                    </div>
-                  </div>
-
-                  <div style={styles.centerDotWrap}>
+                    </div> 
+                    <div style={styles.centerDotWrap}>
                     <div
                       ref={(el) =>
                         (elementRefs.current[`left-dot-${leftItem.id}`] = el)
@@ -487,10 +477,13 @@ const WB_ReadAndMatch_Page22 = () => {
                       style={{
                         ...styles.dot,
                         backgroundColor: getLeftDotColor(leftItem.id),
-                        cursor: showAns ? "default" : "pointer",
+                        cursor: showAns ||showResults? "default" : "pointer",
                       }}
                     />
                   </div>
+                  </div>
+
+                 
 
                   <div style={styles.bubbleRightWrap}>
                     <div
@@ -511,7 +504,7 @@ const WB_ReadAndMatch_Page22 = () => {
                           ...styles.dot,
                           backgroundColor: getRightDotColor(rightItem.id),
                           cursor:
-                            showAns || selectedLeft === null
+                            showAns || selectedLeft === null ||showResults
                               ? "default"
                               : "pointer",
                         }}
@@ -525,17 +518,17 @@ const WB_ReadAndMatch_Page22 = () => {
                           border:
                             selectedLeft !== null &&
                             matches[selectedLeft] === rightItem.id
-                              ? `3px solid ${ACTIVE_COLOR}`
+                              ? `1px solid ${ACTIVE_COLOR}`
                               : Object.values(matches).includes(rightItem.id)
-                              ? "2px solid #d1d5db"
-                              : "2px solid #222",
+                              ? "1px solid #222"
+                              : "1px solid #222",
                           background:
                             selectedLeft !== null &&
                             matches[selectedLeft] === rightItem.id
                               ? "rgba(243,155,66,0.08)"
                               : "#fff",
                           cursor:
-                            showAns || selectedLeft === null
+                            showAns || selectedLeft === null||showResults
                               ? "default"
                               : "pointer",
                         }}
