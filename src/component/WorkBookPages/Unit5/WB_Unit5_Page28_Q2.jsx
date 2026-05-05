@@ -7,8 +7,16 @@ import roomImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Fo
 const ITEMS = [
   {
     id: 1,
-    fixed: true,
+    fixed: false,
     prefix: "The mirror is",
+
+    options: [
+      "next to the window.",
+      "in front of bed.",
+      "under the chair.",
+      "above the dresser.",
+    ],
+
     correct: "above the dresser.",
   },
   {
@@ -74,7 +82,7 @@ export default function WB_Unit5_Page28_QD() {
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, value) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -85,10 +93,10 @@ export default function WB_Unit5_Page28_QD() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     const allAnswered = ITEMS.filter((item) => !item.fixed).every(
-      (item) => answers[item.id]
+      (item) => answers[item.id],
     );
 
     if (!allAnswered) {
@@ -149,7 +157,7 @@ export default function WB_Unit5_Page28_QD() {
       <div className="wb-room-select-wrap">
         <select
           value={getValue(item.id)}
-          disabled={showAns}
+          disabled={showAns||checked}
           onChange={(e) => handleChange(item.id, e.target.value)}
           className={`wb-room-select ${
             getValue(item.id) ? "wb-room-select--filled" : ""
@@ -200,7 +208,7 @@ export default function WB_Unit5_Page28_QD() {
 
         .wb-room-image-box {
           width: 100%;
-          max-width: 520px;
+          max-width: 400px;
           display: flex;
           justify-content: center;
         }
@@ -224,7 +232,7 @@ export default function WB_Unit5_Page28_QD() {
 
         .wb-room-row {
           display: grid;
-          grid-template-columns: 34px minmax(0, 1fr);
+          grid-template-columns: 14px minmax(0, 1fr);
           gap: 14px;
           align-items: start;
           width: 100%;
@@ -244,9 +252,9 @@ export default function WB_Unit5_Page28_QD() {
         }
 
         .wb-room-line {
-          width: 100%;
+          width: 90%;
           min-height: 40px;
-          border-bottom: 3px solid #2f2f2f;
+          border-bottom: 1px solid #2f2f2f;
           display: flex;
           align-items: center;
           gap: 8px;
@@ -257,44 +265,45 @@ export default function WB_Unit5_Page28_QD() {
         }
 
         .wb-room-prefix {
-          font-size: clamp(14px, 1.5vw, 20px);
+          font-size: clamp(14px, 1.4vw, 18px);
           line-height: 1.3;
           color: #111;
-          font-weight: 500;
+          width:200px;
+          // font-weight: 500;
           white-space: nowrap;
         }
 
         .wb-room-answer-fixed {
-          font-size: clamp(14px, 1.5vw, 20px);
+          font-size: clamp(14px, 1.4vw,18px);
           line-height: 1.3;
           color: #111;
-          font-weight: 500;
+          // font-weight: 500;
         }
 
         .wb-room-answer-show {
-          font-size: clamp(14px, 1.5vw, 20px);
+          font-size: clamp(14px, 1.4vw, 18px);
           line-height: 1.3;
           color: #000000ff;
-          font-weight: 500;
+          // font-weight: 500;
           word-break: break-word;
         }
 
         .wb-room-wrong {
           position: absolute;
           top: -7px;
-          right: -7px;
+          right: 83px;
           width: 22px;
           height: 22px;
-          border-radius: 999px;
-          background: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          border-radius: 50%;
+    background-color: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
           box-sizing: border-box;
         }
 
@@ -302,21 +311,21 @@ export default function WB_Unit5_Page28_QD() {
           position: relative;
           display: inline-flex;
           align-items: center;
-          flex: 0 1 clamp(210px, 34vw, 430px);
-          min-width: 170px;
-          max-width: 100%;
+          width:65%;
+          // flex: 0 1 clamp(210px, 34vw, 430px);
+          // min-width: 170px;
+          // max-width: 100%;
         }
 
         .wb-room-select {
           width: 100%;
           min-width: 0;
           height: clamp(32px, 3vw, 38px);
-          border: 2px solid #c9c9c9;
-          border-radius: 10px;
+          
           background: #fff;
           padding: 0 34px 0 12px;
           font-size: clamp(13px, 1.3vw, 18px);
-          font-weight: 500;
+          // font-weight: 500;
           color: #222;
           outline: none;
           appearance: none;
@@ -324,8 +333,8 @@ export default function WB_Unit5_Page28_QD() {
           -moz-appearance: none;
           box-sizing: border-box;
           cursor: pointer;
-          text-align: center;
-          text-align-last: center;
+          text-align: start;
+          text-align-last: start;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -420,24 +429,10 @@ export default function WB_Unit5_Page28_QD() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "18px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "35px",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-            fontSize: "clamp(16px, 1.8vw, 24px)",
-          }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span>
           Read, look, and write.
         </h1>
@@ -454,7 +449,14 @@ export default function WB_Unit5_Page28_QD() {
               <div className="wb-room-num">{item.id}</div>
 
               <div className="wb-room-line-wrap">
-                <div className="wb-room-line">
+                <div
+                  className="wb-room-line"
+                  style={{
+                    borderBottom: isWrong(item)
+                      ? "1px solid red"
+                      : "1px solid #2f2f2f",
+                  }}
+                >
                   <span className="wb-room-prefix">{item.prefix}</span>
 
                   {item.fixed ? (

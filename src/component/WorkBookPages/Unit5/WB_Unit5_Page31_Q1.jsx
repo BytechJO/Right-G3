@@ -10,30 +10,106 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I6.svg";
 
 const BORDER_COLOR = "#f39b42";
-const FOUND_COLOR  = "#ef4444";
+const FOUND_COLOR = "#ef4444";
 const SELECT_COLOR = "rgba(251,191,36,0.45)";
-const WRONG_BG     = "rgba(239,68,68,0.35)";
+const WRONG_BG = "rgba(239,68,68,0.35)";
 
 const GRID = [
-  ["l","b","a","t","h","r","o","o","m","m"],
-  ["i","i","g","a","r","a","g","e","n","b"],
-  ["v","o","e","e","k","a","n","m","n","a"],
-  ["i","m","o","e","i","s","b","x","e","s"],
-  ["n","a","r","a","t","e","e","q","s","e"],
-  ["g","e","v","r","c","m","d","a","c","m"],
-  ["r","k","o","r","h","l","r","g","s","e"],
-  ["o","o","p","r","e","n","o","v","i","n"],
-  ["o","c","o","r","n","t","o","b","q","t"],
-  ["m","n","w","r","v","m","m","r","m","n"],
+  ["l", "b", "a", "t", "h", "r", "o", "o", "m", "m"],
+  ["i", "i", "g", "a", "r", "a", "g", "e", "n", "b"],
+  ["v", "o", "e", "e", "k", "a", "n", "m", "n", "a"],
+  ["i", "m", "o", "e", "i", "s", "b", "x", "e", "s"],
+  ["n", "a", "r", "a", "t", "e", "e", "q", "s", "e"],
+  ["g", "e", "v", "r", "c", "m", "d", "a", "c", "m"],
+  ["r", "k", "o", "r", "h", "l", "r", "g", "s", "e"],
+  ["o", "o", "p", "r", "e", "n", "o", "v", "i", "n"],
+  ["o", "c", "o", "r", "n", "t", "o", "b", "q", "t"],
+  ["m", "n", "w", "r", "v", "m", "m", "r", "m", "n"],
 ];
 
 const WORDS = [
-  { id: 1, word: "bathroom",   cells: [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8]] },
-  { id: 2, word: "garage",     cells: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]] },
-  { id: 3, word: "kitchen",    cells: [[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4]] },
-  { id: 4, word: "bedroom",    cells: [[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6]] }, // ✅ صح
-  { id: 5, word: "living room",cells: [[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0]] },
-  { id: 6, word: "basement",   cells: [[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[8,9]] },
+  {
+    id: 1,
+    word: "bathroom",
+    cells: [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [0, 4],
+      [0, 5],
+      [0, 6],
+      [0, 7],
+      [0, 8],
+    ],
+  },
+  {
+    id: 2,
+    word: "garage",
+    cells: [
+      [1, 2],
+      [1, 3],
+      [1, 4],
+      [1, 5],
+      [1, 6],
+      [1, 7],
+    ],
+  },
+  {
+    id: 3,
+    word: "kitchen",
+    cells: [
+      [2, 4],
+      [3, 4],
+      [4, 4],
+      [5, 4],
+      [6, 4],
+      [7, 4],
+      [8, 4],
+    ],
+  },
+  {
+    id: 4,
+    word: "bedroom",
+    cells: [
+      [3, 6],
+      [4, 6],
+      [5, 6],
+      [6, 6],
+      [7, 6],
+      [8, 6],
+      [9, 6],
+    ],
+  }, // ✅ صح
+  {
+    id: 5,
+    word: "living room",
+    cells: [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [3, 0],
+      [4, 0],
+      [5, 0],
+      [6, 0],
+      [7, 0],
+      [8, 0],
+      [9, 0],
+    ],
+  },
+  {
+    id: 6,
+    word: "basement",
+    cells: [
+      [1, 9],
+      [2, 9],
+      [3, 9],
+      [4, 9],
+      [5, 9],
+      [6, 9],
+      [7, 9],
+      [8, 9],
+    ],
+  },
 ];
 const SIDE_IMAGES = [
   { id: 1, img: img1, wordId: 4 },
@@ -67,36 +143,42 @@ const getCellsBetween = (r1, c1, r2, c2) => {
 };
 
 export default function SB_WordSearch_PageI() {
-  const [selecting,    setSelecting]    = useState(false);
-  const [startCell,    setStartCell]    = useState(null);
+  const [selecting, setSelecting] = useState(false);
+  const [startCell, setStartCell] = useState(null);
   const [currentCells, setCurrentCells] = useState([]);
-  const [foundWords,   setFoundWords]   = useState([]);
-  const [wrongCells,   setWrongCells]   = useState([]);
-  const [showAns,      setShowAns]      = useState(false);
-  const [checked,      setChecked]      = useState(false);
+  const [foundWords, setFoundWords] = useState([]);
+  const [wrongCells, setWrongCells] = useState([]);
+  const [showAns, setShowAns] = useState(false);
+  const [checked, setChecked] = useState(false);
   const gridRef = useRef(null);
 
-  const isCellFound     = (r, c) => foundWords.some((f) => f.cells.some(([fr, fc]) => fr === r && fc === c));
-  const isCellSelecting = (r, c) => currentCells.some(([sr, sc]) => sr === r && sc === c);
-  const isCellWrong     = (r, c) => wrongCells.includes(cellKey(r, c));
-  const isWordFound     = (wordId) => foundWords.some((f) => f.wordId === wordId);
-  const isWordMissed    = (wordId) => checked && !showAns && !isWordFound(wordId);
+  const isCellFound = (r, c) =>
+    foundWords.some((f) => f.cells.some(([fr, fc]) => fr === r && fc === c));
+  const isCellSelecting = (r, c) =>
+    currentCells.some(([sr, sc]) => sr === r && sc === c);
+  const isCellWrong = (r, c) => wrongCells.includes(cellKey(r, c));
+  const isWordFound = (wordId) => foundWords.some((f) => f.wordId === wordId);
+  const isWordMissed = (wordId) => checked && !showAns && !isWordFound(wordId);
 
   const checkSelection = (cells) => {
     if (cells.length < 2) return;
     const match = WORDS.find(
-      (w) => setsEqual(w.cells, cells) && !foundWords.find((f) => f.wordId === w.id)
+      (w) =>
+        setsEqual(w.cells, cells) && !foundWords.find((f) => f.wordId === w.id),
     );
     if (match) {
-      setFoundWords((prev) => [...prev, { wordId: match.id, cells: match.cells }]);
+      setFoundWords((prev) => [
+        ...prev,
+        { wordId: match.id, cells: match.cells },
+      ]);
     } else {
       setWrongCells(cells.map(([r, c]) => cellKey(r, c)));
       setTimeout(() => setWrongCells([]), 600);
     }
   };
 
-  const handleMouseDown  = (r, c) => {
-    if (showAns) return;
+  const handleMouseDown = (r, c) => {
+    if (showAns || checked) return;
     setSelecting(true);
     setStartCell([r, c]);
     setCurrentCells([[r, c]]);
@@ -122,7 +204,7 @@ export default function SB_WordSearch_PageI() {
     return null;
   };
   const handleTouchStart = (e) => {
-    if (showAns) return;
+    if (showAns || checked) return;
     const cell = getCellFromTouch(e.touches[0]);
     if (!cell) return;
     setSelecting(true);
@@ -133,7 +215,9 @@ export default function SB_WordSearch_PageI() {
     if (!selecting || !startCell) return;
     const cell = getCellFromTouch(e.touches[0]);
     if (!cell) return;
-    setCurrentCells(getCellsBetween(startCell[0], startCell[1], cell[0], cell[1]));
+    setCurrentCells(
+      getCellsBetween(startCell[0], startCell[1], cell[0], cell[1]),
+    );
   };
   const handleTouchEnd = () => {
     if (!selecting) return;
@@ -144,13 +228,13 @@ export default function SB_WordSearch_PageI() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || checked) return;
     setChecked(true);
     const score = foundWords.length;
     const total = WORDS.length;
-    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
@@ -170,13 +254,13 @@ export default function SB_WordSearch_PageI() {
   };
 
   const getCellBg = (r, c) => {
-    if (isCellWrong(r, c))                 return WRONG_BG;
-    if (isCellFound(r, c))                 return "rgba(239,68,68,0.18)";
+    if (isCellWrong(r, c)) return WRONG_BG;
+    if (isCellFound(r, c)) return "rgba(239,68,68,0.18)";
     if (isCellSelecting(r, c) && !showAns) return SELECT_COLOR;
     return "#fff";
   };
 
-  const CELL = "clamp(26px,3.8vw,50px)";
+  const CELL = "clamp(26px,3.0vw,42px)";
 
   return (
     <div className="main-container-component">
@@ -204,29 +288,14 @@ export default function SB_WordSearch_PageI() {
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "18px",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+          gap: "40px",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin:   0,
-            display:  "flex",
-            alignItems: "center",
-            gap:      "12px",
-            flexWrap: "wrap",
-            fontSize: "clamp(16px, 1.8vw, 24px)",
-          }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">I</span> Find and circle the words.
         </h1>
 
         <div className="wb-i-layout">
-
           {/* ── Word Search Grid ── */}
           <div className="wb-i-grid-wrap">
             <div
@@ -236,15 +305,15 @@ export default function SB_WordSearch_PageI() {
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
               style={{
-                display:             "inline-grid",
+                display: "inline-grid",
                 gridTemplateColumns: `repeat(${GRID[0].length}, ${CELL})`,
-                border:              `2px solid ${BORDER_COLOR}`,
-                borderRadius:        "clamp(10px,1.2vw,16px)",
-                overflow:            "hidden",
-                background:          "#fff",
-                touchAction:         "none",
-                userSelect:          "none",
-                flexShrink:          0,
+                border: `1px solid ${BORDER_COLOR}`,
+                borderRadius: "clamp(10px,1.2vw,16px)",
+                overflow: "hidden",
+                // background: "#fff",
+                touchAction: "none",
+                userSelect: "none",
+                flexShrink: 0,
               }}
             >
               {GRID.map((row, r) =>
@@ -257,24 +326,24 @@ export default function SB_WordSearch_PageI() {
                     onMouseEnter={() => handleMouseEnter(r, c)}
                     onMouseUp={handleMouseUp}
                     style={{
-                      width:          CELL,
-                      height:         CELL,
-                      display:        "flex",
-                      alignItems:     "center",
+                      width: CELL,
+                      height: CELL,
+                      display: "flex",
+                      alignItems: "center",
                       justifyContent: "center",
-                      fontSize:       "clamp(11px,1.6vw,20px)",
-                      fontWeight:     600,
-                      color:          isCellFound(r, c) ? FOUND_COLOR : "#111",
-                      background:     getCellBg(r, c),
-                      border:         "1px solid #e5e7eb",
-                      cursor:         showAns ? "default" : "pointer",
-                      boxSizing:      "border-box",
-                      transition:     "background 0.12s ease, color 0.12s ease",
+                      fontSize: "clamp(11px,1.4vw,18px)",
+                      // fontWeight:     600,
+                      color: isCellFound(r, c) ? FOUND_COLOR : "#111",
+                      background: getCellBg(r, c),
+                      border: "1px solid #e5e7eb",
+                      cursor: showAns || checked ? "default" : "pointer",
+                      boxSizing: "border-box",
+                      transition: "background 0.12s ease, color 0.12s ease",
                     }}
                   >
                     {letter}
                   </div>
-                ))
+                )),
               )}
             </div>
           </div>
@@ -282,10 +351,10 @@ export default function SB_WordSearch_PageI() {
           {/* ── Side images 2×3 ── */}
           <div
             style={{
-              display:             "grid",
+              display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0,1fr))",
-              gap:                 "clamp(8px,1.2vw,16px)",
-              width:               "100%",
+              gap: "clamp(8px,1.7vw,18px)",
+              width: "100%",height: "100%",alignItems:"center"
             }}
           >
             {SIDE_IMAGES.map((item) => {
@@ -295,18 +364,18 @@ export default function SB_WordSearch_PageI() {
                 <div
                   key={item.id}
                   style={{
-                    display:       "flex",
-                    flexDirection: "column",
-                    alignItems:    "flex-start",
-                    gap:           "clamp(3px,0.4vw,6px)",
+                    display: "flex",
+                    // flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "clamp(3px,0.4vw,6px)",
                   }}
                 >
                   {/* number */}
                   <span
                     style={{
-                      fontSize:   "clamp(13px,1.4vw,20px)",
-                      fontWeight: 700,
-                      color:      "#111",
+                      fontSize: "clamp(13px,1.4vw,20px)",
+                      fontWeight: 500,
+                      color: "#111",
                       lineHeight: 1,
                     }}
                   >
@@ -316,28 +385,28 @@ export default function SB_WordSearch_PageI() {
                   {/* image — البوردر ثابت دايمًا */}
                   <div
                     style={{
-                      position:       "relative",
-                      width:          "100%",
-                      aspectRatio:    "1.6 / 1",
-                      overflow:       "visible",
-                      borderRadius:   "clamp(8px,1vw,14px)",
-                      border:         `2.5px solid ${BORDER_COLOR}`,
-                      background:     "#f0f0f0",
-                      display:        "flex",
-                      alignItems:     "center",
+                      position: "relative",
+                      width: "100%",
+                      // aspectRatio: "1.6 / 1",
+                      // overflow: "visible",
+                      // borderRadius: "clamp(8px,1vw,14px)",
+                      // border: `2.5px solid ${BORDER_COLOR}`,
+                      // background: "#f0f0f0",
+                      display: "flex",
+                      alignItems: "center",
                       justifyContent: "center",
-                      boxSizing:      "border-box",
+                      boxSizing: "border-box",
                     }}
                   >
                     <img
                       src={item.img}
                       alt={`room-${item.id}`}
                       style={{
-                        width:        "100%",
-                        height:       "100%",
-                        objectFit:    "cover",
-                        display:      "block",
-                        borderRadius: "clamp(6px,0.8vw,12px)",
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                        // borderRadius: "clamp(6px,0.8vw,12px)",
                       }}
                     />
 
@@ -345,23 +414,22 @@ export default function SB_WordSearch_PageI() {
                     {missed && (
                       <span
                         style={{
-                          position:       "absolute",
-                          top:            "-8px",
-                          right:          "-8px",
-                          width:          "22px",
-                          height:         "22px",
-                          borderRadius:   "50%",
-                          background:     FOUND_COLOR,
-                          color:          "#fff",
-                          display:        "flex",
-                          alignItems:     "center",
+                          position: "absolute",
+                          top: "-8px",
+                          right: "-8px",
+                          width: "22px",
+                          height: "22px",
+                           borderRadius: "50%",
+                          backgroundColor: "red",
+                          color: "#fff",
+                          display: "flex",
+                          alignItems: "center",
                           justifyContent: "center",
-                          fontSize:       "12px",
-                          fontWeight:     700,
-                          border:         "2px solid #fff",
-                          boxShadow:      "0 2px 6px rgba(0,0,0,0.18)",
-                          boxSizing:      "border-box",
-                          zIndex:         2,
+                          fontSize: "clamp(9px,0.9vw,12px)",
+                          fontWeight: 700,
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                          border: "2px solid white",
+                          zIndex: 2,
                         }}
                       >
                         ✕
@@ -377,9 +445,9 @@ export default function SB_WordSearch_PageI() {
         {/* Buttons */}
         <div
           style={{
-            display:        "flex",
+            display: "flex",
             justifyContent: "center",
-            marginTop:      "clamp(6px,1vw,12px)",
+            marginTop: "clamp(6px,1vw,12px)",
           }}
         >
           <Button

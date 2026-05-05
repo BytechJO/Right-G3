@@ -2,7 +2,7 @@ import { useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 import AudioWithCaption from "../../AudioWithCaption";
-
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd5pg26instruction2-adult-lady_CHBq9E0z.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 const ACTIVE_COLOR = "#f39b42";
@@ -45,16 +45,16 @@ export default function WB_Unit5_Page26_QD() {
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
-const captions = [
-  { start: 0.30, end: 3.06, text: "Page 26, phonics." },
-  { start: 3.06, end: 6.54, text: "Exercise D. Listen and match." },
-  { start: 7.56, end: 9.40, text: "1- math." },
-  { start: 9.40, end: 12.10, text: "2- thick." },
-  { start: 13.40, end: 15.26, text: "3- this." },
-  { start: 16.38, end: 18.00, text: "4- father." },
-  { start: 19.34, end: 20.80, text: "5- thank." },
-  { start: 22.34, end: 23.60, text: "6- they." },
-];
+  const captions = [
+    { start: 0.3, end: 3.06, text: "Page 26, phonics." },
+    { start: 3.06, end: 6.54, text: "Exercise D. Listen and match." },
+    { start: 7.56, end: 9.4, text: "1- math." },
+    { start: 9.4, end: 12.1, text: "2- thick." },
+    { start: 13.4, end: 15.26, text: "3- this." },
+    { start: 16.38, end: 18.0, text: "4- father." },
+    { start: 19.34, end: 20.8, text: "5- thank." },
+    { start: 22.34, end: 23.6, text: "6- they." },
+  ];
   useLayoutEffect(() => {
     const updateLines = () => {
       if (!containerRef.current) return;
@@ -90,13 +90,13 @@ const captions = [
   }, [matches]);
 
   const handleTopClick = (id) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setSelectedTop(id);
     setShowResults(false);
   };
 
   const handleBottomClick = (bottomId) => {
-    if (showAns || selectedTop === null) return;
+    if (showAns || selectedTop === null || showResults) return;
 
     const newMatches = { ...matches };
 
@@ -114,7 +114,7 @@ const captions = [
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     const allConnected = exerciseData.top.every((item) => matches[item.id]);
 
@@ -184,193 +184,189 @@ const captions = [
   return (
     <div className="main-container-component">
       <style>{`
-        .wb-d-wrapper {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 28px !important;
-          max-width: 1150px !important;
-          margin: 0 auto !important;
-          padding: 8px 14px 20px !important;
-          box-sizing: border-box !important;
-        }
+  .wb-d-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 8px 14px 20px;
+    box-sizing: border-box;
+  }
 
-        .wb-d-title {
-          margin: 0 !important;
-        }
+  .wb-d-title {
+    margin: 0;
+  }
 
-        .wb-d-board {
-          position: relative !important;
-          width: 100% !important;
-          min-height: 340px !important;
-          padding: 24px 20px 12px !important;
-          box-sizing: border-box !important;
-        }
+  .wb-d-board {
+    position: relative;
+    width: 100%;
+    min-height: 330px;
+    padding: 24px 20px 12px;
+    box-sizing: border-box;
+  }
 
-        .wb-d-top-row {
-          display: grid !important;
-          grid-template-columns: repeat(6, 1fr) !important;
-          gap: 12px !important;
-          align-items: start !important;
-          margin-bottom: 110px !important;
-          position: relative !important;
-          z-index: 2 !important;
-        }
+  .wb-d-top-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 110px;
+    position: relative;
+    z-index: 2;
+  }
 
-        .wb-d-bottom-row {
-          display: grid !important;
-          grid-template-columns: repeat(6, 1fr) !important;
-          gap: 12px !important;
-          align-items: start !important;
-          position: relative !important;
-          z-index: 2 !important;
-        }
+  .wb-d-bottom-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    align-items: start;
+    position: relative;
+    z-index: 2;
+  }
 
-        .wb-d-top-item,
-        .wb-d-bottom-item {
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          position: relative !important;
-        }
+  .wb-d-top-item,
+  .wb-d-bottom-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
 
-        .wb-d-number-circle {
-          width: 34px !important;
-          height: 34px !important;
-          border-radius: 50% !important;
-          border: 2px solid #9d9d9d !important;
-          background: #fff !important;
-          color: #333 !important;
-          font-size: 24px !important;
-          font-weight: 500 !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          line-height: 1 !important;
-          cursor: pointer !important;
-          box-sizing: border-box !important;
-          transition: all 0.2s ease !important;
-        }
+  .wb-d-number-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #9d9d9d;
+    background: #fff;
+    color: #333;
+    font-size: 24px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
 
-        .wb-d-number-circle.selected {
-          border: 3px solid ${ACTIVE_COLOR} !important;
-          box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35) !important;
-          background: rgba(243, 155, 66, 0.08) !important;
-        }
+  .wb-d-number-circle.selected {
+    border: 3px solid ${ACTIVE_COLOR};
+    box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35);
+    background: rgba(243, 155, 66, 0.08);
+  }
 
-        .wb-d-number-circle.connected {
-          border: 2px solid ${LINE_COLOR} !important;
-          background: rgba(255, 202, 148, 0.12) !important;
-        }
+  .wb-d-number-circle.connected {
+    border: 2px solid ${LINE_COLOR};
+    background: rgba(255, 202, 148, 0.12);
+  }
 
-        .wb-d-dot {
-          width: 14px !important;
-          height: 14px !important;
-          border-radius: 50% !important;
-          margin-top: 10px !important;
-          transition: all 0.2s ease !important;
-          box-sizing: border-box !important;
-          cursor: pointer !important;
-          flex-shrink: 0 !important;
-        }
+  .wb-d-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
 
-        .wb-d-dot.selected {
-          transform: scale(1.12) !important;
-          box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35) !important;
-        }
+  .wb-d-dot.selected {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35);
+  }
 
-        .wb-d-word {
-          font-size: 22px !important;
-          line-height: 1.2 !important;
-          color: #222 !important;
-          padding: 8px 12px !important;
-          border-radius: 12px !important;
-          border: 2px solid transparent !important;
-          cursor: pointer !important;
-          transition: all 0.2s ease !important;
-          text-align: center !important;
-          min-width: 90px !important;
-          box-sizing: border-box !important;
-        }
+  .wb-d-word {
+    font-size: 22px;
+    line-height: 1.2;
+    color: #222;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-width: 90px;
+    box-sizing: border-box;
+  }
 
-        .wb-d-word.selected {
-          border: 3px solid ${ACTIVE_COLOR} !important;
-          box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35) !important;
-          background: rgba(243, 155, 66, 0.08) !important;
-        }
+  .wb-d-word.selected {
+    border: 3px solid ${ACTIVE_COLOR};
+    box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35);
+    background: rgba(243, 155, 66, 0.08);
+  }
 
-        .wb-d-word.connected {
-          border: 2px solid ${LINE_COLOR} !important;
-          background: rgba(255, 202, 148, 0.12) !important;
-        }
+  .wb-d-word.connected {
+    border: 2px solid ${LINE_COLOR};
+    // background: rgba(255, 202, 148, 0.12);
+  }
+ .wb-d-number-circle.wrong {
+    border: 2px solid red;
+    // background: rgba(255, 202, 148, 0.12);
+  }
+  .wb-d-wrong {
+    position: absolute;
+    top: -8px;
+    right: 26px;
+       width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
 
-        .wb-d-wrong {
-          position: absolute !important;
-          top: -8px !important;
-          right: -10px !important;
-          width: 22px !important;
-          height: 22px !important;
-          border-radius: 50% !important;
-          background-color: #ef4444 !important;
-          color: #fff !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 12px !important;
-          font-weight: 700 !important;
-          border: 2px solid #fff !important;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
-        }
+  .wb-d-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
 
-        .wb-d-buttons {
-          display: flex !important;
-          justify-content: center !important;
-          margin-top: 8px !important;
-        }
+  @media (max-width: 900px) {
+    .wb-d-top-row,
+    .wb-d-bottom-row {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 24px;
+    }
 
-        @media (max-width: 900px) {
-          .wb-d-top-row,
-          .wb-d-bottom-row {
-            grid-template-columns: repeat(3, 1fr) !important;
-            row-gap: 24px !important;
-          }
+    .wb-d-board {
+      min-height: 500px;
+    }
+  }
 
-          .wb-d-board {
-            min-height: 500px !important;
-          }
-        }
-
-        @media (max-width: 560px) {
-          .wb-d-top-row,
-          .wb-d-bottom-row {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-      `}</style>
-
-<div
+  @media (max-width: 560px) {
+    .wb-d-top-row,
+    .wb-d-bottom-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+`}</style>
+      <div
         className="div-forall"
-            style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+        style={{
+          gap: "40px",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
-        >            <span className="WB-ex-A">D</span>
+        <h1 className="WB-header-title-page8">
+          {" "}
+          <span className="WB-ex-A">D</span>
           Listen and match.
         </h1>
-<div style={{ display: "flex", justifyContent: "center" }}>
-  <AudioWithCaption src={sound1} captions={captions} />
-</div>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <QuestionAudioPlayer
+            src={sound1}
+            captions={captions}
+            stopAtSecond={6.54}
+          />
+        </div>
 
         <div ref={containerRef} className="wb-d-board">
           <svg
@@ -392,7 +388,7 @@ const captions = [
                 y1={line.y1}
                 x2={line.x2}
                 y2={line.y2}
-                stroke={LINE_COLOR}
+                stroke={"#f39b42"}
                 strokeWidth="4"
                 strokeLinecap="round"
               />
@@ -409,7 +405,13 @@ const captions = [
                 <div key={item.id} className="wb-d-top-item">
                   <div
                     className={`wb-d-number-circle ${
-                      selected ? "selected" : connected ? "connected" : ""
+                      selected
+                        ? "selected"
+                        : connected
+                          ? wrong
+                            ? "wrong"
+                            : "connected"
+                          : ""
                     }`}
                     onClick={() => handleTopClick(item.id)}
                     style={{
@@ -443,7 +445,9 @@ const captions = [
               return (
                 <div key={item.id} className="wb-d-bottom-item">
                   <div
-                    ref={(el) => (elementRefs.current[`bottom-${item.id}`] = el)}
+                    ref={(el) =>
+                      (elementRefs.current[`bottom-${item.id}`] = el)
+                    }
                     className={`wb-d-dot ${selectedMatch ? "selected" : ""}`}
                     onClick={() => handleBottomClick(item.id)}
                     style={{

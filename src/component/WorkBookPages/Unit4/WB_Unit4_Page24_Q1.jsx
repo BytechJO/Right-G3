@@ -16,8 +16,8 @@ const ITEMS = [
     rightImg: right1,
     correct: "autumn",
     selectPos: {
-      top: "66%",
-      left: "19%",
+      top: "79%",
+      left: "34%",
       transform: "translate(-50%, -50%)",
     },
   },
@@ -27,8 +27,8 @@ const ITEMS = [
     rightImg: right2,
     correct: "spring",
     selectPos: {
-      top: "75%",
-      left: "50%",
+      top: "83%",
+      left: "36%",
       transform: "translate(-50%, -50%)",
     },
   },
@@ -38,12 +38,13 @@ const ITEMS = [
     rightImg: right3,
     correct: "summer",
     selectPos: {
-      top: "72%",
-      left: "50%",
+      top: "81%",
+      left: "31%",
       transform: "translate(-50%, -50%)",
     },
   },
 ];
+
 const OPTIONS = ["spring", "summer", "autumn", "winter"];
 
 export default function WB_Unit3_Page24_QG() {
@@ -112,31 +113,9 @@ export default function WB_Unit3_Page24_QG() {
     return answers[item.id] !== item.correct;
   };
 
-  const bubbleBase = {
-    position: "relative",
-    background: "#fff",
-    border: "2px solid #444",
-    borderRadius: "12px",
-    boxSizing: "border-box",
-  };
-
   return (
     <div className="main-container-component">
       <style>{`
-  .wb-g24-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-   
-    margin: 0 auto;
-    padding: 8px 14px 20px;
-    box-sizing: border-box;
-  }
-
-  .wb-g24-title {
-    margin: 0;
-  }
-
   .wb-g24-list {
     display: flex;
     flex-direction: column;
@@ -146,7 +125,6 @@ export default function WB_Unit3_Page24_QG() {
 
   .wb-g24-row {
     display: flex;
-  
     gap: 16px;
     align-items: center;
     width: 100%;
@@ -160,32 +138,23 @@ export default function WB_Unit3_Page24_QG() {
     padding-top: 34px;
   }
 
+  /* 🔥 صار ريسبونسف */
   .wb-g24-side-img {
-    width: auto;
-    height: 180px;
+    width: 100%;
+    height: auto;
     object-fit: contain;
     display: block;
   }
 
-
-  .wb-g24-answer-text {
-    font-size: 18px;
-    color: #222;
-    white-space: nowrap;
-  }
-
   .wb-g24-select {
-    border: none;
+   
     outline: none;
     background: transparent;
-    font-size: 18px;
-    color: #000000ff;
-    border-bottom: 1px solid #444;
-    padding: 0 20px 2px 2px;
+    position :relative;
+    border-bottom: 1px solid #000000ff;
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    min-width: 92px;
+    min-width: clamp(60px, 10vw, 92px);
+    font-size: clamp(12px, 1.5vw, 18px);
     cursor: pointer;
     text-transform: lowercase;
   }
@@ -196,7 +165,7 @@ export default function WB_Unit3_Page24_QG() {
   }
 
   .wb-g24-select-wrap {
-    position: relative;
+    position: absolute;
     display: inline-flex;
     align-items: center;
   }
@@ -218,7 +187,7 @@ export default function WB_Unit3_Page24_QG() {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background-color: #ef4444;
+    background-color: red;
     color: #fff;
     display: flex;
     align-items: center;
@@ -234,38 +203,10 @@ export default function WB_Unit3_Page24_QG() {
     justify-content: center;
     margin-top: 8px;
   }
-
-  @media (max-width: 900px) {
-    .wb-g24-row {
-      grid-template-columns: 1fr;
-    }
-
-    .wb-g24-num {
-      padding-top: 0;
-    }
-
-    .wb-g24-middle {
-      order: 2;
-    }
-
-    .wb-g24-side-left {
-      order: 1;
-    }
-
-    .wb-g24-side-right {
-      order: 3;
-    }
-  }
 `}</style>
-      <div
-        className="div-forall"
-        style={{
-        
-          gap: "28px",
-       
-        }}
-      >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
+
+      <div className="div-forall">
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">G</span>
           Read and complete the conversations.
         </h1>
@@ -278,13 +219,18 @@ export default function WB_Unit3_Page24_QG() {
               <div key={item.id} className="wb-g24-row">
                 <div className="wb-g24-num">{item.id}</div>
 
-                <img src={item.leftImg} alt="" className="wb-g24-side-img" />
+                <img
+                  src={item.leftImg}
+                  alt=""
+                  style={{ width: "400px", height: "auto" }}
+                />
 
                 <div className="wb-g24-side-right">
                   <div
                     style={{
                       position: "relative",
-                      display: "inline-block",
+                      width: "100%",
+                      maxWidth: "250px",
                     }}
                   >
                     <img
@@ -296,8 +242,8 @@ export default function WB_Unit3_Page24_QG() {
                     <div
                       className="wb-g24-select-wrap"
                       style={{
-                        position: "absolute",
                         ...item.selectPos,
+                        
                       }}
                     >
                       <select
@@ -305,6 +251,12 @@ export default function WB_Unit3_Page24_QG() {
                         disabled={showAns}
                         onChange={(e) => handleSelect(item.id, e.target.value)}
                         className="wb-g24-select"
+                        style={{
+                          borderBottom: isWrong(item)
+                            ? "2px solid red"
+                            : "1px solid black",
+                          position:"relative"
+                        }}
                       >
                         <option value="" disabled>
                           select
@@ -316,10 +268,12 @@ export default function WB_Unit3_Page24_QG() {
                         ))}
                       </select>
 
-                      {!showAns && <span className="wb-g24-arrow">▼</span>}
+                      {!showAns && <span className="wb-g24-arrow">▼</span>}  
+                       {isWrong(item) && <div className="wb-g24-wrong">✕</div>}
                     </div>
                   </div>
-                  {isWrong(item) && <div className="wb-g24-wrong">✕</div>}
+
+               
                 </div>
               </div>
             );

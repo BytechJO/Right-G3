@@ -2,6 +2,13 @@ import React, { useRef, useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+} from "@dnd-kit/core";
+
 import imgHouse from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/B1.svg";
 
 const DRAG_ITEMS = [
@@ -16,7 +23,7 @@ const DRAG_ITEMS = [
 ];
 
 const ITEMS = [
-  { id: 1, correct: "bedroom", fixed: true },
+  { id: 1, correct: "bedroom" },
   { id: 2, correct: "basement" },
   { id: 3, correct: "garage" },
   { id: 4, correct: "kitchen" },
@@ -27,19 +34,16 @@ const ITEMS = [
 ];
 
 export default function WB_Unit5_Page27_Q2() {
-  const [answers, setAnswers] = useState({
-    "a-1": { dragId: "act1", value: "bedroom" },
-  });
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [answers, setAnswers] = useState({});
+
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [activeItem, setActiveItem] = useState(null);
 
   const dropRefs = useRef({});
 
   const usedDragIds = Object.entries(answers)
-    .filter(([key, entry]) => key !== "a-1" && entry)
+    .filter(([key, entry]) => entry)
     .map(([, entry]) => entry.dragId);
 
   const applyDrop = (boxKey, item) => {
@@ -49,7 +53,7 @@ export default function WB_Unit5_Page27_Q2() {
     const newAnswers = { ...answers };
 
     Object.keys(newAnswers).forEach((key) => {
-      if (key !== "a-1" && newAnswers[key]?.dragId === item.id) {
+      if (newAnswers[key]?.dragId === item.id) {
         delete newAnswers[key];
       }
     });
@@ -63,55 +67,23 @@ export default function WB_Unit5_Page27_Q2() {
     setChecked(false);
   };
 
-  const handleDragStart = (item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
-    setDraggedItem(item);
-  };
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    setActiveItem(null);
 
-  const handleDrop = (boxKey) => {
-    if (showAns || !draggedItem) return;
-    applyDrop(boxKey, draggedItem);
-    setDraggedItem(null);
-  };
+    if (!over) return;
 
-  const handleTouchStart = (e, item) => {
-    if (showAns || usedDragIds.includes(item.id)) return;
+    const dragged = DRAG_ITEMS.find((d) => d.id === active.id);
+    if (!dragged) return;
 
-    const touch = e.touches[0];
-    setTouchItem(item);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (!touchItem) return;
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchItem) return;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(key, touchItem);
-      }
-    });
-
-    setTouchItem(null);
+    applyDrop(over.id, dragged);
   };
 
   const handleRemoveAnswer = (boxKey) => {
+  
+
     const targetItem = ITEMS.find((q) => `a-${q.id}` === boxKey);
-    if (!targetItem || targetItem.fixed || showAns) return;
+    if (!targetItem || targetItem.fixed || showAns|| checked) return;
 
     setAnswers((prev) => {
       const updated = { ...prev };
@@ -123,7 +95,7 @@ export default function WB_Unit5_Page27_Q2() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || checked) return;
 
     const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
 
@@ -133,7 +105,6 @@ export default function WB_Unit5_Page27_Q2() {
     }
 
     let score = 0;
-    const total = ITEMS.length;
 
     ITEMS.forEach((item) => {
       if (answers[`a-${item.id}`]?.value === item.correct) {
@@ -143,12 +114,12 @@ export default function WB_Unit5_Page27_Q2() {
 
     setChecked(true);
 
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
     }
   };
 
@@ -169,13 +140,10 @@ export default function WB_Unit5_Page27_Q2() {
   };
 
   const handleReset = () => {
-    setAnswers({
-      "a-1": { dragId: "act1", value: "bedroom" },
-    });
-    setDraggedItem(null);
-    setTouchItem(null);
+    setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setActiveItem(null);
   };
 
   const isWrong = (item) => {
@@ -183,35 +151,63 @@ export default function WB_Unit5_Page27_Q2() {
     return answers[`a-${item.id}`]?.value !== item.correct;
   };
 
-  const renderDropBox = (item) => {
+  // 🔥 Draggable
+  const DraggableChip = ({ item, isUsed }) => {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+      id: item.id,
+      disabled: isUsed || showAns,
+    });
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={`wb-house-chip ${
+          isUsed || showAns || checked? "wb-house-chip--used" : "wb-house-chip--active"
+        }`}
+        style={{
+          opacity: isDragging ? 0.3 : 1,
+          cursor: isUsed || showAns|| checked ? "not-allowed" : "grab",
+        }}
+      >
+        {item.value}
+      </div>
+    );
+  };
+
+  // 🔥 DropBox
+  const DropBox = ({ item }) => {
     const boxKey = `a-${item.id}`;
+    const { setNodeRef, isOver } = useDroppable({ id: boxKey });
+
     const value = answers[boxKey]?.value || "";
 
     return (
       <div className="wb-house-line-wrap">
         <div
-          ref={(el) => (dropRefs.current[boxKey] = el)}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={() => handleDrop(boxKey)}
+          ref={setNodeRef}
           onClick={() => handleRemoveAnswer(boxKey)}
-          className={`wb-house-line ${item.fixed ? "wb-house-line--fixed" : ""}`}
+          className={`wb-house-line ${
+            item.fixed ? "wb-house-line--fixed" : ""
+          }`}
           style={{
-            cursor:
-              item.fixed || showAns
-                ? "default"
-                : value
-                ? "pointer"
-                : "pointer",
+            cursor: item.fixed || showAns|| checked ? "default" : "pointer",
+            // boxShadow: isOver
+            //   ? "0 0 0 3px rgba(243,155,66,0.25)"
+            //   : "none",
+            borderBottom: isOver
+              ? "1px solid rgba(255, 132, 8, 0.95)"
+              : isWrong(item)
+                ? "2px solid red"
+                : "1px solid",
+            backgroundColor: isOver ? "rgba(243, 155, 66, 0.18)" : "",
+            transform: isOver ? "scale(1.02)" : "scale(1)",
+            transition: "0.15s",
           }}
         >
           {value ? (
-            <span
-              className={`wb-house-answer ${
-                item.fixed ? "wb-house-answer--fixed" : ""
-              }`}
-            >
-              {value}
-            </span>
+            <span className="wb-house-answer">{value}</span>
           ) : (
             <span className="wb-house-placeholder"></span>
           )}
@@ -223,8 +219,14 @@ export default function WB_Unit5_Page27_Q2() {
   };
 
   return (
-    <div className="main-container-component">
-    <style>{`
+    <DndContext
+      onDragStart={(e) => {
+        const item = DRAG_ITEMS.find((d) => d.id === e.active.id);
+        setActiveItem(item);
+      }}
+      onDragEnd={handleDragEnd}
+    >
+      <style>{`
   .wb-house-wrap {
     width: 100%;
     max-width: 1100px;
@@ -260,16 +262,16 @@ export default function WB_Unit5_Page27_Q2() {
     text-align: center;
     padding: 5px 12px;
     border-radius: 15px;
-    font-size: clamp(11px, 0.9vw, 15px);
-    font-weight: 500;
+    font-size: clamp(11px, 1.4vw, 18px);
+    // font-weight: 500;
     user-select: none;
     box-sizing: border-box;
     transition: 0.2s ease;
     touch-action: none;
     word-break: break-word;
-    background: #ffd09b;
+    // background: #ffd09b;
     color: #111;
-    border: 1.5px solid #ee9a42;
+    border: 1px solid #ee9a42;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   }
 
@@ -288,8 +290,8 @@ export default function WB_Unit5_Page27_Q2() {
 
   .wb-house-layout {
     display: grid;
-    grid-template-columns: minmax(210px, 1fr) minmax(260px, 0.95fr) minmax(210px, 1fr);
-    gap: clamp(20px, 3vw, 42px);
+    grid-template-columns: minmax(170px, 1fr) minmax(337px, 0.95fr) minmax(170px, 1fr);
+    gap: 20px;
     align-items: center;
     width: 100%;
   }
@@ -302,16 +304,15 @@ export default function WB_Unit5_Page27_Q2() {
   }
 
   .wb-house-item {
-    display: grid;
-    grid-template-columns: 32px minmax(0, 1fr);
+    display: flex;
     gap: 12px;
     align-items: center;
     width: 100%;
   }
 
   .wb-house-num {
-    font-size: clamp(14px, 1.2vw, 20px);
-    font-weight: 700;
+    font-size: clamp(14px, 1.7vw, 20px);
+    font-weight: 500;
     line-height: 1;
     color: #1f1f1f;
   }
@@ -324,7 +325,7 @@ export default function WB_Unit5_Page27_Q2() {
   .wb-house-line {
     width: 100%;
     min-height: 36px;
-    border-bottom: 3px solid #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
     display: flex;
     align-items: center;
     padding: 0 4px 4px;
@@ -337,7 +338,7 @@ export default function WB_Unit5_Page27_Q2() {
   }
 
   .wb-house-answer {
-    font-size: clamp(13px, 1.4vw, 20px);
+    font-size: clamp(13px, 1.4vw, 18px);
     line-height: 1.1;
     color: #000000ff;
     font-weight: 500;
@@ -360,8 +361,8 @@ export default function WB_Unit5_Page27_Q2() {
     right: -8px;
     width: 22px;
     height: 22px;
-    border-radius: 999px;
-    background: #ef4444;
+      border-radius: 50%;
+    background-color: red;
     color: #fff;
     display: flex;
     align-items: center;
@@ -369,8 +370,7 @@ export default function WB_Unit5_Page27_Q2() {
     font-size: 12px;
     font-weight: 700;
     border: 2px solid #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    box-sizing: border-box;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
   }
 
   .wb-house-image-wrap {
@@ -443,118 +443,76 @@ export default function WB_Unit5_Page27_Q2() {
     }
   }
 `}</style>
+      <div className="main-container-component">
+        <div className="div-forall" style={{ gap: "28px" }}>
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">B</span>
+            Label the rooms in Tom’s house.
+          </h1>
 
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
-          <span className="WB-ex-A">B</span>
-          Label the rooms in Tom’s house.
-        </h1>
+          <div className="wb-house-chips">
+            {DRAG_ITEMS.map((item) => {
+              const isUsed = usedDragIds.includes(item.id);
 
-        <div className="wb-house-chips">
-          {DRAG_ITEMS.map((item) => {
-            const isUsed =
-              item.id === "act1"
-                ? true
-                : usedDragIds.includes(item.id);
-
-            return (
-              <div
-                key={item.id}
-                draggable={!isUsed && !showAns}
-                onDragStart={() => handleDragStart(item)}
-                onTouchStart={(e) => handleTouchStart(e, item)}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                className={`wb-house-chip ${
-                  isUsed || showAns
-                    ? "wb-house-chip--used"
-                    : "wb-house-chip--active"
-                }`}
-              >
-                {item.value}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="wb-house-layout">
-          <div className="wb-house-col">
-            {ITEMS.filter((item) => [1, 3, 5, 7].includes(item.id)).map((item) => (
-              <div key={item.id} className="wb-house-item">
-                <div className="wb-house-num">{item.id}</div>
-                {renderDropBox(item)}
-              </div>
-            ))}
+              return (
+                <DraggableChip key={item.id} item={item} isUsed={isUsed} />
+              );
+            })}
           </div>
 
-          <div className="wb-house-image-wrap">
-            <img
-              src={imgHouse}
-              alt="house scene"
-              className="wb-house-image"
+          <div className="wb-house-layout">
+            <div className="wb-house-col">
+              {ITEMS.filter((i) => [1, 3, 5, 7].includes(i.id)).map((item) => (
+                <div key={item.id} className="wb-house-item">
+                  <div className="wb-house-num">{item.id}</div>
+                  <DropBox item={item} />
+                </div>
+              ))}
+            </div>
+
+            <div className="wb-house-image-wrap">
+              <img src={imgHouse} className="wb-house-image" />
+            </div>
+
+            <div className="wb-house-col">
+              {ITEMS.filter((i) => [2, 4, 6, 8].includes(i.id)).map((item) => (
+                <div key={item.id} className="wb-house-item">
+                  <div className="wb-house-num">{item.id}</div>
+                  <DropBox item={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="wb-house-buttons">
+            <Button
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleReset}
+              checkAnswers={handleCheck}
             />
           </div>
-
-          <div className="wb-house-col">
-            {ITEMS.filter((item) => [2, 4, 6, 8].includes(item.id)).map((item) => (
-              <div key={item.id} className="wb-house-item">
-                <div className="wb-house-num">{item.id}</div>
-                {renderDropBox(item)}
-              </div>
-            ))}
-          </div>
         </div>
 
-        <div className="wb-house-buttons">
-          <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-            checkAnswers={handleCheck}
-          />
-        </div>
+        {/* 🔥 Overlay */}
+        <DragOverlay>
+          {activeItem ? (
+            <div
+              style={{
+                background: "#fff",
+                padding: "8px 12px",
+                borderRadius: "10px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                fontSize: "17px",
+                fontWeight: 600,
+
+                border: "1px solid #ff901aff",
+              }}
+            >
+              {activeItem.value}
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
-
-      {touchItem && (
-        <div
-          style={{
-            position: "fixed",
-            left: touchPos.x - 60,
-            top: touchPos.y - 20,
-            background: "#fff",
-            padding: "8px 12px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            pointerEvents: "none",
-            zIndex: 9999,
-            fontSize: "17px",
-            fontWeight: 600,
-            color: "#d72626",
-            maxWidth: "180px",
-            textAlign: "center",
-            border: "1px solid #f5c28a",
-          }}
-        >
-          {touchItem.value}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

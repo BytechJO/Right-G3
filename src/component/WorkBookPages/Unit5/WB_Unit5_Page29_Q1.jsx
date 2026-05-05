@@ -21,9 +21,15 @@ const SCENE_ITEMS = [
 const ITEMS = [
   {
     id: 1,
-    fixed: true,
+    fixed: false,
     question: "Where is the pen?",
-    answer: "It is on the desk.",
+     options: [
+      "It is under the desk.",
+      "It is on the desk.",
+      "It is next to the desk.",
+      "It is in the desk.",
+    ],
+    correct: "It is on the desk.",
   },
   {
     id: 2,
@@ -81,13 +87,13 @@ export default function WB_Unit5_Page28_QE() {
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, value) => {
-    if (showAns) return;
+    if (showAns ||checked) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
     setChecked(false);
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     const nonFixedItems = ITEMS.filter((item) => !item.fixed);
 
@@ -148,7 +154,7 @@ export default function WB_Unit5_Page28_QE() {
       <div className="wb-e-select-wrap">
         <select
           value={getValue(item.id)}
-          disabled={showAns}
+          disabled={showAns ||checked}
           onChange={(e) => handleChange(item.id, e.target.value)}
           className={`wb-e-select ${getValue(item.id) ? "wb-e-select--filled" : ""}`}
         >
@@ -167,328 +173,321 @@ export default function WB_Unit5_Page28_QE() {
   };
 
   return (
-    <div className="main-container-component">
-      <style>{`
-        .wb-e-scene-stage img,
-        .wb-e-scene-item img {
-          width: 100% !important;
-          height: auto !important;
-          max-height: none !important;
-          object-fit: contain;
-          display: block;
-        }
+    <div className="main-container-component mb-10">
+     <style>{`
+  .wb-e-scene-stage img,
+  .wb-e-scene-item img {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+    display: block;
+  }
 
-        .wb-e-scene-wrap {
-          width: 100%;
-          display: flex;
-          justify-content: center;
-        }
+  .wb-e-scene-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
-        .wb-e-scene-stage {
-          width: min(100%, 980px);
-          aspect-ratio: 980 / 360;
-          position: relative;
-          overflow: visible;
-          flex-shrink: 0;
-        }
+  .wb-e-scene-stage {
+    width: min(100%, 980px);
+    aspect-ratio: 980 / 360;
+    position: relative;
+    overflow: visible;
+    flex-shrink: 0;
+  }
 
-        .wb-e-scene-item {
-          position: absolute;
-          transform-origin: top left;
-        }
+  .wb-e-scene-item {
+    position: absolute;
+    transform-origin: top left;
+  }
 
-        .wb-e-scene-desk {
-          width: 16.8%;
-          left: 2.2%;
-          top: 7%;
-        }
+  .wb-e-scene-desk {
+    width: 16.8%;
+    left: 2.2%;
+    top: 7%;
+  }
 
-        .wb-e-scene-bed {
-          width: 33.5%;
-          left: 30.8%;
-          top: 3%;
-          z-index: 2;
-        }
+  .wb-e-scene-bed {
+    width: 33.5%;
+    left: 30.8%;
+    top: 3%;
+    z-index: 2;
+  }
 
-        .wb-e-scene-shelf {
-          width: 25.2%;
-          right: 3%;
-          top: 0.5%;
-        }
+  .wb-e-scene-shelf {
+    width: 25.2%;
+    right: 3%;
+    top: 0.5%;
+  }
 
-        .wb-e-scene-toybox {
-          width: 16.8%;
-          left: 17.4%;
-          top: 46.2%;
-          z-index: 1;
-        }
+  .wb-e-scene-toybox {
+    width: 16.8%;
+    left: 17.4%;
+    top: 46.2%;
+    z-index: 1;
+  }
 
-        .wb-e-scene-chair {
-          width: 10.8%;
-          right: 11.3%;
-          top: 36.6%;
-        }
+  .wb-e-scene-chair {
+    width: 10.8%;
+    right: 11.3%;
+    top: 36.6%;
+  }
 
-        .wb-e-bank-wrap {
-          width: 100%;
-          display: flex;
-          justify-content: center;
-        }
+  .wb-e-bank-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
-        .wb-e-bank {
-          width: 100%;
-          max-width: 560px;
-          min-height: 52px;
-          border: 3px solid #f39b42;
-          border-radius: 18px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: clamp(14px, 2vw, 34px);
-          padding: 10px 18px;
-          box-sizing: border-box;
-          flex-wrap: wrap;
-          background: #fff;
-        }
+  .wb-e-bank {
+    width: 90%;
+    // max-width: 560px;
+    min-height: 52px;
+    border: 1px solid #f39b42;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    padding: 10px 18px;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    background: #fff;
+  }
 
-        .wb-e-bank-word {
-          font-size: clamp(13px, 1.4vw, 18px);
-          line-height: 1.1;
-          color: #222;
-          font-weight: 500;
-        }
+  .wb-e-bank-word {
+    font-size: clamp(13px, 1.4vw, 18px);
+    // border: 1px solid #f39b42;
+    //  border-radius: 18px;
+    // padding: 8px 22px;
 
-        .wb-e-list {
-          width: 100%;
-          max-width: 1100px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
+    line-height: 1.1;
+    color: #222;
+    // font-weight: 500;
+  }
 
-        .wb-e-row {
-          display: grid;
-          grid-template-columns: 34px minmax(0, 1fr);
-          gap: 14px;
-          align-items: start;
-          width: 100%;
-        }
+  .wb-e-list {
+    width: 100%;
+    // max-width: 1100px;
+    // margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 
-        .wb-e-num {
-          font-size: clamp(14px, 1.4vw, 20px);
-          font-weight: 700;
-          line-height: 1;
-          color: #222;
-          padding-top: 8px;
-        }
+  .wb-e-row {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    width: 100%;
+  }
 
-        .wb-e-line-wrap {
-          position: relative;
-          width: 100%;
-        }
+  .wb-e-num {
+    font-size: clamp(14px, 1.4vw, 20px);
+    font-weight: 700;
+    line-height: 1;
+    color: #222;
+    padding-top: 8px;
+  }
 
-        .wb-e-line {
-          width: 100%;
-          min-height: 40px;
-          border-bottom: 3px solid #2f2f2f;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding-bottom: 4px;
-          box-sizing: border-box;
-          min-width: 0;
-          flex-wrap: nowrap;
-        }
+  .wb-e-line-wrap {
+    position: relative;
+    width: 100%;
+  }
 
-        .wb-e-question {
-          font-size: clamp(13px, 1.4vw, 18px);
-          line-height: 1.3;
-          color: #111;
-          font-weight: 500;
-          white-space: nowrap;
-          flex: 0 1 auto;
-        }
+  .wb-e-line {
+    width: 90%;
+    min-height: 40px;
+    border-bottom: 1px solid #2f2f2f;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 4px;
+    box-sizing: border-box;
+    min-width: 0;
+    flex-wrap: nowrap;
+  }
 
-        .wb-e-answer-fixed {
-          font-size: clamp(13px, 1.4vw, 18px);
-          line-height: 1.3;
-          color: #111;
-          font-weight: 500;
-        }
+  .wb-e-question {
+    font-size: clamp(13px, 1.4vw, 18px);
+    line-height: 1.3;
+    color: #111;
+    font-weight: 500;
+    white-space: nowrap;
+    flex: 0 1 auto;
+  }
 
-        .wb-e-answer-show {
-          font-size: clamp(13px, 1.4vw, 18px);
-          line-height: 1.3;
-          color: #d62828;
-          font-weight: 500;
-          word-break: break-word;
-        }
+  .wb-e-answer-fixed {
+    font-size: clamp(13px, 1.4vw, 18px);
+    line-height: 1.3;
+    color: #111;
+    font-weight: 500;
+  }
 
-        .wb-e-wrong {
-          position: absolute;
-          top: -7px;
-          right: -7px;
-          width: 22px;
-          height: 22px;
-          border-radius: 999px;
-          background: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-          box-sizing: border-box;
-        }
+  .wb-e-answer-show {
+    font-size: clamp(13px, 1.4vw, 18px);
+    line-height: 1.3;
+    color:#111 ;
+    // font-weight: 500;
+    word-break: break-word;
+  }
 
-        .wb-e-select-wrap {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          flex: 1 1 auto;
-          min-width: 180px;
-          max-width: 380px;
-        }
+  .wb-e-wrong {
+    position: absolute;
+    top: -7px;
+    right: 80px;
+    width: 22px;
+    height: 22px;
+   border-radius: 50%;
+    background-color: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    box-sizing: border-box;
+  }
 
-        .wb-e-select {
-          width: 100%;
-          min-width: 0;
-          height: clamp(30px, 3vw, 38px);
-          border: 2px solid #c9c9c9;
-          border-radius: 10px;
-          background: #fff;
-          padding: 0 34px 0 12px;
-          font-size: clamp(12px, 1.3vw, 17px);
-          font-weight: 500;
-          color: #222;
-          outline: none;
-          appearance: none;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          box-sizing: border-box;
-          cursor: pointer;
-          text-align: center;
-          text-align-last: center;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+  .wb-e-select-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex: 1 1 auto;
+    // min-width: 180px;
+    max-width: 100%;
+  }
 
-        .wb-e-select--filled {
-          color: #111;
-        }
+  .wb-e-select {
+    width: 100%;
+    min-width: 0;
+    height: clamp(30px, 3vw, 38px);
+    
+    background: #fff;
+    padding: 0 34px 0 12px;
+    font-size: clamp(12px, 1.3vw, 17px);
+    // font-weight: 500;
+    color: #222;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    text-align-last: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-        .wb-e-select:disabled {
-          opacity: 1;
-          cursor: default;
-        }
+  .wb-e-select--filled {
+    color: #111;
+  }
 
-        .wb-e-arrow {
-          position: absolute;
-          right: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 12px;
-          color: #666;
-          pointer-events: none;
-        }
+  .wb-e-select:disabled {
+    opacity: 1;
+    cursor: default;
+  }
 
-        .wb-e-buttons {
-          display: flex;
-          justify-content: center;
-          margin-top: 4px;
-        }
+  .wb-e-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #666;
+    pointer-events: none;
+  }
 
-        @media (max-width: 768px) {
-          .wb-e-row {
-            grid-template-columns: 28px 1fr;
-            gap: 10px;
-          }
+  .wb-e-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+  }
 
-          .wb-e-line {
-            min-height: auto;
-            gap: 6px;
-            padding-bottom: 8px;
-          }
+  @media (max-width: 768px) {
+    .wb-e-row {
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+    }
 
-          .wb-e-question {
-            white-space: normal;
-          }
+    .wb-e-line {
+      min-height: auto;
+      gap: 6px;
+      padding-bottom: 8px;
+    }
 
-          .wb-e-select-wrap {
-            flex: 1 1 180px;
-          }
+    .wb-e-question {
+      white-space: normal;
+    }
 
-          .wb-e-bank {
-            gap: 12px 18px;
-            border-width: 2px;
-            border-radius: 16px;
-            min-height: 48px;
-            padding: 8px 14px;
-          }
-        }
+    .wb-e-select-wrap {
+      flex: 1 1 180px;
+    }
 
-        @media (max-width: 560px) {
-          .wb-e-select {
-            height: 36px;
-            padding: 0 28px 0 10px;
-            font-size: 13px;
-          }
+    .wb-e-bank {
+      gap: 12px 18px;
+      border-width: 2px;
+      border-radius: 16px;
+      min-height: 48px;
+      padding: 8px 14px;
+    }
+  }
 
-          .wb-e-line {
-            flex-wrap: wrap;
-            min-height: auto;
-            gap: 6px;
-            padding-bottom: 8px;
-          }
+  @media (max-width: 560px) {
+    .wb-e-select {
+      height: 36px;
+      padding: 0 28px 0 10px;
+      font-size: 13px;
+    }
 
-          .wb-e-question {
-            white-space: normal;
-          }
+    .wb-e-line {
+      flex-wrap: wrap;
+      min-height: auto;
+      gap: 6px;
+      padding-bottom: 8px;
+    }
 
-          .wb-e-select-wrap {
-            flex: 1 1 180px;
-            max-width: 100%;
-          }
+    .wb-e-question {
+      white-space: normal;
+    }
 
-          .wb-e-arrow {
-            right: 10px;
-            font-size: 11px;
-          }
+    .wb-e-select-wrap {
+      flex: 1 1 180px;
+      max-width: 100%;
+    }
 
-          .wb-e-bank-word {
-            font-size: 13px;
-          }
+    .wb-e-arrow {
+      right: 10px;
+      font-size: 11px;
+    }
 
-          .wb-e-wrong {
-            right: -4px;
-          }
-        }
-      `}</style>
+    .wb-e-bank-word {
+      font-size: 13px;
+    }
 
+    .wb-e-wrong {
+      right: -4px;
+    }
+  }
+`}</style>
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
+         
           gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+ 
         }}
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-            fontSize: "clamp(16px, 1.8vw, 24px)",
-          }}
+       
         >
           <span className="WB-ex-A">E</span>
           Look, read, and answer.
@@ -520,7 +519,7 @@ export default function WB_Unit5_Page28_QE() {
               <div className="wb-e-num">{item.id}</div>
 
               <div className="wb-e-line-wrap">
-                <div className="wb-e-line">
+                <div className="wb-e-line" style={{borderBottom:isWrong(item)?"1px solid red":"1px solid #2f2f2f"}}>
                   <span className="wb-e-question">{item.question}</span>
 
                   {item.fixed ? (

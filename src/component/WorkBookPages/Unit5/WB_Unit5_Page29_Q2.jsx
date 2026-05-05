@@ -22,7 +22,7 @@ import q6a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder
 import q6b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F7.svg"
 
 const YELLOW_COLOR = "#f39b42";
-const RED_COLOR = "#ef4444";
+const RED_COLOR = "red";
 const TEXT_COLOR = "#222";
 const BORDER_COLOR = "#d4d4d4";
 
@@ -115,7 +115,7 @@ const styles = {
   },
 
   number: {
-    fontSize: "clamp(20px, 2vw, 30px)",
+    fontSize: "clamp(16px, 1.7vw, 20px)",
     fontWeight: "700",
     color: TEXT_COLOR,
     lineHeight: 1,
@@ -134,17 +134,17 @@ const styles = {
   imageButton: {
     position: "relative",
     width: "100%",
-    border: "3px solid transparent",
+    border: "1px solid transparent",
     borderRadius: "999px",
     background: "transparent",
-    padding: "clamp(12px, 2vw, 21px)",
+    padding: "clamp(8px, 2vw, 15px)",
     cursor: "pointer",
     transition: "all 0.2s ease",
     boxSizing: "border-box",
   },
 
   imageBox: {
-    width: "100%",
+    width: "85%",
     aspectRatio: "1.3 / 1",
     display: "flex",
     alignItems: "center",
@@ -162,10 +162,10 @@ const styles = {
   },
 
   sentence: {
-    fontSize: "clamp(18px, 2vw, 26px)",
+    fontSize: "clamp(16px, 1.4vw, 18px)",
     lineHeight: 1.35,
     color: TEXT_COLOR,
-    fontWeight: "500",
+    // fontWeight: "500",
     paddingLeft: "clamp(28px, 3vw, 38px)",
   },
 
@@ -184,7 +184,7 @@ export default function WB_Unit5_Page29_QF() {
   const [wrongAnswers, setWrongAnswers] = useState({});
 
   const handleSelect = (questionId, optionId) => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -196,7 +196,7 @@ export default function WB_Unit5_Page29_QF() {
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     const allAnswered = Object.values(answers).every((value) => value !== null);
 
@@ -262,18 +262,18 @@ export default function WB_Unit5_Page29_QF() {
 
     if (isWrongSelected) {
       return {
-        border: `4px solid ${RED_COLOR}`,
+        border: `2px solid ${RED_COLOR}`,
       };
     }
 
     if (isSelected || isCorrectShown) {
       return {
-        border: `4px solid ${YELLOW_COLOR}`,
+        border: `2px solid ${YELLOW_COLOR}`,
       };
     }
 
     return {
-      border: "4px solid transparent",
+      border: "2px solid transparent",
       background: "transparent",
     };
   };
@@ -297,23 +297,15 @@ export default function WB_Unit5_Page29_QF() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+        
+          gap: "40px",
+       
 
         }}
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+         
         >
           <span className="WB-ex-A">F</span>
           Read, look, and circle.
@@ -342,7 +334,7 @@ export default function WB_Unit5_Page29_QF() {
                         style={{
                           ...styles.imageButton,
                           ...getCircleStyle(question, option.id),
-                          cursor: showAns ? "default" : "pointer",
+                          cursor: showAns||checked ? "default" : "pointer",
                         }}
                       >
                         <div style={styles.imageBox}>
@@ -362,7 +354,7 @@ export default function WB_Unit5_Page29_QF() {
                               width: "clamp(20px, 2vw, 24px)",
                               height: "clamp(20px, 2vw, 24px)",
                               borderRadius: "50%",
-                              background: RED_COLOR,
+                              background: "red",
                               color: "#fff",
                               display: "flex",
                               alignItems: "center",

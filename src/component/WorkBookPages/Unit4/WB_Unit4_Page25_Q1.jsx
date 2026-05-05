@@ -1,11 +1,18 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 1.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 2.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 3.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 4.svg";
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+} from "@dnd-kit/core";
+
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 3.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 1.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 4.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 2.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 25/Ex H 5.svg";
 
 const IMAGES = [
@@ -17,21 +24,9 @@ const IMAGES = [
 ];
 
 const SENTENCES = [
-  {
-    id: 1,
-    text: "It is January. It is cold. I made a snowman.",
-    correct: 2,
-  },
-  {
-    id: 2,
-    text: "It is June. It is sunny. They are in the park.",
-    correct: 3,
-  },
-  {
-    id: 3,
-    text: "It is October. It is windy. We wear jackets.",
-    correct: 5,
-  },
+  { id: 1, text: "It is January. It is cold. I made a snowman.", correct: 2 },
+  { id: 2, text: "It is June. It is sunny. They are in the park.", correct: 3 },
+  { id: 3, text: "It is October. It is windy. We wear jackets.", correct: 5 },
   {
     id: 4,
     text: "It is April. It is rainy. We are under our umbrellas.",
@@ -50,29 +45,18 @@ export default function WB_Unit_Months_Page232_QH() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
-  const [dragData, setDragData] = useState({
-    active: false,
-    number: null,
-    x: 0,
-    y: 0,
-  });
-
-  const dropRefs = useRef({});
-  const activePointerIdRef = useRef(null);
+  const [activeId, setActiveId] = useState(null);
 
   const usedNumbers = useMemo(() => Object.values(answers), [answers]);
 
-  const assignNumberToSentence = (sentenceId, number) => {
-    if (showAns || number == null) return;
+  const assignNumber = (sentenceId, number) => {
+    if (showAns || checked) return;
 
     setAnswers((prev) => {
       const updated = { ...prev };
 
-      Object.keys(updated).forEach((key) => {
-        if (updated[key] === number) {
-          delete updated[key];
-        }
+      Object.keys(updated).forEach((k) => {
+        if (updated[k] === number) delete updated[k];
       });
 
       updated[sentenceId] = number;
@@ -80,67 +64,112 @@ export default function WB_Unit_Months_Page232_QH() {
     });
   };
 
-  const clearDrag = () => {
-    setDragData({
-      active: false,
-      number: null,
-      x: 0,
-      y: 0,
-    });
-    activePointerIdRef.current = null;
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over) return;
+
+    const number = active.id;
+    const sentenceId = Number(over.id);
+
+    assignNumber(sentenceId, number);
   };
 
-  const handlePointerDownNumber = (e, num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-
-    activePointerIdRef.current = e.pointerId;
-
-    setDragData({
-      active: true,
-      number: num,
-      x: e.clientX,
-      y: e.clientY,
-    });
-  };
-
-  const handlePointerMove = (e) => {
-    if (!dragData.active) return;
-    if (activePointerIdRef.current !== e.pointerId) return;
-
-    setDragData((prev) => ({
-      ...prev,
-      x: e.clientX,
-      y: e.clientY,
-    }));
-  };
-
-  const handlePointerUp = (e) => {
-    if (!dragData.active) return;
-    if (activePointerIdRef.current !== e.pointerId) return;
-
-    const dropTarget = Object.entries(dropRefs.current).find(([, element]) => {
-      if (!element) return false;
-
-      const rect = element.getBoundingClientRect();
-
-      return (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      );
+  // 🔥 Draggable Number
+  const DraggableNumber = ({ num }) => {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+      id: num,
+      disabled: usedNumbers.includes(num) || showAns,
     });
 
-    if (dropTarget) {
-      const sentenceId = Number(dropTarget[0]);
-      assignNumberToSentence(sentenceId, dragData.number);
-    }
-
-    clearDrag();
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        style={{
+          width: "clamp(38px, 5vw, 42px)",
+          height: "clamp(38px, 5vw, 42px)",
+          borderRadius: "50%",
+          backgroundColor: usedNumbers.includes(num) ? "#d1d5db" : "#f29a1f",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: "700",
+          fontSize: "clamp(18px, 2.3vw, 21px)",
+          cursor: "grab",
+          opacity: isDragging ? 0.3 : usedNumbers.includes(num) ? 0.5 : 1,
+        }}
+      >
+        {num}
+      </div>
+    );
   };
 
+  // 🔥 Drop Box
+  const DropBox = ({ sentenceId }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: sentenceId,
+    });
+
+    const value = answers[sentenceId] || "";
+    const sentence = SENTENCES.find((s) => s.id === sentenceId);
+    const wrong = checked && value !== sentence.correct;
+
+    return (
+      <div
+        ref={setNodeRef}
+        onClick={() => value && removeAnswer(sentenceId)}
+        style={{
+          width: "clamp(38px, 4.5vw, 45px)",
+          height: "clamp(38px,4.5vw, 45px)",
+          border: `1px solid ${wrong ? "red" : "#f29a1f"}`,
+          borderRadius: "8px",
+          background: "#fff",
+          boxShadow: isOver ? "0 0 0 4px rgba(243,155,66,0.35)" : "none",
+          transform: isOver ? "scale(1.03)" : "scale(1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "clamp(18px, 2.4vw, 22px)",
+          fontWeight: "500",
+          position: "relative",
+          transition: "0.2s",
+          cursor: value && !checked && !showAns ? "pointer" : "default",
+        }}
+      >
+        {value}
+
+        {wrong && (
+          <div
+            style={{
+              position: "absolute",
+              top: "-10px",
+              right: "-10px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              backgroundColor: "red",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: 700,
+              border: "2px solid #fff",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+            }}
+          >
+            ✕
+          </div>
+        )}
+      </div>
+    );
+  };
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || checked) return;
 
     const allAnswered = SENTENCES.every((item) => answers[item.id]);
 
@@ -167,9 +196,18 @@ export default function WB_Unit_Months_Page232_QH() {
       ValidationAlert.error(`Score: ${score} / ${SENTENCES.length}`);
     }
   };
+  const removeAnswer = (sentenceId) => {
+    if (showAns || checked) return;
 
+    setAnswers((prev) => {
+      const updated = { ...prev };
+      delete updated[sentenceId];
+      return updated;
+    });
+  };
   const handleShowAnswer = () => {
     const filled = {};
+
     SENTENCES.forEach((item) => {
       filled[item.id] = item.correct;
     });
@@ -177,321 +215,118 @@ export default function WB_Unit_Months_Page232_QH() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
-    clearDrag();
+    setActiveId(null); // مهم مع dnd-kit
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
-    clearDrag();
+    setActiveId(null); // reset drag
   };
-
-  const isWrong = (sentenceId) => {
-    if (!checked) return false;
-    const sentence = SENTENCES.find((item) => item.id === sentenceId);
-    return answers[sentenceId] !== sentence.correct;
-  };
-
-  const renderNumberBox = (sentenceId) => {
-    const value = answers[sentenceId] || "";
-    const isDropActive = dragData.active;
-
-    return (
-      <div
-        ref={(el) => {
-          dropRefs.current[sentenceId] = el;
-        }}
-        style={{
-          width: "clamp(38px, 5vw, 46px)",
-          height: "clamp(38px, 5vw, 46px)",
-          border: `2px solid ${
-            isDropActive ? "#f39b42" : "#f39b42"
-          }`,
-          borderRadius: "8px",
-          background: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "clamp(18px, 2.4vw, 22px)",
-          fontWeight: "500",
-          color: value ? "#000" : "#666",
-          position: "relative",
-          flexShrink: 0,
-          boxSizing: "border-box",
-          transition: "0.15s ease",
-        }}
-      >
-        {value}
-
-        {isWrong(sentenceId) && (
-          <div
-            style={{
-              position: "absolute",
-              top: "-10px",
-              right: "-10px",
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              background: "#ef4444",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "11px",
-              fontWeight: "700",
-            }}
-          >
-            ✕
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderImageCard = (item) => (
-    <div
-      key={item.id}
-      style={{
-        position: "relative",
-        width:
-          item.id <= 2
-            ? "clamp(150px, 22vw, 200px)"
-            : "clamp(135px, 20vw, 180px)",
-        height:
-          item.id <= 2
-            ? "clamp(110px, 17vw, 148px)"
-            : "clamp(120px, 18vw, 160px)",
-        border: "2px solid #f39b42",
-        borderRadius: "14px",
-        overflow: "visible",
-        background: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxSizing: "border-box",
-      }}
-    >
-      <img
-        src={item.img}
-        alt={`match-${item.id}`}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          borderRadius: "14px",
-          display: "block",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-12px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "24px",
-          height: "24px",
-          borderRadius: "50%",
-          border: "2px solid #f39b42",
-          background: "#f7f7f7",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "14px",
-          fontWeight: "700",
-          color: "#444",
-          boxSizing: "border-box",
-        }}
-      >
-        {item.id}
-      </div>
-    </div>
-  );
-
   return (
-    <div
-      className="main-container-component"
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={clearDrag}
-      style={{
-        touchAction: "none",
-      }}
+    <DndContext
+      onDragStart={(e) => setActiveId(e.active.id)}
+      onDragEnd={handleDragEnd}
     >
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
-          <span className="WB-ex-A">H</span>
-          Look, read, and match.
-        </h1>
+      <div className="main-container-component mb-10">
+        <div className="div-forall" style={{ gap: "28px" }}>
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">H</span>
+            Look, read, and match.
+          </h1>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "14px",
-            marginTop: "-6px",
-            flexWrap: "wrap",
-          }}
-        >
-          {NUMBERS.map((num) => {
-            const disabled = usedNumbers.includes(num);
-            const isDragging = dragData.active && dragData.number === num;
+        
 
-            return (
+          {/* 🔥 Images */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ display: "flex", gap: "34px", flexWrap: "wrap" }}>
+              {IMAGES.slice(0, 2).map((item) => (
+                <img key={item.id} src={item.img} style={{ height: "160px" }} />
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: "34px", flexWrap: "wrap" }}>
+              {IMAGES.slice(2).map((item) => (
+                <img key={item.id} src={item.img} style={{ height: "160px" }} />
+              ))}
+            </div>
+          </div>
+  {/* 🔥 Numbers */}
+          <div
+            style={{
+              display: "flex",
+              gap: "14px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
+            {NUMBERS.map((num) => (
+              <DraggableNumber key={num} num={num} />
+            ))}
+          </div>
+          {/* 🔥 Sentences */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              maxWidth: "760px",
+              // margin: "0 auto",
+            }}
+          >
+            {SENTENCES.map((item) => (
               <div
-                key={num}
-                onPointerDown={(e) => handlePointerDownNumber(e, num)}
-                style={{
-                  width: "clamp(38px, 5vw, 42px)",
-                  height: "clamp(38px, 5vw, 42px)",
-                  borderRadius: "50%",
-                  backgroundColor: disabled ? "#d1d5db" : "#f39b42",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "700",
-                  fontSize: "clamp(18px, 2.3vw, 21px)",
-                  cursor: disabled || showAns ? "not-allowed" : "grab",
-                  opacity: disabled ? 0.55 : isDragging ? 0.3 : 1,
-                  userSelect: "none",
-                  boxShadow: disabled
-                    ? "none"
-                    : "0 2px 8px rgba(0,0,0,0.12)",
-                  touchAction: "none",
-                }}
+                key={item.id}
+                style={{ display: "flex", gap: "14px", alignItems: "center" }}
               >
-                {num}
+                <DropBox sentenceId={item.id} />
+                <div style={{ fontSize: "clamp(15px, 1.4vw, 18px)" }}>
+                  {item.text}
+                </div>
               </div>
-            );
-          })}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "42px",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "34px",
-              flexWrap: "wrap",
-            }}
-          >
-            {IMAGES.slice(0, 2).map(renderImageCard)}
+            ))}
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "34px",
-              flexWrap: "wrap",
-            }}
-          >
-            {IMAGES.slice(2).map(renderImageCard)}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button />
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            maxWidth: "760px",
-            margin: "0 auto",
-            width: "100%",
-          }}
-        >
-          {SENTENCES.map((item) => (
+        {/* 🔥 Drag Overlay */}
+        <DragOverlay>
+          {activeId ? (
             <div
-              key={item.id}
               style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
+                backgroundColor: "#f39b42",
+                color: "#fff",
                 display: "flex",
-                alignItems: "flex-start",
-                gap: "14px",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "700",
+                fontSize: "22px",
               }}
             >
-              {renderNumberBox(item.id)}
-
-              <div
-                style={{
-                  fontSize: "clamp(15px, 2vw, 18px)",
-                  lineHeight: "1.5",
-                  color: "#222",
-                  paddingTop: "4px",
-                }}
-              >
-                {item.text}
-              </div>
+              {activeId}
             </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "8px",
-          }}
-        >
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-          />
-        </div>
+          ) : null}
+        </DragOverlay>
+        <Button
+          checkAnswers={handleCheck}
+          handleShowAnswer={handleShowAnswer}
+          handleStartAgain={handleReset}
+        />
       </div>
-
-      {dragData.active && dragData.number !== null && (
-        <div
-          style={{
-            position: "fixed",
-            left: dragData.x,
-            top: dragData.y,
-            transform: "translate(-50%, -50%)",
-            width: "48px",
-            height: "48px",
-            borderRadius: "50%",
-            backgroundColor: "#f39b42",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "700",
-            fontSize: "22px",
-            boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
-            pointerEvents: "none",
-            zIndex: 9999,
-          }}
-        >
-          {dragData.number}
-        </div>
-      )}
-    </div>
+    </DndContext>
   );
 }

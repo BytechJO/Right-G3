@@ -3,10 +3,6 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
 import topImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C1.svg";
-import topImg2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C2.svg";
-import topImg3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C3.svg";
-import topImg4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C4.svg";
-import topImg5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C5.svg";
 
 import iconBoy1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C6.svg";
 import iconBoy2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C7.svg";
@@ -144,15 +140,13 @@ const ITEMS = [
   },
 ];
 
-const TOP_IMAGES = [topImg1, topImg2, topImg3, topImg4, topImg5];
-
 export default function WB_Unit5_Page28_QC() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (itemId, lineKey, value) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -172,27 +166,21 @@ export default function WB_Unit5_Page28_QC() {
     return getValue(item.id, line.key) !== line.correct;
   };
 
-  const isItemWrong = (item) => {
-    if (!checked || showAns) return false;
-
-    return item.lines.some((line) => {
-      if (line.type !== "select") return false;
-      return getValue(item.id, line.key) !== line.correct;
-    });
-  };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const requiredLines = ITEMS.flatMap((item) =>
-      item.lines.filter((line) => line.type === "select").map((line) => ({
-        itemId: item.id,
-        lineKey: line.key,
-      }))
+      item.lines
+        .filter((line) => line.type === "select")
+        .map((line) => ({
+          itemId: item.id,
+          lineKey: line.key,
+        })),
     );
 
     const allAnswered = requiredLines.every(
-      ({ itemId, lineKey }) => getValue(itemId, lineKey).trim() !== ""
+      ({ itemId, lineKey }) => getValue(itemId, lineKey).trim() !== "",
     );
 
     if (!allAnswered) {
@@ -252,14 +240,23 @@ export default function WB_Unit5_Page28_QC() {
 
     return (
       <div className="wb-c-line-wrap">
-        <div className="wb-c-line">
+        <div
+          className="wb-c-line"
+          style={{
+            borderBottom: isLineWrong(item, line)
+              ? "2px solid red"
+              : "1px solid #3a3a3a",
+          }}
+        >
           <div className="wb-c-select-wrap">
             <select
               value={getValue(item.id, line.key)}
-              disabled={showAns}
+              disabled={showAns||checked}
               onChange={(e) => handleChange(item.id, line.key, e.target.value)}
               className={`wb-c-select ${
-                getValue(item.id, line.key) ? "wb-c-select--filled" : ""
+                getValue(item.id, line.key)
+                  ? "wb-c-select--filled"
+                  : ""
               }`}
             >
               <option value="" disabled hidden>
@@ -295,8 +292,8 @@ export default function WB_Unit5_Page28_QC() {
         }
 
         .wb-c-top-images {
-          display: grid;
-          grid-template-columns: repeat(5, minmax(0, 1fr));
+          display: flex;
+          // grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: clamp(6px, 1vw, 12px);
           width: 100%;
           max-width: 820px;
@@ -345,16 +342,16 @@ export default function WB_Unit5_Page28_QC() {
         }
 
         .wb-c-num {
-          font-size: clamp(11px, 0.9vw, 15px);
-          font-weight: 700;
+          font-size: clamp(16px, 1.7vw, 20px);
+          font-weight: 500;
           color: #222;
           line-height: 1;
           flex-shrink: 0;
         }
 
         .wb-c-icon {
-          width: clamp(28px, 3vw, 42px);
-          height: clamp(28px, 3vw, 42px);
+          width: clamp(28px, 9vw, 55px);
+          height: clamp(28px, 9vw, 55px);
           object-fit: contain;
           flex-shrink: 0;
         }
@@ -382,7 +379,7 @@ export default function WB_Unit5_Page28_QC() {
         .wb-c-line {
           width: 100%;
           min-height: clamp(32px, 3.5vw, 42px);
-          border-bottom: 2.5px solid #3a3a3a;
+          border-bottom: 1px solid #3a3a3a;
           display: flex;
           align-items: center;
           padding-bottom: 3px;
@@ -392,7 +389,7 @@ export default function WB_Unit5_Page28_QC() {
         .wb-c-line--empty {
           width: 100%;
           min-height: clamp(32px, 3.5vw, 42px);
-          border-bottom: 2.5px solid #3a3a3a;
+          border-bottom: 1px solid #3a3a3a;
         }
 
         .wb-c-select-wrap {
@@ -410,7 +407,7 @@ export default function WB_Unit5_Page28_QC() {
           font-size: clamp(12px, 1.3vw, 17px);
           line-height: 1.2;
           color: #000000ff;
-          font-weight: 500;
+          // font-weight: 500;
           outline: none;
           appearance: none;
           -webkit-appearance: none;
@@ -440,23 +437,22 @@ export default function WB_Unit5_Page28_QC() {
           pointer-events: none;
         }
 
-        .wb-c-wrong {
+        .wb-c-wrong{
           position: absolute;
           top: -8px;
-          right: -8px;
-          width: 22px;
-          height: 22px;
-          border-radius: 999px;
-          background: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-          box-sizing: border-box;
+    right: 0px;
+    width: 22px;
+    height: 22px;
+      border-radius: 50%;
+    background-color: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
         }
 
         .wb-c-buttons {
@@ -477,7 +473,7 @@ export default function WB_Unit5_Page28_QC() {
 
         @media (max-width: 768px) {
           .wb-c-top-images {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+          
             max-width: 520px;
           }
 
@@ -492,7 +488,7 @@ export default function WB_Unit5_Page28_QC() {
 
         @media (max-width: 560px) {
           .wb-c-top-images {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            // grid-template-columns: repeat(2, minmax(0, 1fr));
             max-width: 340px;
           }
 
@@ -519,34 +515,16 @@ export default function WB_Unit5_Page28_QC() {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "40px",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-            fontSize: "clamp(16px, 1.8vw, 24px)",
-          }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span>
           Look, read, and write.
         </h1>
 
         <div className="wb-c-top-images">
-          {TOP_IMAGES.map((img, index) => (
-            <div key={index} className="wb-c-top-card">
-              <img src={img} alt={`room-${index + 1}`} className="wb-c-top-img" />
-            </div>
-          ))}
+          <img src={topImg1} className="wb-c-top-img" />
         </div>
 
         <div className="wb-c-grid">
@@ -554,7 +532,11 @@ export default function WB_Unit5_Page28_QC() {
             <div key={item.id} className="wb-c-item">
               <div className="wb-c-question-row">
                 <div className="wb-c-num">{item.id}</div>
-                <img src={item.icon} alt={`icon-${item.id}`} className="wb-c-icon" />
+                <img
+                  src={item.icon}
+                  alt={`icon-${item.id}`}
+                  className="wb-c-icon"
+                />
                 <div className="wb-c-question">{item.question}</div>
               </div>
 

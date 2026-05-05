@@ -10,7 +10,7 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A6.svg";
 
 const YELLOW_COLOR = "#f39b42";
-const RED_COLOR = "#ef4444";
+const RED_COLOR = "red";
 const TEXT_COLOR = "#222";
 const BORDER_COLOR = "#d4d4d4";
 
@@ -65,7 +65,7 @@ const initialSelections = {
 const styles = {
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
     gap: "clamp(18px, 4vw, 42px)",
     width: "100%",
   },
@@ -80,15 +80,16 @@ const styles = {
 
   topRow: {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "center",
     gap: "clamp(10px, 1.8vw, 18px)",
+    flexDirection: "column",
     width: "100%",
     flexWrap: "nowrap",
   },
 
   number: {
-    fontSize: "clamp(18px, 2.2vw, 28px)",
+    fontSize: "clamp(16px, 1.7vw, 20px)",
     fontWeight: "700",
     color: TEXT_COLOR,
     lineHeight: 1,
@@ -97,17 +98,16 @@ const styles = {
   },
 
   imageWrap: {
-    width: "clamp(78px, 14vw, 140px)",
-    height: "clamp(78px, 14vw, 140px)",
+ 
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
     flexShrink: 0,
   },
 
   image: {
-    width: "100%",
-    height: "100%",
+    width: "130px",
+    height: "100px",
     objectFit: "contain",
     display: "block",
   },
@@ -116,26 +116,29 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "clamp(8px, 1.2vw, 12px)",
+    gap: "5px",
     minWidth: 0,
     flex: 1,
-    paddingTop: "clamp(2px, 0.5vw, 6px)",
+    // paddingTop: "clamp(2px, 0.5vw, 6px)",
   },
 
   optionButton: {
     position: "relative",
     border: "none",
     background: "transparent",
-    padding: "0 clamp(12px, 2vw, 20px)",
-    minHeight: "clamp(26px, 3vw, 36px)",
-    fontSize: "clamp(16px, 2vw, 22px)",
-    fontWeight: "500",
+   
+    padding: "8px 22px",
+    height: "clamp(26px, 3vw, 36px)",
+    fontSize: "clamp(12px, 1.4vw, 18px)",
+    // fontWeight: "500",
     color: TEXT_COLOR,
     cursor: "pointer",
     borderRadius: "999px",
     lineHeight: 1.2,
     transition: "all 0.2s ease",
     whiteSpace: "nowrap",
+    width: "150px",
+
   },
 
   buttonsWrap: {
@@ -153,7 +156,7 @@ const WB_Unit7_Page27_Q1 = () => {
   const [checkedAnswers, setCheckedAnswers] = useState(false);
 
   const handleSelect = (id, option) => {
-    if (showAnswers) return;
+    if (showAnswers ||checkedAnswers) return;
 
     setUserSelections((prev) => ({
       ...prev,
@@ -165,7 +168,7 @@ const WB_Unit7_Page27_Q1 = () => {
   };
 
   const checkAnswers = () => {
-    if (showAnswers) return;
+    if (showAnswers ||checkedAnswers) return;
     const allAnswered = Object.values(userSelections).every((val) => val !== null);
 
     if (!allAnswered) {
@@ -228,27 +231,27 @@ const WB_Unit7_Page27_Q1 = () => {
     if (showAnswers && isCorrect) {
       return {
         ...styles.optionButton,
-        border: `3px solid ${YELLOW_COLOR}`,
+        border: `1px solid ${YELLOW_COLOR}`,
       };
     }
 
     if (isWrongSelected) {
       return {
         ...styles.optionButton,
-        border: `3px solid ${RED_COLOR}`,
+        border: `1px solid ${RED_COLOR}`,
       };
     }
 
     if (isSelected) {
       return {
         ...styles.optionButton,
-        border: `3px solid ${YELLOW_COLOR}`,
+        border: `1px solid ${YELLOW_COLOR}`,
       };
     }
 
     return {
       ...styles.optionButton,
-      border: "3px solid transparent",
+      border: "1px solid transparent",
       background: "transparent",
     };
   };
@@ -259,23 +262,15 @@ const WB_Unit7_Page27_Q1 = () => {
       <div
         className="div-forall"
             style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+         
+          gap: "35px",
+        
         }}
 
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
+         
         >
           <span className="WB-ex-A">A</span>
           Look, read, and circle.
@@ -285,9 +280,10 @@ const WB_Unit7_Page27_Q1 = () => {
           {DATA.map((item) => (
             <div key={item.id} style={styles.card}>
               <div className="wb-u7-q1-row" style={styles.topRow}>
-                <div style={styles.number}>{item.id}</div>
+               
 
                 <div style={styles.imageWrap}>
+                   <div style={styles.number}>{item.id}</div>
                   <img src={item.img} alt={`option-${item.id}`} style={styles.image} />
                 </div>
 

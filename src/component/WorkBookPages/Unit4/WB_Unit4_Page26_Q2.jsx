@@ -54,8 +54,8 @@ const styles = {
   },
 
   grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(165px, 1fr))",
+    display: "flex",
+ 
     gap: "26px 22px",
     alignItems: "start",
   },
@@ -67,7 +67,7 @@ const styles = {
   },
 
   itemNumber: {
-    fontSize: "22px",
+    fontSize: "20px",
     fontWeight: 700,
     color: "#222",
     lineHeight: 1,
@@ -79,7 +79,7 @@ const styles = {
     width: "100%",
     maxWidth: "160px",
     minHeight: "290px",
-    border: "2px solid  #f39b42",
+    border: "1px solid  #f39b42",
     borderRadius: "20px",
     background: "#fff",
     padding: "16px 10px",
@@ -92,16 +92,16 @@ const styles = {
 
   wordBtn: {
     position: "relative",
-    minWidth: "110px",
-    minHeight: "48px",
+    width: "90px",
+    height: "48px",
     padding: "4px 12px",
     borderRadius: "999px",
-    border: "3px solid transparent",
+    border: "1px solid transparent",
     background: "transparent",
     color: "#222",
-    fontSize: "24px",
-    fontWeight: 500,
-    lineHeight: 1.1,
+    fontSize: "18px",
+    // fontWeight: 500,
+    // lineHeight: 1.1,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -112,7 +112,8 @@ const styles = {
   },
 
   selectedWord: {
-    border: "4px solid #d62828",
+    border: "1px solid #f39b42",
+    // backgroundColor :"#ffefe2ff"
   },
 
   wrongBadge: {
@@ -122,14 +123,14 @@ const styles = {
     width: "22px",
     height: "22px",
     borderRadius: "999px",
-    background: "#ef4444",
+    background: "red",
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "12px",
     fontWeight: 700,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
     border: "2px solid #fff",
   },
 
@@ -146,7 +147,7 @@ export default function WB_Unit4_Page233_QB() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, word) => {
-    if (showAns) return;
+    if (showAns ||checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -157,7 +158,7 @@ export default function WB_Unit4_Page233_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -215,7 +216,7 @@ export default function WB_Unit4_Page233_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={styles.container}>
+      <div className="div-forall" style={{gap:"90px"}}>
         <h1 className="WB-header-title-page8" style={styles.title}>
           <span className="WB-ex-A">B</span>
           Circle the word in each box that has a different th sound.
