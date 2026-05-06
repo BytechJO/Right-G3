@@ -424,7 +424,7 @@ export default function WB_Unit6_Page36_QG() {
         </div>
 
         <div style={{ display: "flex", justifyContent: "center", marginTop: "12px" }}>
-          <Button checkAnswers={handleCheck} handleStartAgain={clearAllCanvases} />
+          <Button  handleStartAgain={clearAllCanvases} />
         </div>
       </div>
     </div>

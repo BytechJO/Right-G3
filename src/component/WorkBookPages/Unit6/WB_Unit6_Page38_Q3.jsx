@@ -33,17 +33,18 @@ const WrongBadge = () => (
       position:        "absolute",
       top:             "-7px",
       left:            "-7px",
-      width:           "clamp(15px,1.7vw,20px)",
-      height:          "clamp(15px,1.7vw,20px)",
-      borderRadius:    "50%",
-      backgroundColor: WRONG_COLOR,
-      color:           "#fff",
-      display:         "flex",
-      alignItems:      "center",
-      justifyContent:  "center",
-      fontSize:        "clamp(8px,0.9vw,11px)",
-      fontWeight:      700,
-      boxShadow:       "0 1px 4px rgba(0,0,0,0.25)",
+       width: "22px",
+                                  height: "22px",
+                                  borderRadius: "50%",
+                                  background: "red",
+                                  color: "#fff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "14px",
+                                  fontWeight: "bold",
+                                  border: "2px solid white",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
       zIndex:          5,
       pointerEvents:   "none",
     }}
@@ -101,13 +102,13 @@ export default function WB_ReadAndMatch_PageC() {
   }, [matches, showResults]);
 
   const handleLeftSelect = (id) => {
-    if (showAns) return;
+    if (showAns||showResults) return;
     setSelectedLeft((prev) => prev === id ? null : id);
     setShowResults(false);
   };
 
   const handleRightSelect = (rightId) => {
-    if (showAns || selectedLeft === null) return;
+    if (showAns || selectedLeft === null||showResults) return;
     const upd = { ...matches };
     Object.keys(upd).forEach((k) => { if (upd[k] === rightId) delete upd[k]; });
     upd[selectedLeft] = rightId;
@@ -117,7 +118,7 @@ export default function WB_ReadAndMatch_PageC() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns ||showResults) return;
     const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
     if (!allConnected) {
       ValidationAlert.info("Please connect all sentences first.");
@@ -158,23 +159,15 @@ export default function WB_ReadAndMatch_PageC() {
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "18px",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+       
+          gap:           "30px",
+   
         }}
       >
         {/* Title */}
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin:     0,
-            display:    "flex",
-            alignItems: "center",
-            gap:        "12px",
-            flexWrap:   "wrap",
-          }}
+       
         >
           <span className="WB-ex-A">C</span> Read and match.
         </h1>
@@ -210,9 +203,9 @@ export default function WB_ReadAndMatch_PageC() {
           <div
             style={{
               display:             "grid",
-              gridTemplateColumns: "1fr auto auto auto",
+              gridTemplateColumns: "340px 150px 10px auto",
               columnGap:           "clamp(10px,2vw,28px)",
-              rowGap:              "clamp(18px,3vw,36px)",
+              rowGap:              "20px",
               alignItems:          "center",
               width:               "100%",
             }}
@@ -243,14 +236,14 @@ export default function WB_ReadAndMatch_PageC() {
                         ? `2.5px solid ${ACTIVE_COLOR}`
                         : "2px solid transparent",
                       background:   lSelected ? "rgba(243,155,66,0.08)" : "transparent",
-                      cursor:       showAns ? "default" : "pointer",
+                      cursor:       showAns||showResults ? "default" : "pointer",
                       transition:   "border-color 0.2s, background 0.2s",
                       userSelect:   "none",
                     }}
                   >
                     <span
                       style={{
-                        fontSize:   "clamp(16px,1.9vw,28px)",
+                        fontSize:   "20px",
                         fontWeight: 700,
                         color:      TEXT_COLOR,
                         lineHeight: 1,
@@ -262,11 +255,12 @@ export default function WB_ReadAndMatch_PageC() {
 
                     <span
                       style={{
-                        fontSize:   "clamp(13px,1.6vw,22px)",
-                        fontWeight: 500,
-                        color:      lSelected ? ACTIVE_COLOR : TEXT_COLOR,
+                        fontSize:   "18px",
+                        // fontWeight: 500,
+                        color:   TEXT_COLOR,
                         lineHeight: 1.3,
                         wordBreak:  "break-word",
+                        textWrap:"nowrap",
                         transition: "color 0.2s",
                       }}
                     >
@@ -322,9 +316,7 @@ export default function WB_ReadAndMatch_PageC() {
                       width:        "clamp(90px,13vw,160px)",
                       aspectRatio:  "1.2 / 1",
                       overflow:     "hidden",
-                      borderRadius: "clamp(8px,1vw,14px)",
-                      border:       `2px solid ${rConn ? ACTIVE_COLOR : BORDER_COLOR}`,
-                      background:   "#f7f7f7",
+                     
                       flexShrink:   0,
                       cursor:       showAns || selectedLeft === null ? "default" : "pointer",
                       transition:   "border-color 0.2s",

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.3.svg";
@@ -11,54 +10,110 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 35/E.6.svg";
 
 const BORDER_COLOR = "#f39b42";
-const WRONG_COLOR  = "#ef4444";
+const WRONG_COLOR = "#ef4444";
 
 const ICON = {
-  must:    { symbol: "✓", bg: "rgba(255, 255, 255, 1)", border: "#000000ff", color: "#000000ff" },
-  mustn_t: { symbol: "✕", bg: "rgba(255, 255, 255, 1)", border: "#000000ff", color: "#000000ff" },
+  must: {
+    symbol: "✓",
+    bg: "rgba(255, 255, 255, 1)",
+    border: "#000000ff",
+    color: "#000000ff",
+  },
+  mustn_t: {
+    symbol: "✕",
+    bg: "rgba(255, 255, 255, 1)",
+    border: "#000000ff",
+    color: "#000000ff",
+  },
 };
 
 const OPTIONS = ["must", "mustn't"];
 
 const ITEMS = [
-  { id: 1, img: img1, icon: "mustn_t", before: "She",  after: "eat the cake.",        correct: "mustn't" },
-  { id: 2, img: img2, icon: "must",    before: "She",  after: "go to school.",         correct: "must"    },
-  { id: 3, img: img3, icon: "mustn_t", before: "They", after: "play in the street.",   correct: "mustn't" },
-  { id: 4, img: img4, icon: "must",    before: "She",  after: "eat fruit.",            correct: "must"    },
-  { id: 5, img: img5, icon: "must",    before: "They", after: "wash the dishes.",      correct: "must"    },
-  { id: 6, img: img6, icon: "mustn_t", before: "He",   after: "watch TV.",             correct: "mustn't" },
+  {
+    id: 1,
+    img: img1,
+    icon: "mustn_t",
+    before: "She",
+    after: "eat the cake.",
+    correct: "mustn't",
+  },
+  {
+    id: 2,
+    img: img2,
+    icon: "must",
+    before: "She",
+    after: "go to school.",
+    correct: "must",
+  },
+  {
+    id: 3,
+    img: img3,
+    icon: "mustn_t",
+    before: "They",
+    after: "play in the street.",
+    correct: "mustn't",
+  },
+  {
+    id: 4,
+    img: img4,
+    icon: "must",
+    before: "She",
+    after: "eat fruit.",
+    correct: "must",
+  },
+  {
+    id: 5,
+    img: img5,
+    icon: "must",
+    before: "They",
+    after: "wash the dishes.",
+    correct: "must",
+  },
+  {
+    id: 6,
+    img: img6,
+    icon: "mustn_t",
+    before: "He",
+    after: "watch TV.",
+    correct: "mustn't",
+  },
 ];
 
 export default function WB_LookReadWrite_PageE() {
-  const [answers,     setAnswers]     = useState({});
+  const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
     setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
     let score = 0;
-    ITEMS.forEach((i) => { if (answers[i.id] === i.correct) score++; });
+    ITEMS.forEach((i) => {
+      if (answers[i.id] === i.correct) score++;
+    });
     setShowResults(true);
     const total = ITEMS.length;
-    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
     const filled = {};
-    ITEMS.forEach((i) => { filled[i.id] = i.correct; });
+    ITEMS.forEach((i) => {
+      filled[i.id] = i.correct;
+    });
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
@@ -85,11 +140,11 @@ export default function WB_LookReadWrite_PageE() {
         .wb-e-select {
           height: clamp(30px,3.5vw,42px);
           border: none;
-          border-bottom: 2.5px solid #2f2f2f;
+          border-bottom: 1px solid #2f2f2f;
           background: transparent;
           padding: 0 24px 0 4px;
-          font-size: clamp(14px,1.6vw,20px);
-          font-weight: 700;
+          font-size: clamp(14px,1.4vw,18px);
+          // font-weight: 700;
           color: #000000ff;
           outline: none;
           appearance: none;
@@ -101,7 +156,7 @@ export default function WB_LookReadWrite_PageE() {
         }
 
         .wb-e-select.wrong {
-          border-bottom-color: #000000ff;
+          border-bottom-color: red;
           color: #000000ff;
         }
 
@@ -122,19 +177,21 @@ export default function WB_LookReadWrite_PageE() {
 
         .wb-e-wrong-badge {
           position: absolute;
-          top: -8px;
+          top: 16px;
           right: -10px;
-          width: clamp(16px,1.8vw,20px);
-          height: clamp(16px,1.8vw,20px);
-          border-radius: 50%;
-          background: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: clamp(9px,0.9vw,11px);
-          font-weight: 700;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+         transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
           pointer-events: none;
         }
       `}</style>
@@ -142,114 +199,110 @@ export default function WB_LookReadWrite_PageE() {
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "clamp(18px,2.5vw,28px)",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+          gap: "20px",
         }}
       >
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span> Look, read, and write.
         </h1>
 
         {/* ── Cards Grid 2×3 ── */}
         <div
           style={{
-            display:             "grid",
+            display: "grid",
             gridTemplateColumns: "repeat(2, minmax(0,1fr))",
-            gap:                 "clamp(16px,2.5vw,30px)",
-            width:               "100%",
+            gap: "clamp(16px,2.5vw,30px)",
+            padding:"20px",
+            width: "100%",
           }}
         >
           {ITEMS.map((item) => {
-            const value   = answers[item.id] || "";
-            const wrong   = isWrong(item);
+            const value = answers[item.id] || "";
+            const wrong = isWrong(item);
             const iconCfg = ICON[item.icon];
 
             return (
               <div
                 key={item.id}
                 style={{
-                  display:       "flex",
+                  display: "flex",
                   flexDirection: "column",
-                  gap:           "clamp(8px,1vw,12px)",
+                  gap: "clamp(8px,1vw,12px)",
                 }}
               >
-                {/* رقم */}
-                <span style={{ fontSize: "clamp(16px,1.8vw,24px)", fontWeight: 700, color: "#111" }}>
-                  {item.id}
-                </span>
-
                 {/* الصورة + أيقونة */}
                 <div
                   style={{
-                    position:     "relative",
-                    width:        "100%",
-                    aspectRatio:  "1.55 / 1",
-                    border:       `2px solid ${BORDER_COLOR}`,
-                    borderRadius: "clamp(10px,1.2vw,16px)",
-                    overflow:     "hidden",
-                    background:   "#f7f7f7",
+                    position: "relative",
+                    // width:        "60%",
+                    // aspectRatio:  "1.55 / 1",
+                    // border:       `2px solid ${BORDER_COLOR}`,
+                    // borderRadius: "clamp(10px,1.2vw,16px)",
+                    // overflow:     "hidden",
+                    // background:   "#f7f7f7",
+                    gap: "clamp(8px,1vw,12px)",
+                    display: "flex",
                   }}
                 >
+                  {/* رقم */}
+                  <span
+                    style={{
+                      fontSize: "clamp(16px,1.7vw,20px)",
+                      fontWeight: 700,
+                      color: "#111",
+                    }}
+                  >
+                    {item.id}
+                  </span>
                   <img
                     src={item.img}
                     alt={`item-${item.id}`}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                  />
-
-                  {/* أيقونة ✓/✕ */}
-                  <div
                     style={{
-                      position:        "absolute",
-                      bottom:          "8px",
-                      right:           "8px",
-                      width:           "clamp(26px,3.5vw,40px)",
-                      height:          "clamp(26px,3.5vw,40px)",
-                      borderRadius:    "8px",
-                      backgroundColor: iconCfg.bg,
-                      border:          `2px solid ${iconCfg.border}`,
-                      display:         "flex",
-                      alignItems:      "center",
-                      justifyContent:  "center",
-                      fontSize:        "clamp(14px,2vw,22px)",
-                      fontWeight:      900,
-                      color:           iconCfg.color,
+                      width: "auto",
+                      height: "150px",
+                      objectFit: "contain",
+                      display: "block",
                     }}
-                  >
-                    {iconCfg.symbol}
-                  </div>
+                  />
                 </div>
 
                 {/* الجملة مع select */}
                 <div
                   style={{
-                    display:    "flex",
+                    display: "flex",
                     alignItems: "flex-end",
-                    flexWrap:   "wrap",
-                    gap:        "6px",
+                    flexWrap: "wrap",
+                    gap: "6px",
                   }}
                 >
-                  <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111", paddingBottom: "4px" }}>
+                  <span
+                    style={{
+                      fontSize: "clamp(14px,1.4vw,18px)",
+                      // fontWeight: 500,
+                      color: "#111",
+                      paddingBottom: "4px",
+                    }}
+                  >
                     {item.before}
                   </span>
 
                   {/* Select */}
-                  <div className="wb-e-select-wrap" style={{ position: "relative" }}>
+                  <div
+                    className="wb-e-select-wrap"
+                    style={{ position: "relative" }}
+                  >
                     <select
-                      disabled={showAns}
+                      disabled={showAns || showResults}
                       value={value}
                       onChange={(e) => handleChange(item.id, e.target.value)}
-                      className={`wb-e-select${wrong ? " wrong" : ""}`}
+                      className={`wb-e-select ${wrong ? "wrong" : ""}`}
                     >
                       <option value="" disabled hidden />
                       {OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
                       ))}
                     </select>
 
@@ -258,7 +311,13 @@ export default function WB_LookReadWrite_PageE() {
                     {wrong && <div className="wb-e-wrong-badge">✕</div>}
                   </div>
 
-                  <span style={{ fontSize: "clamp(14px,1.6vw,20px)", fontWeight: 500, color: "#111", paddingBottom: "4px" }}>
+                  <span
+                    style={{
+                      fontSize: "clamp(14px,1.4vw,18px)",
+                      color: "#111",
+                      paddingBottom: "4px",
+                    }}
+                  >
                     {item.after}
                   </span>
                 </div>
@@ -268,7 +327,13 @@ export default function WB_LookReadWrite_PageE() {
         </div>
 
         {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "clamp(6px,1vw,12px)",
+          }}
+        >
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
