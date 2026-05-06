@@ -17,7 +17,16 @@ const TOOLS = [
   { id: "eraser", label: "🧹 Eraser" },
 ];
 
-const COLORS = ["#1e293b", "#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#a855f7", "#ec4899"];
+const COLORS = [
+  "#1e293b",
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#3b82f6",
+  "#a855f7",
+  "#ec4899",
+];
 const SIZES = [2, 4, 7, 12];
 
 export default function WB_Unit7_Page41_Draw() {
@@ -27,14 +36,16 @@ export default function WB_Unit7_Page41_Draw() {
   const [color, setColor] = useState("#1e293b");
   const [size, setSize] = useState(4);
   const lastPos = useRef(null);
-
+  const bgCanvasRef = useRef(null);
   // ارسم الصورة على الـ canvas عند التحميل
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas = bgCanvasRef.current;
     const ctx = canvas.getContext("2d");
     const img = new Image();
     img.src = imgTree;
+
     img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
   }, []);
@@ -72,8 +83,14 @@ export default function WB_Unit7_Page41_Draw() {
     ctx.beginPath();
     ctx.moveTo(lastPos.current.x, lastPos.current.y);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = tool === "eraser" ? "#ffffff" : color;
-    ctx.lineWidth = tool === "eraser" ? size * 4 : size;
+    if (tool === "eraser") {
+      ctx.globalCompositeOperation = "destination-out"; // يمسح
+      ctx.lineWidth = size * 4;
+    } else {
+      ctx.globalCompositeOperation = "source-over"; // رسم عادي
+      ctx.strokeStyle = color;
+      ctx.lineWidth = size;
+    }
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.stroke();
@@ -91,29 +108,24 @@ export default function WB_Unit7_Page41_Draw() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // أعد رسم الصورة
-    const img = new Image();
-    img.src = imgTree;
-    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
 
   const handleCheck = () => {
-    ValidationAlert.success("Great drawing! 🎨");
+    ValidationAlert.success("Great drawing! ");
   };
 
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "15px" }}>
-
         {/* العنوان */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">G</span>Read and draw.
         </h1>
 
         {/* التعليمات */}
-        <div className="flex flex-col gap-1 mb-2">
+        <div className="flex flex-col gap-1 mb-2 ml-5">
           {INSTRUCTIONS.map((inst, i) => (
-            <p key={i} className="text-gray-700 text-sm font-medium">
+            <p key={i} className="text-gray-700 text-[18px]">
               • {inst}
             </p>
           ))}
@@ -121,7 +133,6 @@ export default function WB_Unit7_Page41_Draw() {
 
         {/* شريط الأدوات */}
         <div className="flex flex-wrap items-center gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-3">
-
           {/* أدوات */}
           <div className="flex gap-2">
             {TOOLS.map((t) => (
@@ -129,9 +140,10 @@ export default function WB_Unit7_Page41_Draw() {
                 key={t.id}
                 onClick={() => setTool(t.id)}
                 className={`px-3 py-1.5 rounded-xl text-sm font-medium border-2 transition-all
-                  ${tool === t.id
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                  ${
+                    tool === t.id
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                   }`}
               >
                 {t.label}
@@ -147,9 +159,14 @@ export default function WB_Unit7_Page41_Draw() {
             {COLORS.map((c) => (
               <button
                 key={c}
-                onClick={() => { setColor(c); setTool("pencil"); }}
+                onClick={() => {
+                  setColor(c);
+                  setTool("pencil");
+                }}
                 className={`w-6 h-6 rounded-full border-2 transition-all ${
-                  color === c && tool === "pencil" ? "border-gray-700 scale-110" : "border-transparent hover:scale-105"
+                  color === c && tool === "pencil"
+                    ? "border-gray-700 scale-110"
+                    : "border-transparent hover:scale-105"
                 }`}
                 style={{ backgroundColor: c }}
               />
@@ -171,7 +188,10 @@ export default function WB_Unit7_Page41_Draw() {
               >
                 <span
                   className="rounded-full bg-gray-700"
-                  style={{ width: Math.min(s * 2, 20), height: Math.min(s * 2, 20) }}
+                  style={{
+                    width: Math.min(s * 2, 20),
+                    height: Math.min(s * 2, 20),
+                  }}
                 />
               </button>
             ))}
@@ -188,34 +208,40 @@ export default function WB_Unit7_Page41_Draw() {
             🗑️ Clear
           </button>
         </div>
+        <div className="flex justify-center">
+          {/* الـ Canvas */}
+          <div
+            className="relative w-[60%] rounded-2xl overflow-hidden border-2 border-gray-200 bg-white flex justify-center items-center"
+            style={{ cursor: tool === "eraser" ? "cell" : "crosshair" }}
+          >
+            {/* الصورة (canvas ثابت) */}
+            <canvas
+              ref={bgCanvasRef}
+              width={500}
+              height={500}
+              className="absolute top-0 left-0 w-full h-full"
+            />
 
-        {/* الـ Canvas */}
-        <div className="relative w-full rounded-2xl overflow-hidden border-2 border-gray-200 bg-white"
-          style={{ cursor: tool === "eraser" ? "cell" : "crosshair" }}
-        >
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={600}
-            className="w-full h-auto touch-none"
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onTouchStart={startDrawing}
-            onTouchMove={draw}
-            onTouchEnd={stopDrawing}
-          />
+            {/* الرسم */}
+            <canvas
+              ref={canvasRef}
+              width={500}
+              height={500}
+              className="relative w-full h-full touch-none"
+              onMouseDown={startDrawing}
+              onMouseMove={draw}
+              onMouseUp={stopDrawing}
+              onMouseLeave={stopDrawing}
+              onTouchStart={startDrawing}
+              onTouchMove={draw}
+              onTouchEnd={stopDrawing}
+            />
+          </div>
         </div>
-
         {/* الأزرار */}
         <div className="mt-6 flex justify-center">
-          <Button
-            checkAnswers={handleCheck}
-            handleStartAgain={handleClear}
-          />
+          <Button checkAnswers={handleCheck} handleStartAgain={handleClear} />
         </div>
-
       </div>
     </div>
   );

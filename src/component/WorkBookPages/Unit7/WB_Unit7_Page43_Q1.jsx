@@ -2,82 +2,59 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import person1Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/1.svg";
-import person2Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/2.svg";
-import person3Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/3.svg";
-import person4Img  from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/4.svg";
+import sceneImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/1.svg";
 
-const WRONG_COLOR  = "#ef4444";
-const RED_COLOR    = "#000000ff";
-const LINE_COLOR   = "#333";
-const OPTIONS      = ["me", "you", "it"];
+const WRONG_COLOR = "red";
+const LINE_COLOR = "#000000ff";
+const OPTIONS = ["me", "you", "it"];
 
-// كل bubble: جهة الصورة (left/right) + جهة السهم
+// ✅ مواقع العناصر فوق الصورة (عدليهم حسب التصميم)
 const ITEMS = [
-  {
-    id:        1,
-    before:    "Look at",
-    after:     "!",
-    correct:   "me",
-    imgSrc:    person1Img,
-    imgSide:   "left",   // الصورة يسار والفقاعة يمين
-  },
-  {
-    id:        2,
-    before:    "Can I play with",
-    after:     "?",
-    correct:   "you",
-    imgSrc:    person2Img,
-    imgSide:   "right",  // الصورة يمين والفقاعة يسار
-  },
-  {
-    id:        3,
-    before:    "I can't draw",
-    after:     "!",
-    correct:   "you",
-    imgSrc:    person3Img,
-    imgSide:   "left",
-  },
-  {
-    id:        4,
-    before:    "Please play with",
-    after:     "!",
-    correct:   "me",
-    imgSrc:    person4Img,
-    imgSide:   "right",
-  },
+  { id: 1, correct: "me", position: { top: "9%", left: "47%" } },
+  { id: 2, correct: "you", position: { top: "33%", left: "55%" } },
+  { id: 3, correct: "you", position: { top: "56%", left: "51%" } },
+  { id: 4, correct: "me", position: { top: "80%", left: "57%" } },
 ];
 
 export default function SB_LookReadWrite_PageI() {
-  const [selected,    setSelected]    = useState({});
+  const [selected, setSelected] = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
+  const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
     setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
+
     const allAnswered = ITEMS.every((i) => selected[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
       return;
     }
+
     let score = 0;
-    ITEMS.forEach((i) => { if (selected[i.id] === i.correct) score++; });
+    ITEMS.forEach((i) => {
+      if (selected[i.id] === i.correct) score++;
+    });
+
     setShowResults(true);
+
     const total = ITEMS.length;
-    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
   const handleShowAnswer = () => {
     const filled = {};
-    ITEMS.forEach((i) => { filled[i.id] = i.correct; });
+    ITEMS.forEach((i) => {
+      filled[i.id] = i.correct;
+    });
+
     setSelected(filled);
     setShowResults(true);
     setShowAns(true);
@@ -92,199 +69,113 @@ export default function SB_LookReadWrite_PageI() {
   const isWrong = (item) =>
     showResults && !showAns && selected[item.id] !== item.correct;
 
-  const renderBubble = (item) => {
-    const wrong = isWrong(item);
-    return (
-      <div
-        style={{
-          display:      "flex",
-          alignItems:   "center",
-          gap:          "clamp(6px,1vw,14px)",
-          width:        "100%",
-          flexDirection: item.imgSide === "left" ? "row" : "row-reverse",
-        }}
-      >
-        {/* صورة الشخص */}
-        <div
-          style={{
-            width:        "clamp(70px,12vw,140px)",
-            flexShrink:   0,
-            display:      "flex",
-            alignItems:   "flex-end",
-            justifyContent: "center",
-          }}
-        >
-          <img
-            src={item.imgSrc}
-            alt={`person-${item.id}`}
-            style={{
-              width:         "100%",
-              height:        "auto",
-              objectFit:     "contain",
-              display:       "block",
-              userSelect:    "none",
-              pointerEvents: "none",
-            }}
-          />
-        </div>
-
-     
-
-        {/* فقاعة الكلام */}
-        <div
-          style={{
-            position:     "relative",
-            flex:         1,
-            minWidth:     0,
-            border:       `2px solid #555`,
-            borderRadius: "clamp(10px,1.4vw,18px)",
-            padding:      "clamp(8px,1.2vw,16px) clamp(12px,1.6vw,20px)",
-            background:   "#fff",
-            display:      "flex",
-            alignItems:   "center",
-            flexWrap:     "wrap",
-            gap:          "clamp(4px,0.5vw,8px)",
-            boxSizing:    "border-box",
-            transition:   "border-color 0.2s",
-          }}
-        >
-          {/* before text */}
-          <span
-            style={{
-              fontSize:   "clamp(14px,1.9vw,26px)",
-              fontWeight: 500,
-              color:      "#111",
-              lineHeight: 1.3,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {item.before}
-          </span>
-
-          {/* dropdown */}
-          <div style={{ position: "relative", display: "inline-flex", alignItems: "flex-end" }}>
-            <select
-              disabled={showAns}
-              value={selected[item.id] || ""}
-              onChange={(e) => handleChange(item.id, e.target.value)}
-              style={{
-                minWidth:     "clamp(60px,10vw,130px)",
-                borderTop:    "none",
-                borderLeft:   "none",
-                borderRight:  "none",
-                borderBottom: `2.5px solid ${wrong ? WRONG_COLOR : LINE_COLOR}`,
-                borderRadius: 0,
-                outline:      "none",
-                fontSize:     "clamp(14px,1.9vw,26px)",
-                fontWeight:   700,
-                color:         RED_COLOR,
-                padding:      "0 clamp(4px,0.5vw,6px) 2px 2px",
-                background:   "transparent",
-                cursor:       showAns ? "default" : "pointer",
-                appearance:   "auto",
-                boxSizing:    "border-box",
-              }}
-            >
-              <option value="" disabled hidden></option>
-              {OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-
-            {/* wrong badge — يسار أعلى */}
-            {wrong && (
-              <div
-                style={{
-                  position:        "absolute",
-                  top:             "-8px",
-                  left:            "-8px",
-                  width:           "clamp(16px,1.8vw,22px)",
-                  height:          "clamp(16px,1.8vw,22px)",
-                  borderRadius:    "50%",
-                  backgroundColor: WRONG_COLOR,
-                  border:          "1px solid #fff",
-                  color:           "#fff",
-                  display:         "flex",
-                  alignItems:      "center",
-                  justifyContent:  "center",
-                  fontSize:        "clamp(9px,0.9vw,12px)",
-                  fontWeight:      700,
-                  boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
-                  zIndex:          3,
-                  pointerEvents:   "none",
-                }}
-              >
-                ✕
-              </div>
-            )}
-          </div>
-
-          {/* after text */}
-          <span
-            style={{
-              fontSize:   "clamp(14px,1.9vw,26px)",
-              fontWeight: 500,
-              color:      "#111",
-              lineHeight: 1.3,
-            }}
-          >
-            {item.after}
-          </span>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "18px",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+          gap: "30px",
         }}
       >
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin:     0,
-            display:    "flex",
-            alignItems: "center",
-            gap:        "12px",
-            flexWrap:   "wrap",
-          }}
-        >
-          <span className="WB-ex-A">I</span>
-          Look, read, and write{" "}
-          <strong style={{ fontWeight: 900 }}>me</strong>,{" "}
-          <strong style={{ fontWeight: 900 }}>you</strong>, or{" "}
-          <strong style={{ fontWeight: 900 }}>it</strong>.
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">I</span> Look, read, and write{" "}
+          <strong className="text-blue-900">me</strong>,{" "}
+          <strong className="text-blue-900">you</strong>, or{" "}
+          <strong className="text-blue-900">it</strong>.
         </h1>
 
-        {/* Bubbles */}
-        <div
-          style={{
-            display:       "flex",
-            flexDirection: "column",
-            gap:           "clamp(18px,3vw,36px)",
-            width:         "100%",
-          }}
-        >
-          {ITEMS.map((item) => renderBubble(item))}
+        {/* 🖼️ الصورة + dropdowns */}
+        <div style={{ position: "relative", width: "100%" }}>
+          <img
+            src={sceneImg}
+            alt="scene"
+            style={{ width: "100%", height: "auto", display: "block" }}
+          />
+
+          {ITEMS.map((item) => {
+            const wrong = isWrong(item);
+
+            return (
+              <div
+                key={item.id}
+                style={{
+                  position: "absolute",
+                  top: item.position.top,
+                  left: item.position.left,
+                  transform: "translate(-50%, -50%)",
+                  width: "clamp(70px, 7vw, 140px)",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    borderBottom: wrong
+                      ? `2px solid ${WRONG_COLOR}`
+                      : `1px solid black`,
+                  }}
+                >
+                  <select
+                    value={selected[item.id] || ""}
+                    onChange={(e) => handleChange(item.id, e.target.value)}
+                    disabled={showAns || showResults}
+                    style={{
+                      width: "100%",
+                      // border: "none",
+                      // borderBottom: wrong
+                      //   ? `2px solid ${WRONG_COLOR}`
+                      //   : `1px solid black`,
+                      // background: "#fff",
+                      fontSize: "clamp(12px,1.5vw,18px)",
+                      // fontWeight: 700,
+                      padding: "4px",
+                      // outline: "none",
+                      // borderRadius: "6px",
+                      cursor: showAns || showResults ? "default" : "pointer",
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select...
+                    </option>
+                    {OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* ❌ wrong icon */}
+                  {wrong && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-8px",
+                        right: "-8px",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        background: "red",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      ✕
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Buttons */}
-        <div
-          style={{
-            display:        "flex",
-            justifyContent: "center",
-            marginTop:      "clamp(6px,1vw,12px)",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}

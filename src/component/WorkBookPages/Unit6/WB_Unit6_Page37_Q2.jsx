@@ -274,8 +274,8 @@ export default function WB_LookAndWrite_PageJ() {
       <div className="div-forall" style={{ gap: "30px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">J</span> Look and write{" "}
-          <span className="text-blue-900">✓</span> and
-          <span className="text-blue-900">✕</span> . Write sentences.
+          <span className="text-red-500">✓</span> and
+          <span className="text-red-500">✕</span> . Write sentences.
         </h1>
         <div className="w-full flex flex-col gap-10">
           {ITEMS.map((item) => (
