@@ -51,13 +51,15 @@ const WB_Unit9_Page54_QG = () => {
   const [checkedAnswers, setCheckedAnswers] = useState(false);
 
   const handleSelect = (id, option) => {
-    if (showAnswers) return;
+    if (showAnswers||checkedAnswers) return;
     setUserSelections((prev) => ({ ...prev, [id]: option }));
     setCheckedAnswers(false);
     setWrongAnswers({});
   };
 
   const checkAnswers = () => {
+    if (showAnswers||checkedAnswers) return;
+
     const allAnswered = DATA.every((item) => userSelections[item.id] !== null);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions!");
@@ -75,14 +77,18 @@ const WB_Unit9_Page54_QG = () => {
     });
     setWrongAnswers(newWrong);
     setCheckedAnswers(true);
-    if (score === DATA.length) ValidationAlert.success(`Score: ${score} / ${DATA.length}`);
-    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${DATA.length}`);
+    if (score === DATA.length)
+      ValidationAlert.success(`Score: ${score} / ${DATA.length}`);
+    else if (score > 0)
+      ValidationAlert.warning(`Score: ${score} / ${DATA.length}`);
     else ValidationAlert.error(`Score: ${score} / ${DATA.length}`);
   };
 
   const handleShowAnswer = () => {
     const answers = {};
-    DATA.forEach((item) => { answers[item.id] = item.correct; });
+    DATA.forEach((item) => {
+      answers[item.id] = item.correct;
+    });
     setUserSelections(answers);
     setShowAnswers(true);
     setCheckedAnswers(false);
@@ -100,26 +106,28 @@ const WB_Unit9_Page54_QG = () => {
   const getOptionStyle = (item, option) => {
     const isSelected = userSelections[item.id] === option;
     const isCorrect = option === item.correct;
-    const isWrongSelected = checkedAnswers && wrongAnswers[item.id] && isSelected;
+    const isWrongSelected =
+      checkedAnswers && wrongAnswers[item.id] && isSelected;
 
     const base = {
       position: "relative",
       background: "transparent",
-      border: "2.5px solid transparent",
+      border: "1px solid transparent",
       borderRadius: "999px",
-      padding: "clamp(4px,0.6vw,8px) clamp(18px,2.5vw,32px)",
-      fontSize: "clamp(14px,1.8vw,20px)",
-      fontWeight: "500",
-      color: TEXT_COLOR,
-      cursor: showAnswers ? "default" : "pointer",
+      padding: "clamp(4px,0.6vw,8px)",
+      fontSize: "18px",
+      // fontWeight: "500",
+      // color: TEXT_COLOR,
+      cursor: showAnswers ||checkedAnswers? "default" : "pointer",
       lineHeight: 1.3,
       whiteSpace: "nowrap",
       transition: "all 0.2s ease",
     };
 
-    if (showAnswers && isCorrect) return { ...base, border: `2.5px solid ${YELLOW_COLOR}` };
-    if (isWrongSelected) return { ...base, border: `2.5px solid ${RED_COLOR}` };
-    if (isSelected) return { ...base, border: `2.5px solid ${YELLOW_COLOR}` };
+    if (showAnswers && isCorrect)
+      return { ...base, border: `1px solid ${YELLOW_COLOR}` };
+    if (isWrongSelected) return { ...base, border: `2px solid ${RED_COLOR}` };
+    if (isSelected) return { ...base, border: `1px solid ${YELLOW_COLOR}` };
     return base;
   };
 
@@ -128,18 +136,11 @@ const WB_Unit9_Page54_QG = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(20px,3vw,36px)",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "35px",
         }}
       >
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
-        >
+        <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">G</span>
           Read, look, and circle.
         </h1>
@@ -149,7 +150,7 @@ const WB_Unit9_Page54_QG = () => {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, minmax(0,1fr))",
-            gap: "clamp(24px,4vw,48px) clamp(28px,5vw,60px)",
+            gap: "20px",
             width: "100%",
           }}
         >
@@ -161,7 +162,7 @@ const WB_Unit9_Page54_QG = () => {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 gap: "clamp(8px,1.2vw,14px)",
-                minWidth: 0,
+                // minWidth: 0,
               }}
             >
               {/* ── السؤال ── */}
@@ -174,8 +175,8 @@ const WB_Unit9_Page54_QG = () => {
               >
                 <span
                   style={{
-                    fontSize: "clamp(16px,2vw,24px)",
-                    fontWeight: "700",
+                    fontSize: "20px",
+                    fontWeight: "500",
                     color: TEXT_COLOR,
                     flexShrink: 0,
                   }}
@@ -184,8 +185,8 @@ const WB_Unit9_Page54_QG = () => {
                 </span>
                 <span
                   style={{
-                    fontSize: "clamp(14px,1.7vw,20px)",
-                    fontWeight: "500",
+                    fontSize: "18px",
+                    // fontWeight: "500",
                     color: TEXT_COLOR,
                     lineHeight: 1.3,
                   }}
@@ -194,24 +195,18 @@ const WB_Unit9_Page54_QG = () => {
                 </span>
               </div>
 
-              {/* ── الصورة ── */}
-              <div
-                style={{
-                  width: "100%",
-                  aspectRatio: "4 / 3",
-                  overflow: "hidden",
-                  borderRadius: "clamp(8px,1vw,14px)",
-                  border: `2px solid #d4d4d4`,
-                  background: "#f5f5f5",
-                  flexShrink: 0,
-                }}
-              >
+            
                 <img
                   src={item.img}
                   alt={`img-${item.id}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block"                           ,  border: "2px solid #f39b42", }}
+                  style={{
+                    width: "85%",
+                    height: "auto",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
                 />
-              </div>
+          
 
               {/* ── الخيارات تحت الصورة ── */}
               <div
@@ -220,13 +215,15 @@ const WB_Unit9_Page54_QG = () => {
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "clamp(6px,1vw,10px)",
-                  width: "100%",
+                  width: "85%",
                   marginTop: "clamp(2px,0.4vw,6px)",
                 }}
               >
                 {item.options.map((option) => {
                   const isWrongSelected =
-                    checkedAnswers && wrongAnswers[item.id] && userSelections[item.id] === option;
+                    checkedAnswers &&
+                    wrongAnswers[item.id] &&
+                    userSelections[item.id] === option;
 
                   return (
                     <button
@@ -243,18 +240,19 @@ const WB_Unit9_Page54_QG = () => {
                             position: "absolute",
                             top: "-8px",
                             right: "-8px",
-                            width: "clamp(16px,1.8vw,22px)",
-                            height: "clamp(16px,1.8vw,22px)",
+                            width: "22px",
+                            height: "22px",
                             borderRadius: "50%",
-                            background: RED_COLOR,
+                            backgroundColor: "red",
                             color: "#fff",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            fontSize: "clamp(9px,0.9vw,12px)",
+                            fontSize: "12px",
                             fontWeight: "700",
-                            border: "2px solid #fff",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
                             boxSizing: "border-box",
                           }}
                         >
@@ -270,7 +268,13 @@ const WB_Unit9_Page54_QG = () => {
         </div>
 
         {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(4px,1vw,12px)" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "clamp(4px,1vw,12px)",
+          }}
+        >
           <Button
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}

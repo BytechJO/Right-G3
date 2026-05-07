@@ -4,13 +4,14 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/1.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/2.svg";
-import img2a from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/3.svg";
-import img2b from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/6.svg";
+import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/3.svg";
+import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/6.svg";
 import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/5.svg";
-import img3b from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/4.svg";
-import img4a from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/7.svg";
-import img4b from  "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/8.svg";
+import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/4.svg";
+import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/7.svg";
+import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/8.svg";
 
+import trueIcon from "../../../assets/imgs/true.svg";
 const ITEMS = [
   {
     id: 1,
@@ -56,7 +57,7 @@ export default function WB_Unit8_Page53_QE() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (questionId, optionId) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -64,13 +65,10 @@ export default function WB_Unit8_Page53_QE() {
     }));
   };
 
-  const isWrong = (item) => {
-    if (!checked) return false;
-    return answers[item.id] !== item.correct;
-  };
+
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -111,61 +109,22 @@ export default function WB_Unit8_Page53_QE() {
     setChecked(false);
     setShowAns(false);
   };
+  const isWrongOption = (questionId, optionId, correctId) => {
+    if (!checked) return false;
 
-  const renderChoiceBox = (questionId, optionId) => {
-    const selected = answers[questionId] === optionId;
-
-    return (
-      <div
-        onClick={() => handleSelect(questionId, optionId)}
-        style={{
-          position: "absolute",
-          top: "6px",
-          right: "6px",
-          width: "38px",
-          height: "38px",
-          backgroundColor: "#fff",
-          border: "2px solid #f39b42",
-          borderRadius: "6px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: showAns ? "default" : "pointer",
-          zIndex: 2,
-          boxSizing: "border-box",
-        }}
-      >
-        {selected && (
-          <span
-            style={{
-              color: "#ef4444",
-              fontSize: "28px",
-              fontWeight: "700",
-              lineHeight: "1",
-            }}
-          >
-            ✓
-          </span>
-        )}
-      </div>
-    );
+    return answers[questionId] === optionId && optionId !== correctId;
   };
-
   return (
-  <div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(18px,2.5vw,28px)",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "35px",
         }}
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Read, look, and write ✓.
+          Read, look, and write <strong className="text-red-600">✓</strong>.
         </h1>
 
         <div
@@ -190,7 +149,7 @@ export default function WB_Unit8_Page53_QE() {
                 style={{
                   display: "flex",
                   gap: "10px",
-                  alignItems: "flex-start",
+                  alignItems: "center",
                 }}
               >
                 <span
@@ -229,53 +188,99 @@ export default function WB_Unit8_Page53_QE() {
                   <div
                     key={option.id}
                     style={{
-                      position: "relative",
-                      width: "100%",
-                      height: "160px",
-                      border: "2px solid #f39b42",
-                      borderRadius: "16px",
-                      overflow: "hidden",
-                      backgroundColor: "#fff",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <img
-                      src={option.img}
-                      alt={`${item.id}-${option.id}`}
+                    {/* wrapper للصورة */}
+                    <div
                       style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
+                        position: "relative",
 
-                    {renderChoiceBox(item.id, option.id)}
+                        width: "170px",
+                      }}
+                    >
+                      <img
+                        src={option.img}
+                         onClick={() => handleSelect(item.id, option.id)}
+                        alt={`${item.id}-${option.id}`}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          display: "block",
+                          objectFit: "contain",
+                           cursor: showAns||checked ? "default" : "pointer",
+                        }}
+                      />
+
+                      {/* مربع الاختيار */}
+                      <div
+                        onClick={() => handleSelect(item.id, option.id)}
+                        style={{
+                          position: "absolute",
+
+                          // ثابت مع الصورة نفسها
+                          top: "0%",
+                          right: "0%",
+
+                          width: "clamp(32px,3.5vw,40px)",
+                          height: "clamp(32px,3.5vw,40px)",
+
+                          // backgroundColor: "#fff",
+                          // border: "2px solid #f39b42",
+                          // borderRadius: "8px",
+
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+
+                          cursor: showAns||checked ? "default" : "pointer",
+
+                          zIndex: 2,
+                          boxSizing: "border-box",
+
+                          transition: "0.2s ease",
+                        }}
+                      >
+                        {answers[item.id] === option.id && (
+                          <img
+                            src={trueIcon}
+                            style={{
+                              width: "65%",
+                              height: "65%",
+                              objectFit: "contain",
+                            }}
+                          />
+                        )}
+                      </div>
+                      {isWrongOption(item.id, option.id, item.correct) && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-6px",
+                            right: "-6px",
+                            width: "22px",
+                            height: "22px",
+                            borderRadius: "50%",
+                            background: "red",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            zIndex: 3,
+                          }}
+                        >
+                          ✕
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
-
-                {isWrong(item) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      left: "-8px",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "13px",
-                      fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                      zIndex: 3,
-                    }}
-                  >
-                    ✕
-                  </div>
-                )}
               </div>
             </div>
           ))}

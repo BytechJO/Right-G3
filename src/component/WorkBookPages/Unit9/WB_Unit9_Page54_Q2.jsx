@@ -4,7 +4,7 @@ import Button from "../Button";
 
 import char1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/5.svg";
 import char2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/6.svg";
-import char3 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/7.svg";
+import char3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/7.svg";
 import char4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/8.svg";
 
 import place1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/9.svg";
@@ -107,12 +107,13 @@ const WB_Unit8_Page54_QH = () => {
   }, [matches]);
 
   const handleLeftClick = (id) => {
+    if(showResults)return
     setSelectedLeft(id);
     setShowResults(false);
   };
 
   const handleRightClick = (rightId) => {
-    if (selectedLeft === null) return;
+    if (selectedLeft === null||showResults) return;
 
     const newMatches = { ...matches };
 
@@ -136,6 +137,8 @@ const WB_Unit8_Page54_QH = () => {
   };
 
   const checkAnswers = () => {
+    if(showResults)return
+
     const totalQuestions = exerciseData.left.length;
 
     const allConnected = exerciseData.left.every((item) => matches[item.id]);
@@ -191,15 +194,11 @@ const WB_Unit8_Page54_QH = () => {
   const isLeftSelected = (id) => selectedLeft === id;
 
   return (
-<div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(18px,2.5vw,28px)",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "30px",
         }}
       >
         <h1 className="WB-header-title-page8">
@@ -223,7 +222,7 @@ const WB_Unit8_Page54_QH = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "18px",
+              gap: "5px",
             }}
           >
             {exerciseData.left.map((item) => (
@@ -242,15 +241,13 @@ const WB_Unit8_Page54_QH = () => {
                   onClick={() => handleLeftClick(item.id)}
                   style={{
                     border: isLeftSelected(item.id)
-                      ? "3px solid #f39b42"
-                      : "2px solid transparent",
+                      ? "1px solid #f39b42"
+                      : "1px solid transparent",
                     borderRadius: "14px",
                     padding: "10px 12px",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
-                    backgroundColor: isLeftSelected(item.id)
-                      ? "rgba(59,130,246,0.06)"
-                      : "transparent",
+                 
                     boxSizing: "border-box",
                   }}
                 >
@@ -275,7 +272,7 @@ const WB_Unit8_Page54_QH = () => {
 
                     <span
                       style={{
-                        fontSize: "22px",
+                        fontSize: "18px",
                         lineHeight: "1.3",
                         color: "#222",
                         userSelect: "none",
@@ -291,14 +288,14 @@ const WB_Unit8_Page54_QH = () => {
                     width: "70px",
                     height: "70px",
                     border: isLeftSelected(item.id)
-                      ? "3px solid #f39b42"
-                      : "2px solid transparent",
+                      ? "1px solid #f39b42"
+                      : "1px solid transparent",
                     borderRadius: "14px",
                     overflow: "hidden",
-                    backgroundColor: "#fff",
+                    // backgroundColor: "#fff",
                     boxSizing: "border-box",
                     boxShadow: isLeftSelected(item.id)
-                      ? "0 0 0 4px rgba(59,130,246,0.12)"
+                      ? "0 0 0 4px rgba(10, 10, 10, 0.12)"
                       : "none",
                     transition: "all 0.2s ease",
                   }}
@@ -312,7 +309,7 @@ const WB_Unit8_Page54_QH = () => {
                       height: "100%",
                       objectFit: "contain",
                       display: "block",
-                      cursor: "pointer",
+                      cursor: showResults? "pointer" :"default",
                     }}
                   />
                 </div>
@@ -325,9 +322,10 @@ const WB_Unit8_Page54_QH = () => {
                     height: "16px",
                     borderRadius: "50%",
                     backgroundColor: getDotColor("left", item.id),
-                    cursor: "pointer",
+                     cursor: showResults? "pointer" :"default",
                     transition: "all 0.2s ease",
-                    transform: selectedLeft === item.id ? "scale(1.18)" : "scale(1)",
+                    transform:
+                      selectedLeft === item.id ? "scale(1.18)" : "scale(1)",
                   }}
                 />
 
@@ -335,20 +333,22 @@ const WB_Unit8_Page54_QH = () => {
                   <div
                     style={{
                       position: "absolute",
-                      right: "-10px",
+                      right: "15px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       width: "22px",
                       height: "22px",
                       borderRadius: "50%",
-                      backgroundColor: "#ef4444",
+                      backgroundColor: "red",
                       color: "#fff",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "12px",
                       fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                      zIndex:'9999'
                     }}
                   >
                     ✕
@@ -366,7 +366,7 @@ const WB_Unit8_Page54_QH = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "18px",
+              gap: "5px",
             }}
           >
             {exerciseData.right.map((item) => (
@@ -388,7 +388,7 @@ const WB_Unit8_Page54_QH = () => {
                     height: "16px",
                     borderRadius: "50%",
                     backgroundColor: getDotColor("right", item.id),
-                    cursor: "pointer",
+                    cursor: showResults? "pointer" :"default",
                     transition: "all 0.2s ease",
                   }}
                 />
@@ -398,11 +398,8 @@ const WB_Unit8_Page54_QH = () => {
                   style={{
                     width: "160px",
                     height: "100px",
-                    border: "2px solid #f39b42",
-                    borderRadius: "14px",
-                    backgroundColor: "#fff",
-                    overflow: "hidden",
-                    cursor: "pointer",
+
+                     cursor: showResults? "pointer" :"default",
                     boxSizing: "border-box",
                   }}
                 >
@@ -412,7 +409,7 @@ const WB_Unit8_Page54_QH = () => {
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
+
                       display: "block",
                     }}
                   />

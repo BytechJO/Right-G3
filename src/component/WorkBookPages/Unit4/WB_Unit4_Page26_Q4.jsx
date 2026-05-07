@@ -389,7 +389,7 @@ export default function WB_Unit5_Page26_QD() {
                 x2={line.x2}
                 y2={line.y2}
                 stroke={"#f39b42"}
-                strokeWidth="4"
+                strokeWidth="2"
                 strokeLinecap="round"
               />
             ))}

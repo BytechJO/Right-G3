@@ -1,380 +1,487 @@
-import React, { useState, useRef, useEffect } from "react";
-import Button from "../Button";
+import { useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../Button";
 import AudioWithCaption from "../../AudioWithCaption";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd9pg44instruction2-adult-lady_nRQ4BWTI.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd9pg44instruction2-adult-lady_Xwljrg04.mp3"; // ← غيّر المسار حسب ملف الأوديو
+const ACTIVE_COLOR = "#f39b42";
+const LINE_COLOR = "#ffca94";
+const INACTIVE_COLOR = "#bdbdbd";
 
-const BORDER_COLOR = "#f39b42";
-const WRONG_COLOR  = "#ef4444";
-const LINE_COLOR   = "#ef4444";
-
-const TOP_ITEMS    = [1, 2, 3, 4, 5, 6, 7, 8];
-const BOTTOM_ITEMS = ["i", "y", "z", "q", "c", "p", "t", "r"];
-
-// الإجابات الصحيحة: رقم → حرف
-const CORRECT = {
-  1: "z",
-  2: "y",
-  3: "q",
-  4: "i",
-  5: "c",
-  6: "t",
-  7: "p",
-  8: "r",
+const exerciseData = {
+  top: [
+    { id: 1, text: "1" },
+    { id: 2, text: "2" },
+    { id: 3, text: "3" },
+    { id: 4, text: "4" },
+    { id: 5, text: "5" },
+    { id: 6, text: "6" },
+    { id: 7, text: "7" },
+    { id: 8, text: "8" },
+  ],
+  bottom: [
+    { id: 1, text: "i" },
+    { id: 2, text: "y" },
+    { id: 3, text: "z" },
+    { id: 4, text: "q" },
+    { id: 5, text: "c" },
+    { id: 6, text: "p" },
+    { id: 7, text: "t" },
+    { id: 8, text: "r" },
+  ],
+  correctMatches: {
+    1: 6, // 1 -> math
+    2: 8, // 2 -> thick
+    3: 3, // 3 -> this
+    4: 5, // 4 -> father
+    5: 1, // 5 -> thank
+    6: 7, // 6 -> they
+    7: 4, // 6 -> they
+    8: 2, // 6 -> they
+  },
 };
 
-export default function WB_ListenAndMatch_PageB() {
-  const [lines,       setLines]       = useState([]);   // [{from, to}]
-  const [selecting,   setSelecting]   = useState(null); // رقم أو حرف مختار
+export default function WB_Unit7_Page44_QB() {
+  const [selectedTop, setSelectedTop] = useState(null);
+  const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
-  const [mousePos,    setMousePos]    = useState({ x: 0, y: 0 });
+  const [showAns, setShowAns] = useState(false);
+  const [lines, setLines] = useState([]);
 
-  const topRefs    = useRef({});
-  const bottomRefs = useRef({});
-  const svgRef     = useRef(null);
   const containerRef = useRef(null);
-const captions = [
-  { start: 0.52, end: 3.22, text: "Page 44, phonics exercise B." },
-  { start: 3.22, end: 5.18, text: "Listen and match." },
-  { start: 5.18, end: 7.96, text: "1- math." },
-  { start: 7.96, end: 10.66, text: "2- thick." },
-  { start: 10.66, end: 13.82, text: "3- this." },
-  { start: 13.82, end: 16.56, text: "4- father." },
-  { start: 16.56, end: 19.36, text: "5- bank." },
-];
-  // تتبع الماوس لرسم الخط المؤقت
-  useEffect(() => {
-    const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  const elementRefs = useRef({});
+  const captions = [
+    {
+      start: 0.52,
+      end: 5.18,
+      text: "Page 44, Phonics Exercise B. Listen and match.",
+    },
+    { start: 5.18, end: 7.82, text: "1- plum." },
+    { start: 7.82, end: 10.8, text: "2- rose." },
+    { start: 10.8, end: 13.58, text: "3- zebra." },
+    { start: 13.58, end: 16.2, text: "4- cash." },
+    { start: 16.2, end: 19.2, text: "5- igloo." },
+    { start: 19.2, end: 22.12, text: "6- toy." },
+    { start: 22.12, end: 25.0, text: "7- quilt." },
+    { start: 25.0, end: 27.94, text: "8- yarn." },
+  ];
+  useLayoutEffect(() => {
+    const updateLines = () => {
+      if (!containerRef.current) return;
 
-  const getCenter = (el) => {
-    if (!el || !containerRef.current) return { x: 0, y: 0 };
-    const elRect   = el.getBoundingClientRect();
-    const conRect  = containerRef.current.getBoundingClientRect();
-    return {
-      x: elRect.left + elRect.width  / 2 - conRect.left,
-      y: elRect.top  + elRect.height / 2 - conRect.top,
+      const containerRect = containerRef.current.getBoundingClientRect();
+
+      const newLines = Object.entries(matches)
+        .map(([topId, bottomId]) => {
+          const topEl = elementRefs.current[`top-${topId}`];
+          const bottomEl = elementRefs.current[`bottom-${bottomId}`];
+
+          if (!topEl || !bottomEl) return null;
+
+          const topRect = topEl.getBoundingClientRect();
+          const bottomRect = bottomEl.getBoundingClientRect();
+
+          return {
+            id: `${topId}-${bottomId}`,
+            x1: topRect.left + topRect.width / 2 - containerRect.left,
+            y1: topRect.bottom - containerRect.top,
+            x2: bottomRect.left + bottomRect.width / 2 - containerRect.left,
+            y2: bottomRect.top - containerRect.top,
+          };
+        })
+        .filter(Boolean);
+
+      setLines(newLines);
     };
+
+    updateLines();
+    window.addEventListener("resize", updateLines);
+    return () => window.removeEventListener("resize", updateLines);
+  }, [matches]);
+
+  const handleTopClick = (id) => {
+    if (showAns || showResults) return;
+    setSelectedTop(id);
+    setShowResults(false);
   };
 
-  const getContainerPos = (clientX, clientY) => {
-    if (!containerRef.current) return { x: 0, y: 0 };
-    const r = containerRef.current.getBoundingClientRect();
-    return { x: clientX - r.left, y: clientY - r.top };
-  };
+  const handleBottomClick = (bottomId) => {
+    if (showAns || selectedTop === null || showResults) return;
 
-  const isConnected = (key, type) =>
-    lines.some((l) => type === "top" ? l.from === key : l.to === key);
+    const newMatches = { ...matches };
 
-  const handleTopClick = (num) => {
-    if (showAns) return;
-    if (selecting === null) {
-      setSelecting({ type: "top", key: num });
-    } else if (selecting.type === "top") {
-      setSelecting({ type: "top", key: num });
-    } else {
-      // كان محدد حرف، نوصل
-      connectLine(selecting.key, num);
-    }
-  };
-
-  const handleBottomClick = (letter) => {
-    if (showAns) return;
-    if (selecting === null) {
-      setSelecting({ type: "bottom", key: letter });
-    } else if (selecting.type === "bottom") {
-      setSelecting({ type: "bottom", key: letter });
-    } else {
-      // كان محدد رقم، نوصل
-      connectLine(selecting.key, letter);
-    }
-  };
-
-  const connectLine = (from, to) => {
-    // امسح أي خط قديم للرقم أو الحرف
-    setLines((prev) => {
-      const filtered = prev.filter((l) => l.from !== from && l.to !== to);
-      return [...filtered, { from, to }];
+    Object.keys(newMatches).forEach((key) => {
+      if (newMatches[key] === bottomId) {
+        delete newMatches[key];
+      }
     });
-    setSelecting(null);
+
+    newMatches[selectedTop] = bottomId;
+
+    setMatches(newMatches);
+    setSelectedTop(null);
     setShowResults(false);
   };
 
-  const handleRemoveLine = (from) => {
-    if (showAns) return;
-    setLines((prev) => prev.filter((l) => l.from !== from));
-    setShowResults(false);
-  };
+  const checkAnswers = () => {
+    if (showAns || showResults) return;
 
-  const handleCheck = () => {
-    if (showAns) return;
-    if (lines.length < TOP_ITEMS.length) {
-      ValidationAlert.info("Please complete all matches first.");
+    const allConnected = exerciseData.top.every((item) => matches[item.id]);
+
+    if (!allConnected) {
+      ValidationAlert.info("Please connect all items first.");
       return;
     }
-    let score = 0;
-    lines.forEach((l) => { if (CORRECT[l.from] === l.to) score++; });
+
     setShowResults(true);
-    const total = TOP_ITEMS.length;
-    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+
+    let score = 0;
+    Object.keys(exerciseData.correctMatches).forEach((topId) => {
+      if (matches[topId] === exerciseData.correctMatches[topId]) {
+        score++;
+      }
+    });
+
+    const totalQuestions = exerciseData.top.length;
+
+    if (score === totalQuestions) {
+      ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${totalQuestions}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${totalQuestions}`);
+    }
   };
 
   const handleShowAnswer = () => {
-    const ans = TOP_ITEMS.map((num) => ({ from: num, to: CORRECT[num] }));
-    setLines(ans);
+    setMatches(exerciseData.correctMatches);
     setShowResults(true);
     setShowAns(true);
-    setSelecting(null);
+    setSelectedTop(null);
   };
 
   const handleStartAgain = () => {
-    setLines([]);
-    setSelecting(null);
+    setMatches({});
+    setSelectedTop(null);
     setShowResults(false);
     setShowAns(false);
+    setLines([]);
   };
 
-  const isLineWrong = (line) =>
-    showResults && !showAns && CORRECT[line.from] !== line.to;
+  const getDotColor = (side, id) => {
+    if (side === "top" && selectedTop === id) return ACTIVE_COLOR;
 
-  const getLineColor = (line) =>
-    showResults
-      ? isLineWrong(line) ? WRONG_COLOR : "#16a34a"
-      : LINE_COLOR;
+    const isConnected =
+      side === "top" ? !!matches[id] : Object.values(matches).includes(id);
 
-  // حساب إحداثيات الخطوط
-  const computedLines = lines.map((line) => ({
-    ...line,
-    from_pos: getCenter(topRefs.current[line.from]),
-    to_pos:   getCenter(bottomRefs.current[line.to]),
-  }));
+    if (!isConnected) return INACTIVE_COLOR;
 
-  // الخط المؤقت
-  const tempFrom = selecting?.type === "top"
-    ? getCenter(topRefs.current[selecting.key])
-    : selecting?.type === "bottom"
-    ? getCenter(bottomRefs.current[selecting.key])
-    : null;
+    return ACTIVE_COLOR;
+  };
 
-  const tempTo = tempFrom
-    ? getContainerPos(mousePos.x, mousePos.y)
-    : null;
+  const isWrongMatch = (topId) => {
+    if (!showResults) return false;
+    if (!matches[topId]) return false;
+    return matches[topId] !== exerciseData.correctMatches[topId];
+  };
+
+  const isTopSelected = (id) => selectedTop === id;
+  const isTopConnected = (id) => !!matches[id];
+  const isBottomConnected = (id) => Object.values(matches).includes(id);
+  const isSelectedBottomMatch = (id) =>
+    selectedTop !== null && matches[selectedTop] === id;
 
   return (
     <div className="main-container-component">
+      <style>{`
+  .wb-d-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 8px 14px 20px;
+    box-sizing: border-box;
+  }
+
+  .wb-d-title {
+    margin: 0;
+  }
+
+  .wb-d-board {
+    position: relative;
+    width: 100%;
+    min-height: 330px;
+    padding: 24px 20px 12px;
+    box-sizing: border-box;
+  }
+
+  .wb-d-top-row {
+    display: flex;
+    gap: 12px;
+    // align-items: start;
+    margin-bottom: 110px;
+    position: relative;
+        width: 100%;
+    z-index: 2;
+    justify-content: space-between;
+  }
+
+  .wb-d-bottom-row {
+   display: flex;
+    gap: 12px;
+    // align-items: start;
+    margin-bottom: 110px;
+    position: relative;
+        width: 100%;
+    z-index: 2;
+    justify-content: space-between;
+  }
+
+  .wb-d-top-item,
+  .wb-d-bottom-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .wb-d-number-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #9d9d9d;
+    background: #fff;
+    color: #333;
+    font-size: 24px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .wb-d-number-circle.selected {
+    border: 3px solid ${ACTIVE_COLOR};
+    box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35);
+    background: rgba(243, 155, 66, 0.08);
+  }
+
+  .wb-d-number-circle.connected {
+    border: 2px solid ${LINE_COLOR};
+    background: rgba(255, 202, 148, 0.12);
+  }
+
+  .wb-d-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .wb-d-dot.selected {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35);
+  }
+
+  .wb-d-word {
+    font-size: 22px;
+    line-height: 1.2;
+    color: #222;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-width: 90px;
+    box-sizing: border-box;
+  }
+
+  .wb-d-word.selected {
+    border: 3px solid ${ACTIVE_COLOR};
+    box-shadow: 0 0 0 4px rgba(255, 202, 148, 0.35);
+    background: rgba(243, 155, 66, 0.08);
+  }
+
+  .wb-d-word.connected {
+    border: 2px solid ${LINE_COLOR};
+    // background: rgba(255, 202, 148, 0.12);
+  }
+ .wb-d-number-circle.wrong {
+    border: 2px solid red;
+    // background: rgba(255, 202, 148, 0.12);
+  }
+  .wb-d-wrong {
+    position: absolute;
+    top: -8px;
+    right: 26px;
+       width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+
+  .wb-d-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 900px) {
+    .wb-d-top-row,
+    .wb-d-bottom-row {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 24px;
+    }
+
+    .wb-d-board {
+      min-height: 500px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .wb-d-top-row,
+    .wb-d-bottom-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+`}</style>
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "clamp(18px,2.5vw,28px)",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+          gap: "40px",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}
-        >
-          <span className="WB-ex-A">B</span> Listen and match.
+        <h1 className="WB-header-title-page8">
+          {" "}
+          <span className="WB-ex-A">B</span>
+          Listen and match.
         </h1>
-<div style={{ display: "flex", justifyContent: "center" }}>
-  <AudioWithCaption src={sound1} captions={captions} />
-</div>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <QuestionAudioPlayer
+            src={sound1}
+            captions={captions}
+            stopAtSecond={5.18}
+          />
+        </div>
 
-        {/* ── منطقة الـ match ── */}
-        <div
-          ref={containerRef}
-          style={{
-            position: "relative",
-            width:    "100%",
-            padding:  "clamp(16px,2vw,28px) 0",
-          }}
-        >
-          {/* SVG للخطوط */}
+        <div ref={containerRef} className="wb-d-board">
           <svg
-            ref={svgRef}
             style={{
-              position:      "absolute",
-              top:           0,
-              left:          0,
-              width:         "100%",
-              height:        "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
               pointerEvents: "none",
-              zIndex:        1,
+              overflow: "visible",
+              zIndex: 1,
             }}
           >
-            {/* الخطوط المرسومة */}
-            {computedLines.map((line) => (
+            {lines.map((line) => (
               <line
-                key={`${line.from}-${line.to}`}
-                x1={line.from_pos.x} y1={line.from_pos.y}
-                x2={line.to_pos.x}   y2={line.to_pos.y}
-                stroke={getLineColor(line)}
-                strokeWidth="2.5"
+                key={line.id}
+                x1={line.x1}
+                y1={line.y1}
+                x2={line.x2}
+                y2={line.y2}
+                stroke={"#f39b42"}
+                strokeWidth="2"
                 strokeLinecap="round"
               />
             ))}
-
-            {/* الخط المؤقت */}
-            {tempFrom && tempTo && (
-              <line
-                x1={tempFrom.x} y1={tempFrom.y}
-                x2={tempTo.x}   y2={tempTo.y}
-                stroke={BORDER_COLOR}
-                strokeWidth="2"
-                strokeDasharray="6,4"
-                strokeLinecap="round"
-              />
-            )}
           </svg>
 
-          {/* الأرقام فوق */}
-          <div
-            style={{
-              display:             "grid",
-              gridTemplateColumns: `repeat(${TOP_ITEMS.length}, minmax(0,1fr))`,
-              gap:                 "clamp(6px,1vw,14px)",
-              width:               "100%",
-              position:            "relative",
-              zIndex:              2,
-            }}
-          >
-            {TOP_ITEMS.map((num) => {
-              const connected = isConnected(num, "top");
-              const isSelecting = selecting?.type === "top" && selecting.key === num;
-              const line = lines.find((l) => l.from === num);
-              const wrong = showResults && line && CORRECT[line.from] !== line.to;
+          <div className="wb-d-top-row">
+            {exerciseData.top.map((item) => {
+              const selected = isTopSelected(item.id);
+              const connected = isTopConnected(item.id);
+              const wrong = isWrongMatch(item.id);
 
               return (
-                <div
-                  key={num}
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}
-                >
+                <div key={item.id} className="wb-d-top-item">
                   <div
-                    ref={(el) => (topRefs.current[num] = el)}
-                    onClick={() => handleTopClick(num)}
+                    className={`wb-d-number-circle ${
+                      selected
+                        ? "selected"
+                        : connected
+                          ? wrong
+                            ? "wrong"
+                            : "connected"
+                          : ""
+                    }`}
+                    onClick={() => handleTopClick(item.id)}
                     style={{
-                      width:           "clamp(36px,5vw,56px)",
-                      height:          "clamp(36px,5vw,56px)",
-                      borderRadius:    "50%",
-                      border:          `2.5px solid ${wrong ? WRONG_COLOR : isSelecting ? BORDER_COLOR : connected ? BORDER_COLOR : "#ccc"}`,
-                      background:      isSelecting ? "rgba(243,155,66,0.15)" : "#fff",
-                      display:         "flex",
-                      alignItems:      "center",
-                      justifyContent:  "center",
-                      fontSize:        "clamp(14px,1.7vw,22px)",
-                      fontWeight:      700,
-                      color:           wrong ? WRONG_COLOR : "#111",
-                      cursor:          showAns ? "default" : "pointer",
-                      userSelect:      "none",
-                      transition:      "all 0.15s",
-                      position:        "relative",
-                      boxShadow:       isSelecting ? `0 0 0 3px rgba(243,155,66,0.3)` : "none",
+                      cursor: showAns ? "default" : "pointer",
                     }}
                   >
-                    {num}
-
-                    {wrong && (
-                      <div style={{
-                        position:        "absolute",
-                        top:             "-6px",
-                        right:           "-6px",
-                        width:           "16px",
-                        height:          "16px",
-                        borderRadius:    "50%",
-                        border:          "1px solid #fff",
-                        backgroundColor: WRONG_COLOR,
-                        color:           "#fff",
-                        display:         "flex",
-                        alignItems:      "center",
-                        justifyContent:  "center",
-                        fontSize:        "9px",
-                        fontWeight:      700,
-                        boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
-                        pointerEvents:   "none",
-                        cursor:          "pointer",
-                      }}
-                        onClick={(e) => { e.stopPropagation(); handleRemoveLine(num); }}
-                      >✕</div>
-                    )}
+                    {item.text}
                   </div>
 
-                  {/* نقطة وصل */}
-                  <div style={{
-                    width:        "10px",
-                    height:       "10px",
-                    borderRadius: "50%",
-                    background:   connected ? (wrong ? WRONG_COLOR : BORDER_COLOR) : "#ccc",
-                    transition:   "background 0.15s",
-                  }} />
+                  <div
+                    ref={(el) => (elementRefs.current[`top-${item.id}`] = el)}
+                    className={`wb-d-dot ${selected ? "selected" : ""}`}
+                    onClick={() => handleTopClick(item.id)}
+                    style={{
+                      backgroundColor: getDotColor("top", item.id),
+                      cursor: showAns ? "default" : "pointer",
+                    }}
+                  />
+
+                  {wrong && <div className="wb-d-wrong">✕</div>}
                 </div>
               );
             })}
           </div>
 
-          {/* مسافة بين الصفين */}
-          <div style={{ height: "clamp(40px,7vw,80px)" }} />
-
-          {/* الحروف تحت */}
-          <div
-            style={{
-              display:             "grid",
-              gridTemplateColumns: `repeat(${BOTTOM_ITEMS.length}, minmax(0,1fr))`,
-              gap:                 "clamp(6px,1vw,14px)",
-              width:               "100%",
-              position:            "relative",
-              zIndex:              2,
-            }}
-          >
-            {BOTTOM_ITEMS.map((letter) => {
-              const connected   = isConnected(letter, "bottom");
-              const isSelecting = selecting?.type === "bottom" && selecting.key === letter;
-              const line        = lines.find((l) => l.to === letter);
-              const wrong       = showResults && line && CORRECT[line.from] !== line.to;
+          <div className="wb-d-bottom-row">
+            {exerciseData.bottom.map((item) => {
+              const selectedMatch = isSelectedBottomMatch(item.id);
+              const connected = isBottomConnected(item.id);
 
               return (
-                <div
-                  key={letter}
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}
-                >
-                  {/* نقطة وصل */}
-                  <div style={{
-                    width:        "10px",
-                    height:       "10px",
-                    borderRadius: "50%",
-                    background:   connected ? (wrong ? WRONG_COLOR : BORDER_COLOR) : "#ccc",
-                    transition:   "background 0.15s",
-                  }} />
+                <div key={item.id} className="wb-d-bottom-item">
+                  <div
+                    ref={(el) =>
+                      (elementRefs.current[`bottom-${item.id}`] = el)
+                    }
+                    className={`wb-d-dot ${selectedMatch ? "selected" : ""}`}
+                    onClick={() => handleBottomClick(item.id)}
+                    style={{
+                      backgroundColor: getDotColor("bottom", item.id),
+                      marginBottom: "10px",
+                      marginTop: "0",
+                      cursor: showAns ? "default" : "pointer",
+                    }}
+                  />
 
                   <div
-                    ref={(el) => (bottomRefs.current[letter] = el)}
-                    onClick={() => handleBottomClick(letter)}
+                    className={`wb-d-number-circle ${
+                      selectedMatch ? "selected" : connected ? "connected" : ""
+                    }`}
+                    onClick={() => handleBottomClick(item.id)}
                     style={{
-                      width:           "clamp(36px,5vw,56px)",
-                      height:          "clamp(36px,5vw,56px)",
-                      borderRadius:    "50%",
-                      border:          `2.5px solid ${wrong ? WRONG_COLOR : isSelecting ? BORDER_COLOR : connected ? BORDER_COLOR : "#ccc"}`,
-                      background:      isSelecting ? "rgba(243,155,66,0.15)" : "#fff",
-                      display:         "flex",
-                      alignItems:      "center",
-                      justifyContent:  "center",
-                      fontSize:        "clamp(14px,1.7vw,22px)",
-                      fontWeight:      700,
-                      color:           wrong ? WRONG_COLOR : "#111",
-                      cursor:          showAns ? "default" : "pointer",
-                      userSelect:      "none",
-                      transition:      "all 0.15s",
-                      boxShadow:       isSelecting ? `0 0 0 3px rgba(243,155,66,0.3)` : "none",
+                      cursor: showAns ? "default" : "pointer",
                     }}
                   >
-                    {letter}
+                    {item.text}
                   </div>
                 </div>
               );
@@ -382,8 +489,12 @@ const captions = [
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "clamp(6px,1vw,12px)" }}>
-          <Button checkAnswers={handleCheck} handleShowAnswer={handleShowAnswer} handleStartAgain={handleStartAgain} />
+        <div className="wb-d-buttons">
+          <Button
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
     </div>

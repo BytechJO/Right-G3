@@ -6,7 +6,7 @@ import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folde
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/4.svg";
-
+import trueIcon from "../../../assets/imgs/true.svg";
 const ITEMS = [
   {
     id: 1,
@@ -49,7 +49,7 @@ export default function WB_Unit8_Page48_QI() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -58,7 +58,7 @@ export default function WB_Unit8_Page48_QI() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -112,28 +112,57 @@ export default function WB_Unit8_Page48_QI() {
     const selected = answers[itemId] === text;
 
     return (
-      <button
-        onClick={() => handleSelect(itemId, text)}
-        style={{
-          width: "44px",
-          height: "44px",
-          border: "2px solid #f39b42",
-          borderRadius: "8px",
-          backgroundColor: "#fff",
-          color: selected ? "#dc2626" : "transparent",
-          fontSize: "40px",
-          lineHeight: "1",
-          fontWeight: "700",
-          cursor: showAns ? "default" : "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          padding: 0,
-        }}
-      >
-        ✓
-      </button>
+      <div className="relative">
+        <button
+          onClick={() => handleSelect(itemId, text)}
+          style={{
+            width: "44px",
+            height: "44px",
+            border:
+              isWrong(itemId) && selected
+                ? "2px solid red"
+                : "1px solid #f39b42",
+            borderRadius: "8px",
+            backgroundColor: "#fff",
+            // color: selected ? "#dc2626" : "transparent",
+            fontSize: "40px",
+            lineHeight: "1",
+            fontWeight: "700",
+            cursor: showAns ? "default" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            padding: 0,
+          }}
+        >
+          {selected && <img src={trueIcon} style={{ height: "25px" }} />}
+        </button>
+        {isWrong(itemId) && selected && (
+          <div
+            style={{
+              position: "absolute",
+              top: "-6px",
+              right: "-6px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              background: "red",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "14px",
+              fontWeight: "bold",
+              border: "2px solid white",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              pointerEvents: "none",
+            }}
+          >
+            ✕
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -142,20 +171,12 @@ export default function WB_Unit8_Page48_QI() {
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "clamp(18px,2.5vw,28px)",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+          gap: "clamp(18px,2.5vw,28px)",
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          style={{
-            margin: 0,
-          }}
-        >
-          <span className="WB-ex-A">I</span> Look, read, and write ✓.
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">I</span> Look, read, and write{" "}
+          <strong className="text-red-600"> ✓</strong>.
         </h1>
 
         <div
@@ -172,8 +193,8 @@ export default function WB_Unit8_Page48_QI() {
               style={{
                 position: "relative",
                 display: "grid",
-                gridTemplateColumns: "360px 1fr",
-                gap: "18px",
+                gridTemplateColumns: "250px 1fr",
+                // gap: "18px",
                 alignItems: "center",
                 width: "100%",
               }}
@@ -188,8 +209,8 @@ export default function WB_Unit8_Page48_QI() {
               >
                 <span
                   style={{
-                    fontSize: "22px",
-                    fontWeight: "700",
+                    fontSize: "20px",
+                    fontWeight: "500",
                     color: "#222",
                     minWidth: "18px",
                     lineHeight: "1",
@@ -203,11 +224,11 @@ export default function WB_Unit8_Page48_QI() {
                   src={item.img}
                   alt={`question-${item.id}`}
                   style={{
-                    width: "310px",
-                    height: "150px",
-                    objectFit: "cover",
-                              border: "2px solid #f39b42",
-                              borderRadius : "6%",
+                    width: "auto",
+                    height: "100px",
+                    // objectFit: "cover",
+                    // border: "2px solid #f39b42",
+                    borderRadius: "6%",
 
                     display: "block",
                     flexShrink: 0,
@@ -228,8 +249,7 @@ export default function WB_Unit8_Page48_QI() {
                   <div
                     key={index}
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 50px",
+                      display: "flex",
                       gap: "14px",
                       alignItems: "center",
                     }}
@@ -237,9 +257,10 @@ export default function WB_Unit8_Page48_QI() {
                     <p
                       style={{
                         margin: 0,
-                        fontSize: "26px",
+                        fontSize: "18px",
                         lineHeight: "1.35",
                         color: "#222",
+                        width: "60%",
                       }}
                     >
                       {option}
@@ -249,29 +270,6 @@ export default function WB_Unit8_Page48_QI() {
                   </div>
                 ))}
               </div>
-
-              {isWrong(item.id) && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "-6px",
-                    right: "-6px",
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    backgroundColor: "#ef4444",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-                  }}
-                >
-                  ✕
-                </div>
-              )}
             </div>
           ))}
         </div>

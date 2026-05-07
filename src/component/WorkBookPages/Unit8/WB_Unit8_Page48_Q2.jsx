@@ -4,7 +4,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/8.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/9.svg";
-import img3 from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/10.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/10.svg";
 
 const COLORS = [
   "#111827",
@@ -76,35 +76,22 @@ export default function WB_Unit8_Page48_QH() {
       const ctx = canvas.getContext("2d");
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctxRefs.current[item.id] = ctx;
 
-      loadImageToCanvas(item.id, item.img, item.width, item.height);
+      ctxRefs.current[item.id] = ctx;
     });
   }, []);
 
-  const loadImageToCanvas = (id, src, width, height) => {
+  const clearCanvas = (id) => {
     const canvas = canvasRefs.current[id];
     const ctx = ctxRefs.current[id];
+
     if (!canvas || !ctx) return;
 
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      ctx.clearRect(0, 0, width, height);
-      ctx.drawImage(img, 0, 0, width, height);
-      imageRefs.current[id] = img;
-    };
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
-
-  const clearCanvas = (id) => {
-    const item = ITEMS.find((x) => x.id === id);
-    if (!item) return;
-    loadImageToCanvas(id, item.img, item.width, item.height);
-  };
-
   const clearAllCanvases = () => {
     ITEMS.forEach((item) => {
-      loadImageToCanvas(item.id, item.img, item.width, item.height);
+      clearCanvas(item.id);
     });
   };
 
@@ -166,9 +153,16 @@ export default function WB_Unit8_Page48_QH() {
       pos.y,
       (tool === "eraser" ? size * 2.5 : size) / 2,
       0,
-      Math.PI * 2
+      Math.PI * 2,
     );
-    ctx.fillStyle = tool === "eraser" ? "#ffffff" : color;
+    if (tool === "eraser") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.fillStyle = "rgba(0,0,0,1)";
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = color;
+    }
+
     ctx.fill();
   };
 
@@ -190,8 +184,17 @@ export default function WB_Unit8_Page48_QH() {
     ctx.beginPath();
     ctx.moveTo(prev.x, prev.y);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = tool === "eraser" ? "#ffffff" : color;
-    ctx.lineWidth = tool === "eraser" ? size * 3 : size;
+
+    // ✨ الممحاة تمسح الرسم فقط
+    if (tool === "eraser") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineWidth = size * 3;
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = size;
+    }
+
     ctx.stroke();
 
     lastPos.current[id] = pos;
@@ -214,15 +217,11 @@ export default function WB_Unit8_Page48_QH() {
   };
 
   return (
-      <div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "clamp(18px,2.5vw,28px)",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+          gap: "30px",
         }}
       >
         <h1 className="WB-header-title-page8">
@@ -258,9 +257,7 @@ export default function WB_Unit8_Page48_QH() {
                 padding: "8px 12px",
                 borderRadius: "10px",
                 border:
-                  tool === item.id
-                    ? "2px solid #3b82f6"
-                    : "2px solid #d1d5db",
+                  tool === item.id ? "2px solid #3b82f6" : "2px solid #d1d5db",
                 backgroundColor: tool === item.id ? "#eff6ff" : "#fff",
                 color: tool === item.id ? "#1d4ed8" : "#374151",
                 fontWeight: "600",
@@ -350,8 +347,6 @@ export default function WB_Unit8_Page48_QH() {
             ))}
           </div>
 
-
-
           <button
             onClick={() => clearCanvas(selectedCanvas)}
             style={{
@@ -405,6 +400,7 @@ export default function WB_Unit8_Page48_QH() {
               }}
             >
               {/* image + canvas */}
+              {/* image + drawing layer */}
               <div
                 style={{
                   position: "relative",
@@ -413,8 +409,8 @@ export default function WB_Unit8_Page48_QH() {
                   flexShrink: 0,
                   border:
                     selectedCanvas === item.id
-                      ? "3px solid #f59e0b"
-                      : "2px solid #e5e7eb",
+                      ? "1px solid #f59e0b"
+                      : "1px solid #e5e7eb",
                   borderRadius: "14px",
                   overflow: "hidden",
                   backgroundColor: "#fff",
@@ -422,6 +418,22 @@ export default function WB_Unit8_Page48_QH() {
                 }}
                 onClick={() => setSelectedCanvas(item.id)}
               >
+                {/* الصورة الأساسية */}
+                <img
+                  src={item.img}
+                  alt={`item-${item.id}`}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                  }}
+                />
+
+                {/* Canvas للرسم فقط */}
                 <canvas
                   ref={(el) => {
                     if (el) canvasRefs.current[item.id] = el;
@@ -429,6 +441,8 @@ export default function WB_Unit8_Page48_QH() {
                   width={item.width}
                   height={item.height}
                   style={{
+                    position: "absolute",
+                    inset: 0,
                     width: "100%",
                     height: "100%",
                     display: "block",
@@ -444,6 +458,7 @@ export default function WB_Unit8_Page48_QH() {
                   onTouchEnd={(e) => stopDrawing(e, item.id)}
                 />
 
+                {/* رقم السؤال */}
                 <div
                   style={{
                     position: "absolute",
@@ -459,7 +474,7 @@ export default function WB_Unit8_Page48_QH() {
                     justifyContent: "center",
                     fontSize: "13px",
                     fontWeight: "700",
-                    zIndex: 2,
+                    zIndex: 5,
                   }}
                 >
                   {item.id}
@@ -482,10 +497,10 @@ export default function WB_Unit8_Page48_QH() {
                     key={index}
                     style={{
                       margin: 0,
-                      fontSize: "19px",
+                      fontSize: "18px",
                       lineHeight: "1.45",
                       color: "#222",
-                      fontWeight: index === 0 ? "600" : "500",
+                      // fontWeight: index === 0 ? "600" : "500",
                     }}
                   >
                     {index === 0 ? (

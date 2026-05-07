@@ -59,7 +59,7 @@ export default function WB_Unit8_Page45_QB() {
   }, [wordBanksSeed]);
 
   const handleSelectWord = (itemId, wordIndex) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const currentAnswer = answers[itemId] || [];
     const selectedWord = shuffledBanks[itemId][wordIndex];
@@ -77,7 +77,7 @@ export default function WB_Unit8_Page45_QB() {
   };
 
   const handleRemoveWord = (itemId, answerIndex) => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const currentAnswer = [...(answers[itemId] || [])];
     currentAnswer.splice(answerIndex, 1);
@@ -91,7 +91,6 @@ export default function WB_Unit8_Page45_QB() {
       setChecked(false);
     }
   };
-
   const getVisibleBankWords = (item) => {
     const chosenWords = answers[item.id] || [];
     const tempChosen = [...chosenWords];
@@ -101,10 +100,17 @@ export default function WB_Unit8_Page45_QB() {
 
       if (foundIndex !== -1) {
         tempChosen.splice(foundIndex, 1);
-        return null;
+
+        return {
+          word,
+          disabled: true,
+        };
       }
 
-      return word;
+      return {
+        word,
+        disabled: false,
+      };
     });
   };
 
@@ -117,7 +123,7 @@ export default function WB_Unit8_Page45_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns||checked) return;
 
     const allCompleted = ITEMS.every((item) => isSentenceComplete(item));
 
@@ -164,15 +170,13 @@ export default function WB_Unit8_Page45_QB() {
   };
 
   return (
-  <div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(18px,2.5vw,28px)",
-          maxWidth: "1100px",
-          margin: "0 auto",
+       
+          gap: "30px",
+         
         }}
       >
         <h1 className="WB-header-title-page8">
@@ -191,7 +195,8 @@ export default function WB_Unit8_Page45_QB() {
           {ITEMS.map((item) => {
             const builtWords = answers[item.id] || [];
             const visibleWords = getVisibleBankWords(item);
-            const wrong = checked && isSentenceComplete(item) && !isSentenceCorrect(item);
+            const wrong =
+              checked && isSentenceComplete(item) && !isSentenceCorrect(item);
 
             return (
               <div
@@ -241,12 +246,12 @@ export default function WB_Unit8_Page45_QB() {
                 <div
                   style={{
                     minHeight: "52px",
-                    borderBottom: "2px solid #8f8f8f",
+                    borderBottom: "1px solid #8f8f8f",
                     display: "flex",
                     alignItems: "center",
                     flexWrap: "wrap",
-                    gap: "8px",
-                    paddingBottom: "6px",
+                    // gap: "8px",
+                    // paddingBottom: "6px",
                   }}
                 >
                   {builtWords.map((word, index) => (
@@ -254,21 +259,21 @@ export default function WB_Unit8_Page45_QB() {
                       key={`${item.id}-built-${index}-${word}`}
                       onClick={() => handleRemoveWord(item.id, index)}
                       style={{
-                        padding: "6px 10px",
+                        padding: "5px",
                         borderRadius: "8px",
                         border: "none",
-                        backgroundColor: "#f39b42",
-                        color: "#fff",
-                        fontSize: "15px",
-                        fontWeight: "500",
-                        cursor: showAns ? "default" : "pointer",
+                        fontSize: "18px",
+                        // fontWeight: "500",
+                        cursor: showAns||checked ? "default" : "pointer",
                       }}
+                      className={`${!showAns && !checked && "hover:text-red-500"}`}
                     >
                       {word}
                     </button>
                   ))}
                 </div>
 
+                {/* word bank */}
                 {/* word bank */}
                 <div
                   style={{
@@ -277,26 +282,38 @@ export default function WB_Unit8_Page45_QB() {
                     gap: "8px",
                   }}
                 >
-                  {visibleWords.map((word, index) =>
-                    word ? (
-                      <button
-                        key={`${item.id}-bank-${index}-${word}`}
-                        onClick={() => handleSelectWord(item.id, index)}
-                        style={{
-                          padding: "6px 10px",
-                          borderRadius: "8px",
-                          border: "1px solid #cbd5e1",
-                          backgroundColor: "#f8fafc",
-                          color: "#111827",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          cursor: showAns ? "default" : "pointer",
-                        }}
-                      >
-                        {word}
-                      </button>
-                    ) : null
-                  )}
+                  {visibleWords.map((wordItem, index) => (
+                    <button
+                      key={`${item.id}-bank-${index}-${wordItem.word}`}
+                      onClick={() =>
+                        !wordItem.disabled && handleSelectWord(item.id, index)
+                      }
+                      disabled={wordItem.disabled}
+                      style={{
+                        padding: "6px 10px",
+                        borderRadius: "8px",
+                        border: "1px solid #cbd5e1",
+
+                        backgroundColor: wordItem.disabled
+                          ? "#d1d5db"
+                          : "#f8fafc",
+
+                        color: wordItem.disabled ? "#535353ff" : "#111827",
+
+                        opacity: wordItem.disabled ? 0.6 : 1,
+
+                        fontSize: "15px",
+                        fontWeight: "500",
+
+                        cursor:
+                          showAns || wordItem.disabled
+                            ? "not-allowed"
+                            : "pointer",
+                      }}
+                    >
+                      {wordItem.word}
+                    </button>
+                  ))}
                 </div>
 
                 {wrong && (
@@ -305,20 +322,19 @@ export default function WB_Unit8_Page45_QB() {
                       position: "absolute",
                       top: "-8px",
                       right: "-8px",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "#ef4444",
-                    borderBottom: "2px solid #ffffffff",
-
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "13px",
-                      fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                    }}
+                    width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        background: "red",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                       }}
                   >
                     ✕
                   </div>

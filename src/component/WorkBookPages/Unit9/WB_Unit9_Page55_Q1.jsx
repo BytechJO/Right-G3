@@ -1,407 +1,542 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/3.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/5.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/4.svg";
+
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/core";
 
 // ── ثوابت ──────────────────────────────────────────────────────
-const WRONG_COLOR = "#ef4444";
-const DRAG_COLOR  = "#ffca94";
+const WRONG_COLOR = "red";
+const DRAG_COLOR = "#f39b42";
 
 // ── بيانات ─────────────────────────────────────────────────────
 const ITEMS = [
   {
-    id: 1, img: img1,
+    id: 1,
+    img: img1,
     lines: ["Where's Helen's mom?", "She's in a taxi."],
   },
   {
-    id: 2, img: img2,
+    id: 2,
+    img: img2,
     lines: ["Where's Stella's mom?", "She's in the kitchen."],
   },
   {
-    id: 3, img: img3,
+    id: 3,
+    img: img3,
     lines: ["Where are Jack and Sarah?", "They're on the playground."],
   },
   {
-    id: 4, img: img4,
+    id: 4,
+    img: img4,
     lines: ["Where is Tom?", "He's at school."],
   },
 ];
 
-const CORRECT_ANSWERS = { 1: 3, 2: 4, 3: 1, 4: 2 };
-const NUMBERS         = [1, 2, 3, 4];
+const CORRECT_ANSWERS = {
+  1: 3,
+  2: 4,
+  3: 1,
+  4: 2,
+};
 
-// ── بادج الخطأ ─────────────────────────────────────────────────
+const NUMBERS = [1, 2, 3, 4];
+
+// ── Error Badge ────────────────────────────────────────────────
 const ErrorBadge = ({ top = -8, right = -8 }) => (
   <div
     style={{
-      position:        "absolute",
+      position: "absolute",
       top,
       right,
-      width:           18,
-      height:          18,
-      borderRadius:    "50%",
-      backgroundColor: WRONG_COLOR,
-      color:           "#fff",
-      display:         "flex",
-      alignItems:      "center",
-      justifyContent:  "center",
-      fontSize:        9,
-      fontWeight:      700,
-      border:          "1.5px solid #fff",
-      pointerEvents:   "none",
-      zIndex:          5,
+
+      width: "22px",
+      height: "22px",
+
+      borderRadius: "50%",
+      backgroundColor: "red",
+      color: "#fff",
+
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+
+      fontSize: "12px",
+      fontWeight: "700",
+
+      border: "2px solid white",
+
+      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+      zIndex: 10,
     }}
   >
     ✕
   </div>
 );
 
-// ── المكوّن الرئيسي ─────────────────────────────────────────────
-export default function WB_Unit9_Page55_QI() {
-  const [answers,       setAnswers]       = useState({});
-  const [draggedNumber, setDraggedNumber] = useState(null);
-  const [touchItem,     setTouchItem]     = useState(null);
-  const [touchPos,      setTouchPos]      = useState({ x: 0, y: 0 });
-  const [checked,       setChecked]       = useState(false);
-  const [showAns,       setShowAns]       = useState(false);
+// ── Draggable Number ───────────────────────────────────────────
+function DraggableNumber({ num, disabled, activeId }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `number-${num}`,
+    data: {
+      num,
+    },
+    disabled,
+  });
 
-  const dropRefs   = useRef({});
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={{
+        width: "45px",
+        height: "45px",
+
+        borderRadius: "50%",
+
+        backgroundColor: disabled ? "#cfcfd4" : DRAG_COLOR,
+
+        color: "#fff",
+
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+
+        fontWeight: 700,
+        fontSize: "clamp(18px,2.4vw,28px)",
+
+        cursor: disabled ? "not-allowed" : "grab",
+
+        opacity: isDragging ? 0.35 : disabled ? 0.55 : 1,
+
+        userSelect: "none",
+        touchAction: "none",
+
+        transition: "0.2s ease",
+
+        transform: activeId === `number-${num}` ? "scale(1.1)" : "scale(1)",
+
+        boxShadow:
+          activeId === `number-${num}`
+            ? `0 0 0 3px rgba(242,154,31,0.35)`
+            : "0 3px 10px rgba(0,0,0,0.12)",
+      }}
+    >
+      {num}
+    </div>
+  );
+}
+
+// ── Drop Zone ──────────────────────────────────────────────────
+function DropZone({ item, num, wrong, checked, showAns, handleRemove }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `drop-${item.id}`,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        position: "relative",
+
+        width: "200px",
+
+        transition: "0.25s ease",
+
+        transform: isOver ? "scale(1.03)" : "scale(1)",
+      }}
+    >
+      {/* الصورة */}
+      <img
+        src={item.img}
+        alt={`item-${item.id}`}
+        style={{
+          width: "100%",
+          height: "auto",
+
+          display: "block",
+
+          objectFit: "contain",
+
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Overlay وقت السحب */}
+      {isOver && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+
+            borderRadius: "12px",
+
+            background: "rgba(243,155,66,0.12)",
+
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* مربع الرقم */}
+      <div
+        onClick={() => handleRemove(item.id)}
+        style={{
+          position: "absolute",
+
+          top: "0%",
+          right: "0%",
+
+          width: "clamp(34px,4vw,42px)",
+          height: "clamp(34px,4vw,42px)",
+
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+
+          fontSize: "clamp(14px,2vw,24px)",
+
+          fontWeight: 700,
+
+          zIndex: 5,
+
+          cursor: num && !showAns && !checked ? "pointer" : "default",
+
+          transition: "0.2s ease",
+        }}
+      >
+        {num || ""}
+      </div>
+
+      {/* Error Badge */}
+      {wrong && <ErrorBadge top={-6} right={-6} />}
+    </div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────
+export default function WB_Unit9_Page55_QI() {
+  const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
+
+  const [activeId, setActiveId] = useState(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 5,
+      },
+    }),
+  );
+
   const usedNumbers = Object.values(answers);
 
-  // ── Drag (desktop) ──
-  const handleDragStart = (num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-    setDraggedNumber(num);
+  // ── Drag Start ───────────────────────────────────────────────
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
   };
 
-  const handleDrop = (id) => {
-    if (showAns || draggedNumber === null) return;
-    applyDrop(id, draggedNumber);
-    setDraggedNumber(null);
-  };
+  // ── Drag End ─────────────────────────────────────────────────
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
 
-  // ── Touch (mobile) ──
-  const handleTouchStart = (e, num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-    const t = e.touches[0];
-    setTouchItem(num);
-    setDraggedNumber(num);
-    setTouchPos({ x: t.clientX, y: t.clientY });
-  };
+    setActiveId(null);
 
-  const handleTouchMove = (e) => {
-    if (touchItem === null) return;
-    const t = e.touches[0];
-    setTouchPos({ x: t.clientX, y: t.clientY });
-  };
+    if (!over || showAns || checked) return;
 
-  const handleTouchEnd = () => {
-    if (touchItem === null) return;
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref) return;
-      const r = ref.getBoundingClientRect();
-      if (
-        touchPos.x >= r.left && touchPos.x <= r.right &&
-        touchPos.y >= r.top  && touchPos.y <= r.bottom
-      ) applyDrop(Number(key), touchItem);
-    });
-    setTouchItem(null);
-    setDraggedNumber(null);
-  };
+    const draggedNum = active.data.current?.num;
 
-  const applyDrop = (id, num) => {
+    const dropId = Number(over.id.toString().replace("drop-", ""));
+
+    if (!draggedNum || !dropId) return;
+
     setChecked(false);
-    const updated = { ...answers };
-    Object.keys(updated).forEach((k) => { if (updated[k] === num) delete updated[k]; });
-    updated[id] = num;
-    setAnswers(updated);
-  };
 
-  const handleRemove = (id) => {
-    if (showAns) return;
-    setChecked(false);
     setAnswers((prev) => {
       const updated = { ...prev };
-      delete updated[id];
+
+      Object.keys(updated).forEach((k) => {
+        if (updated[k] === draggedNum) {
+          delete updated[k];
+        }
+      });
+
+      updated[dropId] = draggedNum;
+
       return updated;
     });
   };
 
-  // ── Check / Show / Reset ──
-  const handleCheck = () => {
-    if (showAns) return;
-    const allAnswered = ITEMS.every((item) => answers[item.id]);
-    if (!allAnswered) {
-      ValidationAlert.error("Please complete all answers first! ✏️");
-      return;
-    }
-    let correct = 0;
-    ITEMS.forEach((item) => { if (answers[item.id] === CORRECT_ANSWERS[item.id]) correct++; });
-    setChecked(true);
-    const total = ITEMS.length;
-    if (correct === total) ValidationAlert.success("Excellent! All correct! 🎉");
-    else                   ValidationAlert.error(`${correct} / ${total} correct. Try again! 💪`);
+  // ── Remove ───────────────────────────────────────────────────
+  const handleRemove = (id) => {
+    if (showAns || checked) return;
+
+    setChecked(false);
+
+    setAnswers((prev) => {
+      const updated = { ...prev };
+
+      delete updated[id];
+
+      return updated;
+    });
   };
 
+  // ── Check ────────────────────────────────────────────────────
+  const handleCheck = () => {
+    if (showAns || checked) return;
+
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all answers first! ✏️");
+
+      return;
+    }
+
+    let correct = 0;
+
+    ITEMS.forEach((item) => {
+      if (answers[item.id] === CORRECT_ANSWERS[item.id]) {
+        correct++;
+      }
+    });
+
+    setChecked(true);
+
+    const total = ITEMS.length;
+
+    if (correct === total) {
+      ValidationAlert.success(`Score: ${correct} / ${total}`);
+    } else if (correct > 0) {
+      ValidationAlert.warning(`Score: ${correct} / ${total}`);
+    } else {
+      ValidationAlert.error(`Score: ${correct} / ${total}`);
+    }
+  };
+
+  // ── Show Answer ──────────────────────────────────────────────
   const handleShowAnswer = () => {
-    setAnswers({ ...CORRECT_ANSWERS });
+    setAnswers({
+      ...CORRECT_ANSWERS,
+    });
+
     setChecked(false);
+
     setShowAns(true);
   };
 
+  // ── Reset ────────────────────────────────────────────────────
   const handleReset = () => {
     setAnswers({});
-    setDraggedNumber(null);
-    setTouchItem(null);
+
     setChecked(false);
+
     setShowAns(false);
+
+    setActiveId(null);
   };
 
   const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
 
   return (
-        <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(20px,3vw,36px)",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
+    <div className="main-container-component">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       >
-
-        {/* ── العنوان ── */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span>{" "}
-          Read, look, and number.
-        </h1>
-
-        {/* ── الأرقام للسحب ── */}
         <div
+          className="div-forall"
           style={{
-            display:        "flex",
-            justifyContent: "center",
-            gap:            "clamp(10px,1.5vw,16px)",
-            flexWrap:       "wrap",
+            gap: "25px",
           }}
         >
-          {NUMBERS.map((num) => {
-            const disabled = usedNumbers.includes(num);
-            const selected = draggedNumber === num || touchItem === num;
+          {/* العنوان */}
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">I</span>
+            Read, look, and number.
+          </h1>
 
-            return (
-              <div
+          {/* الأرقام */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+
+              gap: "clamp(10px,1.5vw,16px)",
+
+              flexWrap: "wrap",
+            }}
+          >
+            {NUMBERS.map((num) => (
+              <DraggableNumber
                 key={num}
-                draggable={!disabled && !showAns}
-                onDragStart={() => handleDragStart(num)}
-                onTouchStart={(e) => handleTouchStart(e, num)}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                style={{
-                  width:          "clamp(40px,5vw,56px)",
-                  height:         "clamp(40px,5vw,56px)",
-                  borderRadius:   "50%",
-                  backgroundColor: disabled || showAns ? "#cfcfd4" : DRAG_COLOR,
-                  color:          "#fff",
-                  display:        "flex",
-                  alignItems:     "center",
-                  justifyContent: "center",
-                  fontWeight:     700,
-                  fontSize:       "clamp(18px,2.4vw,28px)",
-                  cursor:         disabled || showAns ? "not-allowed" : "grab",
-                  opacity:        disabled ? 0.55 : 1,
-                  userSelect:     "none",
-                  touchAction:    "none",
-                  transition:     "0.2s ease",
-                  transform:      selected ? "scale(1.1)" : "scale(1)",
-                  boxShadow:      selected
-                    ? `0 0 0 3px rgba(242,154,31,0.35)`
-                    : "0 3px 10px rgba(0,0,0,0.12)",
-                }}
-              >
-                {num}
-              </div>
-            );
-          })}
-        </div>
+                num={num}
+                disabled={usedNumbers.includes(num) || showAns || checked}
+                activeId={activeId}
+              />
+            ))}
+          </div>
 
-        {/* ── الأسئلة ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(12px,1.8vw,20px)" }}>
-          {ITEMS.map((item) => {
-            const wrong = isWrong(item.id);
-            const num   = answers[item.id];
+          {/* الأسئلة */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
 
-            return (
-              <div
-                key={item.id}
-                style={{
-                  display:     "flex",
-                  alignItems:  "center",
-                  gap:         "clamp(10px,2vw,24px)",
-                  flexWrap:    "wrap",
-                }}
-              >
-                {/* رقم السؤال + النص */}
+              gap: "clamp(12px,1.8vw,20px)",
+            }}
+          >
+            {ITEMS.map((item) => {
+              const wrong = isWrong(item.id);
+
+              const num = answers[item.id];
+
+              return (
                 <div
+                  key={item.id}
                   style={{
-                    display:    "flex",
-                    alignItems: "flex-start",
-                    gap:        "clamp(8px,1vw,14px)",
-                    flex:       1,
-                    minWidth:   "200px",
+                    display: "flex",
+
+                    alignItems: "center",
+
+                    gap: "clamp(10px,2vw,24px)",
+
+                    flexWrap: "wrap",
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize:   "clamp(16px,1.9vw,24px)",
-                      fontWeight: 700,
-                      color:      "#111",
-                      minWidth:   "clamp(16px,1.9vw,24px)",
-                      flexShrink: 0,
-                      marginTop:  "2px",
-                    }}
-                  >
-                    {item.id}
-                  </span>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                    {item.lines.map((line, i) => (
-                      <p
-                        key={i}
-                        style={{
-                          margin:     0,
-                          fontSize:   "clamp(14px,1.7vw,20px)",
-                          color:      "#222",
-                          lineHeight: 1.45,
-                          fontWeight: 500,
-                        }}
-                      >
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                {/* الصورة + صندوق الإجابة */}
-                <div
-                  ref={(el) => (dropRefs.current[item.id] = el)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => handleDrop(item.id)}
-                  style={{
-                    position:        "relative",
-                    width:           "clamp(160px,22vw,220px)",
-                    aspectRatio:     "3 / 2",
-                    border:          `2px solid "#f39b42"}`,
-                    borderRadius:    "clamp(10px,1.2vw,16px)",
-                    overflow:        "visible",
-                    backgroundColor: "#f7f7f7",
-                    flexShrink:      0,
-                    transition:      "border-color 0.2s",
-                  }}
-                >
-                  {/* الصورة داخل clip */}
+                  {/* النص */}
                   <div
                     style={{
-                      position:     "absolute",
-                      inset:        0,
-                      borderRadius: "clamp(10px,1.2vw,16px)",
-                      overflow:     "hidden",
+                      display: "flex",
+
+                      alignItems: "flex-start",
+
+                      gap: "clamp(8px,1vw,14px)",
+
+                      flex: 1,
+
+                      minWidth: "200px",
                     }}
                   >
-                    <img
-                      src={item.img}
-                      alt={`item-${item.id}`}
+                    <span
                       style={{
-                        width:         "100%",
-                        height:        "100%",
-                        objectFit:     "cover",
-                        display:       "block",
-                        userSelect:    "none",
-                        pointerEvents: "none",
+                        fontSize: "clamp(16px,1.9vw,24px)",
+                        fontWeight: 500,
+                        color: "#111",
+                        minWidth: "clamp(16px,1.9vw,24px)",
+                        flexShrink: 0,
+                        marginTop: "2px",
                       }}
-                    />
+                    >
+                      {item.id}
+                    </span>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "3px",
+                      }}
+                    >
+                      {item.lines.map((line, i) => (
+                        <p
+                          key={i}
+                          style={{
+                            margin: 0,
+                            fontSize: "clamp(16px,1.9vw,22px)",
+                            color: "#222",
+                            lineHeight: 1.45,
+                          }}
+                        >
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* صندوق الرقم - top right */}
-                  <div
-                    onClick={() => handleRemove(item.id)}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={() => handleDrop(item.id)}
-                    style={{
-                      position:        "absolute",
-                      top:             "clamp(4px,0.8vw,8px)",
-                      right:           "clamp(4px,0.8vw,8px)",
-                      width:           "clamp(28px,3.8vw,44px)",
-                      height:          "clamp(28px,3.8vw,44px)",
-                      borderRadius:    "clamp(5px,0.7vw,8px)",
-                      border:          `2px solid  "#f39b42"}`,
-                      backgroundColor: "#fff",
-                      display:         "flex",
-                      alignItems:      "center",
-                      justifyContent:  "center",
-                      fontSize:        "clamp(14px,2.2vw,28px)",
-                      fontWeight:      700,
-                      color:           wrong ? WRONG_COLOR : DRAG_COLOR,
-                      boxShadow:       "0 2px 6px rgba(0,0,0,0.15)",
-                      zIndex:          4,
-                      cursor:          num && !showAns ? "pointer" : "default",
-                      transition:      "border-color 0.2s, color 0.2s",
-                      boxSizing:       "border-box",
-                    }}
-                  >
-                    {num || ""}
-                  </div>
-
-                  {/* بادج الخطأ */}
-                  {wrong && <ErrorBadge top={-8} right={-8} />}
+                  {/* الصورة */}
+                  <DropZone
+                    item={item}
+                    num={num}
+                    wrong={wrong}
+                    checked={checked}
+                    showAns={showAns}
+                    handleRemove={handleRemove}
+                  />
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* الأزرار */}
+          <div className="mt-4 flex justify-center">
+            <Button
+              checkAnswers={handleCheck}
+              handleStartAgain={handleReset}
+              handleShowAnswer={handleShowAnswer}
+            />
+          </div>
         </div>
 
-        {/* ── الأزرار ── */}
-        <div className="mt-4 flex justify-center">
-          <Button
-            checkAnswers={handleCheck}
-            handleStartAgain={handleReset}
-            handleShowAnswer={handleShowAnswer}
-          />
-        </div>
+        {/* Overlay */}
+        <DragOverlay>
+          {activeId ? (
+            <div
+              style={{
+                width: "56px",
+                height: "56px",
 
-      </div>
+                borderRadius: "50%",
 
-      {/* ── Ghost للمس ── */}
-      {touchItem !== null && (
-        <div
-          style={{
-            position:        "fixed",
-            left:            touchPos.x - 28,
-            top:             touchPos.y - 28,
-            width:           "clamp(40px,5vw,56px)",
-            height:          "clamp(40px,5vw,56px)",
-            borderRadius:    "50%",
-            backgroundColor: DRAG_COLOR,
-            color:           "#fff",
-            display:         "flex",
-            alignItems:      "center",
-            justifyContent:  "center",
-            fontSize:        "clamp(18px,2.4vw,28px)",
-            fontWeight:      700,
-            pointerEvents:   "none",
-            zIndex:          9999,
-            boxShadow:       "0 4px 10px rgba(0,0,0,0.2)",
-          }}
-        >
-          {touchItem}
-        </div>
-      )}
+                backgroundColor: DRAG_COLOR,
+
+                color: "#fff",
+
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+
+                fontSize: "28px",
+
+                fontWeight: 700,
+
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+              }}
+            >
+              {activeId.replace("number-", "")}
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }
