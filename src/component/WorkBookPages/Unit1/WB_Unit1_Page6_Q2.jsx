@@ -179,7 +179,7 @@ const [activeDropId, setActiveDropId] = useState(null);
 
   return (
     <div className="main-container-component">
-      <div className="div-forall">
+      <div className="div-forall" style={{gap:"45px"}}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">H</span>
           Read, look, and number.
@@ -460,7 +460,7 @@ onDrop={() => {
         .wb-buttons-wrap {
           display: flex;
           justify-content: center;
-          margin-top: 4px;
+          // margin-top: 4px;
         }
 
         .wb-touch-preview {

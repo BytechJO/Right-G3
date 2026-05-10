@@ -209,13 +209,13 @@ export default function WB_Unit3_Page6_QC() {
           }
 
           .wb-c6-img-frame {
-            width: 100%;
+            // width: 100%;
             // max-width: 470px;
-            height: 140px;
+            // height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            // overflow: hidden;
             box-sizing: border-box;
             background: transparent;
             border: none;
@@ -224,10 +224,10 @@ export default function WB_Unit3_Page6_QC() {
           }
 
           .wb-c6-img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
+            // max-width: 100%;
+            // max-height: 100%;
+            width: 100%;
+            height: 110px;
             object-fit: contain;
             display: block;
             border: none;
@@ -237,10 +237,10 @@ export default function WB_Unit3_Page6_QC() {
           .wb-c6-pairs {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px 16px;
-            width: 100%;
-            padding-left: 0;
-            justify-content: space-around;
+            // gap: 12px 16px;
+            width: 80%;
+            // padding-left: 0;
+            justify-content: space-between;
           }
 
           .wb-c6-buttons {

@@ -3,19 +3,15 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 1.svg";
-import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 2.svg";
-import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 3.svg";
-import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 4.svg";
-import img3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 5.svg";
-import img3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 6.svg";
-import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 7.svg";
-import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 8.svg";
+import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 4.svg";
+import img2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 2.svg";
+import img2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 3.svg";
 
 const ITEMS = [
   {
     id: 1,
     leftImg: img1a,
-    rightImg: img1b,
+
     question: "Which one is lighter, the tiger or the cat?",
     options: [
       "The cat is lighter than the tiger",
@@ -25,8 +21,8 @@ const ITEMS = [
   },
   {
     id: 2,
-    leftImg: img2a,
-    rightImg: img2b,
+    leftImg: img1b,
+
     question: "Which one is taller, the man or the boy?",
     options: [
       "The man is taller than the boy",
@@ -36,8 +32,8 @@ const ITEMS = [
   },
   {
     id: 3,
-    leftImg: img3a,
-    rightImg: img3b,
+    leftImg: img2a,
+
     question: "Which one is faster, the skateboard or the car?",
     options: [
       "The car is faster than the skateboard",
@@ -47,8 +43,8 @@ const ITEMS = [
   },
   {
     id: 4,
-    leftImg: img4a,
-    rightImg: img4b,
+    leftImg: img2b,
+
     question: "Which one is thinner, the tree or the flower?",
     options: [
       "The flower is thinner than the tree",
@@ -64,7 +60,7 @@ export default function WB_Unit3_Page19_QE() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -75,7 +71,7 @@ export default function WB_Unit3_Page19_QE() {
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -100,17 +96,17 @@ export default function WB_Unit3_Page19_QE() {
     }
   };
 
-const handleShowAnswer = () => {
-  const filled = {};
+  const handleShowAnswer = () => {
+    const filled = {};
 
-  ITEMS.forEach((item) => {
-    filled[item.id] = item.correct;
-  });
+    ITEMS.forEach((item) => {
+      filled[item.id] = item.correct;
+    });
 
-  setAnswers(filled);
-  setChecked(true);
-  setShowAns(true);
-};
+    setAnswers(filled);
+    setChecked(true);
+    setShowAns(true);
+  };
 
   const handleReset = () => {
     setAnswers({});
@@ -129,7 +125,7 @@ const handleShowAnswer = () => {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
           column-gap: clamp(18px, 4vw, 54px);
-          row-gap: clamp(18px, 10vw, 60px);
+          row-gap: 25px;
           align-items: start;
           width: 100%;
         }
@@ -148,7 +144,7 @@ const handleShowAnswer = () => {
           align-items: flex-start;
           min-width: 0;
           width: 100%;
-          height: 265px
+          // height: 265px
         }
 
         .wb-e-num {
@@ -162,13 +158,13 @@ const handleShowAnswer = () => {
         }
 
         .wb-e-content {
-          flex: 1;
+          // flex: 1;
           display: flex;
           flex-direction: column;
-          gap: clamp(8px, 1.2vw, 12px);
+          gap: 5px;
           min-width: 0;
-              height: 100%;
-    justify-content: space-between;
+              // height: 100%;
+    // justify-content: space-between;
         }
 
         .wb-e-images {
@@ -192,8 +188,8 @@ const handleShowAnswer = () => {
         .wb-e-img {
           // max-width: 100%;
           // max-height: clamp(56px, 12vw, 120px);
-          width: 130px;
-          height: 130px;
+          width: auto;
+          height: 110px;
           object-fit: contain;
           display: block;
         }
@@ -202,6 +198,7 @@ const handleShowAnswer = () => {
           font-size: clamp(13px, 1.6vw, 17px);
           line-height: 1.3;
           color: #222;
+          height: 40px;
           
           // font-weight: 500;
           word-break: break-word;
@@ -370,7 +367,7 @@ const handleShowAnswer = () => {
         }
       `}</style>
 
-      <div className="div-forall">
+      <div className="div-forall" style={{gap:"25px"}}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
           Look and read. Answer the questions.
@@ -384,55 +381,46 @@ const handleShowAnswer = () => {
 
                 <div className="wb-e-content">
                   <div className="wb-e-images">
-                    <div className="wb-e-img-box">
-                      <img
-                        src={item.leftImg}
-                        alt={`left-${item.id}`}
-                        className="wb-e-img"
-                      />
-                    </div>
-                    <div className="wb-e-img-box">
-                      <img
-                        src={item.rightImg}
-                        alt={`right-${item.id}`}
-                        className="wb-e-img"
-                      />
-                    </div>
+                    <img
+                      src={item.leftImg}
+                      alt={`left-${item.id}`}
+                      className="wb-e-img"
+                    />
                   </div>
 
                   <div className="wb-e-question">{item.question}</div>
 
                   <div className="wb-e-answer-block">
                     <div className="wb-e-answer-line">
-                    <div className="wb-e-select-wrap">
-  <select
-    value={answers[item.id] || ""}
-    disabled={showAns}
-    onChange={(e) =>
-      handleSelect(item.id, e.target.value)
-    }
-    className={`wb-e-select 
+                      <div className="wb-e-select-wrap">
+                        <select
+                          value={answers[item.id] || ""}
+                          disabled={showAns}
+                          onChange={(e) =>
+                            handleSelect(item.id, e.target.value)
+                          }
+                          className={`wb-e-select 
       ${isWrong(item) ? "wrong" : ""} 
       ${answers[item.id] ? "has-value" : ""}`}
-  >
-    <option value="" disabled hidden>
-      Select
-    </option>
+                        >
+                          <option value="" disabled hidden>
+                            Select
+                          </option>
 
-    {item.options.map((option) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ))}
-  </select>
+                          {item.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
 
-  {!showAns && <span className="wb-e-arrow">▼</span>}
+                        {!showAns && <span className="wb-e-arrow">▼</span>}
 
-  {/* ❌ WRONG BADGE */}
-  {isWrong(item) && (
-    <div className="wb-e-wrong-badge">✕</div>
-  )}
-</div>
+                        {/* ❌ WRONG BADGE */}
+                        {isWrong(item) && (
+                          <div className="wb-e-wrong-badge">✕</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

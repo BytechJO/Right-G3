@@ -112,7 +112,7 @@ export default function WB_Unit1_Page4_Q2() {
               {/* Image */}
               <div className="flex items-start gap-3">
                 <span className="font-bold text-lg">{item.id}</span>
-                <img src={item.img} className="h-[160px] object-contain" style={{height:"160px"}}/>
+                <img src={item.img} className="h-[130px] object-contain" style={{height:"120px"}}/>
               </div>
 
               {/* Select */}
@@ -121,7 +121,7 @@ export default function WB_Unit1_Page4_Q2() {
                   value={answers[item.id] || ""}
                   disabled={showAns}
                   onChange={(e) => handleChange(item.id, e.target.value)}
-                  className={`w-full border-b-1 p-2 text-lg outline-none
+                  className={`w-[80%] border-b-1 p-2 text-lg outline-none
                     ${isWrong(item) ? "border-b-2 border-red-500" : "border-gray-400"}
                   `}
                 >
@@ -148,7 +148,7 @@ export default function WB_Unit1_Page4_Q2() {
           ))}
         </div>
 
-        <div className="flex justify-center mt-10">
+        <div className="flex justify-center">
           <Button
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}

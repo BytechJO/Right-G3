@@ -345,7 +345,7 @@ export default function WB_Unit3_Page5_QF() {
 
       <div
         className="div-forall"
-       
+       style={{gap:"25px"}}
       >
         <h1
           className="WB-header-title-page8"

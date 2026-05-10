@@ -171,7 +171,7 @@ export default function WB_Unit3_Page3_QB() {
         .wb-qb-main-list {
           display: flex;
           flex-direction: column;
-          gap: clamp(20px, 3vw, 34px);
+          gap: 15px;
           width: 100%;
         }
 
@@ -381,7 +381,7 @@ export default function WB_Unit3_Page3_QB() {
         }
       `}</style>
 
-      <div className="div-forall ">
+      <div className="div-forall " style={{gap:"30px"}}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>
           Read, look, circle, and write <img src={trueIcon} style={{height:"25px"}}/>.
