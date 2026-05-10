@@ -1,258 +1,171 @@
-import React, { useState, useCallback } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-const WRONG_COLOR  = "#ef4444";
-const ACTIVE_COLOR = "#f39b42";
-const SOFT_COLOR   = "#ffca94";
-const LINE_COLOR   = "#333";
+const shuffleArray = (array) => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
 
-const EXERCISES = [
-  { id: 1, scrambled: ["he",  "won't", "plant",  "a",   "tree."    ], correct: "He won't plant a tree."       },
-  { id: 2, scrambled: ["they","will",  "wash",   "the", "car."     ], correct: "They will wash the car."      },
-  { id: 3, scrambled: ["she", "will",  "build",  "a",   "snowman." ], correct: "She will build a snowman."    },
-  { id: 4, scrambled: ["I",   "won't", "watch",  "a",   "movie."   ], correct: "I won't watch a movie."       },
-  { id: 5, scrambled: ["she", "won't", "lie",    "in",  "the","sun."], correct: "She won't lie in the sun."   },
-  { id: 6, scrambled: ["he",  "will",  "read",   "a",   "book."    ], correct: "He will read a book."         },
+const ITEMS = [
+  {
+    id: 1,
+    prompt: "he / won't / plant / tree",
+    words: ["He", "won't", "plant", "a", "tree."],
+  },
+  {
+    id: 2,
+    prompt: "they / wash / car",
+    words: ["They", "will", "wash", "the", "car."],
+  },
+  {
+    id: 3,
+    prompt: "she / build / snowman",
+    words: ["She", "will", "build", "a", "snowman."],
+  },
+  {
+    id: 4,
+    prompt: "I / won't / watch / movie",
+    words: ["I", "won't", "watch", "a", "movie."],
+  },
+  {
+    id: 5,
+    prompt: "she / won't / lie / sun",
+    words: ["She", "won't", "lie", "in", "the", "sun."],
+  },
+  {
+    id: 6,
+    prompt: "he / read / book",
+    words: ["He", "will", "read", "a", "book."],
+  },
 ];
+export default function WB_Unit10_Page10_Q2() {
+  const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
+  const [wordBanksSeed, setWordBanksSeed] = useState(0);
 
-// ── Single exercise row ──
-function ExerciseRow({ item, showResults, showAns, onUpdate, resetKey }) {
-  const initWords = () =>
-    item.scrambled.map((w, i) => ({ id: `${item.id}-${i}`, text: w }));
+  const shuffledBanks = useMemo(() => {
+    const banks = {};
+    ITEMS.forEach((item) => {
+      banks[item.id] = shuffleArray(item.words);
+    });
+    return banks;
+  }, [wordBanksSeed]);
 
-  const [available, setAvailable] = useState(initWords);
-  const [chosen,    setChosen]    = useState([]);
+  const handleSelectWord = (itemId, wordIndex) => {
+    if (showAns||checked) return;
 
-  // reset when resetKey changes
-  React.useEffect(() => {
-    setAvailable(initWords());
-    setChosen([]);
-    onUpdate("");
-  }, [resetKey]);
+    const currentAnswer = answers[itemId] || [];
+    const selectedWord = shuffledBanks[itemId][wordIndex];
 
-  // show answer
-  React.useEffect(() => {
-    if (!showAns) return;
-    const words = item.correct.split(" ").map((w, i) => ({
-      id: `${item.id}-ans-${i}`,
-      text: w,
+    if (!selectedWord) return;
+
+    setAnswers((prev) => ({
+      ...prev,
+      [itemId]: [...currentAnswer, selectedWord],
     }));
-    setChosen(words);
-    setAvailable([]);
-    onUpdate(item.correct);
-  }, [showAns]);
 
-  const addWord = (word) => {
-    if (showAns) return;
-    const newChosen = [...chosen, word];
-    setChosen(newChosen);
-    setAvailable((prev) => prev.filter((w) => w.id !== word.id));
-    onUpdate(newChosen.map((w) => w.text).join(" "));
+    if (checked) {
+      setChecked(false);
+    }
   };
 
-  const removeWord = (word) => {
-    if (showAns) return;
-    const newChosen = chosen.filter((w) => w.id !== word.id);
-    setChosen(newChosen);
-    setAvailable((prev) =>
-      [...prev, word].sort((a, b) => a.id.localeCompare(b.id))
-    );
-    onUpdate(newChosen.map((w) => w.text).join(" "));
+  const handleRemoveWord = (itemId, answerIndex) => {
+    if (showAns||checked) return;
+
+    const currentAnswer = [...(answers[itemId] || [])];
+    currentAnswer.splice(answerIndex, 1);
+
+    setAnswers((prev) => ({
+      ...prev,
+      [itemId]: currentAnswer,
+    }));
+
+    if (checked) {
+      setChecked(false);
+    }
+  };
+  const getVisibleBankWords = (item) => {
+    const chosenWords = answers[item.id] || [];
+    const tempChosen = [...chosenWords];
+
+    return shuffledBanks[item.id].map((word) => {
+      const foundIndex = tempChosen.indexOf(word);
+
+      if (foundIndex !== -1) {
+        tempChosen.splice(foundIndex, 1);
+
+        return {
+          word,
+          disabled: true,
+        };
+      }
+
+      return {
+        word,
+        disabled: false,
+      };
+    });
   };
 
-  const userAnswer  = chosen.map((w) => w.text).join(" ").trim().toLowerCase();
-  const correctLow  = item.correct.trim().toLowerCase();
-  const isWrong     = showResults && !showAns && !!userAnswer && userAnswer !== correctLow;
+  const isSentenceComplete = (item) => {
+    return (answers[item.id] || []).length === item.words.length;
+  };
 
-  return (
-    <div
-      style={{
-        display:    "flex",
-        alignItems: "flex-start",
-        gap:        "clamp(8px,1.2vw,16px)",
-        width:      "100%",
-        minWidth:   0,
-      }}
-    >
-      {/* number */}
-      <span
-        style={{
-          fontSize:   "clamp(16px,1.9vw,26px)",
-          fontWeight: 700,
-          color:      "#111",
-          lineHeight: 1.4,
-          flexShrink: 0,
-          minWidth:   "clamp(14px,1.8vw,22px)",
-        }}
-      >
-        {item.id}
-      </span>
-
-      <div
-        style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "clamp(8px,1vw,12px)",
-          flex:          1,
-          minWidth:      0,
-        }}
-      >
-        {/* scrambled words — الكلمات المبعثرة */}
-        <div
-          style={{
-            fontSize:   "clamp(14px,1.7vw,22px)",
-            fontWeight: 500,
-            color:      "#555",
-            lineHeight: 1.3,
-          }}
-        >
-          {item.scrambled.join(" / ")}
-        </div>
-
-        {/* word bank للسؤال */}
-        <div
-          style={{
-            display:      "flex",
-            flexWrap:     "wrap",
-            gap:          "clamp(5px,0.7vw,9px)",
-            minHeight:    "clamp(32px,4vw,44px)",
-            padding:      "clamp(6px,0.8vw,10px)",
-            borderRadius: "clamp(8px,1vw,12px)",
-            background:   "#f3f4f6",
-            border:       "1px solid #e5e7eb",
-            boxSizing:    "border-box",
-          }}
-        >
-          {available.map((word) => (
-            <div
-              key={word.id}
-              onClick={() => addWord(word)}
-              style={{
-                padding:      "clamp(4px,0.5vw,7px) clamp(8px,1vw,14px)",
-                borderRadius: "clamp(6px,0.8vw,10px)",
-                border:       `1.5px solid ${ACTIVE_COLOR}`,
-                background:   SOFT_COLOR,
-                color:        "#222",
-                fontSize:     "clamp(13px,1.6vw,20px)",
-                fontWeight:   500,
-                cursor:       "pointer",
-                userSelect:   "none",
-                transition:   "0.15s ease",
-                lineHeight:   1.2,
-              }}
-            >
-              {word.text}
-            </div>
-          ))}
-        </div>
-
-        {/* answer line — الكلمات المختارة */}
-        <div style={{ position: "relative", width: "100%" }}>
-          <div
-            style={{
-              display:       "flex",
-              flexWrap:      "wrap",
-              gap:           "clamp(5px,0.7vw,9px)",
-              minHeight:     "clamp(32px,4vw,44px)",
-              padding:       "clamp(4px,0.5vw,7px) clamp(4px,0.5vw,7px) clamp(8px,1vw,12px)",
-              borderBottom:  `2.5px solid ${isWrong ? WRONG_COLOR : LINE_COLOR}`,
-              boxSizing:     "border-box",
-            }}
-          >
-            {chosen.map((word) => (
-              <div
-                key={word.id}
-                onClick={() => removeWord(word)}
-                style={{
-                  padding:      "clamp(4px,0.5vw,7px) clamp(8px,1vw,14px)",
-                  borderRadius: "clamp(6px,0.8vw,10px)",
-                  border:       `1.5px solid ${isWrong ? WRONG_COLOR : ACTIVE_COLOR}`,
-                  background:   isWrong ? "rgba(239,68,68,0.08)" : "rgba(243,155,66,0.12)",
-                  color:        isWrong ? WRONG_COLOR : "#222",
-                  fontSize:     "clamp(13px,1.6vw,20px)",
-                  fontWeight:   600,
-                  cursor:       showAns ? "default" : "pointer",
-                  userSelect:   "none",
-                  lineHeight:   1.2,
-                }}
-              >
-                {word.text}
-              </div>
-            ))}
-          </div>
-
-          {/* wrong badge — يسار أعلى */}
-          {isWrong && (
-            <div
-              style={{
-                position:        "absolute",
-                top:             "-8px",
-                left:            "-8px",
-                width:           "clamp(16px,1.8vw,22px)",
-                height:          "clamp(16px,1.8vw,22px)",
-                borderRadius:    "50%",
-                backgroundColor: WRONG_COLOR,
-                border:          "1px solid #fff",
-                color:           "#fff",
-                display:         "flex",
-                alignItems:      "center",
-                justifyContent:  "center",
-                fontSize:        "clamp(9px,0.9vw,12px)",
-                fontWeight:      700,
-                boxShadow:       "0 1px 4px rgba(0,0,0,0.2)",
-                zIndex:          3,
-                pointerEvents:   "none",
-              }}
-            >
-              ✕
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function WB_Unit8_Page60_QH() {
-  const [userAnswers, setUserAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [showAns,     setShowAns]     = useState(false);
-  const [resetKey,    setResetKey]    = useState(0);
-
-  const handleUpdate = useCallback((id, answer) => {
-    setUserAnswers((prev) => ({ ...prev, [id]: answer }));
-    setShowResults(false);
-  }, []);
+  const isSentenceCorrect = (item) => {
+    return (answers[item.id] || []).join(" ") === item.words.join(" ");
+  };
 
   const handleCheck = () => {
-    if (showAns) return;
-    const allAnswered = EXERCISES.every((e) => userAnswers[e.id]?.trim());
-    if (!allAnswered) { ValidationAlert.info("Please complete all sentences first."); return; }
+    if (showAns||checked) return;
+
+    const allCompleted = ITEMS.every((item) => isSentenceComplete(item));
+
+    if (!allCompleted) {
+      ValidationAlert.info("Please complete all sentences first.");
+      return;
+    }
+
     let score = 0;
-    EXERCISES.forEach((e) => {
-      if (userAnswers[e.id]?.trim().toLowerCase() === e.correct.trim().toLowerCase()) score++;
+
+    ITEMS.forEach((item) => {
+      if (isSentenceCorrect(item)) {
+        score++;
+      }
     });
-    setShowResults(true);
-    const total = EXERCISES.length;
-    if (score === total)  ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0)   ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else                  ValidationAlert.error(`Score: ${score} / ${total}`);
+
+    setChecked(true);
+
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+    }
   };
 
   const handleShowAnswer = () => {
-    const filled = {};
-    EXERCISES.forEach((e) => { filled[e.id] = e.correct; });
-    setUserAnswers(filled);
-    setShowResults(true);
+    const solved = {};
+    ITEMS.forEach((item) => {
+      solved[item.id] = [...item.words];
+    });
+
+    setAnswers(solved);
+    setChecked(true);
     setShowAns(true);
   };
 
-  const handleStartAgain = () => {
-    setUserAnswers({});
-    setShowResults(false);
+  const handleReset = () => {
+    setAnswers({});
+    setChecked(false);
     setShowAns(false);
-    setResetKey((prev) => prev + 1);
+    setWordBanksSeed((prev) => prev + 1);
   };
 
   return (
@@ -260,54 +173,190 @@ export default function WB_Unit8_Page60_QH() {
       <div
         className="div-forall"
         style={{
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "clamp(18px,2.5vw,28px)",
-          maxWidth:      "1100px",
-          margin:        "0 auto",
+       
+          gap: "30px",
+         
         }}
       >
-        {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0 }}
-        >
-          <span className="WB-ex-A">H</span> Read and write sentences.
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">H</span>
+     Read and write sentences.
         </h1>
 
-        {/* Exercises */}
         <div
           style={{
-            display:       "flex",
+            display: "flex",
             flexDirection: "column",
-            gap:           "clamp(20px,3vw,36px)",
-            width:         "100%",
+            gap: "18px",
+            width: "100%",
           }}
         >
-          {EXERCISES.map((item) => (
-            <ExerciseRow
-              key={`${item.id}-${resetKey}`}
-              item={item}
-              showResults={showResults}
-              showAns={showAns}
-              onUpdate={(ans) => handleUpdate(item.id, ans)}
-              resetKey={resetKey}
-            />
-          ))}
+          {ITEMS.map((item) => {
+            const builtWords = answers[item.id] || [];
+            const visibleWords = getVisibleBankWords(item);
+            const wrong =
+              checked && isSentenceComplete(item) && !isSentenceCorrect(item);
+
+            return (
+              <div
+                key={item.id}
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  padding: "12px 14px",
+                  border: "1px solid #f39b42",
+                  borderRadius: "14px",
+                  backgroundColor: "#fff",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "700",
+                      color: "#111",
+                      minWidth: "20px",
+                    }}
+                  >
+                    {item.id}
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      color: "#444",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {item.prompt}
+                  </span>
+                </div>
+
+                {/* built answer */}
+                <div
+                  style={{
+                    minHeight: "40px",
+                    borderBottom: "1px solid #8f8f8f",
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    // gap: "8px",
+                    // paddingBottom: "6px",
+                  }}
+                >
+                  {builtWords.map((word, index) => (
+                    <button
+                      key={`${item.id}-built-${index}-${word}`}
+                      onClick={() => handleRemoveWord(item.id, index)}
+                      style={{
+                        padding: "5px",
+                        borderRadius: "8px",
+                        border: "none",
+                        fontSize: "18px",
+                        // fontWeight: "500",
+                        cursor: showAns||checked ? "default" : "pointer",
+                      }}
+                      className={`${!showAns && !checked && "hover:text-red-500"}`}
+                    >
+                      {word}
+                    </button>
+                  ))}
+                </div>
+
+                {/* word bank */}
+                {/* word bank */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                  }}
+                >
+                  {visibleWords.map((wordItem, index) => (
+                    <button
+                      key={`${item.id}-bank-${index}-${wordItem.word}`}
+                      onClick={() =>
+                        !wordItem.disabled && handleSelectWord(item.id, index)
+                      }
+                      disabled={wordItem.disabled}
+                      style={{
+                        padding: "6px 10px",
+                        borderRadius: "8px",
+                        border: "1px solid #cbd5e1",
+
+                        backgroundColor: wordItem.disabled
+                          ? "#d1d5db"
+                          : "#f8fafc",
+
+                        color: wordItem.disabled ? "#535353ff" : "#111827",
+
+                        opacity: wordItem.disabled ? 0.6 : 1,
+
+                        fontSize: "15px",
+                        fontWeight: "500",
+
+                        cursor:
+                          showAns || wordItem.disabled
+                            ? "not-allowed"
+                            : "pointer",
+                      }}
+                    >
+                      {wordItem.word}
+                    </button>
+                  ))}
+                </div>
+
+                {wrong && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-8px",
+                      right: "-8px",
+                     width: "22px",
+      height: "22px",
+      borderRadius: "50%",
+      backgroundColor: "red",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "12px",
+      fontWeight: "700",
+      border: "2px solid white",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+      zIndex: 5,
+      pointerEvents: "none",
+                       }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Buttons */}
         <div
           style={{
-            display:        "flex",
+            display: "flex",
             justifyContent: "center",
-            marginTop:      "clamp(6px,1vw,12px)",
+            marginTop: "8px",
           }}
         >
           <Button
-            checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleStartAgain}
+            handleStartAgain={handleReset}
+            checkAnswers={handleCheck}
           />
         </div>
       </div>

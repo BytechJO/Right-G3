@@ -1,87 +1,86 @@
-.q1-10{
+.q1-10 {
   position: absolute;
   padding: 5px;
-  top: 13%;
-
-  left:58.5%;
-  
+  top: 14.5%;
+  left: 60%;
 }
-.q2-10{
+.q2-10 {
   position: absolute;
   padding: 5px;
-  top: 60%;
-  left: 89.5%;
+  top: 61.5%;
+  left: 91.5%;
 }
-.q3-10{  position: absolute;
+.q3-10 {
+  position: absolute;
+  padding: 5px;
+  top: 3.5%;
+  left: 39.5%;
+}
+.q4-10 {
+  position: absolute;
+  padding: 5px;
+  top: 45.5%;
+  left: 45.5%;
+}
+.q5-10 {
+  position: absolute;
   padding: 5px;
   top: 2%;
-  left:39.5%;
-
+  left: 38.5%;
 }
-.q4-10{
-  position: absolute;
-  padding: 5px;
-  top: 45%;
-  left:45.5%;
-}
-.q5-10{  position: absolute;
-  padding: 5px;
-  top: 2%;
-  left:38.5%;
-
-}
-.q6-10{
+.q6-10 {
   position: absolute;
   padding: 5px;
   top: 47%;
-  left:30.5%;
+  left: 30.5%;
 }
-.q7-10{  
-position: absolute;
-  padding: 5px;
-  top: 2%;
-  left:39.5%;
-}
-.q8-10{
- position: absolute;
-  padding: 5px;
-  top: 56%;
-  left:44.5%;
-}
-.q9-10{  
- position: absolute;
-  padding: 5px;
-  top:2%;
-  left: 39.5%;
-}
-.q10-10{
+.q7-10 {
   position: absolute;
   padding: 5px;
-  top:48%;
-  left: 70.5%;
+  top: 3.5%;
+  left: 45.5%;
 }
-.q11-10{  position: absolute;
+.q8-10 {
+  position: absolute;
   padding: 5px;
-  top: 8%;
-  left:33.5%;
+  top: 56.5%;
+  left: 45.5%;
+}
+.q9-10 {
+  position: absolute;
+  padding: 5px;
+  top: 3%;
+  left: 38.5%;
+}
+.q10-10 {
+  position: absolute;
+  padding: 5px;
+  top: 49%;
+  left: 71.5%;
+}
+.q11-10 {
+  position: absolute;
+  padding: 5px;
+  top: 8.5%;
+  left: 33.5%;
+}
+.q12-10 {
+  position: absolute;
+  padding: 5px;
+  top: 40.5%;
+  left: 55.5%;
+}
 
+.q13-10 {
+  position: absolute;
+  padding: 5px;
+  top: 77%;
+  left: 33.5%;
 }
-.q12-10{
-  position: absolute;
-  padding: 5px;
-  top:40%;
-  left: 55.5%;}
-  
-.q13-10{position: absolute;
-  padding: 5px;
-  top:76%;
-  left:37.5%;
-} 
- 
 
-.q14-10{
+.q14-10 {
   position: absolute;
   padding: 5px;
-  top:83%;
+  top: 83%;
   left: 73.5%;
 }

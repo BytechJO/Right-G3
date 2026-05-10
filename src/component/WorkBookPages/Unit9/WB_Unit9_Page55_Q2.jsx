@@ -152,7 +152,7 @@ export default function WB_Unit8_Page55_QJ() {
       <div
         className="div-forall"
         style={{
-          gap: "clamp(20px,3vw,36px)",
+          gap: "20px",
         }}
       >
         {/* ── Title ───────────────────────────────────────── */}
@@ -225,7 +225,7 @@ export default function WB_Unit8_Page55_QJ() {
                     src={item.img}
                     alt={`question-${item.id}`}
                     style={{
-                      width: "80%",
+                      width: "60%",
                       height: "auto",
 
                       display: "block",
@@ -239,7 +239,7 @@ export default function WB_Unit8_Page55_QJ() {
                 <div
                   style={{
                     position: "relative",
-                    width: "80%",
+                    width: "60%",
                   }}
                 >
                   <select

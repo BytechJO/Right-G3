@@ -53,7 +53,7 @@ export default function WB_Unit8_Page60_QI() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (id, field, value) => {
-    if (showAns) return;
+    if (showAns || checked) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -69,21 +69,15 @@ export default function WB_Unit8_Page60_QI() {
     if (!ans) return false;
 
     return (
-      ans.subject === item.correctSubject &&
-      ans.place === item.correctPlace
+      ans.subject === item.correctSubject && ans.place === item.correctPlace
     );
   };
 
-  const isWrong = (item) => {
-    if (!checked) return false;
-    return !isCorrect(item);
-  };
-
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || checked) return;
 
     const allAnswered = QUESTIONS.every(
-      (item) => answers[item.id]?.subject && answers[item.id]?.place
+      (item) => answers[item.id]?.subject && answers[item.id]?.place,
     );
 
     if (!allAnswered) {
@@ -131,16 +125,26 @@ export default function WB_Unit8_Page60_QI() {
     setShowAns(false);
   };
 
+  const isSubjectWrong = (item) => {
+    if (!checked) return false;
+
+    return answers[item.id]?.subject !== item.correctSubject;
+  };
+
+  const isPlaceWrong = (item) => {
+    if (!checked) return false;
+
+    return answers[item.id]?.place !== item.correctPlace;
+  };
+
   return (
- <div className="main-container-component">
+    <div className="main-container-component">
       <div
-       className="div-forall"
-            style={{
-          flexDirection:  "column",
-       gap: "28px",
-          maxWidth: "1100px",
-         margin: "0 auto",       }}
-      > 
+        className="div-forall"
+        style={{
+          gap: "28px",
+        }}
+      >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">I</span>
           Read, look, and write.
@@ -149,7 +153,7 @@ export default function WB_Unit8_Page60_QI() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.5fr 0.8fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: "36px",
             alignItems: "start",
           }}
@@ -173,8 +177,8 @@ export default function WB_Unit8_Page60_QI() {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    height: "94px",
-                    marginBottom:"30px"
+                    // height: "94px",
+                    marginBottom: "20px",
                   }}
                 >
                   <div
@@ -217,37 +221,70 @@ export default function WB_Unit8_Page60_QI() {
                       gap: "8px",
                       height: "42px",
                       paddingLeft: "28px",
-                      borderBottom: "2px solid #555",
+
                       paddingBottom: "4px",
                       flexWrap: "nowrap",
                     }}
                   >
-                    <select
-                      value={current.subject || ""}
-                      onChange={(e) =>
-                        handleSelect(item.id, "subject", e.target.value)
-                      }
-                      disabled={showAns}
-                      style={{
-                        border: "1px solid #f39b42",
-                        borderRadius: "8px",
-                        padding: "4px 8px",
-                        fontSize: "17px",
-                        outline: "none",
-                        backgroundColor: showAns ? "#f3f4f6" : "#fff",
-                        color: "#444",
-                        cursor: showAns ? "default" : "pointer",
-                        minWidth: "94px",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <option value="">Select</option>
-                      {item.subjectOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
+                    <div style={{ position: "relative" }}>
+                      <select
+                        value={current.subject || ""}
+                        onChange={(e) =>
+                          handleSelect(item.id, "subject", e.target.value)
+                        }
+                        disabled={showAns || checked}
+                        style={{
+                          border: "none",
+                          borderBottom: isSubjectWrong(item)
+                            ? `2px solid 
+                            red`
+                            : "1px solid #f39b42",
+                          padding: "4px 8px",
+                          fontSize: "17px",
+                          outline: "none",
+                          color: "#444",
+                          cursor: showAns || checked ? "default" : "pointer",
+                          minWidth: "94px",
+                          flexShrink: 0,
+                          backgroundColor: "transparent",
+                        }}
+                      >
+                        <option value="">Select</option>
+
+                        {item.subjectOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+                      {isSubjectWrong(item) && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-10px",
+                            right: "-8px",
+                            width: "22px",
+                            height: "22px",
+                            borderRadius: "50%",
+                            backgroundColor: "red",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+                            zIndex: 5,
+                            pointerEvents: "none",
+                          }}
+                        >
+                          ✕
+                        </div>
+                      )}
+                    </div>
 
                     <span
                       style={{
@@ -259,34 +296,65 @@ export default function WB_Unit8_Page60_QI() {
                     >
                       will go to the
                     </span>
+                    <div style={{ position: "relative" }}>
+                      <select
+                        value={current.place || ""}
+                        onChange={(e) =>
+                          handleSelect(item.id, "place", e.target.value)
+                        }
+                        disabled={showAns || checked}
+                        style={{
+                          border: "none",
+                          borderBottom: isPlaceWrong(item)
+                            ? `2px solid 
+                            red`
+                            : "1px solid #f39b42",
+                          padding: "4px 8px",
+                          fontSize: "17px",
+                          outline: "none",
+                          color: "#444",
+                          cursor: showAns || checked ? "default" : "pointer",
+                          minWidth: "150px",
+                          flexShrink: 0,
+                          backgroundColor: "transparent",
+                        }}
+                      >
+                        <option value="">Select place</option>
 
-                    <select
-                      value={current.place || ""}
-                      onChange={(e) =>
-                        handleSelect(item.id, "place", e.target.value)
-                      }
-                      disabled={showAns}
-                      style={{
-                        border: "1px solid #f39b42",
-                        borderRadius: "8px",
-                        padding: "4px 8px",
-                        fontSize: "17px",
-                        outline: "none",
-                        backgroundColor: showAns ? "#f3f4f6" : "#fff",
-                        color: 
-                        "#444",
-                        cursor: showAns ? "default" : "pointer",
-                        minWidth: "150px",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <option value="">Select place</option>
-                      {PLACE_OPTIONS.map((place) => (
-                        <option key={place} value={place}>
-                          {place}
-                        </option>
-                      ))}
-                    </select>
+                        {PLACE_OPTIONS.map((place) => (
+                          <option key={place} value={place}>
+                            {place}
+                          </option>
+                        ))}
+                      </select>
+
+                      {isPlaceWrong(item) && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-10px",
+                            right: "-8px",
+                            width: "22px",
+                            height: "22px",
+                            borderRadius: "50%",
+                            backgroundColor: "red",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+                            zIndex: 5,
+                            pointerEvents: "none",
+                          }}
+                        >
+                          ✕
+                        </div>
+                      )}
+                    </div>
 
                     <span
                       style={{
@@ -297,29 +365,6 @@ export default function WB_Unit8_Page60_QI() {
                     >
                       .
                     </span>
-
-                    {isWrong(item) && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "-10px",
-                          right: "-8px",
-                          width: "22px",
-                          height: "22px",
-                          borderRadius: "50%",
-                          backgroundColor: "#ef4444",
-                          color: "#fff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                        }}
-                      >
-                        ✕
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -336,29 +381,16 @@ export default function WB_Unit8_Page60_QI() {
             }}
           >
             {SIDE_IMAGES.map((item) => (
-              <div
-                key={item.id}
+              <img
+                src={item.img}
+                alt={item.label}
                 style={{
-                  width: "220px",
-                  height: "120px",
-                  border: "2px solid #f39b42",
-                  borderRadius: "14px",
-                  overflow: "hidden",
-                  backgroundColor: "#fff",
-                  flexShrink: 0,
+                  width: "auto",
+                  height: "100px",
+                  objectFit: "cover",
+                  display: "block",
                 }}
-              >
-                <img
-                  src={item.img}
-                  alt={item.label}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              </div>
+              />
             ))}
           </div>
         </div>

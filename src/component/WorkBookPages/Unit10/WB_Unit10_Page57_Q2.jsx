@@ -4,7 +4,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const BORDER_COLOR = "#f39b42";
-const WRONG_COLOR  = "#ef4444";
+const WRONG_COLOR  = "red";
 
 // ── بيانات ─────────────────────────────────────────────────────
 const QUESTIONS = [
@@ -23,14 +23,17 @@ export default function WB_Unit8_Page57_QB() {
   const [checked, setChecked] = useState(false);
 
   const handleSelect = (id, value) => {
+    if(checked)return
+
     setChecked(false);
     setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleCheck = () => {
+    if(checked)return
     const allAnswered = QUESTIONS.every((q) => answers[q.id]);
     if (!allAnswered) {
-      ValidationAlert.error("Please answer all questions first! ✏️");
+      ValidationAlert.info("Please answer all questions first! ✏️");
       return;
     }
     setChecked(true);
@@ -44,7 +47,7 @@ export default function WB_Unit8_Page57_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "clamp(18px,2.5vw,32px)" }}>
+      <div className="div-forall" style={{ gap: "40px" }}>
 
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
@@ -66,13 +69,13 @@ export default function WB_Unit8_Page57_QB() {
               key={opt}
               style={{
                 minWidth:        "clamp(120px,16vw,170px)",
-                height:          "clamp(40px,5vw,52px)",
-                border:          `2px solid ${BORDER_COLOR}`,
+                height:          "45px",
+                border:          `1px solid ${BORDER_COLOR}`,
                 borderRadius:    "14px",
                 display:         "flex",
                 alignItems:      "center",
                 justifyContent:  "center",
-                fontSize:        "clamp(15px,1.8vw,20px)",
+                fontSize:        "18px",
                 fontWeight:      500,
                 color:           "#222",
                 backgroundColor: "#fff",
@@ -115,15 +118,15 @@ export default function WB_Unit8_Page57_QB() {
                 <div
                   style={{
                     display:    "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     gap:        "clamp(8px,1vw,12px)",
                     flexShrink: 0,
                   }}
                 >
                   <span
                     style={{
-                      fontSize:   "clamp(16px,1.9vw,22px)",
-                      fontWeight: 700,
+                      fontSize:   "20px",
+                      fontWeight: 500,
                       color:      "#111",
                       minWidth:   "clamp(14px,1.8vw,20px)",
                     }}
@@ -132,10 +135,10 @@ export default function WB_Unit8_Page57_QB() {
                   </span>
                   <span
                     style={{
-                      fontSize:   "clamp(14px,1.7vw,20px)",
+                      fontSize:   "18px",
                       color:      "#222",
                       lineHeight: 1.4,
-                      fontWeight: 500,
+                      // fontWeight: 500,
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -155,11 +158,11 @@ export default function WB_Unit8_Page57_QB() {
                           padding:         "clamp(5px,0.7vw,8px) clamp(10px,1.2vw,14px)",
                           borderRadius:    "20px",
                           border:          `1.5px solid ${active ? BORDER_COLOR : "#e2e8f0"}`,
-                          backgroundColor: active ? "#ffca94" : "#f8fafc",
-                          color:           active ? "#fff" : "#64748b",
+                          // backgroundColor: active ? "#ffca94" : "#f8fafc",
+                          // color:           active ? "#fff" : "",
                           fontSize:        "clamp(12px,1.4vw,15px)",
                           fontWeight:      600,
-                          cursor:          "pointer",
+                          cursor:          checked ? "default":"pointer",
                           whiteSpace:      "nowrap",
                           transition:      "all 0.15s",
                           userSelect:      "none",
@@ -177,11 +180,11 @@ export default function WB_Unit8_Page57_QB() {
                     flex:         1,
                     minWidth:     "80px",
                     minHeight:    "clamp(30px,3.5vw,40px)",
-                    borderBottom: `2px solid ${unanswered ? WRONG_COLOR : "#7f7f7f"}`,
+                    borderBottom: `1px solid ${unanswered ? WRONG_COLOR : "#7f7f7f"}`,
                     display:      "flex",
                     alignItems:   "center",
-                    fontSize:     "clamp(14px,1.7vw,20px)",
-                    fontWeight:   600,
+                    fontSize:     "18px",
+                    // fontWeight:   600,
                     color:        "#000000ff",
                     paddingBottom:"2px",
                     transition:   "border-color 0.2s",

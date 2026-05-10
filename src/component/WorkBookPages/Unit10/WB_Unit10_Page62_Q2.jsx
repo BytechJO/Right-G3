@@ -103,13 +103,13 @@ const WB_Unit10_Page62_QB = () => {
   };
 
   const handleLeftClick = (id) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     setSelectedLeft(id);
     setShowResults(false);
   };
 
   const handleRightClick = (rightId) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
     if (selectedLeft === null) return;
 
     const newMatches = { ...matches };
@@ -145,7 +145,7 @@ const WB_Unit10_Page62_QB = () => {
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     const allBlanksDone = SENTENCES.every((item) => {
       const current = blankAnswers[item.id] || {};
@@ -212,28 +212,9 @@ const WB_Unit10_Page62_QB = () => {
     return isConnected ? "#3b82f6" : "#9ca3af";
   };
 
-  const getChoiceStyle = (active) => ({
-    minWidth: "42px",
-    height: "32px",
-    borderRadius: "10px",
-    border: active ? "2px solid #ef4444" : "2px solid #d1d5db",
-    backgroundColor: active ? "#fef2f2" : "#fff",
-    color: active ? "#dc2626" : "#444",
-    fontSize: "16px",
-    fontWeight: "700",
-    cursor: showAns ? "default" : "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "0 8px",
-  });
-
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      >
+      <div className="div-forall" style={{ gap: "15px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>
           Read and write cr, dr, or tr. Match.
@@ -244,11 +225,11 @@ const WB_Unit10_Page62_QB = () => {
           style={{
             position: "relative",
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "flex-start",
             gap: "70px",
             padding: "10px 20px",
-            minHeight: "620px",
+            // minHeight: "620px",
           }}
         >
           {/* left side */}
@@ -256,8 +237,8 @@ const WB_Unit10_Page62_QB = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "26px",
-              width: "760px",
+              gap: "20px",
+              width: "100%",
             }}
           >
             {SENTENCES.map((item) => {
@@ -271,15 +252,15 @@ const WB_Unit10_Page62_QB = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    gap: "18px",
-                    minHeight: "130px",
+                    // gap: "18px",
+                    minHeight: "100px",
                     padding: "8px 10px",
                     borderRadius: "14px",
-                    backgroundColor:
-                      selectedLeft === item.id ? "rgba(59,130,246,0.06)" : "transparent",
+              width: "460px",
+
                     border:
                       selectedLeft === item.id
-                        ? "2px solid #3b82f6"
+                        ? "2px solid #f39b42"
                         : "2px solid transparent",
                   }}
                 >
@@ -288,14 +269,14 @@ const WB_Unit10_Page62_QB = () => {
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
-                        gap: "12px",
-                        marginBottom: "18px",
+                        // gap: "12px",
+                        // marginBottom: "18px",
                       }}
                     >
                       <span
                         style={{
-                          fontSize: "22px",
-                          fontWeight: "700",
+                          fontSize: "20px",
+                          fontWeight: "500",
                           color: "#222",
                           minWidth: "18px",
                           lineHeight: "1.5",
@@ -306,7 +287,7 @@ const WB_Unit10_Page62_QB = () => {
 
                       <div
                         style={{
-                          fontSize: "22px",
+                          fontSize: "18px",
                           color: "#222",
                           lineHeight: "1.8",
                           display: "flex",
@@ -317,69 +298,155 @@ const WB_Unit10_Page62_QB = () => {
                       >
                         <span>{item.parts[0]}</span>
 
-                        <span
+                        <div
                           style={{
+                            position: "relative",
                             display: "inline-block",
-                            minWidth: "110px",
-                            borderBottom: "2px solid #444",
-                            textAlign: "center",
-                            color: current[0] ? "#dc2626" : "#9ca3af",
-                            fontWeight: "700",
-                            lineHeight: "1.2",
                           }}
                         >
-                          {current[0] || ""}
-                        </span>
+                          <select
+                            value={current[0] || ""}
+                            disabled={showAns || showResults}
+                            onChange={(e) =>
+                              handleBlankSelect(item.id, 0, e.target.value)
+                            }
+                            style={{
+                              width: "50px",
+                              border: "none",
+                              borderBottom: `2px solid ${
+                                showResults &&
+                                current[0] !== item.correctBlanks[0]
+                                  ? "red"
+                                  : "#444"
+                              }`,
+                              background: "transparent",
+                              textAlign: "center",
+                              // color: current[0] ? "#dc2626" : "#9ca3af",
+                              fontSize: "18px",
+                              outline: "none",
+                              cursor:
+                                showAns || showResults ? "default" : "pointer",
+                              // appearance: "none",
+                              WebkitAppearance: "none",
+                              MozAppearance: "none",
+                              padding: "2px 6px",
+                              fontWeight: "600",
+                            }}
+                          >
+                            <option value=""></option>
+
+                            {CHOICES.map((choice) => (
+                              <option key={choice} value={choice}>
+                                {choice}
+                              </option>
+                            ))}
+                          </select>
+
+                          {showResults &&
+                            current[0] &&
+                            current[0] !== item.correctBlanks[0] && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "-10px",
+                                  right: "-10px",
+                               width: "22px",
+                                  height: "22px",
+                                  borderRadius: "50%",
+                                  backgroundColor: "red",
+                                  color: "#fff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  border: "2px solid white",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+                                  zIndex: 5,
+                                }}
+                              >
+                                ✕
+                              </div>
+                            )}
+                        </div>
 
                         <span>{item.parts[1]}</span>
-
-                        <span
+                        <div
                           style={{
+                            position: "relative",
                             display: "inline-block",
-                            minWidth: "110px",
-                            borderBottom: "2px solid #444",
-                            textAlign: "center",
-                            color: current[1] ? "#dc2626" : "#9ca3af",
-                            fontWeight: "700",
-                            lineHeight: "1.2",
                           }}
                         >
-                          {current[1] || ""}
-                        </span>
+                          <select
+                            value={current[1] || ""}
+                            disabled={showAns || showResults}
+                            onChange={(e) =>
+                              handleBlankSelect(item.id, 1, e.target.value)
+                            }
+                            style={{
+                              width: "50px",
+                              border: "none",
+                              borderBottom: `2px solid ${
+                                showResults &&
+                                current[1] !== item.correctBlanks[1]
+                                  ? "red"
+                                  : "#444"
+                              }`,
+                              background: "transparent",
+                              textAlign: "center",
+                              // color: current[1] ? "#dc2626" : "#9ca3af",
+                              fontSize: "18px",
+                              outline: "none",
+                              cursor: showAns ? "default" : "pointer",
+                              // appearance: "none",
+                              WebkitAppearance: "none",
+                              MozAppearance: "none",
+                              padding: "2px 6px",
+                              fontWeight: "600",
+                            }}
+                          >
+                            <option value=""></option>
+
+                            {CHOICES.map((choice) => (
+                              <option key={choice} value={choice}>
+                                {choice}
+                              </option>
+                            ))}
+                          </select>
+
+                          {showResults &&
+                            current[1] &&
+                            current[1] !== item.correctBlanks[1] && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "-10px",
+                                  right: "-10px",
+                                  width: "22px",
+                                  height: "22px",
+                                  borderRadius: "50%",
+                                  backgroundColor: "red",
+                                  color: "#fff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "12px",
+                                  fontWeight: "700",
+                                  border: "2px solid white",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+                                  zIndex: 5,
+                                  pointerEvents: "none",
+                                }}
+                              >
+                                ✕
+                              </div>
+                            )}
+                        </div>
 
                         <span>{item.parts[2]}</span>
                       </div>
-                    </div>
-
-                    <div
-                      style={{
-                        marginLeft: "34px",
-                        display: "flex",
-                        gap: "10px",
-                      }}
-                    >
-                      {[0, 1].map((blankIndex) => (
-                        <div
-                          key={blankIndex}
-                          style={{
-                            display: "flex",
-                            gap: "8px",
-                            alignItems: "center",
-                          }}
-                        >
-                          {CHOICES.map((choice) => (
-                            <button
-                              key={`${item.id}-${blankIndex}-${choice}`}
-                              onClick={() =>
-                                handleBlankSelect(item.id, blankIndex, choice)
-                              }
-                              style={getChoiceStyle(current[blankIndex] === choice)}
-                            >
-                              {choice}
-                            </button>
-                          ))}
-                        </div>
-                      ))}
                     </div>
                   </div>
 
@@ -390,12 +457,12 @@ const WB_Unit10_Page62_QB = () => {
                       width: "20px",
                       height: "20px",
                       borderRadius: "50%",
-                      backgroundColor: getDotColor("left", item.id),
-                      cursor: showAns ? "default" : "pointer",
+                      backgroundColor: "#f39b42",
+                      cursor: showAns || showResults ? "default" : "pointer",
                       flexShrink: 0,
                       boxShadow:
                         selectedLeft === item.id
-                          ? "0 0 0 4px rgba(59,130,246,0.16)"
+                          ? "0 0 2px 4px rgba(247, 163, 27, 0.49)"
                           : "none",
                     }}
                   />
@@ -410,14 +477,18 @@ const WB_Unit10_Page62_QB = () => {
                         width: "22px",
                         height: "22px",
                         borderRadius: "50%",
-                        backgroundColor: "#ef4444",
+                        backgroundColor: "red",
                         color: "#fff",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: "12px",
                         fontWeight: "700",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+                        zIndex: 5,
+                        pointerEvents: "none",
                       }}
                     >
                       ✕
@@ -443,10 +514,9 @@ const WB_Unit10_Page62_QB = () => {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "14px",
-                  minHeight: "145px",
-                                marginBottom:"20px"
-
+                  gap: "18px",
+                  minHeight: "100px",
+                  // marginBottom:"20px"
                 }}
               >
                 <div
@@ -456,36 +526,25 @@ const WB_Unit10_Page62_QB = () => {
                     width: "20px",
                     height: "20px",
                     borderRadius: "50%",
-                    backgroundColor: getDotColor("right", item.id),
-                    cursor: showAns ? "default" : "pointer",
+                    backgroundColor: "#f39b42",
+
+                    cursor: showAns || showResults ? "default" : "pointer",
                     flexShrink: 0,
                   }}
                 />
 
-                <div
+                <img
+                  src={item.img}
+                  alt={item.alt}
+                  onClick={() => handleRightClick(item.id)}
+
                   style={{
-                    width: "220px",
-                    height: "140px",
-                    border: "2px solid #bdbdbd",
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    backgroundColor: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    width: "auto",
+                    height: "100px",
+
+                    display: "block",
                   }}
-                >
-                  <img
-                    src={item.img}
-                    alt={item.alt}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
-                </div>
+                />
               </div>
             ))}
           </div>
@@ -508,8 +567,8 @@ const WB_Unit10_Page62_QB = () => {
                 y1={line.y1}
                 x2={line.x2}
                 y2={line.y2}
-                stroke="#dc2626"
-                strokeWidth="4"
+                stroke="#f39b42"
+                strokeWidth="2"
                 strokeLinecap="round"
               />
             ))}

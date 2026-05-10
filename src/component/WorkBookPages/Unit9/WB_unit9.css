@@ -1,87 +1,86 @@
-.q1-9{
+.q1-9 {
   position: absolute;
   padding: 5px;
-  top: 13%;
-
-  left:38.5%;
-  
-}
-.q2-9{
-  position: absolute;
-  padding: 5px;
-  top: 63%;
-  left: 44.5%;
-}
-.q3-9{  position: absolute;
-  padding: 5px;
-  top: 2%;
-  left:47.5%;
-
-}
-.q4-9{
-  position: absolute;
-  padding: 5px;
-  top: 57%;
-  left:59.5%;
-}
-.q5-9{  position: absolute;
-  padding: 5px;
-  top: 2%;
-  left:40.5%;
-
-}
-.q6-9{
-  position: absolute;
-  padding: 5px;
-  top: 41%;
-  left:39.5%;
-}
-.q7-9{  
-position: absolute;
-  padding: 5px;
-  top: 2%;
-  left:39.5%;
-}
-.q8-9{
- position: absolute;
-  padding: 5px;
-  top: 58%;
-  left:39.5%;
-}
-.q9-9{  
- position: absolute;
-  padding: 5px;
-  top:2%;
-  left: 37.5%;
-}
-.q10-9{
-  position: absolute;
-  padding: 5px;
-  top:49%;
+  top: 14.5%;
   left: 39.5%;
 }
-.q11-9{  position: absolute;
+.q2-9 {
+  position: absolute;
   padding: 5px;
-  top: 9%;
-  left:33.5%;
-
+  top: 64%;
+  left: 45.5%;
 }
-.q12-9{
+.q3-9 {
   position: absolute;
   padding: 5px;
-  top:45%;
-  left: 83.5%;}
-  
-.q13-9{position: absolute;
+  top: 3.5%;
+  left: 47.5%;
+}
+.q4-9 {
+  position: absolute;
   padding: 5px;
-  top:58%;
-  left:45.5%;
-} 
- 
+  top: 58.5%;
+  left: 59.5%;
+}
+.q5-9 {
+  position: absolute;
+  padding: 5px;
+  top: 3.5%;
+  left: 41.5%;
+}
+.q6-9 {
+  position: absolute;
+  padding: 5px;
+  top: 42.5%;
+  left: 41%;
+}
+.q7-9 {
+  position: absolute;
+  padding: 5px;
+  top: 3.5%;
+  left: 39.5%;
+}
+.q8-9 {
+  position: absolute;
+  padding: 5px;
+  top: 59%;
+  left: 41%;
+}
+.q9-9 {
+  position: absolute;
+  padding: 5px;
+  top: 3.5%;
+  left: 43.5%;
+}
+.q10-9 {
+  position: absolute;
+  padding: 5px;
+  top: 50.5%;
+  left: 39%;
+}
+.q11-9 {
+  position: absolute;
+  padding: 5px;
+  top: 12%;
+  left: 33.5%;
+}
+.q12-9 {
+  position: absolute;
+  padding: 5px;
+  top: 31.5%;
+  left: 84.5%;
+}
 
-.q14-9{
+.q13-9 {
   position: absolute;
   padding: 5px;
-  top:83%;
-  left: 73.5%;
+  top: 60%;
+  left: 44.5%;
+}
+
+.q14-9 {
+  position: absolute;
+  padding: 5px;
+  top: 84%;
+  left: 88.5%;
 }

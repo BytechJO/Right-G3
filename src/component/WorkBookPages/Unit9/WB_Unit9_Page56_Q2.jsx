@@ -36,7 +36,7 @@ export default function WB_Unit9_Page56_QB() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (columnId, word) => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -45,7 +45,7 @@ export default function WB_Unit9_Page56_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || showResults) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -99,16 +99,16 @@ export default function WB_Unit9_Page56_QB() {
     const selected = answers[columnId] === word;
 
     return {
-      minWidth: "128px",
+      minWidth: "70px",
       minHeight: "52px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      fontSize: "24px",
+      fontSize: "18px",
       lineHeight: "1.2",
       color: "#222",
       cursor: showAns ? "default" : "pointer",
-      border: selected ? "4px solid #dc2626" : "4px solid transparent",
+      border: selected ? "1px solid #f39b42" : "1px solid transparent",
       borderRadius: "999px",
       backgroundColor: "transparent",
       transition: "all 0.2s ease",
@@ -118,23 +118,16 @@ export default function WB_Unit9_Page56_QB() {
   };
 
   return (
-        <div className="main-container-component">
+    <div className="main-container-component">
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(20px,3vw,36px)",
-          maxWidth: "1100px",
-          margin: "0 auto",
+          gap: "80px",
         }}
       >
-
-        <h1
-          className="WB-header-title-page8"
-          style={{ margin: 0 }}
-        >
-          <span className="WB-ex-A">B</span> Read and say. Circle the word with a different -s sound.
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">B</span> Read and say. Circle the word with
+          a different -s sound.
         </h1>
 
         <div
@@ -152,36 +145,26 @@ export default function WB_Unit9_Page56_QB() {
               style={{
                 position: "relative",
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                // flexDirection: "column",
+                alignItems: "flex-start",
                 gap: "10px",
               }}
             >
-              <div
+              <span
                 style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  paddingLeft: "6px",
-                  boxSizing: "border-box",
+                  fontSize: "20px",
+                  fontWeight: "700",
+                  color: "#222",
                 }}
               >
-                <span
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: "700",
-                    color: "#222",
-                  }}
-                >
-                  {item.id}
-                </span>
-              </div>
+                {item.id}
+              </span>
 
               <div
                 style={{
-                  width: "160px",
-                  minHeight: "330px",
-                  border: "3px solid #a3a3a3",
+                  width: "100px",
+                  minHeight: "280px",
+                  border: isWrong(item.id) ?"2px solid red":"2px solid #a3a3a3",
                   borderRadius: "24px",
                   backgroundColor: "#fff",
                   display: "flex",
@@ -212,14 +195,18 @@ export default function WB_Unit9_Page56_QB() {
                       width: "24px",
                       height: "24px",
                       borderRadius: "50%",
-                      backgroundColor: "#ef4444",
+                      backgroundColor: "red",
                       color: "#fff",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "13px",
+                      fontSize: "14px",
                       fontWeight: "700",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+
+                      zIndex: 5,
+                      pointerEvents: "none",
                     }}
                   >
                     ✕
