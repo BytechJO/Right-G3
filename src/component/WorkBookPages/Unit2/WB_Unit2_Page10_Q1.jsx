@@ -62,7 +62,7 @@ const DraggableWord = ({ item, disabled }) => {
       {...listeners}
       {...attributes}
       // style={style}
-      className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition
+      className={`px-4 py-2 rounded-xl border-1 text-sm font-medium transition
         ${
           disabled
             ? "bg-gray-200 text-gray-400 border-gray-200"
@@ -84,7 +84,7 @@ const DropBox = ({ id, value, isWrong, showAns }) => {
   return (
     <div
       ref={setNodeRef}
-      className={`relative w-full h-[42px] flex items-end justify-center border-b-2 text-lg
+      className={`relative w-full h-[42px] flex items-end justify-center border-b-1 text-lg
         ${isOver ? "border-orange-400 bg-orange-50" : "border-[#2e3192]"}
         ${isWrong ? "border-red-500" : ""}
       `}
@@ -198,13 +198,13 @@ export default function WB_LookAndWrite_PageC() {
       onDragEnd={handleDragEnd}
     >
       <div className="main-container-component">
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "25px" }}>
   <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">C</span> Look and write.
           </h1>
           <div>
           {/* WORD BANK */}
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
             {DRAG_ITEMS.map((item) => (
               <DraggableWord
                 key={item.id}
@@ -215,10 +215,10 @@ export default function WB_LookAndWrite_PageC() {
           </div>
 
           {/* GRID */}
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-10">
             {ANSWERS.map((item) => (
               <div key={item.id} className="flex flex-col items-center gap-3">
-                <img src={item.img} className="h-32 object-contain" style={{height:"150px"}} />
+                <img src={item.img} className="h-32 object-contain" style={{height:"110px"}} />
 
                 <DropBox
                   id={`a-${item.id}`}
@@ -231,7 +231,7 @@ export default function WB_LookAndWrite_PageC() {
           </div>
 </div>
           {/* BUTTONS */}
-          <div className="mt-6 flex justify-center">
+          <div className="flex justify-center">
             <Button
               checkAnswers={handleCheck}
               handleShowAnswer={handleShowAnswer}

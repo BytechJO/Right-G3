@@ -80,8 +80,8 @@ export default function WB_YesNo_PageC() {
         onClick={() => handleSelect(item.id, value)}
         style={{
           position: "relative",
-          width: "45px",
-          height: "45px",
+          width: "40px",
+          height: "40px",
           border: wrong ? "2px solid red":`1px solid ${BORDER_COLOR}`,
           borderRadius: "clamp(5px,0.6vw,8px)",
           background: "#fff",
@@ -132,7 +132,7 @@ export default function WB_YesNo_PageC() {
       <div
         className="div-forall"
         style={{
-          gap: "15px",
+          gap: "30px",
         }}
       >
         {/* Title */}
@@ -158,8 +158,8 @@ export default function WB_YesNo_PageC() {
               src={roomImg}
               alt="grandma room"
               style={{
-                width: "350px",
-                height: "auto",
+                width: "auto",
+                height: "390px",
                 display: "block",
                 userSelect: "none",
               }}
@@ -167,7 +167,8 @@ export default function WB_YesNo_PageC() {
        
 
           {/* Questions table */}
-          <div style={{ minWidth: 0 }}>
+          <div style={{ minWidth: 0 
+}}>
             {/* Header */}
             <div
               style={{
@@ -205,7 +206,7 @@ export default function WB_YesNo_PageC() {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: "column",height:"390px",
                 gap: "9px",
               }}
             >

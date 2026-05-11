@@ -56,7 +56,7 @@ function DraggableItem({ item, disabled }) {
       {...listeners}
       {...attributes}
       // style={style}
-      className={`h-[40px] w-[70px] flex items-center justify-center rounded-xl border-2 font-medium text-[17px] touch-none transition-all
+      className={`h-[40px] w-[70px] flex items-center justify-center rounded-xl border-1 font-medium text-[17px] touch-none transition-all
         ${
           disabled
             ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
@@ -76,7 +76,7 @@ function DropBox({ id, value, wrong, showAns, onRemove }) {
     <div
       ref={setNodeRef}
       onClick={() => value && !showAns && onRemove(id)}
-      className={`relative w-full max-w-[320px] h-[42px] flex items-center px-2 text-[20px] font-medium border-b-2 transition-all
+      className={`relative w-full max-w-[320px] h-[42px] flex items-center px-2 text-[20px] font-medium border-b-1 transition-all ${!showAns ? "cursor-pointer hover:text-red-600":"cursor-default"}
         ${isOver ? "border-orange-500 bg-orange-50 scale-105" : ""}
         ${wrong ? "border-red-500" : "border-gray-400"}
       `}
@@ -196,18 +196,18 @@ export default function WB_Vocabulary_Page214_QI() {
       onDragEnd={handleDragEnd}
     >
       <div className="main-container-component">
-        <div className="div-forall mb-15">
+        <div className="div-forall mb-15" style={{gap:"20px"}}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">I</span>Look and write a vocabulary word.
           </h1>
-
-          <div className="flex flex-col gap-10 items-center w-full">
+            <div className="flex gap-10 items-center justify-center">
+          <div className="flex flex-col gap-10 items-center justify-center w-[70%]">
 
             {/* IMAGE */}
-            <img src={exerciseImg} className="w-[60%] h-[90px] object-contain"  style={{height:"260px",width:"80%"}} />
+            <img src={exerciseImg} className="object-contain"  style={{height:"auto",width:"100%"}} />
 
             {/* WORD BANK */}
-            <div className="flex flex-wrap justify-between gap-4 w-[80%]">
+            <div className="flex flex-wrap justify-between gap-4 w-[100%]">
               {DRAG_ITEMS.map((item) => (
                 <DraggableItem
                   key={item.id}
@@ -218,7 +218,7 @@ export default function WB_Vocabulary_Page214_QI() {
             </div>
 
             {/* ANSWERS */}
-            <div className="grid grid-cols-2 gap-x-10 gap-y-6 w-[80%]">
+            <div className="grid grid-cols-2 gap-x-10 gap-y-6 w-[100%]">
               {ANSWERS.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
                   <span className="font-bold">{item.id}</span>
@@ -239,14 +239,14 @@ export default function WB_Vocabulary_Page214_QI() {
               handleShowAnswer={handleShowAnswer}
               handleStartAgain={handleStartAgain}
             />
-          </div>
+          </div></div>
         </div>
       </div>
 
       {/* DRAG OVERLAY */}
       <DragOverlay>
         {activeItem && (
-          <div className="px-4 py-2 bg-white border-2 border-orange-400 rounded-lg shadow-xl">
+          <div className="px-4 py-2 bg-white border-1 border-orange-400 rounded-lg shadow-xl">
             {activeItem.value}
           </div>
         )}

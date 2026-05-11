@@ -6,8 +6,8 @@ import img1a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 9.sv
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 11.svg";
 import img2a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 10.svg";
 import img2b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 12.svg";
-import img3a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 13.svg";
-import img3b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 14.svg";
+import img3a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 14.svg";
+import img3b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 13.svg";
 import img4a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 15.svg";
 import img4b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 16.svg";
 import trueIcon from "../../../assets/imgs/true.svg";
@@ -38,7 +38,7 @@ const ITEMS = [
         alt: "walk to school",
         bars: 0,
         overlay: {
-          box: {  top: "16%", right: "8%"  },
+          box: { top: "16%", right: "8%" },
         },
       },
     ],
@@ -54,7 +54,7 @@ const ITEMS = [
         alt: "not taxi to work",
         bars: 1,
         overlay: {
-          box: {  top: "16%", right: "8%"  },
+          box: { top: "16%", right: "8%" },
         },
       },
       {
@@ -63,7 +63,7 @@ const ITEMS = [
         alt: "taxi",
         bars: 0,
         overlay: {
-          box: {  top: "16%", right: "8%" },
+          box: { top: "16%", right: "8%" },
         },
       },
     ],
@@ -79,8 +79,7 @@ const ITEMS = [
         alt: "bus to school",
         bars: 4,
         overlay: {
-         
-          box: {  top: "16%", right: "8%"  },
+          box: { top: "16%", right: "8%" },
         },
       },
       {
@@ -89,8 +88,7 @@ const ITEMS = [
         alt: "car",
         bars: 3,
         overlay: {
-      
-          box: {  top: "16%", right: "8%"  },
+          box: { top: "16%", right: "8%" },
         },
       },
     ],
@@ -106,8 +104,7 @@ const ITEMS = [
         alt: "walk to school",
         bars: 2,
         overlay: {
-       
-          box: {  top: "16%", right: "8%"  },
+          box: { top: "16%", right: "8%" },
         },
       },
       {
@@ -116,7 +113,6 @@ const ITEMS = [
         alt: "car",
         bars: 2,
         overlay: {
-      
           box: { top: "16%", right: "8%" },
         },
       },
@@ -181,8 +177,8 @@ const styles = {
     // border: `1px solid ${BORDER_COLOR}`,
     background: "#fff",
     cursor: "pointer",
-    minWidth: 0,
-    aspectRatio: "1 / 1",
+    // minWidth: 0,
+    // aspectRatio: "1 / 1",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -191,36 +187,38 @@ const styles = {
   },
 
   image: {
-    width: "170px",
+    width: "auto",
     height: "150px",
     objectFit: "contain",
     // border: `2px solid ${BORDER_COLOR}`,
   },
 
-  overlayLayer: {
-    position: "absolute",
-    inset: 0,
-    zIndex: 2,
-  },
-
   // ✅ المربع الأبيض — دايماً موجود في نفس المكان
-emptyBox: {
-  position: "absolute",
-  top: "0%",
-  right: "0%",
-  width: "clamp(18px, 3vw, 30px)",
-  height: "clamp(18px, 3vw, 30px)",
-  border: "1.5px solid #9e9e9e",
-  background: "#fff",
-  borderRadius: "clamp(4px, 0.5vw, 6px)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontWeight: 700,
-  fontSize: "clamp(12px, 1.2vw, 16px)",
-  lineHeight: 1,
-  zIndex: 3,
-},
+  emptyBox: {
+    position: "absolute",
+
+    top: "2px",
+    right: "10px",
+
+    width: "40px",
+    height: "40px",
+
+    border: "1px solid #9e9e9e",
+    background: "#fff",
+    borderRadius: "9px",
+
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    fontWeight: 700,
+    fontSize: "clamp(12px, 1vw, 16px)",
+    lineHeight: 1,
+
+    zIndex: 5,
+
+    boxSizing: "border-box",
+  },
 
   // ✅ بادج الـ ✕ — تحت المربع الأبيض وليس فوقه
   wrongBadge: {
@@ -238,9 +236,9 @@ emptyBox: {
     fontSize: "clamp(10px, 1vw, 12px)",
     fontWeight: 700,
     boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-    zIndex: 4,
+    zIndex: 99,
     pointerEvents: "none",
-    border:"2px solid white"
+    border: "2px solid white",
   },
 
   buttonsWrap: {
@@ -256,13 +254,13 @@ export default function WB_Unit2_Page12_QH() {
   const [showAns, setShowAns] = useState(false);
 
   const handleSelect = (itemId, optionKey) => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
     setAnswers((prev) => ({ ...prev, [itemId]: optionKey }));
     setChecked(false);
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all items first.");
@@ -310,10 +308,10 @@ export default function WB_Unit2_Page12_QH() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"35px"}}>
+      <div className="div-forall" style={{ gap: "25px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">H</span>
-          Read, look, and write <span className="text-red" style={{color:"red"}}>✓</span>.
+          Read, look, and write <span className="text-red-600">✓</span>.
         </h1>
 
         <div style={styles.pageWrap}>
@@ -342,17 +340,13 @@ export default function WB_Unit2_Page12_QH() {
                       >
                         <img src={img.src} alt={img.alt} style={styles.image} />
 
-                        <div style={styles.overlayLayer}>
-                          {/* ✅ المربع دايماً موجود — ✓ يظهر على الخيار المحدد فقط */}
-                          <div
-                            style={{ ...styles.emptyBox, ...img.overlay?.box }}
-                          >
-                            {getBoxContent(item.id, img.key, selected)}
-                          </div>
-
-                          {/* ✅ بادج الـ ✕ في الأسفل حتى ما يغطي المربع */}
-                          {wrong && <div style={styles.wrongBadge}>✕</div>}
+                        {/* ✅ المربع دايماً موجود — ✓ يظهر على الخيار المحدد فقط */}
+                        <div style={styles.emptyBox}>
+                          {getBoxContent(item.id, img.key, selected)}
                         </div>
+
+                        {/* ✅ بادج الـ ✕ في الأسفل حتى ما يغطي المربع */}
+                        {wrong && <div style={styles.wrongBadge}>✕</div>}
                       </div>
                     );
                   })}

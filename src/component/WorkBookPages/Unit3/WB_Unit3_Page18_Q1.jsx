@@ -135,39 +135,40 @@ export default function WB_Unit3_Page18_QB() {
     );
   };
 
-  const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[`a-${item.id}`]?.value !== item.correct;
-  };
+const isWrong = () => false;
 
-  const handleCheck = () => {
-    if (showAns ||showResults) return;
+ const handleCheck = () => {
+  if (showAns || showResults) return;
 
-    const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
+  const allAnswered = ITEMS.every(
+    (item) => answers[`a-${item.id}`]?.value
+  );
 
-    if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
-      return;
-    }
+  if (!allAnswered) {
+    ValidationAlert.info("Please complete all answers first.");
+    return;
+  }
 
-    let score = 0;
+  const studentAnswers = ITEMS.map(
+    (item) => answers[`a-${item.id}`]?.value
+  );
 
-    ITEMS.forEach((item) => {
-      if (answers[`a-${item.id}`]?.value === item.correct) {
-        score++;
-      }
-    });
+  const correctAnswers = ITEMS.map((item) => item.correct);
 
-    setShowResults(true);
+  const score = studentAnswers.filter((ans) =>
+    correctAnswers.includes(ans)
+  ).length;
 
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
-  };
+  setShowResults(true);
+
+  if (score === ITEMS.length) {
+    ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+  } else if (score > 0) {
+    ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+  } else {
+    ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+  }
+};
 
   const handleShowAnswer = () => {
     const filled = {};

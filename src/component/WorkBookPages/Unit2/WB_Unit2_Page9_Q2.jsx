@@ -28,7 +28,7 @@ function DraggableItem({ item, isUsed, showAns }) {
 
   const style = {
     ...styles.dragItem,
-    border: `2px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
+    border: `1px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
     backgroundColor: isUsed ? "#eeeeee" : "white",
     color: isUsed ? "#999" : "#222",
     cursor: isUsed || showAns ? "not-allowed" : "grab",
@@ -413,7 +413,7 @@ export default function WB_ReadLookWrite_Page() {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="main-container-component">
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "25px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">B</span> Read, look, and write.
           </h1>

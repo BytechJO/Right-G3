@@ -3,20 +3,18 @@ import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd6pg32instruction-adult-lady_xXPh6TKj.mp3"; // ← غيّر المسار حسب ملف الأوديو
-
 const ITEMS = [
   {
     id: 1,
     words: ["try", "grumpy", "fry", "cry"],
-    correct: "grumpy",
+    correct: ["try", "fry", "cry"],
   },
   {
     id: 2,
     words: ["sandy", "hearty", "party", "spy"],
-    correct: "spy",
+    correct: ["sandy", "hearty", "party"],
   },
 ];
-
 export default function WB_Unit5_Page32_Qc() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
@@ -28,56 +26,81 @@ export default function WB_Unit5_Page32_Qc() {
 
   { start: 18.10, end: 22.73, text: "2- sandy, hardy, party, spy." },
 ];
-  const handleSelect = (id, word) => {
-    if (showAns || checked) return;
+const handleSelect = (id, word) => {
+  if (showAns || checked) return;
 
-    setAnswers((prev) => ({
+  setAnswers((prev) => {
+    const current = prev[id] || [];
+
+    if (current.includes(word)) {
+      return {
+        ...prev,
+        [id]: current.filter((w) => w !== word),
+      };
+    }
+
+    return {
       ...prev,
-      [id]: word,
-    }));
+      [id]: [...current, word],
+    };
+  });
 
-    setChecked(false);
-  };
+  setChecked(false);
+};
 
-  const handleCheck = () => {
-    if (showAns || checked) return;
+const handleCheck = () => {
+  if (showAns || checked) return;
 
-    const allAnswered = ITEMS.every((item) => answers[item.id]);
+  const allAnswered = ITEMS.every(
+    (item) => answers[item.id]?.length > 0
+  );
 
-    if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
-      return;
+  if (!allAnswered) {
+    ValidationAlert.info("Please answer all questions first.");
+    return;
+  }
+
+  let score = 0;
+
+  ITEMS.forEach((item) => {
+    const selected = answers[item.id] || [];
+
+    const hasWrongChoice = selected.some(
+      (word) => !item.correct.includes(word)
+    );
+
+    const missedCorrect = item.correct.some(
+      (word) => !selected.includes(word)
+    );
+
+    const isCorrect = !hasWrongChoice && !missedCorrect;
+
+    if (isCorrect) {
+      score += 1;
     }
+  });
 
-    let score = 0;
+  setChecked(true);
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score += 1;
-      }
-    });
+  if (score === ITEMS.length) {
+    ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+  } else if (score > 0) {
+    ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+  } else {
+    ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+  }
+};
+ const handleShowAnswer = () => {
+  const filled = {};
 
-    setChecked(true);
+  ITEMS.forEach((item) => {
+    filled[item.id] = item.correct;
+  });
 
-    if (score === ITEMS.length) {
-      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-    }
-  };
-
-  const handleShowAnswer = () => {
-    const filled = {};
-    ITEMS.forEach((item) => {
-      filled[item.id] = item.correct;
-    });
-
-    setAnswers(filled);
-    setChecked(true);
-    setShowAns(true);
-  };
+  setAnswers(filled);
+  setChecked(true);
+  setShowAns(true);
+};
 
   const handleReset = () => {
     setAnswers({});
@@ -90,11 +113,24 @@ export default function WB_Unit5_Page32_Qc() {
     return answers[item.id] === word && word !== item.correct;
   };
 
-  const isSelected = (item, word) => {
-    if (showAns) return item.correct === word;
-    return answers[item.id] === word;
-  };
+ const isSelected = (item, word) => {
+  return answers[item.id]?.includes(word);
+};
+const isQuestionWrong = (item) => {
+  if (!checked || showAns) return false;
 
+  const selected = answers[item.id] || [];
+
+  const hasWrongChoice = selected.some(
+    (word) => !item.correct.includes(word)
+  );
+
+  const missedCorrect = item.correct.some(
+    (word) => !selected.includes(word)
+  );
+
+  return hasWrongChoice || missedCorrect;
+};
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "60px" }}>
@@ -114,12 +150,36 @@ export default function WB_Unit5_Page32_Qc() {
             <div
               key={item.id}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "20px",
+                   position: "relative",
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
                 // flexWrap: "wrap",
               }}
             >
+              {isQuestionWrong(item) && (
+  <div
+    style={{
+      position: "absolute",
+      top: "-10px",
+      left: "-10px",
+      width: "28px",
+      height: "28px",
+      borderRadius: "50%",
+      background: "red",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "16px",
+      fontWeight: "bold",
+      border: "2px solid white",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+    }}
+  >
+    ✕
+  </div>
+)}
               {/* number */}
               <span
                 style={{
@@ -163,29 +223,7 @@ export default function WB_Unit5_Page32_Qc() {
                     >
                       {word}
 
-                      {wrong && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "-8px",
-                            right: "-10px",
-                            width: "22px",
-                            height: "22px",
-                            borderRadius: "50%",
-                            background: "red",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "14px",
-                            fontWeight: "bold",
-                            border: "2px solid white",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          ✕
-                        </div>
-                      )}
+                     
                     </div>
                   );
                 })}

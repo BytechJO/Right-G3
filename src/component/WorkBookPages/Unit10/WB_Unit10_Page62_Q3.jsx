@@ -27,14 +27,14 @@ const exerciseData = {
   { id: 5, text: "tr" },
   { id: 6, text: "cr" },
   ],
-  correctMatches: {
- 1: 2,
-  2: 3,
-  3: 5,
-  4: 1,
-  5: 4,
-  6: 6,
-  },
+correctMatches: {
+  1: [2, 4],
+  2: [3, 6],
+  3: [5, 1],
+  4: [1, 5],
+  5: [4, 2],
+  6: [6, 3],
+},
 };
 
 export default function WB_Unit10_Page62_QC() {
@@ -54,6 +54,7 @@ const captions = [
   { start: 11.14, end: 12.78, text: "3- trust." },
   { start: 12.78, end: 15.38, text: "4- trace." },
   { start: 15.38, end: 18.22, text: "5- drive." },
+  { start: 18.22, end: 21.00, text: "6- cryon" },
 ];
   useLayoutEffect(() => {
     const updateLines = () => {
@@ -113,42 +114,54 @@ const captions = [
     setShowResults(false);
   };
 
-  const checkAnswers = () => {
-    if (showAns || showResults) return;
+ const checkAnswers = () => {
+  if (showAns || showResults) return;
 
-    const allConnected = exerciseData.top.every((item) => matches[item.id]);
+  const allConnected = exerciseData.top.every(
+    (item) => matches[item.id]
+  );
 
-    if (!allConnected) {
-      ValidationAlert.info("Please connect all items first.");
-      return;
+  if (!allConnected) {
+    ValidationAlert.info("Please connect all items first.");
+    return;
+  }
+
+  setShowResults(true);
+
+  let score = 0;
+
+  Object.keys(exerciseData.correctMatches).forEach((topId) => {
+    if (
+      exerciseData.correctMatches[topId].includes(matches[topId])
+    ) {
+      score++;
     }
+  });
 
-    setShowResults(true);
+  const totalQuestions = exerciseData.top.length;
 
-    let score = 0;
-    Object.keys(exerciseData.correctMatches).forEach((topId) => {
-      if (matches[topId] === exerciseData.correctMatches[topId]) {
-        score++;
-      }
-    });
+  if (score === totalQuestions) {
+    ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
+  } else if (score > 0) {
+    ValidationAlert.warning(`Score: ${score} / ${totalQuestions}`);
+  } else {
+    ValidationAlert.error(`Score: ${score} / ${totalQuestions}`);
+  }
+};
+ const handleShowAnswer = () => {
+  const oneCorrectAnswerPerItem = {};
 
-    const totalQuestions = exerciseData.top.length;
+  Object.keys(exerciseData.correctMatches).forEach((topId) => {
+    // ياخد أول إجابة صحيحة فقط
+    oneCorrectAnswerPerItem[topId] =
+      exerciseData.correctMatches[topId][0];
+  });
 
-    if (score === totalQuestions) {
-      ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${totalQuestions}`);
-    } else {
-      ValidationAlert.error(`Score: ${score} / ${totalQuestions}`);
-    }
-  };
-
-  const handleShowAnswer = () => {
-    setMatches(exerciseData.correctMatches);
-    setShowResults(true);
-    setShowAns(true);
-    setSelectedTop(null);
-  };
+  setMatches(oneCorrectAnswerPerItem);
+  setShowResults(true);
+  setShowAns(true);
+  setSelectedTop(null);
+};
 
   const handleStartAgain = () => {
     setMatches({});
@@ -172,7 +185,9 @@ const captions = [
   const isWrongMatch = (topId) => {
     if (!showResults) return false;
     if (!matches[topId]) return false;
-    return matches[topId] !== exerciseData.correctMatches[topId];
+  return !exerciseData.correctMatches[topId].includes(
+  matches[topId]
+);
   };
 
   const isTopSelected = (id) => selectedTop === id;

@@ -30,7 +30,7 @@ const ITEMS = [
     subject: "He",
     boxMark: "x",
     modalOptions: ["will", "won't"],
-    actionOptions: ["go to the beach.", "plant a tree."],
+    actionOptions: ["plant a tree."],
     correctModal: "won't",
     correctAction: "plant a tree..",
   },
@@ -205,7 +205,7 @@ export default function WB_Unit8_Page58_QD() {
       <div className="div-forall" style={{ gap: "clamp(18px,2.5vw,30px)" }}>
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span> Look, read, and circle. Say.
+          <span className="WB-ex-A">G</span> Look, read, and circle. Say.
         </h1>
 
         {/* ── شبكة 2×2 ── */}

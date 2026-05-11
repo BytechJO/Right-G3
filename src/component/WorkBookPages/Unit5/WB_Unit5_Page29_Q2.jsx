@@ -133,7 +133,7 @@ const styles = {
 
   imageButton: {
     position: "relative",
-    width: "100%",
+    width: "80%",
     border: "1px solid transparent",
     borderRadius: "999px",
     background: "transparent",
@@ -155,8 +155,8 @@ const styles = {
   },
 
   image: {
-    width: "100%",
-    height: "100%",
+    width: "100px",
+    height: "80px",
     objectFit: "contain",
     display: "block",
   },
@@ -337,13 +337,13 @@ export default function WB_Unit5_Page29_QF() {
                           cursor: showAns||checked ? "default" : "pointer",
                         }}
                       >
-                        <div style={styles.imageBox}>
+                       
                           <img
                             src={option.img}
                             alt={`q${question.id}-${option.id}`}
                             style={styles.image}
                           />
-                        </div>
+                      
 
                         {isWrongSelected && (
                           <span

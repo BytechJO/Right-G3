@@ -160,7 +160,7 @@ export default function WB_Unit3_Page16_QC() {
         }
 
         .wb-d16-img {
-          width: 250px;
+          width: 220px;
           height: auto;
           object-fit: contain;
           display: block;
@@ -207,7 +207,7 @@ export default function WB_Unit3_Page16_QC() {
           min-width: fit-content;
           line-height: 1.35;
         }
-.wb-d16-option:hover{
+.wb-d16-option.selected:hover{
  border-color: #f39b42;
 }
         .wb-d16-option.selected {

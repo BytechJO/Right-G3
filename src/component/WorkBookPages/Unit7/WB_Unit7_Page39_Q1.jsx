@@ -134,11 +134,11 @@ export default function SB_LookAndAnswer_PageA() {
 
           {/* الأسئلة */}
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "25px" }}
+            style={{ display: "flex", flexDirection: "column", gap: "40px" }}
           >
             {ITEMS.map((item) => (
               <div key={item.id}>
-                <div style={{ fontSize: "18px", marginBottom: "5px" }}>
+                <div style={{ fontSize: "18px" }}>
                   {item.id}. {item.question}
                 </div>
 
@@ -146,7 +146,7 @@ export default function SB_LookAndAnswer_PageA() {
                   <div
                     style={{
                       fontSize: "18px",
-                      borderBottom: `2px solid ${LINE_COLOR}`,
+                      borderBottom: `1px solid ${LINE_COLOR}`,
                       paddingBottom: "5px",
                     }}
                   >
@@ -162,13 +162,14 @@ export default function SB_LookAndAnswer_PageA() {
                           setOpenId(openId === item.id ? null : item.id);
                       }}
                       style={{
-                        borderBottom: `2px solid ${
-                          isWrong(item) ? WRONG_COLOR : LINE_COLOR
-                        }`,
+                        borderBottom:isWrong(item) ? `2px solid ${
+                           WRONG_COLOR}` : `1px solid ${
+                           LINE_COLOR}`
+                        ,
                         padding: "6px 28px 6px 4px",
                         cursor: showAns||showResults ? "default" : "pointer",
-                        fontSize: "18px",
-                        minHeight: "28px",
+                        fontSize: "17px",
+                        height: "30px",
                         background: "#fff",
                         position: "relative",
                       }}

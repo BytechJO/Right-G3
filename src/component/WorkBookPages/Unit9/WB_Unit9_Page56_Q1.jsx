@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd11pg56instruction1-adult-lady_kdnJAymX.mp3";
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
 const ITEMS = [

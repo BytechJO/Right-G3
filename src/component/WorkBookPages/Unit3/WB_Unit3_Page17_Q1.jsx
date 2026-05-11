@@ -312,7 +312,7 @@ export default function WB_Unit3_Page16_QE() {
         }
 
         .wb-e17-img {
-          width:210px;
+          width:180px;
           height: auto;
           object-fit: contain;
           display: block;

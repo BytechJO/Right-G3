@@ -7,29 +7,11 @@ import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folde
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/5.svg";
-import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/6.svg";
+import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/6-1.svg";
 // استبدلي فقط imports تبعون dnd والـ chunk bank + drop zones
 // والباقي خلييه نفسه
 
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-} from "@dnd-kit/core";
-// استبدلي drop zone بهاد
 
-import { useDroppable } from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-
-import { CSS } from "@dnd-kit/utilities";
 const DOT_COLOR = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
 const WRONG_COLOR = "red";

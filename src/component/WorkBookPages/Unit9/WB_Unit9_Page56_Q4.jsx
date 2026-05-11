@@ -4,7 +4,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd12pg56instruction2-adult-lady_tx74LOXb.mp3";
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const WRONG_COLOR = "red";

@@ -269,11 +269,11 @@ export default function WB_Vocabulary_Page_A() {
         }
 
         .wb-a-word-bank {
-          width: 100%;
+          width: 90%;
           border: 2px solid ${BORDER_COLOR};
           border-radius: 16px;
           background: #fff;
-          padding: clamp(10px, 1.7vw, 18px);
+          padding: 10px;
           box-sizing: border-box;
         }
 
@@ -330,6 +330,8 @@ export default function WB_Vocabulary_Page_A() {
         }
 
         .wb-a-section {
+          width: 90%;
+
           display: flex;
           flex-direction: column;
           gap: 8px;
@@ -382,7 +384,7 @@ export default function WB_Vocabulary_Page_A() {
 
         .wb-a-drop-box {
           width: 100%;
-          min-height: clamp(40px, 5vw, 60px);
+          min-height: clamp(40px, 5vw, 45px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -446,12 +448,14 @@ export default function WB_Vocabulary_Page_A() {
         }
       `}</style>
       <div className="main-container-component">
-        <div className="div-forall">
+        <div className="div-forall" style={{gap:"25px"}}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">A</span>
             Read and fill in the charts.
           </h1>
 
+
+<div className="flex flex-col gap-10 items-center justify-center">
           {/* Word Bank */}
           <div className="wb-a-word-bank">
             <div className="wb-a-word-grid">
@@ -465,7 +469,7 @@ export default function WB_Vocabulary_Page_A() {
               ))}
             </div>
           </div>
-
+<div className="flex flex-col gap-5 w-full items-center justify-center">
           {/* Groups */}
           {GROUPS.map((group) => (
             <div key={group.id} className="wb-a-section">
@@ -493,8 +497,8 @@ export default function WB_Vocabulary_Page_A() {
                 ))}
               </div>
             </div>
-          ))}
-
+          ))}</div>
+</div>
           <div className="wb-a-buttons">
             <Button
               checkAnswers={handleCheck}
@@ -507,7 +511,7 @@ export default function WB_Vocabulary_Page_A() {
         {/* 🔥 Drag Overlay */}
         <DragOverlay>
           {activeItem && (
-            <div className="px-3 py-1 bg-white border-2 border-blue-500 rounded-lg shadow-xl font-bold">
+            <div className="px-3 py-1 bg-white border-1 border-orange-500 rounded-lg shadow-xl font-bold">
               {activeItem.value}
             </div>
           )}

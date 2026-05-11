@@ -109,14 +109,17 @@ export default function WB_LookAndWrite_PageE() {
           <span className="WB-ex-A">E</span> Look and write the sentences.
         </h1>
 
-        <div className="flex flex-col gap-1">
-          <img src={img} style={{ width: "auto", height: "120px" }} />
+        <div className="flex flex-col gap-10 items-center justify-center">
+          <img src={img} style={{ width: "auto", height: "90px" }} />
 
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "60px",
+              width: "100%",
+              justifyItems:"center",
+              gap: "40px",
+
             }}
           >
             {ANSWERS.map((item) => (
@@ -125,7 +128,7 @@ export default function WB_LookAndWrite_PageE() {
                   <span className="text-lg font-bold">{item.id}</span>
                   <img
                     src={item.img}
-                    style={{ width: "100%", height: "110px" }}
+                    style={{ width: "auto", height: "90px" }}
                   />
                 </div>
                 <div style={{ position: "relative", marginTop: "10px" }}>
@@ -162,8 +165,9 @@ export default function WB_LookAndWrite_PageE() {
                     }
                     disabled={showResults}
                     style={{
-                      width: "95%",
+                      width: "90%",
                       fontSize: "18px",
+                      marginTop:"20px",
                       borderBottom: isWrong(item)
                         ? `2px solid red`
                         : "1px solid navy",

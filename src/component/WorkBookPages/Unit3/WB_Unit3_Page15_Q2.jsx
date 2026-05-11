@@ -37,7 +37,7 @@ const ITEMS = [
   },
   {
     id: 3,
-    img: img3,
+    img: img4,
     correctQuestion: "What does she have?",
     correctAnswer: "She has a banana.",
     lockQuestion: false,
@@ -51,7 +51,7 @@ const ITEMS = [
   },
   {
     id: 4,
-    img: img4,
+    img: img3,
     correctQuestion: "What does she have?",
     correctAnswer: "She has a doll.",
     lockQuestion: false,

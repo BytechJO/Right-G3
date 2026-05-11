@@ -27,7 +27,7 @@ const RIGHT_ITEMS = [
   { id: 4, text: "Yes, he has a little." },
 ];
 
-const CORRECT_MATCHES = { 1: 2, 2: 3, 3: 1, 4: 4 };
+const CORRECT_MATCHES = { 1: 4, 2: 3, 3: 2, 4: 1 };
 
 export default function WB_ReadLookMatch_PageA() {
   const [selectedLeft, setSelectedLeft] = useState(null);

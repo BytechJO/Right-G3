@@ -136,7 +136,7 @@ const WB_Unit9_Page54_QG = () => {
       <div
         className="div-forall"
         style={{
-          gap: "35px",
+          gap: "10px",
         }}
       >
         {/* Title */}
@@ -150,7 +150,7 @@ const WB_Unit9_Page54_QG = () => {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, minmax(0,1fr))",
-            gap: "20px",
+            gap: "10px",
             width: "100%",
           }}
         >
@@ -161,7 +161,7 @@ const WB_Unit9_Page54_QG = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start",
-                gap: "clamp(8px,1.2vw,14px)",
+                gap: "5px",
                 // minWidth: 0,
               }}
             >
@@ -195,13 +195,13 @@ const WB_Unit9_Page54_QG = () => {
                 </span>
               </div>
 
-            
+            <div className="flex flex-col items-center gap-2">
                 <img
                   src={item.img}
                   alt={`img-${item.id}`}
                   style={{
-                    width: "85%",
-                    height: "auto",
+                    width: "auto",
+                    height: "120px",
                     objectFit: "contain",
                     display: "block",
                   }}
@@ -213,10 +213,10 @@ const WB_Unit9_Page54_QG = () => {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
-                  gap: "clamp(6px,1vw,10px)",
-                  width: "85%",
-                  marginTop: "clamp(2px,0.4vw,6px)",
+                  alignItems: "flex-start",
+                  // gap: "clamp(6px,1vw,10px)",
+                  // width: "50%",
+                  // marginTop: "clamp(2px,0.4vw,6px)",
                 }}
               >
                 {item.options.map((option) => {
@@ -262,6 +262,7 @@ const WB_Unit9_Page54_QG = () => {
                     </button>
                   );
                 })}
+              </div>
               </div>
             </div>
           ))}

@@ -64,6 +64,7 @@ export default function WB_Unit2_Page10_QB() {
 
   const handleCheck = () => {
     // ✅ تحقق إنو كلهم معبّيين
+    if (showResults) return;
     const allFilled = RIGHT_ITEMS.every((i) => answers[`r-${i.id}`]);
 
     if (!allFilled) {
@@ -122,7 +123,7 @@ export default function WB_Unit2_Page10_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span> Connect and write.
         </h1>
@@ -137,7 +138,7 @@ export default function WB_Unit2_Page10_QB() {
         >
           <img src={img} style={{ width: "100%", height: "100%" }} />
 
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-5">
             {RIGHT_ITEMS.map((item) => (
               <div key={item.id} style={{ position: "relative" }}>
                 {/* ❌ ICON */}
@@ -158,7 +159,7 @@ export default function WB_Unit2_Page10_QB() {
                       fontSize: "14px",
                       fontWeight: "bold",
                       border: "2px solid white",
-                       boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                     }}
                   >
                     ✕
@@ -179,9 +180,10 @@ export default function WB_Unit2_Page10_QB() {
 
                 <select
                   value={answers[`r-${item.id}`] || ""}
+                  disabled={showResults}
                   onChange={(e) => handleSelectChange(item.id, e.target.value)}
                   style={{
-                    marginTop: "6px",
+                    marginTop: "25px",
                     width: "100%",
                     fontSize: "18px",
 

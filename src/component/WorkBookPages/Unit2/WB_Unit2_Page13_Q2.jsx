@@ -49,12 +49,12 @@ const PICTURES = [
 const DRAG_NUMBERS = [1, 2, 3, 4];
 
 const styles = {
-  pageWrap: { width: "100%" },
+  pageWrap: { width: "100%" ,display: "flex", justifyContent: "center",},
   contentWrap: {
     display: "flex",
     flexDirection: "column",
     gap: "clamp(18px,2vw,28px)",
-    width: "100%",
+    width: "88%",
   },
 
   sentencesWrap: {
@@ -365,7 +365,7 @@ export default function WB_Unit3_Page22_QJ() {
           <span className="WB-ex-A">J</span> Look and complete the sentences.
           Number the pictures.
         </h1>
-        <img src={img} style={{ width: "auto", height: "120px" }} />
+        <img src={img} style={{ width: "auto", height: "85px" }} />
 
         <div style={styles.pageWrap}>
           <div style={styles.contentWrap}>

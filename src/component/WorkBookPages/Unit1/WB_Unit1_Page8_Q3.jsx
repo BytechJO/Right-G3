@@ -170,7 +170,7 @@ export default function WB_Unit3_Page8_QC() {
         /* ✅ الـ row: نص | نقطة يسار | spacer | نقطة يمين | صورة */
         .wb-c-row {
           display: grid;
-          grid-template-columns: minmax(0, 1.2fr) 28px clamp(60px, 8vw, 100px) 28px minmax(0, 0.7fr);
+          grid-template-columns:1.2fr 150px 1fr;
           align-items: center;
           min-height: clamp(70px, 9vw, 100px);
         }
@@ -198,6 +198,7 @@ export default function WB_Unit3_Page8_QC() {
           // font-weight: 500;
           color: #111;
           line-height: 1.4;
+          width:100% ;
           border: 2px solid transparent;
           border-radius: 12px;
           padding: 8px 10px;
@@ -232,6 +233,7 @@ export default function WB_Unit3_Page8_QC() {
           justify-content: flex-start;
           height: 100%;
           min-width: 0;
+          gap:10px;
           padding-left: clamp(8px, 1vw, 14px);
           cursor: pointer;
         }
@@ -370,8 +372,7 @@ export default function WB_Unit3_Page8_QC() {
                       {row.text}
                     </div>
                     {wrong && <div className="wb-c-wrong">✕</div>}
-                  </div>
-
+                 
                   {/* col 2: نقطة اليسار */}
                   <div className="wb-c-dot-cell">
                     <div
@@ -383,12 +384,20 @@ export default function WB_Unit3_Page8_QC() {
                         cursor: showAns ? "default" : "pointer",
                       }}
                     />
-                  </div>
+                  </div> </div>
+
 
                   {/* col 3: spacer */}
                   <div className="wb-c-spacer" />
 
-                  {/* col 4: نقطة اليمين */}
+                 
+
+                  {/* col 5: الصورة */}
+                  <div
+                    className="wb-c-right-cell"
+                    onClick={() => handleRightClick(row.id)}
+                    style={{ cursor: showAns ? "default" : "pointer" }}
+                  > {/* col 4: نقطة اليمين */}
                   <div className="wb-c-dot-cell">
                     <div
                       ref={(el) =>
@@ -405,13 +414,6 @@ export default function WB_Unit3_Page8_QC() {
                       }}
                     />
                   </div>
-
-                  {/* col 5: الصورة */}
-                  <div
-                    className="wb-c-right-cell"
-                    onClick={() => handleRightClick(row.id)}
-                    style={{ cursor: showAns ? "default" : "pointer" }}
-                  >
                     <img
                       src={row.image}
                       alt={row.alt}

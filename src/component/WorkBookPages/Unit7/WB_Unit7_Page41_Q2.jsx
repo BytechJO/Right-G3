@@ -119,7 +119,7 @@ export default function WB_Unit7_Page41_Draw() {
       <div className="div-forall" style={{ gap: "15px" }}>
         {/* العنوان */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span>Read and draw.
+          <span className="WB-ex-A">F</span>Read and draw.
         </h1>
 
         {/* التعليمات */}

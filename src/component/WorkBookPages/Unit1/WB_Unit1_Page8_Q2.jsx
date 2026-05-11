@@ -53,7 +53,7 @@ const styles = {
     // minHeight: "clamp(260px, 42vw, 430px)",
     display: "flex",
     flexDirection: "column",
-    gap: "clamp(100px, 20vw, 150px)",
+    gap: "clamp(100px, 20vw, 125px)",
   },
 
   topRow: {
@@ -327,7 +327,7 @@ const WB_Unit3_Page215_QB = () => {
   // ─── Render ───────────────────────────────────────────────────────
   return (
     <div className="main-container-component">
-      <div className="div-forall">
+      <div className="div-forall" style={{gap:"30px"}}>
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span> Listen and match.

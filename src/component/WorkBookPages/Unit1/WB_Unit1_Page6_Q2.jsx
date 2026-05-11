@@ -1,26 +1,44 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
-import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/00.svg";
-import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/0000.svg";
-import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/00000.svg";
-import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/Asset 12.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/00.svg";
+import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/0000.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/00000.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/Asset 12.svg";
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  closestCenter,
+} from "@dnd-kit/core";
 
-const WORDS = [
+// ── ثوابت ──────────────────────────────────────────────────────
+const WRONG_COLOR = "red";
+const DRAG_COLOR = "#f6a14cff";
+const BORDER_COLOR = "#f39b42";
+
+// ── بيانات ─────────────────────────────────────────────────────
+const SENTENCES = [
   { id: 1, text: "scoreboard" },
   { id: 2, text: "referee" },
   { id: 3, text: "whistle" },
   { id: 4, text: "bike" },
 ];
 
-const IMAGES = [
+const ITEMS = [
   { id: 3, img: img2, alt: "whistle" },
   { id: 1, img: img1, alt: "scoreboard" },
   { id: 2, img: img3, alt: "referee" },
   { id: 4, img: img4, alt: "bike" },
 ];
 
+const NUMBERS = [1, 2, 3, 4];
 const CORRECT_ANSWERS = {
   1: 1,
   2: 2,
@@ -28,600 +46,391 @@ const CORRECT_ANSWERS = {
   4: 4,
 };
 
-const DRAG_NUMBERS = [1, 2, 3, 4];
+// ── بادج الخطأ ─────────────────────────────────────────────────
+const ErrorBadge = () => (
+  <div
+    style={{
+      position: "absolute",
+      top: -8,
+      right: -8,
+      width: "22px",
+      height: "22px",
+      borderRadius: "50%",
+      backgroundColor: "red",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "12px",
+      fontWeight: "700",
+      border: "2px solid white",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
 
-export default function WB_Vocabulary_Page213_H() {
-  const [imageAnswers, setImageAnswers] = useState({});
+      zIndex: 99999,
+      pointerEvents: "none",
+    }}
+  >
+    ✕
+  </div>
+);
+function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: String(num),
+    disabled,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      onMouseDown={() => setDraggedNumber(num)}
+      onTouchStart={() => setDraggedNumber(num)}
+      style={{
+        width: "clamp(38px,5vw,52px)",
+        height: "clamp(38px,5vw,52px)",
+        borderRadius: "50%",
+        backgroundColor: disabled ? "#cfcfd4" : DRAG_COLOR,
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: 700,
+        fontSize: "clamp(17px,2.2vw,26px)",
+        cursor: disabled ? "not-allowed" : "grab",
+        opacity: disabled ? 0.5 : 1,
+        userSelect: "none",
+        touchAction: "none",
+
+        transition: "0.2s",
+        boxShadow:
+          draggedNumber === num
+            ? "0 0 0 4px rgba(243,155,66,.35)"
+            : "0 3px 10px rgba(0,0,0,.12)",
+      }}
+    >
+      {num}
+    </div>
+  );
+}
+
+function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: String(item.id),
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        position: "relative",
+        width: "180px",
+        // aspectRatio: "3 / 2",
+
+        boxSizing: "border-box",
+        transition: "0.25s ease",
+        transform: isOver ? "scale(1.03)" : "scale(1)",
+        boxShadow: isOver
+          ? "0 0 0 4px rgba(243,155,66,.25)"
+          : "0 3px 10px rgba(0,0,0,.08)",
+      }}
+    >
+      <img
+        src={item.img}
+        alt={`item-${item.id}`}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          display: "block",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* صندوق الرقم */}
+      <div
+        onClick={() => handleRemove(item.id)}
+        style={{
+          position: "absolute",
+          top: "0%",
+          right: "0%",
+          width: "35px",
+          height: "35px",
+          borderRadius: "4px",
+          border: `2px solid #f39b42`,
+          backgroundColor: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "clamp(14px,1.8vw,22px)",
+          fontWeight: 500,
+          // color: wrong ? WRONG_COLOR : DRAG_COLOR,
+          boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+          zIndex: 10,
+          cursor: num && !showAns ? "pointer" : "default",
+          transition: "0.25s ease",
+          transform: isOver ? "scale(1.05)" : "scale(1)",
+          filter: isOver ? "brightness(1.05)" : "brightness(1)",
+          boxSizing: "border-box",
+        }}
+      >
+        {num || ""}
+      </div>
+
+      {/* بادج الخطأ */}
+      {wrong && <ErrorBadge />}
+    </div>
+  );
+}
+// ── المكوّن الرئيسي ─────────────────────────────────────────────
+export default function WB_Unit1_Page6_QH() {
+  const [answers, setAnswers] = useState({});
   const [draggedNumber, setDraggedNumber] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
-const [activeDropId, setActiveDropId] = useState(null);
-  const dropRefs = useRef({});
-
-  const usedNumbers = useMemo(
-    () => Object.values(imageAnswers),
-    [imageAnswers],
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 5,
+      },
+    }),
   );
+  const usedNumbers = Object.values(answers);
+  const applyDrop = (id, num) => {
+    if (!num || showAns) return;
 
-  const applyDrop = (imageId, num) => {
-    const updated = { ...imageAnswers };
+    setChecked(false);
 
-    Object.keys(updated).forEach((key) => {
-      if (updated[key] === num) {
-        delete updated[key];
-      }
-    });
-
-    updated[imageId] = num;
-    setImageAnswers(updated);
-    setDraggedNumber(null);
-  };
-
-  const handleDragStart = (num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-    setDraggedNumber(num);
-  };
-
-  const handleDrop = (imageId) => {
-    if (showAns || draggedNumber === null) return;
-    applyDrop(imageId, draggedNumber);
-  };
-
-  const handleTouchStart = (e, num) => {
-    if (showAns || usedNumbers.includes(num)) return;
-
-    const touch = e.touches[0];
-    setTouchItem(num);
-    setDraggedNumber(num);
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (touchItem === null) return;
-
-    const touch = e.touches[0];
-    setTouchPos({ x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = () => {
-    if (touchItem === null) return;
-
-    Object.entries(dropRefs.current).forEach(([key, ref]) => {
-      if (!ref) return;
-
-      const rect = ref.getBoundingClientRect();
-
-      if (
-        touchPos.x >= rect.left &&
-        touchPos.x <= rect.right &&
-        touchPos.y >= rect.top &&
-        touchPos.y <= rect.bottom
-      ) {
-        applyDrop(Number(key), touchItem);
-      }
-    });
-
-    setTouchItem(null);
-    setDraggedNumber(null);
-  };
-
-  const handleRemoveNumber = (imageId) => {
-    if (showAns ||checked) return;
-
-    setImageAnswers((prev) => {
+    setAnswers((prev) => {
       const updated = { ...prev };
-      delete updated[imageId];
+
+      Object.keys(updated).forEach((k) => {
+        if (updated[k] === num) delete updated[k];
+      });
+
+      updated[id] = num;
+
       return updated;
     });
   };
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
 
-  const getScore = () => {
-    let score = 0;
+    setDraggedNumber(null);
 
-    Object.keys(CORRECT_ANSWERS).forEach((imageId) => {
-      if (imageAnswers[imageId] === CORRECT_ANSWERS[imageId]) {
-        score += 1;
-      }
+    if (!over || showAns) return;
+
+    applyDrop(Number(over.id), Number(active.id));
+  };
+  const handleRemove = (id) => {
+    if (showAns || checked) return;
+    setChecked(false);
+    setAnswers((prev) => {
+      const u = { ...prev };
+      delete u[id];
+      return u;
     });
-
-    return score;
   };
 
+  // ── Check / Show / Reset ──
   const handleCheck = () => {
-    if (showAns ||checked) return;
-
-
-    const allAnswered = Object.keys(CORRECT_ANSWERS).every(
-      (itemId) => imageAnswers[itemId],
-    );
-
+    if (showAns || checked) return;
+    const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
-      ValidationAlert.info("Please complete all answers first.");
+      ValidationAlert.info("Please complete all answers first! ✏️");
       return;
     }
-
-    const total = Object.keys(CORRECT_ANSWERS).length;
-    const score = getScore();
-
+    let correct = 0;
+    ITEMS.forEach((item) => {
+      if (answers[item.id] === CORRECT_ANSWERS[item.id]) correct++;
+    });
     setChecked(true);
-
-    if (score === total) {
-      ValidationAlert.success(`Score: ${score} / ${total}`);
-    } else if (score > 0) {
-      ValidationAlert.warning(`Score: ${score} / ${total}`);
+    const total = ITEMS.length;
+    if (correct === total) {
+      ValidationAlert.success(`Score: ${correct} / ${total}`);
+    } else if (correct > 0) {
+      ValidationAlert.warning(`Score: ${correct} / ${total}`);
     } else {
-      ValidationAlert.error(`Score: ${score} / ${total}`);
+      ValidationAlert.error(`Score: ${correct} / ${total}`);
     }
   };
 
   const handleShowAnswer = () => {
-    setImageAnswers(CORRECT_ANSWERS);
-    setChecked(true);
+    setAnswers({ ...CORRECT_ANSWERS });
+    setChecked(false);
     setShowAns(true);
+
     setDraggedNumber(null);
-    setTouchItem(null);
   };
 
   const handleReset = () => {
-    setImageAnswers({});
+    setAnswers({});
     setDraggedNumber(null);
-    setTouchItem(null);
+
     setChecked(false);
     setShowAns(false);
   };
 
-  const isImageWrong = (imageId) => {
-    if (!checked) return false;
-    return imageAnswers[imageId] !== CORRECT_ANSWERS[imageId];
-  };
+  const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"45px"}}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">H</span>
-          Read, look, and number.
-        </h1>
-        <div>
-          <div className="wb-content-grid">
-            <div className="wb-words-list">
-              {WORDS.map((word) => (
-                <div key={word.id} className="wb-word-row">
-                  <div className="wb-word-box">
-                    <span className="wb-word-number-inline">{word.id}</span>
-                    <span className="wb-word-text">{word.text}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="div-forall" style={{ gap: "clamp(16px,2vw,24px)" }}>
+          {/* ── العنوان ── */}
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">H</span> Read, look, and number.
+          </h1>
 
-            <div className="wb-images-grid">
-              {IMAGES.map((item) => (
-                <div
-                  key={item.id}
-                  ref={(el) => (dropRefs.current[item.id] = el)}
-                  className={`wb-image-card `}
-                 onDragEnter={() => setActiveDropId(item.id)}
-onDragLeave={() => setActiveDropId(null)}
-onDragOver={(e) => e.preventDefault()}
-onDrop={() => {
-  handleDrop(item.id);
-  setActiveDropId(null);
-}}
-                >
-                  <img
-                    src={item.img}
-                    alt={item.alt}
-                    className={`wb-image ${
-                 activeDropId === item.id ? "wb-image-card--active" : ""
-                  }`}
-                    draggable={false}
-                  />
-
-                  <button
-                    type="button"
-                    className={`wb-corner-number ${
-                      imageAnswers[item.id] ? "wb-corner-number--filled" : ""
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveNumber(item.id);
-                    }}
-                    disabled={!imageAnswers[item.id] || showAns}
-                  >
-                    {imageAnswers[item.id] || ""}
-                  </button>
-
-                  {isImageWrong(item.id) && (
-                    <span className="wb-wrong-badge">✕</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="wb-drag-numbers">
-            {DRAG_NUMBERS.map((num) => {
-              const disabled = usedNumbers.includes(num);
-              const selected = draggedNumber === num || touchItem === num;
-
+          {/* ── الأرقام للسحب ── */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "clamp(10px,1.5vw,16px)",
+              flexWrap: "wrap",
+            }}
+          >
+            {NUMBERS.map((num) => {
               return (
-                <div
+                <DraggableNumber
                   key={num}
-                  draggable={!disabled && !showAns}
-                  onDragStart={() => handleDragStart(num)}
-                  onTouchStart={(e) => handleTouchStart(e, num)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  className={`wb-drag-circle ${
-                    disabled || showAns ? "wb-drag-circle--disabled" : ""
-                  } ${selected ? "wb-drag-circle--selected" : ""}`}
-                >
-                  {num}
-                </div>
+                  num={num}
+                  disabled={usedNumbers.includes(num) || showAns}
+                  draggedNumber={draggedNumber}
+                  setDraggedNumber={setDraggedNumber}
+                />
               );
             })}
           </div>
+
+          {/* ── اليسار: الجمل | اليمين: الصور ── */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "0.95fr 1.3fr",
+              gap: "clamp(16px,3vw,30px)",
+              alignItems: "start",
+            }}
+          >
+            {/* الجمل */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "clamp(14px,2vw,24px)",
+              }}
+            >
+              {SENTENCES.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    border: `1px solid ${DRAG_COLOR}`,
+                    padding:"10px",
+                    borderRadius:"9px",
+                    width:"60%",
+                    gap: "clamp(8px,1vw,14px)",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: 500,
+                      color: "#111",
+                      minWidth: "clamp(16px,1.9vw,22px)",
+                      lineHeight: 1.4,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.id}
+                  </span>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "18px",
+                      color: "#222",
+                      lineHeight: 1.45,
+                      // fontWeight: 500,
+                    }}
+                  >
+                    {item.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* الصور 2×3 */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+                gap: "clamp(8px,1.2vw,14px)",
+              }}
+            >
+              {ITEMS.map((item) => {
+                const wrong = isWrong(item.id);
+                const num = answers[item.id];
+
+                return (
+                  <DroppableImage
+                    key={item.id}
+                    item={item}
+                    num={num}
+                    wrong={wrong}
+                    showAns={showAns || checked}
+                    handleRemove={handleRemove}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── الأزرار ── */}
+          <div className="mt-4 flex justify-center">
+            <Button
+              checkAnswers={handleCheck}
+              handleShowAnswer={handleShowAnswer}
+              handleStartAgain={handleReset}
+            />
+          </div>
         </div>
-        <div className="wb-buttons-wrap">
-          <Button
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleReset}
-            checkAnswers={handleCheck}
-          />
-        </div>
-      </div>
 
-      {touchItem !== null && (
-        <div
-          className="wb-touch-preview"
-          style={{
-            left: touchPos.x - 24,
-            top: touchPos.y - 24,
-          }}
-        >
-          {touchItem}
-        </div>
-      )}
-
-      <style jsx>{`
-        .wb-content-grid {
-          display: grid;
-          grid-template-columns: minmax(250px, 320px) 1fr;
-          gap: 30px;
-          align-items: center;
-          margin-bottom:60px
-        }
-
-        .wb-words-list {
-            display: flex;
-    flex-direction: column;
-    /* gap: 56px; */
-    /* padding-top: 10px; */
-    height: 100%;
-    justify-content: space-between;
-        }
-
-        .wb-word-row {
-          display: flex;
-          align-items: center;
-        }
-
-        .wb-word-box {
-          min-height: 44px;
-          padding: 0 12px;
-          border: 2px solid #f39b42;
-          border-radius: 12px;
-          background: #fff;
-          display: inline-flex;
-          align-items: center;
-          box-sizing: border-box;
-          width: 170px;
-          gap: 10px;
-        }
-
-        .wb-word-number-inline {
-          font-size: 18px;
-          font-weight: 700;
-          color: #111;
-          line-height: 1;
-          flex-shrink: 0;
-        }
-
-        .wb-word-text {
-          font-size: 18px;
-          font-weight: 500;
-          line-height: 1.1;
-          color: #222;
-          text-transform: lowercase;
-        }
-
-        .wb-images-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(190px, 1fr));
-          gap: 18px 28px;
-          align-items: start;
-        }
-
-        .wb-image-card {
-          position: relative;
-          height: 130px;
-          // border: 2px solid #ec9b32;
-          border-radius: 14px;
-          background: #fff;
-          // overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 10px;
-          box-sizing: border-box;
-          transition: 0.2s ease;
-        }
-
-        .wb-image-card--active {
-          box-shadow: 0 0 2px 6px rgba(141, 141, 147, 0.12);
-        }
-
-        .wb-image {
-          
-          height: 130px;
-          border-radius: 5px;
-          object-fit: contain;
-          display: block;
-          user-select: none;
-          pointer-events: none;
-        }
-
-        .wb-corner-number {
-        position: absolute;
-    top: -3px;
-    right: 9px;
-    width: 38px;
-    height: 38px;
-    border: none;
-    /* border-left: 2px solid #ec9b32; */
-    /* border-bottom: 2px solid #ec9b32; */
-    /* border-bottom-left-radius: 10px; */
-    /* background: #fff; */
-    color: #000000;
-    font-size: 22px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    line-height: 1;
-        }
-
-        .wb-corner-number:disabled {
-          cursor: default;
-          opacity: 1;
-        }
-
-        .wb-wrong-badge {
-          position: absolute;
-          top: -11px;
-          right: 0;
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background-color: #ef4444;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          border: 2px solid #fff;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-          z-index: 11111;
-          pointer-events: none;
-        }
-
-        .wb-drag-numbers {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 14px;
-          margin-top: 8px;
-        }
-
-        .wb-drag-circle {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          background: #2e3192;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 22px;
-          font-weight: 700;
-          cursor: grab;
-          user-select: none;
-          transition: 0.2s ease;
-          -webkit-tap-highlight-color: transparent;
-          touch-action: none;
-        }
-
-        .wb-drag-circle--selected {
-          transform: scale(1.08);
-          box-shadow: 0 0 0 3px rgba(141, 141, 147, 0.2);
-        }
-
-        .wb-drag-circle--disabled {
-          background: #cfcfd4;
-          cursor: not-allowed;
-          opacity: 0.6;
-        }
-
-        .wb-buttons-wrap {
-          display: flex;
-          justify-content: center;
-          // margin-top: 4px;
-        }
-
-        .wb-touch-preview {
-          position: fixed;
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          background: #8d8d93;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 22px;
-          font-weight: 700;
-          pointer-events: none;
-          z-index: 9999;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        @media (min-width: 768px) and (max-width: 1024px) {
-          .ipad-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 56px;
-            background: #232323;
-            color: #fff;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
-          }
-
-          .WB-header-title-page8 {
-            font-size: 26px;
-          }
-
-          .wb-content-grid {
-            grid-template-columns: minmax(220px, 290px) 1fr;
-            gap: 24px;
-          }
-
-          .wb-words-list {
-            gap: 42px;
-          }
-
-          .wb-word-box {
-            width: 160px;
-            min-height: 42px;
-          }
-
-          .wb-word-text,
-          .wb-word-number-inline {
-            font-size: 17px;
-          }
-
-          .wb-images-grid {
-            grid-template-columns: repeat(2, minmax(160px, 1fr));
-            gap: 18px 22px;
-          }
-
-          .wb-image-card {
-            min-height: 140px;
-          }
-
-          .wb-image {
-            max-height: 118px;
-          }
-
-          .wb-corner-number {
-            width: 36px;
-            height: 36px;
-            font-size: 20px;
-          }
-
-          .wb-drag-circle,
-          .wb-touch-preview {
-            width: 46px;
-            height: 46px;
-            font-size: 20px;
-          }
-        }
-
-        @media (max-width: 767px) {
-          .WB-header-title-page8 {
-            font-size: 23px;
-          }
-
-          .WB-ex-A {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            font-size: 20px;
-          }
-
-          .wb-content-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-          }
-
-          .wb-words-list {
-            gap: 16px;
-            padding-top: 0;
-          }
-
-          .wb-word-box {
-            width: 100%;
-            max-width: 220px;
-            min-height: 42px;
-          }
-
-          .wb-word-number-inline,
-          .wb-word-text {
-            font-size: 16px;
-          }
-
-          .wb-images-grid {
-            grid-template-columns: repeat(2, minmax(130px, 1fr));
-            gap: 14px;
-          }
-
-          .wb-image-card {
-            min-height: 125px;
-            padding: 8px;
-          }
-
-          .wb-image {
-            max-height: 100px;
-          }
-
-          .wb-corner-number {
-            width: 32px;
-            height: 32px;
-            font-size: 18px;
-          }
-
-          .wb-drag-circle,
-          .wb-touch-preview {
-            width: 42px;
-            height: 42px;
-            font-size: 19px;
-          }
-        }
-
-        @media (max-width: 520px) {
-          .wb-images-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .wb-word-box {
-            max-width: 100%;
-          }
-
-          .wb-image-card {
-            min-height: 150px;
-          }
-
-          .wb-image {
-            max-height: 120px;
-          }
-        }
-      `}</style>
+        <DragOverlay>
+          {draggedNumber ? (
+            <div
+              style={{
+                width: "52px",
+                height: "52px",
+                borderRadius: "50%",
+                backgroundColor: DRAG_COLOR,
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+                fontSize: "24px",
+                boxShadow: "0 4px 12px rgba(0,0,0,.25)",
+              }}
+            >
+              {draggedNumber}
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }

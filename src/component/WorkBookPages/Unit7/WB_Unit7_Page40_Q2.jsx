@@ -240,7 +240,10 @@ export default function WB_LookReadFind_PageD() {
     <div className="main-container-component">
       <div
         className="div-forall"
-        
+        style={{
+             
+              gap: "40px",
+            }}
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
@@ -270,7 +273,9 @@ export default function WB_LookReadFind_PageD() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "30px",
+                height:"400px",
+                justifyContent:"space-around"
+                // gap: "45px",
               }}
             >
               {ITEMS.map((item) => (
@@ -341,15 +346,15 @@ export default function WB_LookReadFind_PageD() {
               // borderRadius: "clamp(12px,1.4vw,18px)",
               // overflow: "hidden",
               // background: "#f7f7f7",
-              flexShrink: 0,
+              // flexShrink: 0,
             }}
           >
             <img
               src={sceneImg}
               alt="scene"
               style={{
-                width: "300px",
-                height: "auto",
+                width: "auto",
+                height: "400px",
                 display: "block",
                 objectFit: "contain",
               }}
@@ -362,7 +367,7 @@ export default function WB_LookReadFind_PageD() {
           style={{
             display: "flex",
             justifyContent: "center",
-            marginTop: "clamp(6px,1vw,12px)",
+         
           }}
         >
           <Button

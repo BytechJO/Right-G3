@@ -134,7 +134,7 @@ export default function WB_Page47_F() {
       <div
         className="div-forall"
         style={{
-          gap: "clamp(14px,2vw,22px)",
+          gap: "10px",
         }}
       >
         {/* Title */}
@@ -142,13 +142,13 @@ export default function WB_Page47_F() {
           <span className="WB-ex-A">F</span>
           Read and write.
         </h1>
-
+<div className="flex flex-col gap-5">
         <img
           src={boyImg}
           alt="boy"
           style={{
-            width: "80%",
-            height: "auto",
+            width: "100%",
+            height: "280px",
             objectFit: "contain",
           }}
         />
@@ -158,7 +158,7 @@ export default function WB_Page47_F() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "clamp(14px,2vw,22px)",
+            gap: "10px",
             width: "100%",
           }}
         >
@@ -245,7 +245,7 @@ export default function WB_Page47_F() {
             );
           })}
         </div>
-
+</div>
         {/* Buttons */}
         <div
           style={{

@@ -64,13 +64,17 @@ const DRAG_BG = "#f29a1f";
 const styles = {
   pageWrap: {
     width: "100%",
+     display: "flex",
+      justifyContent: "center",
+
   },
 
   contentWrap: {
     display: "flex",
     flexDirection: "column",
-    gap: "clamp(14px, 6vw, 30px)",
-    width: "100%",
+    gap: "clamp(14px, 6vw, 15px)",
+    
+    width: "88%",
   },
 
   sentencesWrap: {
@@ -99,7 +103,7 @@ const styles = {
 
   sentenceText: {
     fontSize: "clamp(12px, 1.4vw, 18px)",
-    fontWeight: 500,
+    // fontWeight: 500,
     color: TEXT_COLOR,
     lineHeight: 1.25,
     wordBreak: "break-word",
@@ -115,7 +119,7 @@ const styles = {
 
   cardDropArea: {
     position: "relative",
-    width: "100%",
+    width: "80%",
     minWidth: 0,
     cursor: "pointer",
     transition: "0.2s ease",
@@ -444,13 +448,13 @@ export default function WB_Unit3_Page21_QI() {
         }
       `}</style>
 
-      <div className="div-forall" style={{ gap: "33px" }}>
+      <div className="div-forall" style={{ gap: "35px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">I</span>
           Read, look, and number.
         </h1>
         <div className="flex flex-col gap-3">
-       <img src={img} style={{ width: "auto", height: "120px" }} />
+       <img src={img} style={{ width: "auto", height: "80px" }} />
 
         <div style={styles.pageWrap}>
           <div style={styles.contentWrap}>

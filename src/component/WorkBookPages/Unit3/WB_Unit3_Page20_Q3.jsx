@@ -87,14 +87,14 @@ export default function WB_Unit3_Page18_QC() {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          minWidth: "118px",
+          // minWidth: "118px",
           minHeight: "54px",
           padding: "6px 18px",
           borderRadius: "999px",
           border: selected
             ? wrong
               ? "2px solid red"
-              : "2px solid #f39b42"
+              : "1px solid #f39b42"
             : "2px solid transparent",
           background: "transparent",
           color: "#222",
@@ -151,8 +151,10 @@ export default function WB_Unit3_Page18_QC() {
           display: flex;
           // flex-direction: column;
           align-items: flex-start;
+          justify-content: center;
+
           gap: 5px;
-          min-width: 0;
+          // min-width: 0;
         }
 
         /* ✅ FIX: صف الرقم فوق الكارت محاذي للشمال */
@@ -160,7 +162,7 @@ export default function WB_Unit3_Page18_QC() {
           display: flex;
           align-items: flex-end;
           justify-content: flex-start;
-          width: 100%;
+          // width: 100%;
           padding-bottom: 6px;
         }
 
@@ -168,11 +170,11 @@ export default function WB_Unit3_Page18_QC() {
           font-size: 20px;
           font-weight: 700;
           color: #222;
-          line-height: 1;
+          // line-height: 1;
         }
 
         .wb-c-card {
-          width: 126px;
+          width: 100px;
           // min-height: 138px;
           border: 1px solid #f39b42;
           border-radius: 18px;

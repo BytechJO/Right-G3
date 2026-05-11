@@ -95,7 +95,7 @@ export default function WB_NewVersion() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "20px" }}>
+      <div className="div-forall" style={{ gap: "50px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span> Complete the sentences and write{" "}
           <span className="text-blue-900">him</span>,{" "}

@@ -156,7 +156,7 @@ function DropZone({ item, num, wrong, checked, showAns, handleRemove }) {
       style={{
         position: "relative",
 
-        width: "200px",
+        width: "140px",
 
         transition: "0.25s ease",
 
@@ -205,8 +205,8 @@ function DropZone({ item, num, wrong, checked, showAns, handleRemove }) {
           top: "0%",
           right: "0%",
 
-          width: "clamp(34px,4vw,42px)",
-          height: "clamp(34px,4vw,42px)",
+          width: "30px",
+          height: "30px",
 
           display: "flex",
           alignItems: "center",
@@ -376,7 +376,7 @@ export default function WB_Unit9_Page55_QI() {
         <div
           className="div-forall"
           style={{
-            gap: "25px",
+            gap: "5px",
           }}
         >
           {/* العنوان */}
@@ -412,7 +412,7 @@ export default function WB_Unit9_Page55_QI() {
               display: "flex",
               flexDirection: "column",
 
-              gap: "clamp(12px,1.8vw,20px)",
+              gap: "10px",
             }}
           >
             {ITEMS.map((item) => {
@@ -442,9 +442,9 @@ export default function WB_Unit9_Page55_QI() {
 
                       gap: "clamp(8px,1vw,14px)",
 
-                      flex: 1,
+                      // flex: 1,
 
-                      minWidth: "200px",
+                     width: "70%",
                     }}
                   >
                     <span

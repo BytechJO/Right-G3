@@ -82,9 +82,10 @@ export default function WB_ReadLookWrite_PageE() {
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{
-          gap: "50px",
-        }}
+       style={{
+             
+              gap: "40px",
+            }}
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
@@ -119,8 +120,9 @@ export default function WB_ReadLookWrite_PageE() {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "40px",
-              minWidth: 0,
+              height:"400px",
+                justifyContent:"space-around"
+            
             }}
           >
             {ITEMS.map((item) => {
@@ -163,7 +165,7 @@ export default function WB_ReadLookWrite_PageE() {
                     {/* before */}
                     <span
                       style={{
-                        fontSize: "20px",
+                        fontSize: "18px",
                         // fontWeight: 500,
                         color: "#111",
                         lineHeight: 1.4,
@@ -244,7 +246,7 @@ export default function WB_ReadLookWrite_PageE() {
                     {/* after */}
                     <span
                       style={{
-                        fontSize: "20px",
+                        fontSize: "18px",
                         // fontWeight: 500,
                         color: "#111",
                         lineHeight: 1.4,
@@ -270,8 +272,8 @@ export default function WB_ReadLookWrite_PageE() {
               src={houseImg}
               alt="toy house"
               style={{
-                width: "100%",
-                height: "auto",
+                width: "auto",
+                height: "400px",
                 display: "block",
                 userSelect: "none",
                 pointerEvents: "none",
@@ -285,7 +287,7 @@ export default function WB_ReadLookWrite_PageE() {
           style={{
             display: "flex",
             justifyContent: "center",
-            marginTop: "clamp(6px,1vw,12px)",
+            // marginTop: "clamp(6px,1vw,12px)",
           }}
         >
           <Button

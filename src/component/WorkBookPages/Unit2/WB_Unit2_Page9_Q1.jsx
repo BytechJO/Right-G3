@@ -25,13 +25,13 @@ export default function WB_Transport_Dropdown() {
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, value) => {
-    if (showAns ||showResults) return;
+    if (showAns || showResults) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
     setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || showResults) return;
     const allAnswered = ANSWERS.every((a) => selected[a.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -69,7 +69,7 @@ export default function WB_Transport_Dropdown() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "45px" }}>
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span> Look and write.
@@ -78,19 +78,18 @@ export default function WB_Transport_Dropdown() {
         {/* ── Main layout: word bank LEFT  |  grid RIGHT ── */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(110px, 0.5fr) minmax(0px, 1fr)",
-            gap: "clamp(16px, 2vw, 28px)",
+            display: "flex",
+            gap: "30px",
             alignItems: "center",
             width: "100%",
           }}
         >
           {/* Word Bank */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ display: "flex", justifyContent: "center" , width: "30%",}}>
             <div
               style={{
-                width: "70%",
-                maxWidth: "clamp(160px, 20vw, 230px)",
+                width: "100%",
+                // maxWidth: "clamp(160px, 20vw, 230px)",
                 border: `2px solid ${BORDER_COLOR}`,
                 borderRadius: "clamp(12px, 1.4vw, 18px)",
                 padding: "clamp(12px, 1.8vw, 22px) clamp(10px, 1.4vw, 16px)",
@@ -123,9 +122,8 @@ export default function WB_Transport_Dropdown() {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "clamp(24px, 3.5vw, 48px) clamp(16px, 2.5vw, 36px)",
+              gap: "90px",
               width: "100%",
-              
             }}
           >
             {ANSWERS.map((item) => {
@@ -163,36 +161,22 @@ export default function WB_Transport_Dropdown() {
                       {item.id}
                     </span>
 
-                    <div
+                    <img
+                      src={item.img}
+                      alt={`transport-${item.id}`}
                       style={{
-                        flex: 1,
-                        borderRadius: "clamp(10px, 1.2vw, 18px)",
-                        // overflow: "hidden",
-                        // border: `2px solid ${BORDER_COLOR}`,
-                        // background: "#f7f7f7",
-                        aspectRatio: "1.85 / 1",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        width: "auto",
+                        height: "100px",
+                        // objectFit: "cover",
+                        display: "block",
                       }}
-                    >
-                      <img
-                        src={item.img}
-                        alt={`transport-${item.id}`}
-                        style={{
-                          width: "200px",
-                          height: "auto",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-                    </div>
+                    />
                   </div>
 
                   {/* Dropdown answer */}
                   <div style={{ width: "100%", position: "relative" }}>
                     <select
-                      disabled={showAns||showResults}
+                      disabled={showAns || showResults}
                       value={selected[item.id]}
                       onChange={(e) => handleChange(item.id, e.target.value)}
                       style={{
@@ -208,7 +192,7 @@ export default function WB_Transport_Dropdown() {
                         color: "#000",
                         padding: "4px clamp(4px, 0.8vw, 10px) 4px 2px",
                         background: "transparent",
-                        cursor: showAns ||showResults ? "default" : "pointer",
+                        cursor: showAns || showResults ? "default" : "pointer",
                         appearance: "auto",
                         boxSizing: "border-box",
                       }}
@@ -240,7 +224,7 @@ export default function WB_Transport_Dropdown() {
                           fontSize: "12px",
                           fontWeight: 700,
                           boxShadow: "0 2px 2px rgba(0,0,0,0.2)",
-                          border:"2px solid white"
+                          border: "2px solid white",
                         }}
                       >
                         ✕

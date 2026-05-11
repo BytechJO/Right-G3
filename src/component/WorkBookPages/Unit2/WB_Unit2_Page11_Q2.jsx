@@ -193,7 +193,7 @@ export default function WB_Unit2_Page11_QF() {
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{ maxWidth: "1100px", margin: "auto" }}
+        style={{gap:"20px" }}
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">F</span>
@@ -209,7 +209,7 @@ export default function WB_Unit2_Page11_QF() {
               <img
                 src={item.img}
                 alt=""
-                style={{ width: "110px", height: "120px" }}
+                style={{ width: "20%", height: "100px" }}
               />
               <div className="w-[70%]">
                 {item.example ? (

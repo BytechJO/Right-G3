@@ -33,21 +33,21 @@ const BOXES = [
     word: ["n", "t"],
     missingLetter: "e",
     options: ["a", "e", "i"],
-    correctImgId: 1,
+    correctImgId:3,
   },
   {
     id: 2,
     word: ["b", "g"],
     missingLetter: "a",
     options: ["a", "e", "u"],
-    correctImgId: 2,
+    correctImgId: 6,
   },
   {
     id: 3,
     word: ["f", "g"],
     missingLetter: "i",
     options: ["o", "i", "e"],
-    correctImgId: 3,
+    correctImgId: 7,
   },
   {
     id: 4,
@@ -61,21 +61,21 @@ const BOXES = [
     word: ["l", "g"],
     missingLetter: "e",
     options: ["u", "e", "a"],
-    correctImgId: 5,
+    correctImgId: 2,
   },
   {
     id: 6,
     word: ["b", "d"],
     missingLetter: "e",
     options: ["e", "a", "u"],
-    correctImgId: 6,
+    correctImgId: 1,
   },
   {
     id: 7,
     word: ["h", "t"],
     missingLetter: "a",
     options: ["a", "i", "u"],
-    correctImgId: 7,
+    correctImgId: 5,
   },
   {
     id: 8,
@@ -144,7 +144,7 @@ function DropBox({ box, imgSrc, wrong, imgId, handleRemove, renderWord }) {
         gap: "clamp(4px,0.5vw,7px)",
       }}
     >
-      <div className="flex gap-2 w-full">
+      <div className="flex w-full">
       <span
         style={{
           fontSize: "clamp(14px,1.7vw,22px)",
@@ -155,7 +155,7 @@ function DropBox({ box, imgSrc, wrong, imgId, handleRemove, renderWord }) {
       >
         {box.id}
       </span>
-      <div className="flex flex-col items-start gap-5 w-full">
+      <div className="flex flex-col items-center gap-5 w-full">
       <div
         ref={setNodeRef}
         onClick={() => handleRemove(box.id)}
