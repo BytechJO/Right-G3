@@ -5,7 +5,6 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Bas
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 5.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 6.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 7.svg";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import WrongMark from "../../WrongMark";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Page9_Q1.css";
@@ -18,7 +17,6 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 
-import { CSS } from "@dnd-kit/utilities";
 
 const DraggableItem = ({ word, isUsed }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -33,8 +31,8 @@ const DraggableItem = ({ word, isUsed }) => {
       {...listeners}
       {...attributes}
       style={{
-        width: "40px",
-        height: "40px",
+        width: "45px",
+        height: "45px",
         borderRadius: "50%",
         backgroundColor: isUsed ? "#cfcfd4" : "#f39b42",
         color: "#fff",
@@ -223,7 +221,7 @@ const Page9_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall" style={{ gap: "10px" }}>
+        <div className="div-forall" style={{ gap: "15px" }}>
           <h5 className="header-title-page8 pb-2.5">
             <span className="ex-A" style={{ marginRight: "10px" }}>
               D
@@ -241,10 +239,10 @@ const Page9_Q1 = () => {
             ))}
           </BankDrop>
           <div className=" mt-6 flex gap-10">
-            <div className="flex flex-col gap-12 w-1/2">
+            <div className="flex flex-col gap-10 w-1/2">
               {questions.map((q) => (
-                <p key={q.id}>
-                  <span className="font-bold mr-2">{q.id}</span>
+                <p key={q.id} className="text-[18px]">
+                  <span className="font-bold mr-2 text-[20px]">{q.id}</span>
                   {q.text}
                 </p>
               ))}
@@ -304,8 +302,8 @@ const Page9_Q1 = () => {
                           <div
                             style={{
                               position: "absolute",
-                              top: "6px",
-                              right: "6px",
+                              top: "1px",
+                              right: "21px",
                             }}
                           >
                             <WrongMark />
