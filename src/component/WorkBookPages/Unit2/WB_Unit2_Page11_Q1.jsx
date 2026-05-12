@@ -117,7 +117,7 @@ export default function WB_LookAndWrite_PageE() {
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
               width: "100%",
-              justifyItems:"center",
+              // justifyItems:"center",
               gap: "40px",
 
             }}

@@ -211,7 +211,7 @@ export default function WB_Unit2_Page11_QF() {
                 alt=""
                 style={{ width: "20%", height: "100px" }}
               />
-              <div className="w-[70%]">
+              <div className="w-[70%] flex flex-col gap-5">
                 {item.example ? (
                   <>
                     <div>{item.question}</div>

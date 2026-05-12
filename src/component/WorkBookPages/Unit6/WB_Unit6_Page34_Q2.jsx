@@ -118,8 +118,8 @@ export default function WB_LookReadWrite_PageD() {
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span> Look, read, and choose.
         </h1>
-
-       
+           
+       <div className="flex flex-col justify-start items-start gap-20">
           <img
             src={img1}
             alt=""
@@ -198,7 +198,7 @@ export default function WB_LookReadWrite_PageD() {
             </div>
           ))}
         </div>
-
+</div>
         {/* Buttons */}
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Button

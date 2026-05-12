@@ -206,8 +206,9 @@ export default function WB_YesNo_PageC() {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",height:"390px",
-                gap: "9px",
+                flexDirection: "column",height:"370px",
+                justifyContent:"space-between",
+                // gap: "9px",
               }}
             >
               {ITEMS.map((item) => (

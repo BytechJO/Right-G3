@@ -230,7 +230,7 @@ export default function WB_Unit3_Page15_QB() {
                 />
               </div>
 
-              <div className="wb-b15-lines">
+              <div className="flex flex-col gap-5">
                 {item.lockQuestion
                   ? renderFixedLine(item.fixedQuestion)
                   : renderSelect(item, "q", isWrongQuestion(item))}

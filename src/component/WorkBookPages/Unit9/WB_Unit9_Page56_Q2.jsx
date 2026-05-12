@@ -122,7 +122,7 @@ export default function WB_Unit9_Page56_QB() {
       <div
         className="div-forall"
         style={{
-          gap: "80px",
+          gap: "120px",
         }}
       >
         <h1 className="WB-header-title-page8">

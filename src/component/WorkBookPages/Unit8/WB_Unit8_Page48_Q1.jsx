@@ -263,7 +263,7 @@ export default function WB_FindMissingLetters_PageG() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "clamp(4px,0.6vw,8px)",
+        gap: "clamp(4px, 1.5vw, 15px)",
       }}
     >
       {/* صورة */}

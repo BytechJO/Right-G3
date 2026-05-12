@@ -21,7 +21,7 @@ const ITEMS = [
     fixed: false,
     question: "Can you see Helen?",
     beforeDrop: "Yes, I can see her",
-    after: ".",
+    afterDrop: ".",
     correct: "in the living room",
   },
   {
