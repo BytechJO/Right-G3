@@ -11,12 +11,14 @@ import video from "../../../assets/videos/grade 3 unit 5 page 43.mp4";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import AudioWithCaption from "../../AudioWithCaption";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
 
 const Unit5_Page4 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+  const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
     {
       start: 0.399,
@@ -34,7 +36,7 @@ const Unit5_Page4 = ({ openPopup }) => {
     { x1: 6.33, y1: 9.01, x2: 45.12, y2: 17.98, sound: sound1 },
     { x1: 55.03, y1: 8.84, x2: 94.46, y2: 17.47, sound: sound2 },
     { x1: 39.52, y1: 32.7, x2: 93.81, y2: 41.17, sound: sound3 },
-    { x1: 57.18, y1: 66.04, x2: 90.15 , y2: 71.46, sound: sound4 },
+    { x1: 57.18, y1: 66.04, x2: 90.15, y2: 71.46, sound: sound4 },
   ];
 
   const handleImageClick = (e) => {
@@ -43,19 +45,21 @@ const Unit5_Page4 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+  const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
 
   return (
@@ -68,9 +72,7 @@ const Unit5_Page4 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
-              ? "highlight"
-              : ""
+            hoveredAreaIndex === index || activeId === index ? "highlight" : ""
           }`}
           style={{
             position: "absolute",
@@ -80,8 +82,7 @@ const Unit5_Page4 = ({ openPopup }) => {
             height: `${area.y2 - area.y1}%`,
           }}
           onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
+            playSound(area.sound, `p43-${area.sound}`);
           }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);

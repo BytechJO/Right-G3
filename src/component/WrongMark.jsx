@@ -6,9 +6,14 @@ const WrongMark = ({
   return (
     <div
       className={`absolute ${top} ${left} ${marginLeft} -translate-y-1/2
-      w-6 h-6 text-xs bg-red-500 text-white rounded-full
-      flex items-center justify-center font-bold border-2 border-white
-      pointer-events-none shadow-lg`}
+      w-[22px] h-[22px]
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-none`}
     >
       ✕
     </div>

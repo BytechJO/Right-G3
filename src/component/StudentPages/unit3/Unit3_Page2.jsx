@@ -120,69 +120,14 @@ const Unit3_Page2 = ({ openPopup }) => {
     { start: 11.44, end: 13.66, text: "peach, watch, shell" },
   ];
 
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-    console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
-  };
-  const playSound = (path) => {
-    if (audioRef.current) {
-      audioRef.current.src = path;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
-  };
-
-  const clickableAreas = [
-    { x1: 5, y1: 22, x2: 56, y2: 26.5, sound: shopkeeper1 },
-    { x1: 5, y1: 26, x2: 63, y2: 31.5, sound: Lala1 },
-    { x1: 5, y1: 31, x2: 56, y2: 36.5, sound: shopkeeper2 },
-    { x1: 5, y1: 36, x2: 66.5, y2: 41.5, sound: Lala2 },
-    { x1: 5, y1: 42, x2: 63, y2: 46.5, sound: shopkeeper3 },
-    { x1: 5, y1: 46, x2: 58, y2: 54, sound: Lala3 },
-    { x1: 5, y1: 53.5, x2: 56, y2: 59, sound: shopkeeper4 },
-  ];
   return (
     <div
       className="page1-img-wrapper"
-      onClick={handleImageClick}
+
       style={{ backgroundImage: `url(${page_2})` }}
     >
-      {clickableAreas.map((area, index) => (
-        <div
-          key={index}
-          className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
-              ? "highlight"
-              : ""
-          }`}
-          style={{
-            position: "absolute",
-            left: `${area.x1}%`,
-            top: `${area.y1}%`,
-            width: `${area.x2 - area.x1}%`,
-            height: `${area.y2 - area.y1}%`,
-          }}
-          onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
-          }}
-          onMouseEnter={() => {
-            if (!isPlaying) setHoveredAreaIndex(index);
-          }}
-          onMouseLeave={() => {
-            if (!isPlaying) setHoveredAreaIndex(null);
-          }}
-        ></div>
-      ))}
+      
       <audio ref={audioRef} style={{ display: "none" }} />
       <div
         className="headset-icon-CD-unit3-page2-1 hover:scale-110 transition"

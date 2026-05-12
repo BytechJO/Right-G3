@@ -5,11 +5,13 @@ import grammarSound from "../../../assets/audio/ClassBook/Unit 8/P 66/unit8-pg66
 import sound1 from "../../../assets/audio/ClassBook/Unit 8/P 66/sound1.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 8/P 66/Pg66_2.1_Adult Lady.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 8/P 66/Pg66_3.1_Adult Lady.mp3";
-
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import video from "../../../assets/videos/grade 3 unit 8 page 66.mp4";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
+
 const Unit8_Page3 = ({ openPopup }) => {
   const audioRef = useRef(null);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
@@ -57,21 +59,22 @@ const Unit8_Page3 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+ const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
-
   return (
     <div
       className="page1-img-wrapper"
@@ -87,7 +90,7 @@ const Unit8_Page3 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
+            hoveredAreaIndex === index || activeId === index
               ? "highlight"
               : ""
           }`}
@@ -98,10 +101,10 @@ const Unit8_Page3 = ({ openPopup }) => {
             width: `${area.x2 - area.x1}%`,
             height: `${area.y2 - area.y1}%`,
           }}
-          onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
-          }}
+         onClick={() => {
+                  // setActiveAreaIndex(area.sound);
+                  playSound(area.sound, `p66-${area.sound}`);
+                }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);
           }}

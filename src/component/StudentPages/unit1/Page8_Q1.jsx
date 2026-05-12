@@ -135,6 +135,8 @@ const Page8_Q1 = () => {
 
   /* ================= Selection ================= */
   const startSelect = (rowIndex, colIndex) => {
+    if (locked) return;
+
     setCurrentRow(rowIndex);
     setSelected([{ row: rowIndex, col: colIndex }]);
   };
@@ -150,6 +152,8 @@ const Page8_Q1 = () => {
   };
 
   const endSelect = () => {
+    if (locked) return;
+
     if (!selected.length) return;
 
     const rowIndex = selected[0].row;
@@ -192,6 +196,22 @@ const Page8_Q1 = () => {
       return;
     }
 
+    // ✅ التأكد إنو بكل row في كلمة وحدة عالأقل
+    const missingRows = rows.filter((_, rowIndex) => {
+      return !foundSelections.some((selection) => selection.row === rowIndex);
+    });
+
+    if (missingRows.length > 0) {
+      ValidationAlert.info(
+        `
+      <div style="font-size:18px;text-align:center;">
+        Please find at least one word in each box.
+      </div>
+      `,
+      );
+      return;
+    }
+
     const total = rows.reduce((acc, r) => acc + r.words.length, 0);
     const score = foundSelections.length;
 
@@ -211,7 +231,6 @@ const Page8_Q1 = () => {
 
     setLocked(true);
   };
-
   const showAnswers = () => {
     let answers = [];
 
@@ -248,7 +267,7 @@ const Page8_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "50px" }}>
         <h5 className="header-title-page8">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             A
@@ -279,20 +298,47 @@ const Page8_Q1 = () => {
             >
               <div
                 style={{
+                  position: "relative",
                   color: row.color,
                   fontWeight: "bold",
                   minWidth: "80px",
-                  textAlign: "right",
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
                 Short {row.vowel}
+                {/* ❌ إذا لسا مو كل الكلمات موجودة */}
+                {locked &&
+                  foundSelections.filter((f) => f.row === rowIndex).length <
+                    row.words.length && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-12px",
+                        right: "-12px",
+                        width: "22px",
+                    height: "22px",
+                    borderRadius: "50%",
+                    background: "red",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    border: "2px solid white",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",}}
+                    >
+                      ✕
+                    </div>
+                  )}
               </div>
 
               <div
                 style={{
-                  border: "2px solid orange",
+                  border: "1.5px solid orange",
                   borderRadius: "20px",
-                  padding: "10px 15px",
+                  padding: "10px 10px",
                   display: "flex",
                   flexWrap: "nowrap",
                   justifyContent: "center",
@@ -345,15 +391,15 @@ const Page8_Q1 = () => {
                         justifyContent: "center",
                         fontSize: "16px",
                         fontWeight: "bold",
-                        cursor: "pointer",
+                        cursor: locked ? "default":"pointer",
                         borderRadius: "4px",
                         border: "1px solid #ccc",
                         userSelect: "none",
                         WebkitUserSelect: "none",
                         background: isFound
-                          ? "rgba(231, 76, 60, 0.4)"
+                          ? "rgba(52, 152, 219, 0.4)"
                           : isSelected
-                            ? "rgba(52, 152, 219, 0.4)"
+                            ? "rgba(180, 218, 241, 0.4)"
                             : "#fff",
                       }}
                     >

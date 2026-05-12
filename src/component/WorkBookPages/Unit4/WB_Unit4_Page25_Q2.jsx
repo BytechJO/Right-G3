@@ -28,7 +28,7 @@ function MonthItem({ item, value, onChange, showAns, wrong }) {
         <select
           aria-label={`Select the order number for ${item.name}`}
           value={currentValue}
-          disabled={showAns ||checked}
+          disabled={showAns}
           onChange={(e) => onChange(item.id, Number(e.target.value))}
           className="month-select"
         >

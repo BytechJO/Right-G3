@@ -10,22 +10,75 @@ import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import video from "../../../assets/videos/grade 3 unit 1 page 6.mp4";
 import "./Page6.css";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
+
 const Page6 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+  const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
     {
-      start: 0,
-      end: 29.1,
-      text: "Page six, exercise one. Write grammar. The bear is shorter than the giraffe. The giraffe is taller than the bear. The elephant is the biggest animal in the zoo. The bear is shorter than the giraffe. The giraffe is taller than the bear. The bush is younger than the tree. The tree is older than the bush. Is the bicycle faster than the skateboard? Yes, it is",
+      start: 0.16,
+      end: 2.04,
+      text: "Page 6, exercise 1.",
+    },
+    {
+      start: 2.58,
+      end: 3.5,
+      text: "Right grammar.",
+    },
+    {
+      start: 3.96,
+      end: 6.24,
+      text: "The bear is shorter than the giraffe.",
+    },
+    {
+      start: 6.86,
+      end: 9.06,
+      text: "The giraffe is taller than the bear.",
+    },
+    {
+      start: 9.74,
+      end: 12.66,
+      text: "The elephant is the biggest animal in the zoo.",
+    },
+    {
+      start: 13.18,
+      end: 15.28,
+      text: "The bear is shorter than the giraffe.",
+    },
+    {
+      start: 16.04,
+      end: 18.68,
+      text: "The giraffe is taller than the bear.",
+    },
+    {
+      start: 19.0,
+      end: 21.16,
+      text: "The bush is younger than the tree.",
+    },
+    {
+      start: 22.08,
+      end: 24.22,
+      text: "The tree is older than the bush.",
+    },
+    {
+      start: 24.7,
+      end: 27.1,
+      text: "Is the bicycle faster than the skateboard?",
+    },
+    {
+      start: 27.8,
+      end: 29.12,
+      text: "Yes, it is.",
     },
   ];
 
   // 🟩 مناطق مستطيلة (x1,y1,x2,y2)
   const clickableAreas = [
-    { x1: 5.37, y1: 8.65, x2: 64.76, y2: 20.37, sound: sound1 },
+    { x1: 6.92, y1: 9.52, x2: 64.76, y2: 20.37, sound: sound1 },
     { x1: 5.37, y1: 32.49, x2: 45.13, y2: 38.86, sound: sound2 },
     { x1: 54.81, y1: 32.7, x2: 94.32, y2: 38.45, sound: sound3 },
     { x1: 47.86, y1: 90.75, x2: 93.54, y2: 96.67, sound: sound4 },
@@ -36,19 +89,21 @@ const Page6 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+  const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
 
   return (
@@ -62,9 +117,7 @@ const Page6 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
-              ? "highlight"
-              : ""
+            hoveredAreaIndex === index || activeId === index ? "highlight" : ""
           }`}
           style={{
             position: "absolute",
@@ -74,8 +127,7 @@ const Page6 = ({ openPopup }) => {
             height: `${area.y2 - area.y1}%`,
           }}
           onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
+            playSound(area.sound, `p6-${area.sound}`);
           }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);

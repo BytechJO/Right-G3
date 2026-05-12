@@ -27,9 +27,7 @@ import Lolo from "../../../assets/audio/ClassBook/Unit 2/P 11/Pg11_1.2_Lolo.mp3"
 import "./Unit2_Page2.css";
 const Unit2_Page2 = ({ openPopup }) => {
   const audioRef = useRef(null);
-  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
+  
   // أصوات الصور
   const imageSounds = [
     null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
@@ -65,15 +63,7 @@ const Unit2_Page2 = ({ openPopup }) => {
     { start: 3.46, end: 5.92, text: "Do you play basketball? " },
     { start: 5.92, end: 7.54, text: "No, I play volleyball" },
   ];
-  const areas = [
-  
-    // الصوت الأول – منطقة إضافية
-   { x1: 5.04, y1: 14.09, x2: 44.9, y2: 43.7, sound: 1, isPrimary: false },
 
-  ];
-  const sounds = {
-    1: sound1,
-  };
   const captions = [
     { start: 0, end: 3.02, text: "Page five Listen and read along." },
     {
@@ -82,81 +72,17 @@ const Unit2_Page2 = ({ openPopup }) => {
       text: "Long vowels. Cake, bee, bike, home, cube",
     },
   ];
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-    console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
-  };
-  const playSound = (path) => {
-    if (audioRef.current) {
-      audioRef.current.src = path;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
-
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
-  };
+  
   return (
     <>
       <div
         className="page1-img-wrapper"
         style={{ backgroundImage: `url(${page_5})` }}
-        onClick={handleImageClick}
+       
       >
         <audio ref={audioRef} style={{ display: "none" }} />
 
-        {areas.map((area, index) => {
-          const isActive = activeAreaIndex === area.sound;
-
-          // ============================
-          // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
-          // ============================
-          if (area.isPrimary) {
-            return (
-              <div
-                key={index}
-                className={`circle-area ${isActive ? "active" : ""}`}
-                style={{
-                  left: `${area.x1}%`,
-                  top: `${area.y1}%`,
-                }}
-                onClick={() => {
-                  setActiveAreaIndex(area.sound);
-                  playSound(sounds[area.sound]);
-                }}
-              ></div>
-            );
-          }
-
-          // ============================
-          // 2️⃣ المناطق الفرعية → مربعات داكنة مخفية ولازم
-          //    عند الضغط عليها → تفعّل الدائرة الأساسية
-          // ============================
-          return (
-            <div
-              key={index}
-              className="clickable-area"
-              style={{
-                position: "absolute",
-                left: `${area.x1}%`,
-                top: `${area.y1}%`,
-                width: `${area.x2 - area.x1}%`,
-                height: `${area.y2 - area.y1}%`,
-              }}
-              onClick={() => {
-                setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-                playSound(sounds[area.sound]);
-              }}
-            ></div>
-          );
-        })}
-
+     
         <div
           className="headset-icon-CD-unit2-page2-1 hover:scale-110 transition"
           style={{ overflow: "visible" }}

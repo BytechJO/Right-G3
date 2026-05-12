@@ -10,11 +10,14 @@ import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import video from "../../../assets/videos/grade 3 unit 1 page 7.mp4";
 import AudioWithCaption from "../../AudioWithCaption";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
+
 const Page7 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+  const { audioRef, activeId, setActiveId } = useContext(AudioContext);
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
+
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
@@ -28,7 +31,7 @@ const Page7 = ({ openPopup }) => {
     {
       start: 0,
       end: 9.88,
-      text: "Page seven, exercise two. Write grammar. Who is older, Stella or Sarah? Stella is older than Sarah. ",
+      text: "Page 7, exercise 2. Right grammar. Who is older, Stella or Sarah? Stella is older than Sarah. ",
     },
     {
       start: 11.34,
@@ -53,10 +56,10 @@ const Page7 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 5.893, y1: 9.27, x2: 87.26, y2: 20.98, sound: sound1 },
+    { x1: 7.41, y1: 9.52, x2: 85.8, y2: 20.98, sound: sound1 },
     { x1: 10.08, y1:57.56, x2: 42.26, y2: 63.73, sound: sound2 },
-    { x1: 51.15, y1: 31.67, x2: 93.27, y2: 37.63, sound: sound3 },
-    { x1: 5.37, y1: 64.75, x2: 49.06, y2: 71.12, sound: sound4 },
+    { x1: 51.80, y1: 32.03, x2: 93.81, y2: 38.29, sound: sound3 },
+    { x1: 6.12, y1: 64.85, x2: 49.06, y2: 71.12, sound: sound4 },
   ];
 
   const checkAreaAndPlaySound = (x, y) => {
@@ -68,21 +71,22 @@ const Page7 = ({ openPopup }) => {
 
     if (area) playSound(area.sound);
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+   const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
-
   return (
     <div
       className="page1-img-wrapper"
@@ -94,7 +98,7 @@ const Page7 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
+            hoveredAreaIndex === index || activeId === index
               ? "highlight"
               : ""
           }`}
@@ -106,8 +110,7 @@ const Page7 = ({ openPopup }) => {
             height: `${area.y2 - area.y1}%`,
           }}
           onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
+            playSound(area.sound, `p7-${area.sound}`);
           }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);

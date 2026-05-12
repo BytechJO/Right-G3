@@ -10,21 +10,23 @@ import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_3.1_Helen.m
 import sound6 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_3.2_Helen's Mom.mp3";
 import sound7 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_4.1_Helen.mp3";
 import sound8 from "../../../assets/audio/ClassBook/Unit 2/P 12/Pg12_4.2 _Tom.mp3";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import video from "../../../assets/videos/grade 3 unit 2 page 12.mp4";
 const Unit2_Page3 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+   const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
     {
       start: 0.399,
       end: 9.0,
-      text: "Page 12, exercise 1. Write grammar. How do you/they/we go to school?",
+      text: "Page 12, exercise 1. Right grammar. How do you/they/we go to school?",
     },
     {
       start: 10.179,
@@ -124,19 +126,21 @@ const Unit2_Page3 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+ const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
 
   return (
@@ -154,7 +158,7 @@ const Unit2_Page3 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
+            hoveredAreaIndex === index || activeId === index
               ? "highlight"
               : ""
           }`}
@@ -166,8 +170,7 @@ const Unit2_Page3 = ({ openPopup }) => {
             height: `${area.y2 - area.y1}%`,
           }}
           onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
+            playSound(area.sound, `p12-${area.sound}`);
           }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);

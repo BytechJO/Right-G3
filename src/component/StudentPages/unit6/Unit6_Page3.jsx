@@ -8,16 +8,19 @@ import sound3 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_2.1_Hansel.
 import sound4 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_2.2_Tom.mp3";
 import sound5 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_3.1_Stella.mp3";
 import sound6 from "../../../assets/audio/ClassBook/Unit 6/P 48/Pg48_3.2_Jack.mp3";
-
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import video from "../../../assets/videos/grade 3 unit 6 page 48.mp4";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
+
 const Unit6_Page3 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+ const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
+
   const captionsExample = [
     {
       start: 0.079,
@@ -60,19 +63,21 @@ const Unit6_Page3 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+  const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
 
   return (
@@ -90,7 +95,7 @@ const Unit6_Page3 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
+            hoveredAreaIndex === index || activeId === index
               ? "highlight"
               : ""
           }`}
@@ -101,10 +106,10 @@ const Unit6_Page3 = ({ openPopup }) => {
             width: `${area.x2 - area.x1}%`,
             height: `${area.y2 - area.y1}%`,
           }}
-          onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
-          }}
+         onClick={() => {
+                  // setActiveAreaIndex(area.sound);
+                  playSound(area.sound, `p48-${area.sound}`);
+                }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);
           }}

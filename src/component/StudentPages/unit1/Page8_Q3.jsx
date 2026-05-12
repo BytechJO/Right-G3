@@ -103,7 +103,7 @@ const Page8_Q3 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "10px" }}>
         <h5 className="header-title-page8">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             B
@@ -114,14 +114,14 @@ const Page8_Q3 = () => {
         </h5>
         <div className=" flex flex-col  gap-8 mt-8">
           {questions.map((q) => (
-            <div key={q.id} className="flex items-center">
+            <div key={q.id} className="flex items-center h-[90px]">
               <div className="flex items-center gap-4 w-[55%]">
-                <span className="font-bold text-xl">{q.id}</span>
-                <span className="text-[1.2rem]">{q.text}</span>
+                <span className="font-bold text-[20px]">{q.id}</span>
+                <span className="text-[18px]">{q.text}</span>
               </div>
 
-              <div className="flex flex-col items-center w-[25%]">
-                <div className="flex gap-6 mb-2">
+              <div className="flex flex-col items-center w-[50%]">
+                <div className="flex gap-6 mb-2 text-[18px]">
                   {["true", "false"].map((val) => {
                     const isSelected = answers[q.id] === val;
                     const isCorrect = q.answer === val;
@@ -135,7 +135,7 @@ const Page8_Q3 = () => {
                         }}
                         style={{
                           position: "relative",
-                          cursor: "pointer",
+                          cursor: locked ? "default" : "pointer",
                           padding: "4px 12px",
                           display: "inline-block",
                         }}
@@ -154,9 +154,9 @@ const Page8_Q3 = () => {
                               border: isSelected
                                 ? showResult
                                   ? isCorrect
-                                    ? "2px solid #1C398E"
-                                    : "2px solid #ef4444"
-                                  : "2px solid #1C398E"
+                                    ? "1px solid #f39b42"
+                                    : "2px solid red"
+                                  : "1px solid #f39b42"
                                 : "none",
                               borderRadius: "20px",
                               pointerEvents: "none",
@@ -185,19 +185,19 @@ const Page8_Q3 = () => {
               </div>
 
               {/* الصورة */}
-                <div className="w-[50%] flex justify-center gap-2">
-                  {q.images.map((image, i) => (
-                    <img
-                      key={i}
-                      src={image}
-                      alt=""
-                      style={{
-                        width: q.images.length === 1 ? "100px" : "70px",
-                        height: "auto",
-                        objectFit: "contain",
-                      }}
-                    />
-                  ))}
+              <div className="w-[50%] flex justify-center gap-2">
+                {q.images.map((image, i) => (
+                  <img
+                    key={i}
+                    src={image}
+                    alt=""
+                    style={{
+                      width: q.images.length === 1 ? "100px" : "70px",
+                      height: "auto",
+                      objectFit: "contain",
+                    }}
+                  />
+                ))}
               </div>
             </div>
           ))}

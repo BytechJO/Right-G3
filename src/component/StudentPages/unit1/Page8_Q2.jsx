@@ -27,7 +27,7 @@ const Page8_Q2 = () => {
     {
       start: 0.259,
       end: 18.899,
-      text: "Page eight. Write activities. Exercise A, Number 2. Listen and circle the words with long vowel sounds. One, may, lake, jam, paint. Two, bee, bed,",
+      text: "Page 8. Write activities. Exercise A, Number 2. Listen and circle the words with long vowel sounds. One, may, lake, jam, paint. Two, bee, bed,",
     },
     {
       start: 19.939,
@@ -154,14 +154,17 @@ const Page8_Q2 = () => {
             style={{
               display: "flex",
               justifyContent: "center",
+              width: "100%",
+
               gap: "25px",
             }}
           >
             <div
               style={{
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 gap: "35px",
+                width: "100%",
                 marginTop: "30px",
               }}
             >
@@ -177,7 +180,7 @@ const Page8_Q2 = () => {
                       position: "absolute",
                       left: "-20px",
                       fontWeight: "bold",
-                      fontSize: "16px",
+                      fontSize: "20px",
                     }}
                   >
                     {index + 1}
@@ -191,7 +194,8 @@ const Page8_Q2 = () => {
                       minWidth: "7vw",
                       display: "flex",
                       flexDirection: "column",
-                      gap: "10px",
+                      alignItems: "center",
+                      gap: "20px",
                     }}
                   >
                     {group.words.map((word, i) => {
@@ -218,8 +222,16 @@ const Page8_Q2 = () => {
                           }}
                           style={{
                             fontSize: "18px",
-                            cursor: "pointer",
+                            cursor: locked ? "default" : "pointer",
                             position: "relative",
+                            height:"50px",
+                            width:"50px",
+                             display: "flex",
+              justifyContent: "center",
+                      alignItems: "center",
+
+                      // padding: "10px 8px",
+
                           }}
                         >
                           {word}
@@ -237,11 +249,11 @@ const Page8_Q2 = () => {
                                     border: isSelected
                                       ? showResult2
                                         ? isCorrect
-                                          ? "2px solid #1C398E" // صح → يضل أزرق
-                                          : "2px solid #ef4444" // غلط → أحمر
-                                        : "2px solid #1C398E" // قبل check
+                                          ? "1px solid #f39b42" // صح → يضل أزرق
+                                          : "2px solid red" // غلط → أحمر
+                                        : "1px solid #f39b42" // قبل check
                                       : "none",
-                                    borderRadius: "20px",
+                                    borderRadius: "50%",
                                     pointerEvents: "none",
                                   }}
                                 />

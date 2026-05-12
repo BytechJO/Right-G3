@@ -22,15 +22,10 @@ import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 import AudioWithCaption from "../../AudioWithCaption";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
-// import sound1 from "../../../assets/img_unit4/sounds-unit4/U2-06.mp3";
-// import sound2 from "../../../assets/img_unit4/sounds-unit4/U2-07.mp3";
-
 import "./Unit4_Page2.css";
 import ReadChoose from "../../ReadChoose";
 const Unit4_Page2 = ({ openPopup }) => {
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
-  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+
   const audioRef = useRef(null);
   // أصوات الصور
   const imageSounds = [
@@ -78,65 +73,14 @@ const Unit4_Page2 = ({ openPopup }) => {
     { start: 6.8, end: 7.48, text: "I will tomorrow." },
   ];
 
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-    console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
-  };
-  const playSound = (path) => {
-    if (audioRef.current) {
-      audioRef.current.src = path;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
-
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
-  };
-  const clickableAreas = [
-    { x1: 5.69, y1: 14.43, x2: 50.93, y2: 43.87, sound: long },
-  ];
+ 
   return (
     <div
       className="page1-img-wrapper"
-      onClick={handleImageClick}
+ 
       style={{ backgroundImage: `url(${page_2})` }}
     >
       <audio ref={audioRef} style={{ display: "none" }} />
-
-      {clickableAreas.map((area, index) => (
-        <div
-          key={index}
-          className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
-              ? "highlight"
-              : ""
-          }`}
-          style={{
-            position: "absolute",
-            left: `${area.x1}%`,
-            top: `${area.y1}%`,
-            width: `${area.x2 - area.x1}%`,
-            height: `${area.y2 - area.y1}%`,
-          }}
-          onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
-          }}
-          onMouseEnter={() => {
-            if (!isPlaying) setHoveredAreaIndex(index);
-          }}
-          onMouseLeave={() => {
-            if (!isPlaying) setHoveredAreaIndex(null);
-          }}
-        ></div>
-      ))}
-
       <div
         className="headset-icon-CD-unit4-page2-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}

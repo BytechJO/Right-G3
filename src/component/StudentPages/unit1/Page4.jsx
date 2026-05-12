@@ -34,11 +34,12 @@ import sound10 from "../../../assets/audio/ClassBook/Unit 1/P 4/sound10.mp3";
 import sound11 from "../../../assets/audio/ClassBook/Unit 1/P 4/sound11.mp3";
 import sound12 from "../../../assets/audio/ClassBook/Unit 1/P 4/sound12.mp3";
 import "./Page4.css";
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
+
 const Page4 = ({ openPopup }) => {
-  const audioRef = useRef(null);
-  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
+  const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   // أصوات الصور
   const imageSounds = [
     null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
@@ -53,24 +54,24 @@ const Page4 = ({ openPopup }) => {
     {
       start: 0,
       end: 4,
-      text: "Page four, unit one. At the basketball game.",
+      text: "Page 4, unit 1. At the basketball game.",
     },
     {
       start: 4.2,
       end: 16.5,
-      text: "Page four, unit one, vocabulary. One, scoreboard. Two, young. Three, old. Four, small.",
+      text: "Page 4, unit 1, vocabulary. 1, scoreboard. 2, young. 3, old. 4, small.",
     },
     {
       start: 17.5,
       end: 57.24,
-      text: "Five, big. Six, referee. Seven, whistle. Eight, fast. Nine, slow. Ten, tall. Eleven, short. Twelve, basketball court. Page four, listen and read along. Short vowels. Cat, bed, fish, box, gum. Unit one, page five, reading. Listen and read along. Slow and steady wins the race. Page five, listen, read and repeat.",
+      text: "5, big. 6, referee. 7, whistle. 8, fast. 9, slow. 10, tall. Eleven, short. Twelve, basketball court. Page four, listen and read along. Short vowels. Cat, bed, fish, box, gum. Unit one, page five, reading. Listen and read along. Slow and steady wins the race. Page five, listen, read and repeat.",
     },
     { start: 57.239, end: 59.499, text: "Do you play basketball?" },
     { start: 59.5, end: 62.18, text: " No, I play volleyball." },
     {
       start: 62.5,
       end: 71.11,
-      text: "Page five, listen and read along. Long vowels. Cake, bee, bike, home, cube.",
+      text: "Page 5, listen and read along. Long vowels. Cake, bee, bike, home, cube.",
     },
   ];
 
@@ -168,19 +169,21 @@ const Page4 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (path) => {
-    if (audioRef.current) {
-      audioRef.current.src = path;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+  const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
   return (
     <>
@@ -192,7 +195,7 @@ const Page4 = ({ openPopup }) => {
         <audio ref={audioRef} style={{ display: "none" }} />
 
         {areas.map((area, index) => {
-          const isActive = activeAreaIndex === area.sound;
+          const isActive = activeId === `p4-${area.sound}`;
 
           // ============================
           // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
@@ -207,8 +210,8 @@ const Page4 = ({ openPopup }) => {
                   top: `${area.y1}%`,
                 }}
                 onClick={() => {
-                  setActiveAreaIndex(area.sound);
-                  playSound(sounds[area.sound]);
+                  // setActiveAreaIndex(area.sound);
+                  playSound(sounds[area.sound], `p4-${area.sound}`);
                 }}
               ></div>
             );
@@ -230,8 +233,8 @@ const Page4 = ({ openPopup }) => {
                 height: `${area.y2 - area.y1}%`,
               }}
               onClick={() => {
-                setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-                playSound(sounds[area.sound]);
+                // setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
+                playSound(sounds[area.sound], `p4-${area.sound}`);
               }}
             ></div>
           );

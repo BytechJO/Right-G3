@@ -456,19 +456,19 @@ export default function Book() {
 
   const studentBookInfo = {
     cover: stbookCover,
-    title: `Right 1 Class Book`,
+    title: `Right 3 Class Book`,
     pages: studentPages().length,
   };
 
   const workbookInfo = {
     cover: workbookCover,
-    title: "Right 1 Workbook",
+    title: "Right 3 Workbook",
     pages: workbookPages().length,
   };
 
   const teacherInfo = {
     cover: teacherBookCover,
-    title: "Right 1 Teacher's Book",
+    title: "Right 3 Teacher's Book",
     pages: teacherPages.length,
   };
 

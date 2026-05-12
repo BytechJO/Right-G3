@@ -6,13 +6,15 @@ import sound1 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_1.1_Adult L
 import sound2 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_1.4_Adult Lady.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_2.1_Boy.mp3";
 import sound4 from "../../../assets/audio/ClassBook/Unit 4/P 30/Pg30_3.1_Older Boy.mp3";
-
+import { useContext } from "react";
+import { AudioContext } from "../../../AudioContext";
 import AudioWithCaption from "../../AudioWithCaption";
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
 import video from "../../../assets/videos/grade 3 unit 4 page 30.mp4";
 const Unit4_Page3 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+   const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
@@ -61,19 +63,21 @@ const Unit4_Page3 = ({ openPopup }) => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-  const playSound = (soundPath) => {
-    if (audioRef.current) {
-      audioRef.current.src = soundPath;
-      audioRef.current.play();
-      setIsPlaying(true);
-      setHoveredAreaIndex(null); // إزالة الهايلايت عند بدء الصوت
+ const playSound = (path, id) => {
+    if (!audioRef.current) return;
 
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setHoveredAreaIndex(null);
-        setActiveAreaIndex(null); // مسح الهايلايت بعد انتهاء الصوت
-      };
-    }
+    // 🔥 وقف أي صوت شغال بأي صفحة
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.src = path;
+    audioRef.current.play();
+
+    setActiveId(id); // 🔥 مهم للهايلايت
+
+    audioRef.current.onended = () => {
+      setActiveId(null);
+    };
   };
 
   return (
@@ -91,7 +95,7 @@ const Unit4_Page3 = ({ openPopup }) => {
         <div
           key={index}
           className={`clickable-area ${
-            hoveredAreaIndex === index || activeAreaIndex === index
+            hoveredAreaIndex === index || activeId === index
               ? "highlight"
               : ""
           }`}
@@ -103,9 +107,8 @@ const Unit4_Page3 = ({ openPopup }) => {
             height: `${area.y2 - area.y1}%`,
           }}
           onClick={() => {
-            setActiveAreaIndex(index); // لتثبيت الهايلايت أثناء الصوت
-            playSound(area.sound);
-          }}
+                playSound(area.sound, `p30-${area.sound}`);
+              }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);
           }}
