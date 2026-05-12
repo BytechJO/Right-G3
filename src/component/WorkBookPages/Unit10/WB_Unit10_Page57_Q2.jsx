@@ -47,7 +47,7 @@ export default function WB_Unit8_Page57_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "40px" }}>
+      <div className="div-forall" style={{ gap: "45px" }}>
 
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
@@ -93,7 +93,7 @@ export default function WB_Unit8_Page57_QB() {
           style={{
             display:       "flex",
             flexDirection: "column",
-            gap:           "clamp(14px,2vw,22px)",
+            gap:           "clamp(20px,4vw,40px)",
             width:         "100%",
             maxWidth:      "820px",
             margin:        "0 auto",

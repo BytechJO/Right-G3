@@ -387,6 +387,8 @@ export default function WB_Phonics_Page227_QA() {
           flex-direction: column;
           gap: clamp(8px, 1.4vw, 16px);
           align-items: center;
+          height:100%;
+           justify-content: space-between;
           min-width: 0;
         }
 
@@ -612,7 +614,7 @@ export default function WB_Phonics_Page227_QA() {
         }
       `}</style>
 
-        <div className="div-forall" style={{ gap: "28px" }}>
+        <div className="div-forall" style={{ gap: "70px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">A</span>
             Write ch, tch, or sh. Then number the pictures.

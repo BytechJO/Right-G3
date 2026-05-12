@@ -80,9 +80,9 @@ const styles = {
 
   topRow: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
-    gap: "clamp(10px, 1.8vw, 18px)",
+    // gap: "clamp(10px, 1.8vw, 18px)",
     flexDirection: "column",
     width: "100%",
     flexWrap: "nowrap",
@@ -263,7 +263,7 @@ const WB_Unit7_Page27_Q1 = () => {
         className="div-forall"
             style={{
          
-          gap: "35px",
+          gap: "25px",
         
         }}
 

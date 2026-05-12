@@ -464,6 +464,7 @@ export default function WB_Unit10_Page61_QJ() {
                 border: "1px solid #e5e7eb",
                 borderRadius: "clamp(10px,1.2vw,16px)",
                 backgroundColor: "#fff",
+                height:"100%",
                 padding: "clamp(12px,1.5vw,20px)",
               }}
             >
@@ -471,7 +472,7 @@ export default function WB_Unit10_Page61_QJ() {
                 style={{
                   margin: 0,
                   fontSize: "clamp(13px,1.6vw,18px)",
-                  lineHeight: 1.85,
+                  lineHeight: 2.5,
                   color: "#222",
                   // fontWeight: 500,
                 }}

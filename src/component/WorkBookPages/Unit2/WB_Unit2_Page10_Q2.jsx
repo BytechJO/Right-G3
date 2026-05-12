@@ -123,7 +123,7 @@ export default function WB_Unit2_Page10_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "30px" }}>
+      <div className="div-forall" style={{ gap: "12px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span> Connect and write.
         </h1>

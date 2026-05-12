@@ -247,11 +247,11 @@ export default function WB_Unit5_Page27_Q2() {
   }
 
   .wb-house-chips {
-    width: 100%;
-    display: flex;
+       width: 100%;
+    display: grid;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 10px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 
   .wb-house-chip {
@@ -444,7 +444,7 @@ export default function WB_Unit5_Page27_Q2() {
   }
 `}</style>
       <div className="main-container-component">
-        <div className="div-forall" style={{ gap: "28px" }}>
+        <div className="div-forall" style={{ gap: "55px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">B</span>
             Label the rooms in Tom’s house.

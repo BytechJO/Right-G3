@@ -238,7 +238,7 @@ export default function WB_Unit5_Page28_QE() {
   .wb-e-bank-wrap {
     width: 100%;
     display: flex;
-    justify-content: center;
+    // justify-content: center;
   }
 
   .wb-e-bank {

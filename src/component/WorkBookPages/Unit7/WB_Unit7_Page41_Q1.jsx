@@ -84,7 +84,7 @@ export default function WB_ReadLookWrite_PageE() {
         className="div-forall"
        style={{
              
-              gap: "40px",
+              gap: "70px",
             }}
       >
         {/* Title */}

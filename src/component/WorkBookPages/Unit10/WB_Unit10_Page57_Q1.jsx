@@ -336,7 +336,9 @@ export default function WB_Unit10_Page57_QA() {
               style={{
                 display: "flex",
               flexDirection: "column",
-                gap: "clamp(14px,2vw,24px)",
+              height:"100%",
+              justifyContent:"space-between",
+                // gap: "clamp(14px,2vw,24px)",
               }}
             >
               {SENTENCES.map((item) => (

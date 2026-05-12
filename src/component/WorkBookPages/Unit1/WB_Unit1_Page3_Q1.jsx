@@ -181,7 +181,7 @@ const WB_TrueFalse_Table = () => {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"30px"}}>
+      <div className="div-forall" style={{gap:"45px"}}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span> Read and write <img src={trueIcon} style={{height:"25px"}}/>.
         </h1>

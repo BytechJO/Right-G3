@@ -3,7 +3,7 @@ import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex C 2.svg";
-
+import "./Page8_Q4.css"
 const Page8_Q4 = () => {
   const grid = [
     [
@@ -148,7 +148,7 @@ const Page8_Q4 = () => {
         correctAnswers.find((c) => c.word === foundWord)?.order === index,
     );
 
-    const SLOT_LENGTH = 10;
+    const SLOT_LENGTH = 7;
 
     if (isFound) {
       return word.padEnd(SLOT_LENGTH, "");

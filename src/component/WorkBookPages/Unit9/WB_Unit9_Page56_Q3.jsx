@@ -126,7 +126,7 @@ export default function WB_Unit9_Page56_QC() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{ gap: "80px" }}>
+      <div className="div-forall" style={{ gap: "120px" }}>
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span> Look, read, and circle. Say.

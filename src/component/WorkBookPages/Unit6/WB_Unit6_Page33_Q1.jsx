@@ -7,23 +7,18 @@ import {
   useDroppable,
   DragOverlay,
 } from "@dnd-kit/core";
-import imgHelen from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.1.svg";
-import imgStella from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.2.svg";
-import imgJohn from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.3.svg";
-import imgHarley from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.4.svg";
-import imgTom from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.5.svg";
-import imgHansel from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.6.svg";
+import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.1.svg";
+import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.2.svg";
+import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/A.3.svg";
 
 const NAME_BANK = ["Helen", "Stella", "John", "Harley", "Tom", "Hansel"];
 const CORRECT_ORDER = ["Hansel", "Harley", "Helen", "John", "Stella", "Tom"];
 
 const NAME_IMGS = {
-  Hansel: imgHansel,
-  Harley: imgHarley,
-  Helen: imgHelen,
-  John: imgJohn,
-  Stella: imgStella,
-  Tom: imgTom,
+  Hansel: img1,
+  Harley:img2,
+  Helen:img3,
+ 
 };
 function DraggableName({ name, disabled, style }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -280,26 +275,26 @@ export default function WB_Unit6_Page33_Q1() {
           </div>
 
           {/* ── الجزء الأول: الترتيب ── */}
-          <div style={{ display: "flex", gap: "30px" }}>
+          <div style={{ display: "flex", gap: "50px" }}>
             {/* 🔹 العمود الأول: الصور */}
-            <div className="grid grid-cols-2 gap-4">
-              {[1, 2, 3, 4, 5, 6].map((slot) => {
+            <div className="flex flex-col">
+              {[1, 2, 3].map((slot) => {
                 const name = CORRECT_ORDER[slot - 1]; // ترتيب الصور ثابت
 
                 return (
-                  <div key={slot} style={{ height: "60px" }}>
+                
                     <img
                       src={NAME_IMGS[name]}
                       alt={name}
-                      style={{ width: 75, height: 75, objectFit: "contain" }}
+                      style={{ width: "auto", height: 120,  }}
                     />
-                  </div>
+
                 );
               })}
             </div>
 
             {/* 🔹 العمود الثاني: الأرقام + drop areas */}
-            <div className="flex flex-col gap-4 flex-1 w-full">
+            <div className="flex flex-col justify-between gap-4 flex-1 w-full">
               {[1, 2, 3, 4, 5, 6].map((slot) => (
                 <div key={slot} className="flex items-center gap-3 w-full">
                   <span className="font-bold text-gray-600 w-4 text-xl">

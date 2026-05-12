@@ -330,6 +330,8 @@ export default function WB_Unit1_Page6_QH() {
               style={{
                 display: "flex",
                 flexDirection: "column",
+                height: "100%",
+                justifyContent: "space-between",
                 gap: "clamp(14px,2vw,24px)",
               }}
             >
@@ -340,9 +342,9 @@ export default function WB_Unit1_Page6_QH() {
                     display: "flex",
                     alignItems: "flex-start",
                     border: `1px solid ${DRAG_COLOR}`,
-                    padding:"10px",
-                    borderRadius:"9px",
-                    width:"60%",
+                    padding: "10px",
+                    borderRadius: "9px",
+                    width: "60%",
                     gap: "clamp(8px,1vw,14px)",
                   }}
                 >

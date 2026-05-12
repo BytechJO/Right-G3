@@ -356,7 +356,7 @@ export default function WB_Unit3_Page26_QA() {
       <div
         className="div-forall"
         style={{
-          gap: "28px",
+          gap: "90px",
         }}
       >
         <h1 className="WB-header-title-page8">

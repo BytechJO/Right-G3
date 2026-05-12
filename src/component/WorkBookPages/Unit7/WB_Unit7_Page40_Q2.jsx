@@ -242,7 +242,7 @@ export default function WB_LookReadFind_PageD() {
         className="div-forall"
         style={{
              
-              gap: "40px",
+              gap: "55px",
             }}
       >
         {/* Title */}
@@ -274,7 +274,7 @@ export default function WB_LookReadFind_PageD() {
                 display: "flex",
                 flexDirection: "column",
                 height:"400px",
-                justifyContent:"space-around"
+                justifyContent:"space-between"
                 // gap: "45px",
               }}
             >
@@ -284,7 +284,7 @@ export default function WB_LookReadFind_PageD() {
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "5px",
+                    gap: "25px",
                   }}
                 >
                   {/* رقم + سؤال */}

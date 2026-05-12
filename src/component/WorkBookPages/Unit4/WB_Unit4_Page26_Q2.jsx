@@ -216,7 +216,7 @@ export default function WB_Unit4_Page233_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"90px"}}>
+      <div className="div-forall" style={{gap:"110px"}}>
         <h1 className="WB-header-title-page8" style={styles.title}>
           <span className="WB-ex-A">B</span>
           Circle the word in each box that has a different th sound.
