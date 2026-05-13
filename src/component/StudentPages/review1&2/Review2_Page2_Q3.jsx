@@ -77,7 +77,7 @@ const Review2_Page2_Q3 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{gap:"110px"}}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>E</span>
           Does the underlined word have a{" "}
@@ -96,6 +96,7 @@ const Review2_Page2_Q3 = () => {
                 justifyContent: "space-between",
                 border: "2px solid #f97316",
                 borderRadius: "10px",
+                fontSize: "22px",
                 padding: "10px",
                 marginTop: "10px",
               }}
@@ -103,7 +104,14 @@ const Review2_Page2_Q3 = () => {
               {/* الجملة */}
               <div>
                 <b>{i + 1}.</b> {parts[0]}
-                <span style={{ textDecoration: "underline", color: "#2e3192" }}>
+                <span
+                  style={{
+                    textDecoration: "underline",
+                    fontWeight:"500",
+                    color: "#F79530",
+                    fontSize: "22px",
+                  }}
+                >
                   {q.underline}
                 </span>
                 {parts[1]}
@@ -129,10 +137,10 @@ const Review2_Page2_Q3 = () => {
                         style={{
                           padding: "6px 12px",
                           borderRadius: "8px",
-                          border: "2px solid #ccc",
-                          cursor: "pointer",
-                          background: selected ? "#1C398E" : "#fff",
-                          color: selected ? "#fff" : "#000",
+                          border: selected ? "2px solid #F79530" : "2px solid #ccc" ,
+                          cursor: locked?"default":"pointer",
+                          // background: selected ? "#1C398E" : "#fff",
+                          // color: selected ? "#fff" : "#000",
                         }}
                       >
                         {opt}
@@ -142,7 +150,8 @@ const Review2_Page2_Q3 = () => {
                         <div
                           style={{
                             position: "absolute",
-                            right: "15px", 
+                            right: "15px",
+                            top:"0px",
                             zIndex: 10,
                           }}
                         >

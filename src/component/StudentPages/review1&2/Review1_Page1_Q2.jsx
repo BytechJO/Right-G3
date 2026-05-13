@@ -1,18 +1,10 @@
 import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
-
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 4.svg";
-import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 5.svg";
-import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 6.svg";
-import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 7.svg";
-import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 8.svg";
-import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Ex B 9.svg";
 
 const Review1_Page1_Q2 = () => {
   const answersBank = ["A", "B", "C"];
@@ -21,19 +13,19 @@ const Review1_Page1_Q2 = () => {
     {
       id: 1,
       label: "fast",
-      images: [img1, img2, img3],
+      images: img1,
       answers: { fastest: "C", slowest: "A" },
     },
     {
       id: 2,
       label: "short",
-      images: [img4, img5, img6],
+      images: img2,
       answers: { shortest: "C", tallest: "B" },
     },
     {
       id: 3,
       label: "old",
-      images: [img7, img8, img9],
+      images: img3,
       answers: { oldest: "A", youngest: "C" },
     },
   ];
@@ -42,26 +34,14 @@ const Review1_Page1_Q2 = () => {
   const [locked, setLocked] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
-  const onDragEnd = (result) => {
-    if (!result.destination || locked) return;
-
-    const key = result.destination.droppableId;
-    const draggedLetter = result.draggableId;
-
-    const qIndex = key.split("-")[0];
-
-    const alreadyUsed = Object.keys(answers).some(
-      (k) => k.startsWith(qIndex + "-") && answers[k] === draggedLetter,
-    );
-
-    if (alreadyUsed) return;
+  const handleSelect = (key, value) => {
+    if (locked) return;
 
     setAnswers((prev) => ({
       ...prev,
-      [key]: draggedLetter,
+      [key]: value,
     }));
   };
-
   const reset = () => {
     setAnswers({});
     setLocked(false);
@@ -119,189 +99,127 @@ const Review1_Page1_Q2 = () => {
     setShowResult(true);
     setLocked(true);
   };
-
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "30px",
-        }}
-      >
-        <div className="div-forall">
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>B</span>
-            Read, look, and write. You can answer in two ways.
-          </h5>
-
-          {/* ANSWER BANK */}
-          <Droppable droppableId="bank" direction="horizontal">
-            {(provided) => (
-              <div style={{ textAlign: "center" }}>
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    gap: "10px",
-                    marginBottom: "20px",
-                    border: "2px dashed #2c5287",
-                    borderRadius: "12px",
-                    padding: "10px",
-                  }}
-                >
-                  {answersBank.map((a, index) => (
-                    <Draggable
-                      key={a}
-                      draggableId={a}
-                      index={index}
-                      isDragDisabled={locked}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            padding: "6px 14px",
-                            border: "2px solid #2c5287",
-                            borderRadius: "10px",
-                            background: "#fff",
-                            fontWeight: "bold",
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          {a}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              </div>
-            )}
-          </Droppable>
-
-          {/* QUESTIONS */}
-          {questions.map((q, qIndex) => (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall"  style={{
+                gap: "40px",
+              }}>
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>B</span>
+          Read, look, and write. You can answer in two ways.
+        </h5>
+        {/* QUESTIONS */}
+        <div className="flex flex-col gap-10">
+        {questions.map((q, qIndex) => (
+          <div
+            key={q.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+              // marginBottom: "40px",
+            }}
+          >
+            {/* LEFT */}
             <div
-              key={q.id}
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "50px",
-                marginBottom: "40px",
+                      width: "50%",
+
+                gap: "10px",
               }}
             >
-              {/* LEFT */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "80px auto",
-                  alignItems: "center",
-                  gap: "20px",
-                }}
-              >
-                <div style={{ fontWeight: "bold", gap: "10px" }}>
-                  {q.id} {q.label}
-                </div>
-
-                <div style={{ display: "flex", gap: "20px" }}>
-                  {q.images.map((img, i) => {
-                    const letter = ["A", "B", "C"][i];
-                    return (
-                      <div key={i} style={{ textAlign: "center" }}>
-                        <img
-                          src={img}
-                          alt=""
-                          style={{
-                            width: "80px",
-                            height: "80px",
-                            objectFit: "contain",
-                          }}
-                        />
-                        <p style={{ fontWeight: "bold" }}>{letter}</p>
-                      </div>
-                    );
-                  })}
-                </div>
+              <div className="flex text-[20px] w-[60px]" >
+               <span className="font-bold text-[20px] mr-2">{q.id}</span>  {q.label}
               </div>
 
-              {/* RIGHT */}
-              <div style={{ width: "320px" }}>
-                {Object.keys(q.answers).map((type) => (
-                  <Droppable key={type} droppableId={`${qIndex}-${type}`}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        style={{
-                          marginBottom: "12px",
-                          minHeight: "40px",
-                          background: snapshot.isDraggingOver
-                            ? "#dbeafe"
-                            : "#f9f9f9",
-                          borderBottom: locked
-                            ? answers[`${qIndex}-${type}`] === q.answers[type]
-                              ? "2px solid #000"
-                              : "2px solid #ef4444"
-                            : "2px solid #000",
-                          padding: "5px",
-                          position: "relative",
-                        }}
-                      >
-                        <p>
-                          <span
-                            style={{
-                              color: answers[`${qIndex}-${type}`]
-                                ? "#1C398E"
-                                : "#000",
-                              fontWeight: answers[`${qIndex}-${type}`]
-                                ? "bold"
-                                : "normal",
-                            }}
-                          >
-                            {answers[`${qIndex}-${type}`] || "___"}
-                          </span>{" "}
-                          is the {type}.
-                        </p>
-
-                        {/* WRONG MARK */}
-                        {showResult &&
-                          answers[`${qIndex}-${type}`] &&
-                          answers[`${qIndex}-${type}`] !== q.answers[type] && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                right: "-20px",
-                                top: "0",
-                              }}
-                            >
-                              <WrongMark />
-                            </div>
-                          )}
-
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                ))}
+              <div style={{ display: "flex", gap: "20px" }}>
+                <div key={q.id} style={{ textAlign: "center" }}>
+                  <img
+                    src={q.images}
+                    alt=""
+                    style={{
+                      width: "300px",
+                      height: "auto",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          ))}
 
-          {/* BUTTONS */}
-          <Button
-            handleShowAnswer={showAnswers}
-            handleStartAgain={reset}
-            checkAnswers={checkAnswers}
-          />
-        </div>
+            {/* RIGHT */}
+            <div style={{ width: "50%" }}>
+              {Object.keys(q.answers).map((type) => (
+                <div
+                  style={{
+                    marginBottom: "12px",
+                    minHeight: "40px",
+                    borderBottom: locked
+                      ? answers[`${qIndex}-${type}`] === q.answers[type]
+                        ? "1px solid #000"
+                        : "2px solid #ef4444"
+                      : "1px solid #000",
+                    padding: "5px",
+                    position: "relative",
+                  }}
+                >
+                  <p className="flex items-center gap-2 flex-wrap">
+                    <select
+                      value={answers[`${qIndex}-${type}`] || ""}
+                      onChange={(e) =>
+                        handleSelect(`${qIndex}-${type}`, e.target.value)
+                      }
+                      disabled={locked}
+                      className="border-b px-2 py-1 outline-none bg-white"
+                    >
+                      <option value="">Select</option>
+
+                      {answersBank.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                    is the {type}.
+                  </p>
+
+                  {/* WRONG MARK */}
+                  {showResult &&
+                    answers[`${qIndex}-${type}`] &&
+                    answers[`${qIndex}-${type}`] !== q.answers[type] && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "-20px",
+                          top: "0",
+                        }}
+                      >
+                        <WrongMark />
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+</div>
+        {/* BUTTONS */}
+        <Button
+          handleShowAnswer={showAnswers}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 

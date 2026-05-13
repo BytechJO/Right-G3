@@ -181,7 +181,7 @@ const Page8_Q3 = () => {
                 </div>
 
                 {/* الخط */}
-                <div className="w-[70%] border-b-[3px] border-gray-500"></div>
+                <div className="w-[70%] border-b-[1px] border-gray-500"></div>
               </div>
 
               {/* الصورة */}

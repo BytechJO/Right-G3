@@ -91,11 +91,8 @@ const Page8_Q4 = () => {
       "t",
       "y",
       "m",
-    ],[
-      "z",
-      "a",
-      "q",
-     ]
+    ],
+    ["z", "a", "q"],
   ];
 
   const letters = grid;
@@ -107,6 +104,15 @@ const Page8_Q4 = () => {
     "and",
     "places",
     "there",
+  ];
+ const correctAnswers = [
+    { word: "they", order: 0 },
+    { word: "enjoy", order: 1 },
+    { word: "the", order: 2 },
+    { word: "food", order: 3 },
+    { word: "and", order: 4 },
+    { word: "places", order: 5 },
+    { word: "there", order: 6 },
   ];
 
   const correctPositions = {
@@ -124,13 +130,22 @@ const Page8_Q4 = () => {
 
     there: [200 + 8, 200 + 9, 200 + 10, 200 + 11, 200 + 12], // الصف الثالث
   };
+
   const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-
+  const fullSentence = [
+    "they",
+    "enjoy",
+    "the",
+    "food",
+    "and",
+    "places",
+    "there",
+  ];
   const handleMouseDown = (index) => {
     if (locked) return;
     setIsDragging(true);
@@ -148,6 +163,20 @@ const Page8_Q4 = () => {
     }
   };
 
+  const displayedSentence = fullSentence.map((word, index) => {
+    const isFound = foundWords.some(
+      (foundWord) =>
+        correctAnswers.find((c) => c.word === foundWord)?.order === index,
+    );
+
+    const SLOT_LENGTH = 7;
+
+    if (isFound) {
+      return word.padEnd(SLOT_LENGTH, "");
+    }
+
+    return "_".repeat(SLOT_LENGTH);
+  });
   const handleTouchMove = (e) => {
     if (!isDragging || locked) return;
     e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
@@ -263,11 +292,11 @@ const Page8_Q4 = () => {
             C
           </span>
           What do Tom and his family enjoy about France in Vacation in France on
-          page 11?
+          page 11?{" "}
         </h5>
 
         {/* Words List */}
-        <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
+        {/* <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
           {wordsToFind.map((word) => (
             <span
               key={word}
@@ -281,18 +310,18 @@ const Page8_Q4 = () => {
               {word}
             </span>
           ))}
-        </div>
+        </div> */}
 
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
           {/* Grid Wrapper */}
           <div
-            className="border-2 border-[#f28c63] px-4 pt-4 pb-5"
+            className="px-4 pt-4 pb-5"
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px]"
+              className="bg-[#daf5ff] mb-10 rounded-[15px] p-2 sm:p-[15px]"
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -329,7 +358,7 @@ const Page8_Q4 = () => {
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleMouseUp}
                         className={`
-                          flex items-center justify-center
+                          flex items-center justify-center mb-2
                           cursor-pointer
                           transition
                           ${isSelected ? "bg-[#ffd54f] rounded-sm" : ""}
@@ -349,45 +378,21 @@ const Page8_Q4 = () => {
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                marginTop: "15px",
-              }}
-            >
+            <div className="flex justify-center items-center">
               <img
                 src={img1}
-                alt="start"
+                alt="end"
                 style={{
                   width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
                   height: "auto",
                 }}
               />
-
-              <div
-                style={{
-                  flex: 1,
-                  borderBottom: "2px solid black",
-                  height: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  value={sentence}
-                  readOnly
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontSize: "clamp(14px, 2vw, 18px)", // 🔥 حجم خط ديناميكي للإجابة
-                  }}
-                />
-              </div>
+              <input
+                className="answer-input-CB-unit3-p5-q4"
+                value={displayedSentence.join(" ")}
+                readOnly
+                style={{ fontFamily: "monospace", width: "100%" }} // 🔥 مهم جدا
+              />
 
               <img
                 src={img2}

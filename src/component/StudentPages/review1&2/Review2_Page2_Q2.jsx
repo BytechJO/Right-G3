@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
+import WrongMark from "../../WrongMark";
+
 const COLORS = [
   { key: "long a", color: "#D1232A" },
   { key: "long e", color: "#FFF101" },
@@ -13,11 +15,13 @@ const COLORS = [
   { key: "short o", color: "#3730A3" },
   { key: "short u", color: "#00AEEF" },
 ];
+
 const WORDS = [
   ["snow", "soap", "cup", "date", "may", "make", "cape", "coat", "grow"],
   ["five", "time", "chat", "hat", "desk", "man", "act", "glue", "mine"],
   ["kid", "sit", "bee", "log", "pop", "pen", "he", "see", "blue"],
 ];
+
 const CORRECT = {
   snow: "long o",
   soap: "long o",
@@ -47,44 +51,65 @@ const CORRECT = {
   see: "long e",
   blue: "long u",
 };
+
 const Review2_Page2_Q2 = () => {
-  const [selectedColor, setSelectedColor] = useState(null);
   const [answers, setAnswers] = useState({});
   const [locked, setLocked] = useState(false);
-  const handleSelectColor = (key) => {
+
+  const [selectedWord, setSelectedWord] = useState(null);
+
+  const handleWordClick = (word) => {
     if (locked) return;
-    setSelectedColor(key);
+    setSelectedWord(word);
   };
-  const handleClickWord = (word) => {
-    if (locked || !selectedColor) return;
-    setAnswers((prev) => ({ ...prev, [word]: selectedColor }));
+
+  const handleSelectColor = (colorKey) => {
+    if (!selectedWord || locked) return;
+
+    setAnswers((prev) => ({
+      ...prev,
+      [selectedWord]: colorKey,
+    }));
+
+    setSelectedWord(null);
   };
+
   const checkAnswers = () => {
     if (locked) return;
+
     const allWords = Object.keys(CORRECT);
+
     if (allWords.some((w) => !answers[w])) {
       ValidationAlert.info();
       return;
     }
+
     let score = 0;
+
     allWords.forEach((w) => {
       if (answers[w] === CORRECT[w]) score++;
     });
+
     const total = allWords.length;
+
     if (score === total) ValidationAlert.success(`Score: ${score}/${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score}/${total}`);
     else ValidationAlert.error(`Score: ${score}/${total}`);
+
     setLocked(true);
   };
+
   const reset = () => {
     setAnswers({});
-    setSelectedColor(null);
+    setSelectedWord(null);
     setLocked(false);
   };
+
   const showAnswer = () => {
     setAnswers(CORRECT);
     setLocked(true);
   };
+
   return (
     <div
       style={{
@@ -94,105 +119,136 @@ const Review2_Page2_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "45px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "20px" }}>D</span>
-          Color each square according to the{" "}
-          <span style={{ color: "#2e3192" }}>vowel sound</span> you hear in the
-          word.
+          Color each square according to the vowel sound.
         </h5>
 
-        <div className="flex flex-col items-center px-6 mt-3">
-          {" "}
-          {/* 🎨 COLOR BAR */}{" "}
-          <div className="mb-6">
-            <table className="border-2 border-gray-500 text-center text-lg scale-100">
-              <tbody>
-                <tr>
-                  <td className="border px-3 py-2 text-sm font-medium">
-                    color
-                  </td>
-                  {COLORS.map((c) => (
-                    <td
-                      key={c.key}
-                      onClick={() => handleSelectColor(c.key)}
-                      className={`border cursor-pointer ${
-                        selectedColor === c.key ? `ring-2 ${c.color}` : ""
-                      }`}
-                      style={{
-                        background: c.color,
-                        width: "60px",
-                        height: "40px",
-                      }}
-                    />
-                  ))}
-                </tr>
-
-                <tr>
-                  <td className="border px-3 py-2 text-sm font-medium">
-                    sound
-                  </td>
-                  {COLORS.map((c) => (
-                    <td key={c.key} className="border px-2 text-xs">
-                      {c.key}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div className="w-full ">
-            <div className="flex flex-col gap-6"></div>
-            {/* 🧩 WORDS */}{" "}
-            <div className="flex flex-col gap-4">
-              {" "}
-              {WORDS.map((row, i) => (
-                <div
-                  key={i}
-                  className="grid grid-cols-9 border-2 border-orange-400 rounded-xl overflow-hidden w-full"
-                >
-                  {" "}
-                  {row.map((word) => {
-                    const colorKey = answers[word];
-                    const colorObj = COLORS.find((c) => c.key === colorKey);
-                    const isWrong =
-                      locked && colorKey && colorKey !== CORRECT[word];
-                    return (
-                      <div
-                        key={word}
-                        onClick={() => handleClickWord(word)}
-                        className="relative py-5 text-lg font-semibold cursor-pointer border-r last:border-r-0 flex items-center justify-center"
-                        style={{
-                          backgroundColor: colorObj?.color || "#f3f4f6",
-                        }}
-                      >
-                        {word}
-                        {isWrong && (
-                          <div
-                            className="absolute top-3 right-3 translate-x-1/2 -translate-y-1/2
-                     w-5 h-5 text-xs bg-red-500 text-white rounded-full
-                     flex items-center justify-center font-bold border-2 border-white
-                     pointer-events-none shadow"
-                          >
-                            ✕
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+        {/* COLOR TABLE */}
+        <table className="border-1 border-gray-500 text-center">
+          <tbody>
+            <tr>
+              <td className="border px-3 py-2">color</td>
+              {COLORS.map((c) => (
+                <td
+                  key={c.key}
+                  className="border text-[18px]"
+                  style={{ background: c.color, width: 80, height: 40 }}
+                />
               ))}
+            </tr>
+
+            <tr>
+              <td className="border px-3 py-2">sound</td>
+              {COLORS.map((c) => (
+                <td key={c.key} className="border px-2 text-[18px]">
+                  {c.key}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+
+        {/* WORDS */}
+        <div className="flex flex-col gap-10 mt-6 w-full">
+          {WORDS.map((row, i) => (
+            <div
+              key={i}
+              className="grid grid-cols-9 border-1 border-orange-400 rounded-xl"
+            >
+              {row.map((word) => {
+                const colorKey = answers[word];
+                const colorObj = COLORS.find((c) => c.key === colorKey);
+
+                const isSelected = selectedWord === word;
+
+                const isWrong =
+                  locked && colorKey && colorKey !== CORRECT[word];
+
+                return (
+                  <div
+                    key={word}
+                    onClick={() => handleWordClick(word)}
+                    className="relative py-5 text-lg font-semibold flex items-center justify-center cursor-pointer transition-all"
+                    style={{
+                      backgroundColor: colorObj?.color || "white",
+                      border: isSelected
+                        ? "3px solid #F79530"
+                        : "1px solid #F79530",
+                      transform: isSelected ? "scale(1.05)" : "",
+                      boxShadow: isSelected
+                        ? "0 0 10px rgba(247,149,48,0.6)"
+                        : "none",
+                    }}
+                  >
+                    {word}
+
+                    {isWrong && (
+                      <div
+                        className="absolute -top-2 -right-2  w-[22px] h-[22px] z-9999
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-none"
+                      >
+                        ✕
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            {/* 🔘 BUTTON */}{" "}
-            <Button
-              handleShowAnswer={showAnswer}
-              handleStartAgain={reset}
-              checkAnswers={checkAnswers}
-            />{" "}
-          </div>
+          ))}
         </div>
+
+        {/* COLOR PALETTE */}
+        {selectedWord && !locked && (
+          <div
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 9999,
+              background: "white",
+              borderRadius: "12px",
+              padding: "10px",
+              display: "flex",
+              gap: "10px",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+            }}
+          >
+            {COLORS.map((c) => (
+              <div
+                key={c.key}
+                onClick={() => handleSelectColor(c.key)}
+                style={{
+                  width: 25,
+                  height: 25,
+                  borderRadius: "50%",
+                  background: c.color,
+                  cursor: "pointer",
+                  border: "2px solid white",
+                }}
+                title={c.key}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* BUTTON */}
+        <Button
+          handleShowAnswer={showAnswer}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );
 };
+
 export default Review2_Page2_Q2;

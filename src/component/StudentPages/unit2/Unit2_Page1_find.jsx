@@ -91,6 +91,8 @@ const Unit2_Page1_find = () => {
         style={{
           textAlign: "center",
           display: "flex",
+              borderRadius:"15px",
+
           flexDirection: "column",
           alignItems: "center",
         }}

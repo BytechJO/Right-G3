@@ -103,7 +103,7 @@
 .fullscreen-size {
   background: #fff;
   border-radius: 0;
-  padding: 20px;
+  padding: 40px;
   animation: fadeIn 0.2s ease;
 
   width: 100vw;

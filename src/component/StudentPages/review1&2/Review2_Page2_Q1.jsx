@@ -58,15 +58,40 @@ const ITEMS = [
 const captions = [
   {
     start: 0.179,
-    end: 26.52,
-    text: "Page 19, review two, exercise C. Listen, read, and write the vowel sound. Toast, bite, five, knee, top, cap, cup, bike, cube, kitten, bed, soap, hen, music, boat",
+    end: 7.5,
+    text: "Page 19, review two, exercise C. Listen, read, and write the vowel sound.",
   },
+
+  { start: 8.039, end: 8.559, text: "Toast," },
+  { start: 9.159, end: 9.579, text: "bite," },
+  { start: 10.46, end: 10.96, text: "five," },
+  { start: 11.639, end: 12.039, text: "knee," },
+  { start: 13.039, end: 13.46, text: "top," },
+  { start: 14.359, end: 14.779, text: "cap," },
+  { start: 15.579, end: 15.939, text: "cup," },
+  { start: 16.879, end: 17.279, text: "bike," },
+  { start: 18.139, end: 18.619, text: "cube," },
+  { start: 19.439, end: 19.879, text: "kitten," },
+  { start: 20.84, end: 21.219, text: "bed," },
+  { start: 22.199, end: 22.559, text: "soap," },
+  { start: 23.519, end: 23.899, text: "hen," },
+  { start: 24.779, end: 25.299, text: "music," },
+  { start: 26.099, end: 26.52, text: "boat" },
 ];
 /* ===== draggable ===== */
 
 function DraggableLetter({ item, locked }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: item, disabled: locked });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: item,
+    disabled: locked,
+  });
 
   return (
     <div
@@ -79,15 +104,21 @@ function DraggableLetter({ item, locked }) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "6px 10px", // 👈 أكبر
-        border: "2px solid #e5e7eb",
+        padding: "6px 10px",
+        border: "1px solid",
+        borderColor: isDragging ? "#F79530" : "#e5e7eb",
         borderRadius: "8px",
         background: "white",
+        color: "#F79530",
         fontWeight: "bold",
-        fontSize: "18px", // 👈 أكبر
-        cursor: "grab",
-        minWidth: "35px", // 👈 حجم ثابت شوي
+        fontSize: "18px",
+        cursor: locked ? "default" : "grab",
+        minWidth: "35px",
+        boxShadow: isDragging
+          ? "0 4px 10px rgba(247,149,48,0.25)"
+          : "0 1px 3px rgba(0,0,0,0.08)",
       }}
+      className="hover:border-[#F79530]"
     >
       {item}
     </div>
@@ -96,8 +127,8 @@ function DraggableLetter({ item, locked }) {
 
 /* ===== drop slot ===== */
 
-function DropSlot({ id, content }) {
-  const { setNodeRef } = useSortable({ id });
+function DropSlot({ id, content, locked, onRemove }) {
+  const { setNodeRef, isOver } = useSortable({ id });
 
   return (
     <div
@@ -106,21 +137,29 @@ function DropSlot({ id, content }) {
         position: "relative",
         width: "30px",
         height: "30px",
-        border: "2px solid #F79530", // 🔥 نفس اللون
+        border: `1px solid ${isOver ? "#fb923c" : "#F79530"}`,
         borderRadius: "6px",
-        background: "white",
+        background: isOver ? "#fff7ed" : "white",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontWeight: "bold",
         fontSize: "16px",
+        transform: isOver ? "scale(1.08)" : "scale(1)",
+        transition: "all 0.18s ease",
+        boxShadow: isOver ? "0 0 0 4px rgba(251,146,60,0.18)" : "none",
       }}
     >
       {content && (
         <span
-          style={{
-            color: content ? "#1C398E" : "#000",
+          onClick={() => {
+            if (!locked) {
+              onRemove(id);
+            }
           }}
+          className={`text-[20px] ${
+            locked ? "" : "cursor-pointer hover:text-red-500"
+          }`}
         >
           {content}
         </span>
@@ -174,6 +213,15 @@ const Review2_Page2_Q1 = () => {
     setLocked(false);
   };
 
+  const removeAnswer = (slotId) => {
+    if (locked) return;
+
+    setAnswers((prev) => ({
+      ...prev,
+      [slotId]: null,
+    }));
+  };
+
   return (
     <DndContext
       sensors={sensors}
@@ -197,7 +245,7 @@ const Review2_Page2_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "25px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "20px" }}>C</span>
             Listen, read, and write the{" "}
@@ -216,8 +264,8 @@ const Review2_Page2_Q1 = () => {
           >
             <div className="flex flex-col lg:flex-row gap-8">
               {/* 🔤 البنك */}
-              <div className="bg-blue-50 p-3 rounded-2xl border-2 border-blue-100 h-fit w-fit">
-                <h3 className="font-bold text-blue-800 mb-4 text-center">
+              <div className="p-3 rounded-2xl border-2 border-gray-200 h-fit w-fit">
+                <h3 className="font-bold text-orange-600 mb-4 text-center">
                   Letters
                 </h3>
 
@@ -255,6 +303,8 @@ const Review2_Page2_Q1 = () => {
                           content={answers[item.id]}
                           correct={item.correct}
                           isSubmitted={showResults}
+                          locked={locked}
+                          onRemove={removeAnswer}
                         />
                       </div>
 
@@ -264,7 +314,7 @@ const Review2_Page2_Q1 = () => {
                         style={{
                           width: "150px",
                           height: "120px",
-                          border: "2px solid #F79530",
+                          border: "1px solid #F79530",
                           borderRadius: "10px",
                         }}
                       />
@@ -275,7 +325,7 @@ const Review2_Page2_Q1 = () => {
                             style={{
                               position: "absolute",
                               bottom: "25px",
-                              right: "45px", // 🔥 زي المثال اللي بدك
+                              right: "25px", // 🔥 زي المثال اللي بدك
                               zIndex: 10,
                             }}
                           >
@@ -309,7 +359,7 @@ const Review2_Page2_Q1 = () => {
 
       <DragOverlay>
         {activeId ? (
-          <div className="p-3 bg-white border-2 rounded-xl shadow text-xs">
+          <div className="p-2 bg-white border-1 border-[#F79530] rounded-xl shadow text-[20px]">
             {activeId}
           </div>
         ) : null}

@@ -92,6 +92,19 @@ const Unit2_Page5_Q1 = () => {
     setLocked(false);
   };
 
+  const removeAnswer = (qIndex) => {
+  if (locked) return;
+
+  setAnswers((prev) => {
+    const copy = [...prev];
+    copy[qIndex] = "";
+    return copy;
+  });
+
+  setWrongInputs((prev) =>
+    prev.filter((item) => item !== `${qIndex}`),
+  );
+};
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
@@ -111,13 +124,13 @@ const Unit2_Page5_Q1 = () => {
             Look and write.
           </h5>
 
-          <div className=" mt-2">
+          <div className="mt-2 flex flex-col gap-5">
             <Droppable droppableId="word-bank" direction="horizontal">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center mb-6"
+                  className="flex gap-16 p-3 rounded-xl justify-center mb-6"
                 >
                   {wordBank.map((w, i) => {
                     const isUsed = usedWords.includes(w.id);
@@ -134,14 +147,14 @@ const Unit2_Page5_Q1 = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="px-4 py-1 rounded-lg border-2 border-[#2c5287] font-bold bg-white text-sm cursor-grab select-none"
+                            className="px-4 py-1 rounded-lg border-1 border-[#2c5287] font-bold bg-white text-sm cursor-grab select-none"
                             style={{
-                              padding: "6px 14px",
-                              border: "2px solid #2c5287",
+                              padding: "6px 30px",
+                              border: "1px solid #f39b42",
                               borderRadius: "10px",
                               background: "#fff",
                               fontWeight: "bold",
-                              fontSize: "14px",
+                              fontSize: "20px",
                               cursor: isUsed ? "not-allowed" : "grab",
                               opacity: isUsed ? 0.4 : 1, // 🔥 فاتح
                               ...provided.draggableProps.style,
@@ -188,23 +201,25 @@ const Unit2_Page5_Q1 = () => {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`w-full min-h-10 flex items-center justify-center text-center text-[16px] font-semibold px-1 relative ${
-                            snapshot.isDraggingOver ? "bg-blue-100" : ""
+                          className={`w-full min-h-10 flex items-center justify-center text-center text-[18px] font-semibold px-1 relative ${
+                            snapshot.isDraggingOver ? "bg-orange-100 border-b border-orange-500" : ""
                           }`}
                           style={{
                             borderBottom: locked
                               ? wrongInputs.includes(`${qIndex}`)
-                                ? "2px solid #ef4444" // 🔴 غلط
-                                : "2px solid #000" // ⚫ صح
-                              : "2px solid #000",
+                                ? "2px solid red" // 🔴 غلط
+                                : "1px solid #000" // ⚫ صح
+                              : "1px solid #000",
                           }}
                         >
                           <span
-                            style={{
-                              color: answers[qIndex] ? "#1C398E" : "#000", // 🔵 blue-600
-                              fontWeight: answers[qIndex] ? "bold" : "normal",
-                            }}
-                          >
+                          className={`${ answers[qIndex] ? "hover:text-red-500":""}`}
+  onClick={() => answers[qIndex] && removeAnswer(qIndex)}
+  style={{
+    fontWeight: answers[qIndex] ? "bold" : "normal",
+    cursor: answers[qIndex] ? "pointer" : "default",
+  }}
+>
                             {wordBank.find((w) => w.id === answers[qIndex])
                               ?.text || ""}
                           </span>

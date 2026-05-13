@@ -1,6 +1,19 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DndContext,
+  PointerSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  useDroppable,
+} from "@dnd-kit/core";
+
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+
+import { CSS } from "@dnd-kit/utilities";
 import WrongMark from "../../WrongMark";
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Asset 18.svg";
@@ -9,6 +22,94 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vac
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Asset 20.svg";
 import Button from "../../Button";
 
+function DraggableWord({ word, isUsed, locked }) {
+ const {
+  attributes,
+  listeners,
+  setNodeRef,
+  transform,
+  transition,
+  isDragging,
+} = useSortable({
+  id: word,
+  disabled: isUsed || locked,
+});
+
+ const style = {
+  transform: CSS.Transform.toString(transform),
+  transition,
+  opacity: isDragging || isUsed || locked ? 0.4 : 1,
+};
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={style}
+      className={`flex items-center gap-2 bg-[#fff1e4] px-3 py-2 rounded-[20px]
+${isUsed || locked ? "cursor-not-allowed" : "cursor-grab"}
+`}
+    >
+      <div className="flex">
+        {[1, 2, 3, 4].map((i) => {
+          const activeCount =
+            word === "always"
+              ? 4
+              : word === "usually"
+                ? 3
+                : word === "sometimes"
+                  ? 2
+                  : 0;
+
+          return (
+            <div
+              key={i}
+              style={{
+                width: "20px",
+                height: "15px",
+                background: i <= activeCount ? "#ef4444" : "#fff",
+                border: "1px solid #c72b2bff",
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <span className="text-[18px]">= {word}</span>
+    </div>
+  );
+}
+
+function DropSlot({ id, value, correct, locked, showResult, onRemove }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        display: "inline-block",
+        width: "100px",
+        height:"30px",
+        borderBottom: locked
+          ? value === correct
+            ? "1px solid #000"
+            : "2px solid red"
+          : "1px solid #000",
+        textAlign: "center",
+        margin: "0 5px",
+        background: isOver ? "#fff7ed" : "transparent",
+      }}
+    >
+      {value && (
+        <span onClick={onRemove} className={`${locked ? "cursor-default":"cursor-pointer hover:text-red-500"} font-medium`}>
+          {value}
+        </span>
+      )}
+    </div>
+  );
+}
 const Review2_Page1_Q1 = () => {
   const questions = [
     { id: 1, img: img1, correct: "never", sentence: "clean my room." },
@@ -21,16 +122,43 @@ const Review2_Page1_Q1 = () => {
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState({});
   const [locked, setLocked] = useState(false);
-  const onDragEnd = (result) => {
-    if (!result.destination || locked) return;
+  const [activeId, setActiveId] = useState(null);
 
-    const sentence = result.draggableId;
-    const slotId = result.destination.droppableId;
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+    useSensor(PointerSensor),
+  );
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
 
-    setAnswers((prev) => ({
-      ...prev,
-      [slotId]: sentence,
-    }));
+    setActiveId(null);
+
+    if (!over || locked) return;
+
+    const draggedWord = active.id;
+    const slotId = over.id;
+
+    if (!slotId.startsWith("slot-")) return;
+
+    setAnswers((prev) => {
+      const updated = { ...prev };
+
+      Object.keys(updated).forEach((key) => {
+        if (updated[key] === draggedWord) {
+          updated[key] = "";
+        }
+      });
+
+      updated[slotId] = draggedWord;
+
+      return updated;
+    });
   };
 
   const checkAnswers = () => {
@@ -86,8 +214,21 @@ const Review2_Page1_Q1 = () => {
     setShowResult(false);
   };
 
+  const removeAnswer = (slotId) => {
+    if (locked) return;
+
+    setAnswers((prev) => ({
+      ...prev,
+      [slotId]: "",
+    }));
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={(event) => setActiveId(event.active.id)}
+      onDragEnd={handleDragEnd}
+    >
       <div
         style={{
           display: "flex",
@@ -96,193 +237,97 @@ const Review2_Page1_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "20px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "20px" }}>A</span>
             Write sentences. Use the words below.
           </h5>
-          {/* بنك الكلمات */}
-          <Droppable droppableId="bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl justify-center mt-3"
-                style={{
-                  display: "flex",
-                  gap: "15px",
-                  flexWrap: "wrap",
-                }}
-              >
-                {words.map((w, index) => {
-                  const isUsed = Object.values(answers).includes(w);
-                  return (
-                    <Draggable
-                      key={w}
-                      draggableId={w}
-                      index={index}
-                      isDragDisabled={locked || isUsed}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            background: "#eee",
-                            padding: "6px 10px",
-                            borderRadius: "20px",
-                            cursor: isUsed ? "not-allowed" : "grab",
-                            opacity: isUsed ? 0.4 : 1,
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          {/* البار */}
-                          <div style={{ display: "flex" }}>
-                            {[1, 2, 3, 4].map((i) => {
-                              const activeCount =
-                                w === "always"
-                                  ? 4
-                                  : w === "usually"
-                                    ? 3
-                                    : w === "sometimes"
-                                      ? 2
-                                      : 0;
-
-                              return (
-                                <div
-                                  key={i}
-                                  style={{
-                                    width: "12px",
-                                    height: "12px",
-                                    marginRight: "2px",
-                                    background:
-                                      i <= activeCount ? "#ef4444" : "#fff",
-                                    border: "1px solid #ef4444",
-                                  }}
-                                />
-                              );
-                            })}
-                          </div>
-
-                          {/* النص */}
-                          <span style={{ fontSize: "14px" }}>= {w}</span>
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
+          <div className="flex flex-col gap-10">
+            {/* بنك الكلمات */}
+            <SortableContext items={words}>
+              <div className="flex gap-3 p-3 justify-center mt-3 flex-wrap">
+                {words.map((w) => (
+                 <DraggableWord
+  key={w}
+  word={w}
+  isUsed={Object.values(answers).includes(w)}
+  locked={locked}
+/>
+                ))}
               </div>
-            )}
-          </Droppable>
-
-          {/* الأسئلة */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "auto auto", // 🔥 بدل 1fr
-              gap: "20px",
-              justifyContent: "center",
-              columnGap: "80px",
-              rowGap: "2px",
-            }}
-          >
-            {questions.map((q) => (
-              <div key={q.id} style={{ marginBottom: "20px" }}>
-                <div style={{ fontWeight: "bold" }}>{q.id}</div>
-
-                <img
-                  src={q.img}
-                  style={{
-                    width: "300px",
-                    height: "150px",
-                    objectFit: "contain",
-                  }}
-                />
-
-                <Droppable droppableId={`slot-${q.id}`}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      style={{
-                        marginTop: "10px",
-                        minHeight: "35px",
-                      }}
-                    >
+            </SortableContext>
+            {/* الأسئلة */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr", // 🔥 بدل 1fr
+                gap: "20px",
+                // justifyContent: "center",
+                columnGap: "80px",
+                rowGap: "2px",
+              }}
+            >
+              {questions.map((q) => (
+                <div key={q.id} style={{ marginBottom: "20px" }}>
+                  <div className="flex gap-5">
+                    <div className="text-[20px] font-bold">{q.id}</div>
+                    <div className="flex flex-col gap-3">
+                      <img
+                        src={q.img}
+                        style={{
+                          width: "auto",
+                          height: "120px",
+                          objectFit: "contain",
+                        }}
+                      />
                       <div
                         style={{
-                          position: "relative",
-                          display: "inline-block", // 🔥 هذا الحل
+                          marginTop: "10px",
+                          minHeight: "35px",
                         }}
                       >
-                        I{" "}
-                        <span
+                        <div
                           style={{
-                            display: "inline-block",
-                            minWidth: "80px",
-                            borderBottom: locked
-                              ? answers[`slot-${q.id}`] === q.correct
-                                ? "2px solid #000"
-                                : "2px solid #ef4444"
-                              : "2px solid #000",
-                            textAlign: "center",
-                            margin: "0 5px",
+                            position: "relative",
+                            fontSize: "18px",
+                            display: "flex",
+                          alignItems: "center",
+
                           }}
                         >
-                          {answers[`slot-${q.id}`] && (
-                            <Draggable
-                              draggableId={`slot-${q.id}-${answers[`slot-${q.id}`]}`}
-                              index={0}
-                              isDragDisabled={locked}
-                            >
-                              {(provided) => (
-                                <span
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  style={{
-                                    color: answers[`slot-${q.id}`]
-                                      ? "#1C398E"
-                                      : "#000",
-                                    fontWeight: answers[`slot-${q.id}`]
-                                      ? "bold"
-                                      : "normal",
-                                  }}
-                                >
-                                  {answers[`slot-${q.id}`]}
-                                </span>
-                              )}
-                            </Draggable>
-                          )}
-                        </span>{" "}
-                        {q.sentence}
-                        {/* ❌ WrongMark */}
-                        {showResult &&
-                          answers[`slot-${q.id}`] &&
-                          answers[`slot-${q.id}`] !== q.correct && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                left: "100%", // 🔥 يجي جنب الجملة
-                                marginLeft: "8px", // مسافة صغيرة
-                                top: "50%",
-                                transform: "translateY(-50%)",
-                              }}
-                            >
-                              <WrongMark />
-                            </div>
-                          )}
+                          I{" "}
+                          <DropSlot
+                            id={`slot-${q.id}`}
+                            value={answers[`slot-${q.id}`]}
+                            correct={q.correct}
+                            locked={locked}
+                            showResult={showResult}
+                            onRemove={() => removeAnswer(`slot-${q.id}`)}
+                          />{" "}
+                          {q.sentence}
+                          {/* ❌ WrongMark */}
+                          {showResult &&
+                            answers[`slot-${q.id}`] &&
+                            answers[`slot-${q.id}`] !== q.correct && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  left: "40%",
+                                  marginLeft: "8px",
+                                  top: "6%",
+                                  transform: "translateY(-50%)",
+                                }}
+                              >
+                                <WrongMark />
+                              </div>
+                            )}
+                        </div>
                       </div>
                     </div>
-                  )}
-                </Droppable>
-              </div>
-            ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
           <Button
             handleShowAnswer={showAnswers}
@@ -290,8 +335,15 @@ const Review2_Page1_Q1 = () => {
             checkAnswers={checkAnswers}
           />
         </div>
+        <DragOverlay>
+          {activeId ? (
+            <div className="bg-white border border-orange-400 px-3 py-2 rounded-xl shadow-xl">
+              {activeId}
+            </div>
+          ) : null}
+        </DragOverlay>
       </div>
-    </DragDropContext>
+    </DndContext>
   );
 };
 

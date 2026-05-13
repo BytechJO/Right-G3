@@ -6,7 +6,8 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vac
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex D 4.svg";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/unit2-pg17-EXD.mp3";
 
 import Button from "../../Button";
@@ -111,8 +112,8 @@ const Review1_Page2_Q2 = () => {
               <img
                 src={item.img}
                 style={{
-                  width: "15vw",
-                  height: "15vh",
+                  width: "auto",
+                  height: "20vh",
                   objectFit: "contain",
                 }}
               />
@@ -132,15 +133,18 @@ const Review1_Page2_Q2 = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "18px",
-                      cursor: "pointer",
-
-                      background: selected[i] === "yes" ? "#1C398E" : "#fff", // 🔵 دايماً
-                      color: selected[i] === "yes" ? "#fff" : "#000",
-
-                      border: "2px solid #ccc",
+                      cursor: locked ? "default" : "pointer",
+                      border:
+                        selected[i] === "yes"
+                          ? locked &&
+                            selected[i] === "yes" &&
+                            item.correct !== "yes"
+                            ? "2px solid red"
+                            : "2px solid #f39b42"
+                          : "2px solid #ccc",
                     }}
                   >
-                    ✓
+                    <img src={trueIcon} style={{ height: "25px" }} />
                   </button>
 
                   {locked &&
@@ -149,8 +153,8 @@ const Review1_Page2_Q2 = () => {
                       <div
                         style={{
                           position: "absolute",
-                          left: "-35px",
-                          top: "50%",
+                          left: "20px",
+                        top: "5%",
                           transform: "translateY(-50%)",
                           zIndex: 10,
                         }}
@@ -175,22 +179,25 @@ const Review1_Page2_Q2 = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "18px",
-                      cursor: "pointer",
-
-                      background: selected[i] === "no" ? "#1C398E" : "#fff",
-                      color: selected[i] === "no" ? "#fff" : "#000",
-
-                      border: "2px solid #ccc",
+                      cursor: locked ? "default" : "pointer",
+                      border:
+                        selected[i] === "no"
+                          ? locked &&
+                            selected[i] === "no" &&
+                            item.correct !== "no"
+                            ? "2px solid red"
+                            : "2px solid #f39b42"
+                          : "2px solid #ccc",
                     }}
                   >
-                    ✗
+                    <img src={falseIcon} style={{ height: "25px" }} />
                   </button>
                   {locked && selected[i] === "no" && item.correct !== "no" && (
                     <div
                       style={{
                         position: "absolute",
-                        left: "35px",
-                        top: "50%",
+                        left: "20px",
+                        top: "5%",
                         transform: "translateY(-50%)",
                         zIndex: 10,
                       }}

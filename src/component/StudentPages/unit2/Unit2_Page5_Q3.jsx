@@ -8,6 +8,7 @@ import {
   MouseSensor,
   TouchSensor,
   DragOverlay,
+  useDroppable,
 } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -54,30 +55,39 @@ function DraggableActivity({ item, isUsed }) {
       style={{ ...style, touchAction: "none" }}
       {...attributes}
       {...listeners}
-      className={`p-2 bg-white border-2 border-gray-200 rounded-xl shadow-sm cursor-grab text-blue-700 font-medium text-xs text-center ${isUsed ? "bg-gray-50 text-gray-300 pointer-events-none" : "hover:border-blue-400 hover:shadow-md transition-all"}`}
+      className={`p-2 bg-white border-1 border-gray-200 rounded-xl shadow-sm cursor-grab text-[#f39b42] text-[18px] text-center ${isUsed ? "bg-gray-50 text-gray-300 pointer-events-none" : "hover:border-orange-400 hover:shadow-md transition-all"}`}
     >
       {item.text}
     </div>
   );
 }
 
-function DropSlot({ id, content, isCorrect, isSubmitted }) {
-  const { setNodeRef, isOver } = useSortable({ id });
+function DropSlot({
+  id,
+  content,
+  isCorrect,
+  isSubmitted,
+  onRemove,
+}) {
+ const { setNodeRef, isOver } = useDroppable({ id });
   const borderColor = isSubmitted
     ? isCorrect
       ? "border-black"
       : "border-red-500"
     : isOver
-      ? "border-blue-400 bg-blue-50"
+      ? "border-orange-400 bg-orange-50"
       : "border-black";
   return (
     <div
       ref={setNodeRef}
-      className={`w-full min-h-10 border-b-2 flex items-center justify-center px-2 transition-all ${borderColor}`}
+      className={`w-full min-h-10 border-b-1 flex items-center justify-center px-2 transition-all ${borderColor}`}
     >
       {content ? (
         <div className="relative flex items-center justify-center">
-          <span className="text-blue-900 font-bold text-sm text-center">
+        <span
+  onClick={onRemove}
+  className={`text-[18px] text-center cursor-pointer ${isSubmitted?"":"hover:text-red-500" }`}
+>
             {ACTIVITIES.find((a) => a.id === content).text}
           </span>
 
@@ -143,7 +153,14 @@ const Unit2_Page5_Q3 = () => {
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
     else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
+const removeAnswer = (questionId) => {
+  if (locked) return;
 
+  setAnswers((prev) => ({
+    ...prev,
+    [questionId]: null,
+  }));
+};
   const handleReset = () => {
     setAnswers({
       q1: null,
@@ -170,11 +187,33 @@ const Unit2_Page5_Q3 = () => {
     <DndContext
       sensors={sensors}
       onDragStart={(e) => setActiveId(e.active.id)}
-      onDragEnd={(e) => {
-        if (e.over)
-          setAnswers((prev) => ({ ...prev, [e.over.id]: e.active.id }));
-        setActiveId(null);
-      }}
+     onDragEnd={(e) => {
+  const { active, over } = e;
+
+  // إذا مو فوق drop area حقيقية
+  if (!over || !QUESTIONS.some((q) => q.id === over.id)) {
+    setActiveId(null);
+    return;
+  }
+
+  setAnswers((prev) => {
+    const updated = { ...prev };
+
+    // احذف العنصر من مكانه القديم
+    Object.keys(updated).forEach((key) => {
+      if (updated[key] === active.id) {
+        updated[key] = null;
+      }
+    });
+
+    // ضيفه بالمكان الجديد
+    updated[over.id] = active.id;
+
+    return updated;
+  });
+
+  setActiveId(null);
+}}
     >
       <div
         style={{
@@ -187,9 +226,8 @@ const Unit2_Page5_Q3 = () => {
         <div
           className="div-forall"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
+            
+            // gap: "45px",
           }}
         >
           <h5 className="header-title-page8">
@@ -198,9 +236,9 @@ const Unit2_Page5_Q3 = () => {
             </span>
             Look, read, and write. Use the words below.
           </h5>
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="flex-1 bg-blue-50 p-5 rounded-2xl border-2 border-blue-100 h-fit sticky top-4">
-              <h3 className="font-bold text-blue-800 mb-4 text-center">
+          <div className="flex flex-col lg:flex-row gap-8 items-center">
+            <div className="flex-1 p-5 rounded-2xl border-1 border-gray-200 h-fit sticky top-4">
+              <h3 className="font-bold text-[#f39b42] mb-4 text-center">
                 Activities Bank
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -216,22 +254,23 @@ const Unit2_Page5_Q3 = () => {
               </div>
             </div>
 
-            <div className="flex-2 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            <div className="flex-3 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
               {QUESTIONS.map((q) => (
                 <div key={q.id} className="space-y-3">
-                  <div className="bg-gray-50 p-2 rounded-xl border border-gray-100 flex justify-center">
+                
                     <img
                       src={q.img}
                       alt="activity"
                       className="max-h-32 object-contain rounded-lg"
                     />
-                  </div>
-                  <DropSlot
-                    id={q.id}
-                    content={answers[q.id]}
-                    isCorrect={answers[q.id] === CORRECT_ANSWERS[q.id]}
-                    isSubmitted={showResults}
-                  />
+                
+                 <DropSlot
+  id={q.id}
+  content={answers[q.id]}
+  isCorrect={answers[q.id] === CORRECT_ANSWERS[q.id]}
+  isSubmitted={showResults}
+  onRemove={() => removeAnswer(q.id)}
+/>
                 </div>
               ))}
             </div>
@@ -251,7 +290,7 @@ const Unit2_Page5_Q3 = () => {
 
       <DragOverlay>
         {activeId ? (
-          <div className="p-3 bg-white border-2 border-blue-500 rounded-xl shadow-2xl text-blue-700 font-bold text-xs scale-105">
+          <div className="p-2 bg-white border-2 border-orange-500 rounded-xl shadow-2xl text-orange-700 font-bold text-[15px] scale-105">
             {ACTIVITIES.find((a) => a.id === activeId).text}
           </div>
         ) : null}

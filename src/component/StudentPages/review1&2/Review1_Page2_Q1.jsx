@@ -107,7 +107,9 @@ const Review1_Page2_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall"   style={{
+                gap: "40px",
+              }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>C</span>
           Look and choose.
@@ -168,10 +170,10 @@ const Review1_Page2_Q1 = () => {
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E"
-                                : "2px solid #ef4444"
-                              : "2px solid #1C398E"
-                            : "2px solid transparent",
+                                ? "1px solid #f39b42"
+                                : "2px solid red"
+                              : "1px solid #f39b42"
+                            : "1px solid transparent",
                       }}
                     >
                       {opt}
@@ -183,8 +185,8 @@ const Review1_Page2_Q1 = () => {
                         <div
                           style={{
                             position: "absolute",
-                            right: "-25px",
-                            top: "50%",
+                            right: "20px",
+                            top: "5%",
                             transform: "translateY(-50%)",
                           }}
                         >

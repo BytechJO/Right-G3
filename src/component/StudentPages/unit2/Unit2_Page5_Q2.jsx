@@ -116,9 +116,8 @@ const Unit2_Page5_Q2 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "30px",
+
+          gap: "45px",
         }}
       >
         <h5 className="header-title-page8">
@@ -143,24 +142,22 @@ const Unit2_Page5_Q2 = () => {
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
-            gap: "35px",
+            // justifyContent: "center",
+            gap: "10px",
             marginTop: "30px",
           }}
         >
           {groups.map((group, index) => (
             <div
               key={index}
-              style={{
-                position: "relative",
-              }}
+              className="flex gap-2"
+              
             >
               <div
                 style={{
-                  position: "absolute",
-                  left: "-20px",
+                
                   fontWeight: "bold",
-                  fontSize: "16px",
+                  fontSize: "20px",
                 }}
               >
                 {index + 1}
@@ -169,10 +166,13 @@ const Unit2_Page5_Q2 = () => {
               <div
                 style={{
                   background: "#FEF3E6",
-                  padding: "1vw 2.5vw",
+                  padding: "15px 25px",
                   borderRadius: "1vw",
                   minWidth: "7vw",
                   display: "flex",
+                  height:"170px",
+                  justifyContent:"space-between",
+                  alignItems:"center",
                   flexDirection: "column",
                   gap: "10px",
                 }}
@@ -202,6 +202,7 @@ const Unit2_Page5_Q2 = () => {
                       style={{
                         fontSize: "18px",
                         cursor: "pointer",
+                        padding:"4px 5px",
                         position: "relative",
                       }}
                     >
@@ -220,9 +221,9 @@ const Unit2_Page5_Q2 = () => {
                                 border: isSelected
                                   ? showResult2
                                     ? isCorrect
-                                      ? "2px solid #1C398E" 
-                                      : "2px solid #ef4444" 
-                                    : "2px solid #1C398E" 
+                                      ? "1px solid #f39b42" 
+                                      : "2px solid red" 
+                                    : "1px solid #f39b42" 
                                   : "none",
                                 borderRadius: "20px",
                                 pointerEvents: "none",

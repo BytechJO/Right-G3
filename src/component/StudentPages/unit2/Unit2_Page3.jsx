@@ -115,9 +115,9 @@ const Unit2_Page3 = ({ openPopup }) => {
     { x1: 14.26, y1: 17.08, x2: 87.26, y2: 27.94, sound: sound2 },
     { x1: 5.48, y1: 38.22, x2: 25.25, y2: 42.7, sound: sound3 },
     { x1: 32.43, y1: 60.25, x2: 50.30, y2: 64.9, sound: sound4 },
-    { x1: 50.37, y1: 39.07, x2: 88.56, y2: 43.38, sound: sound5 },
-    { x1: 73.65, y1: 63.93, x2: 92.49, y2: 68.86, sound: sound6 },
-    { x1: 5.63, y1: 68.25, x2: 38.07, y2: 71.74, sound: sound7 },
+    { x1: 50.37, y1: 39.07, x2: 88.56, y2: 42.89, sound: sound5 },
+    { x1: 74.01, y1: 64.27, x2: 92.2, y2: 68.93, sound: sound6 },
+    { x1: 6.08, y1: 68.45, x2: 38.20, y2: 72.15, sound: sound7 },
     { x1: 50.63, y1: 81.4, x2: 68.42, y2: 86.54, sound: sound8 },
   ];
   const handleImageClick = (e) => {

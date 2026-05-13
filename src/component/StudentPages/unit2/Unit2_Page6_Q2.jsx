@@ -86,7 +86,7 @@ const Unit2_Page6_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall"  style={{gap:"15px"}}>
         <h5 className="header-title-page8 pb-2.5">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             E
@@ -94,7 +94,7 @@ const Unit2_Page6_Q2 = () => {
           Look, read, and circle.
         </h5>
         {/* 🔥 GRID */}
-        <div className="grid grid-cols-4 gap-6 text-center mt-5">
+        <div className="grid grid-cols-4 gap-x-10 gap-y-15 text-center mt-5">
           {questions.map((q, index) => (
             <div key={index} className="flex flex-col items-center gap-3">
               {/* IMAGE + NUMBER */}
@@ -113,7 +113,7 @@ const Unit2_Page6_Q2 = () => {
               </div>
 
               <div
-                className="bg-[#ead6cc] rounded-xl  flex flex-col  items-center"
+                className="bg-orange-100 rounded-xl px-2 py-3  flex flex-col  items-center"
                 style={{
                   width: "160px", 
                 }}
@@ -130,14 +130,14 @@ const Unit2_Page6_Q2 = () => {
                         border: selected
                           ? locked
                             ? type === q.answer
-                              ? "2px solid #1C398E" // 🔵 صح
-                              : "2px solid #ef4444" // 🔴 غلط
-                            : "2px solid #1C398E" // قبل check
-                          : "2px solid transparent",
+                              ? "1px solid #f39b42" // 🔵 صح
+                              : "2px solid red" // 🔴 غلط
+                            : "1px solid #f39b42" // قبل check
+                          : "1px solid transparent",
                         position: "relative",
                       }}
                     >
-                      {type} a
+                      {type}
                       {locked && selected && type !== q.answer && <WrongMark />}
                     </div>
                   );

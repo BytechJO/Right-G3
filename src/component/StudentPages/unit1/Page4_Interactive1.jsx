@@ -92,7 +92,8 @@ const Page4_Interactive1 = () => {
           textAlign: "center",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          gap:"30px"
+,          alignItems: "center",
         }}
       >
         <div
@@ -113,6 +114,7 @@ const Page4_Interactive1 = () => {
               width: "auto",
               height: "70vh",
               cursor: "pointer",
+              borderRadius:"15px",
               display: "block",
             }}
           />
