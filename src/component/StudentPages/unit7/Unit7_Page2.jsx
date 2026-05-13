@@ -26,8 +26,8 @@ import img11 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My 
 import img12 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-23.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import soundListen from "../../../assets/audio/ClassBook/Unit 7/P 59/unit7-pg59-reading.mp3";
-import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/Asset 40.svg";
-import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/Asset 39.svg";
+import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/Asset 40.svg";
+import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/Asset 39.svg";
 
 import repeat from "../../../assets/audio/ClassBook/Unit 7/P 59/unit7-pg59-bebo&lolo.mp3";
 import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
