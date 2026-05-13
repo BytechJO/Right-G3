@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 23.png";
-import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-05.svg";
-import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-06.svg";
-import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-07.svg";
-import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-08.svg";
+import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-01000.svg";
+import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-5.svg";
+import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-06.svg";
+import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/1-07.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import main from "../../../assets/audio/ClassBook/Unit 3/P 23/main.mp3";
 import sound1_letter from "../../../assets/audio/ClassBook/Unit 3/P 23/sound1.mp3";

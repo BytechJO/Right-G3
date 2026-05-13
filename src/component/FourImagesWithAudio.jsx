@@ -291,8 +291,9 @@ const FourImagesWithAudio = ({
                       className="small-img1"
                       style={{
                         cursor: "pointer",
-                        width: images.length > 4 ? "150px" : "",
-                        height: "auto",
+                        width:  "auto",
+                        objectFit:"contain",
+                        height: "175px",
                       }}
                       onClick={() => playImageSound(globalIndex)}
                     />

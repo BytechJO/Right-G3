@@ -13,10 +13,11 @@ import { useContext } from "react";
 import { AudioContext } from "../../../AudioContext";
 
 const Unit8_Page3 = ({ openPopup }) => {
-  const audioRef = useRef(null);
+const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
+;
   const captionsExample = [
     {
       start: 0.299,
