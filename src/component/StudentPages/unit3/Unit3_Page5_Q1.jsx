@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import "./Unit3_Page5_Q1.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import WrongMark from "../../WrongMark";
+
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 3.svg";
@@ -11,8 +12,7 @@ import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes 
 import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 8.svg";
 import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex A 9.svg";
 
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import WrongMark from "../../WrongMark";
+const OPTIONS = ["ch", "sh", "tch"];
 
 const data = [
   { img: img1, pattern: "icken", answer: "ch", position: "start" },
@@ -25,27 +25,20 @@ const data = [
   { img: img8, pattern: "bea", answer: "ch", position: "end" },
   { img: img9, pattern: "op", answer: "sh", position: "start" },
 ];
+
 const Unit3_Page5_Q1 = () => {
   const [inputs, setInputs] = useState(Array(data.length).fill(""));
   const [wrongInputs, setWrongInputs] = useState(
     Array(data.length).fill(false),
   );
-  const [showAnswer, setShowAnswer] = useState(false); // ⭐ NEW
-  const lettersBank = [
-    { id: "l1", value: "ch" },
-    { id: "l2", value: "tch" },
-    { id: "l3", value: "sh" },
-  ];
-
-  const onDragEnd = (result) => {
-    if (!result.destination || showAnswer) return;
-
-    const letter = lettersBank.find((l) => l.id === result.draggableId)?.value;
-    const targetIndex = Number(result.destination.droppableId);
+  const [showAnswer, setShowAnswer] = useState(false);
+const [locked ,setLocked]=useState(false)
+  const handleChange = (index, value) => {
+    if (showAnswer||locked) return;
 
     setInputs((prev) => {
       const copy = [...prev];
-      copy[targetIndex] = letter; // ✔ نفس الحرف مسموح يتكرر
+      copy[index] = value;
       return copy;
     });
 
@@ -53,277 +46,167 @@ const Unit3_Page5_Q1 = () => {
   };
 
   const checkAnswers = () => {
-    if (showAnswer) return; // ❌ ممنوع التعديل بعد Show Answer
+    if (showAnswer||locked) return;
 
-    if (inputs.some((val) => val.trim() === "")) {
-      ValidationAlert.info(
-        "Oops!",
-        "Please fill in all the answers before checking.",
-      );
+    if (inputs.some((v) => !v)) {
+      ValidationAlert.info("Please fill all answers");
       return;
     }
 
-    let correctCount = 0;
-    const wrongFlags = [];
+    let score = 0;
+    const wrong = [];
 
-    data.forEach((item, index) => {
-      if (inputs[index].toLowerCase() === item.answer) {
-        correctCount++;
-        wrongFlags[index] = false;
+    data.forEach((item, i) => {
+      if (inputs[i] === item.answer) {
+        score++;
+        wrong[i] = false;
       } else {
-        wrongFlags[index] = true;
+        wrong[i] = true;
       }
     });
 
-    setWrongInputs(wrongFlags);
+    setWrongInputs(wrong);
     setShowAnswer(true);
+setLocked(true)
     const total = data.length;
-    const color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
 
-    const scoreMessage = `
-      <div style="font-size: 20px; text-align:center;">
-        <span style="color:${color}; font-weight:bold;">
-          Score: ${correctCount} / ${total}
-        </span>
-      </div>
-    `;
-
-    if (correctCount === total) ValidationAlert.success(scoreMessage);
-    else if (correctCount === 0) ValidationAlert.error(scoreMessage);
-    else ValidationAlert.warning(scoreMessage);
+    if (score === total) ValidationAlert.success(`Score: ${score}/${total}`);
+    else if (score === 0) ValidationAlert.error(`Score: ${score}/${total}`);
+    else ValidationAlert.warning(`Score: ${score}/${total}`);
   };
 
-  const handleShowAnswer = () => {
-    const correct = data.map((item) => item.answer);
-    setInputs(correct); // ⭐ تعبئة الإجابة الصحيحة
-    setWrongInputs(Array(data.length).fill(false));
+  const showCorrectAnswers = () => {
+    setInputs(data.map((d) => d.answer));
     setShowAnswer(true);
+setLocked(false)
+
   };
 
   const reset = () => {
     setInputs(Array(data.length).fill(""));
     setWrongInputs(Array(data.length).fill(false));
     setShowAnswer(false);
+setLocked(false)
+
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "30px",
-        }}
-      >
-        <div
-          className="div-forall"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
-          }}
-        >
-          <div className="unscramble-container">
-            <h5 className="header-title-page8 pb-2.5">
-              <span className="ex-A" style={{ marginRight: "10px" }}>
-                A
-              </span>
-              Look and write<span style={{ color: "#2e3192" }}>ch</span>,
-              <span style={{ color: "#2e3192" }}>tch</span>or<span style={{ color: "#2e3192" }}>sh</span>.
-            </h5>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
+      <div className="div-forall" style={{ gap: "30px" }}>
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            A
+          </span>
+          Look and write <span style={{ color: "#2e3192" }}>ch / sh / tch</span>
+        </h5>
 
-            <Droppable droppableId="letters" direction="horizontal">
-              {(provided) => (
+        {/* GRID */}
+        <div className="unscramble-row-wb-unit1-p8-q1">
+          {data.map((item, index) => (
+            <div className="unscramble-box" key={index}>
+              <div className="input-row-wb-unit1-p8-q1">
+                <div className="flex gap-2">
+                  <span className="text-[20px] font-bold">{index + 1}</span>
+                  <img
+                    src={item.img}
+                    alt=""
+                    style={{ height: "100px", width: "100px" }}
+                  />
+                </div>
+
                 <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
                   style={{
+                    position: "relative",
                     display: "flex",
-                    gap: "12px",
-                    padding: "10px",
-                    border: "2px dashed #ccc",
-                    borderRadius: "10px",
-                    marginTop: "20px",
-                    justifyContent: "center",
-                    width: "100%",
-                    // justifyContent: "center",
+                    alignItems: "center",
+                    gap: "5px",
                   }}
                 >
-                  {lettersBank.map((l, i) => (
-                    <Draggable
-                      key={l.id}
-                      draggableId={l.id}
-                      index={i}
-                      isDragDisabled={showAnswer}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            padding: "7px 14px",
-                            border: "2px solid #2c5287",
-                            borderRadius: "8px",
-                            background: "white",
-                            fontWeight: "bold",
-                            cursor: "grab",
-                            fontSize: "22px",
-                            ...provided.draggableProps.style,
-                          }}
+                  <span style={{ fontSize: "18px" }}>
+                    {item.position === "start" && (
+                      <>
+                        <select
+                          value={inputs[index]}
+                          className={`${wrongInputs[index]&&locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
+                          onChange={(e) => handleChange(index, e.target.value)}
+                          disabled={showAnswer||locked}
                         >
-                          {l.value}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+                          <option value="">...</option>
+                          {OPTIONS.map((o) => (
+                            <option key={o} value={o}>
+                              {o}
+                            </option>
+                          ))}
+                        </select>
+                        {item.pattern}
+                      </>
+                    )}
 
-            <div className="unscramble-row-wb-unit1-p8-q1 ">
-              {data.map((item, index) => (
-                <div className="unscramble-box" key={index}>
-                  <div className="input-row-wb-unit1-p8-q1">
-                    <span
-                      className="num"
-                      style={{ fontSize: "25px", fontWeight: "600" }}
-                    >
-                      {index + 1}
-                    </span>
-                    <div className="img-box-wb-unit1-p8-q1">
-                      <img src={item.img} alt="" />
-                    </div>
-                    <div
-                      style={{
-                        position: "relative",
-                        display: "inline-flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        className="pattern"
-                        style={{
-                          fontSize: "22px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "5px",
-                        }}
-                      >
-                        {/* start */}
-                        {item.position === "start" && (
-                          <Droppable
-                            droppableId={String(index)}
-                            isDropDisabled={showAnswer}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                                className={`WB-unit1-p8-q1-input ${
-                                  wrongInputs[index] ? "wrong-line" : ""
-                                }`}
-                                style={{
-                                  color: inputs[index] ? "#1C398E" : "#000",
-                                }}
-                              >
-                                {inputs[index]}
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-                        )}
-
-                        {item.position !== "middle" && item.pattern}
-
-                        {/* end */}
-                        {item.position === "end" && (
-                          <Droppable
-                            droppableId={String(index)}
-                            isDropDisabled={showAnswer}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                                className={`WB-unit1-p8-q1-input ${
-                                  wrongInputs[index] ? "wrong-line" : ""
-                                }`}
-                                style={{
-                                  color: inputs[index] ? "#1C398E" : "#000",
-                                }}
-                              >
-                                {inputs[index]}
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-                        )}
-
-                        {/* middle */}
-                        {item.position === "middle" && (
-                          <>
-                            {"ki"} {/* أول جزء */}
-                            <Droppable
-                              droppableId={String(index)}
-                              isDropDisabled={showAnswer}
-                            >
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.droppableProps}
-                                  className={`WB-unit1-p8-q1-input ${
-                                    wrongInputs[index] ? "wrong-line" : ""
-                                  }`}
-                                  style={{
-                                    color: inputs[index] ? "#1C398E" : "#000",
-                                  }}
-                                >
-                                  {inputs[index]}
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                            {"en"} {/* آخر جزء */}
-                          </>
-                        )}
-                      </span>
-
-                      {/* ✅ WrongMark INLINE */}
-                      {wrongInputs[index] && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            right: "-1px",
-                            top: "50%",
-                            marginLeft: 0,
-                          }}
+                    {item.position === "end" && (
+                      <>
+                        {item.pattern}
+                        <select
+                          value={inputs[index]}
+                          className={`${wrongInputs[index]&&locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
+                          onChange={(e) => handleChange(index, e.target.value)}
+                          disabled={showAnswer||locked}
                         >
-                          <WrongMark />
-                        </div>
-                      )}
+                          <option value="">...</option>
+                          {OPTIONS.map((o) => (
+                            <option key={o} value={o}>
+                              {o}
+                            </option>
+                          ))}
+                        </select>
+                      </>
+                    )}
+
+                    {item.position === "middle" && (
+                      <>
+                        {"ki"}
+                        <select
+                          value={inputs[index]}
+                          className={`${wrongInputs[index]&&locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
+                          onChange={(e) => handleChange(index, e.target.value)}
+                          disabled={showAnswer||locked}
+                        >
+                          <option value="">...</option>
+                          {OPTIONS.map((o) => (
+                            <option key={o} value={o}>
+                              {o}
+                            </option>
+                          ))}
+                        </select>
+                        {"en"}
+                      </>
+                    )}
+                  </span>
+
+                  {wrongInputs[index] && locked && (
+                    <div style={{ position: "absolute", right: "10px" }}>
+                      <WrongMark />
                     </div>
-                  </div>
+                  )}
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* ⭐ BUTTONS */}
         <div className="action-buttons-container">
           <button onClick={reset} className="try-again-button">
             Start Again ↻
           </button>
 
           <button
-            onClick={handleShowAnswer}
+            onClick={showCorrectAnswers}
             className="show-answer-btn swal-continue"
           >
             Show Answer
@@ -334,7 +217,7 @@ const Unit3_Page5_Q1 = () => {
           </button>
         </div>
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 

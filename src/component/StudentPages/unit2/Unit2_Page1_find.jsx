@@ -91,16 +91,20 @@ const Unit2_Page1_find = () => {
         style={{
           textAlign: "center",
           display: "flex",
-              borderRadius:"15px",
-
+gap:"30px",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
         <div
-          style={{ display: "flex", justifyContent: "center", width: "100%" }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          
+            width: "100%",
+          }}
         >
-          <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
+          <img src={Rabbit} style={{   height: "50px", width: "auto" }} />{" "}
           <h5 className="header-title-page8">
             I need your help. Can you help me find carriage in the picture?
           </h5>
@@ -114,6 +118,7 @@ const Unit2_Page1_find = () => {
               width: "auto",
               height: "70vh",
               cursor: "pointer",
+              borderRadius: "15px",
               display: "block",
             }}
           />

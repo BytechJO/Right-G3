@@ -119,10 +119,9 @@ const Unit4_Page5_Q2 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "30px",
-          justifyContent: "flex-start",
+          
+          gap: "50px",
+        
         }}
       >
         <h5 className="header-title-page8 pb-2.5">
@@ -131,19 +130,20 @@ const Unit4_Page5_Q2 = () => {
           </span>
           Look, read, and choose
         </h5>
-        <div className="grid grid-cols-2 gap-10 max-w-[1000px] w-full">
+        <div className="grid grid-cols-2 gap-20 w-full">
           {questions.map((q, qIndex) => (
             <div key={q.id} className="flex items-center gap-4">
-              <span style={{ fontWeight: "bold" }}>{q.id}</span>
+              <div className="flex gap-2 items-start">
+              <span className="text-[20px]" style={{ fontWeight: "bold" }}>{q.id}</span>
               {/* الصورة */}
               <img
                 src={q.image}
                 style={{
-                  width: "120px",
-                  height: "auto",
+                  width: "150px",
+                  height: "100%",
                 }}
               />
-
+</div>
               {/* الخيارات فوق بعض */}
               <div className="flex flex-col gap-2">
                 {q.options.map((opt, i) => {
@@ -165,7 +165,7 @@ const Unit4_Page5_Q2 = () => {
                       <span
                         style={{
                           color: "black",
-                          fontSize: "14px",
+                          fontSize: "18px",
                         }}
                       >
                         {opt}
@@ -189,24 +189,15 @@ const Unit4_Page5_Q2 = () => {
                           {/* ❌ X */}
                           {showResult && isWrong && (
                             <div
-                              style={{
-                                position: "absolute",
-                                top: "-6px",
-                                right: "-6px",
-                                width: "20px",
-                                height: "20px",
-                                background: "#ef4444",
-                                color: "white",
-                                borderRadius: "50%",
-                                fontSize: "12px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: "bold",
-                                border: "2px solid white",
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                pointerEvents: "none",
-                              }}
+                             className="absolute top-0 -right-3 -translate-y-1/2
+      w-[22px] h-[22px]
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-nonel"
                             >
                               ✕
                             </div>
@@ -222,27 +213,27 @@ const Unit4_Page5_Q2 = () => {
               <div
                 style={{
                   width: "1px", // ⭐ أهم تعديل
-                  height: "1.5em", // ⭐ مرتبط بالنص
+                  height: "80px", // ⭐ مرتبط بالنص
                   background: "#444",
                   alignSelf: "center",
                 }}
               />
 
               {/* الكلمة */}
-              <span className="text-[16px]">{q.word}</span>
+              <span className="text-[18px]">{q.word}</span>
 
               {/* الخط الثاني */}
               <div
                 style={{
                   width: "1px", // ⭐ أهم تعديل
-                  height: "1.5em", // ⭐ مرتبط بالنص
+                  height: "80px", // ⭐ مرتبط بالنص
                   background: "#444",
                   alignSelf: "center",
                 }}
               />
 
               {/* باقي الجملة */}
-              <span className="text-[16px]">{q.rest}</span>
+              <span className="text-[18px]">{q.rest}</span>
             </div>
           ))}
         </div>

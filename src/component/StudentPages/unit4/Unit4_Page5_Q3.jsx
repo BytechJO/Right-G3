@@ -4,7 +4,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex C 2.svg";
 
-const Unit4_Page5_Q3 = () => {
+const Page8_Q4 = () => {
   const grid = [
     [
       "t",
@@ -125,6 +125,17 @@ const Unit4_Page5_Q3 = () => {
 
     school2: [300 + 3, 300 + 4, 300 + 5, 300 + 6, 300 + 7, 300 + 8],
   };
+  const correctAnswers = [
+    { word: "the", order: 0 },
+    { word: "name", order: 1 },
+    { word: "of", order: 2 },
+    { word: "julias", order: 3 },
+    { word: "school1", order: 4 },
+    { word: "is", order: 5 },
+    { word: "london", order: 6 },
+    { word: "court", order: 7 },
+    { word: "school2", order: 8 },
+  ];
   const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
@@ -132,6 +143,17 @@ const Unit4_Page5_Q3 = () => {
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const fullSentence = [
+    "the",
+    "name",
+    "of",
+    "julias",
+    "school",
+    "is",
+    "london",
+    "court",
+    "school",
+  ];
 
   const handleMouseDown = (index) => {
     if (locked) return;
@@ -158,7 +180,20 @@ const Unit4_Page5_Q3 = () => {
       }
     }
   };
+  const displayedSentence = fullSentence.map((word, index) => {
+    const isFound = foundWords.some(
+      (foundWord) =>
+        correctAnswers.find((c) => c.word === foundWord)?.order === index,
+    );
 
+    const SLOT_LENGTH = 8;
+
+    if (isFound) {
+      return word.padEnd(SLOT_LENGTH, "");
+    }
+
+    return "_".repeat(SLOT_LENGTH);
+  });
   const handleTouchMove = (e) => {
     if (!isDragging || locked) return;
     e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
@@ -202,6 +237,7 @@ const Unit4_Page5_Q3 = () => {
 
   const reset = () => {
     setSelected([]);
+    setCurrentWord("");
     setFoundWords([]);
     setColoredCells([]);
     setSentence("");
@@ -210,15 +246,16 @@ const Unit4_Page5_Q3 = () => {
 
   const showAnswers = () => {
     let allCells = [];
-    wordsToFind.forEach((word) => {
-      if (correctPositions[word.id]) {
-        allCells.push(...correctPositions[word.id]);
+    wordsToFind.forEach((item) => {
+      if (correctPositions[item.id]) {
+        allCells.push(...correctPositions[item.id]);
       }
     });
-    setFoundWords(wordsToFind.map(w => w.id));
+    setFoundWords(wordsToFind.map((item) => item.id));
     setColoredCells(allCells);
     setSelected([]);
-    setSentence(wordsToFind.map(w => w.word).join(" "));
+    setCurrentWord("");
+    setSentence(wordsToFind.map((item) => item.word).join(" "));
     setLocked(true);
   };
 
@@ -255,6 +292,7 @@ const Unit4_Page5_Q3 = () => {
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
+
         width: "100%",
         boxSizing: "border-box",
       }}
@@ -268,33 +306,32 @@ const Unit4_Page5_Q3 = () => {
           page 29?
         </h5>
 
-        {/* Words List */}
+        {/* Words List
         <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((word) => (
+          {wordsToFind.map((item) => (
             <span
-              key={word.id}
-              className={`px-3 py-1.5 rounded-[10px] border-2 border-[#2c5287] font-semibold transition duration-200 ${
-                foundWords.includes(word.id)
-                  ? "bg-[#2c5287] text-white border-[#2c5287]"
+              key={item.id}
+              className={`px-3 py-1.5 rounded-[10px] border-2 border-blue-800 ${
+                foundWords.includes(item.id)
+                  ? "bg-[#2c5287] text-white"
                   : "bg-white text-black"
               }`}
-              style={{ fontSize: "clamp(12px, 2vw, 15px)" }}
             >
-              {word.word}
+              {item.word}
             </span>
           ))}
-        </div>
+        </div> */}
 
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
           {/* Grid Wrapper */}
           <div
-            className="border-2 border-[#f28c63] px-4 pt-4 pb-5"
+            className="px-4 pt-4 pb-5"
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px]"
+              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10"
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -351,15 +388,7 @@ const Unit4_Page5_Q3 = () => {
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                marginTop: "15px",
-              }}
-            >
+            <div className="flex justify-center items-center">
               <img
                 src={img1}
                 alt="start"
@@ -369,27 +398,12 @@ const Unit4_Page5_Q3 = () => {
                 }}
               />
 
-              <div
-                style={{
-                  flex: 1,
-                  borderBottom: "2px solid black",
-                  height: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  value={sentence}
-                  readOnly
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontSize: "clamp(14px, 2vw, 18px)", // 🔥 حجم خط ديناميكي للإجابة
-                  }}
-                />
-              </div>
+              <input
+                className="answer-input-CB-unit3-p5-q4"
+                value={displayedSentence.join(" ")}
+                readOnly
+                style={{ fontFamily: "monospace" }} // 🔥 مهم جدا
+              />
 
               <img
                 src={img2}
@@ -414,4 +428,4 @@ const Unit4_Page5_Q3 = () => {
   );
 };
 
-export default Unit4_Page5_Q3;
+export default Page8_Q4;

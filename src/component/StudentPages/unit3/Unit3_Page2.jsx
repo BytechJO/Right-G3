@@ -15,32 +15,18 @@ import Bebo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.1_Bebo.mp3"
 import Lolo from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Lolo.mp3";
 import along from "../../../assets/audio/ClassBook/Unit 3/P 23/along.mp3";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Asset 30.svg";
-
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Asset 30.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 22-23/Asset 31.svg";
 import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
-import shopkeeper1 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.2_Shopkeeper.mp3";
-import Lala1 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.3_Lala.mp3";
-import shopkeeper2 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.4_Shopkeeper.mp3";
-import Lala2 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.5_Lala.mp3";
-import shopkeeper3 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.6_Shopkeeper.mp3";
-import Lala3 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.7_Lala.mp3";
-import shopkeeper4 from "../../../assets/audio/ClassBook/Unit 3/P 23/Pg23_1.8_Shopkeeper.mp3";
 
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 import AudioWithCaption from "../../AudioWithCaption";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
-// import sound1 from "../../../assets/img_unit3/sounds-unit3/U2-06.mp3";
-// import sound2 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
-// import sound3 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
-// import sound4 from "../../../assets/img_unit3/sounds-unit3/U2-07.mp3";
 
 import "./Unit3_Page2.css";
 import ReadChoose from "../../ReadChoose";
 const Unit3_Page2 = ({ openPopup }) => {
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
-  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+
   const audioRef = useRef(null);
   // أصوات الصور
   const imageSounds = [

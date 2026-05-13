@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Unit3_Page6_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 const data = [
   {
     id: 1,
@@ -110,11 +111,7 @@ const Unit3_Page6_Q2 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          // gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
+          gap: "30px",
         }}
       >
         <h5 className="header-title-page8">
@@ -145,15 +142,13 @@ const Unit3_Page6_Q2 = () => {
                 {/* TRUE */}
                 <div
                   onClick={() => handleSelect(q.id, true)}
-                  className={`relative w-8 h-8 border-2 rounded-md cursor-pointer flex items-center justify-center
-    ${
-      selected[q.id] === true
-        ? "border-blue-700 text-blue-700"
-        : "border-orange-400"
-    }`}
+                  className={`relative w-[45px] h-[45px] border-2 rounded-md cursor-pointer flex items-center justify-center
+    ${selected[q.id] === true ? showResult &&
+                    selected[q.id] === true &&
+                    q.correct !== true? "border-red-500": "border-orange-400" : "border-gray-300"}`}
                 >
                   {selected[q.id] === true && (
-                    <span className="font-bold">✓</span>
+                    <img src={trueIcon} style={{ height: "25px" }} />
                   )}
 
                   {/* ❌ WRONG */}
@@ -161,19 +156,15 @@ const Unit3_Page6_Q2 = () => {
                     selected[q.id] === true &&
                     q.correct !== true && (
                       <span
-                        style={{
-                          marginLeft: "6px",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "18px",
-                          height: "18px",
-                          background: "#ef4444",
-                          color: "white",
-                          borderRadius: "50%",
-                          fontSize: "12px",
-                        }}
-                        className="absolute -top-2 -right-2 text-red-500 text-xs shadow-2xl"
+                        className="absolute top-0 -right-3 -translate-y-1/2
+      w-[22px] h-[22px]
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-nonel"
                       >
                         ✕
                       </span>
@@ -183,15 +174,13 @@ const Unit3_Page6_Q2 = () => {
                 {/* FALSE */}
                 <div
                   onClick={() => handleSelect(q.id, false)}
-                  className={`relative w-8 h-8 border-2 rounded-md cursor-pointer flex items-center justify-center
-    ${
-      selected[q.id] === false
-        ? "border-blue-700 text-blue-700"
-        : "border-orange-400"
-    }`}
+                  className={`relative  w-[45px] h-[45px] border-2 rounded-md cursor-pointer flex items-center justify-center
+    ${selected[q.id] === false ? showResult &&
+                    selected[q.id] === false &&
+                    q.correct !== false ?  "border-red-500": "border-orange-400" : "border-gray-300"} `}
                 >
                   {selected[q.id] === false && (
-                    <span className="font-bold">✗</span>
+                    <img src={falseIcon} style={{ height: "25px" }} />
                   )}
 
                   {/* ❌ WRONG */}
@@ -199,19 +188,15 @@ const Unit3_Page6_Q2 = () => {
                     selected[q.id] === false &&
                     q.correct !== false && (
                       <span
-                        style={{
-                          marginLeft: "6px",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "18px",
-                          height: "18px",
-                          background: "#ef4444",
-                          color: "white",
-                          borderRadius: "50%",
-                          fontSize: "12px",
-                        }}
-                        className="absolute -top-2 -right-2 text-red-500 text-xs shadow-2xl"
+                        className="absolute top-0 -right-3 -translate-y-1/2
+      w-[22px] h-[22px]
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-nonel"
                       >
                         ✕
                       </span>

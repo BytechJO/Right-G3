@@ -23,7 +23,7 @@ const Unit3_Page3 = ({ openPopup }) => {
 
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
+
   const captionsExample = [
     {
       start: 0.0,
@@ -118,11 +118,11 @@ const Unit3_Page3 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 6.5, y1: 10, x2: 49, y2: 15.0, sound: sound1 },
-    { x1: 53, y1: 9, x2: 92, y2: 15, sound: sound2 },
-    { x1: 6.5, y1: 15.8, x2: 49, y2: 29, sound: sound3 },
-    { x1: 53.5, y1: 16.7, x2: 92, y2: 27.8, sound: sound4 },
-    { x1: 5.5, y1: 29, x2: 37, y2: 34, sound: sound5 },
+    { x1: 6.28, y1: 8.50, x2: 47.21, y2: 14.77, sound: sound1 },
+    { x1: 53, y1: 9, x2: 92.84, y2: 14.77, sound: sound2 },
+    { x1: 6.28, y1: 16.86, x2: 46.80, y2: 27.14, sound: sound3 },
+    { x1: 53.5, y1: 16.7, x2: 92.84, y2: 27.8, sound: sound4 },
+    { x1: 5.5, y1: 29.55, x2: 37, y2: 34, sound: sound5 },
     { x1: 25.5, y1: 35, x2:51.5, y2: 38.5, sound: sound6 },
     { x1: 53.5, y1: 30, x2:94, y2: 34, sound: sound7 },
     { x1: 67, y1: 57.9, x2:93.5, y2: 61.5, sound: sound8 },

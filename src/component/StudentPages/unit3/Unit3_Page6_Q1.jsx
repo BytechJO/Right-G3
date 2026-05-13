@@ -119,10 +119,10 @@ export default function CircleQuestions() {
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
-        paddingBottom: "120px",
+        // paddingBottom: "120px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "10px" }}>
         <h5 className="header-title-page8 pb-2.5">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             D
@@ -135,7 +135,7 @@ export default function CircleQuestions() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr", // 🔥 عمودين
-            gap: "40px 60px",
+            gap: "20px 60px",
             width: "100%",
             maxWidth: "900px",
           }}
@@ -143,40 +143,33 @@ export default function CircleQuestions() {
           {questions.map((q) => (
             <div
               key={q.id}
-              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                flexDirection: "column",
+                gap: "10px",
+              }}
             >
               {/* QUESTION */}
               <div
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                <span style={{ fontWeight: "bold", color: "#2c5287" }}>
+                <span className="text-[20px]" style={{ fontWeight: "bold" }}>
                   {q.id}
                 </span>
-                <span>{q.text}</span>
+                <span className="text-[18px]">{q.text}</span>
               </div>
 
               {/* IMAGE */}
-              <div
+
+              <img
+                src={q.image}
                 style={{
-                  width: "100%",
-                  maxWidth: "400px",
-                  aspectRatio: "16 / 9",
-                  border: "3px solid orange",
-                  borderRadius: "12px",
-                  overflow: "hidden",
+                  width: "auto",
+                  height: "110px",
                 }}
-              >
-                <img
-                  src={q.image}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center top",
-                    transform: "scale(1.1)", // 🔥 الحل
-                  }}
-                />
-              </div>
+              />
+
               {/* OPTIONS */}
               <div
                 style={{
@@ -194,22 +187,22 @@ export default function CircleQuestions() {
                       key={i}
                       onClick={() => handleSelect(q.id, opt)}
                       style={{
-                        cursor: "pointer",
-                        padding: "8px 16px",
+                        cursor: showResult ? "default" : "pointer",
+                        padding: "5px 10px",
                         borderRadius: "25px",
-                        border: "2px solid",
+                        // border: "2px solid",
                         width: "fit-content",
                         fontSize: "16px",
-
-                        borderColor: isSelected
+                        position: "relative",
+                        border: isSelected
                           ? showResult
                             ? isCorrect
-                              ? "#1C398E"
-                              : "red"
-                            : "#1C398E"
-                          : "#ccc",
+                              ? "1px solid #f39b42"
+                              : "2px solid red"
+                            : "1px solid #f39b42"
+                          : "1px solid transparent",
 
-                        color: isSelected ? "#1C398E" : "black",
+                        // color: isSelected ? "#1C398E" : "black",
 
                         background: "#fff",
                       }}
@@ -219,18 +212,15 @@ export default function CircleQuestions() {
                       {/* ❌ WRONG */}
                       {showResult && isSelected && !isCorrect && (
                         <span
-                          style={{
-                            marginLeft: "6px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "18px",
-                            height: "18px",
-                            background: "#ef4444",
-                            color: "white",
-                            borderRadius: "50%",
-                            fontSize: "12px",
-                          }}
+                          className={`absolute top-0 right-0  -translate-y-1/2
+      w-[22px] h-[22px]
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-none`}
                         >
                           ✕
                         </span>

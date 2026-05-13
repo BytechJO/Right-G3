@@ -282,7 +282,7 @@ const ModernVocabularyComponent = ({
                     src={nums[i]}
                     alt={`num-${i + 1}`}
                     className="w-full h-full"
-                    style={{ height: "25px" }}
+                    style={{ height: "22px" }}
                   />
 
                   {(activeIndex2 === i ||

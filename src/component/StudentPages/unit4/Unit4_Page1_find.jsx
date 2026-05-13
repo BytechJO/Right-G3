@@ -70,6 +70,8 @@ console.log("X",xPercent,"y",yPercent);
         style={{
           textAlign: "center",
           display: "flex",
+                    gap:"30px",
+
           flexDirection: "column",
           alignItems: "center",
         }}
@@ -88,8 +90,10 @@ console.log("X",xPercent,"y",yPercent);
             alt="interactive"
             style={{
               width: "auto",
-              height: "95vh",
+              height: "70vh",
               cursor: "pointer",
+                             borderRadius:"15px",
+
               display: "block",
             }}
             onClick={handleImageClick}

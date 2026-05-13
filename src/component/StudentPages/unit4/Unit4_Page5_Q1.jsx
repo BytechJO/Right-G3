@@ -39,7 +39,6 @@ const Unit4_Page5_Q1 = () => {
 
   const handleCheck = () => {
     if (locked || showAnswer) return;
-    if (locked || showAnswer) return;
 
     const totalCorrect = words.filter((w) => w.correct).length;
 
@@ -59,25 +58,35 @@ const Unit4_Page5_Q1 = () => {
       }
     });
 
+    // 🔥 خصم عدد الإجابات الخاطئة
+    let finalScore = correctCount - wrong.length;
+
+    // 🔥 ما ينزل تحت الصفر
+    if (finalScore < 0) {
+      finalScore = 0;
+    }
+
     setWrongWords(wrong);
     setLocked(true);
 
     const color =
-      correctCount === totalCorrect
+      finalScore === totalCorrect
         ? "green"
-        : correctCount === 0
+        : finalScore === 0
           ? "red"
           : "orange";
 
     ValidationAlert[
-      correctCount === totalCorrect
+      finalScore === totalCorrect
         ? "success"
-        : correctCount === 0
+        : finalScore === 0
           ? "error"
           : "warning"
-    ](`<b style="color:${color}">Score: ${correctCount} / ${totalCorrect}</b>`);
-
-    setLocked(true);
+    ](
+      `
+      Score: ${finalScore} / ${totalCorrect}
+    `,
+    );
   };
 
   const handleShowAnswer = () => {
@@ -106,164 +115,150 @@ const Unit4_Page5_Q1 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
           gap: "30px",
-          justifyContent: "flex-start",
         }}
       >
-        <div className="unscramble-container">
-          <h5 className="header-title-page8 pb-2.5">
-            <span className="ex-A" style={{ marginRight: "10px" }}>
-              A
-            </span>
-            Follow the words with the
-            <span style={{ color: "#2e3192" }}>voiced th</span>sound.
-          </h5>
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            A
+          </span>
+          Follow the words with the
+          <span style={{ color: "#2e3192" }}>voiced th</span>sound.
+        </h5>
 
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            maxWidth: "1000px", // ⭐ تحكم بالحجم العام
+            margin: "0 auto",
+          }}
+        >
+          {/* الصورة */}
+          <img
+            src={image}
+            alt="interactive"
+            style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
+            }}
+          />
+          {/* START */}
           <div
             style={{
-              position: "relative",
-              width: "100%",
-              maxWidth: "1000px", // ⭐ تحكم بالحجم العام
-              margin: "0 auto",
+              position: "absolute",
+              top: "10.53%",
+              left: "10.18%",
+              transform: "translate(-50%, -50%) rotate(-15deg)",
+              fontSize: "clamp(20px, 1vw, 16px)",
+              fontWeight: "bold",
+              pointerEvents: "none",
             }}
           >
-            {/* الصورة */}
-            <img
-              src={image}
-              alt="interactive"
-              style={{
-                width: "100%",
-                height: "auto",
-                display: "block",
-              }}
-            />
-            {/* START */}
-            <div
-              style={{
-                position: "absolute",
-                top: "10.53%",
-                left: "10.18%",
-                transform: "translate(-50%, -50%) rotate(-15deg)",
-                fontSize: "clamp(20px, 1vw, 16px)",
-                fontWeight: "bold",
-                pointerEvents: "none",
-              }}
-            >
-              Start
-            </div>
+            Start
+          </div>
 
-            {/* FINISH */}
-            <div
-              style={{
-                position: "absolute",
-                top: "82.75%",
-                left: "88.65%",
-                transform: "translate(-50%, -50%) rotate(-15deg)",
-                fontSize: "clamp(20px, 1vw, 16px)",
-                fontWeight: "bold",
-                pointerEvents: "none",
-              }}
-            >
-              Finish
-            </div>
-            {/* ✅ الدوائر */}
-            {selected.map((word, i) => {
-              const isWrong = wrongWords.includes(word.id);
+          {/* FINISH */}
+          <div
+            style={{
+              position: "absolute",
+              top: "82.75%",
+              left: "88.65%",
+              transform: "translate(-50%, -50%) rotate(-15deg)",
+              fontSize: "clamp(20px, 1vw, 16px)",
+              fontWeight: "bold",
+              pointerEvents: "none",
+            }}
+          >
+            Finish
+          </div>
+          {/* ✅ الدوائر */}
+          {selected.map((word, i) => {
+            const isWrong = wrongWords.includes(word.id);
 
-              return (
-                <div
-                  key={i}
-                  style={{
-                    position: "absolute",
-                    top: word.top,
-                    left: word.left,
-                    width: "10%",
-                    height: "16%",
-                    border: `0.2vw solid ${isWrong ? "red" : "#1C398E"}`, // 🔥 التغيير
-                    borderRadius: "50%",
-                    transform: "translate(-50%, -50%)",
-                    pointerEvents: "none",
-                    zIndex: 5,
-                  }}
-                >
-                  {/* ❌ X */}
-                  {isWrong && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "-6px",
-                        right: "-6px",
-                        width: "20px",
-                        height: "20px",
-                        background: "#ef4444",
-                        color: "white",
-                        borderRadius: "50%",
-                        fontSize: "12px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      ✕
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* ✅ مناطق الضغط */}
-            {words.map((word, i) => {
-              return (
-                <div
-                  key={i}
-                  onClick={() => handleClick(word)}
-                  style={{
-                    position: "absolute",
-                    top: word.top,
-                    left: word.left,
-                    transform: "translate(-50%, -50%)",
-                    fontSize: "clamp(10px, 1vw, 16px)",
-                    padding: "0.2vw 0.6vw",
-                    borderRadius: "0.5vw",
-                    whiteSpace: "nowrap",
-                    cursor: "pointer",
-
-                    // 🔥 هذا المهم
-                    border: "0.2vw solid orange",
-                  }}
-                >
-                  {word.id}
-                </div>
-              );
-            })}
-
-            {/* ✅ الكلمات */}
-            {words.map((word, i) => (
+            return (
               <div
                 key={i}
                 style={{
                   position: "absolute",
                   top: word.top,
                   left: word.left,
+                  width: "10%",
+                  height: "16%",
+                  border: `0.2vw solid ${isWrong ? "red" : "#1C398E"}`, // 🔥 التغيير
+                  borderRadius: "50%",
                   transform: "translate(-50%, -50%)",
-                  fontSize: "clamp(10px, 1vw, 16px)", // ⭐ responsive ذكي
-                  background: "white",
+                  pointerEvents: "none",
+                  zIndex: 5,
+                }}
+              >
+                {/* ❌ X */}
+                {isWrong && (
+                  <div
+                    className="absolute top-2 -right-2 -translate-y-1/2
+      w-[22px] h-[22px]
+rounded-full
+bg-[red] text-white
+flex items-center justify-center
+text-[12px] font-bold
+border-2 border-white
+shadow-[0_2px_6px_rgba(0,0,0,0.2)]
+pointer-events-nonel"
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* ✅ مناطق الضغط */}
+          {words.map((word, i) => {
+            return (
+              <div
+                key={i}
+                onClick={() => handleClick(word)}
+                style={{
+                  position: "absolute",
+                  top: word.top,
+                  left: word.left,
+                  transform: "translate(-50%, -50%)",
+                  fontSize: "clamp(10px, 1vw, 16px)",
                   padding: "0.2vw 0.6vw",
                   borderRadius: "0.5vw",
                   whiteSpace: "nowrap",
-                  pointerEvents: "none",
+                  cursor: "pointer",
+
+                  // 🔥 هذا المهم
+                  border: "0.2vw solid orange",
                 }}
               >
                 {word.id}
               </div>
-            ))}
-          </div>
+            );
+          })}
+
+          {/* ✅ الكلمات */}
+          {words.map((word, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                top: word.top,
+                left: word.left,
+                transform: "translate(-50%, -50%)",
+                fontSize: "clamp(10px, 1vw, 16px)", // ⭐ responsive ذكي
+                background: "white",
+                padding: "0.2vw 0.6vw",
+                borderRadius: "0.5vw",
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+              }}
+            >
+              {word.id}
+            </div>
+          ))}
         </div>
       </div>
 
