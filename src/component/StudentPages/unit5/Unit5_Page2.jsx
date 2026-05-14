@@ -6,8 +6,8 @@ import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At 
 import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 40-41/1-08.svg";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import soundListen from "../../../assets/audio/ClassBook/Unit 5/P 41/unit5-pg41-reading.mp3";
-import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 40-41/Asset 35.svg";
-import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 40-41/Asset 36.svg";
+import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 40-41/Asset 36.svg";
+import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 40-41/Asset 35.svg";
 import sound1_letter from "../../../assets/audio/ClassBook/Unit 5/P 41/Pg41_2.1_Adult Lady.mp3";
 import sound2_letter from "../../../assets/audio/ClassBook/Unit 5/P 41/Pg41_2.2_Adult Lady.mp3";
 import sound3_letter from "../../../assets/audio/ClassBook/Unit 5/P 41/Pg41_2.3_Adult Lady.mp3";

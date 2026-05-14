@@ -1,21 +1,10 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Review6_Page2_Q2.css";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const Review6_Page1_Q3 = () => {
-  const wordBank = [
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-  ];
+  const months = ["June", "July", "August", "September", "October"];
+
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
   const correctAnswers = [
     ["June", "Monday"],
@@ -30,17 +19,12 @@ const Review6_Page1_Q3 = () => {
   const [showCorrect, setShowCorrect] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
 
-  // ================= DRAG =================
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination) return;
-
-    const value = draggableId.replace("word-", "");
-    const [qIndex, blankIndex] = destination.droppableId.split("-");
+  // ================= CHANGE =================
+  const handleChange = (qIndex, blankIndex, value) => {
+    if (showCorrect) return;
 
     const updated = [...answers];
     updated[qIndex][blankIndex] = value;
-
     setAnswers(updated);
   };
 
@@ -66,7 +50,7 @@ const Review6_Page1_Q3 = () => {
     if (showCorrect) return;
 
     if (answers.some((q) => q.includes(""))) {
-      ValidationAlert.info("Oops!", "Please complete all answers.");
+      ValidationAlert.info("Please complete all answers.");
       return;
     }
 
@@ -102,195 +86,157 @@ const Review6_Page1_Q3 = () => {
     else ValidationAlert.warning(msg);
   };
 
-  const usedWords = answers.flat().filter(Boolean);
-
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col items-center p-8">
-        <div className="div-forall w-[60%]">
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>C</span>
-            Read and write.
-          </h5>
+    <div className="flex flex-col items-center p-8">
+      <div className="div-forall w-[60%]">
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>C</span>
+          Read and write.
+        </h5>
 
-          {/* 🔵 MONTHS */}
-          <Droppable droppableId="months" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-3 p-3 border-2 border-dashed rounded-xl mt-5 justify-center"
-              >
-                {wordBank
-                  .filter((w) =>
-                    ["June", "July", "August", "September", "October"].includes(
-                      w,
-                    ),
-                  )
-                  .map((word, index) => {
-                    const isUsed = usedWords.includes(word);
-
-                    return (
-                      <Draggable
-                        key={word}
-                        draggableId={`word-${word}`}
-                        index={index}
-                        isDragDisabled={isUsed}
-                      >
-                        {(provided) => (
-                          <span
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              padding: "7px 14px",
-                              border: "2px solid #2c5287",
-                              borderRadius: "8px",
-                              background: "white",
-                              fontWeight: "bold",
-                              cursor: isUsed ? "not-allowed" : "grab",
-                              opacity: isUsed ? 0.4 : 1,
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            {word}
-                          </span>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                {provided.placeholder}
+        {/* QUESTIONS */}
+        <div className="mt-10 space-y-30 text-[22px]">
+          {[0, 1].map((qIndex) => (
+            <div key={qIndex}>
+              <div className="mb-2">
+                <b>{qIndex + 1}</b>{" "}
+                {qIndex === 0
+                  ? "It is the sixth month of the year and the second day of the week."
+                  : "It is the ninth month of the year and the fifth day of the week."}
               </div>
-            )}
-          </Droppable>
 
-          {/* 🟢 DAYS */}
-          <Droppable droppableId="days" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="flex gap-3 p-3 border-2 border-dashed rounded-xl mt-3 justify-center"
-              >
-                {wordBank
-                  .filter((w) =>
-                    [
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                    ].includes(w),
-                  )
-                  .map((word, index) => {
-                    const isUsed = usedWords.includes(word);
+              <div className="flex items-center gap-2 flex-wrap">
+                <span>The month is</span>
 
-                    return (
-                      <Draggable
-                        key={word}
-                        draggableId={`word-${word}`}
-                        index={index}
-                        isDragDisabled={isUsed}
-                      >
-                        {(provided) => (
-                          <span
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              padding: "7px 14px",
-                              border: "2px solid #2c5287",
-                              borderRadius: "8px",
-                              background: "white",
-                              fontWeight: "bold",
-                              cursor: isUsed ? "not-allowed" : "grab",
-                              opacity: isUsed ? 0.4 : 1,
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            {word}
-                          </span>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+                {/* MONTH DROPDOWN */}
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <select
+                  disabled={showCorrect}
+                    value={answers[qIndex][0]}
+                    onChange={(e) => handleChange(qIndex, 0, e.target.value)}
+                    style={{
+                      borderBottom:
+                        showCorrect && wrongMarks.includes(`${qIndex}-0`)
+                          ? "2px solid red"
+                          : "1px solid black",
+                      fontWeight: "bold",
+                      outline:"none",
+                      padding: "4px",
+                      // color: "#1C398E",
+                    }}
+                  >
+                    <option value=""></option>
+                    {months.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
 
-          {/* 🟢 QUESTIONS */}
-          <div className="mt-10 space-y-8 text-lg">
-            {[0, 1].map((qIndex) => (
-              <div key={qIndex}>
-                <div className="mb-2">
-                  <b>{qIndex + 1}</b>{" "}
-                  {qIndex === 0
-                    ? "It is the sixth month of the year and the second day of the week."
-                    : "It is the ninth month of the year and the fifth day of the week."}
+                  {/* ✕ icon */}
+                  {showCorrect && wrongMarks.includes(`${qIndex}-0`) && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "-8px",
+                        right: "-8px",
+                       width: "24px",
+                        height: "24px",
+                        background: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ✕
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span>The month is</span>
+                <span>, and the day is</span>
 
-                  {[0, 1].map((blankIndex) => {
-                    const id = `${qIndex}-${blankIndex}`;
-                    const isWrong = wrongMarks.includes(id);
+                {/* DAY DROPDOWN */}
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <select
+                    value={answers[qIndex][1]}
+                    disabled={showCorrect}
+                    onChange={(e) => handleChange(qIndex, 1, e.target.value)}
+                    style={{
+                      borderBottom:
+                        showCorrect && wrongMarks.includes(`${qIndex}-1`)
+                          ? "2px solid red"
+                          : "1px solid black",
+                      fontWeight: "bold",
+                      outline:"none",
+                      padding: "4px",
+                      // color: "#1C398E",
+                    }}
+                  >
+                    <option value=""></option>
+                    {days.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
 
-                    return (
-                      <React.Fragment key={id}>
-                        <Droppable droppableId={id}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                              className="relative min-w-[140px] border-b-2 px-2 font-bold text-[#1C398E]"
-                              style={{
-                                borderColor: isWrong ? "red" : "black",
-                              }}
-                            >
-                              {answers[qIndex][blankIndex]}
-                              {provided.placeholder}
-
-                              {showCorrect && isWrong && (
-                                <span className="absolute -right-1 top-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
-                                  ✕
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </Droppable>
-
-                        {blankIndex === 0 && <span>, and the day is</span>}
-                      </React.Fragment>
-                    );
-                  })}
-
-                  <span>.</span>
+                  {showCorrect && wrongMarks.includes(`${qIndex}-1`) && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "-8px",
+                        right: "-8px",
+                        width: "24px",
+                        height: "24px",
+                        background: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ✕
+                    </span>
+                  )}
                 </div>
 
-                <div className="border-b mt-2"></div>
+                <span>.</span>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* BUTTONS */}
-        <div className="action-buttons-container">
-          <button onClick={resetAll} className="try-again-button">
-            Start Again ↻
-          </button>
-
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
+              <div className="border-b mt-2"></div>
+            </div>
+          ))}
         </div>
       </div>
-    </DragDropContext>
+
+      {/* BUTTONS */}
+      <div className="action-buttons-container mt-6">
+        <button onClick={resetAll} className="try-again-button">
+          Start Again ↻
+        </button>
+
+        <button onClick={showAnswers} className="show-answer-btn">
+          Show Answer
+        </button>
+
+        <button onClick={checkAnswers} className="check-button2">
+          Check Answer ✓
+        </button>
+      </div>
+    </div>
   );
 };
 

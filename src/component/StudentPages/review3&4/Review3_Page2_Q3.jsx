@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import WrongMark from "../../WrongMark";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 6.svg";
+
 const items = [
   {
     sentence: "pcaeh",
@@ -47,63 +49,125 @@ const items = [
 ];
 
 export default function Review3_Page2_Q3() {
-  // ✨ كل كلمة string بدل array
-  const [answers, setAnswers] = useState(
-    items.map((item) => Array(item.correct[0].length).fill("")),
+  const [answers, setAnswers] = useState(items.map(() => []));
+  const [hoveredWord, setHoveredWord] = useState(null);
+  // ✅ بنك الحروف مع حالة used
+  const [letterBank, setLetterBank] = useState(
+    items.map((item) =>
+      item.scrambled[0].split("").map((l) => ({
+        value: l,
+        used: false,
+      })),
+    ),
   );
 
   const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   const onDragEnd = (result) => {
-    const { destination, draggableId, source } = result;
+    const { source, destination } = result;
     if (!destination || locked) return;
 
-    const letterId = draggableId;
-    const letter = letterId.split("-")[0];
+    if (
+      source.droppableId.startsWith("bank") &&
+      destination.droppableId.startsWith("slot")
+    ) {
+      const sourceIndex = Number(source.droppableId.split("-")[1]);
+      const destIndex = Number(destination.droppableId.split("-")[1]);
 
-    // إذا سحب داخل نفس المكان → تجاهل
-    if (destination.droppableId === source.droppableId) return;
+      // ❌ منع السحب بين الكلمات
+      if (sourceIndex !== destIndex) return;
 
-    // إذا drop على slot
-    if (destination.droppableId.startsWith("slot")) {
-      const [, qIndex, letterIndex] = destination.droppableId.split("-");
+      const updatedAnswers = [...answers];
+      const updatedBank = [...letterBank];
 
-      const updated = [...answers];
+      const letterObj = updatedBank[sourceIndex][source.index];
 
-      // 🔁 إذا في حرف قديم → احذفه (عشان يرجع يتفعل بالبنك)
-      updated[qIndex][letterIndex] = {
-        char: letter,
-        id: letterId,
-      };
+      // ❌ إذا مستخدم
+      if (letterObj.used) return;
 
-      setAnswers(updated);
+      // ❌ إذا امتلأت الكلمة
+      if (
+        updatedAnswers[destIndex].length >= items[destIndex].correct[0].length
+      ) {
+        return;
+      }
+
+      // ✅ أضف الحرف
+      updatedAnswers[destIndex] = [
+        ...updatedAnswers[destIndex],
+        letterObj.value,
+      ];
+
+      // ✅ علّمه مستخدم
+      updatedBank[sourceIndex][source.index].used = true;
+
+      setAnswers(updatedAnswers);
+      setLetterBank(updatedBank);
     }
   };
 
-  const resetAll = () => {
-    setAnswers(items.map((item) => Array(item.correct[0].length).fill("")));
-    setLocked(false);
-    setShowResult(false);
-  };
+  // ✅ حذف حرف وإرجاعه للبنك
+ const handleRemoveLetter = (questionIndex, letterIndex) => {
+  if (locked) return;
 
-  const showAnswers = () => {
-    setAnswers(
+  const updatedAnswers = [...answers];
+  const updatedBank = [...letterBank];
+
+  const removedLetter = updatedAnswers[questionIndex][letterIndex];
+
+  updatedAnswers[questionIndex].splice(letterIndex, 1);
+
+  // رجّع أول حرف مطابق
+  const bankLetters = updatedBank[questionIndex];
+
+  const indexToEnable = bankLetters.findIndex(
+    (l) => l.value === removedLetter && l.used === true
+  );
+
+  if (indexToEnable !== -1) {
+    bankLetters[indexToEnable].used = false;
+  }
+
+  setAnswers(updatedAnswers);
+  setLetterBank(updatedBank);
+};
+
+  const resetAll = () => {
+    setAnswers(items.map(() => []));
+    setLetterBank(
       items.map((item) =>
-        item.correct[0].split("").map((char, index) => ({
-          char,
-          id: `answer-${index}`,
+        item.scrambled[0].split("").map((l) => ({
+          value: l,
+          used: false,
         })),
       ),
     );
-    setLocked(true);
-    setShowResult(true);
+    setLocked(false);
+    setChecked(false);
   };
 
+  const showAnswers = () => {
+    // حط الإجابات
+    setAnswers(items.map((item) => item.correct[0].split("")));
+
+    // 🔥 خلّي كل الحروف used
+    const updatedBank = items.map((item) =>
+      item.scrambled[0].split("").map((l) => ({
+        value: l,
+        used: true,
+      })),
+    );
+
+    setLetterBank(updatedBank);
+
+    setLocked(true);
+    setChecked(true);
+  };
   const checkAnswers = () => {
     if (locked) return;
 
-    const empty = answers.some((row) => row.some((word) => word === ""));
+    const empty = answers.some((letters) => letters.length === 0);
 
     if (empty) {
       ValidationAlert.info("Please complete all answers.");
@@ -112,18 +176,20 @@ export default function Review3_Page2_Q3() {
 
     let score = 0;
 
-    answers.forEach((row, i) => {
-      if (row.map((l) => l.char).join("") === items[i].correct[0]) {
+    answers.forEach((letters, i) => {
+      if (letters.join("") === items[i].correct[0]) {
         score++;
       }
     });
 
     const total = items.length;
 
+    let color = score === total ? "green" : score === 0 ? "red" : "orange";
+
     const message = `
-      <div style="font-size:20px;text-align:center;">
-        <span style="color:#2e7d32;font-weight:bold;">
-          Score: ${score} / ${total}
+      <div style="font-size: 20px; text-align:center; margin-top: 8px;">
+        <span style="color:${color}; font-weight:bold;">
+          Score: ${score} /${total}
         </span>
       </div>
     `;
@@ -132,181 +198,114 @@ export default function Review3_Page2_Q3() {
     else if (score === 0) ValidationAlert.error(message);
     else ValidationAlert.warning(message);
 
-    setShowResult(true);
     setLocked(true);
+    setChecked(true);
   };
+const addLetter = (letter, questionIndex, letterIndex) => {
+  if (locked) return;
 
+  const updatedAnswers = [...answers];
+  const updatedBank = [...letterBank];
+
+  // إذا الحرف مستخدم بالفعل
+  if (updatedBank[questionIndex][letterIndex].used) return;
+
+  // إذا الامتلاء
+  if (updatedAnswers[questionIndex].length >= items[questionIndex].correct[0].length)
+    return;
+
+  // إضافة الحرف
+  updatedAnswers[questionIndex].push(letter);
+
+  // mark used
+  updatedBank[questionIndex][letterIndex].used = true;
+
+  setAnswers(updatedAnswers);
+  setLetterBank(updatedBank);
+};
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex justify-center p-8">
-        <div className="div-forall">
+      <div className="main-container-component">
+        <div className="div-forall" style={{gap:"20px"}}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>B</span>
-            Unscramble the letters to make words with a
-            <span style={{ color: "#2e3192" }}>ch</span> sound.
+            <span className=" mr-4">E</span>
+            Unscramble the letters to make words with a <span className="text-blue-800">ch</span> sound.
           </h5>
+          <div className="flex flex-col gap-3">
+            {items.map((item, i) => (
+              <div key={i} className="flex gap-5">
+                <img src={item.img} style={{height:"75px" ,width:"90px"}}/>
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-lg">{i + 1}</span>
+                  <span className="font-bold text-lg">{item.sentence}</span>
 
-          <div className="grid grid-cols-1 gap-6 justify-center pb-15">
-            {items.map((item, i) => {
-              const userWord = answers[i].map((l) => l?.char || "").join("");
-
-              const isWordWrong =
-                showResult && userWord && userWord !== item.correct[0];
-
-              return (
-                <div key={i} className="flex items-center gap-4">
-                  {/* 🟠 الصورة */}
-                  <img
-                    src={item.img}
-                    alt=""
-                    style={{ width: "70px", height: "70px" }}
-                  />
-
-                  {/* 🔵 المحتوى */}
-                  <div className="flex flex-col gap-2">
-                    {/* السطر الأول */}
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-lg w-5">{i + 1}</span>
-                      <span className="text-lg">{item.sentence}</span>
-                    </div>
-
-                    {/* السطر الثاني */}
-                    <div className="flex items-center gap-3 ml-7 relative">
-                      {/* 🔤 الحروف */}
-                      <Droppable
-                        droppableId={`bank-${i}`}
-                        direction="horizontal"
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className="flex gap-1"
-                          >
-                            {item.scrambled.map((word, wordIndex) => {
-                              const letters = word
-                                .split("")
-                                .map((letter, index) => ({
-                                  char: letter,
-                                  id: `${letter}-${i}-${wordIndex}-${index}`,
-                                }));
-
-                              return (
-                                <div key={wordIndex} className="flex gap-1">
-                                  {letters.map((letterObj, letterIndex) => {
-                                    const isUsed = answers[i].some(
-                                      (l) => l?.id === letterObj.id,
-                                    );
-
-                                    return (
-                                      <Draggable
-                                        key={letterObj.id}
-                                        draggableId={letterObj.id}
-                                        index={wordIndex * 10 + letterIndex}
-                                        isDragDisabled={locked || isUsed}
-                                      >
-                                        {(provided) => (
-                                          <span
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            className={`w-8 h-8 flex items-center justify-center rounded border font-bold
-          ${
-            isUsed
-              ? "bg-gray-300 opacity-40 cursor-not-allowed"
-              : "bg-yellow-200 cursor-grab"
-          }`}
-                                          >
-                                            {letterObj.char}
-                                          </span>
-                                        )}
-                                      </Draggable>
-                                    );
-                                  })}
-                                </div>
-                              );
-                            })}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                      {isWordWrong && (
+                  {/* 🔤 BANK */}
+                  <div className="w-full">
+                   
                         <div
-                          style={{
-                            position: "absolute",
-                            right: "-30px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            width: "22px",
-                            height: "22px",
-                            background: "#ef4444",
-                            color: "white",
-                            borderRadius: "50%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "bold",
-                            border: "2px solid white",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                            pointerEvents: "none",
-                          }}
+                      
+                          className="flex gap-2 w-full"
                         >
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              lineHeight: "1",
-                              transform: "translateY(-1px)",
-                            }}
-                          >
-                            ✕
-                          </span>
+                          {letterBank[i].map((letter, index) => {
+                            const id = `letter-${i}-${index}-${letter.value}`;
+
+                            return (
+                           <span
+  onClick={() => addLetter(letter.value, i, index)}
+  className={`w-9 h-9 flex items-center justify-center rounded border
+    ${
+      letter.used
+        ? "bg-gray-300 text-gray-500 opacity-60 cursor-not-allowed"
+        : "bg-white border-1 border-[#F79530] cursor-pointer hover:bg-orange-50"
+    }
+  `}
+>
+  {letter.value}
+</span>
+                            );
+                          })}
+                       
                         </div>
-                      )}
-                      {/* 🔲 البوكسات */}
-                      <div className="flex gap-1 ml-4 relative">
-                        {item.correct[0].split("").map((_, letterIndex) => {
-                          const isCorrect =
-                            answers[i][letterIndex]?.char ===
-                            item.correct[0][letterIndex];
+                 
+                  </div>
+                  {/* ✍️ SLOT */}
+                  <div style={{ position: "relative" }}>
+                  <div
+  style={{
+    width: "200px",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    padding: "0 8px",
+    position: "relative",
+    borderBottom: "1px solid gray",
+  }}
+>
+  {answers[i].map((letter, letterIndex) => {
+    const key = `${i}-${letterIndex}`;
 
-                          const isWrong =
-                            showResult && answers[i][letterIndex] && !isCorrect;
+    return (
+      <span
+        key={key}
+        className={`${locked ? "":"hover:text-red-500"}`}
+        onClick={() => handleRemoveLetter(i, letterIndex)}
 
-                          return (
-                            <Droppable
-                              droppableId={`slot-${i}-${letterIndex}`}
-                              key={letterIndex}
-                            >
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.droppableProps}
-                                  className={`w-8 h-8 border-b-2 flex items-center justify-center font-bold relative
-                ${isWrong ? "border-red-500" : "border-black"}
-              `}
-                                >
-                                  <span
-                                    style={{
-                                      color: "#1C398E",
-                                    }}
-                                  >
-                                    {answers[i][letterIndex]?.char}
-                                  </span>
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                          );
-                        })}
-                      </div>
-                    </div>
+        style={{
+          marginRight: "2px",
+          fontSize:"20px",
+          cursor: locked ? "default" : "pointer",
+        }}
+      >
+        {letter}
+      </span>
+    );
+  })}
+</div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-
-          {/* buttons */}
           <div className="action-buttons-container">
             <button className="try-again-button" onClick={resetAll}>
               Start Again ↻

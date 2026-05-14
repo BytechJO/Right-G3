@@ -104,10 +104,7 @@ const Unit7_Page5_Q3 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          width: "60%",
+          gap: "80px",
         }}
       >
         <div>
@@ -118,14 +115,22 @@ const Unit7_Page5_Q3 = () => {
             Read and choose.
           </h5>
         </div>
-        <div style={{ marginTop: "20px" }}>
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "50px",
+          }}
+        >
           {exerciseData.questions.map((q) => (
             <div
               key={q.id}
               style={{
                 marginBottom: "20px",
-                fontSize: "18px",
+                fontSize: "22px",
                 display: "flex",
+                position: "relative",
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
@@ -149,7 +154,7 @@ const Unit7_Page5_Q3 = () => {
                           border: isSelected
                             ? isWrong
                               ? "2px solid red"
-                              : "2px solid #2c5287"
+                              : "2px solid #F79530"
                             : "2px solid transparent",
                           fontWeight: "bold",
                         }}
@@ -160,29 +165,31 @@ const Unit7_Page5_Q3 = () => {
                     </span>
                   );
                 })}
+                {showResults && answers[q.id] !== q.correct && (
+                  <span
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      position: "absolute",
+                      top: "0px",
+                      left: "0px",
+                      background: "red",
+                      color: "white",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    ✕
+                  </span>
+                )}
               </div>
-
-              {showResults && answers[q.id] !== q.correct && (
-                <span
-                  style={{
-                    width: "20px",
-                    height: "20px",
-                    background: "#ef4444",
-                    color: "white",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    border: "2px solid white",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                    pointerEvents: "none",
-                  }}
-                >
-                  ✕
-                </span>
-              )}
             </div>
           ))}
         </div>

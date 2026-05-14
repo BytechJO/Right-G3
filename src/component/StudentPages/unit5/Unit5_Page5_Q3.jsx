@@ -4,7 +4,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex C 2.svg";
 
-const Unit5_Page5_Q3 = () => {
+const Page8_Q4 = () => {
   const grid = [
     [
       "l",
@@ -91,18 +91,19 @@ const Unit5_Page5_Q3 = () => {
     ],
   ];
 
-  const letters = grid;
   const wordsToFind = [
-    "there",
-    "is",
-    "a",
-    "swing",
-    "and",
-    "slide",
-    "in",
-    "the",
-    "yard",
+    { id: "there", word: "there" },
+    { id: "is", word: "is" },
+    { id: "a", word: "a" },
+    { id: "swing", word: "swing" },
+    { id: "and", word: "and" },
+    { id: "slide", word: "slide" },
+    { id: "in", word: "in" },
+    { id: "the", word: "the" },
+    { id: "yard", word: "yard" },
   ];
+
+  const letters = grid;
 
   const correctPositions = {
     there: [3, 4, 5, 6, 7],
@@ -115,7 +116,17 @@ const Unit5_Page5_Q3 = () => {
     the: [200 + 12, 200 + 13, 200 + 14],
     yard: [200 + 21, 200 + 22, 200 + 23, 200 + 24],
   };
-
+  const correctAnswers = [
+    { word: "there", order: 0 },
+    { word: "is", order: 1 },
+    { word: "a", order: 2 },
+    { word: "swing", order: 3 },
+    { word: "and", order: 4 },
+    { word: "slide", order: 5 },
+    { word: "in", order: 6 },
+    { word: "the", order: 7 },
+    { word: "yard", order: 8 },
+  ];
   const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
@@ -123,6 +134,17 @@ const Unit5_Page5_Q3 = () => {
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const fullSentence = [
+    "there",
+    "is",
+    "a",
+    "swing",
+    "and",
+    "slide",
+    "in",
+    "the",
+    "yard",
+  ];
 
   const handleMouseDown = (index) => {
     if (locked) return;
@@ -149,7 +171,20 @@ const Unit5_Page5_Q3 = () => {
       }
     }
   };
+  const displayedSentence = fullSentence.map((word, index) => {
+    const isFound = foundWords.some(
+      (foundWord) =>
+        correctAnswers.find((c) => c.word === foundWord)?.order === index,
+    );
 
+    const SLOT_LENGTH = 8;
+
+    if (isFound) {
+      return word.padEnd(SLOT_LENGTH, "");
+    }
+
+    return "_".repeat(SLOT_LENGTH);
+  });
   const handleTouchMove = (e) => {
     if (!isDragging || locked) return;
     e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
@@ -171,15 +206,18 @@ const Unit5_Page5_Q3 = () => {
     const reversedWord = currentWord.split("").reverse().join("");
 
     const matchedWord = wordsToFind.find(
-      (word) => word === currentWord || word === reversedWord,
+      (item) =>
+        (item.word === currentWord || item.word === reversedWord) &&
+        !foundWords.includes(item.id),
     );
 
-    if (matchedWord && !foundWords.includes(matchedWord)) {
-      setFoundWords((prev) => [...prev, matchedWord]);
+    if (matchedWord && !foundWords.includes(matchedWord.id)) {
+      setFoundWords((prev) => [...prev, matchedWord.id]);
       setColoredCells((prev) => [...prev, ...selected]);
       setSentence(
         wordsToFind
-          .filter((word) => [...foundWords, matchedWord].includes(word))
+          .filter((item) => [...foundWords, matchedWord.id].includes(item.id))
+          .map((item) => item.word)
           .join(" "),
       );
     }
@@ -199,16 +237,16 @@ const Unit5_Page5_Q3 = () => {
 
   const showAnswers = () => {
     let allCells = [];
-    wordsToFind.forEach((word) => {
-      if (correctPositions[word]) {
-        allCells.push(...correctPositions[word]);
+    wordsToFind.forEach((item) => {
+      if (correctPositions[item.id]) {
+        allCells.push(...correctPositions[item.id]);
       }
     });
-    setFoundWords(wordsToFind);
+    setFoundWords(wordsToFind.map((item) => item.id));
     setColoredCells(allCells);
     setSelected([]);
     setCurrentWord("");
-    setSentence(wordsToFind.join(" "));
+    setSentence(wordsToFind.map((item) => item.word).join(" "));
     setLocked(true);
   };
 
@@ -245,6 +283,7 @@ const Unit5_Page5_Q3 = () => {
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
+
         width: "100%",
         boxSizing: "border-box",
       }}
@@ -254,36 +293,36 @@ const Unit5_Page5_Q3 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What things are in the yard in Tom Lives in a House on page 41? 
+          What’s the name of Julia’s school in Helen and Stella Get an e-Mail on
+          page 29?
         </h5>
 
-        {/* Words List */}
+        {/* Words List
         <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((word) => (
+          {wordsToFind.map((item) => (
             <span
-              key={word}
-              className={`px-3 py-1.5 rounded-[10px] border-2 border-[#2c5287] font-semibold transition duration-200 ${
-                foundWords.includes(word)
-                  ? "bg-[#2c5287] text-white border-[#2c5287]"
+              key={item.id}
+              className={`px-3 py-1.5 rounded-[10px] border-2 border-blue-800 ${
+                foundWords.includes(item.id)
+                  ? "bg-[#2c5287] text-white"
                   : "bg-white text-black"
               }`}
-              style={{ fontSize: "clamp(12px, 2vw, 15px)" }}
             >
-              {word}
+              {item.word}
             </span>
           ))}
-        </div>
+        </div> */}
 
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
           {/* Grid Wrapper */}
           <div
-            className="border-2 border-[#f28c63] px-4 pt-4 pb-5"
+            className="px-4 pt-4 pb-5"
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px]"
+              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10"
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -340,15 +379,7 @@ const Unit5_Page5_Q3 = () => {
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                marginTop: "15px",
-              }}
-            >
+            <div className="flex justify-center items-center">
               <img
                 src={img1}
                 alt="start"
@@ -358,27 +389,12 @@ const Unit5_Page5_Q3 = () => {
                 }}
               />
 
-              <div
-                style={{
-                  flex: 1,
-                  borderBottom: "2px solid black",
-                  height: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  value={sentence}
-                  readOnly
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontSize: "clamp(14px, 2vw, 18px)", // 🔥 حجم خط ديناميكي للإجابة
-                  }}
-                />
-              </div>
+              <input
+                className="answer-input-CB-unit3-p5-q4"
+                value={displayedSentence.join(" ")}
+                readOnly
+                style={{ fontFamily: "monospace" }} // 🔥 مهم جدا
+              />
 
               <img
                 src={img2}
@@ -403,4 +419,4 @@ const Unit5_Page5_Q3 = () => {
   );
 };
 
-export default Unit5_Page5_Q3;
+export default Page8_Q4;

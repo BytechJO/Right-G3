@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 2.svg";
@@ -54,7 +53,7 @@ export default function Review6_Page2_Q1() {
   );
   const [lines, setLines] = useState([]);
   const [startDot, setStartDot] = useState(null);
-
+  const [activeWord, setActiveWord] = useState(null);
   const imageDotRefs = useRef([]);
   const textDotRefs = useRef([]);
   const containerRef = useRef(null);
@@ -107,32 +106,44 @@ export default function Review6_Page2_Q1() {
     6: 3, // pyppu → puppy → ??? (حسب ترتيبك)
   };
 
-  const onDragEnd = (result) => {
-    const { destination, draggableId, source } = result;
-    if (!destination || locked) return;
+  const handleLetterClick = (letterObj) => {
+    if (locked) return;
 
-    const letterId = draggableId;
-    const letter = letterId.split("-")[0];
+    setAnswers((prev) => {
+      const updated = [...prev];
 
-    // إذا سحب داخل نفس المكان → تجاهل
-    if (destination.droppableId === source.droppableId) return;
+      // إذا الحرف موجود بالفعل احذفه من مكانه
+      for (let i = 0; i < updated.length; i++) {
+        const index = updated[i].findIndex((l) => l?.id === letterObj.id);
+        if (index !== -1) {
+          updated[i][index] = "";
+        }
+      }
 
-    // إذا drop على slot
-    if (destination.droppableId.startsWith("slot")) {
-      const [, qIndex, letterIndex] = destination.droppableId.split("-");
+      // حطه بأول مكان فاضي
+      for (let i = 0; i < updated.length; i++) {
+        const emptyIndex = updated[i].findIndex((l) => !l);
+        if (emptyIndex !== -1) {
+          updated[i][emptyIndex] = letterObj;
+          break;
+        }
+      }
 
-      const updated = [...answers];
-
-      // 🔁 إذا في حرف قديم → احذفه (عشان يرجع يتفعل بالبنك)
-      updated[qIndex][letterIndex] = {
-        char: letter,
-        id: letterId,
-      };
-
-      setAnswers(updated);
-    }
+      return updated;
+    });
   };
 
+  const handleSlotClick = (qIndex, letterIndex) => {
+    if (locked) return;
+
+    setAnswers((prev) => {
+      const updated = [...prev];
+
+      updated[qIndex][letterIndex] = "";
+
+      return updated;
+    });
+  };
   const resetAll = () => {
     setAnswers(items.map((item) => Array(item.correct[0].length).fill("")));
     setLines([]); // 🔥 مهم
@@ -217,7 +228,7 @@ export default function Review6_Page2_Q1() {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+   
       <div className="flex justify-center p-8">
         <div
           className="div-forall"
@@ -261,76 +272,76 @@ export default function Review6_Page2_Q1() {
                       {/* السطر الأول */}
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-base w-5">{i + 1}</span>
-                        <span className="text-base">{item.sentence}</span>
+                        <span
+                          className="text-base transition-all duration-200"
+                          style={{
+                            cursor:
+                              locked || showResult ? "default" : "pointer",
+                            display: "inline-block",
+                            padding: "2px 6px",
+                            borderRadius: "6px",
+                            border:
+                              activeWord === i
+                                ? `1px solid #F79530`
+                                : "2px solid transparent",
+                            background:
+                              activeWord === i ? "#ffe8a3" : "transparent",
+                            transform:
+                              activeWord === i ? "scale(1.08)" : "scale(1)",
+                            boxShadow:
+                              activeWord === i
+                                ? "0 0 10px rgba(255,165,0,0.6)"
+                                : "none",
+                          }}
+                          onClick={() => {
+                            handleDotClick(i, "text");
+                            setActiveWord(i);
+                          }}
+                        >
+                          {item.sentence}
+                        </span>
                       </div>
 
                       {/* السطر الثاني */}
                       <div className="flex flex-col gap-2 ml-7 relative w-[350px]">
                         {/* 🔤 الحروف */}
-                        <Droppable
-                          droppableId={`bank-${i}`}
-                          direction="horizontal"
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                              className="flex gap-1"
-                            >
-                              {item.scrambled.map((word, wordIndex) => {
-                                const letters = word
-                                  .split("")
-                                  .map((letter, index) => ({
-                                    char: letter,
-                                    id: `${letter}-${i}-${wordIndex}-${index}`,
-                                  }));
 
-                                return (
-                                  <div key={wordIndex} className="flex gap-1">
-                                    {letters.map((letterObj, letterIndex) => {
-                                      const isUsed = answers[i].some(
-                                        (l) => l?.id === letterObj.id,
-                                      );
+                        <div className="flex gap-1">
+                          {item.scrambled.map((word, wordIndex) => {
+                            const letters = word
+                              .split("")
+                              .map((letter, index) => ({
+                                char: letter,
+                                id: `${letter}-${i}-${wordIndex}-${index}`,
+                              }));
 
-                                      return (
-                                        <Draggable
-                                          key={letterObj.id}
-                                          draggableId={letterObj.id}
-                                          index={wordIndex * 10 + letterIndex}
-                                          isDragDisabled={locked || isUsed}
-                                        >
-                                          {(provided) => (
-                                            <span
-                                              ref={provided.innerRef}
-                                              {...provided.draggableProps}
-                                              {...provided.dragHandleProps}
-                                              style={{
-                                                touchAction: "none", // 🔥 أهم سطر
-                                                userSelect: "none",
-                                                WebkitUserDrag: "none",
-                                                ...provided.draggableProps
-                                                  .style,
-                                              }}
-                                              className={`w-8 h-8 text-sm flex items-center justify-center rounded border font-bold
-                                                ${
-                                                  isUsed
-                                                    ? "bg-gray-300 opacity-40 cursor-not-allowed"
-                                                    : "bg-yellow-200 cursor-grab"
-                                                }`}
-                                            >
-                                              {letterObj.char}
-                                            </span>
-                                          )}
-                                        </Draggable>
-                                      );
-                                    })}
-                                  </div>
-                                );
-                              })}
-                              {provided.placeholder}
-                            </div>
-                          )}
-                        </Droppable>
+                            return (
+                              <div key={wordIndex} className="flex gap-1">
+                                {letters.map((letterObj, letterIndex) => {
+                                  const isUsed = answers[i].some(
+                                    (l) => l?.id === letterObj.id,
+                                  );
+
+                                  return (
+                                    <span
+                                      onClick={() =>
+                                        handleLetterClick(letterObj)
+                                      }
+                                      className={`w-8 h-8 text-sm flex items-center justify-center rounded border border-[#F79530] font-bold
+    ${
+      answers[i].some((l) => l?.id === letterObj.id)
+        ? "bg-gray-300 opacity-40 cursor-not-allowed"
+        : "cursor-pointer"
+    }`}
+                                    >
+                                      {letterObj.char}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
+                        </div>
 
                         {/* 🔲 البوكسات */}
                         <div className="flex items-center gap-2 ml-0 relative w-[260px]">
@@ -345,35 +356,20 @@ export default function Review6_Page2_Q1() {
                               !isCorrect;
 
                             return (
-                              <Droppable
-                                droppableId={`slot-${i}-${letterIndex}`}
-                                key={letterIndex}
+                              <div
+                                onClick={() => handleSlotClick(i, letterIndex)}
+                                className={`w-8 h-8 border-b-1 flex items-center justify-center font-bold relative cursor-pointer
+    ${isWrong ? "border-red-500" : "border-black"}
+  `}
                               >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                    className={`w-8 h-8 border-b-2 flex items-center justify-center font-bold relative
-                ${isWrong ? "border-red-500" : "border-black"}
-              `}
-                                  >
-                                    <span
-                                      style={{
-                                        color: "#1C398E",
-                                      }}
-                                    >
-                                      {answers[i][letterIndex]?.char}
-                                    </span>
-                                    {provided.placeholder}
-                                  </div>
-                                )}
-                              </Droppable>
+                                {answers[i][letterIndex]?.char}
+                              </div>
                             );
                           })}
                           <div
                             ref={(el) => (textDotRefs.current[i] = el)}
                             onClick={() => handleDotClick(i, "text")}
-                            className={`absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full cursor-pointer transition-all duration-200
+                            className={`absolute right-0 -top-8 -translate-y-1/2 w-3 h-3 rounded-full cursor-pointer transition-all duration-200
                               ${
                                 startDot?.index === i &&
                                 startDot?.type === "text"
@@ -389,7 +385,7 @@ export default function Review6_Page2_Q1() {
                 );
               })}
             </div>
-            <div className="flex flex-col gap-4 ml-6 mt-0 shrink-0">
+            <div className="flex flex-col gap-10 ml-6 mt-0 shrink-0">
               {images.map((img, i) => {
                 const wrongMatch =
                   showResult &&
@@ -410,6 +406,10 @@ export default function Review6_Page2_Q1() {
                     />
                     <img
                       src={img}
+                      onClick={() => {
+                        // handleDotClick(i, "image");
+                        setActiveWord(null);
+                      }}
                       style={{
                         width: "clamp(60px, 8vw, 100px)",
                         height: "clamp(60px, 8vw, 100px)",
@@ -425,7 +425,7 @@ export default function Review6_Page2_Q1() {
                           transform: "translateY(-50%)",
                           width: "22px",
                           height: "22px",
-                          background: "#ef4444",
+                          background: "red",
                           color: "white",
                           borderRadius: "50%",
                           display: "flex",
@@ -493,6 +493,6 @@ export default function Review6_Page2_Q1() {
           </div>
         </div>
       </div>
-    </DragDropContext>
+ 
   );
 }

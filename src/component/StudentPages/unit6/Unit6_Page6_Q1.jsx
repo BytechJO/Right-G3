@@ -6,7 +6,9 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 4.svg";
 import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
+import WrongMark from "../../WrongMark";
 const Unit6_Page6_Q1 = () => {
   const [locked, setLocked] = useState(false);
   const [answers, setAnswers] = useState({});
@@ -106,11 +108,10 @@ const Unit6_Page6_Q1 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          // gap: "20px",
-          width: "60%",
-          justifyContent: "flex-start",
+
+          gap: "10px",
+          // width: "60%",
+      
         }}
       >
         <h5 className="header-title-page8">
@@ -128,19 +129,20 @@ const Unit6_Page6_Q1 = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "20px",
-                marginBottom: "25px",
+                marginBottom: "20px",
               }}
             >
+              <div className="flex gap-5 items-start">
               {/* الرقم */}
-              <span style={{ fontWeight: "bold" }}>{index + 1}</span>
+              <span style={{ fontSize:"20px",fontWeight: "bold" }}>{index + 1}</span>
 
               {/* الصورة */}
               <div
                 style={{
-                  width: "200px",
-                  height: "150px",
+                
+                  height: "110px",
                   overflow: "hidden",
-                  border: "3px solid orange",
+                  // border: "3px solid orange",
                   borderRadius: "8px",
                 }}
               >
@@ -150,9 +152,10 @@ const Unit6_Page6_Q1 = () => {
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                   }}
                 />
+              </div>
               </div>
               {/* بوكسات الصح والخطا */}
               <div style={{ display: "flex", gap: "10px" }}>
@@ -161,17 +164,22 @@ const Unit6_Page6_Q1 = () => {
                   style={{
                     width: "40px",
                     height: "40px",
-                    border: "2px solid orange",
+                    border:
+                      answers[q.id] === "must"
+                        ? locked && answers[q.id] !== q.correct
+                          ? "2px solid red"
+                          : "2px solid orange"
+                        : "1px solid gray",
                     borderRadius: "6px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
-                    background: answers[q.id] === "must" ? "#2a4e7c" : "white",
+                    // background: answers[q.id] === "must" ? "#2a4e7c" : "white",
                     color: answers[q.id] === "must" ? "white" : "black",
                   }}
                 >
-                  ✓
+                  <img src={trueIcon} style={{ height: "25px" }} />
                 </div>
 
                 <div
@@ -179,18 +187,23 @@ const Unit6_Page6_Q1 = () => {
                   style={{
                     width: "40px",
                     height: "40px",
-                    border: "2px solid orange",
+                    border:
+                      answers[q.id] === "mustnt"
+                        ? locked && answers[q.id] !== q.correct
+                          ? "2px solid red"
+                          : "2px solid orange"
+                        : "1px solid gray",
                     borderRadius: "6px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
-                    background:
-                      answers[q.id] === "mustnt" ? "#2a4e7c" : "white",
+                    // background:
+                    // answers[q.id] === "mustnt" ? "#2a4e7c" : "white",
                     color: answers[q.id] === "mustnt" ? "white" : "black",
                   }}
                 >
-                  ✕
+                  <img src={falseIcon} style={{ height: "25px" }} />
                 </div>
               </div>
 
@@ -204,7 +217,7 @@ const Unit6_Page6_Q1 = () => {
                   }`,
                   paddingBottom: "5px",
                   minHeight: "24px",
-                  color: "#2a4e7c",
+                  // color: "#2a4e7c",
                   fontWeight: "500",
                 }}
               >
@@ -213,8 +226,8 @@ const Unit6_Page6_Q1 = () => {
                     {q.subject} {answers[q.id] === "must" ? "must" : "mustn't"}{" "}
                     {q.action}.{/* ❌ فقط عند الغلط */}
                     {locked && answers[q.id] !== q.correct && (
-                      <span className="absolute -top-2 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
-                        ✕
+                      <span className="absolute -top-2 -right-1 ">
+                        <WrongMark />
                       </span>
                     )}
                   </span>

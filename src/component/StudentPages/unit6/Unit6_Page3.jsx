@@ -50,11 +50,11 @@ const Unit6_Page3 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 6.28, y1: 8.67, x2:45.92, y2: 19.17, sound: sound1 },
-    { x1:58.20, y1: 8.67, x2:94.18, y2: 18.49, sound: sound2 },
-    { x1: 15.11, y1: 38.12, x2: 35.6, y2: 20.0, sound: sound3 },
-    { x1: 66.82, y1: 51.83, x2: 82.76, y2: 55.38, sound: sound4 },
-    { x1: 7.35 , y1: 62.83, x2:45.06, y2: 67.56, sound: sound5 },
+    { x1: 6.28, y1: 8.67, x2:45.92, y2: 18.17, sound: sound1 },
+    { x1:58.20, y1: 8.67, x2:94.18, y2: 18.17, sound: sound2 },
+    { x1: 15.11, y1: 38.12, x2: 35.6, y2: 41.45, sound: sound3 },
+    { x1: 66.82, y1: 52.03, x2: 82.76, y2: 55.38, sound: sound4 },
+    { x1: 7.35 , y1: 63.5, x2:45.06, y2: 67.3, sound: sound5 },
     { x1: 43.77, y1: 68.58, x2: 74.58, y2:74.33, sound: sound6 },
   ];
   const handleImageClick = (e) => {

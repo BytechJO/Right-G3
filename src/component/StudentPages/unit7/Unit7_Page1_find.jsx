@@ -9,12 +9,12 @@ const Unit3_Page1_find = () => {
   const [checkResult, setCheckResult] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   // ✅ منطقة المطعم (بالنسب المئوية)
-const targetArea = {
-  x1: 65,
-  y1: 40,
-  x2: 72,
-  y2: 46.5,
-};
+  const targetArea = {
+    x1: 65,
+    y1: 40,
+    x2: 72,
+    y2: 46.5,
+  };
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
@@ -69,6 +69,7 @@ const targetArea = {
           textAlign: "center",
           display: "flex",
           flexDirection: "column",
+          gap:"30px",
           alignItems: "center",
         }}
       >
@@ -77,8 +78,7 @@ const targetArea = {
         >
           <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
           <h5 className="header-title-page8">
-            I need your help. Can you help me find the drum in the
-            picture?
+            I need your help. Can you help me find the drum in the picture?
           </h5>
         </div>
         <div style={{ position: "relative", display: "inline-block" }}>
@@ -87,7 +87,8 @@ const targetArea = {
             alt="interactive"
             style={{
               width: "auto",
-              height: "75vh",
+                  borderRadius:"15px",
+              height: "70vh",
               cursor: "pointer",
               display: "block",
             }}

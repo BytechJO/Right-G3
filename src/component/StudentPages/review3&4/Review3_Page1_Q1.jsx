@@ -8,7 +8,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-    DragOverlay,
+  DragOverlay,
 } from "@dnd-kit/core";
 
 import { useDraggable, useDroppable } from "@dnd-kit/core";
@@ -33,7 +33,7 @@ const DraggableWord = ({ word, disabled }) => {
       : undefined,
 
     padding: "7px 14px",
-    border: "2px solid #2c5287",
+    border: "1px solid #F79530",
     borderRadius: "8px",
     background: "white",
     fontWeight: "bold",
@@ -59,13 +59,7 @@ const DraggableWord = ({ word, disabled }) => {
 /* =========================
    DROP ZONE
 ========================= */
-const DropZone = ({
-  id,
-  value,
-  showCorrect,
-  isWrong,
-  children,
-}) => {
+const DropZone = ({ id, value, showCorrect, isWrong, onRemove }) => {
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
@@ -73,24 +67,38 @@ const DropZone = ({
   return (
     <span
       ref={setNodeRef}
+      onClick={() => value && onRemove()}
+      className={`${showCorrect ? "":"hover:text-red-500"}`}
       style={{
         display: "inline-block",
         minWidth: "100px",
-        borderBottom: `2px solid ${
+        borderBottom: `1px solid ${
           showCorrect
             ? isWrong
               ? "red"
-              : "#1C398E"
+              : "#F79530"
             : isOver
               ? "#F79530"
               : "black"
         }`,
+
+        // 🔥 لون خلفية لما يكون فيه كلمة
+        backgroundColor: value
+          ? "white"
+          : isOver
+            ? "#ffd2a56d"
+            : "transparent",
+
+        padding: "2px 6px",
+        // borderRadius: "6px",
+        fontSize:"18px",
+        height:"25px",
         margin: "0 5px",
         textAlign: "center",
         fontWeight: "bold",
         position: "relative",
-        color: "#1C398E",
         transition: "0.2s",
+        cursor: value ? "pointer" : "default",
       }}
     >
       {value}
@@ -104,7 +112,7 @@ const DropZone = ({
             transform: "translateY(-50%)",
             width: "22px",
             height: "22px",
-            background: "#ef4444",
+            background: "red",
             color: "white",
             borderRadius: "50%",
             fontSize: "12px",
@@ -120,12 +128,9 @@ const DropZone = ({
           ✕
         </div>
       )}
-
-      {children}
     </span>
   );
 };
-
 const Review3_Page1_Q1 = () => {
   const items = [
     {
@@ -181,17 +186,13 @@ const Review3_Page1_Q1 = () => {
 
   const [answers, setAnswers] = useState(
     items.map((item) =>
-      !item.answer
-        ? []
-        : Array.isArray(item.answer)
-          ? ["", ""]
-          : [""],
+      !item.answer ? [] : Array.isArray(item.answer) ? ["", ""] : [""],
     ),
   );
 
   const [showCorrect, setShowCorrect] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
-const [activeWord, setActiveWord] = useState(null);
+  const [activeWord, setActiveWord] = useState(null);
   /* =========================
      SENSORS
   ========================= */
@@ -237,6 +238,15 @@ const [activeWord, setActiveWord] = useState(null);
     setAnswers(updated);
   };
 
+  const removeWordFromBlank = (qIndex, blankIndex) => {
+    if (showCorrect) return;
+
+    const updated = [...answers];
+
+    updated[qIndex][blankIndex] = "";
+
+    setAnswers(updated);
+  };
   /* =========================
      SHOW ANSWERS
   ========================= */
@@ -261,11 +271,7 @@ const [activeWord, setActiveWord] = useState(null);
   const resetAll = () => {
     setAnswers(
       items.map((item) =>
-        !item.answer
-          ? []
-          : Array.isArray(item.answer)
-            ? ["", ""]
-            : [""],
+        !item.answer ? [] : Array.isArray(item.answer) ? ["", ""] : [""],
       ),
     );
 
@@ -279,9 +285,7 @@ const [activeWord, setActiveWord] = useState(null);
   const checkAnswers = () => {
     if (showCorrect) return;
 
-    const hasEmpty = answers.some((arr) =>
-      arr.some((val) => val === ""),
-    );
+    const hasEmpty = answers.some((arr) => arr.some((val) => val === ""));
 
     if (hasEmpty) {
       ValidationAlert.info();
@@ -299,10 +303,7 @@ const [activeWord, setActiveWord] = useState(null);
         item.answer.forEach((ans, j) => {
           total++;
 
-          if (
-            answers[i][j]?.trim().toLowerCase() ===
-            ans.toLowerCase()
-          ) {
+          if (answers[i][j]?.trim().toLowerCase() === ans.toLowerCase()) {
             score++;
           } else {
             wrong.push({ qIndex: i, blankIndex: j });
@@ -311,10 +312,7 @@ const [activeWord, setActiveWord] = useState(null);
       } else {
         total++;
 
-        if (
-          answers[i][0]?.trim().toLowerCase() ===
-          item.answer.toLowerCase()
-        ) {
+        if (answers[i][0]?.trim().toLowerCase() === item.answer.toLowerCase()) {
           score++;
         } else {
           wrong.push({ qIndex: i, blankIndex: 0 });
@@ -325,12 +323,7 @@ const [activeWord, setActiveWord] = useState(null);
     setWrongMarks(wrong);
     setShowCorrect(true);
 
-    const color =
-      score === total
-        ? "green"
-        : score === 0
-          ? "red"
-          : "orange";
+    const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
     const msg = `
       <div style="font-size:20px;text-align:center;">
@@ -346,20 +339,20 @@ const [activeWord, setActiveWord] = useState(null);
   };
 
   return (
-   <DndContext
-  sensors={sensors}
-  collisionDetection={closestCenter}
-  onDragStart={(event) => {
-    setActiveWord(event.active.id);
-  }}
-  onDragEnd={(event) => {
-    handleDragEnd(event);
-    setActiveWord(null);
-  }}
-  onDragCancel={() => {
-    setActiveWord(null);
-  }}
->
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={(event) => {
+        setActiveWord(event.active.id);
+      }}
+      onDragEnd={(event) => {
+        handleDragEnd(event);
+        setActiveWord(null);
+      }}
+      onDragCancel={() => {
+        setActiveWord(null);
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -369,10 +362,7 @@ const [activeWord, setActiveWord] = useState(null);
           padding: "30px",
         }}
       >
-        <div
-          className="div-forall"
-          style={{ width: "60%", marginBottom: "40px" }}
-        >
+        <div className="div-forall" style={{ gap: "30px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>A</span>
             Read and complete the conversation. Use the words below.
@@ -384,12 +374,12 @@ const [activeWord, setActiveWord] = useState(null);
               display: "flex",
               gap: "12px",
               padding: "10px",
-              border: "2px dashed #ccc",
+              // border: "2px dashed #ccc",
               borderRadius: "10px",
-              marginTop: "20px",
+              // marginTop: "20px",
               justifyContent: "center",
               width: "100%",
-              marginBottom: "20px",
+              // marginBottom: "20px",
               flexWrap: "wrap",
             }}
           >
@@ -435,30 +425,27 @@ const [activeWord, setActiveWord] = useState(null);
                       {!item.answer ? (
                         <span>{item.text}</span>
                       ) : (
-                        item.text
-                          .split("______")
-                          .map((part, j) => {
-                            const isWrong = wrongMarks.some(
-                              (w) =>
-                                w.qIndex === i &&
-                                w.blankIndex === j,
-                            );
+                        item.text.split("______").map((part, j) => {
+                          const isWrong = wrongMarks.some(
+                            (w) => w.qIndex === i && w.blankIndex === j,
+                          );
 
-                            return (
-                              <span key={j}>
-                                {part}
+                          return (
+                            <span key={j}>
+                              {part}
 
-                                {j < (answers[i]?.length || 0) && (
-                                  <DropZone
-                                    id={`${i}-${j}`}
-                                    value={answers[i][j]}
-                                    showCorrect={showCorrect}
-                                    isWrong={isWrong}
-                                  />
-                                )}
-                              </span>
-                            );
-                          })
+                              {j < (answers[i]?.length || 0) && (
+                                <DropZone
+                                  id={`${i}-${j}`}
+                                  value={answers[i][j]}
+                                  showCorrect={showCorrect}
+                                  isWrong={isWrong}
+                                  onRemove={() => removeWordFromBlank(i, j)}
+                                />
+                              )}
+                            </span>
+                          );
+                        })
                       )}
                     </div>
                   </div>
@@ -509,24 +496,24 @@ const [activeWord, setActiveWord] = useState(null);
         </div>
       </div>
       <DragOverlay>
-  {activeWord ? (
-    <div
-      style={{
-        padding: "7px 14px",
-        border: "2px solid #2c5287",
-        borderRadius: "8px",
-        background: "white",
-        fontWeight: "bold",
-        fontSize: "16px",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-        cursor: "grabbing",
-        transform: "scale(1.05)",
-      }}
-    >
-      {activeWord}
-    </div>
-  ) : null}
-</DragOverlay>
+        {activeWord ? (
+          <div
+            style={{
+              padding: "7px 14px",
+              border: "1px solid #F79530",
+              borderRadius: "8px",
+              background: "white",
+              fontWeight: "bold",
+              fontSize: "16px",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+              cursor: "grabbing",
+              transform: "scale(1.05)",
+            }}
+          >
+            {activeWord}
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 };

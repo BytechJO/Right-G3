@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.72 83.71">
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 95.9 82.22">
   <defs>
     <style>
       .cls-1 {
+        stroke: #f89631;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+      }
+
+      .cls-3 {
         fill: #f89631;
-        font-family: PoppinsRegularEdited, PoppinsRegularEdited;
-        font-size: 65.38px;
+      }
+
+      .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-5 {
+        clip-path: url(#clippath);
       }
     </style>
+    <clipPath id="clippath">
+      <rect class="cls-2" width="95.9" height="82.22"/>
+    </clipPath>
   </defs>
   <g id="Layer_1-2" data-name="Layer 1">
-    <text class="cls-1" transform="translate(2.31 47.89)"><tspan x="0" y="0">13</tspan></text>
+    <g class="cls-5">
+      <path class="cls-4" d="M9.55.5S.5.5.5,9.75v62.72s0,9.25,9.05,9.25h76.79s9.05,0,9.05-9.25V9.75s0-9.25-9.05-9.25H9.55Z"/>
+      <path class="cls-1" d="M9.55.5S.5.5.5,9.75v62.72s0,9.25,9.05,9.25h76.79s9.05,0,9.05-9.25V9.75s0-9.25-9.05-9.25H9.55Z"/>
+    </g>
+    <g>
+      <path class="cls-3" d="M21.58,24.35v-5.43h6.02v47.27h-6.02V24.35Z"/>
+      <path class="cls-3" d="M57.08,18.01c9.22,0,14.25,5.36,14.25,12.16,0,5.43-3.4,9.68-8.37,10.79v.33c5.49,1.31,9.22,5.36,9.22,12.16,0,7.32-5.1,13.08-14.97,13.08-8.96,0-15.63-4.77-16.35-13.93h5.75c.59,5.03,4.25,8.89,10.53,8.89s9.35-3.73,9.35-8.57c0-6.67-4.64-9.22-13.14-9.22h-1.5v-4.97h1.57c7.91-.07,12.16-2.48,12.16-7.98,0-4.51-3.01-7.65-8.7-7.65s-8.89,3.14-9.48,7.72h-5.82c.59-8.11,6.73-12.82,15.5-12.82Z"/>
+    </g>
   </g>
 </svg>

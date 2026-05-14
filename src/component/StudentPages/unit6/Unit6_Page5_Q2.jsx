@@ -100,7 +100,7 @@ const Unit6_Page5_Q2 = () => {
   };
   return (
     <div className="main-container-component">
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "5px" }}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-4">B</span>
           Look, listen, and choose
@@ -124,35 +124,38 @@ const Unit6_Page5_Q2 = () => {
                       src={item.img}
                       alt=""
                       style={{
-                        width: "80px",
-                        height: "auto",
+                        width: "110px",
+                        height: "120px",
                       }}
                     />
 
                     {/* OPTIONS */}
                     <div className="flex flex-col gap-1.5 text-[18px] ml-4">
-                      <div className="relative  mt-2">
-                        {/* ❌ */}
-                        {isWrong(i) && (
-                          <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
-                            ✕
-                          </span>
-                        )}
-                      </div>
+                      {/* ❌ */}
+
                       {item.options.map((opt, idx) => (
-                        <span
-                          key={idx}
-                          onClick={() => chooseOption(i, opt)}
-                          className={`cursor-pointer px-2 py-0.5 rounded-full ${
-                            selected[i] === opt
-                              ? isWrong(i)
-                                ? "border-2 border-red-500"
-                                : "border-2 border-[#1C398E]"
-                              : "hover:bg-gray-100"
-                          }`}
-                        >
-                          {opt}
-                        </span>
+                        <div className="relative ">
+                          <span
+                            key={idx}
+                            onClick={() => chooseOption(i, opt)}
+                            className={`cursor-pointer px-2 py-0.5 rounded-full ${
+                              selected[i] === opt
+                                ? isWrong(i)
+                                  ? "border-2 border-red-500"
+                                  : "border-2 border-[#F79530]"
+                                : locked || showResult
+                                  ? ""
+                                  : "hover:bg-gray-100"
+                            }`}
+                          >
+                            {opt}
+                          </span>
+                          {isWrong(i) && selected[i] === opt && (
+                            <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
+                              ✕
+                            </span>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>

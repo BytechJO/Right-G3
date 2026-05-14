@@ -169,10 +169,7 @@ const Unit7_Page5_Q2 = () => {
       <div
         className="div-forall"
         style={{
-          width: "100%",
-          maxWidth: "900px",
-          display: "flex",
-          flexDirection: "column",
+          
           gap: "30px",
         }}
       >
@@ -182,7 +179,7 @@ const Unit7_Page5_Q2 = () => {
         </h5>
         <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={8} />
 
-        <div className="w-full flex flex-col items-center gap-16">
+        <div className="w-full flex flex-col items-center gap-30">
           {/* 🔥 الصور فوق */}
           <div className="grid grid-cols-6 gap-10 w-full justify-items-center">
             {images.map((img, i) => (
@@ -194,7 +191,7 @@ const Unit7_Page5_Q2 = () => {
                 <img
                   src={img.img}
                   style={{
-                    width: "85px",
+                    width: "auto",
                     height: "85px",
                     objectFit: "contain",
                     border:
@@ -251,7 +248,7 @@ const Unit7_Page5_Q2 = () => {
 
                 {/* 🔥 البوكس */}
                 <div
-                  className="relative px-4 py-2 rounded-2xl text-sm text-center transition"
+                  className="relative px-4 py-2 rounded-2xl text-[20px] text-center transition"
                   style={{
                     backgroundColor:
                       selectedSentence === i ? "#fed7aa" : "#ffedd5",
@@ -275,7 +272,7 @@ const Unit7_Page5_Q2 = () => {
                           transform: "translateY(-50%)",
                           width: "20px",
                           height: "20px",
-                          background: "#ef4444",
+                          background: "red",
                           color: "white",
                           borderRadius: "50%",
                           display: "flex",

@@ -107,7 +107,7 @@ const Review4_Page2_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "50px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>D</span>
           Look, read, and choose.
@@ -130,7 +130,7 @@ const Review4_Page2_Q1 = () => {
                   top: "-10px",
                   left: "-15px",
                   fontWeight: "bold",
-                  fontSize: "18px",
+                  fontSize: "20px",
                 }}
               >
                 {i + 1}
@@ -142,8 +142,8 @@ const Review4_Page2_Q1 = () => {
                 style={{
                   width: "15vw",
                   height: "20vh",
-                  border: "2px solid orange",
-                  borderRadius: 5,
+                  // border: "2px solid orange",
+                  // borderRadius: 5,
                 }}
               />
 
@@ -170,10 +170,10 @@ const Review4_Page2_Q1 = () => {
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E"
-                                : "2px solid #ef4444"
-                              : "2px solid #1C398E"
-                            : "2px solid transparent",
+                                ? "1px solid #F79530"
+                                : "2px solid red"
+                              : "1px solid #F79530"
+                            : "1px solid transparent",
                       }}
                     >
                       {opt}
@@ -185,32 +185,11 @@ const Review4_Page2_Q1 = () => {
                         <div
                           style={{
                             position: "absolute",
-                            right: "-20px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            width: "22px",
-                            height: "22px",
-                            background: "#ef4444",
-                            color: "white",
-                            borderRadius: "50%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "bold",
-                            border: "2px solid white",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                            pointerEvents: "none",
+                            right: "20px",
+                            top: "10%",
                           }}
                         >
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              lineHeight: "1",
-                              transform: "translateY(-1px)",
-                            }}
-                          >
-                            ✕
-                          </span>
+                          <WrongMark />
                         </div>
                       )}
                   </div>

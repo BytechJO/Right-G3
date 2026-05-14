@@ -1,364 +1,392 @@
-import React, { useState, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Review6_Page2_Q2.css";
 
-const Review6_Page1_Q2 = () => {
-  const [lines, setLines] = useState([]);
-  const [startDot, setStartDot] = useState(null);
-  const [wrongTextIndexes, setWrongTextIndexes] = useState([]);
-  const imageDotRefs = useRef([]);
-  const textDotRefs = useRef([]);
-  const containerRef = useRef(null);
-  const [isChecked, setIsChecked] = useState(false);
-  const [showedAnswer, setShowedAnswer] = useState(false);
-  const items = [
-    { letter: "a", word: "3rd" },
-    { letter: "b", word: "4th" },
-    { letter: "c", word: "1st" },
-    { letter: "d", word: "2nd" },
-    { letter: "e", word: "8th" },
-    { letter: "f", word: "6th" },
-    { letter: "g", word: "9th" },
-    { letter: "h", word: "10th" },
-    { letter: "i", word: "7th" },
-    { letter: "j", word: "5th" },
-  ];
+const DOT_COLOR = "#9ca3af";
+const ACTIVE_COLOR = "#f39b42";
+const WRONG_COLOR = "#ef4444";
+const PATH_COLOR = "#f39b42";
+const TEXT_COLOR = "#111";
 
-  const words = [
-    "first",
-    "second",
-    "third",
-    "fourth",
-    "fifth",
-    "sixth",
-    "seventh",
-    "eighth",
-    "ninth",
-    "tenth",
-  ];
+const LEFT_ITEMS = [
+  { id: 1, text: "first" },
+  { id: 2, text: "second" },
+  { id: 3, text: "third" },
+  { id: 4, text: "fourth" },
+  { id: 5, text: "fifth" },
+  { id: 6, text: "sixth" },
+  { id: 7, text: "seventh" },
+  { id: 8, text: "eighth" },
+  { id: 9, text: "ninth" },
+  { id: 10, text: "tenth" },
+];
 
-  const correctMatches = {
-    0: 2, // a → third
-    1: 3, // b → fourth
-    2: 0, // c → first
-    3: 1, // d → second
-    4: 7, // e → eighth
-    5: 5, // f → sixth
-    6: 8, // g → ninth
-    7: 9, // h → tenth
-    8: 6, // i → seventh
-    9: 4, // j → fifth
+const RIGHT_ITEMS = [
+  { id: 1, letter: "a", text: "3rd" },
+  { id: 2, letter: "b", text: "4th" },
+  { id: 3, letter: "c", text: "1st" },
+  { id: 4, letter: "d", text: "2nd" },
+  { id: 5, letter: "e", text: "8th" },
+  { id: 6, letter: "f", text: "6th" },
+  { id: 7, letter: "g", text: "9th" },
+  { id: 8, letter: "h", text: "10th" },
+  { id: 9, letter: "i", text: "7th" },
+  { id: 10, letter: "j", text: "5th" },
+];
+
+// 7th→seventh, 8th→eighth, 9th→ninth, 10th→tenth, 1st→first, 2nd→second
+const CORRECT_MATCHES = {
+  1: 3, // b → fourth
+  2: 4, // c → first
+  3: 1, // d → second
+  4: 2, // e → eighth
+  5: 10, // f → sixth
+  6: 6, // g → ninth
+  7: 9, // h → tenth
+  8: 5, // i → seventh
+  9: 7, // j → fifth
+  10: 8,
+};
+
+export default function Review6_Page1_Q2() {
+  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [matches, setMatches] = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [showAns, setShowAns] = useState(false);
+  const [paths, setPaths] = useState([]);
+
+  const boardRef = useRef(null);
+  const pointRefs = useRef({});
+
+  // ── SVG paths ──
+  useLayoutEffect(() => {
+    const update = () => {
+      if (!boardRef.current) return;
+      const br = boardRef.current.getBoundingClientRect();
+
+      const newPaths = Object.entries(matches)
+        .map(([leftId, rightId]) => {
+          const s = pointRefs.current[`left-${leftId}`];
+          const e = pointRefs.current[`right-${rightId}`];
+          if (!s || !e) return null;
+
+          const sr = s.getBoundingClientRect();
+          const er = e.getBoundingClientRect();
+          const x1 = sr.left + sr.width / 2 - br.left;
+          const y1 = sr.top + sr.height / 2 - br.top;
+          const x2 = er.left + er.width / 2 - br.left;
+          const y2 = er.top + er.height / 2 - br.top;
+          const dx = Math.abs(x2 - x1);
+
+          const isWrong =
+            showResults &&
+            matches[Number(leftId)] !== CORRECT_MATCHES[Number(leftId)];
+
+          return {
+            id: `path-${leftId}-${rightId}`,
+            d: `M ${x1} ${y1} C ${x1 + dx * 0.45} ${y1}, ${x2 - dx * 0.45} ${y2}, ${x2} ${y2}`,
+            color: isWrong ? WRONG_COLOR : PATH_COLOR,
+          };
+        })
+        .filter(Boolean);
+
+      setPaths(newPaths);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    let obs;
+    if (boardRef.current && typeof ResizeObserver !== "undefined") {
+      obs = new ResizeObserver(update);
+      obs.observe(boardRef.current);
+    }
+    return () => {
+      window.removeEventListener("resize", update);
+      obs?.disconnect();
+    };
+  }, [matches, showResults]);
+
+  const handleLeftSelect = (id) => {
+    if (showAns || showResults) return;
+    setSelectedLeft((prev) => (prev === id ? null : id));
+    setShowResults(false);
   };
-  const handleDotClick = (index, type) => {
-    if (isChecked || showedAnswer) return;
-    if (!startDot) {
-      setStartDot({ index, type });
-      return;
-    }
 
-    if (startDot.type === type) {
-      setStartDot(null);
-      return;
-    }
-
-    const imageIndex = startDot.type === "image" ? startDot.index : index;
-
-    const textIndex = startDot.type === "text" ? startDot.index : index;
-
-    setLines((prevLines) => {
-      let updatedLines = [...prevLines];
-
-      updatedLines = updatedLines.filter((line) => {
-        const img =
-          line.from.type === "image" ? line.from.index : line.to.index;
-
-        return img !== imageIndex;
-      });
-
-      updatedLines = updatedLines.filter((line) => {
-        const txt = line.from.type === "text" ? line.from.index : line.to.index;
-
-        return txt !== textIndex;
-      });
-
-      updatedLines.push({
-        from: { index: imageIndex, type: "image" },
-        to: { index: textIndex, type: "text" },
-      });
-
-      return updatedLines;
+  const handleRightSelect = (rightId) => {
+    if (showAns || selectedLeft === null || showResults) return;
+    const upd = { ...matches };
+    Object.keys(upd).forEach((k) => {
+      if (upd[k] === rightId) delete upd[k];
     });
-
-    setStartDot(null);
-  };
-  const formatOrdinal = (word) => {
-    const match = word.match(/(\d+)(st|nd|rd|th)/);
-    if (!match) return word;
-
-    return (
-      <>
-        {match[1]}
-        <sup style={{ fontSize: "0.6em", marginLeft: "1px" }}>{match[2]}</sup>
-      </>
-    );
-  };
-  const showAnswers = () => {
-    if (isChecked) return;
-
-    const answerLines = Object.keys(correctMatches).map((imgIndex) => ({
-      from: { index: parseInt(imgIndex), type: "image" },
-      to: { index: correctMatches[imgIndex], type: "text" },
-    }));
-
-    setLines(answerLines);
-    setShowedAnswer(true);
-  };
-  const resetAll = () => {
-    setLines([]);
-    setStartDot(null);
-    setIsChecked(false);
-    setShowedAnswer(false);
-    setWrongTextIndexes([]);
+    upd[selectedLeft] = rightId;
+    setMatches(upd);
+    setSelectedLeft(null);
+    setShowResults(false);
   };
 
-  const checkAnswers = () => {
-    if (showedAnswer) return;
-
-    if (lines.length !== items.length) {
-      ValidationAlert.info(
-        "Oops!",
-        "Please complete all matches before checking.",
-      );
+  const handleCheck = () => {
+    if (showAns || showResults) return;
+    const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
+    if (!allConnected) {
+      ValidationAlert.info("Please connect all items first.");
       return;
     }
-
     let score = 0;
-    const wrongIndexes = [];
-
-    lines.forEach((line) => {
-      const imageIndex =
-        line.from.type === "image" ? line.from.index : line.to.index;
-
-      const textIndex =
-        line.from.type === "text" ? line.from.index : line.to.index;
-
-      if (correctMatches[imageIndex] === textIndex) {
-        score++;
-      } else {
-        wrongIndexes.push(textIndex);
-      }
+    LEFT_ITEMS.forEach((i) => {
+      if (matches[i.id] === CORRECT_MATCHES[i.id]) score++;
     });
-
-    setWrongTextIndexes(wrongIndexes);
-
-    const total = items.length;
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:${color};font-weight:bold">
-        Score: ${score} / ${total}
-      </span>
-    </div>
-  `;
-
-    setIsChecked(true);
-    setShowedAnswer(true);
-
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+    setShowResults(true);
+    const total = LEFT_ITEMS.length;
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: ${score} / ${total}`);
   };
 
-  return (
+  const handleShowAnswer = () => {
+    setMatches({ ...CORRECT_MATCHES });
+    setShowResults(true);
+    setShowAns(true);
+    setSelectedLeft(null);
+  };
+
+  const handleStartAgain = () => {
+    setSelectedLeft(null);
+    setMatches({});
+    setShowResults(false);
+    setShowAns(false);
+    setPaths([]);
+  };
+
+  const getLeftConn = (id) => !!matches[id];
+  const getRightConn = (id) => Object.values(matches).includes(id);
+  const isWrongMatch = (leftId) =>
+    showResults &&
+    !!matches[leftId] &&
+    matches[leftId] !== CORRECT_MATCHES[leftId];
+
+  const WrongBadge = () => (
     <div
-      ref={containerRef}
       style={{
+        position: "absolute",
+        top: "-7px",
+        right: "-7px",
+        width: "22px",
+        height: "22px",
+        borderRadius: "50%",
+        background: "red",
+        color: "#fff",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
-        padding: "30px",
-        position: "relative",
+        justifyContent: "center",
+        fontSize: "14px",
+        fontWeight: "bold",
+        border: "2px solid white",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+        zIndex: 5,
+        pointerEvents: "none",
       }}
     >
-      <div className="div-forall" style={{ width: "60%" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>B</span>
-          Match.
-        </h5>
-        <div className="flex justify-center mt-7">
-          {/* 🟢 LEFT SIDE (words) */}
-          <div className="w-[35%] flex flex-col gap-4">
-            {words.map((word, i) => (
-              <div
-                key={i}
-                onClick={() => handleDotClick(i, "text")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                }}
-              >
-                <span
-                  style={{
-                    position: "relative",
-                    display: "flex",
-                    alignItems: "center",
-                    width: "30%", // 🔥 مهم
-                    justifyContent: "flex-start",
-                    padding: "2px 6px",
-                    borderRadius: "6px",
-                    background:
-                      startDot?.index === i && startDot?.type === "text"
-                        ? "#fde68a"
-                        : "transparent",
-                  }}
-                >
-                  {isChecked && wrongTextIndexes.includes(i) && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: "-20px",
-                        top: "20%",
-                        width: "20px",
-                        height: "20px",
-                        background: "#ef4444",
-                        color: "white",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      ✕
-                    </span>
-                  )}
-                  <span style={{ fontWeight: "bold", marginRight: 4 }}>
-                    {i + 1}
-                  </span>
-                  {word}
-                </span>
+      ✕
+    </div>
+  );
 
-                <div
-                  ref={(el) => (textDotRefs.current[i] = el)}
-                  className="w-3 h-3 bg-[orange] rounded-full"
-                />
-              </div>
-            ))}
-          </div>
+  return (
+    <div className="main-container-component">
+      <div
+        className="div-forall"
+        style={{
+          gap: "28px",
+        }}
+      >
+        {/* Title */}
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">F</span> Read and match.
+        </h1>
 
-          {/* 🟠 RIGHT SIDE (letters + ordinals) */}
-          <div
-            className="flex flex-col gap-4 items-end"
+        {/* Board */}
+        <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
+          {/* SVG lines */}
+          <svg
             style={{
-              width: "30%", // 🔥 صغّر العرض
-              alignItems: "flex-end",
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              overflow: "visible",
+              zIndex: 1,
             }}
           >
-            {items.map((item, i) => (
-              <div
-                key={i}
-                onClick={() => handleDotClick(i, "image")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between", // 🔥
-                  width: "40%", // 🔥 مهم
-                  cursor: "pointer",
-                }}
-              >
-                <div
-                  ref={(el) => (imageDotRefs.current[i] = el)}
-                  className="w-3 h-3 bg-[orange] rounded-full"
-                />
-
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "80px",
-                    padding: "2px 6px",
-                    borderRadius: "6px",
-                    background:
-                      startDot?.index === i && startDot?.type === "image"
-                        ? "#fde68a"
-                        : "transparent",
-                  }}
-                >
-                  <span style={{ fontWeight: "bold", marginRight: 10 }}>
-                    {item.letter}
-                  </span>
-                  {formatOrdinal(item.word)}
-                </span>
-              </div>
+            {paths.map((p) => (
+              <path
+                key={p.id}
+                d={p.d}
+                fill="none"
+                stroke={ACTIVE_COLOR}
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             ))}
+          </svg>
+
+          {/* Grid: left text | left dot | right dot | right text */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "auto auto 1fr auto",
+              columnGap: "clamp(8px,2vw,24px)",
+              rowGap: "11px",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            {LEFT_ITEMS.map((lItem, idx) => {
+              const rItem = RIGHT_ITEMS[idx];
+              const lConn = getLeftConn(lItem.id);
+              const rConn = getRightConn(rItem.id);
+              const lSelected = selectedLeft === lItem.id;
+              const wrong = isWrongMatch(lItem.id);
+
+              return (
+                <React.Fragment key={lItem.id}>
+                  {/* ── Left text ── */}
+                  <div
+                    onClick={() => handleLeftSelect(lItem.id)}
+                    style={{
+                      position: "relative",
+                      fontSize: "clamp(16px,1.5vw,20px)",
+                      // fontWeight:   700,
+                      color: wrong
+                        ? TEXT_COLOR
+                        : lSelected
+                          ? ACTIVE_COLOR
+                          : TEXT_COLOR,
+                      lineHeight: 1,
+                      cursor: showAns || showResults ? "default" : "pointer",
+                      userSelect: "none",
+                      padding: "clamp(4px,0.6vw,8px) clamp(10px,1.2vw,16px)",
+                      borderRadius: "clamp(8px,1vw,12px)",
+                      border: lSelected
+                        ? `1px solid ${ACTIVE_COLOR}`
+                        : lConn
+                          ? `2px solid ${wrong ? WRONG_COLOR : "transparent"}`
+                          : "2px solid transparent",
+                      background: lSelected
+                        ? "rgba(243,155,66,0.08)"
+                        : "transparent",
+                      transition:
+                        "border-color 0.2s, color 0.2s, background 0.2s",
+                      whiteSpace: "nowrap",
+                      zIndex: 2,
+                    }}
+                  >
+                    <span className="text-[20px] font-bold mr-2">{lItem.id}</span>
+                    {lItem.text}
+                    {wrong && <WrongBadge />}
+                  </div>
+
+                  {/* ── Left dot ── */}
+                  <div
+                    ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
+                    onClick={() => handleLeftSelect(lItem.id)}
+                    style={{
+                      width: "clamp(10px,1.4vw,16px)",
+                      height: "clamp(10px,1.4vw,16px)",
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      background: lSelected
+                        ? ACTIVE_COLOR
+                        : lConn
+                          ? wrong
+                            ? ACTIVE_COLOR
+                            : ACTIVE_COLOR
+                          : DOT_COLOR,
+                      cursor: showAns || showResults ? "default" : "pointer",
+                      transition: "background 0.2s",
+                      boxShadow: lSelected
+                        ? `0 0 0 3px rgba(243,155,66,0.3)`
+                        : "none",
+                      zIndex: 2,
+                    }}
+                  />
+
+                  {/* ── Right dot ── */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      zIndex: 2,
+                    }}
+                  >
+                    <div
+                      ref={(el) =>
+                        (pointRefs.current[`right-${rItem.id}`] = el)
+                      }
+                      onClick={() => handleRightSelect(rItem.id)}
+                      style={{
+                        width: "clamp(10px,1.4vw,16px)",
+                        height: "clamp(10px,1.4vw,16px)",
+                        borderRadius: "50%",
+                        background: rConn ? ACTIVE_COLOR : DOT_COLOR,
+                        cursor:
+                          showAns || selectedLeft === null
+                            ? "default"
+                            : "pointer",
+                        transition: "background 0.2s",
+                        zIndex: 2,
+                      }}
+                    />
+                  </div>
+
+                  {/* ── Right text ── */}
+                  <div
+                    onClick={() => handleRightSelect(rItem.id)}
+                    style={{
+                      position: "relative",
+                      fontSize: "clamp(16px,1.4vw,20px)",
+                      fontWeight: 500,
+                      color: TEXT_COLOR,
+                      lineHeight: 1,
+                      cursor:
+                        showAns || selectedLeft === null
+                          ? "default"
+                          : "pointer",
+                      userSelect: "none",
+                      whiteSpace: "nowrap",
+                      zIndex: 2,
+                      padding: "clamp(4px,0.6vw,8px) clamp(10px,1.2vw,16px)",
+                      borderRadius: "clamp(8px,1vw,12px)",
+                      border: rConn
+                        ? `1px solid transparent`
+                        : "2px solid transparent",
+                      transition: "border-color 0.2s",
+                    }}
+                  >
+                    <span className="text-[20px] font-bold mr-2">{rItem.letter}</span>{" "}
+                    {rItem.text}
+                  </div>
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
 
-        {/* SVG */}
-        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          {lines.map((line, i) => {
-            const imageIndex =
-              line.from.type === "image" ? line.from.index : line.to.index;
-
-            const textIndex =
-              line.from.type === "text" ? line.from.index : line.to.index;
-
-            const imgDot = imageDotRefs.current[imageIndex];
-            const txtDot = textDotRefs.current[textIndex];
-
-            if (!imgDot || !txtDot || !containerRef.current) return null;
-
-            const imgRect = imgDot.getBoundingClientRect();
-            const txtRect = txtDot.getBoundingClientRect();
-            const containerRect = containerRef.current.getBoundingClientRect();
-
-            const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
-            const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
-
-            const x2 = txtRect.left + txtRect.width / 2 - containerRect.left;
-            const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
-
-            return (
-              <path
-                key={i}
-                d={`
-                  M ${x1} ${y1}
-                  C ${(x1 + x2) / 2} ${y1},
-                    ${(x1 + x2) / 2} ${y2},
-                    ${x2} ${y2}
-                `}
-                stroke="orange"
-                strokeWidth="3"
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray="6,6" // 🔥 هذا اللي بخلي الخط منقط
-              />
-            );
-          })}
-        </svg>
-
-        <div className="action-buttons-container">
-          <button onClick={resetAll} className="try-again-button">
-            Start Again ↻
-          </button>
-
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-
-          <button onClick={checkAnswers} className="check-button2">
-            Check Answer ✓
-          </button>
+        {/* Buttons */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "clamp(8px,1.5vw,16px)",
+            zIndex: 100,
+          }}
+        >
+          <Button
+            checkAnswers={handleCheck}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleStartAgain}
+          />
         </div>
       </div>
     </div>
   );
-};
-
-export default Review6_Page1_Q2;
+}

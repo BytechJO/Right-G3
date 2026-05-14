@@ -47,10 +47,10 @@ const Reading_Unit4_Page1 = ({ openPopup }) => {
     },
   ];
   const clickableAreas = [
-    { x1: 15.26, y1: 35.78, x2: 51.62, y2: 48.0, sound: sound2 },
-    { x1: 56.0, y1: 35.98, x2: 92.44, y2: 48.0, sound: sound3 },
-    { x1: 16.0, y1: 84.0, x2: 51.9, y2: 95.5, sound: sound4 },
-    { x1: 56.0, y1: 84.5, x2: 93.7, y2: 94.9, sound: sound5 },
+    { x1: 15.29, y1: 36.2, x2: 53.35, y2: 49.81, sound: sound2 },
+    { x1: 55.36, y1: 35.98, x2: 93.89, y2: 49.9, sound: sound3 },
+    { x1: 15.29, y1: 84.36, x2: 53.55, y2: 95.93, sound: sound4 },
+    { x1: 55.36, y1: 84.5, x2: 93.7, y2: 95.93, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

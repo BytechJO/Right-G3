@@ -33,9 +33,9 @@ const Unit5_Page4 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 6.33, y1: 9.01, x2: 45.12, y2: 17.98, sound: sound1 },
+    { x1: 6.33, y1: 9.01, x2: 45.12, y2: 16.98, sound: sound1 },
     { x1: 55.03, y1: 8.84, x2: 94.46, y2: 17.47, sound: sound2 },
-    { x1: 39.52, y1: 32.7, x2: 93.81, y2: 41.17, sound: sound3 },
+    { x1: 39.52, y1: 32.7, x2: 93.81, y2: 40.52, sound: sound3 },
     { x1: 57.18, y1: 66.04, x2: 90.15, y2: 71.46, sound: sound4 },
   ];
 

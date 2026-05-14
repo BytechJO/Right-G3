@@ -1,11 +1,57 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  useDraggable,
+} from "@dnd-kit/core";
+import WrongMark from "../../WrongMark";
+import { useDroppable } from "@dnd-kit/core";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 4.svg";
+const ImageDrop = ({ i, children }) => {
+  const { setNodeRef } = useDroppable({
+    id: `image-${i}`,
+  });
 
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        position: "relative",
+        borderRadius: "16px",
+        padding: "6px",
+        background: "#fff",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+const WrongIcon = () => (
+  <span
+    style={{
+      width: "22px",
+      height: "22px",
+      background: "red",
+      color: "white",
+      borderRadius: "50%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontWeight: "bold",
+      border: "2px solid white",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+      fontSize: "14px",
+    }}
+  >
+    ✕
+  </span>
+);
 const Review4_Page1_Q1 = () => {
   const questions = [
     {
@@ -31,7 +77,6 @@ const Review4_Page1_Q1 = () => {
   ];
 
   const wordBank = ["spring", "summer", "autumn", "winter"];
-  const numbers = [1, 2, 3, 4];
   const images = [img1, img2, img3, img4];
 
   const [answers, setAnswers] = useState(Array(4).fill(""));
@@ -40,16 +85,28 @@ const Review4_Page1_Q1 = () => {
   const [wrongMarks, setWrongMarks] = useState([]);
 
   // =========================
+  // dnd-kit sensors
+  // =========================
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+  );
+
+  // =========================
   // DRAG END
   // =========================
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination) return;
+  const onDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
 
-    // ✨ كلمات
+    const draggableId = active.id;
+    const destinationId = over.id;
+
+    // ✨ words
     if (draggableId.startsWith("season-")) {
       const value = draggableId.replace("season-", "");
-      const index = Number(destination.droppableId);
+      const index = Number(destinationId);
 
       if (!isNaN(index)) {
         const updated = [...answers];
@@ -58,12 +115,12 @@ const Review4_Page1_Q1 = () => {
       }
     }
 
-    // 🔥 أرقام
+    // 🔢 numbers
     if (draggableId.startsWith("num-")) {
       const number = Number(draggableId.split("-")[1]);
 
-      if (destination.droppableId.startsWith("image-")) {
-        const index = Number(destination.droppableId.split("-")[1]);
+      if (destinationId.startsWith("image-")) {
+        const index = Number(destinationId.split("-")[1]);
 
         const updated = [...imageNumbers];
         updated[index] = number;
@@ -73,21 +130,13 @@ const Review4_Page1_Q1 = () => {
   };
 
   // =========================
-  // SHOW ANSWERS
-  // =========================
   const showAnswers = () => {
     setAnswers(questions.map((q) => q.answer));
-
-    // 🔥 هاي الإضافة
     setImageNumbers(questions.map((q) => q.correctImage));
-
     setShowCorrect(true);
     setWrongMarks([]);
   };
 
-  // =========================
-  // RESET
-  // =========================
   const resetAll = () => {
     setAnswers(questions.map(() => ""));
     setImageNumbers([null, null, null, null]);
@@ -95,9 +144,6 @@ const Review4_Page1_Q1 = () => {
     setWrongMarks([]);
   };
 
-  // =========================
-  // CHECK ANSWERS
-  // =========================
   const checkAnswers = () => {
     if (showCorrect) return;
 
@@ -146,8 +192,49 @@ const Review4_Page1_Q1 = () => {
     else ValidationAlert.warning(msg);
   };
 
+  // =========================
+  // DRAGGABLE NUMBER (same UI)
+  // =========================
+  const NumberItem = ({ num, isUsed }) => {
+    const { setNodeRef, listeners, attributes, transform, isDragging } =
+      useDraggable({
+        id: `num-${num}`,
+      });
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        style={{
+          width: "45px",
+          height: "45px",
+          borderRadius: "50%",
+          backgroundColor: isUsed ? "#cfcfd4" : "#f39b42",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 700,
+          fontSize: "20px",
+          cursor: isUsed ? "not-allowed" : "grab",
+          opacity: isUsed ? 0.5 : 1,
+          userSelect: "none",
+          zIndex: 9999999,
+          ...(transform
+            ? {
+                transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+              }
+            : {}),
+        }}
+      >
+        {num}
+      </div>
+    );
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={onDragEnd}>
       <div
         style={{
           display: "flex",
@@ -156,126 +243,39 @@ const Review4_Page1_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "5px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>A</span> Read and write the
             season. Number the pictures .
           </h5>
-          <Droppable droppableId="mixed" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  padding: "8px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  marginTop: "15px",
-                  justifyContent: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                {/* 🔢 الأرقام */}
-                {[1, 2, 3, 4].map((num, index) => {
-                  const isUsed = imageNumbers.includes(num);
 
-                  return (
-                    <Draggable
-                      key={`num-${num}`}
-                      draggableId={`num-${num}`}
-                      index={index}
-                      isDragDisabled={isUsed} // 🔥 disable
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          style={{
-                            width: "32px",
-                            height: "32px",
-                            border: "2px solid #1C398E",
-                            borderRadius: "8px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                            opacity: isUsed ? 0.4 : 1, // 🔥 opacity
-                            cursor: isUsed ? "not-allowed" : "grab",
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          <div
-                            {...provided.dragHandleProps}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            {num}
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
+          {/* ========================= */}
+          {/* NUMBERS BANK */}
+          {/* ========================= */}
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              padding: "8px",
+              // border: "2px dashed #ccc",
+              borderRadius: "10px",
+              marginTop: "10px",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {[1, 2, 3, 4].map((num) => {
+              const isUsed = imageNumbers.includes(num);
+              return <NumberItem key={num} num={num} isUsed={isUsed} />;
+            })}
+          </div>
 
-                {/* 🌸 الكلمات */}
-                {wordBank.map((word, index) => {
-                  const isUsed = answers.includes(word);
-
-                  return (
-                    <Draggable
-                      key={`season-${word}`}
-                      draggableId={`season-${word}`}
-                      index={index + 10}
-                      isDragDisabled={isUsed} // 🔥 disable
-                    >
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          style={{
-                            padding: "5px 10px",
-                            border: "2px solid #2c5287",
-                            borderRadius: "6px",
-                            background: "white",
-                            fontWeight: "bold",
-                            fontSize: "13px",
-                            opacity: isUsed ? 0.4 : 1, // 🔥 opacity
-                            cursor: isUsed ? "not-allowed" : "grab",
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          <span
-                            {...provided.dragHandleProps}
-                            style={{
-                              display: "inline-block",
-                              cursor: isUsed ? "not-allowed" : "grab",
-                            }}
-                          >
-                            {word}
-                          </span>
-                        </span>
-                      )}
-                    </Draggable>
-                  );
-                })}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-          {/* الصور */}
-          <div style={{ marginTop: "20px" }}>
+          {/* ========================= */}
+          {/* QUESTIONS */}
+          {/* ========================= */}
+          <div>
             {questions.map((q, i) => {
               const wrongItem = wrongMarks.find((w) => w.qIndex === i);
-
               const isWordWrong = wrongItem?.wordWrong;
               const isImageWrong = wrongItem?.imageWrong;
 
@@ -286,172 +286,122 @@ const Review4_Page1_Q1 = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    marginBottom: "25px",
+                    marginBottom: "5px",
                     gap: "20px",
                   }}
                 >
-                  {/* 🟢 TEXT */}
-                  <div style={{ flex: 1 }}>
+                  {/* TEXT */}
+                  <div style={{ flex: 1, fontSize: "18px" }}>
                     <span style={{ fontWeight: "bold" }}>{i + 1}</span> {q.text}
                     <br />
                     It’s{" "}
-                    <Droppable droppableId={`${i}`}>
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          style={{
-                            borderBottom: `2px solid ${
-                              showCorrect
-                                ? isWordWrong
-                                  ? "red"
-                                  : "#1C398E"
-                                : "black"
-                            }`,
-                            display: "inline-block",
-                            padding: "0 4px",
-                            minWidth: answers[i] ? "auto" : "60px", // 🔥 الحل
-                            marginLeft: "8px",
-                            color: "#1C398E",
-                            fontWeight: "bold",
-                            position: "relative",
-                            textAlign: "center",
-                          }}
-                        >
-                          {answers[i]}
-                          {provided.placeholder}
-
-                          {/* ❌ للكلمة */}
-                          {showCorrect && isWordWrong && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: "50%",
-                                right: "-30px",
-                                transform: "translateY(-50%)",
-                                width: "22px",
-                                height: "22px",
-                                background: "#ef4444",
-                                color: "white",
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: "bold",
-                                border: "2px solid white",
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                pointerEvents: "none",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: "13px",
-                                  lineHeight: "1",
-                                  transform: "translateY(-1px)",
-                                }}
-                              >
-                                ✕
-                              </span>
-                            </div>
-                          )}
-                        </span>
-                      )}
-                    </Droppable>
-                    .
-                  </div>
-
-                  {/* 🟠 IMAGE + NUMBER */}
-                  <Droppable droppableId={`image-${i}`}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
+                    <div
+                      id={`${i}`}
+                      style={{
+                        display: "inline-block",
+                        borderBottom: showCorrect && isWordWrong ?"2px solid red":"1px solid",
+                        minWidth: "120px",
+                        // fontWeight: "bold",
+                        position: "relative",
+                        marginLeft: "8px",
+                      }}
+                    >
+                      <select
+                        value={answers[i]}
+                        disabled={showCorrect}
+                        onChange={(e) => {
+                          const updated = [...answers];
+                          updated[i] = e.target.value;
+                          setAnswers(updated);
+                        }}
                         style={{
-                          position: "relative",
-                          border: "2px solid orange",
-                          borderRadius: "16px",
-                          padding: "6px",
-                          background: "#fff",
+                          border: "none",
+                          outline: "none",
+                          // fontWeight: "bold",
+                          fontSize: "20px",
                         }}
                       >
-                        <img
-                          src={images[i]}
-                          style={{
-                            width: "170px",
-                            height: "100px",
-                            objectFit: "cover",
-                            borderRadius: "12px",
-                          }}
-                        />
-
-                        {/* 🔢 الرقم */}
-                        <div
+                        <option value="">Choose</option>
+                        {wordBank.map((word) => (
+                          <option
+                            key={word}
+                            value={word}
+                            disabled={showCorrect}
+                          >
+                            {word}
+                          </option>
+                        ))}
+                      </select>
+                      {showCorrect && isWordWrong && (
+                        <span
                           style={{
                             position: "absolute",
                             right: "-10px",
-                            bottom: "-10px",
-                            width: "40px",
-                            height: "40px",
-                            background: "white",
-                            border: "2px solid orange",
-                            borderRadius: "12px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "bold",
-                            fontSize: "18px",
-                            color:
-                              showCorrect && isImageWrong ? "red" : "black",
+                            top: "0px",
                           }}
                         >
-                          {imageNumbers[i]}
+                          <WrongIcon />
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                          {/* ❌ للرقم */}
-                          {showCorrect && isImageWrong && (
-                            <span
-                              style={{
-                                position: "absolute",
-                                top: "-1px",
-                                right: "-8px",
-                                transform: "translateY(-50%)",
-                                width: "22px",
-                                height: "22px",
-                                background: "#ef4444",
-                                color: "white",
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: "bold",
-                                border: "2px solid white",
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                pointerEvents: "none",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: "13px",
-                                  lineHeight: "1",
-                                  transform: "translateY(-1px)",
-                                }}
-                              >
-                                ✕
-                              </span>
-                            </span>
-                          )}
-                        </div>
-
-                        {provided.placeholder}
-                      </div>
+                  {/* IMAGE */}
+                  <ImageDrop i={i}>
+                    <img
+                      src={images[i]}
+                      style={{
+                        width: "auto",
+                        height: "100px",
+                        objectFit: "contain",
+                        borderRadius: "12px",
+                      }}
+                    />
+                    {showCorrect && isImageWrong && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: "-2px",
+                          right: "11px",
+                        }}
+                      >
+                        <WrongIcon />
+                      </span>
                     )}
-                  </Droppable>
+                    <div
+                      onClick={() => {
+                        if (showCorrect) return;
+                        const updated = [...imageNumbers];
+                        updated[i] = null;
+                        setImageNumbers(updated);
+                      }}
+                      style={{
+                        position: "absolute",
+                        right: "8px",
+                        bottom: "8px",
+                        width: "40px",
+                        height: "40px",
+                        // background: "white",
+                        // border: "2px solid orange",
+                        borderRadius: "12px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                        fontSize: "20px",
+                        color: showCorrect && isImageWrong ? "red" : "black",
+                      }}
+                    >
+                      {imageNumbers[i]}
+                    </div>
+                  </ImageDrop>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* buttons */}
+        {/* BUTTONS */}
         <div className="action-buttons-container">
           <button onClick={resetAll} className="try-again-button">
             Start Again ↻
@@ -464,7 +414,7 @@ const Review4_Page1_Q1 = () => {
           </button>
         </div>
       </div>
-    </DragDropContext>
+    </DndContext>
   );
 };
 

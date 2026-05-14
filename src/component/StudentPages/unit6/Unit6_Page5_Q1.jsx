@@ -8,6 +8,7 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex A 6.svg";
+import WrongMark from "../../WrongMark";
 
 const Unit6_Page5_Q1 = () => {
   const items = [
@@ -122,16 +123,16 @@ const Unit6_Page5_Q1 = () => {
   };
   return (
     <div className="main-container-component">
-      <div className="div-forall">
+      <div className="div-forall"  style={{gap:"5px"}}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-4">A</span>
           Look, circle, and write.
         </h5>
         <div className="flex w-full">
-          <div className="grid grid-cols-3 gap-y-10 w-full gap-x-[60px] mt-10 justify-center">
+          <div className="grid grid-cols-3 gap-y-25 w-full gap-x-[70px] mt-10 justify-center">
             {items.map((item, i) => (
-              <div key={i} className="flex flex-col justify-between h-40">
-                <div className="flex items-center gap-2.5">
+              <div key={i} className="flex flex-col justify-between items-center h-35">
+                <div className="flex items-start gap-2.5">
                   <span className="text-[20px] font-bold text-[#2a4e7c]">
                     {i + 1}
                   </span>
@@ -140,7 +141,7 @@ const Unit6_Page5_Q1 = () => {
                     src={item.img}
                     alt=""
                     style={{
-                      width: "80px",
+                      width: "100px",
                       height: "auto",
                     }}
                   />
@@ -153,7 +154,7 @@ const Unit6_Page5_Q1 = () => {
                         onClick={() => chooseOption(i, opt)}
                         className={`cursor-pointer px-2 py-0.5 ${
                           selected[i] === opt
-                            ? "border-2 border-[#1C398E] rounded-full"
+                            ? "border-2 border-[#F79530] rounded-full"
                             : "hover:bg-gray-100 rounded-full"
                         }`}
                       >
@@ -166,12 +167,12 @@ const Unit6_Page5_Q1 = () => {
                 <div className="relative w-40 mt-2">
                   {/* ❌ */}
                   {isWrong(i) && (
-                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
-                      ✕
+                    <span className="absolute top-3 right-13">
+                     <WrongMark/>
                     </span>
                   )}
 
-                  <div className="text-[22px] flex items-end gap-1">
+                  <div className="text-[22px] flex items-end justify-center gap-1">
                     {(() => {
                       const parts = item.word.split(/__|_/); // يقسم الكلمة
 
@@ -183,7 +184,7 @@ const Unit6_Page5_Q1 = () => {
                           <span
                             className={`px-1 min-w-6 text-center border-b-2 ${
                               isWrong(i) ? "border-red-500" : "border-black"
-                            } text-[#1C398E]`}
+                            } text-[#F79530]`}
                           >
                             {selected[i] || ""}
                           </span>

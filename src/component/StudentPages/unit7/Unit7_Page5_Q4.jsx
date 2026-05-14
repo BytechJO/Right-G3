@@ -4,7 +4,7 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex C 2.svg";
 
-const Unit7_Page5_Q4 = () => {
+const Page8_Q4 = () => {
   const grid = [
     [
       "y",
@@ -109,7 +109,14 @@ const Unit7_Page5_Q4 = () => {
     the2: [200 + 16, 200 + 17, 200 + 18], // ثاني the
     school: [300 + 0, 300 + 1, 300 + 2, 300 + 3, 300 + 4, 300 + 5],
   };
-
+  const correctAnswers = [
+    { word: "the1", order: 0 },
+    { word: "playground", order: 1 },
+    { word: "was", order: 2 },
+    { word: "behind", order: 3 },
+    { word: "the2", order: 4 },
+    { word: "school", order: 5 },
+  ];
   const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
@@ -117,6 +124,7 @@ const Unit7_Page5_Q4 = () => {
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const fullSentence = ["the", "playground", "was", "behind", "the", "school"];
 
   const handleMouseDown = (index) => {
     if (locked) return;
@@ -143,7 +151,20 @@ const Unit7_Page5_Q4 = () => {
       }
     }
   };
+  const displayedSentence = fullSentence.map((word, index) => {
+    const isFound = foundWords.some(
+      (foundWord) =>
+        correctAnswers.find((c) => c.word === foundWord)?.order === index,
+    );
 
+    const SLOT_LENGTH = 8;
+
+    if (isFound) {
+      return word.padEnd(SLOT_LENGTH, "");
+    }
+
+    return "_".repeat(SLOT_LENGTH);
+  });
   const handleTouchMove = (e) => {
     if (!isDragging || locked) return;
     e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
@@ -252,15 +273,16 @@ const Unit7_Page5_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What does Stella recommend in I Love My Garden! on page 47?
+          What’s the name of Julia’s school in Helen and Stella Get an e-Mail on
+          page 29?
         </h5>
 
-        {/* Words List */}
+        {/* Words List
         <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
           {wordsToFind.map((item) => (
             <span
               key={item.id}
-              className={`px-3 py-1.5 rounded-[10px] border-2 ${
+              className={`px-3 py-1.5 rounded-[10px] border-2 border-blue-800 ${
                 foundWords.includes(item.id)
                   ? "bg-[#2c5287] text-white"
                   : "bg-white text-black"
@@ -269,18 +291,18 @@ const Unit7_Page5_Q4 = () => {
               {item.word}
             </span>
           ))}
-        </div>
+        </div> */}
 
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
           {/* Grid Wrapper */}
           <div
-            className="border-2 border-[#f28c63] px-4 pt-4 pb-5"
+            className="px-4 pt-4 pb-5"
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px]"
+              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10"
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -337,15 +359,7 @@ const Unit7_Page5_Q4 = () => {
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                marginTop: "15px",
-              }}
-            >
+            <div className="flex justify-center items-center">
               <img
                 src={img1}
                 alt="start"
@@ -355,27 +369,12 @@ const Unit7_Page5_Q4 = () => {
                 }}
               />
 
-              <div
-                style={{
-                  flex: 1,
-                  borderBottom: "2px solid black",
-                  height: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  value={sentence}
-                  readOnly
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontSize: "clamp(14px, 2vw, 18px)", // 🔥 حجم خط ديناميكي للإجابة
-                  }}
-                />
-              </div>
+              <input
+                className="answer-input-CB-unit3-p5-q4"
+                value={displayedSentence.join(" ")}
+                readOnly
+                style={{ fontFamily: "monospace" }} // 🔥 مهم جدا
+              />
 
               <img
                 src={img2}
@@ -400,4 +399,4 @@ const Unit7_Page5_Q4 = () => {
   );
 };
 
-export default Unit7_Page5_Q4;
+export default Page8_Q4;

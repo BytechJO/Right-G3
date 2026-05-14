@@ -27,7 +27,7 @@ const Unit7_Page5_Q1 = () => {
     10: "",
   });
   const [locked, setLocked] = useState(false);
-
+  const [hoveredCell, setHoveredCell] = useState(null);
   const [checked, setChecked] = useState(false);
 
   const words = ["j", "d", "h", "f", "b", "r", "c", "d", "v", "w"];
@@ -44,7 +44,14 @@ const Unit7_Page5_Q1 = () => {
     9: "v",
     10: "w",
   };
+  const handleReturnWord = (id) => {
+    if (locked) return;
 
+    setUserAnswers((prev) => ({
+      ...prev,
+      [id]: "",
+    }));
+  };
   const questions = [
     { id: 1, image: img1 },
     { id: 2, image: img2 },
@@ -142,10 +149,7 @@ const Unit7_Page5_Q1 = () => {
         <div
           className="div-forall"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            width: "60%",
+            gap: "25px",
           }}
         >
           <div>
@@ -163,7 +167,7 @@ const Unit7_Page5_Q1 = () => {
             style={{
               display: "flex",
               justifyContent: "center",
-              padding: "20px",
+              // padding: "20px",
             }}
           >
             <div
@@ -185,7 +189,7 @@ const Unit7_Page5_Q1 = () => {
                       display: "flex",
                       gap: "12px",
                       padding: "10px",
-                      border: "2px dashed #ccc",
+                      // border: "2px dashed #ccc",
                       borderRadius: "10px",
                       marginTop: "20px",
                       justifyContent: "center",
@@ -216,7 +220,7 @@ const Unit7_Page5_Q1 = () => {
                               {...provided.dragHandleProps}
                               style={{
                                 padding: "7px 14px",
-                                border: "2px solid #2c5287",
+                                border: "1px solid #F79530",
                                 borderRadius: "8px",
                                 background: "white",
                                 fontWeight: "bold",
@@ -242,7 +246,7 @@ const Unit7_Page5_Q1 = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(5, 1fr)",
-                  gap: "12px",
+                  gap: "30px",
                 }}
               >
                 {questions.map((q) => (
@@ -288,34 +292,44 @@ const Unit7_Page5_Q1 = () => {
                           style={{
                             position: "relative",
                             marginTop: "6px",
-                            borderBottom: `2px solid ${
+                            borderBottom:
                               checked &&
                               userAnswers[q.id] !== correctAnswers[q.id]
-                                ? "red"
-                                : "#000"
-                            }`,
-                            minHeight: "28px",
+                                ? "2px solid red"
+                                : "1px solid #000",
+                            minHeight: "35px",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
                             fontSize: "20px",
-                            color: "#1C398E",
                             fontWeight: "bold",
+                            cursor: userAnswers[q.id] ? "pointer" : "default",
                           }}
                         >
-                          {userAnswers[q.id]}
+                          <span
+                            onClick={() => handleReturnWord(q.id)}
+                            onMouseEnter={() => setHoveredCell(q.id)}
+                            onMouseLeave={() => setHoveredCell(null)}
+                            style={{
+                              color: hoveredCell === q.id ? "red" : "black",
+                              cursor: "pointer",
+                              transition: "0.2s",
+                            }}
+                          >
+                            {userAnswers[q.id]}
+                          </span>
 
                           {checked &&
                             userAnswers[q.id] !== correctAnswers[q.id] && (
                               <span
                                 style={{
                                   position: "absolute",
-                                  left: "25%",
+                                  right: "25%",
                                   top: "50%",
                                   transform: "translateY(-50%)",
                                   width: "20px",
                                   height: "20px",
-                                  background: "#ef4444",
+                                  background: "red",
                                   color: "white",
                                   borderRadius: "50%",
                                   display: "flex",

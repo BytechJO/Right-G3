@@ -30,7 +30,7 @@ const Unit6_Page4 = ({ openPopup }) => {
   const clickableAreas = [
     { x1: 5.90, y1: 8.84, x2:  82.61, y2: 21.03, sound: sound1 },
     { x1: 5.90, y1: 26.1, x2: 48.13, y2: 30.33, sound: sound2 },
-    { x1: 72.05, y1: 61.47, x2: 93.60, y2: 67.56, sound: sound3 },
+    { x1: 72.05, y1: 61.9, x2: 93.60, y2: 67.56, sound: sound3 },
   ];
 
   const handleImageClick = (e) => {

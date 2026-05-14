@@ -24,8 +24,8 @@
 }
 .small-images {
   display: flex;
-  justify-content: space-between;
-  gap: 25px;
+  justify-content: center;
+  gap: 35px;
   /* position: absolute;
   top: 20%; */
   width: 60%;
@@ -92,7 +92,7 @@
 .small-box1 {
   padding: 10px;
   background: #fff;
-  width: 100%;
+  width: auto;
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.3s ease;

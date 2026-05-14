@@ -22,6 +22,50 @@ const Review6_Page2_Q2 = () => {
   ];
   const [answers, setAnswers] = useState(Array(items.length).fill(null));
   const [showResult, setShowResult] = useState(false);
+
+  const showAnswers = () => {
+    const correct = items.map((item) => (item.correct ? "y" : ""));
+    setAnswers(correct);
+    setShowResult(true);
+    setShowedAnswer(true);
+    setLocked(true);
+  };
+  const resetAll = () => {
+    setAnswers(Array(items.length).fill(""));
+    setShowResult(false);
+    setLocked(false);
+    setShowedAnswer(false);
+  };
+  const checkAnswers = () => {
+    if (locked) return;
+
+    let score = 0;
+
+    items.forEach((item, i) => {
+      const userAnswer = answers[i];
+
+      // فقط نحسب إذا في إجابة
+      if (userAnswer === "" || userAnswer === null) return;
+
+      const isCorrect =
+        (item.correct && userAnswer === "y") ||
+        (!item.correct && userAnswer === "");
+
+      if (isCorrect) score++;
+    });
+
+    const total = items.length;
+
+    const message = `Score: ${score} / ${total}`;
+
+    setShowResult(true);
+    setLocked(true);
+
+    if (score === total) ValidationAlert.success(message);
+    else if (score === 0) ValidationAlert.error(message);
+    else ValidationAlert.warning(message);
+  };
+
   const handleSelect = (index, value) => {
     if (locked) return;
 
@@ -30,54 +74,6 @@ const Review6_Page2_Q2 = () => {
       updated[index] = value;
       return updated;
     });
-  };
-  const showAnswers = () => {
-    const correct = items.map((item) => (item.correct ? "y" : "n"));
-    setAnswers(correct);
-    setShowResult(true);
-    setShowedAnswer(true);
-    setLocked(true);
-  };
-  const resetAll = () => {
-    setAnswers(Array(items.length).fill(null)); // ❗ مش ""
-    setShowResult(false);
-    setLocked(false);
-    setShowedAnswer(false);
-  };
-  const checkAnswers = () => {
-    if (locked || showedAnswer) return;
-
-    // ❗ لازم يجاوب الكل
-    const allAnswered = answers.every((a) => a !== null);
-
-    if (!allAnswered) {
-      ValidationAlert.info("Please answer all questions.");
-      return;
-    }
-
-    let score = 0;
-
-    items.forEach((item, i) => {
-      if (
-        (item.correct && answers[i] === "y") ||
-        (!item.correct && answers[i] === "n")
-      ) {
-        score++;
-      }
-    });
-
-    const total = items.length; // 🔥 = 6
-
-    const message = `
-        Score: ${score} / ${total}
-  `;
-
-    setShowResult(true);
-    setLocked(true);
-
-    if (score === total) ValidationAlert.success(message);
-    else if (score === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
   };
   return (
     <div
@@ -89,7 +85,7 @@ const Review6_Page2_Q2 = () => {
         position: "relative",
       }}
     >
-      <div className="div-forall" style={{ width: "60%" }}>
+      <div className="div-forall" style={{ gap: "40px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>E</span>
           Write <span style={{ color: "#2e3192" }}>y</span> in the blank only
@@ -100,84 +96,64 @@ const Review6_Page2_Q2 = () => {
           {items.map((item, i) => {
             const isWrong =
               showResult &&
+              answers[i] !== "" &&
               ((item.correct && answers[i] !== "y") ||
-                (!item.correct && answers[i] !== "n"));
+                (!item.correct && answers[i] !== ""));
 
             return (
-              <div key={i} className="relative text-center">
+              <div
+                key={i}
+                className="relative text-center flex flex-col justify-center items-center gap-2"
+              >
                 {/* الصورة */}
                 <img
                   src={item.img}
-                  style={{ width: "90px", height: "auto" }}
-                  className="mb-2 mx-auto"
+                  style={{ width: "auto", height: "150px" }}
                 />
 
                 {/* الكلمة + الخط */}
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-lg">
-                    {i + 1} {item.word}
+                <div className="relative flex items-center justify-center gap-2">
+                  <span className="text-[18px]">
+                  <span  className="text-[20px] font-bold mr-2">{i + 1}</span>   {item.word}
                   </span>
 
-                  {/* الخط + البوكسين */}
-                  <div className="relative w-24">
-                    {/* الخط */}
-                    <div
-                      className={`border-b-2 w-full h-6
-                  "border-black"
-              `}
-                    />
-
-                    {/* البوكسين فوق الخط */}
-                    <div className="absolute inset-0 flex items-center justify-center gap-2">
-                      {/* Y */}
-                      <div
-                        onClick={() => handleSelect(i, "y")}
-                        className={`px-2 py-0.5 border rounded text-xs font-bold cursor-pointer
-                  ${answers[i] === "y" ? "bg-[#1C398E] text-white" : "bg-white"}
-                  ${locked ? "cursor-not-allowed " : "hover:bg-[#1C398E]"}
-                `}
-                      >
-                        Y
-                      </div>
-
-                      {/* NO */}
-                      <div
-                        onClick={() => handleSelect(i, "n")}
-                        className={`px-2 py-0.5 border rounded text-xs font-bold cursor-pointer 
-                  ${answers[i] === "n" ? "bg-[#1C398E] text-white" : "bg-white"}
-                  ${locked ? "cursor-not-allowed " : "hover:bg-gray-200"}
-                `}
-                      >
-                        No
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ❌ الغلط */}
-                {isWrong && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: "22px",
-                      height: "22px",
-                      background: "#ef4444",
-                      color: "white",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                      border: "2px solid white",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                      pointerEvents: "none",
-                    }}
+                  <select
+                    value={answers[i]}
+                    onChange={(e) => handleSelect(i, e.target.value)}
+                    disabled={locked}
+                    className="border-b px-2 py-1 text-[20px] font-bold"
                   >
-                    ✕
-                  </div>
-                )}
+                    <option value="">__</option>
+                    <option value="y">y</option>
+                  </select>
+                  {/* ❌ الغلط */}
+                  {isWrong && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        right:"0px",
+                        transform: "translateY(-50%)",
+                        transform: "translateY(-50%)",
+                        width: "22px",
+                        height: "22px",
+                        background: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "500",
+                        fontSize:"12px",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ✕
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}

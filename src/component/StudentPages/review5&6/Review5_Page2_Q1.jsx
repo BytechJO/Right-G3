@@ -76,6 +76,7 @@ const Review5_Page2_Q1 = () => {
   const showAnswers = () => {
     const filled = questions.map((q) => q.answer);
     setAnswers(filled);
+     setWrongMap({});
     setLocked(true);
   };
   const checkAnswers = () => {
@@ -115,7 +116,18 @@ const Review5_Page2_Q1 = () => {
     setLocked(true);
   };
   const usedWords = answers.flat().filter(Boolean);
+  const removeWord = (word) => {
+    if (locked) return;
 
+    setAnswers((prev) => {
+      const updated = [...prev];
+      const index = updated.findIndex((a) => a === word);
+      if (index !== -1) {
+        updated[index] = "";
+      }
+      return updated;
+    });
+  };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
@@ -126,7 +138,7 @@ const Review5_Page2_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "30px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>C</span>
             Look and write the words ending in{" "}
@@ -134,7 +146,7 @@ const Review5_Page2_Q1 = () => {
           </h5>
 
           {/* IMAGES */}
-          <div className="w-[70%] mx-auto">
+          <div className="flex flex-col gap-5">
             {/* ANSWERS BANK */}
 
             <Droppable droppableId="bank" direction="horizontal">
@@ -144,14 +156,14 @@ const Review5_Page2_Q1 = () => {
                   {...provided.droppableProps}
                   style={{
                     display: "flex",
-                    gap: "12px",
+                    gap: "25px",
                     padding: "10px",
-                    border: "2px dashed #ccc",
+                    // border: "2px dashed #ccc",
                     borderRadius: "10px",
-                    marginTop: "20px",
+                    // marginTop: "20px",
                     justifyContent: "center",
                     width: "100%",
-                    marginBottom: "20px",
+                    // marginBottom: "20px",
                     // justifyContent: "center",
                   }}
                 >
@@ -172,8 +184,8 @@ const Review5_Page2_Q1 = () => {
                             {...provided.dragHandleProps}
                             className="season-chip"
                             style={{
-                              padding: "7px 14px",
-                              border: "2px solid #2c5287",
+                              padding: "7px 20px",
+                              border: "1px solid #F79530",
                               borderRadius: "8px",
                               background: "white",
                               fontWeight: "bold",
@@ -196,7 +208,7 @@ const Review5_Page2_Q1 = () => {
 
             {/* QUESTIONS GRID */}
 
-            <div className="grid grid-cols-3 gap-10 mb-20">
+            <div className="grid grid-cols-3 gap-15 mb-5">
               {questions.map((q) => (
                 <div key={q.id} className="flex flex-col items-start">
                   <div className="flex gap-2 items-start">
@@ -205,7 +217,7 @@ const Review5_Page2_Q1 = () => {
                       src={q.img}
                       style={{
                         height: "120px",
-                        border: "2px solid orange",
+                        // border: "2px solid orange",
                         borderRadius: "10px",
                       }}
                     />
@@ -218,8 +230,8 @@ const Review5_Page2_Q1 = () => {
                         {...provided.droppableProps}
                         style={{
                           width: "200px",
-                          borderBottom: `3px solid ${
-                            wrongMap[q.id] ? "red" : "black"
+                          borderBottom: ` ${
+                            wrongMap[q.id] ? "2px solid red" : "1px solid black"
                           }`,
                           minHeight: "35px",
                           marginTop: "10px",
@@ -232,7 +244,7 @@ const Review5_Page2_Q1 = () => {
                           <Draggable
                             draggableId={answers[q.id - 1]}
                             index={0}
-                            isDragDisabled={locked}
+                            isDragDisabled={true}
                           >
                             {(provided) => (
                               <div
@@ -244,7 +256,13 @@ const Review5_Page2_Q1 = () => {
                                   position: "relative", // 👈 أضف هذا
                                 }}
                               >
-                                <span className="text-[#1C398E] font-semibold text-center block">
+                                <span
+                                  onClick={() => removeWord(answers[q.id - 1])}
+                                  className={`font-semibold text-center block ${locked ? "":"hover:text-red-500 cursor-pointer"} `}
+                                  style={{
+                                    userSelect: "none",
+                                  }}
+                                >
                                   {answers[q.id - 1]}
                                 </span>
                                 {wrongMap[q.id] && (
@@ -256,7 +274,7 @@ const Review5_Page2_Q1 = () => {
                                       transform: "translateY(-50%)",
                                       width: "20px",
                                       height: "20px",
-                                      background: "#ef4444",
+                                      background: "red",
                                       color: "white",
                                       borderRadius: "50%",
                                       display: "flex",

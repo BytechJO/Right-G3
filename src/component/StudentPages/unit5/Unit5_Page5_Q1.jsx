@@ -46,16 +46,33 @@ const Unit5_Page5_Q1 = () => {
     groups.map((group) => Array(group.items.length).fill(false)),
   );
   const [locked, setLocked] = useState(false); // ⭐ NEW — يمنع التعديل بعد Show Answer
-
+const getCorrectCount = (group) => {
+  return group.items.filter((item) =>
+    group.correctWords.includes(item.word),
+  ).length;
+};
   // ----------- الداتا الجديدة الخاصة بسؤال short a ---------------
 
   const handleSelect = (groupIndex, itemIndex) => {
-    if (locked) return;
+  if (locked) return;
 
-    const updated = answers.map((group) => [...group]);
-    updated[groupIndex][itemIndex] = !updated[groupIndex][itemIndex];
-    setAnswers(updated);
-  };
+  const updated = answers.map((group) => [...group]);
+
+  const group = groups[groupIndex];
+
+  const correctLimit = getCorrectCount(group);
+
+  const currentSelectedCount = updated[groupIndex].filter(Boolean).length;
+
+  const isSelected = updated[groupIndex][itemIndex];
+
+  // 🔥 إذا بدو يختار زيادة → امنعه
+  if (!isSelected && currentSelectedCount >= correctLimit) return;
+
+  updated[groupIndex][itemIndex] = !updated[groupIndex][itemIndex];
+
+  setAnswers(updated);
+};
 
   const checkAnswers = () => {
     if (locked) return;
@@ -132,10 +149,8 @@ const Unit5_Page5_Q1 = () => {
       <div
         className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          width: "60%",
+          
+          gap: "30px",
         }}
       >
         <div>
@@ -152,7 +167,7 @@ const Unit5_Page5_Q1 = () => {
           style={{
             display: "flex",
             justifyContent: "center",
-            gap: "10px",
+            gap: "35px",
             flexWrap: "wrap",
             marginTop: "20px",
           }}
@@ -161,7 +176,7 @@ const Unit5_Page5_Q1 = () => {
             <div
               key={groupIndex}
               style={{
-                border: "2px solid #F79530",
+                border: "1px solid #F79530",
                 borderRadius: "18px",
                 padding: "18px 16px 12px",
                 position: "relative",
@@ -246,7 +261,7 @@ const Unit5_Page5_Q1 = () => {
                               position: "absolute",
                               inset: 0,
                               borderRadius: "50%",
-                              border: "3px solid #2c5287",
+                              border: isWrong ? "2px solid red":"1px solid #F79530",
                               zIndex: 2, // 🔥 فوق الصورة
                               pointerEvents: "none",
                             }}
@@ -271,12 +286,12 @@ const Unit5_Page5_Q1 = () => {
                         <div
                           style={{
                             position: "absolute",
-                            right: "-20px",
-                            top: "50%",
+                            right: "2px",
+                            top: "10%",
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             display: "flex",
@@ -285,6 +300,7 @@ const Unit5_Page5_Q1 = () => {
                             fontWeight: "bold",
                             border: "2px solid white",
                             boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            zIndex:99999,
                             pointerEvents: "none",
                           }}
                         >

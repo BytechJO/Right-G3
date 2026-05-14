@@ -4,7 +4,8 @@ import "./Review5_Page2_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import blue from "../../../assets/audio/ClassBook/Unit 6/P 53/unit6-pg53-EXD.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 const Review5_Page2_Q2 = () => {
   const captions = [
     {
@@ -98,9 +99,9 @@ const Review5_Page2_Q2 = () => {
       <div
         onClick={() => handleSelect(index, value)}
         style={{
-          width: "34px",
-          height: "34px",
-          border: "2px solid #F79530",
+          width: "45px",
+          height: "45px",
+          border: isWrong ? "1px solid red" : "1px solid #F79530",
           borderRadius: "9px",
           display: "flex",
           alignItems: "center",
@@ -115,18 +116,26 @@ const Review5_Page2_Q2 = () => {
           userSelect: "none",
         }}
       >
-        {isSelected ? symbol : ""}
+        {isSelected ? (
+          symbol === "✓" ? (
+            <img src={trueIcon} style={{ height: "25px" }} />
+          ) : (
+            <img src={falseIcon} style={{ height: "25px" }} />
+          )
+        ) : (
+          ""
+        )}
 
         {isWrong && (
           <span
             style={{
               position: "absolute",
-              right: "-14px",
-              top: "50%",
+              right: "-10px",
+              top: "5%",
               transform: "translateY(-50%)",
-              width: "20px",
-              height: "20px",
-              background: "#ef4444",
+              width: "22px",
+              height: "22px",
+              background: "red",
               color: "white",
               borderRadius: "50%",
               display: "flex",
@@ -159,22 +168,27 @@ const Review5_Page2_Q2 = () => {
     >
       <div
         className="div-forall"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "30px",
-          width: "60%",
-          justifyContent: "flex-start",
-        }}
+        style={
+          {
+            gap: "50px",
+          }
+        }
       >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>D</span> Do both words have the
-          same <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and
-          write <span style={{ color: "#D52328" }}>✓</span> or{" "}
+        <h3 className="header-title-page8">
+          <span className="ex-A" style={{ marginRight: "10px" }}>
+            D
+          </span>{" "}
+          Do both words have the same{" "}
+          <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and write{" "}
+          <span style={{ color: "#D52328" }}>✓</span> or{" "}
           <span style={{ color: "#D52328" }}>✗</span>.
-        </h5>
+        </h3>
 
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={10.8} />
+        <QuestionAudioPlayer
+          src={blue}
+          captions={captions}
+          stopAtSecond={11.5}
+        />
 
         <div
           style={{
@@ -190,7 +204,7 @@ const Review5_Page2_Q2 = () => {
               key={group.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "32px 1fr 1fr 40px 40px",
+                gridTemplateColumns: "32px 70px 70px 40px 40px",
                 alignItems: "center",
                 columnGap: "14px",
                 minHeight: "52px",
@@ -199,7 +213,7 @@ const Review5_Page2_Q2 = () => {
               <span
                 style={{
                   fontWeight: "700",
-                  fontSize: "18px",
+                  fontSize: "20px",
                   color: "#1f1f1f",
                 }}
               >
@@ -208,7 +222,7 @@ const Review5_Page2_Q2 = () => {
 
               <span
                 style={{
-                  fontSize: "18px",
+                  fontSize: "20px",
                   color: "#2b2b2b",
                 }}
               >
@@ -217,7 +231,7 @@ const Review5_Page2_Q2 = () => {
 
               <span
                 style={{
-                  fontSize: "18px",
+                  fontSize: "20px",
                   color: "#2b2b2b",
                 }}
               >

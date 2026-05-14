@@ -5,7 +5,7 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frien
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 4.svg";
-import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Asset 82.svg";
+import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 5.svg";
 
 const Review4_Page1_Q3 = () => {
   const [lines, setLines] = useState([]);
@@ -26,8 +26,8 @@ const Review4_Page1_Q3 = () => {
 
   const words = [`cloudy`, `rainy`, `cold`, `warm`, `hot`];
   const correctMatches = {
-    4: 0, 
-    3: 1, 
+    4: 0,
+    3: 1,
     0: 2,
     1: 3,
     2: 4,
@@ -160,7 +160,7 @@ const Review4_Page1_Q3 = () => {
         position: "relative",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>C</span> Match and write the
           words.
@@ -178,9 +178,11 @@ const Review4_Page1_Q3 = () => {
         ${
           startDot?.index === i && startDot?.type === "text"
             ? "border-2 border-[#F79530] bg-[#fdecea]"
-            : "bg-[#FEF3E6]"
+            : isChecked && isWrong
+              ? "border-2 border-red-500 bg-[#fdecea]"
+              : "border-2 border-transparent bg-[#fdecea]"
         }
-        ${isChecked && isWrong ? "border-red-500" : ""}
+      
         `}
                   onClick={() => handleDotClick(i, "text")}
                 >
@@ -197,7 +199,7 @@ const Review4_Page1_Q3 = () => {
                       transform: "translateY(-50%)",
                       width: "22px",
                       height: "22px",
-                      background: "#ef4444",
+                      background: "red",
                       color: "white",
                       borderRadius: "50%",
                       display: "flex",
@@ -259,7 +261,7 @@ const Review4_Page1_Q3 = () => {
                   objectFit: "cover",
                   cursor: "pointer",
                   borderRadius: "16px",
-                  border: "2px solid #F79530",
+                  // border: "2px solid #F79530",
                   transition: "all 0.3s ease",
                   transform:
                     startDot?.index === i && startDot?.type === "image"

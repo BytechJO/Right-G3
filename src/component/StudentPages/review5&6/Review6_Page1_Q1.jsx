@@ -93,7 +93,15 @@ const Review6_Page1_Q1 = () => {
     else ValidationAlert.warning(msg);
   };
   const usedWords = answers.filter(Boolean);
+  const removeWord = (index) => {
+    if (showCorrect) return;
 
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[index] = "";
+      return updated;
+    });
+  };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
@@ -105,13 +113,10 @@ const Review6_Page1_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div
-          className="div-forall"
-          style={{ width: "60%", marginBottom: "40px" }}
-        >
+        <div className="div-forall" style={{ gap: "40px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>A</span>Read,
-            look, and write. Use the words below.
+            <span style={{ marginRight: "10px" }}>A</span>Read, look, and write.
+            Use the words below.
           </h5>
           {/* WORD BANK */}
           <Droppable droppableId="bank" direction="horizontal">
@@ -121,14 +126,14 @@ const Review6_Page1_Q1 = () => {
                 {...provided.droppableProps}
                 style={{
                   display: "flex",
-                  gap: "12px",
+                  gap: "25px",
                   padding: "10px",
-                  border: "2px dashed #ccc",
+                  // border: "2px dashed #ccc",
                   borderRadius: "10px",
-                  marginTop: "20px",
+                  // marginTop: "20px",
                   justifyContent: "center",
                   width: "100%",
-                  marginBottom: "20px",
+                  // marginBottom: "20px",
                 }}
               >
                 {wordBank.map((word, index) => {
@@ -149,7 +154,7 @@ const Review6_Page1_Q1 = () => {
                           className="season-chip"
                           style={{
                             padding: "7px 14px",
-                            border: "2px solid #2c5287",
+                            border: "1px solid #F79530",
                             borderRadius: "8px",
                             background: "white",
                             fontWeight: "bold",
@@ -177,31 +182,24 @@ const Review6_Page1_Q1 = () => {
               gap: "30px",
             }}
           >
-            {/* 🟠 IMAGE */}
-            <div
+            <img
+              src={img1}
+              alt="exercise"
               style={{
-                width: "300px",
-                height: "300px",
-                overflow: "hidden",
-                border: "2px solid orange",
-                borderRadius: 5,
+                width: "auto",
+                height: "350px",
               }}
-            >
-              <img
-                src={img1}
-                alt="exercise"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "50% 85%",
-                  transform: "scale(1.05)",
-                }}
-              />
-            </div>
+            />
 
             {/* 🔵 RIGHT SIDE (النص + الأسئلة) */}
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                display: "flex",
+                height: "350px",
+                justifyContent: "space-between",
+                flexDirection: "column",
+              }}
+            >
               {/* ✨ الفقرة */}
               <div
                 style={{
@@ -226,7 +224,7 @@ const Review6_Page1_Q1 = () => {
                       flexDirection: "row",
                       alignItems: "center",
                       gap: "10px", // 🔥 أهم تغيير
-                      marginBottom: "15px",
+                      // marginBottom: "15px",
                     }}
                   >
                     {/* TEXT */}
@@ -234,6 +232,7 @@ const Review6_Page1_Q1 = () => {
                       style={{
                         fontSize: "18px",
                         minWidth: "100px", // 🔥 مهم
+                        alignSelf: "end",
                         whiteSpace: "nowrap", // 🔥 يمنع النزول سطر ثاني
                       }}
                     >
@@ -254,17 +253,26 @@ const Review6_Page1_Q1 = () => {
                               width: "100%",
                               maxWidth: "400px",
                               fontWeight: "bold",
-                              color: answers[i] ? "#1C398E" : "black",
+                              // color: answers[i] ? "#1C398E" : "black",
 
-                              borderBottom: `3px solid ${
-                                isWrong ? "red" : "black"
+                              borderBottom: ` ${
+                                isWrong ? "2px solid red" : "1px solid black"
                               }`,
 
-                              marginTop: "20px",
+                              // marginTop: "20px",
                               paddingBottom: "6px",
                             }}
                           >
-                            {answers[i]}
+                            <span
+                              onClick={() => removeWord(i)}
+                              style={{
+                                cursor: showCorrect? "default":"pointer",
+                                userSelect: "none",
+                              }}
+                              className={`${showCorrect?"":"hover:text-red-500"}`}
+                            >
+                              {answers[i]}
+                            </span>
                             {provided.placeholder}
 
                             {showCorrect && isWrong && (
@@ -276,7 +284,7 @@ const Review6_Page1_Q1 = () => {
                                   transform: "translateY(-50%)",
                                   width: "22px",
                                   height: "22px",
-                                  background: "#ef4444",
+                                  background: "red",
                                   color: "white",
                                   borderRadius: "50%",
                                   fontSize: "12px",

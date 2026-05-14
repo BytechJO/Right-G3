@@ -69,6 +69,7 @@ const Unit5_Page1_find = () => {
         style={{
           textAlign: "center",
           display: "flex",
+             gap:"30px",
           flexDirection: "column",
           alignItems: "center",
         }}
@@ -87,7 +88,8 @@ const Unit5_Page1_find = () => {
             alt="interactive"
             style={{
               width: "auto",
-              height: "75vh",
+              height: "70vh",
+                             borderRadius:"15px",
               cursor: "pointer",
               display: "block",
             }}
@@ -119,6 +121,7 @@ const Unit5_Page1_find = () => {
               style={{
                 position: "absolute",
                 top: `60.9%`,
+                
                 left: `79%`,
                 height: `7%`,
                 pointerEvents: "none",

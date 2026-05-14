@@ -5,10 +5,11 @@ import WrongMark from "../../WrongMark";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex F 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex F 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex F 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Asset 83.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 37/Ex F 4.svg";
 
 import blue from "../../../assets/audio/ClassBook/Unit 4/P 37/full2.mp3";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 import Button from "../../Button";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 const Review4_Page2_Q3 = () => {
@@ -130,121 +131,123 @@ const Review4_Page2_Q3 = () => {
     >
       <div className="div-forall">
         <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>E</span>
-          Does the word have a{" "}
-          <span style={{ color: "#2e3192" }}>voiceless th</span> sound? Listen
-          and write<span style={{ color: "#D52328" }}> ✓ </span>or
+          <span style={{ marginRight: "20px" }}>D</span>
+          Does the word have a
+          <span style={{ color: "#2e3192" }}>voiceless th</span>sound? Listen and
+          write<span style={{ color: "#D52328" }}> ✓ </span>or
           <span style={{ color: "#D52328" }}> ✗</span>
         </h5>
-        <QuestionAudioPlayer
-          src={blue}
-          captions={captions}
-          stopAtSecond={11.16}
-        />
+        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11} />
 
         {/* GRID */}
         <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center">
           {items.map((item, i) => (
             <div key={i} className="relative flex flex-col items-center">
               {/* الرقم */}
-              <span className="absolute -top-3 -left-3 text-lg font-bold">
-                {i + 1}
-              </span>
+              <div className="flex gap-2">
+                <span className="text-[20px] font-bold">{i + 1}</span>
 
-              {/* الصورة */}
-              <img
-                src={item.img}
-                style={{
-                  width: "15vw",
-                  height: "18vh",
-                  objectFit: "contain",
-                  border: "3px solid #F79530", // 🔥 برتقالي
-                  borderRadius: "12px",
-                  padding: "4px",
-                }}
-              />
-
-              <div className="flex gap-3 mt-3 items-center">
-                <div
-                  className="flex items-center gap-1"
-                  style={{ position: "relative" }}
-                >
-                  <button
-                    onClick={() => choose(i, "yes")}
+                {/* الصورة */}
+                <div className="flex flex-col items-center">
+                  <img
+                    src={item.img}
                     style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "18px",
-                      cursor: "pointer",
-
-                      background: selected[i] === "yes" ? "#1C398E" : "#fff", // 🔵 دايماً
-                      color: selected[i] === "yes" ? "#fff" : "#000",
-
-                      border: "2px solid #F79530",
+                      width: "auto",
+                      height: "20vh",
+                      // objectFit: "contain",
                     }}
-                  >
-                    ✓
-                  </button>
-
-                  {locked &&
-                    selected[i] === "yes" &&
-                    item.correct !== "yes" && (
-                      <div
+                  />
+                  <div className="flex gap-3 mt-3 items-center">
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ position: "relative" }}
+                    >
+                      <button
+                        onClick={() => choose(i, "yes")}
                         style={{
-                          position: "absolute",
-                          left: "-35px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          zIndex: 10,
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "18px",
+                          cursor: locked ? "default" : "pointer",
+                          border:
+                            selected[i] === "yes"
+                              ? locked &&
+                                selected[i] === "yes" &&
+                                item.correct !== "yes"
+                                ? "2px solid red"
+                                : "2px solid #f39b42"
+                              : "2px solid #ccc",
                         }}
                       >
-                        <WrongMark />
-                      </div>
-                    )}
-                </div>
+                        <img src={trueIcon} style={{ height: "25px" }} />
+                      </button>
 
-                {/* NO */}
-                <div
-                  className="flex items-center gap-1"
-                  style={{ position: "relative" }}
-                >
-                  <button
-                    onClick={() => choose(i, "no")}
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "18px",
-                      cursor: "pointer",
-
-                      background: selected[i] === "no" ? "#1C398E" : "#fff",
-                      color: selected[i] === "no" ? "#fff" : "#000",
-
-                      border: "2px solid #F79530",
-                    }}
-                  >
-                    ✗
-                  </button>
-                  {locked && selected[i] === "no" && item.correct !== "no" && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: "35px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        zIndex: 10,
-                      }}
-                    >
-                      <WrongMark />
+                      {locked &&
+                        selected[i] === "yes" &&
+                        item.correct !== "yes" && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              left: "20px",
+                              top: "5%",
+                              transform: "translateY(-50%)",
+                              zIndex: 10,
+                            }}
+                          >
+                            <WrongMark />
+                          </div>
+                        )}
                     </div>
-                  )}
+
+                    {/* NO */}
+                    <div
+                      className="flex items-center gap-1"
+                      style={{ position: "relative" }}
+                    >
+                      <button
+                        onClick={() => choose(i, "no")}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "18px",
+                          cursor: locked ? "default" : "pointer",
+                          border:
+                            selected[i] === "no"
+                              ? locked &&
+                                selected[i] === "no" &&
+                                item.correct !== "no"
+                                ? "2px solid red"
+                                : "2px solid #f39b42"
+                              : "2px solid #ccc",
+                        }}
+                      >
+                        <img src={falseIcon} style={{ height: "25px" }} />
+                      </button>
+                      {locked &&
+                        selected[i] === "no" &&
+                        item.correct !== "no" && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              left: "20px",
+                              top: "5%",
+                              transform: "translateY(-50%)",
+                              zIndex: 10,
+                            }}
+                          >
+                            <WrongMark />
+                          </div>
+                        )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

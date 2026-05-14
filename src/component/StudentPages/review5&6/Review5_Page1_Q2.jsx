@@ -26,15 +26,15 @@ const Review5_Page1_Q2 = () => {
     { id: "b", src: under },
     { id: "c", src: between },
     { id: "d", src: inFrontOf },
-    { id: "e", src: on },
-    { id: "f", src: nextTo },
+    { id: "e", src: nextTo },
+    { id: "f", src:  on },
   ];
   const correctAnswers = {
     1: "a",
     2: "d",
-    3: "f",
+    3: "e",
     4: "c",
-    5: "e",
+    5: "f",
     6: "b",
   };
   const [locked, setLocked] = useState(false);
@@ -162,13 +162,13 @@ Score: ${score} / ${total}
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "15px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>B</span>
           Read, match, and write.
         </h5>
 
-        <div className="container relative w-full h-[600px]">
+        <div className="container relative w-full h-[500px] px-5">
           {/* الخطوط */}
           <svg className="absolute w-full h-full pointer-events-none">
             {connections.map((c, i) => (
@@ -187,7 +187,7 @@ Score: ${score} / ${total}
           </svg>
 
           {/* اليسار (كلمات + بوكس) */}
-          <div className="absolute top-10 left-10 w-full flex flex-col gap-6">
+          <div className="w-full flex flex-col gap-6">
             {items.map((item, index) => {
               const img = images[index];
               const isRight = index % 2 !== 0;

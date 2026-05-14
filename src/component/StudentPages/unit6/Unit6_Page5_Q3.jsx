@@ -4,8 +4,8 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50/Ex C 2.svg";
 
-const Unit6_Page5_Q3 = () => {
-  const grid = [
+const Page8_Q4 = () => {
+ const grid = [
     [
       "h",
       "i",
@@ -104,16 +104,18 @@ const Unit6_Page5_Q3 = () => {
     ],
   ];
   const letters = grid;
-  const wordsToFind = [
-    "stella",
-    "recommends",
-    "everyone",
-    "to",
-    "start",
-    "a",
-    "garden",
-  ];
 
+const wordsToFind = [
+    { id: "stella", word: "stella" },
+    { id: "recommends", word: "recommends" },
+    { id: "everyone", word: "everyone" },
+    { id: "to", word: "to" },
+    { id: "start", word: "start" },
+    { id: "slide", word: "slide" },
+    { id: "a", word: "a" },
+    { id: "the", word: "the" },
+    { id: "garden", word: "garden" },
+  ];
   const correctPositions = {
     stella: [4, 5, 6, 7, 8, 9],
     recommends: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
@@ -132,7 +134,17 @@ const Unit6_Page5_Q3 = () => {
     a: [200 + 7],
     garden: [200 + 14, 200 + 15, 200 + 16, 200 + 17, 200 + 18, 200 + 19],
   };
-
+  
+    const correctAnswers = [
+    { word: "stella", order: 0 },
+    { word: "recommends", order: 1 },
+    { word: "everyone", order: 2 },
+    { word: "to", order: 3 },
+    { word: "start", order: 4 },
+    { word: "a", order: 5 },
+    { word: "garden", order: 6 },
+  
+  ];
   const [locked, setLocked] = useState(false);
   const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
@@ -140,6 +152,15 @@ const Unit6_Page5_Q3 = () => {
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const fullSentence = [
+    "stella",
+    "recommends",
+    "everyone",
+    "to",
+    "start",
+    "a",
+    "garden",
+  ];
 
   const handleMouseDown = (index) => {
     if (locked) return;
@@ -166,7 +187,20 @@ const Unit6_Page5_Q3 = () => {
       }
     }
   };
+  const displayedSentence = fullSentence.map((word, index) => {
+    const isFound = foundWords.some(
+      (foundWord) =>
+        correctAnswers.find((c) => c.word === foundWord)?.order === index,
+    );
 
+    const SLOT_LENGTH = 8;
+
+    if (isFound) {
+      return word.padEnd(SLOT_LENGTH, "");
+    }
+
+    return "_".repeat(SLOT_LENGTH);
+  });
   const handleTouchMove = (e) => {
     if (!isDragging || locked) return;
     e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
@@ -188,15 +222,18 @@ const Unit6_Page5_Q3 = () => {
     const reversedWord = currentWord.split("").reverse().join("");
 
     const matchedWord = wordsToFind.find(
-      (word) => word === currentWord || word === reversedWord,
+      (item) =>
+        (item.word === currentWord || item.word === reversedWord) &&
+        !foundWords.includes(item.id),
     );
 
-    if (matchedWord && !foundWords.includes(matchedWord)) {
-      setFoundWords((prev) => [...prev, matchedWord]);
+    if (matchedWord && !foundWords.includes(matchedWord.id)) {
+      setFoundWords((prev) => [...prev, matchedWord.id]);
       setColoredCells((prev) => [...prev, ...selected]);
       setSentence(
         wordsToFind
-          .filter((word) => [...foundWords, matchedWord].includes(word))
+          .filter((item) => [...foundWords, matchedWord.id].includes(item.id))
+          .map((item) => item.word)
           .join(" "),
       );
     }
@@ -216,16 +253,16 @@ const Unit6_Page5_Q3 = () => {
 
   const showAnswers = () => {
     let allCells = [];
-    wordsToFind.forEach((word) => {
-      if (correctPositions[word]) {
-        allCells.push(...correctPositions[word]);
+    wordsToFind.forEach((item) => {
+      if (correctPositions[item.id]) {
+        allCells.push(...correctPositions[item.id]);
       }
     });
-    setFoundWords(wordsToFind);
+    setFoundWords(wordsToFind.map((item) => item.id));
     setColoredCells(allCells);
     setSelected([]);
     setCurrentWord("");
-    setSentence(wordsToFind.join(" "));
+    setSentence(wordsToFind.map((item) => item.word).join(" "));
     setLocked(true);
   };
 
@@ -263,47 +300,45 @@ const Unit6_Page5_Q3 = () => {
         alignItems: "center",
         padding: "30px",
 
-        width: "100%",
+
         boxSizing: "border-box",
       }}
     >
       <div className="div-forall">
-        <h5
-          className="header-title-page8 pb-2.5"
-        >
+        <h5 className="header-title-page8 pb-2.5">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What does Stella recommend in I Love My Garden! on page 47?
+         What does Stella recommend in I Love My
+Garden! on page 47?
         </h5>
 
-        {/* Words List */}
+        {/* Words List
         <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((word) => (
+          {wordsToFind.map((item) => (
             <span
-              key={word}
-              className={`px-3 py-1.5 rounded-[10px] border-2 border-[#2c5287] font-semibold transition duration-200 ${
-                foundWords.includes(word)
-                  ? "bg-[#2c5287] text-white border-[#2c5287]"
+              key={item.id}
+              className={`px-3 py-1.5 rounded-[10px] border-2 border-blue-800 ${
+                foundWords.includes(item.id)
+                  ? "bg-[#2c5287] text-white"
                   : "bg-white text-black"
               }`}
-              style={{ fontSize: "clamp(12px, 2vw, 15px)" }}
             >
-              {word}
+              {item.word}
             </span>
           ))}
-        </div>
+        </div> */}
 
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
           {/* Grid Wrapper */}
           <div
-            className="border-2 border-[#f28c63] px-4 pt-4 pb-5"
+            className="px-4 pt-4 pb-5"
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px]"
+              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10"
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -360,15 +395,7 @@ const Unit6_Page5_Q3 = () => {
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                marginTop: "15px",
-              }}
-            >
+            <div className="flex justify-center items-center">
               <img
                 src={img1}
                 alt="start"
@@ -378,27 +405,12 @@ const Unit6_Page5_Q3 = () => {
                 }}
               />
 
-              <div
-                style={{
-                  flex: 1,
-                  borderBottom: "2px solid black",
-                  height: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  value={sentence}
-                  readOnly
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontSize: "clamp(14px, 2vw, 18px)", // 🔥 حجم خط ديناميكي للإجابة
-                  }}
-                />
-              </div>
+              <input
+                className="answer-input-CB-unit3-p5-q4"
+                value={displayedSentence.join(" ")}
+                readOnly
+                style={{ fontFamily: "monospace" }} // 🔥 مهم جدا
+              />
 
               <img
                 src={img2}
@@ -423,4 +435,4 @@ const Unit6_Page5_Q3 = () => {
   );
 };
 
-export default Unit6_Page5_Q3;
+export default Page8_Q4;
