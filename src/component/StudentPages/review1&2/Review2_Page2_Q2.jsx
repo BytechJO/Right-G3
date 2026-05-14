@@ -60,7 +60,8 @@ const Review2_Page2_Q2 = () => {
 
   const handleWordClick = (word) => {
     if (locked) return;
-    setSelectedWord(word);
+
+    setSelectedWord((prev) => (prev === word ? null : word));
   };
 
   const handleSelectColor = (colorKey) => {
@@ -155,7 +156,7 @@ const Review2_Page2_Q2 = () => {
           {WORDS.map((row, i) => (
             <div
               key={i}
-              className="grid grid-cols-9 border-1 border-orange-400 rounded-xl"
+              className="grid grid-cols-9 border-1 border-orange-400 rounded-xl overflow-visible"
             >
               {row.map((word) => {
                 const colorKey = answers[word];
@@ -169,24 +170,28 @@ const Review2_Page2_Q2 = () => {
                 return (
                   <div
                     key={word}
-                    onClick={() => handleWordClick(word)}
-                    className="relative py-5 text-lg font-semibold flex items-center justify-center cursor-pointer transition-all"
-                    style={{
-                      backgroundColor: colorObj?.color || "white",
-                      border: isSelected
-                        ? "3px solid #F79530"
-                        : "1px solid #F79530",
-                      transform: isSelected ? "scale(1.05)" : "",
-                      boxShadow: isSelected
-                        ? "0 0 10px rgba(247,149,48,0.6)"
-                        : "none",
-                    }}
+                    className="relative overflow-visible"
                   >
-                    {word}
+                    <div
+                      onClick={() => handleWordClick(word)}
+                      className="relative py-5 text-lg font-semibold flex items-center justify-center cursor-pointer transition-all"
+                      style={{
+                        backgroundColor: colorObj?.color || "white",
+                        border: isSelected
+                          ? "3px solid #F79530"
+                          : "1px solid #F79530",
+                        transform: isSelected ? "scale(1.05)" : "",
+                        boxShadow: isSelected
+                          ? "0 0 10px rgba(247,149,48,0.6)"
+                          : "none",
+                        zIndex: isSelected ? 20 : 1,
+                      }}
+                    >
+                      {word}
 
-                    {isWrong && (
-                      <div
-                        className="absolute -top-2 -right-2  w-[22px] h-[22px] z-9999
+                      {isWrong && (
+                        <div
+                          className="absolute -top-2 -right-2 w-[22px] h-[22px] z-[9999]
 rounded-full
 bg-[red] text-white
 flex items-center justify-center
@@ -194,8 +199,34 @@ text-[12px] font-bold
 border-2 border-white
 shadow-[0_2px_6px_rgba(0,0,0,0.2)]
 pointer-events-none"
+                        >
+                          ✕
+                        </div>
+                      )}
+                    </div>
+
+                    {/* COLOR PALETTE فوق البوكس */}
+                    {isSelected && !locked && (
+                      <div
+                        className="absolute left-1/2 -top-[65px] -translate-x-1/2 z-[9999]
+bg-white rounded-xl px-3 py-2 flex gap-2
+shadow-[0_10px_25px_rgba(0,0,0,0.2)] border"
                       >
-                        ✕
+                        {COLORS.map((c) => (
+                          <div
+                            key={c.key}
+                            onClick={() => handleSelectColor(c.key)}
+                            style={{
+                              width: 25,
+                              height: 25,
+                              borderRadius: "50%",
+                              background: c.color,
+                              cursor: "pointer",
+                              border: "2px solid white",
+                            }}
+                            title={c.key}
+                          />
+                        ))}
                       </div>
                     )}
                   </div>
@@ -205,42 +236,6 @@ pointer-events-none"
           ))}
         </div>
 
-        {/* COLOR PALETTE */}
-        {selectedWord && !locked && (
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 9999,
-              background: "white",
-              borderRadius: "12px",
-              padding: "10px",
-              display: "flex",
-              gap: "10px",
-              boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-            }}
-          >
-            {COLORS.map((c) => (
-              <div
-                key={c.key}
-                onClick={() => handleSelectColor(c.key)}
-                style={{
-                  width: 25,
-                  height: 25,
-                  borderRadius: "50%",
-                  background: c.color,
-                  cursor: "pointer",
-                  border: "2px solid white",
-                }}
-                title={c.key}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* BUTTON */}
         <Button
           handleShowAnswer={showAnswer}
           handleStartAgain={reset}

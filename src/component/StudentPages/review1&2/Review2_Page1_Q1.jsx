@@ -114,8 +114,8 @@ const Review2_Page1_Q1 = () => {
   const questions = [
     { id: 1, img: img1, correct: "never", sentence: "clean my room." },
     { id: 2, img: img2, correct: "usually", sentence: "jump rope." },
-    { id: 3, img: img3, correct: "sometimes", sentence: "go to the store." },
-    { id: 4, img: img4, correct: "always", sentence: "go to bed." },
+    { id: 3, img: img3, correct: "always", sentence: "go to the store." },
+    { id: 4, img: img4, correct: "sometimes", sentence: "go to bed." },
   ];
 
   const words = ["always", "usually", "sometimes", "never"];
