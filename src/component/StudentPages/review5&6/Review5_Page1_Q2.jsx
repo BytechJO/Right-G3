@@ -56,29 +56,33 @@ const Review5_Page1_Q2 = () => {
     setSelected({ id, ...pos });
   };
 
-  const handleImage = (id, e) => {
-    if (!selected) return;
+const handleImage = (id) => {
+  if (!selected) return;
 
-    const pos = getRelativePos(e);
+  const parent = document
+    .querySelector(".container")
+    .getBoundingClientRect();
 
-    const newConnection = {
-      from: selected.id,
-      to: id,
-      x1: selected.x,
-      y1: selected.y,
-      x2: pos.x,
-      y2: pos.y,
-    };
+  const rightEl = rightRefs.current[id];
+  const rect = rightEl.getBoundingClientRect();
 
-    // ✅ نحذف القديم ونضيف الجديد
-    const filtered = connections.filter(
-      (c) => c.from !== selected.id && c.to !== id,
-    );
-
-    setConnections([...filtered, newConnection]);
-
-    setSelected(null);
+  const newConnection = {
+    from: selected.id,
+    to: id,
+    x1: selected.x,
+    y1: selected.y,
+    x2: rect.left - parent.left - 15,
+    y2: rect.top - parent.top + rect.height / 2,
   };
+
+  const filtered = connections.filter(
+    (c) => c.from !== selected.id && c.to !== id,
+  );
+
+  setConnections([...filtered, newConnection]);
+
+  setSelected(null);
+};
   const resetAll = () => {
     setConnections([]);
     setSelected(null);
@@ -99,13 +103,13 @@ const Review5_Page1_Q2 = () => {
       const rightRect = rightEl.getBoundingClientRect();
 
       return {
-        from: item.id,
-        to: to,
-        x1: leftRect.left - parent.left + leftRect.width / 2,
-        y1: leftRect.top - parent.top + leftRect.height / 2,
-        x2: rightRect.left - parent.left + rightRect.width / 2,
-        y2: rightRect.top - parent.top + rightRect.height / 2,
-      };
+  from: item.id,
+  to: to,
+  x1: leftRect.left - parent.left + leftRect.width / 2,
+  y1: leftRect.top - parent.top + leftRect.height / 2,
+  x2: rightRect.left - parent.left - 15,
+  y2: rightRect.top - parent.top + rightRect.height / 2,
+};
     });
 
     setConnections(newConnections);
@@ -245,7 +249,7 @@ Score: ${score} / ${total}
 
                   {/* 🔹 اليمين (الصورة + البوكس) */}
                   <div
-                    onClick={(e) => handleImage(img.id, e)}
+                   onClick={() => handleImage(img.id)}
                     className="flex items-center gap-3 cursor-pointer"
                     style={{
                       marginRight: isRight ? "40px" : "0px",
