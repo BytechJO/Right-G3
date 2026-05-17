@@ -134,7 +134,6 @@ const Review6_Page2_Q2 = () => {
                         top: "50%",
                         right:"0px",
                         transform: "translateY(-50%)",
-                        transform: "translateY(-50%)",
                         width: "22px",
                         height: "22px",
                         background: "red",

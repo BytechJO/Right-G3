@@ -23,7 +23,7 @@ const Unit6_Page4 = ({ openPopup }) => {
     {
       start: 0.419,
       end: 23.7,
-      text: "Page 49, exercise two. Write grammar. They, we, you, he, she must play in the playground. They, we, you, he, she mustn't play in the street. You must brush your teeth every day. They mustn't eat too many sweets",
+      text: "Page 49, exercise 2. Right grammar. They, we, you, he, she must play in the playground. They, we, you, he, she mustn't play in the street. You must brush your teeth every day. They mustn't eat too many sweets",
     },
   ];
 

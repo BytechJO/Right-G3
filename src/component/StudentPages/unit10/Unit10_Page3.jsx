@@ -22,7 +22,7 @@ const Unit10_Page3 = ({ openPopup }) => {
     {
       start: 0.379,
       end: 18.079,
-      text: "Page 84, exercise one, write grammar. She/he will/won't plant a tree. I/you/we/they will/won't water the plants.",
+      text: "Page 84, exercise 1, Right grammar. She/he will/won't plant a tree. I/you/we/they will/won't water the plants.",
     },
     {
       start: 18.079,
@@ -38,10 +38,10 @@ const Unit10_Page3 = ({ openPopup }) => {
 
   const clickableAreas = [
     { x1: 5.41, y1: 7.83, x2: 81.69, y2: 20.69, sound: sound1 },
-    { x1: 25.88, y1: 56.23, x2: 49.58, y2: 60.12, sound: sound2 },
-    { x1: 53.03, y1: 55, x2: 83.19, y2: 60.6, sound: sound3 },
-    { x1: 5.63, y1: 89.06, x2: 44.20, y2: 94.64, sound: sound4 },
-    { x1: 53.03, y1: 89.90, x2:90.09, y2: 96.33, sound: sound5 },
+    { x1: 25.88, y1: 56.6, x2: 49.58, y2: 60.12, sound: sound2 },
+    { x1: 53.03, y1: 55.5, x2: 83.19, y2: 60.6, sound: sound3 },
+    { x1: 5.63, y1: 89.8, x2: 44.20, y2: 94.9, sound: sound4 },
+    { x1: 53.5, y1: 90.5, x2:90.09, y2: 96.0, sound: sound5 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

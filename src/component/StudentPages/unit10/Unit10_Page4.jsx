@@ -25,7 +25,7 @@ const Unit10_Page4 = ({ openPopup }) => {
     {
       start: 0.14,
       end: 16.619,
-      text: "Page 85, exercise two, write grammar. What will they do on the weekend? What will we do on the weekend? What will you do on the weekend? What will she do on the weekend? What will he do on the weekend?",
+      text: "Page 85, exercise 2, Right grammar. What will they do on the weekend? What will we do on the weekend? What will you do on the weekend? What will she do on the weekend? What will he do on the weekend?",
     },
     {
       start: 19.02,
@@ -46,10 +46,10 @@ const Unit10_Page4 = ({ openPopup }) => {
 
   const clickableAreas = [
     { x1: 5.9, y1: 8.0, x2: 53.09, y2: 21.53, sound: sound1 },
-    { x1: 54.38, y1: 8.0, x2: 94.67, y2: 22.04, sound: sound2 },
+    { x1: 54.38, y1: 8.0, x2: 94.67, y2: 21.6, sound: sound2 },
     { x1: 6.98, y1: 30.84, x2: 43.61, y2: 34.23, sound: sound3 },
-    { x1: 56.54, y1: 56.23, x2: 93.81, y2: 64.32, sound: sound4 },
-    { x1: 6.12, y1: 65.7, x2: 45.12, y2: 74.16, sound: sound5 },
+    { x1: 56.54, y1: 56.6, x2: 93.81, y2: 64.32, sound: sound4 },
+    { x1: 6.12, y1: 65.7, x2: 44.70, y2: 73.1, sound: sound5 },
   ];
 
   const handleImageClick = (e) => {

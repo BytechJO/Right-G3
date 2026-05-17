@@ -70,6 +70,7 @@ const Unit8_Page1_find = () => {
           textAlign: "center",
           display: "flex",
           flexDirection: "column",
+          gap: "30px",
           alignItems: "center",
         }}
       >
@@ -87,7 +88,8 @@ const Unit8_Page1_find = () => {
             alt="interactive"
             style={{
               width: "auto",
-              height: "75vh",
+              height: "70vh",
+              borderRadius: "15px",
               cursor: "pointer",
               display: "block",
             }}

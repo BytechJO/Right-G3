@@ -10,8 +10,10 @@ const Review10_Page1_Q2 = () => {
     {
       img: img1,
       q: "What will she do on the weekend?",
-      type: "fixed",
-      answer: "She will read a book.",
+      type: "input",
+      blank: ["She", "will", "read", "a", "book", "."],
+      correct: "She will read a book",
+      wrong: "She will play football",
     },
     {
       img: img2,
@@ -19,6 +21,7 @@ const Review10_Page1_Q2 = () => {
       type: "input",
       blank: ["will", "They", "eat", "at", "restaurant", "a"],
       correct: "They will eat at a restaurant",
+      wrong: "She will build a sandcastle.",
     },
     {
       img: img3,
@@ -26,6 +29,7 @@ const Review10_Page1_Q2 = () => {
       answer: "He will build a sandcastle.",
       blank: ["he", "What", "do", "will", "weekend", "the", "on"],
       correct: "What will he do on the weekend",
+      wrong: "What will she do on the weekend",
     },
     {
       img: img4,
@@ -33,6 +37,7 @@ const Review10_Page1_Q2 = () => {
       type: "input",
       blank: ["do", "She", "homework", "will", "her"],
       correct: "She will do her homework",
+      wrong: "She will build a sandcastle.",
     },
   ];
 
@@ -46,23 +51,6 @@ const Review10_Page1_Q2 = () => {
   const [answers, setAnswers] = useState({});
   const [locked, setLocked] = useState(false);
 
-  const addWord = (qIndex, word) => {
-    if (locked) return;
-    setAnswers((prev) => ({
-      ...prev,
-      [qIndex]: prev[qIndex] ? [...prev[qIndex], word] : [word],
-    }));
-  };
-
-  const removeWord = (qIndex, index) => {
-    if (locked) return;
-    setAnswers((prev) => {
-      const updated = [...prev[qIndex]];
-      updated.splice(index, 1);
-      return { ...prev, [qIndex]: updated };
-    });
-  };
-
   const reset = () => {
     setAnswers({});
     setLocked(false);
@@ -70,15 +58,16 @@ const Review10_Page1_Q2 = () => {
 
   const showAnswers = () => {
     const formatted = {};
+
     questions.forEach((q, i) => {
       if (q.type === "input" || q.type === "reverse") {
-        formatted[i] = q.correct.split(" ");
+        formatted[i] = q.correct;
       }
     });
+
     setAnswers(formatted);
     setLocked(true);
   };
-
   const checkAnswers = () => {
     if (locked) return;
     let score = 0;
@@ -92,8 +81,7 @@ const Review10_Page1_Q2 = () => {
     }
 
     Object.keys(correct).forEach((key) => {
-      const userAnswer = answers[key]?.join(" ");
-      if (userAnswer === correct[key]) score++;
+      if (answers[key] === correct[key]) score++;
     });
 
     const total = Object.keys(correct).length;
@@ -115,8 +103,8 @@ const Review10_Page1_Q2 = () => {
 
   const isWrong = (index) => {
     if (!locked) return false;
-    const userAnswer = answers[index]?.join(" ");
-    return userAnswer !== questions[index].correct;
+
+    return answers[index] !== questions[index].correct;
   };
 
   return (
@@ -128,13 +116,13 @@ const Review10_Page1_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{gap:"20px"}}>
         <h5 className="header-title-page8 mb-7">
           <span className="mr-3">B</span>Look, read, and write the questions or
           answers.
         </h5>
 
-        <div className="questions-grid mb-20">
+        <div className="questions-grid">
           {questions.map((item, i) => (
             <div
               key={i}
@@ -142,7 +130,7 @@ const Review10_Page1_Q2 = () => {
                 display: "flex",
                 alignItems: "flex-start",
                 gap: "12px",
-                height: "300px",
+                // height: "300px",
               }}
             >
               {/* الرقم - جزء من الـ flex بدل absolute */}
@@ -150,7 +138,7 @@ const Review10_Page1_Q2 = () => {
                 style={{
                   fontWeight: "bold",
                   fontSize: "18px",
-                  minWidth: "24px",
+                  // minWidth: "24px",
                   paddingTop: "4px",
                   flexShrink: 0,
                 }}
@@ -165,9 +153,9 @@ const Review10_Page1_Q2 = () => {
                   flexDirection: "column",
                   gap: "10px",
 
-                  flex: 1,
-                  height: "100%", // 🔥 مهم
-                  justifyContent: "space-between",
+                  // flex: 1,
+                  // height: "100%", // 🔥 مهم
+                  // justifyContent: "space-between",
                 }}
               >
                 {/* الصورة */}
@@ -175,9 +163,9 @@ const Review10_Page1_Q2 = () => {
                   src={item.img}
                   alt="question"
                   style={{
-                    width: "200px",
+                    width: "180px",
                     height: "auto",
-                    objectFit: "cover",
+                    objectFit: "contain",
                   }}
                 />
 
@@ -201,90 +189,57 @@ const Review10_Page1_Q2 = () => {
                   </div>
                 )}
 
-                {/* أنواع input و reverse */}
                 {(item.type === "input" || item.type === "reverse") && (
                   <>
-                    {/* حبات الكلمات */}
+                    {/* dropdown */}
                     <div
                       style={{
-                        display: "flex",
-                        gap: "8px",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      {item.blank.map((word, index) => {
-                        const isUsed = answers[i]?.includes(word);
-                        return (
-                          <div
-                            key={index}
-                            onClick={() => !isUsed && addWord(i, word)}
-                            style={{
-                              padding: "6px 12px",
-                              border: "2px solid orange",
-                              borderRadius: "8px",
-                              cursor: isUsed ? "not-allowed" : "pointer",
-                              opacity: isUsed ? 0.4 : 1,
-                              fontSize: "14px",
-                              userSelect: "none",
-                              transition: "opacity 0.2s",
-                            }}
-                          >
-                            {word}
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* خط الإجابة */}
-                    <div
-                      style={{
-                        minHeight: "40px",
-                        borderBottom: isWrong(i)
-                          ? "2px solid red"
-                          : "2px solid black",
-                        padding: "5px 0",
-                        fontWeight: "bold",
-                        width: "250px",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                        gap: "4px",
                         position: "relative",
+                        width: "250px",
                       }}
                     >
-                      {answers[i]?.map((word, idx) => (
-                        <span
-                          key={idx}
-                          onClick={() => removeWord(i, idx)}
-                          style={{
-                            cursor: locked ? "default" : "pointer",
-                            color: "#1e3a8a",
-                          }}
-                        >
-                          {word}
-                        </span>
-                      ))}
-                      <span
+                      <select
+                        disabled={locked}
+                        value={answers[i] || ""}
+                        onChange={(e) =>
+                          setAnswers((prev) => ({
+                            ...prev,
+                            [i]: e.target.value,
+                          }))
+                        }
                         style={{
-                          position: "absolute",
-                          right: "0",
-                          bottom: "-2px", // 🔥 على الخط نفسه
-                          fontWeight: "bold",
-                          color: "#000",
+                          width: "100%",
+                          padding: "10px",
+                          // borderRadius: "8px",
+                          borderBottom: isWrong(i)
+                            ? "2px solid red"
+                            : "1px solid gray",
+                          background: "white",
+                          fontSize: "17px",
+                          // fontWeight: "bold",
+                          outline: "none",
+                          // color: answers[i] ? "#1e3a8a" : "#000",
+                          appearance: "none",
                         }}
                       >
-                        {item.type === "reverse" ? "?" : "."}
-                      </span>
+                        <option value="">Choose</option>
+
+                        {/* الخيار الصحيح */}
+                        <option value={item.correct}>{item.correct}</option>
+
+                        <option value={item.wrong}>{item.wrong}</option>
+                      </select>
+
+                      {/* علامة الخطأ */}
                       {isWrong(i) && (
                         <div
                           style={{
                             position: "absolute",
-                            right: "-30px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
+                            top: "-8px",
+                            right: "-8px",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             display: "flex",
@@ -294,22 +249,15 @@ const Review10_Page1_Q2 = () => {
                             border: "2px solid white",
                             boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
                             pointerEvents: "none",
+                            zIndex: 2,
                           }}
                         >
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              lineHeight: "1",
-                              transform: "translateY(-1px)",
-                            }}
-                          >
-                            ✕
-                          </span>
+                          ✕
                         </div>
                       )}
                     </div>
 
-                    {/* الجواب النهائي يظهر فقط لنوع reverse */}
+                    {/* الجواب النهائي لسؤال reverse */}
                     {item.type === "reverse" && (
                       <div
                         style={{

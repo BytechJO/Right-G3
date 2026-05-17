@@ -104,7 +104,7 @@ const Unit7_Page5_Q3 = () => {
       <div
         className="div-forall"
         style={{
-          gap: "80px",
+          gap: "70px",
         }}
       >
         <div>

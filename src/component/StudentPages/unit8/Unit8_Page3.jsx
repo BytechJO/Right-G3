@@ -22,7 +22,7 @@ const { audioRef, activeId, setActiveId } = useContext(AudioContext);
     {
       start: 0.299,
       end: 9.96,
-      text: "Page 66, exercise one. Write grammar. I, he, she, it was.",
+      text: "Page 66, exercise 1. Right grammar. I, he, she, it was.",
     },
     { start: 11.239, end: 12.699, text: "It was sunny yesterday." },
     { start: 13.979, end: 17.879, text: "They, we, you were." },
@@ -51,7 +51,7 @@ const { audioRef, activeId, setActiveId } = useContext(AudioContext);
 
   const clickableAreas = [
     { x1: 5.63, y1: 8.17, x2: 93.97, y2: 32.37, sound: sound1 },
-    { x1: 7.14, y1:55.72, x2: 68.54, y2: 64.35, sound: sound2 },
+    { x1: 7.14, y1:55.72, x2: 68.54, y2: 63.63, sound: sound2 },
     { x1: 7.14, y1: 66.55, x2: 45.27, y2: 75.0, sound: sound3 },
   ];
   const handleImageClick = (e) => {

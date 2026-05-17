@@ -126,7 +126,12 @@ const Unit9_Page6_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div
+        className="div-forall"
+        style={{
+          gap: "10px",
+        }}
+      >
         <h5 className="header-title-page8">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             D
@@ -143,7 +148,7 @@ const Unit9_Page6_Q1 = () => {
           <div
             style={{
               width: "100%",
-              maxWidth: "900px",
+
               display: "flex",
               flexDirection: "column",
               gap: "20px",
@@ -165,38 +170,32 @@ const Unit9_Page6_Q1 = () => {
                     position: "relative",
                   }}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "0px",
-                      left: "0px",
-                      color: "black",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      zIndex: 2,
-                    }}
-                  >
-                    {q.id}
+                  <div className="flex gap-2">
+                    <span
+                      style={{
+                        fontSize: "22px",
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    >
+                      {q.id}
+                    </span>
+                    <img
+                      src={q.image}
+                      alt={`q${q.id}`}
+                      style={{
+                        width: "280px",
+                        height: "auto",
+                        objectFit: "contain",
+                        marginTop: "10px",
+                      }}
+                    />
                   </div>
-
-                  <img
-                    src={q.image}
-                    alt={`q${q.id}`}
-                    style={{
-                      width: "70%",
-                      height: "auto",
-                      objectFit: "cover",
-                      marginTop: "10px",
-                    }}
-                  />
 
                   <div
                     style={{
                       marginTop: "8px",
-                      fontWeight: "500",
+                      // fontWeight: "500",
                       marginBottom: 15,
                     }}
                   >
@@ -206,9 +205,9 @@ const Unit9_Page6_Q1 = () => {
                   <div
                     style={{
                       marginTop: "5px",
-                      borderBottom: "2px solid black",
+                      borderBottom: "1px solid black",
                       paddingBottom: "3px",
-                      minWidth: "220px",
+                      width: "70%",
                       display: "flex",
                       alignItems: "baseline",
                       gap: "6px",
@@ -231,16 +230,19 @@ const Unit9_Page6_Q1 = () => {
                           MozAppearance: "none",
 
                           border: "none",
-                          borderBottom: "1px dashed #aaa",
+                          borderBottom: checked &&
+                        userAnswers[q.id]?.word2 &&
+                        userAnswers[q.id]?.word2 !==
+                          correctAnswers[q.id].word2 ?  "2px solid red":"1px solid transparent",
                           backgroundColor: "transparent",
 
                           fontSize: "inherit",
                           fontWeight: "600",
-                          color: userAnswers[q.id]?.word2 ? "#1e3a8a" : "#aaa",
+                          // color: userAnswers[q.id]?.word2 ? "#1e3a8a" : "#aaa",
 
                           padding: "2px 18px 2px 4px",
                           minWidth: "90px",
-
+                          outline: "none",
                           cursor: locked ? "not-allowed" : "pointer",
                         }}
                       >
@@ -255,7 +257,8 @@ const Unit9_Page6_Q1 = () => {
                       </select>
                       {checked &&
                         userAnswers[q.id]?.word2 &&
-                        userAnswers[q.id]?.word2 !== correctAnswers[q.id].word2 && (
+                        userAnswers[q.id]?.word2 !==
+                          correctAnswers[q.id].word2 && (
                           <div
                             style={{
                               position: "absolute",
@@ -264,7 +267,7 @@ const Unit9_Page6_Q1 = () => {
                               transform: "translateY(-50%)",
                               width: "22px",
                               height: "22px",
-                              background: "#ef4444",
+                              background: "red",
                               color: "white",
                               borderRadius: "50%",
                               fontSize: "12px",
@@ -287,8 +290,8 @@ const Unit9_Page6_Q1 = () => {
                           top: "50%",
                           transform: "translateY(-50%)",
                           pointerEvents: "none",
-                          fontSize: "10px",
-                          color: "#666",
+                          fontSize: "18px",
+                          // color: "#666",
                         }}
                       >
                         ▾
@@ -309,13 +312,16 @@ const Unit9_Page6_Q1 = () => {
                           MozAppearance: "none",
 
                           border: "none",
-                          borderBottom: "1px dashed #aaa",
+                          borderBottom: checked &&
+                        userAnswers[q.id]?.word1 &&
+                        userAnswers[q.id]?.word1 !==
+                          correctAnswers[q.id].word1 ?"2px solid red":"1px dashed transparent",
                           backgroundColor: "transparent",
 
                           fontSize: "inherit",
                           fontWeight: "600",
-                          color: userAnswers[q.id]?.word1 ? "#1e3a8a" : "#aaa",
-
+                          // color: userAnswers[q.id]?.word1 ? "#1e3a8a" : "#aaa",
+                          outline: "none",
                           padding: "2px 18px 2px 4px",
                           minWidth: "90px",
 
@@ -333,7 +339,8 @@ const Unit9_Page6_Q1 = () => {
                       </select>
                       {checked &&
                         userAnswers[q.id]?.word1 &&
-                        userAnswers[q.id]?.word1 !== correctAnswers[q.id].word1 && (
+                        userAnswers[q.id]?.word1 !==
+                          correctAnswers[q.id].word1 && (
                           <div
                             style={{
                               position: "absolute",
@@ -342,7 +349,7 @@ const Unit9_Page6_Q1 = () => {
                               transform: "translateY(-50%)",
                               width: "22px",
                               height: "22px",
-                              background: "#ef4444",
+                              background: "red",
                               color: "white",
                               borderRadius: "50%",
                               fontSize: "12px",
@@ -365,8 +372,8 @@ const Unit9_Page6_Q1 = () => {
                           top: "50%",
                           transform: "translateY(-50%)",
                           pointerEvents: "none",
-                          fontSize: "10px",
-                          color: "#666",
+                          fontSize: "18px",
+                          // color: "#666",
                         }}
                       >
                         ▾

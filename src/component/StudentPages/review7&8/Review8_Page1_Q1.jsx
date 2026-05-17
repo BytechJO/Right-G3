@@ -102,13 +102,11 @@ const Review8_Page1_Q1 = () => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        marginBottom: "50px",
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall"
-        style={{ width: "60%", marginBottom: "40px" }}
-      >
+      <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>A</span>
           Read and look at the picture. Then answer the questions.
@@ -125,18 +123,18 @@ const Review8_Page1_Q1 = () => {
           <img
             src={img1}
             style={{
-              width: "650px",
+              width: "450px",
               height: "auto",
-              objectFit: "cover",
-              marginBottom: "10px",
+              objectFit: "contain",
+              // marginBottom: "10px",
             }}
           />
         </div>
-        <div className="space-y-6">
+        <div className="space-y-3">
           {items.map((item, i) => (
             <div key={i} className="flex items-center gap-6 flex-wrap">
               {/* السؤال */}
-              <span className="text-base">
+              <span className="text-[18px]">
                 <span style={{ fontWeight: "bold", marginRight: "10px" }}>
                   {i + 1}
                 </span>
@@ -144,7 +142,7 @@ const Review8_Page1_Q1 = () => {
               </span>
 
               {/* الخيارات */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 text-[18px]">
                 {item.options.map((opt, idx) => (
                   <span
                     key={idx}
@@ -158,13 +156,13 @@ const Review8_Page1_Q1 = () => {
                         selected[i] === opt
                           ? locked
                             ? opt === item.correct
-                              ? "2px solid #1C398E"
+                              ? "1px solid #F79530"
                               : "2px solid red"
-                            : "2px solid #1C398E"
-                          : "2px solid transparent",
+                            : "1px solid #F79530"
+                          : "1px solid transparent",
 
                       transition: "0.2s",
-                      fontWeight: "bold",
+                      fontWeight: "500",
                     }}
                   >
                     {opt}
@@ -180,7 +178,7 @@ const Review8_Page1_Q1 = () => {
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             fontSize: "12px",

@@ -1,297 +1,549 @@
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex F 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex F 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex F 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex F 4.svg";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 
-const Unit8_Page6_Q3 = () => {
-  const questions = [
-    { id: 1, text: "First, she washed the dishes", answer: 2 },
-    { id: 2, text: "Next, she shopped in the supermarket.", answer: 4 },
-    { id: 3, text: "She carried home a grocery bag.", answer: 1 },
-    { id: 4, text: "Then, she played with her sister Sarah.", answer: 3 },
-  ];
-  const images = [img1, img2, img3, img4];
-  const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل
-  const [showResult, setShowResult] = useState(false);
+const SENTENCES = [
+  {
+    id: 1,
+    text: "First, she washed the dishes",
+  },
+  {
+    id: 2,
+    text: "Next, she shopped in the supermarket.",
+  },
+  {
+    id: 3,
+    text: "She carried home a grocery bag.",
+  },
+  {
+    id: 4,
+    text: "Then, she played with her sister Sarah.",
+  },
+];
 
-  const wordBank = ["1", "2", "3", "4"];
-  const onDragEnd = (result) => {
-    if (locked) return;
+const IMAGE_CARDS = [
+  {
+    id: 1,
+    img: img1,
+    alt: "bus",
+    correctNumber: 2,
+  },
+  {
+    id: 2,
+    img: img2,
+    alt: "scooter",
+    correctNumber: 4,
+  },
+  {
+    id: 3,
+    img: img3,
+    alt: "car",
+    correctNumber: 1,
+  },
+  {
+    id: 4,
+    img: img4,
+    alt: "motorcycle",
+    correctNumber: 3,
+  },
+];
 
-    const { destination, draggableId } = result;
+const DRAG_NUMBERS = [1, 2, 3, 4];
 
-    if (!destination) return;
+const WRONG_COLOR = "#ef4444";
+const TEXT_COLOR = "#111";
+const NUMBER_COLOR = "#000000ff";
+const DRAG_BG = "#f29a1f";
 
-    const value = Number(draggableId.replace("season-", ""));
+const styles = {
+  pageWrap: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+  },
 
-    // ✅ إذا رجع للبنك
-    if (destination.droppableId === "bank") {
-      setAnswers((prev) => {
-        const newAnswers = { ...prev };
+  contentWrap: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "50px",
 
-        Object.keys(newAnswers).forEach((key) => {
-          if (newAnswers[key] === value) {
-            delete newAnswers[key];
-          }
-        });
+    width: "88%",
+  },
 
-        return newAnswers;
-      });
+  sentencesWrap: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "25px",
+    width: "100%",
+  },
 
-      return;
-    }
+  sentenceRow: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "clamp(10px, 1.4vw, 16px)",
+    width: "100%",
+  },
 
-    // ✅ إذا راح على صورة
-    const imageIndex = Number(destination.droppableId.split("-")[1]);
+  sentenceNumber: {
+    fontSize: "clamp(12px, 1.4vw, 20px)",
+    fontWeight: 700,
+    color: TEXT_COLOR,
+    lineHeight: 1,
+    minWidth: "clamp(18px, 2vw, 28px)",
+    flexShrink: 0,
+    paddingTop: "2px",
+  },
 
-    setAnswers((prev) => ({
-      ...prev,
-      [imageIndex]: value,
-    }));
-  };
+  sentenceText: {
+    fontSize: "18px",
+    // fontWeight: 500,
+    color: TEXT_COLOR,
+    lineHeight: 1.25,
+    wordBreak: "break-word",
+  },
 
-  const checkAnswers = () => {
-    if (locked) return;
+  cardsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: "clamp(10px, 1.4vw, 18px)",
+    width: "100%",
+    alignItems: "start",
+  },
 
-    if (Object.keys(answers).length < images.length) {
-      ValidationAlert.info();
-      return;
-    }
+  cardDropArea: {
+    position: "relative",
+    width: "100%",
+    minWidth: 0,
+    cursor: "pointer",
+    transition: "0.2s ease",
+    borderRadius: "clamp(12px, 1.4vw, 18px)",
+  },
 
-    setShowResult(true); // 🔥 مهم
+  imageWrap: {
+    position: "relative",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-    let correct = 0;
+  image: {
+    width: "100%",
+    height: "auto",
+    display: "block",
+    objectFit: "contain",
+    userSelect: "none",
+    pointerEvents: "none",
+  },
 
-    questions.forEach((q, index) => {
-      if (answers[index] === q.answer) {
-        correct++;
+  numberOverlay: {
+    position: "absolute",
+    top: "0.01%",
+    left: "1.2%",
+    width: "17%",
+    aspectRatio: "1 / 1",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: NUMBER_COLOR,
+    fontSize: "clamp(18px, 1.7vw, 20px)",
+    fontWeight: 500,
+    lineHeight: 1,
+    background: "transparent",
+    border: "none",
+    boxSizing: "border-box",
+    pointerEvents: "none",
+  },
+
+  wrongBadge: {
+    position: "absolute",
+    top: "-10px",
+    right: "-14px",
+    width: "clamp(18px, 2vw, 24px)",
+    height: "clamp(18px, 2vw, 24px)",
+    borderRadius: "50%",
+    backgroundColor: "red",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "clamp(10px, 1vw, 12px)",
+    fontWeight: 700,
+    border: "2px solid #fff",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+    zIndex: 3,
+    pointerEvents: "none",
+  },
+
+  dragNumbersWrap: {
+    display: "flex",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    gap: "clamp(10px, 1.4vw, 16px)",
+    marginTop: "clamp(2px, 0.6vw, 8px)",
+  },
+
+  dragCircle: {
+    width: "clamp(30px, 5vw, 40px)",
+    height: "clamp(30px, 5vw, 40px)",
+    borderRadius: "50%",
+    background: DRAG_BG,
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "clamp(20px, 2.4vw, 25px)",
+    fontWeight: 500,
+    cursor: "grab",
+    userSelect: "none",
+    transition: "0.2s ease",
+    touchAction: "none",
+  },
+
+  buttonsWrap: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "4px",
+  },
+};
+
+export default function Unit8_Page6_Q3() {
+  const [imageAnswers, setImageAnswers] = useState({});
+  const [draggedNumber, setDraggedNumber] = useState(null);
+  const [touchItem, setTouchItem] = useState(null);
+  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [checked, setChecked] = useState(false);
+  const [showAns, setShowAns] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const dropRefs = useRef({});
+
+  const usedNumbers = useMemo(
+    () => Object.values(imageAnswers),
+    [imageAnswers],
+  );
+
+  const applyDrop = (cardId, num) => {
+    const updated = { ...imageAnswers };
+
+    Object.keys(updated).forEach((key) => {
+      if (updated[key] === num) {
+        delete updated[key];
       }
     });
 
-    const total = questions.length;
-
-    const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <b style="color:${color};">Score: ${correct} / ${total}</b>
-    </div>
-  `;
-
-    if (correct === total) ValidationAlert.success(msg);
-    else if (correct === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setLocked(true);
+    updated[cardId] = num;
+    setImageAnswers(updated);
+    setDraggedNumber(null);
+    setChecked(false);
   };
 
-  const reset = () => {
-    setAnswers({});
-    setLocked(false); // ⭐ NEW — إعادة التعديل
-    setShowResult(false);
+  const handleDragStart = (num) => {
+    if (showAns || usedNumbers.includes(num) || checked) return;
+    setDraggedNumber(num);
   };
 
-  // ⭐⭐⭐ NEW — showAnswer
-  const showAnswer = () => {
-    const correct = {};
+  const handleDrop = (cardId) => {
+    if (showAns || draggedNumber === null || checked) return;
+    applyDrop(cardId, draggedNumber);
+  };
 
-    questions.forEach((q, index) => {
-      correct[index] = q.answer;
+  const handleTouchStart = (e, num) => {
+    if (showAns || usedNumbers.includes(num)) return;
+
+    const touch = e.touches[0];
+    setTouchItem(num);
+    setDraggedNumber(num);
+    setTouchPos({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchMove = (e) => {
+    if (touchItem === null) return;
+
+    const touch = e.touches[0];
+    setTouchPos({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchEnd = () => {
+    if (touchItem === null) return;
+
+    Object.entries(dropRefs.current).forEach(([key, ref]) => {
+      if (!ref) return;
+
+      const rect = ref.getBoundingClientRect();
+
+      if (
+        touchPos.x >= rect.left &&
+        touchPos.x <= rect.right &&
+        touchPos.y >= rect.top &&
+        touchPos.y <= rect.bottom
+      ) {
+        applyDrop(Number(key), touchItem);
+      }
     });
 
-    setAnswers(correct);
-    setLocked(true);
+    setTouchItem(null);
+    setDraggedNumber(null);
   };
-  const usedWords = Object.values(answers).filter(Boolean);
+
+  const handleRemoveNumber = (cardId) => {
+    if (showAns || checked) return;
+
+    setImageAnswers((prev) => {
+      const updated = { ...prev };
+      delete updated[cardId];
+      return updated;
+    });
+
+    setChecked(false);
+  };
+
+  const getScore = () => {
+    let score = 0;
+
+    IMAGE_CARDS.forEach((card) => {
+      if (imageAnswers[card.id] === card.correctNumber) {
+        score += 1;
+      }
+    });
+
+    return score;
+  };
+
+  const handleCheck = () => {
+    if (showAns || checked) return;
+
+    const allAnswered = IMAGE_CARDS.every((card) => imageAnswers[card.id]);
+
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all answers first.");
+      return;
+    }
+
+    const total = IMAGE_CARDS.length;
+    const score = getScore();
+
+    setChecked(true);
+
+    if (score === total) {
+      ValidationAlert.success(`Score: ${score} / ${total}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${total}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${total}`);
+    }
+  };
+
+  const handleShowAnswer = () => {
+    const correctMap = {};
+
+    IMAGE_CARDS.forEach((card) => {
+      correctMap[card.id] = card.correctNumber;
+    });
+
+    setImageAnswers(correctMap);
+    setChecked(true);
+    setShowAns(true);
+    setDraggedNumber(null);
+    setTouchItem(null);
+  };
+
+  const handleReset = () => {
+    setImageAnswers({});
+    setDraggedNumber(null);
+    setTouchItem(null);
+    setChecked(false);
+    setShowAns(false);
+  };
+
+  const isCardWrong = (cardId) => {
+    if (!checked || showAns) return false;
+    const card = IMAGE_CARDS.find((item) => item.id === cardId);
+    return imageAnswers[cardId] !== card.correctNumber;
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "30px",
-        }}
-      >
-        <div className="div-forall">
-          <h5 className="header-title-page8 pb-2.5">
-            <span className="ex-A" style={{ marginRight: "10px" }}>
-              F
-            </span>
-            Read and number the pictures.{" "}
-          </h5>
-          <Droppable droppableId="bank" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  padding: "10px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  marginTop: "20px",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                {wordBank.map((word, index) => {
-                  const isUsed = usedWords.includes(Number(word));
+    <div className="main-container-component">
+      <style>{`
+        .wb-i-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: clamp(10px, 1.6vw, 18px);
+          width: 100%;
+          align-items: start;
+        }
+
+       
+        .wb-i-card-wrong {
+          filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+        }
+
+        .wb-i-drag-selected {
+          transform: scale(1.08);
+          box-shadow: 0 0 0 3px rgba(141, 141, 147, 0.2);
+        }
+
+        .wb-i-drag-disabled {
+          background: #cfcfd4 !important;
+          cursor: not-allowed !important;
+          opacity: 0.6;
+        }
+.wb-i-card-active {
+  transform: translateY(-4px) scale(1.03);
+  transition: all 0.25s ease;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.15));
+}
+
+.wb-i-card-hover {
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+        .wb-i-touch-preview {
+          position: fixed;
+          width: clamp(40px, 5vw, 52px);
+          height: clamp(40px, 5vw, 52px);
+          border-radius: 50%;
+          background: #8d8d93;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: clamp(20px, 2.4vw, 28px);
+          font-weight: 700;
+          pointer-events: none;
+          z-index: 9999;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 900px) {
+          .wb-i-cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 560px) {
+          .wb-i-cards-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="div-forall" style={{gap:"30px" }}>
+        <h1 className="WB-header-title-page8">
+          <span className="WB-ex-A">F</span>
+          Read and number the pictures.
+        </h1>
+        <div className="flex flex-col gap-10">
+          <div style={styles.pageWrap}>
+            <div style={styles.contentWrap}>
+              <div style={styles.dragNumbersWrap}>
+                {DRAG_NUMBERS.map((num) => {
+                  const disabled = usedNumbers.includes(num);
+                  const selected = draggedNumber === num || touchItem === num;
 
                   return (
-                    <Draggable
-                      key={word}
-                      draggableId={`season-${word}`}
-                      index={index}
-                      isDragDisabled={locked || isUsed}
+                    <div
+                      key={num}
+                      draggable={!disabled && !showAns}
+                      onDragStart={() => handleDragStart(num)}
+                      onTouchStart={(e) => handleTouchStart(e, num)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      style={styles.dragCircle}
+                      className={`${disabled || showAns ? "wb-i-drag-disabled" : ""} ${
+                        selected ? "wb-i-drag-selected" : ""
+                      }`}
                     >
-                      {(provided) => (
-                        <span
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="season-chip"
-                          style={{
-                            padding: "7px 14px",
-                            border: "2px solid #2c5287",
-                            borderRadius: "8px",
-                            background: "white",
-                            fontWeight: "bold",
-                            cursor: isUsed ? "not-allowed" : "grab",
-                            fontSize: "16px",
-                            opacity: isUsed ? 0.4 : 1,
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          {word}
-                        </span>
-                      )}
-                    </Draggable>
+                      {num}
+                    </div>
                   );
                 })}
-                {provided.placeholder}
               </div>
-            )}
-          </Droppable>
-          <div className="mt-6 flex flex-col gap-10 mb-7">
-            {/* الصور أول */}
-            <div className="flex gap-4 justify-center flex-wrap">
-              {images.map((img, i) => (
-                <div
-                  key={i}
-                  className="border-2 border-orange-400 rounded-xl relative "
-                >
-                  <img
-                    src={img}
-                    alt=""
-                    style={{
-                      width: "200px",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
+              <div className="wb-i-cards-grid">
+                {IMAGE_CARDS.map((item) => (
+                  <div
+                    key={item.id}
+                    ref={(el) => (dropRefs.current[item.id] = el)}
+                    style={styles.cardDropArea}
+                    className={`
+  ${hoveredCard === item.id ? "wb-i-card-active" : ""}
+  ${imageAnswers[item.id] ? "wb-i-card-filled" : ""}
+`}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleDrop(item.id)}
+                    onClick={() => handleRemoveNumber(item.id)}
+                    onDragEnter={() => setHoveredCard(item.id)}
+                    onDragLeave={() => setHoveredCard(null)}
+                    onMouseEnter={() => setHoveredCard(item.id)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <div style={styles.imageWrap}>
+                      <img
+                        src={item.img}
+                        alt={item.alt}
+                        style={styles.image}
+                        draggable={false}
+                      />
 
-                  {/* نفس الكود تبعك بدون تغيير 👇 */}
-                  {showResult && answers[i] && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "-6px",
-                        left: "-6px",
-                        right: "-6px",
-                        bottom: "-6px",
-                        borderRadius: "16px",
-                        pointerEvents: "none",
-                      }}
-                    />
-                  )}
-
-                  {showResult &&
-                    answers[i] &&
-                    Number(answers[i]) !== Number(questions[i].answer) && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "5%",
-                          left: "-6px",
-                          transform: "translateY(-50%)",
-                          width: "22px",
-                          height: "22px",
-                          background: "#ef4444",
-                          color: "white",
-                          borderRadius: "50%",
-                          fontSize: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          border: "2px solid white",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                          pointerEvents: "none",
-                          zIndex: 999,
-                        }}
-                      >
-                        ✕
+                      <div style={styles.numberOverlay}>
+                        {imageAnswers[item.id] || ""}
+                        {isCardWrong(item.id) && (
+                          <span style={styles.wrongBadge}>✕</span>
+                        )}
                       </div>
-                    )}
-
-                  <Droppable droppableId={`image-${i}`}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="
-                          absolute top-0 left-0
-                          w-10 h-10
-                          border border-orange-400
-                          bg-white
-                          flex items-center justify-center
-                          rounded-xl rounded-bl-none
-                          font-bold
-                        "
-                      >
-                        <span style={{ color: "#2c5287" }}>
-                          {answers[i] && answers[i]}
-                        </span>
-
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </div>
-              ))}
-            </div>
-
-            {/* الجمل تحت */}
-            <div className="flex flex-col gap-6 text-left">
-              <p>Yesterday, Stella did many things.</p>
-
-              {questions.map((q) => (
-                <p key={q.id}>
-                  <span className="font-bold mr-2">{q.id}</span>
-                  {q.text}
-                </p>
-              ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={styles.sentencesWrap}>
+                {SENTENCES.map((item) => (
+                  <div key={item.id} style={styles.sentenceRow}>
+                    <div style={styles.sentenceNumber}>{item.id}</div>
+                    <div style={styles.sentenceText}>{item.text}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          {/* BUTTONS */}
+        </div>
+        <div style={styles.buttonsWrap}>
           <Button
-            handleShowAnswer={showAnswer}
-            handleStartAgain={reset}
-            checkAnswers={checkAnswers}
+            handleShowAnswer={handleShowAnswer}
+            handleStartAgain={handleReset}
+            checkAnswers={handleCheck}
           />
         </div>
       </div>
-    </DragDropContext>
-  );
-};
 
-export default Unit8_Page6_Q3;
+      {touchItem !== null && (
+        <div
+          className="wb-i-touch-preview"
+          style={{
+            left: touchPos.x - 24,
+            top: touchPos.y - 24,
+          }}
+        >
+          {touchItem}
+        </div>
+      )}
+    </div>
+  );
+}

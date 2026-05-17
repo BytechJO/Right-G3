@@ -21,7 +21,7 @@ const Unit7_Page4 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   
   const captionsExample = [
-    { start: 0.239, end: 4.859, text: "Page 61, exercise two. Write grammar." },
+    { start: 0.239, end: 4.859, text: "Page 61, exercise 2. Right grammar." },
 
     { start: 4.859, end: 6.019, text: "Can you see them?" },
     { start: 6.019, end: 10.5, text: "Yes, I can see them next to the gym." },

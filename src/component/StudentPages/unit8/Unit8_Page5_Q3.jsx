@@ -180,18 +180,18 @@ mt-10
                         minWidth: "90px",
                         whiteSpace: "nowrap",
                         background:
-                          hovered === i + "-" + idx ? "#e0f2fe" : "transparent",
+                         !locked && hovered === i + "-" + idx ? "#fee2c762" : "transparent",
 
                         border:
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E"
-                                : "2px solid #ef4444"
-                              : "2px solid #1C398E"
-                            : hovered === i + "-" + idx
-                              ? "2px solid #60a5fa"
-                              : "2px solid transparent",
+                                ? "1px solid #F79530"
+                                : "2px solid red"
+                              : "1px solid #F79530"
+                            : !locked && hovered === i + "-" + idx
+                              ? "1px solid #F79530"
+                              : "1px solid transparent",
 
                         transition: "0.2s", // 🔥 حركة ناعمة
                       }}
@@ -210,7 +210,7 @@ mt-10
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             display: "flex",

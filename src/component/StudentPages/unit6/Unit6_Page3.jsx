@@ -25,7 +25,7 @@ const Unit6_Page3 = ({ openPopup }) => {
     {
       start: 0.079,
       end: 14.199,
-      text: "Page 48, exercise one, write grammar. What month is it? It's February. Is it the first month of the year? Yes, it is. No, it isn't.",
+      text: "Page 48, exercise 1. Right grammar. What month is it? It's February. Is it the first month of the year? Yes, it is. No, it isn't.",
     },
     {
       start: 14.199,

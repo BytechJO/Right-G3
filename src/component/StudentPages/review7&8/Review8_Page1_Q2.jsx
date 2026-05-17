@@ -38,12 +38,14 @@ export default function Review8_Page1_Q3() {
 
   return (
     <div className="flex justify-center p-8">
-      <div className="div-forall" style={{ width: "60%" }}>
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px", marginBottom: 20 }}>B</span>
           Write about the picture.
         </h5>
-        <p style={{ fontWeight: "bold" }}>{items[0].starter}</p>
+        <p style={{ fontSize: "20px", fontWeight: "500" }}>
+          {items[0].starter}
+        </p>
 
         {answers.map((ans, i) => (
           <textarea

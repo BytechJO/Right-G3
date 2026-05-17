@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Review7_Page1_Q1.css";
 
@@ -24,27 +24,18 @@ const Review7_Page1_Q1 = () => {
   const [wrongAnswers, setWrongAnswers] = useState({});
   const [answers, setAnswers] = useState({});
   const [locked, setLocked] = useState(false);
-
-  const onDragEnd = (result) => {
-    if (locked) return;
-
-    const { destination, draggableId } = result;
-    if (!destination) return;
-
-    const value = draggableId.replace("season-", ""); // A B C
-
-    if (destination.droppableId.startsWith("room")) {
-      const index = Number(destination.droppableId.split("-")[1]);
-
-      setAnswers((prev) => ({
-        ...prev,
-        [index]: value,
-      }));
-    }
-  };
+  const [showAns, setShowAns] = useState(false);
+const handleChange = (id, value) => {
+  setAnswers((prev) => ({
+    ...prev,
+    [id]: value,
+  }));
+};
+ 
   const reset = () => {
     setAnswers({});
     setWrongAnswers({});
+    setShowAns(false)
     setLocked(false);
   };
   const showAnswers = () => {
@@ -55,11 +46,11 @@ const Review7_Page1_Q1 = () => {
     });
 
     setAnswers(filled);
-    setLocked(true);
+    setShowAns(true);
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (locked||showAns) return;
 
     const empty = questions.some((q) => !answers[q.id]);
     if (empty) {
@@ -96,10 +87,9 @@ const Review7_Page1_Q1 = () => {
 
     setLocked(true);
   };
-  const usedWords = Object.values(answers).filter(Boolean);
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    
       <div
         style={{
           display: "flex",
@@ -108,7 +98,7 @@ const Review7_Page1_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "10px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>A</span>
             Read and match. Write the letters.
@@ -118,78 +108,24 @@ const Review7_Page1_Q1 = () => {
             <div
               style={{
                 display: "flex",
-                justifyContent: "center",
-                marginBottom: "10px",
+                // justifyContent: "center",
+                marginBottom: "20px",
               }}
             >
               <img
                 src={big}
                 alt="sentences"
                 style={{
-                  maxWidth: "100%",
-                  height: "auto",
+                  width: "auto",
+                  height: "150px",
                 }}
               />
             </div>
             {/*  BANK */}
-            <Droppable droppableId="bank" direction="horizontal">
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{
-                    display: "flex",
-                    gap: "12px",
-                    padding: "10px",
-                    border: "2px dashed #ccc",
-                    borderRadius: "10px",
-                    marginTop: "20px",
-                    justifyContent: "center",
-                    width: "100%",
-                    marginBottom: "20px",
-                  }}
-                >
-                  {wordBank.map((word, index) => {
-                    const isUsed = usedWords.includes(word);
-
-                    return (
-                      <Draggable
-                        key={word}
-                        draggableId={`season-${word}`}
-                        index={index}
-                        isDragDisabled={locked || isUsed}
-                      >
-                        {(provided) => (
-                          <span
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="season-chip"
-                            style={{
-                              padding: "7px 14px",
-                              border: "2px solid #2c5287",
-                              borderRadius: "8px",
-                              background: "white",
-                              fontWeight: "bold",
-                              cursor: isUsed ? "not-allowed" : "grab",
-                              fontSize: "16px",
-                              opacity: isUsed ? 0.4 : 1,
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            {word}
-                          </span>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+      
 
             {/* QUESTIONS GRID */}
-            <div className="grid grid-cols-3 gap-10 mb-10">
+            <div className="grid grid-cols-3 gap-5 mb-10">
               {questions.map((q) => (
                 <div key={q.id} className="flex flex-col items-start">
                   <div className="flex gap-2 items-start">
@@ -198,8 +134,8 @@ const Review7_Page1_Q1 = () => {
                       src={q.img}
                       style={{
                         height: "120px",
-                        border: "2px solid orange",
-                        borderRadius: "10px",
+                        // border: "2px solid orange",
+                        // borderRadius: "10px",
                       }}
                     />
                   </div>
@@ -207,7 +143,7 @@ const Review7_Page1_Q1 = () => {
               ))}
             </div>
 
-            <div className="questions-grid">
+            <div className="flex gap-2">
               {questions.map((q) => (
                 <div
                   key={q.id}
@@ -218,97 +154,71 @@ const Review7_Page1_Q1 = () => {
                   }}
                 >
                   <span style={{ fontWeight: "bold" }}>{q.id}</span>
-                  <Droppable droppableId={`room-${q.id}`}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        style={{
-                          position: "relative", // 🔥 مهم
-                          minWidth: "120px",
-                          height: "30px",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
+              <div
+  style={{
+    position: "relative",
+    minWidth: "120px",
+  }}
+>
+  <select
+    value={answers[q.id] || ""}
+    disabled={locked}
+    onChange={(e) => handleChange(q.id, e.target.value)}
+    style={{
+      width: "90px",
+      border: "none",
+      borderBottom: `1px solid ${
+        locked
+          ? wrongAnswers[q.id]&&!showAns
+            ? "red"
+            : "black"
+          : "black"
+      }`,
+      background: "transparent",
+      outline: "none",
+      textAlign: "center",
+      fontWeight: "400",
+      // color: answers[q.id] ? "#2c5287" : "black",
+      fontSize: "18px",
+      paddingBottom: "4px",
+      cursor: locked ? "not-allowed" : "pointer",
+    }}
+  >
+    <option value="">Select</option>
 
-                          borderBottom: `2px solid ${
-                            locked
-                              ? wrongAnswers[q.id]
-                                ? "red"
-                                : "#2c5287"
-                              : "black"
-                          }`,
-                        }}
-                      >
-                        {/* 🔥 البوكس فوق */}
-                        {snapshot.isDraggingOver && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-2px",
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              border: "2px dashed #2c5287",
-                              borderRadius: "6px",
-                              backgroundColor: "#e6f0ff",
-                              pointerEvents: "none",
-                            }}
-                          />
-                        )}
+    {wordBank.map((word) => (
+      <option key={word} value={word}>
+        {word}
+      </option>
+    ))}
+  </select>
 
-                        {/* المحتوى */}
-                        {answers[q.id] && (
-                          <Draggable
-                            draggableId={`room-${answers[q.id]}`}
-                            index={0}
-                          >
-                            {(provided) => (
-                              <span
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={{
-                                  fontWeight: "bold",
-                                  color: "#2c5287",
-                                  ...provided.draggableProps.style,
-                                }}
-                              >
-                                {answers[q.id]}
-                              </span>
-                            )}
-                          </Draggable>
-                        )}
-
-                        {provided.placeholder}
-                        {locked && wrongAnswers[q.id] && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "50%",
-                              right: "-15px",
-                              transform: "translateY(-50%)",
-                              width: "22px",
-                              height: "22px",
-                              background: "#ef4444",
-                              color: "white",
-                              borderRadius: "50%",
-                              fontSize: "12px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontWeight: "bold",
-                              border: "2px solid white",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                              pointerEvents: "none",
-                            }}
-                          >
-                            ✕
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </Droppable>
+  {locked && wrongAnswers[q.id] &&!showAns&& (
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        right: "25px",
+        transform: "translateY(-50%)",
+        width: "22px",
+        height: "22px",
+        background: "red",
+        color: "white",
+        borderRadius: "50%",
+        fontSize: "12px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: "bold",
+        border: "2px solid white",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+        pointerEvents: "none",
+      }}
+    >
+      ✕
+    </div>
+  )}
+</div>
                 </div>
               ))}
             </div>
@@ -329,7 +239,7 @@ const Review7_Page1_Q1 = () => {
           </div>
         </div>
       </div>
-    </DragDropContext>
+
   );
 };
 

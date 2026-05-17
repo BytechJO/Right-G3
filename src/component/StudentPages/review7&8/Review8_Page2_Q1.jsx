@@ -114,7 +114,7 @@ function DraggableLetter({ item, locked }) {
         alignItems: "center",
         justifyContent: "center",
         padding: "6px 10px",
-        border: "2px solid #e5e7eb",
+        border: "1px solid #F79530",
         borderRadius: "8px",
         background: "white",
         fontWeight: "bold",
@@ -133,8 +133,8 @@ function DraggableLetter({ item, locked }) {
 
 /* ===== drop slot ===== */
 
-function DropSlot({ id, content }) {
-  const { setNodeRef } = useSortable({ id });
+function DropSlot({ id, content, onRemove }) {
+  const { setNodeRef, isOver } = useSortable({ id });
 
   return (
     <div
@@ -143,20 +143,29 @@ function DropSlot({ id, content }) {
         position: "relative",
         width: "30px",
         height: "30px",
-        border: "2px solid #F79530", // 🔥 نفس اللون
+        border: isOver
+          ? "2px dashed #F79530"
+          : "2px solid #F79530",
         borderRadius: "6px",
-        background: "white",
+        background: isOver ? "#fffaeeff" : "white",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontWeight: "bold",
         fontSize: "16px",
+        transition: "0.2s",
       }}
     >
       {content && (
         <span
+          onClick={() => onRemove(id)}
           style={{
-            color: content ? "#1C398E" : "#000",
+            cursor: "pointer",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           {content}
@@ -210,7 +219,14 @@ const Review8_Page2_Q1 = () => {
     setShowResults(false);
     setLocked(false);
   };
+const handleRemoveLetter = (slotId) => {
+  if (locked) return;
 
+  setAnswers((prev) => ({
+    ...prev,
+    [slotId]: null,
+  }));
+};
   return (
     <DndContext
       sensors={sensors}
@@ -234,7 +250,7 @@ const Review8_Page2_Q1 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "30px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "20px" }}>C</span>
             Listen and write the{" "}
@@ -253,7 +269,7 @@ const Review8_Page2_Q1 = () => {
             }}
           >
             {/* 🔤 البنك */}
-            <div className="bg-blue-50 p-3 rounded-2xl border-2 border-blue-100 mb-6">
+            <div className="p-3 mb-6">
               <div className="flex flex-wrap justify-center gap-3">
                 <SortableContext items={LETTERS}>
                   {LETTERS.map((l) => (
@@ -283,12 +299,11 @@ const Review8_Page2_Q1 = () => {
                         zIndex: 2,
                       }}
                     >
-                      <DropSlot
-                        id={item.id}
-                        content={answers[item.id]}
-                        correct={item.correct}
-                        isSubmitted={showResults}
-                      />
+                    <DropSlot
+  id={item.id}
+  content={answers[item.id]}
+  onRemove={handleRemoveLetter}
+/>
                     </div>
 
                     {/* 🖼️ الصورة */}
@@ -338,7 +353,7 @@ const Review8_Page2_Q1 = () => {
 
       <DragOverlay>
         {activeId ? (
-          <div className="p-3 bg-white border-2 rounded-xl shadow text-xs">
+          <div className="p-3 bg-white border-2 rounded-xl border-[#F79530] shadow text-[18px]">
             {activeId}
           </div>
         ) : null}

@@ -76,11 +76,7 @@ const Unit7_Page6_Q2 = () => {
 
     const total = questions.length;
     ValidationAlert[
-      score === total
-        ? "success"
-        : score === 0
-          ? "error"
-          : "warning"
+      score === total ? "success" : score === 0 ? "error" : "warning"
     ](`
         Score: ${score} / ${total}
   `);
@@ -98,7 +94,17 @@ const Unit7_Page6_Q2 = () => {
     setUserAnswers({ 1: "", 2: "", 3: "", 4: "", 5: "" });
     setChecked(false);
   };
+  const isWordUsed = (word) => {
+    return Object.values(userAnswers).includes(word);
+  };
+  const handleRemoveWord = (id) => {
+    if (checked) return;
 
+    setUserAnswers((prev) => ({
+      ...prev,
+      [id]: "",
+    }));
+  };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div
@@ -110,7 +116,7 @@ const Unit7_Page6_Q2 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall">
+        <div className="div-forall" style={{ gap: "30px" }}>
           <h5 className="header-title-page8 pb-2.5">
             <span
               className="ex-A"
@@ -129,14 +135,14 @@ const Unit7_Page6_Q2 = () => {
                 {...provided.droppableProps}
                 style={{
                   display: "flex",
-                  gap: "12px",
-                  padding: "10px",
-                  border: "2px dashed #ccc",
+                  gap: "30px",
+                  // padding: "10px",
+                  // border: "2px dashed #ccc",
                   borderRadius: "10px",
-                  marginTop: "20px",
+                  // marginTop: "20px",
                   justifyContent: "center",
                   width: "100%",
-                  marginBottom: "20px",
+                  // marginBottom: "20px",
                   // justifyContent: "center",
                 }}
               >
@@ -146,7 +152,7 @@ const Unit7_Page6_Q2 = () => {
                       key={`${word}-${index}`}
                       draggableId={`${word}-${index}`}
                       index={index}
-                      isDragDisabled={checked} // بس بعد التشيك
+                      isDragDisabled={checked || isWordUsed(word)} // بس بعد التشيك
                     >
                       {(provided) => (
                         <div
@@ -154,15 +160,27 @@ const Unit7_Page6_Q2 = () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           style={{
-                            padding: "7px 14px",
-                            border: "2px solid #2c5287",
+                            // padding: "7px 14px",
+                            height: "35px",
+                            width: "90px",
+                            border: "1px solid #F79530",
                             borderRadius: "8px",
                             background: "white",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                             fontWeight: "bold",
-                            cursor: checked ? "not-allowed" : "grab",
+                            cursor:
+                              checked || isWordUsed(word)
+                                ? "not-allowed"
+                                : "grab",
                             fontSize: "16px",
 
-                            opacity: provided.snapshot?.isDragging ? 0.6 : 1, // 🔥 بس وقت السحب
+                            opacity: isWordUsed(word)
+                              ? 0.35
+                              : provided.snapshot?.isDragging
+                                ? 0.6
+                                : 1, // 🔥 بس وقت السحب
 
                             ...provided.draggableProps.style,
                           }}
@@ -179,46 +197,46 @@ const Unit7_Page6_Q2 = () => {
           </Droppable>
 
           {/* الصور - صف واحد 5 صور */}
+          {/* الصور */}
+          {/* الصف الأول */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(5, 1fr)",
-              gap: "10px",
+              display: "flex",
+              justifyContent: "center",
+              gap: "80px",
+              // marginTop: "40px",
             }}
           >
-            {questions.map((q) => (
+            {questions.slice(0, 3).map((q) => (
               <div
                 key={q.id}
                 style={{
-                  borderRadius: "10px",
-                  padding: "6px",
                   textAlign: "center",
+                  width: "180px",
                 }}
               >
-                {/* رقم السؤال */}
-                <div
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    textAlign: "left",
-                    marginBottom: "4px",
-                    color: "#333",
-                  }}
-                >
-                  {q.id}
+                <div className="flex gap-3">
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      textAlign: "left",
+                      // marginBottom: "10px",
+                    }}
+                  >
+                    {q.id}
+                  </span>
+
+                  <img
+                    src={q.image}
+                    alt={`q${q.id}`}
+                    style={{
+                      width: "140px",
+                      height: "140px",
+                      objectFit: "contain",
+                    }}
+                  />
                 </div>
-
-                <img
-                  src={q.image}
-                  alt={`q${q.id}`}
-                  style={{
-                    width: "100%",
-                    height: "150px",
-                    objectFit: "contain",
-                    borderRadius: "8px",
-                  }}
-                />
-
                 <Droppable droppableId={String(q.id)}>
                   {(provided) => (
                     <div
@@ -226,35 +244,46 @@ const Unit7_Page6_Q2 = () => {
                       {...provided.droppableProps}
                       style={{
                         position: "relative",
-                        marginTop: "6px",
+                        marginTop: "10px",
                         borderBottom: checked
                           ? userAnswers[q.id]?.toLowerCase().trim() ===
                             correctAnswers[q.id]?.toLowerCase()
                             ? "2px solid black"
                             : "2px solid red"
                           : "2px solid black",
-                        minHeight: "26px",
+                        minHeight: "30px",
+                        width: "120px",
+                        marginInline: "auto",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
                         fontSize: "18px",
                       }}
                     >
-                      <span style={{ color: "#2c5287", fontWeight: "bold" }}>
-                        {" "}
+                      <span
+                        onClick={() => handleRemoveWord(q.id)}
+                  className={`${checked?"":"hover:text-red-500"}`}
+
+                        style={{
+                          fontWeight: "bold",
+                          cursor: checked ? "default" : "pointer",
+                          userSelect: "none",
+                        }}
+                      >
                         {userAnswers[q.id]}
                       </span>
+
                       {checked &&
                         userAnswers[q.id] !== correctAnswers[q.id] && (
                           <span
                             style={{
                               position: "absolute",
-                              left: "80%",
+                              left: "105%",
                               top: "50%",
                               transform: "translateY(-50%)",
                               width: "20px",
                               height: "20px",
-                              background: "#ef4444",
+                              background: "red",
                               color: "white",
                               borderRadius: "50%",
                               display: "flex",
@@ -263,14 +292,12 @@ const Unit7_Page6_Q2 = () => {
                               fontSize: "12px",
                               fontWeight: "bold",
                               border: "2px solid white",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                              pointerEvents: "none",
-                              zIndex: 3,
                             }}
                           >
                             ✕
                           </span>
                         )}
+
                       {provided.placeholder}
                     </div>
                   )}
@@ -279,6 +306,112 @@ const Unit7_Page6_Q2 = () => {
             ))}
           </div>
 
+          {/* الصف الثاني */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "140px",
+              marginTop: "10px",
+            }}
+          >
+            {questions.slice(3, 5).map((q) => (
+              <div
+                key={q.id}
+                style={{
+                  textAlign: "center",
+                  width: "180px",
+                }}
+              >
+                <div className="flex gap-3">
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      textAlign: "left",
+                    }}
+                  >
+                    {" "}
+                    {q.id}
+                  </span>
+
+                  <img
+                    src={q.image}
+                    alt={`q${q.id}`}
+                    style={{
+                      width: "140px",
+                      height: "140px",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+                <Droppable droppableId={String(q.id)}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      style={{
+                        position: "relative",
+                        marginTop: "10px",
+                        borderBottom: checked
+                          ? userAnswers[q.id]?.toLowerCase().trim() ===
+                            correctAnswers[q.id]?.toLowerCase()
+                            ? "2px solid black"
+                            : "2px solid red"
+                          : "2px solid black",
+                        minHeight: "30px",
+                        width: "120px",
+                        marginInline: "auto",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontSize: "18px",
+                      }}
+                    >
+                      <span
+                        onClick={() => handleRemoveWord(q.id)}
+                        className={`${checked ? "" : "hover:text-red-500"}`}
+                        style={{
+                          fontWeight: "bold",
+                          cursor: checked ? "default" : "pointer",
+                          userSelect: "none",
+                        }}
+                      >
+                        {userAnswers[q.id]}
+                      </span>
+
+                      {checked &&
+                        userAnswers[q.id] !== correctAnswers[q.id] && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: "105%",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              width: "20px",
+                              height: "20px",
+                              background: "red",
+                              color: "white",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                            }}
+                          >
+                            ✕
+                          </span>
+                        )}
+
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            ))}
+          </div>
           <Button
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleStartAgain}

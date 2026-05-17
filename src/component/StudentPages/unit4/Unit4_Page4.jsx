@@ -20,7 +20,7 @@ const Unit4_Page4 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   
   const captionsExample = [
-    { start: 0.239, end: 5.0, text: "Page 31, exercise two, write grammar." },
+    { start: 0.239, end: 5.0, text: "Page 31, exercise 2. Right grammar." },
 
     { start: 5.0, end: 6.139, text: "What season is it?" },
     { start: 6.139, end: 7.859, text: "It's spring." },

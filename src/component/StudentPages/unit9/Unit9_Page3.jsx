@@ -23,7 +23,7 @@ const Unit9_Page3 = ({ openPopup }) => {
     {
       start: 0.099,
       end: 9.519,
-      text: "Page 78, exercise one. Write grammar. Now. He, she, it is.",
+      text: "Page 78, exercise 1. Right grammar. Now. He, she, it is.",
     },
     { start: 10.539, end: 14.279, text: "We, they, you are." },
     { start: 15.399, end: 17.819, text: "I am. Yesterday." },
@@ -39,10 +39,10 @@ const Unit9_Page3 = ({ openPopup }) => {
   const clickableAreas = [
     { x1: 12.52, y1: 8.5, x2: 44.41, y2:21.53, sound: sound1 },
     { x1: 58.63, y1: 8.5, x2: 90.09, y2: 21.7, sound: sound2 },
-    { x1: 17.48, y1: 52.5, x2: 47.86, y2: 58.93, sound: sound3 },
-    { x1: 5.20, y1: 63, x2:49.15, y2: 69.43, sound: sound5 },
-    { x1: 50.88, y1: 49.12, x2: 67.68, y2: 60.29, sound: sound4 },
-    { x1: 60.57, y1: 62.15, x2:94.61, y2: 69.6, sound: sound6 },
+    { x1: 17.9, y1: 53.2, x2: 47.86, y2: 58.93, sound: sound3 },
+    { x1: 5.80, y1: 63.8, x2:49.15, y2: 69.43, sound: sound5 },
+    { x1: 51.2, y1: 49.12, x2: 67.68, y2: 60.29, sound: sound4 },
+    { x1: 60.57, y1: 62.15, x2:94.2, y2: 69.2, sound: sound6 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

@@ -4,7 +4,8 @@ import "./Review9_Page2_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import blue from "../../../assets/audio/ClassBook/Unit 10/P 89/full.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 const Review9_Page2_Q2 = () => {
   const captions = [
     {
@@ -102,9 +103,9 @@ const Review9_Page2_Q2 = () => {
       <div
         onClick={() => handleSelect(index, value)}
         style={{
-          width: "34px",
-          height: "34px",
-          border: "2px solid #F79530",
+          width: "40px",
+          height: "40px",
+          border:isSelected ?  isWrong ?"2px solid red":"1px solid #F79530":"1px solid gray",
           borderRadius: "9px",
           display: "flex",
           alignItems: "center",
@@ -114,23 +115,31 @@ const Review9_Page2_Q2 = () => {
           position: "relative",
           fontSize: "22px",
           fontWeight: "700",
-          color: isSelected ? "#2c5287" : "transparent",
+          // color: isSelected ? "#2c5287" : "transparent",
           lineHeight: 1,
           userSelect: "none",
         }}
       >
-        {isSelected ? symbol : ""}
+        {isSelected ? (
+          symbol === "✓" ? (
+            <img src={trueIcon} style={{ height: "25px" }} />
+          ) : (
+            <img src={falseIcon} style={{ height: "25px" }} />
+          )
+        ) : (
+          ""
+        )}
 
         {isWrong && (
           <span
             style={{
               position: "absolute",
               right: "-14px",
-              top: "50%",
+              top: "0%",
               transform: "translateY(-50%)",
-              width: "20px",
-              height: "20px",
-              background: "#ef4444",
+              width: "22px",
+              height: "22px",
+              background: "red",
               color: "white",
               borderRadius: "50%",
               display: "flex",
@@ -160,7 +169,7 @@ const Review9_Page2_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "40px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>D</span> Do both words have the
           same final <span style={{ color: "#2e3192" }}> -s sound</span>? Listen
@@ -168,7 +177,11 @@ const Review9_Page2_Q2 = () => {
           <span style={{ color: "#D52328" }}>✗</span>.
         </h5>
 
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11.22} />
+        <QuestionAudioPlayer
+          src={blue}
+          captions={captions}
+          stopAtSecond={11.22}
+        />
 
         <div
           style={{
@@ -192,7 +205,7 @@ const Review9_Page2_Q2 = () => {
               <span
                 style={{
                   fontWeight: "700",
-                  fontSize: "18px",
+                  fontSize: "22px",
                   color: "#1f1f1f",
                 }}
               >
@@ -201,7 +214,7 @@ const Review9_Page2_Q2 = () => {
 
               <span
                 style={{
-                  fontSize: "18px",
+                  fontSize: "20px",
                   color: "#2b2b2b",
                   width: "120px", // 🔥 ثابت
                   display: "inline-block",
@@ -211,7 +224,7 @@ const Review9_Page2_Q2 = () => {
               </span>
               <span
                 style={{
-                  fontSize: "18px",
+                  fontSize: "20px",
                   color: "#2b2b2b",
                   width: "120px",
                   display: "inline-block",

@@ -119,7 +119,7 @@ const Review10_Page1_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>A</span>
           Look, read, and underline the correct answer.
@@ -130,9 +130,8 @@ const Review10_Page1_Q1 = () => {
                   grid grid-cols-1 
                   lg:grid-cols-3 
                   gap-y-10 
-                  gap-x-30
+                  gap-x-10
                   xl:gap-x-10   /* 🔥 للويب فقط */
-                  mt-10
                   mb-10
                   "
         >
@@ -144,33 +143,31 @@ const Review10_Page1_Q1 = () => {
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
+                alignItems: "flex-start",
                 gap: "10px",
               }}
             >
-              <span
-                style={{
-                  position: "absolute",
-                  top: "0",
-                  right: "100%", // 🔥 يخليه على يسار العنصر
-                  marginRight: "10px", // مسافة بسيطة
-                  fontWeight: "bold",
-                  fontSize: "18px",
-                }}
-              >
-                {i + 1}
-              </span>
+              <div className="flex gap-3">
+                <span
+                  style={{
+                    // marginRight: "10px", // مسافة بسيطة
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                  }}
+                >
+                  {i + 1}
+                </span>
 
-              <img
-                src={item.img}
-                alt=""
-                style={{
-                  width: "160px",
-                  height: "auto",
-                  objectFit: "contain",
-                }}
-              />
-
+                <img
+                  src={item.img}
+                  alt=""
+                  style={{
+                    width: "auto",
+                    height: "110px",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
               <div className="flex flex-col gap-5 text-[18px]">
                 {item.options.map((opt, idx) => (
                   <div
@@ -191,17 +188,18 @@ const Review10_Page1_Q1 = () => {
                         textAlign: "center",
                         minWidth: "90px",
                         whiteSpace: "nowrap",
+                        fontSize:"17px",
                         background:
-                          hovered === i + "-" + idx ? "#e0f2fe" : "transparent",
+                         !locked&& hovered === i + "-" + idx ? "#fef2e0ff" : "transparent",
 
                         borderBottom:
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E" // صح
-                                : "2px solid #ef4444" // غلط
-                              : "2px solid #1C398E"
-                            : "2px solid transparent",
+                                ? "1px solid #F79530" // صح
+                                : "2px solid red" // غلط
+                              : "1px solid #F79530"
+                            : "1px solid transparent",
 
                         transition: "0.2s", // 🔥 حركة ناعمة
                       }}
@@ -220,7 +218,7 @@ const Review10_Page1_Q1 = () => {
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             display: "flex",

@@ -9,6 +9,7 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad 
 import sound1 from "../../../assets/audio/ClassBook/Unit 9/P 80/unit9-pg80-EXB.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import WrongMark from "../../WrongMark";
 const Unit9_Page5_Q2 = () => {
   const items = [
     {
@@ -36,7 +37,7 @@ const Unit9_Page5_Q2 = () => {
   const [selected, setSelected] = useState(Array(items.length).fill([]));
   const [locked, setLocked] = useState(false);
   const [showResult, setShowResult] = useState(false);
-   const captions = [
+  const captions = [
     {
       start: 0.119,
       end: 11.699,
@@ -129,7 +130,7 @@ const Unit9_Page5_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "25px" }}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-3">B</span>
           Listen and circle the words with the same final
@@ -146,33 +147,34 @@ const Unit9_Page5_Q2 = () => {
               {items.map((item, i) => (
                 <div key={i} className="flex flex-col justify-center h-50">
                   <div className="flex flex-col items-center gap-3">
-                    <span className="text-[20px] font-bold text-[#2a4e7c]">
-                      {i + 1}
-                    </span>
+                    <div className="flex gap-5">
+                      <span className="text-[20px] font-bold text-[#2a4e7c]">
+                        {i + 1}
+                      </span>
 
-                    <img
-                      src={item.img}
-                      alt=""
-                      style={{
-                        width: "150px",
-                        height: "auto",
-                      }}
-                    />
-
+                      <img
+                        src={item.img}
+                        alt=""
+                        style={{
+                          width: "150px",
+                          height: "auto",
+                        }}
+                      />
+                    </div>
                     {/* OPTIONS تحت الصورة وبالعرض */}
                     <div className="flex gap-3 text-[18px] mt-2">
                       {item.options.map((opt, idx) => (
                         <span
                           key={idx}
                           onClick={() => chooseOption(i, opt)}
-                          className={`relative cursor-pointer px-3 py-1 rounded-full border-2 ${
+                          className={`relative cursor-pointer px-3 py-1 rounded-full border-1 ${
                             selected[i]?.includes(opt)
                               ? showResult
                                 ? items[i].correct.includes(opt)
-                                  ? "border-[#1C398E] bg-blue-50"
+                                  ? "border-[#F79530] bg-orange-50"
                                   : "border-red-500"
-                                : "border-[#1C398E] bg-blue-50"
-                              : "border-transparent hover:bg-gray-100"
+                                : "border-[#F79530] bg-orang-50"
+                              : "border-transparent hover:border-[#F79530]"
                           }`}
                         >
                           {opt}
@@ -181,8 +183,8 @@ const Unit9_Page5_Q2 = () => {
                           {showResult &&
                             selected[i]?.includes(opt) &&
                             !items[i].correct.includes(opt) && (
-                              <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow">
-                                ✕
+                              <span className="absolute top-0 right-6">
+                                <WrongMark />
                               </span>
                             )}
                         </span>

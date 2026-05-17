@@ -99,7 +99,7 @@ const Review9_Page1_Q2 = () => {
   };
 
   return (
-        <div
+    <div
       style={{
         display: "flex",
         flexDirection: "column",
@@ -107,13 +107,16 @@ const Review9_Page1_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>B</span>
           Read, look, and circle.
         </h5>
 
-        <div className="grid grid-cols-2 gap-y-10 gap-x-20 mt-5 ">
+        <div
+          className="grid grid-cols-2 gap-y-10 gap-x-20"
+          style={{ justifyItems: "center" }}
+        >
           {items.map((item, i) => (
             <div
               key={i}
@@ -121,32 +124,30 @@ const Review9_Page1_Q2 = () => {
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
-                marginBottom: "30px",
+                // marginBottom: "30px",
               }}
             >
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-10px",
-                  left: "-15px",
-                  fontWeight: "bold",
-                  fontSize: "18px",
-                }}
-              >
-                {i + 1}
-              </span>
+              <div className="flex gap-2">
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                  }}
+                >
+                  {i + 1}
+                </span>
 
-              <img
-                src={item.img}
-                alt=""
-                style={{
-                  width: "15vw",
-                  height: "20vh",
-                  marginBottom:"20px"
-                }}
-              />
-
-              <div className="flex flex-col gap-5 text-[20px]">
+                <img
+                  src={item.img}
+                  alt=""
+                  style={{
+                    width: "auto",
+                    height: "120px",
+                    marginBottom: "10px",
+                  }}
+                />
+              </div>
+              <div className="flex flex-col gap-2 text-[18px]">
                 {item.options.map((opt, idx) => (
                   <div
                     key={idx}
@@ -169,10 +170,10 @@ const Review9_Page1_Q2 = () => {
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E"
-                                : "2px solid #ef4444"
-                              : "2px solid #1C398E"
-                            : "2px solid transparent",
+                                ? "1px solid #F79530"
+                                : "2px solid red"
+                              : "1px solid #F79530"
+                            : "1px solid transparent",
                       }}
                     >
                       {opt}
@@ -185,11 +186,11 @@ const Review9_Page1_Q2 = () => {
                           style={{
                             position: "absolute",
                             top: "10px",
-                            left: "-15px",
+                            right: "-15px",
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             fontSize: "12px",

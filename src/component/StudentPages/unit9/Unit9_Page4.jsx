@@ -25,7 +25,7 @@ const Unit9_Page4 = ({ openPopup }) => {
     {
       start: 0.299,
       end: 9.059,
-      text: "Page seventy-nine, exercise two. Write grammar. Now, where is he, she, it?",
+      text: "Page seventy-nine, exercise 2. Right grammar. Now, where is he, she, it?",
     },
     { start: 10.199, end: 13.559, text: "Where are we, they, you?" },
     { start: 14.819, end: 15.5, text: "Yesterday." },
@@ -45,9 +45,9 @@ const Unit9_Page4 = ({ openPopup }) => {
   const clickableAreas = [
     { x1: 5.9, y1: 7.83, x2: 94.46, y2: 27.46, sound: sound1 },
     { x1: 5.47, y1: 34.73, x2: 38.22, y2: 40.49, sound: sound2 },
-    { x1: 47.7, y1: 34.4, x2: 82.61, y2: 41.17, sound: sound3 },
-    { x1: 8.92, y1: 65.2, x2: 43.61, y2: 71.63, sound: sound4 },
-    { x1: 47.06, y1: 65.03, x2: 94.67, y2: 71.29, sound: sound5 },
+    { x1: 48.2, y1: 34.8, x2: 81.61, y2: 40.17, sound: sound3 },
+    { x1: 9.2, y1: 65.8, x2: 43.61, y2: 71.2, sound: sound4 },
+    { x1: 47.06, y1: 65.8, x2: 94.67, y2: 71.29, sound: sound5 },
   ];
 
   const handleImageClick = (e) => {

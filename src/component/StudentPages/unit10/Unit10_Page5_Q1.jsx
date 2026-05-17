@@ -6,7 +6,6 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shal
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Ex A 4.svg";
 
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import WrongMark from "../../WrongMark";
 
 const data = [
@@ -15,34 +14,31 @@ const data = [
   { img: img3, pattern: "ess", answer: "dr" },
   { img: img4, pattern: "ee", answer: "tr" },
 ];
+
+const options = ["dr", "tr"];
+
 const Unit10_Page5_Q1 = () => {
   const [inputs, setInputs] = useState(Array(data.length).fill(""));
   const [wrongInputs, setWrongInputs] = useState(
     Array(data.length).fill(false),
   );
-  const [showAnswer, setShowAnswer] = useState(false); // ⭐ NEW
-  const lettersBank = [
-    { id: "l1", value: "dr" },
-    { id: "l2", value: "tr" },
-  ];
+  const [showAnswer, setShowAnswer] = useState(false);
+const [locked ,setLocked]=useState(false)
+  const handleSelect = (index, value) => {
+    if (showAnswer) return;
 
-  const onDragEnd = (result) => {
-    if (!result.destination || showAnswer) return;
+    const updated = [...inputs];
+    updated[index] = value;
 
-    const letter = lettersBank.find((l) => l.id === result.draggableId)?.value;
-    const targetIndex = Number(result.destination.droppableId);
+    setInputs(updated);
 
-    setInputs((prev) => {
-      const copy = [...prev];
-      copy[targetIndex] = letter; // ✔ نفس الحرف مسموح يتكرر
-      return copy;
-    });
-
-    setWrongInputs(Array(data.length).fill(false));
+    const wrongReset = [...wrongInputs];
+    wrongReset[index] = false;
+    setWrongInputs(wrongReset);
   };
 
   const checkAnswers = () => {
-    if (showAnswer) return; // ❌ ممنوع التعديل بعد Show Answer
+    if (showAnswer||locked) return;
 
     if (inputs.some((val) => val.trim() === "")) {
       ValidationAlert.info(
@@ -66,7 +62,9 @@ const Unit10_Page5_Q1 = () => {
 
     setWrongInputs(wrongFlags);
     setShowAnswer(true);
+
     const total = data.length;
+
     const color =
       correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
 
@@ -85,7 +83,8 @@ const Unit10_Page5_Q1 = () => {
 
   const handleShowAnswer = () => {
     const correct = data.map((item) => item.answer);
-    setInputs(correct); // ⭐ تعبئة الإجابة الصحيحة
+
+    setInputs(correct);
     setWrongInputs(Array(data.length).fill(false));
     setShowAnswer(true);
   };
@@ -97,146 +96,100 @@ const Unit10_Page5_Q1 = () => {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "30px",
+      }}
+    >
       <div
+        className="div-forall"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "30px",
+          gap: "120px",
+          
         }}
       >
-        <div
-          className="div-forall"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
-          }}
-        >
-          <h5 className="header-title-page8 pb-2.5">
-            <span className="ex-A mr-3">A</span>
-            <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
-            Look and write
-            <span style={{ color: "#2e3192" }}>dr</span>or
-            <span style={{ color: "#2e3192" }}>tr</span>.
-          </h5>
+        <h5 className="header-title-page8 pb-2.5">
+          <span className="ex-A mr-3">A</span>
+          <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
+          Look and write
+          <span style={{ color: "#2e3192" }}> dr </span>
+          or
+          <span style={{ color: "#2e3192" }}> tr</span>.
+        </h5>
 
-          <Droppable droppableId="letters" direction="horizontal">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  padding: "10px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  marginTop: "20px",
-                  justifyContent: "center",
-                  width: "100%",
-                  // justifyContent: "center",
-                }}
-              >
-                {lettersBank.map((l, i) => (
-                  <Draggable
-                    key={l.id}
-                    draggableId={l.id}
-                    index={i}
-                    isDragDisabled={showAnswer}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={{
-                          padding: "7px 14px",
-                          border: "2px solid #2c5287",
-                          borderRadius: "8px",
-                          background: "white",
-                          fontWeight: "bold",
-                          cursor: "grab",
-                          fontSize: "22px",
-                          ...provided.draggableProps.style,
-                        }}
-                      >
-                        {l.value}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
+    
+        {/* QUESTIONS */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 mt-7">
+          {data.map((item, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center gap-10 relative p-3"
+            >
+              {/* NUMBER */}
+              <span className="absolute -top-2 -left-2 text-lg font-bold">
+                {index + 1}
+              </span>
+
+              {/* IMAGE */}
+              <div className="w-[150px] h-24 flex items-center justify-center">
+                <img
+                  src={item.img}
+                  alt=""
+                  className="max-w-full max-h-full"
+                />
               </div>
-            )}
-          </Droppable>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 mt-7">
-            {data.map((item, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center gap-10 relative p-3"
-              >
-                {/* الرقم */}
-                <span className="absolute -top-2 -left-2 text-lg font-bold">
-                  {index + 1}
-                </span>
+              {/* WORD */}
+              <div className="relative flex items-center gap-1 text-xl">
+                <select
+                  value={inputs[index]}
+                  disabled={showAnswer}
+                  onChange={(e) => handleSelect(index, e.target.value)}
+                  style={{
+                    minWidth: "75px",
+                    height: "38px",
+                    borderBottom: `1px solid ${
+                      wrongInputs[index] ? "red" : "black"
+                    }`,
+                    // borderRadius: "8px",
+                    // background: inputs[index] ? "#eff6ff" : "#fff",
+                    // color: inputs[index] ? "#1e3a8a" : "#000",
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                    textAlign: "center",
+                    outline: "none",
+                    padding: "0 8px",
+                    cursor: showAnswer ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <option value="">--</option>
 
-                {/* الصورة */}
-                <div className="w-[150px] h-24 flex items-center justify-center">
-                  <img
-                    src={item.img}
-                    alt=""
-                    className="max-w-full max-h-full"
-                  />
+                  {options.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+              {/* WRONG MARK */}
+              {wrongInputs[index] && (
+                <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                  <WrongMark />
                 </div>
-
-                {/* الكلمة */}
-                <div className="flex items-center gap-1 text-xl">
-                  {/* drop */}
-                  <Droppable
-                    droppableId={String(index)}
-                    isDropDisabled={showAnswer}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`min-w-[30px] text-center font-bold border-b-4 transition-all ${
-                          wrongInputs[index] ? "border-red-500" : "border-black"
-                        } ${
-                          inputs[index]
-                            ? "text-blue-800 bg-blue-50 rounded px-1"
-                            : "text-black"
-                        }`}
-                      >
-                        {inputs[index]}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-
-                  {/* pattern */}
-                  <span>{item.pattern}</span>
-                </div>
-
-                {/* Wrong mark */}
-                {wrongInputs[index] && (
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                    <WrongMark />
-                  </div>
-                )}
+              )}
+                <span>{item.pattern}</span>
               </div>
-            ))}
-          </div>
+
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ⭐ BUTTONS */}
+      {/* BUTTONS */}
       <div className="action-buttons-container">
         <button onClick={reset} className="try-again-button">
           Start Again ↻
@@ -253,7 +206,7 @@ const Unit10_Page5_Q1 = () => {
           Check Answer ✓
         </button>
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 

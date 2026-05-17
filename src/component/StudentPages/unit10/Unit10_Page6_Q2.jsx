@@ -117,25 +117,28 @@ const Unit10_Page6_Q2 = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        marginBottom:"40px",
         padding: "30px",
       }}
     >
-      <div className="div-forall">
-        <h5 className="header-title-page8 mb-7">
+      <div className="div-forall" style={{gap:"30px"}}>
+        <h5 className="header-title-page8">
           <span className="ex-A mr-5">E</span>Write.
         </h5>
+        <div className="flex flex-col gap-5">
         {questions.map((item, i) => (
           <div
+            className="border-1 border-gray-300 rounded-[25px]"
             key={i}
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: "30px",
+              // marginBottom: "30px",
             }}
           >
             {/* اليسار: السؤال + الكلمات */}
-            <div>
+            <div className="p-5">
               {/* رقم + السؤال */}
               <div
                 style={{ display: "flex", gap: "10px", marginBottom: "10px" }}
@@ -155,7 +158,7 @@ const Unit10_Page6_Q2 = () => {
                       onClick={() => !isUsed && addWord(i, word)}
                       style={{
                         padding: "6px 12px",
-                        border: "2px solid orange",
+                        border: "1px solid orange",
                         borderRadius: "8px",
                         cursor: isUsed ? "not-allowed" : "pointer",
                         opacity: isUsed ? 0.4 : 1,
@@ -171,10 +174,10 @@ const Unit10_Page6_Q2 = () => {
                   minHeight: "40px",
                   borderBottom: isWrong(i)
                     ? "2px solid red"
-                    : "2px solid black",
+                    : "1px solid gray",
                   marginBottom: "10px",
                   padding: "5px",
-                  fontWeight: "bold",
+                  fontWeight: "500",
                   width: "350px",
                   fontSize: "18px",
                   position: "relative", // 🔥 مهم
@@ -184,10 +187,11 @@ const Unit10_Page6_Q2 = () => {
                   <span
                     key={idx}
                     onClick={() => removeWord(i, idx)}
+                    className={`${locked ? "":"hover:text-red-500"}`}
                     style={{
                       marginRight: "8px",
                       cursor: "pointer",
-                      color: "#1e3a8a",
+                      // color: "#1e3a8a",
                     }}
                   >
                     {word}
@@ -226,14 +230,14 @@ const Unit10_Page6_Q2 = () => {
               src={item.img}
               alt="question"
               style={{
-                width: "180px",
+                width: "245px",
                 height: "auto",
                 objectFit: "contain",
                 marginLeft: "10px",
               }}
             />
           </div>
-        ))}
+        ))}</div>
         {/* BUTTONS */}
         <div className="action-buttons-container">
           <button onClick={reset} className="try-again-button">

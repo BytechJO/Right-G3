@@ -2,12 +2,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Unit8_Page5_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-1.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-2.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-4.svg";
-import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-5.svg";
-import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-6.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-3.svg";
+
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import blue from "../../../assets/audio/ClassBook/Unit 8/P 68/unit8-pg68-EXA2.mp3";
 
@@ -18,14 +18,14 @@ const Unit8_Page5_Q2 = () => {
     {
       id: 1,
       image1: img1,
-      image2: img2,
+
       correct: "✗",
     },
-    { id: 2, image1: img3, image2: img4, correct: "✓" },
+    { id: 2, image1: img2, correct: "✓" },
     {
       id: 3,
-      image1: img5,
-      image2: img6,
+      image1: img3,
+
       correct: "✓",
     },
   ];
@@ -141,33 +141,16 @@ const Unit8_Page5_Q2 = () => {
                 key={q.id}
                 className="u8p5-card p-4 bg-white flex flex-col items-center gap-3 relative"
               >
-                {/* رقم السؤال */}
-                <p className="w-full text-left text-[20px] u8p5-card-num">
-                  <span className="text-[darkblue] font-bold">{q.id}.</span>
-                </p>
-
                 <div className="flex flex-col items-center gap-3.5">
                   {/* الصور */}
-                  <div className="u8p5-images-box border-2 border-[#ff6b57] rounded-xl p-4 w-[250px]">
-                    <div className="flex">
-                      {/* الديف الأول */}
-                      <div className="u8p5-img-cell w-1/2 border-r-2 border-[#ff6b57] flex items-center justify-center h-[150px]">
-                        <img
-                          src={q.image1}
-                          alt=""
-                          style={{ height: "120px", objectFit: "contain" }}
-                        />
-                      </div>
-
-                      {/* الديف الثاني */}
-                      <div className="u8p5-img-cell w-1/2 flex items-center justify-center h-[150px]">
-                        <img
-                          src={q.image2}
-                          alt=""
-                          style={{ height: "120px", objectFit: "contain" }}
-                        />
-                      </div>
-                    </div>
+                  <div className="flex gap-2 rounded-xl p-4 w-[250px]">
+                    {/* الديف الأول */}
+                    <span className="text-[darkblue] font-bold">{q.id}.</span>
+                    <img
+                      src={q.image1}
+                      alt=""
+                      style={{ height: "120px", objectFit: "contain" }}
+                    />
                   </div>
 
                   {/* الخيارات */}
@@ -175,14 +158,17 @@ const Unit8_Page5_Q2 = () => {
                     {/* ✓ */}
                     <div className="relative">
                       <div
-                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 hover:bg-[#ffe3df] ${
+                        className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✓"
-                            ? "bg-[#2c5287] text-white"
-                            : "bg-white"
+                            ? showResult[index] === "wrong" &&
+                              answers[q.id] === "✓"
+                              ? "border-2 border-red-500"
+                              : "border-2 border-[#F79530] text-white"
+                            : "border border-gray-300 bg-white"
                         }`}
                         onClick={() => selectAnswer(q.id, "✓")}
                       >
-                        ✓
+                        <img src={trueIcon} style={{ height: "25px" }} />
                       </div>
 
                       {showResult[index] === "wrong" &&
@@ -195,15 +181,18 @@ const Unit8_Page5_Q2 = () => {
 
                     {/* ✗ */}
                     <div className="relative">
-                      <div
-                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${
+                       <div
+                        className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✗"
-                            ? "bg-[#2c5287] text-white"
-                            : "bg-white hover:bg-[#ffe3df]"
+                            ? showResult[index] === "wrong" &&
+                              answers[q.id] === "✗"
+                              ? "border-2 border-red-500"
+                              : "border-2 border-[#F79530] text-white"
+                            : "border border-gray-300 bg-white"
                         }`}
                         onClick={() => selectAnswer(q.id, "✗")}
                       >
-                        ✗
+                        <img src={falseIcon} style={{ height: "25px" }} />
                       </div>
 
                       {showResult[index] === "wrong" &&

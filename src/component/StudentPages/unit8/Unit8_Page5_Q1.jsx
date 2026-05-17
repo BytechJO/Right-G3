@@ -2,15 +2,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Unit8_Page5_Q1.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 1.svg";
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 2.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 4.svg";
-import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 5.svg";
-import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 6.svg";
-import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 7.svg";
-import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 8.svg";
-
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 1.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 2.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 3.svg";
+import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A 4.svg";
+import trueIcon from "../../../assets/imgs/true.svg";
+import falseIcon from "../../../assets/imgs/false.svg";
 const Unit8_Page5_Q1 = () => {
   const [locked, setLocked] = useState(false);
 
@@ -18,17 +15,17 @@ const Unit8_Page5_Q1 = () => {
     {
       id: 1,
       image1: img1,
-      image2: img2,
+
       correct: "✓",
     },
-    { id: 2, image1: img3, image2: img4, correct: "✓" },
+    { id: 2, image1: img2, correct: "✓" },
     {
       id: 3,
-      image1: img5,
-      image2: img6,
+      image1: img3,
+
       correct: "✗",
     },
-    { id: 4, image1: img7, image2: img8, correct: "✗" },
+    { id: 4, image1: img4, correct: "✗" },
   ];
 
   const [answers, setAnswers] = useState({});
@@ -105,11 +102,7 @@ const Unit8_Page5_Q1 = () => {
         <div
           className="div-forall"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
+            gap: "120px",
           }}
         >
           <h5 className="header-title-page8">
@@ -128,48 +121,39 @@ const Unit8_Page5_Q1 = () => {
                 key={q.id}
                 className="u8p5-card p-4 bg-white flex flex-col items-center gap-3 relative"
               >
-                {/* رقم السؤال */}
-                <p className="w-full text-left text-[20px] u8p5-card-num">
-                  <span className="text-[darkblue] font-bold">{q.id}.</span>
-                </p>
-
                 <div className="flex flex-col items-center gap-3.5">
                   {/* الصور */}
-                  <div className="u8p5-images-box border-2 border-[#ff6b57] rounded-xl p-4 w-[200px]">
-                    <div className="flex">
-                      {/* الديف الأول */}
-                      <div className="u8p5-img-cell w-1/2 border-r-2 border-[#ff6b57] flex items-center justify-center h-[150px]">
-                        <img
-                          src={q.image1}
-                          alt=""
-                          style={{ height: "120px", objectFit: "contain" }}
-                        />
-                      </div>
+                  <div className="w-[200px]">
+                    {/* الديف الأول */}
+                    <div className="flex gap-2">
+                      {/* رقم السؤال */}
 
-                      {/* الديف الثاني */}
-                      <div className="u8p5-img-cell w-1/2 flex items-center justify-center h-[150px]">
-                        <img
-                          src={q.image2}
-                          alt=""
-                          style={{ height: "120px", objectFit: "contain" }}
-                        />
-                      </div>
+                      <span className="text-[darkblue] font-bold">{q.id}.</span>
+
+                      <img
+                        src={q.image1}
+                        alt=""
+                        style={{ height: "140px", objectFit: "contain" }}
+                      />
                     </div>
                   </div>
 
                   {/* الخيارات */}
-                  <div className="u8p5-opts-row flex gap-5">
+                  <div className="u8p5-opts-row flex gap-5 ml-2">
                     {/* ✓ */}
                     <div className="relative">
                       <div
-                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 hover:bg-[#ffe3df] ${
+                        className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✓"
-                            ? "bg-[#2c5287] text-white"
-                            : "bg-white"
+                            ? showResult[index] === "wrong" &&
+                              answers[q.id] === "✓"
+                              ? "border-2 border-red-500"
+                              : "border-2 border-[#F79530] text-white"
+                            : "border border-gray-300 bg-white"
                         }`}
                         onClick={() => selectAnswer(q.id, "✓")}
                       >
-                        ✓
+                        <img src={trueIcon} style={{ height: "25px" }} />
                       </div>
 
                       {showResult[index] === "wrong" &&
@@ -183,14 +167,17 @@ const Unit8_Page5_Q1 = () => {
                     {/* ✗ */}
                     <div className="relative">
                       <div
-                        className={`u8p5-opt-btn w-[45px] h-[45px] border-2 border-[#ff6b57] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${
+                        className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✗"
-                            ? "bg-[#2c5287] text-white"
-                            : "bg-white hover:bg-[#ffe3df]"
+                            ? showResult[index] === "wrong" &&
+                              answers[q.id] === "✗"
+                              ? "border-2 border-red-500"
+                              : "border-2 border-[#F79530] text-white"
+                            : "border border-gray-300 bg-white"
                         }`}
                         onClick={() => selectAnswer(q.id, "✗")}
                       >
-                        ✗
+                        <img src={falseIcon} style={{ height: "25px" }} />
                       </div>
 
                       {showResult[index] === "wrong" &&

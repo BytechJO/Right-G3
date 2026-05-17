@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 91/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 91/Ex C 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 91/Ex C 3.svg";
@@ -55,57 +56,50 @@ const Review10_Page2_Q1 = () => {
     { id: 20, img: img20, word: "treasure", correct: "tr" },
     { id: 21, img: img21, word: "drink", correct: "dr" },
   ];
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل بعد Show Answer
+
+  const [locked, setLocked] = useState(false);
   const [answers, setAnswers] = useState({});
   const [showResult, setShowResult] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const handleSelectAnswer = (id) => {
-    if (!selectedOption || locked) return;
 
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: selectedOption.key,
-    }));
-  };
   const showAnswers = () => {
     const corrects = {};
+
     questions.forEach((q) => {
-      corrects[q.id] = q.correct; // ✓ أو ✗
+      corrects[q.id] = q.correct;
     });
 
     setAnswers(corrects);
-    setShowResult([]); // إخفاء كل X
-    setLocked(true); // 🔒 قفل التعديل
+    setShowResult([]);
+    setLocked(true);
   };
 
   const checkAnswers = () => {
     if (locked) return;
-    // 1) فحص الخانات الفارغة
+
     const isEmpty = questions.some((q) => !answers[q.id]);
+
     if (isEmpty) {
-      ValidationAlert.info("Please choose ✓ or ✗ for all questions!");
+      ValidationAlert.info("Please choose an answer for all questions!");
       return;
     }
 
-    // 2) مقارنة الإجابات
     const results = questions.map((q) =>
       answers[q.id] === q.correct ? "correct" : "wrong",
     );
 
     setShowResult(results);
-    setLocked(true); // 🔒 قفل التعديل
-    // 3) حساب السكور
+    setLocked(true);
+
     const correctCount = results.filter((r) => r === "correct").length;
     const total = questions.length;
-    const scoreMsg = `${correctCount} / ${total}`;
 
-    let color =
+    const color =
       correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
 
     const resultHTML = `
       <div style="font-size: 20px; text-align:center; margin-top: 8px;">
         <span style="color:${color}; font-weight:bold;">
-          Score: ${scoreMsg}
+          Score: ${correctCount} / ${total}
         </span>
       </div>
     `;
@@ -118,7 +112,7 @@ const Review10_Page2_Q1 = () => {
   const resetAnswers = () => {
     setAnswers({});
     setShowResult([]);
-    setLocked(false); // ← مهم جداً
+    setLocked(false);
   };
 
   return (
@@ -130,43 +124,49 @@ const Review10_Page2_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "15px" }}>C</span>
           Color each box according to the sound you hear in the word.
         </h5>
-
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             gap: "15px",
-            marginBottom: "20px",
+            // marginBottom: "20px",
           }}
         >
+          {" "}
           {options.map((opt) => (
-            <button
-              key={opt.key}
-              onClick={() => setSelectedOption(opt)}
-              style={{
-                backgroundColor: opt.color,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "row",
-                color: "white",
-                margin: "10px",
-                padding: "10px 20px",
-                border:
-                  selectedOption?.key === opt.key ? "3px solid black" : "none",
-                borderRadius: "10px",
-                cursor: "pointer",
-              }}
-            >
-              {opt.key}
-            </button>
-          ))}
+            <div className="flex flex-col gap-1 items-center justify-center">
+              <button
+                key={opt.key}
+                style={{
+                  backgroundColor: "#fee7ce",
+                  height: "30px",
+                  width: "100px",
+                  fontSize: "18px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  // color: "white",
+                  margin: "10px",
+                  padding: "10px 20px",
+                  borderRadius: "50px",
+                  cursor: "pointer",
+                }}
+              >
+                {" "}
+                {opt.key}{" "}
+              </button>
+              <span style={{ color: opt.color, fontSize: "18px" }}>
+                {opt.color}
+              </span>
+            </div>
+          ))}{" "}
         </div>
         <div
           style={{
@@ -183,26 +183,21 @@ const Review10_Page2_Q1 = () => {
             return (
               <div
                 key={q.id}
-                onClick={() => handleSelectAnswer(q.id)}
                 style={{
                   position: "relative",
-
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  cursor: "pointer",
                 }}
               >
-                {/* 🖼️ بوكس الصورة */}
+                {/* الصورة */}
                 <div
-                  onClick={() => handleSelectAnswer(q.id)}
                   style={{
-                    border: "2px solid #f4a261",
+                    border: "1px solid #f4a261",
                     borderRadius: "10px",
                     padding: "5px",
                     width: "100%",
                     textAlign: "center",
-                    cursor: "pointer",
                     background: "#fff",
                   }}
                 >
@@ -212,81 +207,104 @@ const Review10_Page2_Q1 = () => {
                     style={{ width: "100%", height: "70px" }}
                   />
 
-                  {/* الكلمة داخل نفس البوكس */}
-                  <div style={{ marginTop: "5px", fontWeight: "bold" }}>
+                  <div
+                    style={{
+                      marginTop: "5px",
+                      // fontWeight: "bold",
+                    }}
+                  >
                     {q.word}
                   </div>
                 </div>
 
-                {/* 🎨 بوكس التلوين (منفصل) */}
+                {/* dropdown */}
                 <div
                   style={{
-                    marginTop: "5px",
+                    marginTop: "8px",
                     width: "80%",
-                    height: "25px",
-                    border: "2px solid #f4a261",
-                    borderRadius: "8px",
-                    backgroundColor: userAnswer
-                      ? selectedOpt?.color
-                      : "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontWeight: "bold",
+                    position: "relative",
                   }}
                 >
-                  {userAnswer}
-                </div>
-
-                {/* ✅ ❌ */}
-                {showResult[index] === "wrong" && (
-                  <div
+                  <select
+                    disabled={locked}
+                    value={answers[q.id] || ""}
+                    onChange={(e) =>
+                      setAnswers((prev) => ({
+                        ...prev,
+                        [q.id]: e.target.value,
+                      }))
+                    }
                     style={{
-                      position: "absolute",
-                      right: "-10px",
-                      top: "90%",
-                      transform: "translateY(-50%)",
-                      width: "22px",
-                      height: "22px",
-                      background: "#ef4444",
-                      color: "white",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                      border: "2px solid white",
-                      boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
-                      pointerEvents: "none",
+                      width: "100%",
+                      height: "35px",
+                      borderRadius: "8px",
+                      border:
+                        showResult[index] === "wrong"
+                          ? "2px solid red"
+                          : "1px solid #f4a261",
+                      outline: "none",
+                      // fontWeight: "bold",
+                      textAlign: "center",
+                      backgroundColor: userAnswer
+                        ? selectedOpt?.color
+                        : "white",
+                      color: userAnswer ? "white" : "black",
+                      cursor: locked ? "default" : "pointer",
                     }}
                   >
-                    <span
+                    <option value="">Choose</option>
+
+                    {options.map((opt) => (
+                      <option key={opt.key} value={opt.key}>
+                        {opt.key}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* ❌ */}
+                  {showResult[index] === "wrong" && (
+                    <div
                       style={{
-                        fontSize: "13px",
-                        lineHeight: "1",
-                        transform: "translateY(-1px)",
+                        position: "absolute",
+                        right: "-10px",
+                        top: "-8px",
+                        width: "22px",
+                        height: "22px",
+                        background: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        // fontWeight: "bold",
+                        fontSize:"12px",
+                        border: "2px solid white",
+                        boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                        zIndex: 2,
                       }}
                     >
                       ✕
-                    </span>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
+
         <div className="action-buttons-container">
           <button onClick={resetAnswers} className="try-again-button">
             Start Again ↻
           </button>
-          {/* ⭐⭐⭐ NEW — زر Show Answer */}
+
           <button
             onClick={showAnswers}
             className="show-answer-btn swal-continue"
           >
             Show Answer
           </button>
+
           <button onClick={checkAnswers} className="check-button2">
             Check Answer ✓
           </button>

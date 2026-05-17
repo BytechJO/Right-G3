@@ -23,7 +23,7 @@ const Unit5_Page4 = ({ openPopup }) => {
     {
       start: 0.399,
       end: 25.739,
-      text: "Page forty-three, exercise two. Write grammar. Is there a sink in the bathroom? Yes, there is. No, there isn't. Are there sinks in the kitchen? Yes, there are. No, there aren't. Is there a telephone behind the chair in the living room? No, there isn't. The telephone is next to the chair.",
+      text: "Page 43, exercise 2. Right grammar. Is there a sink in the bathroom? Yes, there is. No, there isn't. Are there sinks in the kitchen? Yes, there are. No, there aren't. Is there a telephone behind the chair in the living room? No, there isn't. The telephone is next to the chair.",
     },
     {
       start: 27.0,

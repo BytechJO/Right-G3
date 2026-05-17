@@ -23,7 +23,7 @@ const Unit8_Page4 = ({ openPopup }) => {
     {
       start: 0.399,
       end: 14.039,
-      text: "Page sixty-seven, exercise two. Write grammar. I, he, she, it, they, we, you, verb plus E-D.",
+      text: "Page sixty-seven, exercise 2. Right grammar. I, he, she, it, they, we, you, verb plus E-D.",
     },
     {
       start: 16.119,
@@ -39,9 +39,9 @@ const Unit8_Page4 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 6.12, y1: 8, x2: 94.03, y2: 27.8, sound: sound1 },
-    { x1: 5.9, y1: 54.69, x2: 52.66, y2: 66, sound: sound2 },
-    { x1: 5.69, y1: 83.3, x2: 52.66, y2: 95.66, sound: sound3 },
+    { x1: 5.61, y1: 8, x2: 94.03, y2: 27.8, sound: sound1 },
+    { x1:6.03, y1: 53.82, x2: 52.66, y2:65.39, sound: sound2 },
+    { x1: 5.69, y1: 84.20, x2: 52.66, y2: 95.66, sound: sound3 },
   ];
 
   const handleImageClick = (e) => {

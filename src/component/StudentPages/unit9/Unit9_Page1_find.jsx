@@ -10,16 +10,17 @@ const Unit5_Page1_find = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   // ✅ منطقة المطعم (بالنسب المئوية)
   const targetArea = {
-    x1: 50.99,
-    y1: 73.8,
+    x1: 43.4,
+    y1: 76.8,
     x2: 59.05,
-    y2: 78.44,
+    y2: 82.44,
   };
 
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+// console.log(xPercent,yPercent);
 
     setClickedPoint({
       x: xPercent,
@@ -69,6 +70,7 @@ const Unit5_Page1_find = () => {
         style={{
           textAlign: "center",
           display: "flex",
+          // gap: "30px",
           flexDirection: "column",
           alignItems: "center",
         }}
@@ -87,7 +89,8 @@ const Unit5_Page1_find = () => {
             alt="interactive"
             style={{
               width: "auto",
-              height: "75vh",
+              height: "70vh",
+              borderRadius: "15px",
               cursor: "pointer",
               display: "block",
             }}
@@ -118,8 +121,8 @@ const Unit5_Page1_find = () => {
               alt="answer highlight"
               style={{
                 position: "absolute",
-                top: `73.4%`,
-                left: `49.8%`,
+                top: `77.4%`,
+                left: `45.2%`,
                 height: `4.5%`,
                 pointerEvents: "none",
               }}

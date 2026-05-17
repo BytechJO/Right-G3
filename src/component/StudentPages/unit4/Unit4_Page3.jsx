@@ -19,7 +19,7 @@ const Unit4_Page3 = ({ openPopup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const captionsExample = [
-    { start: 0.219, end: 3.38, text: "Page 30, exercise 1.Write grammar." },
+    { start: 0.219, end: 3.38, text: "Page 30, exercise 1. Right grammar." },
     { start: 4.32, end: 5.78, text: " What's the weather like today?" },
 
     {

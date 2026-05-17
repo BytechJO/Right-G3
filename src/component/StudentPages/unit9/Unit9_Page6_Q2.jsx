@@ -111,7 +111,7 @@ const Unit9_Page6_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8">
           <span className="ex-A" style={{ marginRight: "10px" }}>
             E
@@ -119,7 +119,7 @@ const Unit9_Page6_Q2 = () => {
           Read, look, and circle
         </h5>
 
-        <div className="grid grid-cols-2 gap-y-5 gap-x-20 mt-10 mb-10">
+        <div className="grid grid-cols-2 gap-y-5 gap-x-20 mb-10">
           {items.map((item, i) => (
             <div
               key={i}
@@ -145,16 +145,15 @@ const Unit9_Page6_Q2 = () => {
                 src={item.img}
                 alt=""
                 style={{
-                  width: "300px",
+                  width: "250px",
                   height: "auto",
-                  border: "2px solid orange",
-                  borderRadius: 10,
-                  alignSelf: "flex-start",
+               
+               
                 }}
               />
 
               {/* الخيارات */}
-              <div className="flex flex-col gap-3 text-[20px]">
+              <div className="flex flex-col gap-2 text-[18px]">
                 {item.options.map((opt, idx) => (
                   <div key={idx} style={{ position: "relative" }}>
                     <span
@@ -170,10 +169,10 @@ const Unit9_Page6_Q2 = () => {
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E"
-                                : "2px solid #ef4444"
-                              : "2px solid #1C398E"
-                            : "2px solid transparent",
+                                ? "1px solid #F79530"
+                                : "2px solid red"
+                              : "1px solid #F79530"
+                            : "1px solid transparent",
                       }}
                     >
                       {opt}
@@ -191,7 +190,7 @@ const Unit9_Page6_Q2 = () => {
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             fontSize: "12px",

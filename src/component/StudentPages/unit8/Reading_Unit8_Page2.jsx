@@ -17,10 +17,10 @@ const Reading_Unit8_Page2 = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const clickableAreas = [
-    { x1: 8.06, y1: 41.17, x2: 45.76, y2: 48.95, sound: sound1 },
-    { x1: 48.35, y1: 41.17, x2: 86.49, y2: 49.8, sound: sound2 },
-    { x1: 8.27, y1: 79.07, x2: 45.98, y2: 95, sound: sound3 },
-    { x1: 48.56, y1: 79.07, x2: 86.27, y2: 96.0, sound: sound4 },
+    { x1: 8.06, y1: 41.45, x2: 46.33, y2: 50.13, sound: sound1 },
+    { x1: 48.35, y1: 41.45, x2: 86.64, y2: 50.13, sound: sound2 },
+    { x1: 8.27, y1: 79.5, x2: 46.33, y2: 96.0, sound: sound3 },
+    { x1: 48.56, y1: 79.5, x2: 86.64, y2: 96.0, sound: sound4 },
   ];
   const handleImageClick = (e) => {
     const rect = e.target.getBoundingClientRect();

@@ -19,7 +19,7 @@ const Review9_Page2_Q1 = () => {
   const imageRefs = useRef([]);
   const sentenceRefs = useRef([]);
   const containerRef = useRef(null);
- 
+
   const images = [
     { id: 0, img: img1 },
     { id: 1, img: img2 },
@@ -153,15 +153,13 @@ const Review9_Page2_Q1 = () => {
         position: "relative",
       }}
     >
-      <div
-        className="div-forall"
-      >
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8 mb-10">
-          <span style={{  marginRight: "10px" }}>C</span>
+          <span style={{ marginRight: "10px" }}>C</span>
           Look, read, and match.
         </h5>
 
-        <div className="w-full flex flex-col items-center gap-16">
+        <div className="w-full flex flex-col items-center gap-40">
           {/* 🔥 الصور فوق */}
           <div className="grid grid-cols-6 gap-10 w-full justify-items-center">
             {images.map((img, i) => (
@@ -170,34 +168,32 @@ const Review9_Page2_Q1 = () => {
                 onClick={() => selectImage(i)}
                 className="relative flex flex-col items-center gap-2 cursor-pointer transition"
               >
-                 <span
-                style={{
-                  position: "absolute",
-                  top: "-10px",
-                  left: "-15px",
-                  fontWeight: "bold",
-                  fontSize: "18px",
-                }}
-              >
-                {i + 1}
-              </span>
-                <img
-                  src={img.img}
-                  style={{
-                    width: "85px",
-                    height: "85px",
-                    objectFit: "contain",
-                    border:
-                      selectedImg === i
-                        ? "3px solid #f97316"
-                        : "3px solid transparent",
-                    borderRadius: "12px",
-                    padding: "4px",
-                    backgroundColor:
-                      selectedImg === i ? "#ffedd5" : "transparent",
-                  }}
-                />
-
+                <div className="flex gap-2">
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: "18px",
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <img
+                    src={img.img}
+                    style={{
+                      width: "100px",
+                      height: "85px",
+                      objectFit: "contain",
+                      border:
+                        selectedImg === i
+                          ? "2px solid #f97316"
+                          : "2px solid transparent",
+                      borderRadius: "12px",
+                      padding: "4px",
+                      backgroundColor:
+                        selectedImg === i ? "#ffedd5" : "transparent",
+                    }}
+                  />
+                </div>
                 <div
                   ref={(el) => (imageRefs.current[i] = el)} // 🔥 الريف هون على الدوت
                   className="w-3 h-3 rounded-full mt-2 transition"
@@ -241,7 +237,7 @@ const Review9_Page2_Q1 = () => {
 
                 {/* 🔥 البوكس */}
                 <div
-                  className="relative px-4 py-2 rounded-2xl text-sm text-center transition"
+                  className="relative px-4 py-2 rounded-2xl text-[18px] text-center transition"
                   style={{
                     backgroundColor:
                       selectedSentence === i ? "#fed7aa" : "#ffedd5",
@@ -263,15 +259,15 @@ const Review9_Page2_Q1 = () => {
                           top: "-10px",
                           right: "-10px",
                           transform: "translateY(-50%)",
-                          width: "20px",
-                          height: "20px",
-                          background: "#ef4444",
+                          width: "24px",
+                          height: "24px",
+                          background: "red",
                           color: "white",
                           borderRadius: "50%",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "12px",
+                          fontSize: "14px",
                           fontWeight: "bold",
                           border: "2px solid white",
                           boxShadow: "0 1px 6px rgba(0,0,0,0.2)",

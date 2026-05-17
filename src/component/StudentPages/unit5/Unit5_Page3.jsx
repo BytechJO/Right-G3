@@ -24,7 +24,7 @@ const Unit5_Page3 = ({ openPopup }) => {
     {
       start: 0.199,
       end: 12.84,
-      text: "Page 42, exercise one. Write grammar. Where's the sofa? It's in the living room. Where's the fridge? It's in the kitchen. Where's the computer?",
+      text: "Page 42, exercise 1. Right grammar. Where's the sofa? It's in the living room. Where's the fridge? It's in the kitchen. Where's the computer?",
     },
     {
       start: 13.899,

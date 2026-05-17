@@ -33,16 +33,17 @@ export default function Review10_Page2_Q2() {
     if (!word) return;
 
     setColumns((prev) => {
-      if (prev[col].includes(word)) return prev;
+      // إذا الكلمة مستخدمة بأي عمود لا تضيفها
+      const alreadyUsed = prev.s.includes(word) || prev.z.includes(word);
+
+      if (alreadyUsed) return prev;
+
       return {
         ...prev,
         [col]: [...prev[col], word],
       };
     });
-
-    setRemaining((prev) => prev.filter((w) => w !== word));
   };
-
   const moveWordBetweenColumns = (fromCol, toCol, word) => {
     if (showResult) return;
     if (!word || fromCol === toCol) return;
@@ -66,12 +67,7 @@ export default function Review10_Page2_Q2() {
       ...prev,
       [fromCol]: prev[fromCol].filter((w) => w !== word),
     }));
-
-    setRemaining((prev) =>
-      [...prev, word].sort((a, b) => wordBank.indexOf(a) - wordBank.indexOf(b)),
-    );
   };
-
   const handleDragStart = (word, source) => {
     if (showResult) return;
     setDraggedWord(word);
@@ -109,7 +105,9 @@ export default function Review10_Page2_Q2() {
     if (showResult) return;
 
     // 1) تأكد إن كل الكلمات انحطت
-    if (remaining.length > 0) {
+    const usedWordsCount = columns.s.length + columns.z.length;
+
+    if (usedWordsCount < wordBank.length) {
       ValidationAlert.info(
         "Please place all words before checking your answers!",
       );
@@ -160,13 +158,12 @@ export default function Review10_Page2_Q2() {
       s: [...correctAnswers.s],
       z: [...correctAnswers.z],
     });
-    setRemaining([]);
+
     setShowResult(true);
   };
 
   const handleStartAgain = () => {
     setColumns({ s: [], z: [] });
-    setRemaining([...wordBank]);
     setShowResult(false);
     setDraggedWord(null);
     setDragSource(null);
@@ -174,28 +171,23 @@ export default function Review10_Page2_Q2() {
 
   const getWordClass = (col, word) => {
     const base =
-      "px-3 py-2 rounded-lg text-sm font-semibold cursor-move transition-all border-2 ";
+      "px-3 py-2 rounded-lg text-[17px] font-semibold cursor-move transition-all border-1 ";
 
     if (!showResult) {
-      return base + "bg-blue-500 text-white border-blue-500 hover:bg-blue-600";
+      return base + "border-gray-300 hover:border-orange-500";
     }
 
     const isCorrect = correctAnswers[col].includes(word);
 
-    return (
-      base +
-      (isCorrect
-        ? "bg-blue-500 text-white border-blue-500"
-        : "bg-blue-500 text-white border-blue-500")
-    );
+    return base + (isCorrect ? "border-blue-500" : "border-red-500");
   };
 
   const getColClass = (col) => {
     const base =
-      "border-2 border-dashed rounded-xl p-4 min-h-[160px] transition-all";
+      "border-2 border-dashed border-gray-300 rounded-xl p-4 min-h-[140px] transition-all";
 
     if (!showResult) {
-      return base + "border-gray-300 bg-white hover:border-blue-400";
+      return base + "border-gray-300 bg-white hover:border-orange-400";
     }
 
     const userSorted = [...columns[col]].sort().join(",");
@@ -215,7 +207,7 @@ export default function Review10_Page2_Q2() {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8" style={{ display: "flex" }}>
           <span style={{ marginRight: "15px" }}>D</span>
 
@@ -228,135 +220,149 @@ export default function Review10_Page2_Q2() {
         </h5>
 
         {/* Word Bank */}
-        <div className="mb-8">
+        <div>
           <div
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDropOnBank}
-            className="flex flex-wrap gap-3 p-4 bg-gray-100 rounded-xl min-h-20 border-2 border-dashed border-gray-300"
+            className="flex flex-wrap gap-2 p-4 w-full justify-center rounded-xl min-h-20 "
           >
-            {remaining.map((word) => (
-              <button
-                key={word}
-                draggable={!showResult}
-                onDragStart={() => handleDragStart(word, "bank")}
-                onDragEnd={handleDragEnd}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-lg text-sm font-semibold text-gray-700 shadow-sm cursor-move hover:border-blue-400 hover:bg-blue-50 transition-all"
-              >
-                {word}
-              </button>
-            ))}
+            {wordBank.map((word) => {
+              const isUsed =
+                columns.s.includes(word) || columns.z.includes(word);
+
+              return (
+                <button
+                  key={word}
+                  draggable={!showResult && !isUsed}
+                  disabled={isUsed}
+                  onDragStart={() => handleDragStart(word, "bank")}
+                  onDragEnd={handleDragEnd}
+                  className="px-4 py-2 bg-white border-1 border-gray-300 rounded-lg text-[17px] text-gray-700 transition-all"
+                  style={{
+                    cursor: isUsed ? "not-allowed" : "grab",
+                    opacity: isUsed ? 0.4 : 1,
+                  }}
+                >
+                  {word}
+                </button>
+              );
+            })}
 
             {remaining.length === 0 && (
               <p className="text-gray-400 text-sm">All words placed ✓</p>
             )}
           </div>
         </div>
-
-        {/* Columns */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          {["s", "z"].map((col) => (
-            <div key={col}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="font-bold text-gray-700 text-lg">/{col}/</span>
-              </div>
-
-              <div
-                className={getColClass(col)}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDropOnColumn(col)}
-              >
-                <div className="flex flex-wrap gap-2">
-                  {columns[col].map((word) => {
-                    const isCorrect = correctAnswers[col].includes(word);
-
-                    return (
-                      <div key={word} style={{ position: "relative" }}>
-                        <button
-                          draggable={!showResult}
-                          onDragStart={() => handleDragStart(word, col)}
-                          onDragEnd={handleDragEnd}
-                          onClick={() => {
-                            if (!showResult) {
-                              returnWordToBank(col, word);
-                            }
-                          }}
-                          className={getWordClass(col, word)}
-                        >
-                          {word}
-                        </button>
-
-                        {/* ❌ للغلط فقط */}
-                        {showResult && !isCorrect && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              right: "-10px",
-                              top: "90%",
-                              transform: "translateY(-50%)",
-                              width: "22px",
-                              height: "22px",
-                              background: "#ef4444",
-                              color: "white",
-                              borderRadius: "50%",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontWeight: "bold",
-                              border: "2px solid white",
-                              boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
-                              pointerEvents: "none",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: "13px",
-                                lineHeight: "1",
-                                transform: "translateY(-1px)",
-                              }}
-                            >
-                              ✕
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+        <div className="flex flex-col gap-5">
+          {/* Columns */}
+          <div className="grid grid-cols-2 gap-6">
+            {["s", "z"].map((col) => (
+              <div key={col}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="font-bold text-blue-800 text-lg">
+                    /{col}/
+                  </span>
                 </div>
 
-                {columns[col].length === 0 && (
-                  <div className="text-gray-400 text-sm mt-2">
-                    Drag words here
+                <div
+                  className={getColClass(col)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDropOnColumn(col)}
+                >
+                  <div className="flex flex-wrap gap-2">
+                    {columns[col].map((word) => {
+                      const isCorrect = correctAnswers[col].includes(word);
+
+                      return (
+                        <div key={word} style={{ position: "relative" }}>
+                          <button
+                            draggable={!showResult}
+                            onDragStart={() => handleDragStart(word, col)}
+                            onDragEnd={handleDragEnd}
+                            onClick={() => {
+                              if (!showResult) {
+                                returnWordToBank(col, word);
+                              }
+                            }}
+                            className={getWordClass(col, word)}
+                          >
+                            {word}
+                          </button>
+
+                          {/* ❌ للغلط فقط */}
+                          {showResult && !isCorrect && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                right: "-10px",
+                                top: "00%",
+                                transform: "translateY(-50%)",
+                                width: "22px",
+                                height: "22px",
+                                background: "red",
+                                color: "white",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontWeight: "bold",
+                                border: "2px solid white",
+                                boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: "13px",
+                                  lineHeight: "1",
+                                  transform: "translateY(-1px)",
+                                }}
+                              >
+                                ✕
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
+
+                  {columns[col].length === 0 && (
+                    <div className="text-gray-400 text-sm mt-2">
+                      Drag words here
+                    </div>
+                  )}
+                </div>
               </div>
+            ))}
+          </div>
+          <div style={{ marginTop: "20px", fontSize: "18px", lineHeight: "2" }}>
+            <div>
+              <strong>1</strong> She gets full{" "}
+              <span style={{ textDecoration: "underline" }}>marks</span>.
             </div>
-          ))}
-        </div>
-        <div style={{ marginTop: "20px", lineHeight: "2" }}>
-          <div>
-            <strong>1</strong> She gets full{" "}
-            <span style={{ textDecoration: "underline" }}>marks</span>.
-          </div>
 
-          <div>
-            <strong>2</strong> Dad{" "}
-            <span style={{ textDecoration: "underline" }}>makes</span> us{" "}
-            <span style={{ textDecoration: "underline" }}>sandwiches</span>.
-          </div>
+            <div>
+              <strong>2</strong> Dad{" "}
+              <span style={{ textDecoration: "underline" }}>makes</span> us{" "}
+              <span style={{ textDecoration: "underline" }}>sandwiches</span>.
+            </div>
 
-          <div>
-            <strong>3</strong> Jacob usually{" "}
-            <span style={{ textDecoration: "underline" }}>plays</span>, then{" "}
-            <span style={{ textDecoration: "underline" }}>eats</span> his lunch.
-          </div>
+            <div>
+              <strong>3</strong> Jacob usually{" "}
+              <span style={{ textDecoration: "underline" }}>plays</span>, then{" "}
+              <span style={{ textDecoration: "underline" }}>eats</span> his
+              lunch.
+            </div>
 
-          <div>
-            <strong>4</strong> The{" "}
-            <span style={{ textDecoration: "underline" }}>girls</span> and{" "}
-            <span style={{ textDecoration: "underline" }}>boys</span> are
-            carrying the{" "}
-            <span style={{ textDecoration: "underline" }}>bags</span>{" "}
-            <span style={{ textDecoration: "underline" }}>downstairs</span>.
+            <div>
+              <strong>4</strong> The{" "}
+              <span style={{ textDecoration: "underline" }}>girls</span> and{" "}
+              <span style={{ textDecoration: "underline" }}>boys</span> are
+              carrying the{" "}
+              <span style={{ textDecoration: "underline" }}>bags</span>{" "}
+              <span style={{ textDecoration: "underline" }}>downstairs</span>.
+            </div>
           </div>
         </div>
         <Button

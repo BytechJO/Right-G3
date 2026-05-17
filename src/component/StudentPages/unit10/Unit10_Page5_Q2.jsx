@@ -121,7 +121,10 @@ const Unit10_Page5_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{
+          gap: "50px",
+          
+        }}>
         <h5 className="header-title-page8">
           <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
           Listen and choose.
@@ -139,6 +142,7 @@ const Unit10_Page5_Q2 = () => {
                 alignItems: "center", // لتوسيط كل العناصر داخل العمود
               }}
             >
+              <div className="flex gap-2">
               {/* الرقم */}
               <div style={{ fontWeight: "bold", fontSize: "18px" }}>
                 {i + 1}
@@ -150,12 +154,12 @@ const Unit10_Page5_Q2 = () => {
                 alt=""
                 style={{
                   width: "100%",
-                  maxWidth: "160px",
+                
                   height: "120px",
                   objectFit: "contain",
                 }}
               />
-
+</div>
               {/* الخيارات */}
               <div
                 style={{
@@ -167,12 +171,12 @@ const Unit10_Page5_Q2 = () => {
               >
                 {item.options.map((opt, idx) => {
                   // تحديد الألوان بناءً على الحالة
-                  let borderColor = "#e5e7eb"; // رمادي افتراضي
-                  let bgColor = "#f9fafb"; // خلفية افتراضية
+                  let borderColor = "#ebe8e5ff"; // رمادي افتراضي
+                  let bgColor = "#fbfaf9ff"; // خلفية افتراضية
 
                   if (selected[i] === opt) {
-                    borderColor = "#1C398E";
-                    bgColor = "#EBF0FF"; // أزرق فاتح لما يختار
+                    borderColor = "#F79530";
+                    bgColor = "#fff6ebff"; // أزرق فاتح لما يختار
                   }
 
                   if (
@@ -180,8 +184,8 @@ const Unit10_Page5_Q2 = () => {
                     selected[i] === opt &&
                     opt !== item.correct
                   ) {
-                    borderColor = "#ef4444";
-                    bgColor = "#FEF2F2"; // أحمر فاتح لما يكون غلط
+                    borderColor = "red";
+                    
                   }
 
                   return (
@@ -191,7 +195,7 @@ const Unit10_Page5_Q2 = () => {
                       style={{
                         flex: 1,
                         textAlign: "center",
-                        padding: "8px 12px", // padding شامل عشان يبان كـ زر
+                        padding: "4px 8px", // padding شامل عشان يبان كـ زر
                         borderRadius: "20px",
                         cursor: locked ? "not-allowed" : "pointer",
                         border: `2px solid ${borderColor}`,
@@ -200,7 +204,7 @@ const Unit10_Page5_Q2 = () => {
                         fontSize: "16px",
                         position: "relative",
                         transition: "all 0.2s ease", // حركة ناعمة لما يتغير اللون
-                        maxWidth: "120px", // حتى لو الكلام قصير ما يكبر أوي
+                        // maxWidth: "120px", // حتى لو الكلام قصير ما يكبر أوي
                       }}
                     >
                       {opt}
@@ -213,11 +217,11 @@ const Unit10_Page5_Q2 = () => {
                             style={{
                               position: "absolute",
                               top: "-10px",
-                              left: "50%",
+                              left: "90%",
                               transform: "translateX(-50%)", // ضبط التوسيط فوق الزر بالظبط
                               width: "22px",
                               height: "22px",
-                              background: "#ef4444",
+                              background: "red",
                               color: "white",
                               borderRadius: "50%",
                               fontSize: "12px",

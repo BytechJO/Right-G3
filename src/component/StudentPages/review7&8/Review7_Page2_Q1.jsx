@@ -119,13 +119,13 @@ const Review7_Page2_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall">
+      <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>C</span>
           Look, read, and circle.
         </h5>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-7 mb-10 lg:gap-y-16 gap-x-4 sm:gap-x-8 md:gap-x-16 lg:gap-x-1 xl:gap-x-20 mt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-15 mb-10 lg:gap-y-16 gap-x-4 sm:gap-x-8 md:gap-x-16 lg:gap-x-1 xl:gap-x-20 mt-10">
           {items.map((item, i) => (
             <div
               key={i}
@@ -137,11 +137,10 @@ const Review7_Page2_Q1 = () => {
                 marginRight: 4,
               }}
             >
+              <div className="flex gap-5">
               <span
                 style={{
-                  position: "absolute",
-                  top: "-10px",
-                  left: "-15px",
+             
                   fontWeight: "bold",
                   fontSize: "18px",
                 }}
@@ -149,32 +148,19 @@ const Review7_Page2_Q1 = () => {
                 {i + 1}
               </span>
 
-              <div
-                style={{
-                  position: "relative",
-                  width: "160px",
-                  height: "160px",
-                  border: "2px solid orange", // 🔥 هون البوردر
-                  borderRadius: "10px",
-                  padding: "10px", // 🔥 يعطي فراغ داخلي
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  boxSizing: "border-box",
-                }}
-              >
+          
                 <img
                   src={item.img}
                   alt=""
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
+                    width: "auto",
+                    height: "120px",
                     objectFit: "contain",
                   }}
                 />
-              </div>
+           </div>
 
-              <div className="flex flex-col gap-5 text-[18px]">
+              <div className="flex flex-col gap-1 text-[18px]">
                 {item.options.map((opt, idx) => (
                   <div
                     key={idx}
@@ -196,18 +182,18 @@ const Review7_Page2_Q1 = () => {
                         minWidth: "90px",
                         whiteSpace: "nowrap",
                         background:
-                          hovered === i + "-" + idx ? "#e0f2fe" : "transparent",
+                         !locked && hovered === i + "-" + idx ? "#fef2e0ff" : "transparent",
 
                         border:
                           selected[i] === opt
                             ? locked
                               ? opt === item.correct
-                                ? "2px solid #1C398E"
-                                : "2px solid #ef4444"
-                              : "2px solid #1C398E"
-                            : hovered === i + "-" + idx
-                              ? "2px solid #60a5fa"
-                              : "2px solid transparent",
+                                ? "1px solid #F79530"
+                                : "2px solid red"
+                              : "1px solid #F79530"
+                            :  !locked &&hovered === i + "-" + idx
+                              ? "1px solid #F79530"
+                              : "1px solid transparent",
 
                         transition: "0.2s", // 🔥 حركة ناعمة
                       }}
@@ -226,7 +212,7 @@ const Review7_Page2_Q1 = () => {
                             transform: "translateY(-50%)",
                             width: "22px",
                             height: "22px",
-                            background: "#ef4444",
+                            background: "red",
                             color: "white",
                             borderRadius: "50%",
                             display: "flex",

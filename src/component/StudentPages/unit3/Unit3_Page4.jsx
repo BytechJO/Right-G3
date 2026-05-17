@@ -28,7 +28,7 @@ const Unit3_Page4 = ({ openPopup }) => {
     {
       start: 0.0,
       end: 3.67,
-      text: "Page 25, exercise one. Write grammar.",
+      text: "Page 25, exercise 2. Right grammar.",
     },
     {
       start: 4.3,
