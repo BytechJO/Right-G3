@@ -17,7 +17,6 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 
-
 const DraggableItem = ({ word, isUsed }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -41,7 +40,7 @@ const DraggableItem = ({ word, isUsed }) => {
         justifyContent: "center",
         fontWeight: 700,
         fontSize: "20px",
-
+        touchAction: "none",
         cursor: isUsed ? "not-allowed" : "grab",
         opacity: isUsed ? 0.5 : 1,
         userSelect: "none",
@@ -266,8 +265,8 @@ const Page9_Q1 = () => {
                       alt=""
                       style={{
                         width: "100%",
-                        maxWidth: "220px",
-                        height: "120px",
+                        // maxWidth: "220px",
+                        height: "auto",
                         objectFit: "contain",
                         display: "block",
                       }}
@@ -280,9 +279,9 @@ const Page9_Q1 = () => {
                         style={{
                           position: "absolute",
                           bottom: "1px",
-                          left: "1px",
-                          width: "32px",
-                          height: "32px",
+                          left: "10px",
+                          width: "clam(26px,2vw,32px)",
+                          height: "clam(26px,2vw,32px)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",

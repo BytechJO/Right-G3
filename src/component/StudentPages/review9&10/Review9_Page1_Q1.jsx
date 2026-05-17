@@ -124,6 +124,7 @@ const Review9_Page1_Q1 = () => {
         >
           {words.map((word) => (
             <span
+            className="bg-[#fdc791]"
               key={word}
               style={{
                 // padding: "7px 14px",
@@ -134,7 +135,7 @@ const Review9_Page1_Q1 = () => {
                 // border: "2px solid #2c5287",
                 backgroundColor:"#fdc791",
                 borderRadius: "50px",
-                background: "white",
+                // background: "white",
                 fontWeight: "bold",
                 fontSize: "16px",
               }}

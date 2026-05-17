@@ -123,7 +123,9 @@ const Review2_Page2_Q2 = () => {
       <div className="div-forall" style={{ gap: "45px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "20px" }}>D</span>
-          Color each square according to the vowel sound.
+          Color each square according to the{" "}
+          <span className="text-blue-800 w-30">vowel sound</span> you hear in the
+          word.
         </h5>
 
         {/* COLOR TABLE */}
@@ -168,10 +170,7 @@ const Review2_Page2_Q2 = () => {
                   locked && colorKey && colorKey !== CORRECT[word];
 
                 return (
-                  <div
-                    key={word}
-                    className="relative overflow-visible"
-                  >
+                  <div key={word} className="relative overflow-visible">
                     <div
                       onClick={() => handleWordClick(word)}
                       className="relative py-5 text-lg font-semibold flex items-center justify-center cursor-pointer transition-all"

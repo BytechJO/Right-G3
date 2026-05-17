@@ -293,8 +293,8 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What’s the name of Julia’s school in Helen and Stella Get an e-Mail on
-          page 29?
+         What things are in the yard in Tom Lives in a House
+on page 41?
         </h5>
 
         {/* Words List

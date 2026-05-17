@@ -187,9 +187,9 @@ export default function Unit5_Page6_Q2() {
       <div className="div-forall" style={{ gap: "40px" }}>
         <h5 className="header-title-page8">
           <span className="ex-A" style={{ marginRight: "10px" }}>
-            D
+            E
           </span>
-          Look, read, and answer.
+          Look and answer.
         </h5>
         <div className="flex gap-2">
           <div className="w-full">

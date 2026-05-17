@@ -82,7 +82,7 @@ const Review2_Page2_Q3 = () => {
           <span style={{ marginRight: "10px" }}>E</span>
           Does the underlined word have a{" "}
           <span style={{ color: "#2e3192" }}>long u</span> or{" "}
-          <span style={{ color: "#2e3192" }}>short u</span> sound?
+          <span style={{ color: "#2e3192" }}>short u</span> sound?Read and circle
         </h5>
 
         {questions.map((q, i) => {

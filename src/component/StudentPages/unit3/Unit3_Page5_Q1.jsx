@@ -32,9 +32,9 @@ const Unit3_Page5_Q1 = () => {
     Array(data.length).fill(false),
   );
   const [showAnswer, setShowAnswer] = useState(false);
-const [locked ,setLocked]=useState(false)
+  const [locked, setLocked] = useState(false);
   const handleChange = (index, value) => {
-    if (showAnswer||locked) return;
+    if (showAnswer || locked) return;
 
     setInputs((prev) => {
       const copy = [...prev];
@@ -46,7 +46,7 @@ const [locked ,setLocked]=useState(false)
   };
 
   const checkAnswers = () => {
-    if (showAnswer||locked) return;
+    if (showAnswer || locked) return;
 
     if (inputs.some((v) => !v)) {
       ValidationAlert.info("Please fill all answers");
@@ -67,7 +67,7 @@ const [locked ,setLocked]=useState(false)
 
     setWrongInputs(wrong);
     setShowAnswer(true);
-setLocked(true)
+    setLocked(true);
     const total = data.length;
 
     if (score === total) ValidationAlert.success(`Score: ${score}/${total}`);
@@ -78,16 +78,14 @@ setLocked(true)
   const showCorrectAnswers = () => {
     setInputs(data.map((d) => d.answer));
     setShowAnswer(true);
-setLocked(false)
-
+    setLocked(false);
   };
 
   const reset = () => {
     setInputs(Array(data.length).fill(""));
     setWrongInputs(Array(data.length).fill(false));
     setShowAnswer(false);
-setLocked(false)
-
+    setLocked(false);
   };
 
   return (
@@ -104,7 +102,8 @@ setLocked(false)
           <span className="ex-A" style={{ marginRight: "10px" }}>
             A
           </span>
-          Look and write <span style={{ color: "#2e3192" }}>ch / sh / tch</span>
+          Look and write <span style={{ color: "#2e3192" }}>ch , sh</span> or{" "}
+          <span style={{ color: "#2e3192" }}>tch</span>
         </h5>
 
         {/* GRID */}
@@ -134,9 +133,9 @@ setLocked(false)
                       <>
                         <select
                           value={inputs[index]}
-                          className={`${wrongInputs[index]&&locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
+                          className={`${wrongInputs[index] && locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
                           onChange={(e) => handleChange(index, e.target.value)}
-                          disabled={showAnswer||locked}
+                          disabled={showAnswer || locked}
                         >
                           <option value="">...</option>
                           {OPTIONS.map((o) => (
@@ -154,9 +153,9 @@ setLocked(false)
                         {item.pattern}
                         <select
                           value={inputs[index]}
-                          className={`${wrongInputs[index]&&locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
+                          className={`${wrongInputs[index] && locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
                           onChange={(e) => handleChange(index, e.target.value)}
-                          disabled={showAnswer||locked}
+                          disabled={showAnswer || locked}
                         >
                           <option value="">...</option>
                           {OPTIONS.map((o) => (
@@ -173,9 +172,9 @@ setLocked(false)
                         {"ki"}
                         <select
                           value={inputs[index]}
-                          className={`${wrongInputs[index]&&locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
+                          className={`${wrongInputs[index] && locked ? "border-b-2  border-red-500" : "border-b-1 "} outline-none w-[70px]`}
                           onChange={(e) => handleChange(index, e.target.value)}
-                          disabled={showAnswer||locked}
+                          disabled={showAnswer || locked}
                         >
                           <option value="">...</option>
                           {OPTIONS.map((o) => (
