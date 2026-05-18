@@ -28,7 +28,7 @@ const Reading_Unit8_Page2 = () => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-   const playSound = (path, id) => {
+ const playSound = (path, id) => {
     if (!audioRef.current) return;
 
     // 🔥 وقف أي صوت شغال بأي صفحة
@@ -44,6 +44,7 @@ const Reading_Unit8_Page2 = () => {
       setActiveId(null);
     };
   };
+
   return (
     <div className="page1-img-wrapper"
           onClick={handleImageClick}
@@ -71,7 +72,7 @@ const Reading_Unit8_Page2 = () => {
           }}
          onClick={() => {
                   // setActiveAreaIndex(area.sound);
-                  playSound(sounds[area.sound], `p75-${area.sound}`);
+                  playSound(area.sound, `p75-${area.sound}`);
                 }}
           onMouseEnter={() => {
             if (!isPlaying) setHoveredAreaIndex(index);

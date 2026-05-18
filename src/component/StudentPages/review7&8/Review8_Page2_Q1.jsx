@@ -60,7 +60,7 @@ const LETTERS = [
   "d",
 ];
 const ITEMS = [
-  { id: "q1", word: "January", img: img1, correct: "j" },
+  { id: "q1", word: "Calendar", img: img1, correct: "c" },
   { id: "q2", word: "van", img: img2, correct: "v" },
   { id: "q3", word: "wagon", img: img3, correct: "w" },
   { id: "q4", word: "cat", img: img4, correct: "c" },

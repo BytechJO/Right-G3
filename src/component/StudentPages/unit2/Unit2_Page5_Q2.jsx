@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
-import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 14/CD12.Pg14_Instruction1_Adult Lady.mp3";
+import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 14/cd12pg14-instruction1-adult-lady_odrSfnYJ.mp3";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { TbMessageCircle } from "react-icons/tb";
@@ -41,17 +41,48 @@ const Unit2_Page5_Q2 = () => {
   // ================================
   // ✔ Captions Array
   // ================================
-  const captions = [
-    {
-      start: 0,
-      end: 9.04,
-      text: "Page 53, exercise E. Which picture begins with a different sound? Listen and write X.",
-    },
-    { start: 9.06, end: 13.14, text: "1. goose, gate, kiwi," },
-    { start: 13.16, end: 17.17, text: "2. kick, goat, kite," },
-    { start: 17.19, end: 22.06, text: "3. king, garlic, game,  " },
-    { start: 22.08, end: 27.09, text: "4. kangaroo, key, grapes. " },
-  ];
+const captions = [
+  {
+    start: 0,
+    end: 6.01,
+    text: "Page 14, Write Activities. Exercise A, Number 2.",
+  },
+  {
+    start: 7.05,
+    end: 10.73,
+    text: "Listen and circle the words with the same U sound.",
+  },
+  {
+    start: 11.97,
+    end: 15.5,
+    text: "1. tune, run, June.",
+  },
+  {
+    start: 15.51,
+    end: 20.2,
+    text: "2. cube, gum, hut.",
+  },
+  {
+    start: 20.21,
+    end: 25.05,
+    text: "3. blue, duck, up.",
+  },
+  {
+    start: 26.11,
+    end: 30.15,
+    text: "4. sun, glue, fun.",
+  },
+  {
+    start: 31.43,
+    end: 35.75,
+    text: "5. spun, cute, tube.",
+  },
+  {
+    start: 36.89,
+    end: 40.83,
+    text: "6. Sue, blue, bus.",
+  },
+];
   const showAnswers = () => {
     const correctSelections = groups.map((g) => g.correct);
 
