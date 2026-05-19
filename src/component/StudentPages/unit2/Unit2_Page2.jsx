@@ -59,9 +59,9 @@ const Unit2_Page2 = ({ openPopup }) => {
     },
   ];
   const captions3 = [
-    { start: 0, end: 3.46, text: "Page five. Listen, read and repeat.  " },
-    { start: 3.46, end: 5.92, text: "Do you play basketball? " },
-    { start: 5.92, end: 7.54, text: "No, I play volleyball" },
+    { start: 0, end: 3.98, text: "Page 11, listen, read, and repeat " },
+    { start: 3.98, end:6.74, text: "Where do you go on your summer vacation? " },
+    { start: 6.74, end: 8.12, text: "I usually go to Italy" },
   ];
 
   const captions = [
@@ -136,7 +136,7 @@ const Unit2_Page2 = ({ openPopup }) => {
                 <FourImagesWithAudio
                   images={[read, img1_conversation, img2_conversation]}
                   audioSrc={bebo}
-                  checkpoints={[0, 3.46, 5.92]}
+                  checkpoints={[0, 3.98, 6.74]}
                   popupOpen={true}
                   titleQ={`Listen, read, and repeat.`}
                   audioArr={repeatSounds}

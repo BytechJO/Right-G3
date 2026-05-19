@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/G5_U8_Pg_64.png";
 import ModernVocabularyComponent from "../../ModernVocabularyComponent";
 
-// import vocabulary from "../../../assets/img_unit3/sounds-unit3/Pg10_Vocabulary_Adult Lady.mp3";
 import "./Unit8_Page1.css";
 import num1 from "../../../assets/imgs/num/1_1.svg";
 import num2 from "../../../assets/imgs/num/2_1.svg";

@@ -33,7 +33,7 @@ const Page4_vocabulary = () => {
   // ✔ Captions Array
   // ================================
   const captions = [
-    { start: 0.459, end: 3.0, text: "Page 28. Unit 4 Vocabulary." },
+    { start: 0.459, end: 3.0, text: "Page 4. Unit 1 Vocabulary." },
 
     { start: 3.8, end: 4.74, text: "1. scoreboard." },
     { start: 6.06, end: 7.4, text: "2. young." },

@@ -40,13 +40,12 @@ button {
 }
 
 .div-forall {
- display: flex;
+  display: flex;
   flex-direction: column;
   width: 60%;
-  gap:68px;
-justify-content: flex-start;
-margin-top: 20px;
-  
+  gap: 68px;
+  justify-content: flex-start;
+  margin-top: 20px;
 }
 .tooltip-text {
   visibility: hidden;
@@ -196,7 +195,7 @@ img {
   background-size: 100% auto;
   background-repeat: no-repeat;
   background-position: top left;
-  aspect-ratio: 879 / 1280;
+  aspect-ratio: 855 / 1280;
   position: relative;
   display: block;
 }
@@ -208,7 +207,7 @@ img {
   background-size: 100% auto;
   background-repeat: no-repeat;
   background-position: top left;
-  aspect-ratio: 813 / 1114;
+  aspect-ratio: 785 / 1114;
   position: relative;
   display: block;
 }
