@@ -494,7 +494,7 @@ export default function Book() {
   //   pages: posterPages.length,
   // };
   const posterVocabInfo = {
-    cover: flashCardBookCover,
+    // cover: flashCardBookCover,
     title: "Right 2 Posters",
     pages: postersVocabPages().length,
   };
