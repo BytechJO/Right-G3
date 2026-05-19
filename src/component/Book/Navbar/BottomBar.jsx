@@ -3,7 +3,7 @@ import downloadIcon from "../../../assets/Page 01/Download pdf.svg";
 // import { ALL_ASSETS } from "../../../audioList"; // عدّلي المسار حسب مشروعك
 // import { MdOutlineWifiOff } from "react-icons/md";
 // import { MdOutlineWifi } from "react-icons/md";
-
+import teacherPdf from "../../../assets/Teacher Book G3.pdf"
 export default function BottomBar({
   pageIndex,
   totalPages,
@@ -18,7 +18,7 @@ export default function BottomBar({
   setViewMode,
   icons,
   activeTab,
-  teacherPdf,
+  
 }) {
   const [pageInput, setPageInput] = useState("");
 
