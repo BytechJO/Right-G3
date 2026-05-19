@@ -402,18 +402,18 @@ export default function Book() {
       id: 11,
       label: "Unit 10",
       start: 136,
-      pages: 12,
+      pages: 24,
     },
     {
       id: 12,
       label: "Teaching Contractions",
-      start: 149,
+      start: 160,
       pages: 3,
     },
     {
       id: 13,
       label: "Instructions and Answer Keys",
-      start: 153,
+      start: 169,
       pages: teacherPages.length - 152,
     },
   ];
