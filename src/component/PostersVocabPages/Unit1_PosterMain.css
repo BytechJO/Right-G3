@@ -16,7 +16,7 @@
   /* height: 80vh; */
   aspect-ratio: 1484 / 1023;
   /* background-size: contain; */
-  min-height: 75vh; /* 👈 يمنع الاختفاء */
+  /* min-height: 75vh; 👈 يمنع الاختفاء */
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-position: top left;
@@ -41,7 +41,7 @@
   transition: 0.2s ease-in-out;
 }
 
-@media (max-width: 1180px) {
+/* @media (max-width: 1180px) {
   .vocab_container_poster_vocab {
     font-size: 16px;
   }
@@ -54,7 +54,7 @@
   .vocab_container_poster_vocab {
     font-size: 20px;
   }
-}
+} */
 /* @media (max-height: 800px) {
 .vocab_container_poster_vocab {
    
@@ -66,27 +66,27 @@
     height: 90vh;
     width: auto;
   }
-  .vocab_container_poster_vocab {
+  /* .vocab_container_poster_vocab {
     font-size: 13px;
-  }
+  } */
 }
 
 @media (max-width: 820px) {
-  .vocab_container_poster_vocab {
+  /* .vocab_container_poster_vocab {
     font-size: 17px;
-  }
+  } */
 }
 
 @media (max-width: 770px) {
-  .vocab_container_poster_vocab {
+  /* .vocab_container_poster_vocab {
     font-size: 14px;
-  }
+  } */
 }
 
 @media (max-width: 540px) {
-  .vocab_container_poster_vocab {
+  /* .vocab_container_poster_vocab {
     font-size: 10px;
-  }
+  } */
 }
 
 @media (max-width: 480px) {
@@ -99,7 +99,7 @@
     height: 33px;
   }
 
-  .vocab_container_poster_vocab {
+  /* .vocab_container_poster_vocab {
     font-size: 7px;
-  }
+  } */
 }
