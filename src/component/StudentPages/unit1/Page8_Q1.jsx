@@ -273,8 +273,8 @@ const Page8_Q1 = () => {
             A
           </span>
           <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
-          Find and circle three words in each box with{" "}
-          <span style={{ color: "#2e3192" }}>short vowel</span> sounds.
+          Find and tap or click three words in each box with{" "}
+          <span className="text-blue-800">short vowel</span> sounds.
         </h5>
 
         <div
@@ -317,17 +317,18 @@ const Page8_Q1 = () => {
                         top: "-12px",
                         right: "-12px",
                         width: "22px",
-                    height: "22px",
-                    borderRadius: "50%",
-                    background: "red",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    border: "2px solid white",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",}}
+                        height: "22px",
+                        borderRadius: "50%",
+                        background: "red",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      }}
                     >
                       ✕
                     </div>
@@ -391,7 +392,7 @@ const Page8_Q1 = () => {
                         justifyContent: "center",
                         fontSize: "16px",
                         fontWeight: "bold",
-                        cursor: locked ? "default":"pointer",
+                        cursor: locked ? "default" : "pointer",
                         borderRadius: "4px",
                         border: "1px solid #ccc",
                         userSelect: "none",

@@ -196,7 +196,7 @@ export default function Unit4_Page6_Q2() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Look, unscramble, and answer. Use the words below.
+           Look, unscramble, and answer. Use the words below.
         </h1>
 
         <div

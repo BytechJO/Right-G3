@@ -121,7 +121,7 @@ const Unit2_Page5_Q1 = () => {
               A
             </span>
             <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
-            Look and write.
+     Look, drag, and drop.
           </h5>
 
           <div className="mt-2 flex flex-col gap-5">

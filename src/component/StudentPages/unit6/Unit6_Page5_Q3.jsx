@@ -309,26 +309,8 @@ const wordsToFind = [
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-         What does Stella recommend in I Love My
-Garden! on page 47?
+          What does Stella recommend in I Love My Garden! on page 47?
         </h5>
-
-        {/* Words List
-        <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((item) => (
-            <span
-              key={item.id}
-              className={`px-3 py-1.5 rounded-[10px] border-2 border-blue-800 ${
-                foundWords.includes(item.id)
-                  ? "bg-[#2c5287] text-white"
-                  : "bg-white text-black"
-              }`}
-            >
-              {item.word}
-            </span>
-          ))}
-        </div> */}
-
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >

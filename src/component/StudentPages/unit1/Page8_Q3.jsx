@@ -108,9 +108,9 @@ const Page8_Q3 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             B
           </span>
-          Look and write
-          <span style={{ color: "#2e3192" }}>true</span>or
-          <span style={{ color: "#2e3192" }}>false</span>.
+          Look, drag, and drop
+          <span style={{ color: "#2e3192" }}> true</span> or
+          <span style={{ color: "#2e3192" }}> false</span>.
         </h5>
         <div className=" flex flex-col  gap-8 mt-8">
           {questions.map((q) => (

@@ -270,7 +270,7 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What is the moral of Slow and Steady Wins the Race on page 5?
+        What is the moral of Slow and Steady Wins the Race on page 5? Tap or click the hidden words.
         </h5>
 
         {/* Words List */}

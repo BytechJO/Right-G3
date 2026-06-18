@@ -116,8 +116,9 @@ const Unit3_Page6_Q2 = () => {
       >
         <h5 className="header-title-page8">
           <span className="ex-A">E</span>Read the first sentences carefully. Are
-          the second sentences right or wrong? Write<span style={{ color: "#D1232A" }}>✓</span>or
-          <span style={{ color: "#D1232A" }}>✗</span>.
+          the second sentences right or wrong? Drag and drop 
+          <span style={{ color: "#D1232A" }}> ✓ </span>or
+          <span style={{ color: "#D1232A" }}> ✗ </span>.
         </h5>
 
         <div className="w-full max-w-3xl space-y-6 mt-7">
@@ -142,9 +143,13 @@ const Unit3_Page6_Q2 = () => {
                 <div
                   onClick={() => handleSelect(q.id, true)}
                   className={`relative w-[45px] h-[45px] border-2 rounded-md cursor-pointer flex items-center justify-center
-    ${selected[q.id] === true ? showResult &&
-                    selected[q.id] === true &&
-                    q.correct !== true? "border-red-500": "border-orange-400" : "border-gray-300"}`}
+    ${
+      selected[q.id] === true
+        ? showResult && selected[q.id] === true && q.correct !== true
+          ? "border-red-500"
+          : "border-orange-400"
+        : "border-gray-300"
+    }`}
                 >
                   {selected[q.id] === true && (
                     <img src={trueIcon} style={{ height: "25px" }} />
@@ -174,9 +179,13 @@ pointer-events-nonel"
                 <div
                   onClick={() => handleSelect(q.id, false)}
                   className={`relative  w-[45px] h-[45px] border-2 rounded-md cursor-pointer flex items-center justify-center
-    ${selected[q.id] === false ? showResult &&
-                    selected[q.id] === false &&
-                    q.correct !== false ?  "border-red-500": "border-orange-400" : "border-gray-300"} `}
+    ${
+      selected[q.id] === false
+        ? showResult && selected[q.id] === false && q.correct !== false
+          ? "border-red-500"
+          : "border-orange-400"
+        : "border-gray-300"
+    } `}
                 >
                   {selected[q.id] === false && (
                     <img src={falseIcon} style={{ height: "25px" }} />

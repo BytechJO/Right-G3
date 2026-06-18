@@ -225,7 +225,7 @@ const Page9_Q1 = () => {
             <span className="ex-A" style={{ marginRight: "10px" }}>
               D
             </span>
-            Read and number the pictures.
+          Read and number the pictures.
           </h5>
 
           <BankDrop>

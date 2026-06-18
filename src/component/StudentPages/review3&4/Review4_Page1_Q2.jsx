@@ -159,7 +159,7 @@ export default function Review4_Page1_Q2() {
       <div className="div-forall" style={{gap:"90px"}}>
         <h5 className="header-title-page8">
           <span className=" mr-4">B</span>
-          Unscramble and write.
+         Unscramble, drag, and drop.
         </h5>
         <div className="flex flex-col gap-15">
           {items.map((item, i) => (

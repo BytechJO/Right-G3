@@ -234,7 +234,8 @@ const removeAnswer = (questionId) => {
             <span className="ex-A" style={{ marginRight: "10px" }}>
               B
             </span>
-            Look, read, and write. Use the words below.
+                 Look, read, drag, and drop. Use the words below.
+
           </h5>
           <div className="flex flex-col lg:flex-row gap-8 items-center">
             <div className="flex-1 p-5 rounded-2xl border-1 border-gray-200 h-fit sticky top-4">

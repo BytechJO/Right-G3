@@ -77,12 +77,13 @@ const Review2_Page2_Q3 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall" style={{gap:"110px"}}>
+      <div className="div-forall" style={{ gap: "110px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>E</span>
-          Does the underlined word have a{" "}
-          <span style={{ color: "#2e3192" }}>long u</span> or{" "}
-          <span style={{ color: "#2e3192" }}>short u</span> sound?Read and circle
+          Does the underlined word have a
+          <span style={{ color: "#2e3192" }}> long u </span> or{" "}
+          <span style={{ color: "#2e3192" }}> short u </span> sound? Read and
+          tap or click.
         </h5>
 
         {questions.map((q, i) => {
@@ -107,7 +108,7 @@ const Review2_Page2_Q3 = () => {
                 <span
                   style={{
                     textDecoration: "underline",
-                    fontWeight:"500",
+                    fontWeight: "500",
                     color: "#F79530",
                     fontSize: "22px",
                   }}
@@ -137,8 +138,10 @@ const Review2_Page2_Q3 = () => {
                         style={{
                           padding: "6px 12px",
                           borderRadius: "8px",
-                          border: selected ? "2px solid #F79530" : "2px solid #ccc" ,
-                          cursor: locked?"default":"pointer",
+                          border: selected
+                            ? "2px solid #F79530"
+                            : "2px solid #ccc",
+                          cursor: locked ? "default" : "pointer",
                           // background: selected ? "#1C398E" : "#fff",
                           // color: selected ? "#fff" : "#000",
                         }}
@@ -151,7 +154,7 @@ const Review2_Page2_Q3 = () => {
                           style={{
                             position: "absolute",
                             right: "15px",
-                            top:"0px",
+                            top: "0px",
                             zIndex: 10,
                           }}
                         >

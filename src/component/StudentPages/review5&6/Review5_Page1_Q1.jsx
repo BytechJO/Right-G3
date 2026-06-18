@@ -116,7 +116,7 @@ const Review5_Page1_Q1 = () => {
       <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>A</span>
-          Read, look, and write. Use the words below.
+          Read, look, drag and drop. Use the words below.
         </h5>
 
         <div className="w-full mx-auto">

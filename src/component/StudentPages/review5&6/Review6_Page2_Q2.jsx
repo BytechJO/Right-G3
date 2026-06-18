@@ -88,9 +88,9 @@ const Review6_Page2_Q2 = () => {
       <div className="div-forall" style={{ gap: "40px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>E</span>
-          Write <span style={{ color: "#2e3192" }}>y</span> in the blank only
-          under the pictures that end with
-          <span style={{ color: "#2e3192" }}>y</span>.
+          Drag and drop <span style={{ color: "#2e3192" }}> y </span> in the
+          blank only under the pictures that end with
+          <span style={{ color: "#2e3192" }}> y </span>.
         </h5>
         <div className="grid grid-cols-3 gap-10">
           {items.map((item, i) => {
@@ -114,7 +114,8 @@ const Review6_Page2_Q2 = () => {
                 {/* الكلمة + الخط */}
                 <div className="relative flex items-center justify-center gap-2">
                   <span className="text-[18px]">
-                  <span  className="text-[20px] font-bold mr-2">{i + 1}</span>   {item.word}
+                    <span className="text-[20px] font-bold mr-2">{i + 1}</span>{" "}
+                    {item.word}
                   </span>
 
                   <select
@@ -132,7 +133,7 @@ const Review6_Page2_Q2 = () => {
                       style={{
                         position: "absolute",
                         top: "50%",
-                        right:"0px",
+                        right: "0px",
                         transform: "translateY(-50%)",
                         width: "22px",
                         height: "22px",
@@ -143,7 +144,7 @@ const Review6_Page2_Q2 = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         fontWeight: "500",
-                        fontSize:"12px",
+                        fontSize: "12px",
                         border: "2px solid white",
                         boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                         pointerEvents: "none",

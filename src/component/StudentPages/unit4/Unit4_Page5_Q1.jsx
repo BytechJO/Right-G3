@@ -123,7 +123,7 @@ const Unit4_Page5_Q1 = () => {
             A
           </span>
           Follow the words with the
-          <span style={{ color: "#2e3192" }}>voiced th</span>sound.
+          <span style={{ color: "#2e3192" }}> voiced th </span>sound.
         </h5>
 
         <div

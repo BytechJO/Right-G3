@@ -298,7 +298,7 @@ const Review3_Page1_Q2 = () => {
         <div className="div-forall" style={{ gap: "20px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>B</span>
-            Read, look, and answer. Use the sentences below
+           Read, look, and answer. Use the sentences below.
           </h5>
 
           {/* WORD BANK */}

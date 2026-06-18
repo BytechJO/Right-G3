@@ -105,7 +105,7 @@ const Page8_Q4 = () => {
     "places",
     "there",
   ];
- const correctAnswers = [
+  const correctAnswers = [
     { word: "they", order: 0 },
     { word: "enjoy", order: 1 },
     { word: "the", order: 2 },
@@ -292,7 +292,7 @@ const Page8_Q4 = () => {
             C
           </span>
           What do Tom and his family enjoy about France in Vacation in France on
-          page 11?{" "}
+          page 11? Tap or click the hidden words.
         </h5>
 
         {/* Words List */}

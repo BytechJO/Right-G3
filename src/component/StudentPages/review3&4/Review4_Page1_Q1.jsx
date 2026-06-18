@@ -220,6 +220,7 @@ const Review4_Page1_Q1 = () => {
           cursor: isUsed ? "not-allowed" : "grab",
           opacity: isUsed ? 0.5 : 1,
           userSelect: "none",
+          touchAction:"none",
           zIndex: 9999999,
           ...(transform
             ? {
@@ -245,8 +246,8 @@ const Review4_Page1_Q1 = () => {
       >
         <div className="div-forall" style={{ gap: "5px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>A</span> Read and write the
-            season. Number the pictures .
+            <span style={{ marginRight: "10px" }}>A</span> Read, drag, and drop
+            the season. Number the pictures.
           </h5>
 
           {/* ========================= */}
@@ -299,7 +300,10 @@ const Review4_Page1_Q1 = () => {
                       id={`${i}`}
                       style={{
                         display: "inline-block",
-                        borderBottom: showCorrect && isWordWrong ?"2px solid red":"1px solid",
+                        borderBottom:
+                          showCorrect && isWordWrong
+                            ? "2px solid red"
+                            : "1px solid",
                         minWidth: "120px",
                         // fontWeight: "bold",
                         position: "relative",
@@ -388,6 +392,7 @@ const Review4_Page1_Q1 = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         fontWeight: "bold",
+                        
                         fontSize: "20px",
                         color: showCorrect && isImageWrong ? "red" : "black",
                       }}

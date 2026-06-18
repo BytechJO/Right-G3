@@ -293,8 +293,7 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-         What things are in the yard in Tom Lives in a House
-on page 41?
+        What things are in the yard in Tom Lives in a House on page 41?
         </h5>
 
         {/* Words List

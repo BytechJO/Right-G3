@@ -128,7 +128,7 @@ const Unit4_Page5_Q2 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             B
           </span>
-          Look, read, and choose
+         Look, read, and choose.
         </h5>
         <div className="grid grid-cols-2 gap-20 w-full">
           {questions.map((q, qIndex) => (

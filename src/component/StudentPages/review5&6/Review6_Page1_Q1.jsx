@@ -115,8 +115,8 @@ const Review6_Page1_Q1 = () => {
       >
         <div className="div-forall" style={{ gap: "40px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>A</span>Read, look, and write.
-            Use the words below.
+            <span style={{ marginRight: "10px" }}>A</span>Read, look, drag, and
+            drop. Use the words below.
           </h5>
           {/* WORD BANK */}
           <Droppable droppableId="bank" direction="horizontal">
@@ -266,10 +266,10 @@ const Review6_Page1_Q1 = () => {
                             <span
                               onClick={() => removeWord(i)}
                               style={{
-                                cursor: showCorrect? "default":"pointer",
+                                cursor: showCorrect ? "default" : "pointer",
                                 userSelect: "none",
                               }}
-                              className={`${showCorrect?"":"hover:text-red-500"}`}
+                              className={`${showCorrect ? "" : "hover:text-red-500"}`}
                             >
                               {answers[i]}
                             </span>

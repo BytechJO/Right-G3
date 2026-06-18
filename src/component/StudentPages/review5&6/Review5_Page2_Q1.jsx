@@ -141,8 +141,8 @@ const Review5_Page2_Q1 = () => {
         <div className="div-forall" style={{ gap: "30px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>C</span>
-            Look and write the words ending in{" "}
-            <span style={{ color: "#2e3192" }}>-y</span>.
+           Look, drag and drop the words ending in
+            <span style={{ color: "#2e3192" }}> -y </span>.
           </h5>
 
           {/* IMAGES */}

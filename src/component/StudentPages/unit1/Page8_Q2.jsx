@@ -141,8 +141,8 @@ const Page8_Q2 = () => {
         >
           <h5 className="header-title-page8">
             <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
-            Listen and circle the words with
-            <span style={{ color: "#2e3192" }}>long vowel</span> sounds.
+            Listen and tap or click the words with{" "}
+            <span className="text-blue-800">long vowel </span>sounds.
           </h5>
           <QuestionAudioPlayer
             src={sound1}
@@ -224,14 +224,13 @@ const Page8_Q2 = () => {
                             fontSize: "18px",
                             cursor: locked ? "default" : "pointer",
                             position: "relative",
-                            height:"50px",
-                            width:"50px",
-                             display: "flex",
-              justifyContent: "center",
-                      alignItems: "center",
+                            height: "50px",
+                            width: "50px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
 
-                      // padding: "10px 8px",
-
+                            // padding: "10px 8px",
                           }}
                         >
                           {word}

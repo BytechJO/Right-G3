@@ -114,6 +114,7 @@ function DraggableLetter({ item, locked }) {
         fontSize: "18px",
         cursor: locked ? "default" : "grab",
         minWidth: "35px",
+        touchAction: "none",
         boxShadow: isDragging
           ? "0 4px 10px rgba(247,149,48,0.25)"
           : "0 1px 3px rgba(0,0,0,0.08)",
@@ -247,9 +248,9 @@ const Review2_Page2_Q1 = () => {
       >
         <div className="div-forall" style={{ gap: "25px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "20px" }}>C</span>
-            Listen, read, and write the{" "}
-            <span style={{ color: "#2e3192" }}>vowel sound</span>.
+            <span style={{ marginRight: "10px" }}>C</span>
+           Listen, read, drag, and drop the 
+            <span style={{ color: "#2e3192" }}> vowel sound</span>.
           </h5>
           <QuestionAudioPlayer
             src={sound}

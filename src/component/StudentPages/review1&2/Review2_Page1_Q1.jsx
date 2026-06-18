@@ -23,23 +23,24 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vac
 import Button from "../../Button";
 
 function DraggableWord({ word, isUsed, locked }) {
- const {
-  attributes,
-  listeners,
-  setNodeRef,
-  transform,
-  transition,
-  isDragging,
-} = useSortable({
-  id: word,
-  disabled: isUsed || locked,
-});
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: word,
+    disabled: isUsed || locked,
+  });
 
- const style = {
-  transform: CSS.Transform.toString(transform),
-  transition,
-  opacity: isDragging || isUsed || locked ? 0.4 : 1,
-};
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    touchAction: "none",
+    opacity: isDragging || isUsed || locked ? 0.4 : 1,
+  };
   return (
     <div
       ref={setNodeRef}
@@ -91,7 +92,7 @@ function DropSlot({ id, value, correct, locked, showResult, onRemove }) {
       style={{
         display: "inline-block",
         width: "100px",
-        height:"30px",
+        height: "30px",
         borderBottom: locked
           ? value === correct
             ? "1px solid #000"
@@ -103,7 +104,10 @@ function DropSlot({ id, value, correct, locked, showResult, onRemove }) {
       }}
     >
       {value && (
-        <span onClick={onRemove} className={`${locked ? "cursor-default":"cursor-pointer hover:text-red-500"} font-medium`}>
+        <span
+          onClick={onRemove}
+          className={`${locked ? "cursor-default" : "cursor-pointer hover:text-red-500"} font-medium`}
+        >
           {value}
         </span>
       )}
@@ -239,20 +243,20 @@ const Review2_Page1_Q1 = () => {
       >
         <div className="div-forall" style={{ gap: "20px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "20px" }}>A</span>
-            Write sentences. Use the words below.
+            <span style={{ marginRight: "10px" }}>A</span>
+           Drag and drop sentences. Use the words below.
           </h5>
           <div className="flex flex-col gap-10">
             {/* بنك الكلمات */}
             <SortableContext items={words}>
               <div className="flex gap-3 p-3 justify-center mt-3 flex-wrap">
                 {words.map((w) => (
-                 <DraggableWord
-  key={w}
-  word={w}
-  isUsed={Object.values(answers).includes(w)}
-  locked={locked}
-/>
+                  <DraggableWord
+                    key={w}
+                    word={w}
+                    isUsed={Object.values(answers).includes(w)}
+                    locked={locked}
+                  />
                 ))}
               </div>
             </SortableContext>
@@ -291,8 +295,7 @@ const Review2_Page1_Q1 = () => {
                             position: "relative",
                             fontSize: "18px",
                             display: "flex",
-                          alignItems: "center",
-
+                            alignItems: "center",
                           }}
                         >
                           I{" "}

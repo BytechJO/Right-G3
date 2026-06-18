@@ -103,7 +103,7 @@ const Unit6_Page5_Q2 = () => {
       <div className="div-forall" style={{ gap: "5px" }}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-4">B</span>
-          Look, listen, and choose
+          Look, listen, and choose.
         </h5>
         <QuestionAudioPlayer
           src={sound1}

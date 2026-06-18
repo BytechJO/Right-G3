@@ -46,33 +46,32 @@ const Unit5_Page5_Q1 = () => {
     groups.map((group) => Array(group.items.length).fill(false)),
   );
   const [locked, setLocked] = useState(false); // ⭐ NEW — يمنع التعديل بعد Show Answer
-const getCorrectCount = (group) => {
-  return group.items.filter((item) =>
-    group.correctWords.includes(item.word),
-  ).length;
-};
+  const getCorrectCount = (group) => {
+    return group.items.filter((item) => group.correctWords.includes(item.word))
+      .length;
+  };
   // ----------- الداتا الجديدة الخاصة بسؤال short a ---------------
 
   const handleSelect = (groupIndex, itemIndex) => {
-  if (locked) return;
+    if (locked) return;
 
-  const updated = answers.map((group) => [...group]);
+    const updated = answers.map((group) => [...group]);
 
-  const group = groups[groupIndex];
+    const group = groups[groupIndex];
 
-  const correctLimit = getCorrectCount(group);
+    const correctLimit = getCorrectCount(group);
 
-  const currentSelectedCount = updated[groupIndex].filter(Boolean).length;
+    const currentSelectedCount = updated[groupIndex].filter(Boolean).length;
 
-  const isSelected = updated[groupIndex][itemIndex];
+    const isSelected = updated[groupIndex][itemIndex];
 
-  // 🔥 إذا بدو يختار زيادة → امنعه
-  if (!isSelected && currentSelectedCount >= correctLimit) return;
+    // 🔥 إذا بدو يختار زيادة → امنعه
+    if (!isSelected && currentSelectedCount >= correctLimit) return;
 
-  updated[groupIndex][itemIndex] = !updated[groupIndex][itemIndex];
+    updated[groupIndex][itemIndex] = !updated[groupIndex][itemIndex];
 
-  setAnswers(updated);
-};
+    setAnswers(updated);
+  };
 
   const checkAnswers = () => {
     if (locked) return;
@@ -147,9 +146,8 @@ const getCorrectCount = (group) => {
       }}
     >
       <div
-        className="div-forall"
+        className="div-forall mb-10"
         style={{
-          
           gap: "30px",
         }}
       >
@@ -158,8 +156,8 @@ const getCorrectCount = (group) => {
             <span className="ex-A" style={{ marginRight: "10px" }}>
               A
             </span>{" "}
-            Which pictures have the same{" "}
-            <span style={{ color: "#2e3192" }}>-y sound</span>? Circle.
+            Which pictures have the same
+            <span style={{ color: "#2e3192" }}> -y sound </span>? Tap or click.
           </h5>
         </div>
 
@@ -261,7 +259,9 @@ const getCorrectCount = (group) => {
                               position: "absolute",
                               inset: 0,
                               borderRadius: "50%",
-                              border: isWrong ? "2px solid red":"1px solid #F79530",
+                              border: isWrong
+                                ? "2px solid red"
+                                : "1px solid #F79530",
                               zIndex: 2, // 🔥 فوق الصورة
                               pointerEvents: "none",
                             }}
@@ -300,7 +300,7 @@ const getCorrectCount = (group) => {
                             fontWeight: "bold",
                             border: "2px solid white",
                             boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                            zIndex:99999,
+                            zIndex: 99999,
                             pointerEvents: "none",
                           }}
                         >

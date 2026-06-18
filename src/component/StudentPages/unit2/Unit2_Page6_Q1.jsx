@@ -128,7 +128,7 @@ const Unit2_Page6_Q1 = () => {
       <div className="div-forall gap-5" style={{gap:"25px"}}>
         <h5 className="header-title-page8 pb-2.5">
           <span className="ex-A mr-2.5">D</span>
-          Look, read, and circle.
+          Look, read, and tap or click.
         </h5>
 
         <div className="flex flex-wrap justify-center gap-x-25 gap-y-10">

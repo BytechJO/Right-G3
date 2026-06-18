@@ -127,7 +127,7 @@ export default function CircleQuestions() {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             D
           </span>
-          Read and circle.
+          Read and tap or click.
         </h5>
 
         {/* QUESTIONS */}

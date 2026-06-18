@@ -126,7 +126,7 @@ const Unit6_Page5_Q1 = () => {
       <div className="div-forall"  style={{gap:"5px"}}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-4">A</span>
-          Look, circle, and write.
+          Look, tap or click and drag the word.
         </h5>
         <div className="flex w-full">
           <div className="grid grid-cols-3 gap-y-25 w-full gap-x-[70px] mt-10 justify-center">

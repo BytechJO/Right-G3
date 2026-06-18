@@ -169,7 +169,7 @@ Score: ${score} / ${total}
       <div className="div-forall" style={{ gap: "15px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>B</span>
-          Read, match, and write.
+          Read, match, drag and drop.
         </h5>
 
         <div className="container relative w-full h-[500px] px-5">

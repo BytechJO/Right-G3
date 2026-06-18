@@ -55,7 +55,7 @@ const buildQuestionOptions = (correctQuestion) => {
 const buildAnswerOptions = (sentence) => {
   const words = sentence.split(" ");
 
-  const subject = words[0];        // She
+  const subject = words[0]; // She
   const rest = words.slice(2).join(" "); // irons clothes.
 
   return FREQUENCIES.map((freq) => `${subject} ${freq} ${rest}`);
@@ -132,115 +132,106 @@ export default function Review2_Page1_Q2() {
     setShowAns(false);
   };
 
- const renderSelect = (item, type) => {
-  const value = answers[`${type}-${item.id}`] || "";
-  const wrong = isWrong(item, type);
+  const renderSelect = (item, type) => {
+    const value = answers[`${type}-${item.id}`] || "";
+    const wrong = isWrong(item, type);
 
-  const options =
-    type === "question"
-      ? buildQuestionOptions(item.question)
-      : buildAnswerOptions(item.answer);
+    const options =
+      type === "question"
+        ? buildQuestionOptions(item.question)
+        : buildAnswerOptions(item.answer);
 
-  // أول كلمة ثابتة
-  const firstWord =
-    type === "question"
-      ? "How"
-      : item.answer.split(" ")[0];
+    // أول كلمة ثابتة
+    const firstWord = type === "question" ? "How" : item.answer.split(" ")[0];
 
-  // حذف أول كلمة من الخيارات
-  const cleanedOptions = options.map((opt) => {
-    const words = opt.split(" ");
-    words.shift();
-    return words.join(" ");
-  });
+    // حذف أول كلمة من الخيارات
+    const cleanedOptions = options.map((opt) => {
+      const words = opt.split(" ");
+      words.shift();
+      return words.join(" ");
+    });
 
-  // القيمة الحالية بدون أول كلمة
-  const cleanedValue = value
-    ? value.split(" ").slice(1).join(" ")
-    : "";
+    // القيمة الحالية بدون أول كلمة
+    const cleanedValue = value ? value.split(" ").slice(1).join(" ") : "";
 
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-      }}
-    >
-      {/* الكلمة الثابتة */}
-      <span
+    return (
+      <div
         style={{
-          fontWeight: "600",
-          fontSize:"20px",
-          minWidth: "45px",
-
-        }}
-      >
-        {firstWord}
-      </span>
-
-      <select
-        value={cleanedValue}
-        onChange={(e) => {
-          const finalValue = `${firstWord} ${e.target.value}`;
-          handleChange(item.id, type, finalValue);
-        }}
-        disabled={showResults || showAns}
-        style={{
+          position: "relative",
           width: "100%",
-          borderBottom: `1px solid ${wrong ? "red" : "navy"}`,
-          fontSize: "clamp(12px, 1.4vw, 18px)",
-          outline:"none",
-          padding: "4px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
         }}
       >
-        <option value="">Select</option>
-
-        {cleanedOptions.map((opt, i) => (
-          <option key={i} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-
-      {wrong && (
-        <div
+        {/* الكلمة الثابتة */}
+        <span
           style={{
-            position: "absolute",
-            top: "-8px",
-            right: "-8px",
-            width: "22px",
-            height: "22px",
-            borderRadius: "50%",
-            background: "red",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "14px",
-            fontWeight: "bold",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-            border: "2px solid white",
+            fontWeight: "600",
+            fontSize: "20px",
+            minWidth: "45px",
           }}
         >
-          ✕
-        </div>
-      )}
-    </div>
-  );
-};
+          {firstWord}
+        </span>
+
+        <select
+          value={cleanedValue}
+          onChange={(e) => {
+            const finalValue = `${firstWord} ${e.target.value}`;
+            handleChange(item.id, type, finalValue);
+          }}
+          disabled={showResults || showAns}
+          style={{
+            width: "100%",
+            borderBottom: `1px solid ${wrong ? "red" : "navy"}`,
+            fontSize: "clamp(12px, 1.4vw, 18px)",
+            outline: "none",
+            padding: "4px",
+          }}
+        >
+          <option value="">Select</option>
+
+          {cleanedOptions.map((opt, i) => (
+            <option key={i} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+
+        {wrong && (
+          <div
+            style={{
+              position: "absolute",
+              top: "-8px",
+              right: "-8px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              background: "red",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "14px",
+              fontWeight: "bold",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              border: "2px solid white",
+            }}
+          >
+            ✕
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{gap:"40px" }}
-      >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span>
-         Look at Exercise A. Write the questions and answers.
+      <div className="div-forall" style={{ gap: "40px" }}>
+        <h1 className="header-title-page8">
+          <span className="ex-A">B</span>
+          Look at Exercise A. Drag and drop the questions and answers.
         </h1>
         <div>
           {ITEMS.map((item) => (

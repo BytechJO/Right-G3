@@ -123,8 +123,8 @@ const Review2_Page2_Q2 = () => {
       <div className="div-forall" style={{ gap: "45px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "20px" }}>D</span>
-          Color each square according to the{" "}
-          <span className="text-blue-800 w-30">vowel sound</span> you hear in the
+           Color each square according to the 
+          <span className="text-blue-800 w-30"> vowel sound </span> you hear in the
           word.
         </h5>
 

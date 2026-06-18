@@ -36,6 +36,7 @@ const DraggableWord = ({ word, disabled }) => {
         fontWeight: "bold",
         cursor: disabled ? "not-allowed" : "grab",
         opacity: disabled ? 0.4 : 1,
+        touchAction: "none",
         transform: transform
           ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
           : undefined,
@@ -203,9 +204,9 @@ const Review3_Page2_Q2 = () => {
       >
         <div className="div-forall" style={{ gap: "55px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>D</span> Answer each riddle
-            with a <span style={{ color: "#2e3192" }}>ch</span>or{" "}
-            <span style={{ color: "#2e3192" }}>sh</span> word.
+            <span style={{ marginRight: "10px" }}>D</span>Answer each riddle
+            with a <span style={{ color: "#2e3192" }}> ch </span>or{" "}
+            <span style={{ color: "#2e3192" }}> sh </span> word.
           </h5>
 
           {/* WORD BANK */}
@@ -218,11 +219,11 @@ const Review3_Page2_Q2 = () => {
             }}
           >
             {words.map((w) => (
-             <DraggableWord
-  key={w}
-  word={w}
-  disabled={usedWords.includes(w) || showAnswer}
-/>
+              <DraggableWord
+                key={w}
+                word={w}
+                disabled={usedWords.includes(w) || showAnswer}
+              />
             ))}
           </div>
 

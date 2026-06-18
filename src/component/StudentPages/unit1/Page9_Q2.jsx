@@ -15,23 +15,43 @@ const ITEMS = [
   {
     id: 1,
     prompt: "basketball player / young / referee",
-    words: ["The", "basketball", "player", "is", "younger", "than", "the", "referee","." ],
+    words: [
+      "The",
+      "basketball",
+      "player",
+      "is",
+      "younger",
+      "than",
+      "the",
+      "referee",
+      ".",
+    ],
   },
   {
     id: 2,
     prompt: "cat / short / bear",
-    words: ["The", "cat","is", "shorter",  "than", "the", "bear","."],
+    words: ["The", "cat", "is", "shorter", "than", "the", "bear", "."],
   },
   {
     id: 3,
     prompt: "mouse / small / dog",
-    words: ["The", "mouse","is", "smaller",  "than", "the", "dog","."],
+    words: ["The", "mouse", "is", "smaller", "than", "the", "dog", "."],
   },
   {
     id: 4,
     prompt: "basketball court / big / scoreboard",
-    words: ["The", "basketball", "court", "is", "bigger", "than", "the", "scoreboard","." ],
-  }
+    words: [
+      "The",
+      "basketball",
+      "court",
+      "is",
+      "bigger",
+      "than",
+      "the",
+      "scoreboard",
+      ".",
+    ],
+  },
 ];
 
 export default function Page9_Q2() {
@@ -49,7 +69,7 @@ export default function Page9_Q2() {
   }, [wordBanksSeed]);
 
   const handleSelectWord = (itemId, wordIndex) => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
 
     const currentAnswer = answers[itemId] || [];
     const selectedWord = shuffledBanks[itemId][wordIndex];
@@ -67,7 +87,7 @@ export default function Page9_Q2() {
   };
 
   const handleRemoveWord = (itemId, answerIndex) => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
 
     const currentAnswer = [...(answers[itemId] || [])];
     currentAnswer.splice(answerIndex, 1);
@@ -113,7 +133,7 @@ export default function Page9_Q2() {
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
 
     const allCompleted = ITEMS.every((item) => isSentenceComplete(item));
 
@@ -164,14 +184,12 @@ export default function Page9_Q2() {
       <div
         className="div-forall"
         style={{
-       
           gap: "30px",
-         
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-          Read and write the sentences.
+        <h1 className="WB-header-title-page8 mr-2">
+          <span className="ex-A">E</span>
+          Read, drag, and drop the sentences
         </h1>
 
         <div
@@ -254,7 +272,7 @@ export default function Page9_Q2() {
                         border: "none",
                         fontSize: "18px",
                         // fontWeight: "500",
-                        cursor: showAns||checked ? "default" : "pointer",
+                        cursor: showAns || checked ? "default" : "pointer",
                       }}
                       className={`${!showAns && !checked && "hover:text-red-500"}`}
                     >
@@ -312,19 +330,19 @@ export default function Page9_Q2() {
                       position: "absolute",
                       top: "-8px",
                       right: "-8px",
-                    width: "22px",
-                        height: "22px",
-                        borderRadius: "50%",
-                        background: "red",
-                        color: "#fff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                       }}
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      background: "red",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                    }}
                   >
                     ✕
                   </div>

@@ -102,7 +102,8 @@ const Unit3_Page5_Q1 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             A
           </span>
-          Look and write <span style={{ color: "#2e3192" }}>ch , sh</span> or{" "}
+          Look, drag, and drop{" "}
+          <span style={{ color: "#2e3192" }}> ch , sh </span> or{" "}
           <span style={{ color: "#2e3192" }}>tch</span>
         </h5>
 

@@ -112,7 +112,7 @@ const Review1_Page2_Q1 = () => {
               }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>C</span>
-          Look and choose.
+          Look and tap or click.
         </h5>
 
         <div className="grid grid-cols-2 gap-y-16 gap-x-20 mt-10 ">

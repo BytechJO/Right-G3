@@ -305,26 +305,8 @@ const Page8_Q4 = () => {
             C
           </span>
           What color gloves does the shopkeeper have in Picky Shopper on page
-          23?
+          23?{" "}
         </h5>
-
-        {/* Words List */}
-        {/* <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((word) => (
-            <span
-              key={word}
-              className={`px-3 py-1.5 rounded-[10px] border-2 border-[#2c5287] font-semibold transition duration-200 ${
-                foundWords.includes(word)
-                  ? "bg-[#2c5287] text-white border-[#2c5287]"
-                  : "bg-white text-black"
-              }`}
-              style={{ fontSize: "clamp(12px, 2vw, 15px)" }}
-            >
-              {word}
-            </span>
-          ))}
-        </div> */}
-
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >

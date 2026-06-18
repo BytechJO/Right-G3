@@ -23,20 +23,7 @@ const Unit2_Page5_Q2 = () => {
   const [showResult, setShowResult] = useState(false);
   const [locked, setLocked] = useState(false);
 
-  const audioRef = useRef(null);
-  const [paused, setPaused] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
-  const stopAtSecond = 9;
 
-  // إعدادات الصوت
-  const [showSettings, setShowSettings] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const settingsRef = useRef(null);
-  const [forceRender, setForceRender] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showCaption, setShowCaption] = useState(false);
 
   // ================================
   // ✔ Captions Array
@@ -153,22 +140,16 @@ const captions = [
       >
         <h5 className="header-title-page8">
           <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
-          Listen and circle the words with the same
-          <span style={{ color: "#2e3192" }}>u sound</span>.
+         Listen and tap or click the words with the  
+          <span style={{ color: "#2e3192" }}> u sound</span>.
         </h5>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
+     
           <QuestionAudioPlayer
             src={sound1}
             captions={captions}
             stopAtSecond={11}
           />
-        </div>
+     
 
         <div
           style={{

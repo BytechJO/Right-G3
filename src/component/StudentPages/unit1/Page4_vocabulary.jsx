@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Asset 22.png";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/G5_U1_Pg_04_05.png";
 import ModernVocabularyComponent from "../../ModernVocabularyComponent";
 import vocabulary from "../../../assets/audio/ClassBook/Unit 1/P 4/Pg4_Vocab_Adult Lady.mp3";
 import "./Page4.css";
@@ -101,18 +101,18 @@ const Page4_vocabulary = () => {
   ];
 
   const positions = [
-    { top: "18.5%", left: "29%" }, //1
-    { top: "32%", left: "55%" }, //2
-    { top: "27%", left: "15%" }, //3
-    { top: "24%", left: "39%" }, //4
-    { top: "17%", left: "48.5%" }, //5
-    { top: "47%", left: "89%" }, //6
-    { top: "45%", left: "78.5%" }, //7
-    { top: "50.5%", left: "63%" }, // 8
-    { top: "37.5%", left: "40.5%" }, //9
-    { top: "37.5%", left: "79.5%" }, //10
-    { top: "35.5%", left: "61%" }, //11
-    { top: "63.5%", left: "26%" }, //12
+    { top: "5.5%", left: "29%" }, //1
+    { top: "31%", left: "55%" }, //2
+    { top: "22%", left: "15%" }, //3
+    { top: "13%", left: "41%" }, //4
+    { top: "3%", left: "50.5%" }, //5
+    { top: "64%", left: "91%" }, //6
+    { top: "58%", left: "81.5%" }, //7
+    { top: "69.5%", left: "64%" }, // 8
+    { top: "40.5%", left: "41%" }, //9
+    { top: "41.5%", left: "80.5%" }, //10
+    { top: "39.5%", left: "63%" }, //11
+    { top: "87.5%", left: "26%" }, //12
   ];
 
   return (

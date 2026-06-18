@@ -228,148 +228,126 @@ export default function Review6_Page2_Q1() {
   };
 
   return (
-   
-      <div className="flex justify-center p-8">
+    <div className="flex justify-center p-8">
+      <div
+        className="div-forall"
+        style={{
+          touchAction: "manipulation",
+        }}
+      >
+        <h5 className="header-title-page8">
+          <span style={{ marginRight: "10px" }}>D</span>
+          Unscramble the letters to make words with the end sound you hear in.
+          Then match each word to its picture.
+        </h5>
+
         <div
-          className="div-forall"
-          style={{
-            touchAction: "manipulation",
-          }}
+          ref={containerRef}
+          className="relative grid grid-cols-[1fr_150px] gap-20 mb-10"
         >
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>D</span>
+          {" "}
+          <div className="flex flex-col gap-4">
+            {items.map((item, i) => {
+              return (
+                <div key={i} className="flex items-center gap-2">
+                  {/* 🔵 المحتوى */}
+                  <div className="flex flex-col gap-1">
+                    {/* السطر الأول */}
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-base w-5">{i + 1}</span>
+                      <span
+                        className="text-base transition-all duration-200"
+                        style={{
+                          cursor: locked || showResult ? "default" : "pointer",
+                          display: "inline-block",
+                          padding: "2px 6px",
+                          borderRadius: "6px",
+                          border:
+                            activeWord === i
+                              ? `1px solid #F79530`
+                              : "2px solid transparent",
+                          background:
+                            activeWord === i ? "#ffe8a3" : "transparent",
+                          transform:
+                            activeWord === i ? "scale(1.08)" : "scale(1)",
+                          boxShadow:
+                            activeWord === i
+                              ? "0 0 10px rgba(255,165,0,0.6)"
+                              : "none",
+                        }}
+                        onClick={() => {
+                          handleDotClick(i, "text");
+                          setActiveWord(i);
+                        }}
+                      >
+                        {item.sentence}
+                      </span>
+                    </div>
 
-            <div>
-              Unscramble the letters to make words with the end sound
-              <br />
-              you hear in{" "}
-              <img
-                src={qImage}
-                alt=""
-                style={{
-                  display: "inline-block",
-                  width: "40px",
-                  height: "auto",
-                  margin: "0 6px",
-                  verticalAlign: "middle",
-                }}
-              />
-              . Then match each word to its picture.
-            </div>
-          </h5>
+                    {/* السطر الثاني */}
+                    <div className="flex flex-col gap-2 ml-7 relative w-[350px]">
+                      {/* 🔤 الحروف */}
 
-          <div
-            ref={containerRef}
-            className="relative grid grid-cols-[1fr_150px] gap-20 mb-10"
-          >
-            {" "}
-            <div className="flex flex-col gap-4">
-              {items.map((item, i) => {
-                return (
-                  <div key={i} className="flex items-center gap-2">
-                    {/* 🔵 المحتوى */}
-                    <div className="flex flex-col gap-1">
-                      {/* السطر الأول */}
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-base w-5">{i + 1}</span>
-                        <span
-                          className="text-base transition-all duration-200"
-                          style={{
-                            cursor:
-                              locked || showResult ? "default" : "pointer",
-                            display: "inline-block",
-                            padding: "2px 6px",
-                            borderRadius: "6px",
-                            border:
-                              activeWord === i
-                                ? `1px solid #F79530`
-                                : "2px solid transparent",
-                            background:
-                              activeWord === i ? "#ffe8a3" : "transparent",
-                            transform:
-                              activeWord === i ? "scale(1.08)" : "scale(1)",
-                            boxShadow:
-                              activeWord === i
-                                ? "0 0 10px rgba(255,165,0,0.6)"
-                                : "none",
-                          }}
-                          onClick={() => {
-                            handleDotClick(i, "text");
-                            setActiveWord(i);
-                          }}
-                        >
-                          {item.sentence}
-                        </span>
-                      </div>
+                      <div className="flex gap-1">
+                        {item.scrambled.map((word, wordIndex) => {
+                          const letters = word
+                            .split("")
+                            .map((letter, index) => ({
+                              char: letter,
+                              id: `${letter}-${i}-${wordIndex}-${index}`,
+                            }));
 
-                      {/* السطر الثاني */}
-                      <div className="flex flex-col gap-2 ml-7 relative w-[350px]">
-                        {/* 🔤 الحروف */}
+                          return (
+                            <div key={wordIndex} className="flex gap-1">
+                              {letters.map((letterObj, letterIndex) => {
+                                const isUsed = answers[i].some(
+                                  (l) => l?.id === letterObj.id,
+                                );
 
-                        <div className="flex gap-1">
-                          {item.scrambled.map((word, wordIndex) => {
-                            const letters = word
-                              .split("")
-                              .map((letter, index) => ({
-                                char: letter,
-                                id: `${letter}-${i}-${wordIndex}-${index}`,
-                              }));
-
-                            return (
-                              <div key={wordIndex} className="flex gap-1">
-                                {letters.map((letterObj, letterIndex) => {
-                                  const isUsed = answers[i].some(
-                                    (l) => l?.id === letterObj.id,
-                                  );
-
-                                  return (
-                                    <span
-                                      onClick={() =>
-                                        handleLetterClick(letterObj)
-                                      }
-                                      className={`w-8 h-8 text-sm flex items-center justify-center rounded border border-[#F79530] font-bold
+                                return (
+                                  <span
+                                    onClick={() => handleLetterClick(letterObj)}
+                                    className={`w-8 h-8 text-sm flex items-center justify-center rounded border border-[#F79530] font-bold
     ${
       answers[i].some((l) => l?.id === letterObj.id)
         ? "bg-gray-300 opacity-40 cursor-not-allowed"
         : "cursor-pointer"
     }`}
-                                    >
-                                      {letterObj.char}
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                            );
-                          })}
-                        </div>
+                                  >
+                                    {letterObj.char}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
 
-                        {/* 🔲 البوكسات */}
-                        <div className="flex items-center gap-2 ml-0 relative w-[260px]">
-                          {item.correct[0].split("").map((_, letterIndex) => {
-                            const isCorrect =
-                              answers[i][letterIndex]?.char ===
-                              item.correct[0][letterIndex];
+                      {/* 🔲 البوكسات */}
+                      <div className="flex items-center gap-2 ml-0 relative w-[260px]">
+                        {item.correct[0].split("").map((_, letterIndex) => {
+                          const isCorrect =
+                            answers[i][letterIndex]?.char ===
+                            item.correct[0][letterIndex];
 
-                            const isWrong =
-                              showResult &&
-                              answers[i][letterIndex] &&
-                              !isCorrect;
+                          const isWrong =
+                            showResult && answers[i][letterIndex] && !isCorrect;
 
-                            return (
-                              <div
-                                onClick={() => handleSlotClick(i, letterIndex)}
-                                className={`w-8 h-8 border-b-1 flex items-center justify-center font-bold relative cursor-pointer
+                          return (
+                            <div
+                              onClick={() => handleSlotClick(i, letterIndex)}
+                              className={`w-8 h-8 border-b-1 flex items-center justify-center font-bold relative cursor-pointer
     ${isWrong ? "border-red-500" : "border-black"}
   `}
-                              >
-                                {answers[i][letterIndex]?.char}
-                              </div>
-                            );
-                          })}
-                          <div
-                            ref={(el) => (textDotRefs.current[i] = el)}
-                            onClick={() => handleDotClick(i, "text")}
-                            className={`absolute right-0 -top-8 -translate-y-1/2 w-3 h-3 rounded-full cursor-pointer transition-all duration-200
+                            >
+                              {answers[i][letterIndex]?.char}
+                            </div>
+                          );
+                        })}
+                        <div
+                          ref={(el) => (textDotRefs.current[i] = el)}
+                          onClick={() => handleDotClick(i, "text")}
+                          className={`absolute right-0 -top-8 -translate-y-1/2 w-3 h-3 rounded-full cursor-pointer transition-all duration-200
                               ${
                                 startDot?.index === i &&
                                 startDot?.type === "text"
@@ -377,122 +355,118 @@ export default function Review6_Page2_Q1() {
                                   : "bg-orange-400 hover:scale-110"
                               }
                             `}
-                          />
-                        </div>
+                        />
                       </div>
                     </div>
                   </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex flex-col gap-10 ml-6 mt-0 shrink-0">
+            {images.map((img, i) => {
+              const wrongMatch =
+                showResult &&
+                lines.some((l) => l.from.index === i) && // مربوط
+                !lines.some(
+                  (l) => l.from.index === i && correctMatches[l.to.index] === i,
                 );
-              })}
-            </div>
-            <div className="flex flex-col gap-10 ml-6 mt-0 shrink-0">
-              {images.map((img, i) => {
-                const wrongMatch =
-                  showResult &&
-                  lines.some((l) => l.from.index === i) && // مربوط
-                  !lines.some(
-                    (l) =>
-                      l.from.index === i && correctMatches[l.to.index] === i,
-                  );
-                return (
+              return (
+                <div
+                  key={i}
+                  onClick={() => handleDotClick(i, "image")}
+                  className="flex items-center gap-3 cursor-pointer relative h-20"
+                >
                   <div
-                    key={i}
-                    onClick={() => handleDotClick(i, "image")}
-                    className="flex items-center gap-3 cursor-pointer relative h-20"
-                  >
-                    <div
-                      ref={(el) => (imageDotRefs.current[i] = el)}
-                      className="w-3 h-3 bg-orange-400 rounded-full shrink-0 z-10"
-                    />
-                    <img
-                      src={img}
-                      onClick={() => {
-                        // handleDotClick(i, "image");
-                        setActiveWord(null);
-                      }}
-                      style={{
-                        width: "clamp(60px, 8vw, 100px)",
-                        height: "clamp(60px, 8vw, 100px)",
-                        objectFit: "contain",
-                      }}
-                    />
-                    {showResult && wrongMatch && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          right: "-25px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          width: "22px",
-                          height: "22px",
-                          background: "red",
-                          color: "white",
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          border: "2px solid white",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                          pointerEvents: "none",
-                        }}
-                      >
-                        ✕
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>{" "}
-            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-              {lines.map((line, i) => {
-                const imgDot = imageDotRefs.current[line.from.index];
-                const txtDot = textDotRefs.current[line.to.index];
-
-                if (!imgDot || !txtDot || !containerRef.current) return null;
-
-                const imgRect = imgDot.getBoundingClientRect();
-                const txtRect = txtDot.getBoundingClientRect();
-                const containerRect =
-                  containerRef.current.getBoundingClientRect();
-
-                const x1 =
-                  imgRect.left + imgRect.width / 2 - containerRect.left;
-                const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
-
-                const x2 =
-                  txtRect.left + txtRect.width / 2 - containerRect.left;
-                const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
-
-                return (
-                  <path
-                    key={i}
-                    d={`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`}
-                    stroke="orange"
-                    strokeWidth="3"
-                    fill="none"
+                    ref={(el) => (imageDotRefs.current[i] = el)}
+                    className="w-3 h-3 bg-orange-400 rounded-full shrink-0 z-10"
                   />
-                );
-              })}
-            </svg>
-          </div>
+                  <img
+                    src={img}
+                    onClick={() => {
+                      // handleDotClick(i, "image");
+                      setActiveWord(null);
+                    }}
+                    style={{
+                      width: "clamp(60px, 8vw, 100px)",
+                      height: "clamp(60px, 8vw, 100px)",
+                      objectFit: "contain",
+                    }}
+                  />
+                  {showResult && wrongMatch && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: "-25px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        width: "22px",
+                        height: "22px",
+                        background: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ✕
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>{" "}
+          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+            {lines.map((line, i) => {
+              const imgDot = imageDotRefs.current[line.from.index];
+              const txtDot = textDotRefs.current[line.to.index];
 
-          {/* buttons */}
-          <div className="action-buttons-container">
-            <button className="try-again-button" onClick={resetAll}>
-              Start Again ↻
-            </button>
+              if (!imgDot || !txtDot || !containerRef.current) return null;
 
-            <button onClick={showAnswers} className="show-answer-btn">
-              Show Answer
-            </button>
+              const imgRect = imgDot.getBoundingClientRect();
+              const txtRect = txtDot.getBoundingClientRect();
+              const containerRect =
+                containerRef.current.getBoundingClientRect();
 
-            <button className="check-button2" onClick={checkAnswers}>
-              Check Answer ✓
-            </button>
-          </div>
+              const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
+              const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
+
+              const x2 = txtRect.left + txtRect.width / 2 - containerRect.left;
+              const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
+
+              return (
+                <path
+                  key={i}
+                  d={`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`}
+                  stroke="orange"
+                  strokeWidth="3"
+                  fill="none"
+                />
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* buttons */}
+        <div className="action-buttons-container">
+          <button className="try-again-button" onClick={resetAll}>
+            Start Again ↻
+          </button>
+
+          <button onClick={showAnswers} className="show-answer-btn">
+            Show Answer
+          </button>
+
+          <button className="check-button2" onClick={checkAnswers}>
+            Check Answer ✓
+          </button>
         </div>
       </div>
- 
+    </div>
   );
 }

@@ -113,7 +113,7 @@ const Review1_Page1_Q2 = () => {
               }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>B</span>
-          Read, look, and write. You can answer in two ways.
+     Read, look, drag, and drop. You can answer in two ways.
         </h5>
         {/* QUESTIONS */}
         <div className="flex flex-col gap-10">

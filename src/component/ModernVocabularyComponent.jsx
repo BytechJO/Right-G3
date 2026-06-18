@@ -32,7 +32,7 @@ const ModernVocabularyComponent = ({
     if (!captions || captions.length === 0) return;
 
     const capIdx = captions.findIndex(
-      (cap) => time >= cap.start && time <= cap.end
+      (cap) => time >= cap.start && time <= cap.end,
     );
     setActiveIndex(capIdx !== -1 ? capIdx : null);
 
@@ -89,8 +89,8 @@ const ModernVocabularyComponent = ({
       setClickedIndex(index);
 
       audio.onended = () => {
-  setClickedIndex(null);
-};
+        setClickedIndex(null);
+      };
     }
   };
 
@@ -109,127 +109,108 @@ const ModernVocabularyComponent = ({
   return (
     <div className="min-h-screen font-sans text-slate-800 flex flex-col items-center gap-[30px]">
       <div className="w-full bg-white p-5 rounded-[2rem] overflow-hidden border border-slate-100 flex flex-col lg:flex-row relative justify-center">
-        
         {/* ================= AUDIO ================= */}
         <div className="flex flex-col justify-center items-center">
-          <div className="flex w-full justify-center w-full" >
-          <div
-            className="audio-popup-vocab-container"
-            style={{
-              width: "70%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              margin: "0px 20px",
-              position: "relative",
-              alignItems: "center",
-            }}
-          >
-            <div className="audio-popup-vocab">
-              <div className="audio-inner player-ui">
-                <audio
-                  ref={mainAudioRef}
-                  src={mainAudio}
-                  onTimeUpdate={(e) => {
-                    const t = e.target.currentTime;
-                    setCurrent(t);
-                    updateSync(t);
-                  }}
-                  onLoadedMetadata={(e) =>
-                    setDuration(e.target.duration)
-                  }
-                />
-
-                {/* time + slider */}
-                <div className="top-row">
-                  <span className="audio-time">
-                    {new Date(current * 1000)
-                      .toISOString()
-                      .substring(14, 19)}
-                  </span>
-
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration}
-                    value={current}
-                    className="audio-slider"
-                    onChange={(e) => {
-                      mainAudioRef.current.currentTime = e.target.value;
+          <div className="flex justify-center w-[85%]">
+            <div
+              className="audio-popup-vocab-container"
+              style={{
+                width: "70%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                margin: "0px 20px",
+                position: "relative",
+                alignItems: "center",
+              }}
+            >
+              <div className="audio-popup-vocab">
+                <div className="audio-inner player-ui">
+                  <audio
+                    ref={mainAudioRef}
+                    src={mainAudio}
+                    onTimeUpdate={(e) => {
+                      const t = e.target.currentTime;
+                      setCurrent(t);
+                      updateSync(t);
                     }}
-                    style={{
-                      background: `linear-gradient(to right, #430f68 ${
-                        (current / duration) * 100
-                      }%, #d9d9d9ff ${
-                        (current / duration) * 100
-                      }%)`,
-                    }}
+                    onLoadedMetadata={(e) => setDuration(e.target.duration)}
                   />
 
-                  <span className="audio-time">
-                    {new Date(duration * 1000)
-                      .toISOString()
-                      .substring(14, 19)}
-                  </span>
-                </div>
+                  {/* time + slider */}
+                  <div className="top-row">
+                    <span className="audio-time">
+                      {new Date(current * 1000).toISOString().substring(14, 19)}
+                    </span>
 
-                {/* controls */}
-                <div className="bottom-row">
-                  <div
-                    className={`round-btn ${
-                      showCaption ? "active" : ""
-                    }`}
-                    onClick={() => setShowCaption(!showCaption)}
-                  >
-                    <TbMessageCircle size={36} />
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration}
+                      value={current}
+                      className="audio-slider"
+                      onChange={(e) => {
+                        mainAudioRef.current.currentTime = e.target.value;
+                      }}
+                      style={{
+                        background: `linear-gradient(to right, #430f68 ${
+                          (current / duration) * 100
+                        }%, #d9d9d9ff ${(current / duration) * 100}%)`,
+                      }}
+                    />
+
+                    <span className="audio-time">
+                      {new Date(duration * 1000)
+                        .toISOString()
+                        .substring(14, 19)}
+                    </span>
                   </div>
 
-                  <button className="play-btn2" onClick={togglePlay}>
-                    {isPlaying ? (
-                      <FaPause size={20} />
-                    ) : (
-                      <FaPlay size={20} />
-                    )}
-                  </button>
-
-                  <div className="relative">
-                    <button
-                      className={`round-btn ${
-                        showSettings ? "active" : ""
-                      }`}
-                      onClick={() =>
-                        setShowSettings(!showSettings)
-                      }
+                  {/* controls */}
+                  <div className="bottom-row">
+                    <div
+                      className={`round-btn ${showCaption ? "active" : ""}`}
+                      onClick={() => setShowCaption(!showCaption)}
                     >
-                      <IoMdSettings size={36} />
+                      <TbMessageCircle size={36} />
+                    </div>
+
+                    <button className="play-btn2" onClick={togglePlay}>
+                      {isPlaying ? <FaPause size={20} /> : <FaPlay size={20} />}
                     </button>
 
-                    {showSettings && (
-                      <div className="settings-popup">
-                        <label>Volume</label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.05"
-                          value={volume}
-                          onChange={(e) => {
-                            setVolume(e.target.value);
-                            mainAudioRef.current.volume =
-                              e.target.value;
-                          }}
-                        />
-                      </div>
-                    )}
+                    <div className="relative">
+                      <button
+                        className={`round-btn ${showSettings ? "active" : ""}`}
+                        onClick={() => setShowSettings(!showSettings)}
+                      >
+                        <IoMdSettings size={36} />
+                      </button>
+
+                      {showSettings && (
+                        <div className="settings-popup">
+                          <label>Volume</label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.05"
+                            value={volume}
+                            onChange={(e) => {
+                              setVolume(e.target.value);
+                              mainAudioRef.current.volume = e.target.value;
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-</div>
           {/* ================= IMAGE + CAPTION ================= */}
           <div className="p-4 md:p-3 flex flex-col items-center justify-center relative">
-            
             {/* 🔥 NEW CAPTION STYLE */}
             <div
               className={`absolute -top-2 left-13 z-999999 w-[50%] max-w-md transition-all duration-500 ${
@@ -273,8 +254,6 @@ const ModernVocabularyComponent = ({
                   style={{
                     top: marker.top,
                     left: marker.left,
-                    width: "30px",
-                    height: "30px",
                   }}
                   onClick={() => playWordAudio(i)}
                 >
@@ -285,8 +264,7 @@ const ModernVocabularyComponent = ({
                     style={{ height: "22px" }}
                   />
 
-                  {(activeIndex2 === i ||
-                    clickedIndex === i) && (
+                  {(activeIndex2 === i || clickedIndex === i) && (
                     <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-40 -z-10"></span>
                   )}
                 </div>
@@ -295,7 +273,7 @@ const ModernVocabularyComponent = ({
           </div>
 
           {/* tip */}
-          <div className="p-5 rounded-[1.5rem]">
+          <div className="rounded-[1.5rem]" style={{ alignSelf: "baseline" }}>
             <p className="text-red-700">
               💡 Tip: Click on the numbers or words to hear the pronunciation!
             </p>
@@ -313,7 +291,7 @@ const ModernVocabularyComponent = ({
                 onClick={() => playWordAudio(i)}
                 className={`flex items-center p-2 rounded-2xl transition ${
                   activeIndex2 === i || clickedIndex === i
-                    ? "bg-red-600 text-white"
+                    ? "bg-orange-600 text-white"
                     : "bg-slate-50"
                 }`}
               >

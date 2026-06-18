@@ -108,18 +108,16 @@ const Unit6_Page6_Q1 = () => {
       <div
         className="div-forall"
         style={{
-
           gap: "10px",
           // width: "60%",
-      
         }}
       >
         <h5 className="header-title-page8">
           <span style={{ marginRight: "15px" }} className="ex-A">
             D
           </span>
-          Look and write<span style={{ color: "#D1232A" }}>✓</span>or
-          <span style={{ color: "#D1232A" }}>✗</span>.Then write.
+          Look, drag and drop <span style={{ color: "#D1232A" }}> ✓ </span>or
+          <span style={{ color: "#D1232A" }}> ✗ </span>Then drag and drop.
         </h5>
         <div style={{ padding: "20px" }}>
           {questions.map((q, index) => (
@@ -133,29 +131,30 @@ const Unit6_Page6_Q1 = () => {
               }}
             >
               <div className="flex gap-5 items-start">
-              {/* الرقم */}
-              <span style={{ fontSize:"20px",fontWeight: "bold" }}>{index + 1}</span>
+                {/* الرقم */}
+                <span style={{ fontSize: "20px", fontWeight: "bold" }}>
+                  {index + 1}
+                </span>
 
-              {/* الصورة */}
-              <div
-                style={{
-                
-                  height: "110px",
-                  overflow: "hidden",
-                  // border: "3px solid orange",
-                  borderRadius: "8px",
-                }}
-              >
-                <img
-                  src={q.img}
-                  alt=""
+                {/* الصورة */}
+                <div
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
+                    height: "110px",
+                    overflow: "hidden",
+                    // border: "3px solid orange",
+                    borderRadius: "8px",
                   }}
-                />
-              </div>
+                >
+                  <img
+                    src={q.img}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
               </div>
               {/* بوكسات الصح والخطا */}
               <div style={{ display: "flex", gap: "10px" }}>
