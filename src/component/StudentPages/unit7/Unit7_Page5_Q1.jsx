@@ -157,8 +157,8 @@ const Unit7_Page5_Q1 = () => {
               <span className="ex-A" style={{ marginRight: "10px" }}>
                 A
               </span>{" "}
-              <span style={{ color: "#2e3192" }}>1</span>
-              Look and write the{" "}
+              <span style={{ color: "#2e3192" ,marginRight: "10px"}}>1</span>
+              Look, drag, and drop the 
               <span style={{ color: "#2e3192" }}>beginning sound</span> for each
               word.
             </h5>

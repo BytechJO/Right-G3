@@ -15,11 +15,11 @@ import blue from "../../../assets/audio/ClassBook/Unit 9/P 80/unit9-pg80-EXB.mp3
 const Unit9_Page5_Q1 = () => {
   const [locked, setLocked] = useState(false);
 
-   const questions = [
+  const questions = [
     {
       id: 1,
       image1: img1,
- 
+
       label1: "ducks",
       label2: "girls",
       correct: "✗",
@@ -27,7 +27,7 @@ const Unit9_Page5_Q1 = () => {
     {
       id: 2,
       image1: img2,
-    
+
       label1: "cats",
       label2: "cups",
       correct: "✓",
@@ -115,7 +115,7 @@ const Unit9_Page5_Q1 = () => {
   return (
     <>
       <div
-        className="u8p5-wrapper"
+ 
         style={{
           display: "flex",
           flexDirection: "column",
@@ -125,21 +125,18 @@ const Unit9_Page5_Q1 = () => {
         }}
       >
         <div
-          className="div-forall"
+          className="div-forall mb-10"
           style={{
-            display: "flex",
-            flexDirection: "column",
             gap: "30px",
-            width: "60%",
-            justifyContent: "flex-start",
           }}
         >
           <h5 className="header-title-page8">
-         <span className="ex-A mr-3">A</span>
-           Do they both have the same final <span style={{ color: "#2e3192" }}>-s sound</span>
-            write
-            <span style={{ color: "#D52328" }}>✓</span> or{" "}
-            <span style={{ color: "#D52328" }}>✗</span>.
+            <span className="ex-A mr-3">A</span>
+            Do they both have the same final{" "}
+            <span style={{ color: "#2e3192" }}> -s sound </span>
+            Drag and drop
+            <span style={{ color: "#D52328" }}> ✓</span> or{" "}
+            <span style={{ color: "#D52328" }}> ✗</span>.
           </h5>
           <QuestionAudioPlayer
             src={blue}
@@ -155,7 +152,7 @@ const Unit9_Page5_Q1 = () => {
               >
                 <div className="flex flex-col items-center gap-3.5">
                   {/* الصور */}
-                  <div className="flex gap-2 rounded-xl p-4 w-[250px]">
+                  <div className="flex gap-2 rounded-xl p-4 w-[200px]">
                     {/* الديف الأول */}
                     <span className="text-[darkblue] font-bold">{q.id}.</span>
                     <img
@@ -193,7 +190,7 @@ const Unit9_Page5_Q1 = () => {
 
                     {/* ✗ */}
                     <div className="relative">
-                       <div
+                      <div
                         className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✗"
                             ? showResult[index] === "wrong" &&

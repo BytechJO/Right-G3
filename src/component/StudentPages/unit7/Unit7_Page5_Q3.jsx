@@ -112,7 +112,7 @@ const Unit7_Page5_Q3 = () => {
             <span className="ex-A" style={{ marginRight: "10px" }}>
               B
             </span>{" "}
-            Read and choose.
+           Read and choose.
           </h5>
         </div>
         <div

@@ -312,7 +312,7 @@ const Page8_Q4 = () => {
             C
           </span>
           Why weren’t Tom and his sister in school last week in Helping Out on
-          the Farm on page 65?{" "}
+          the Farm on page 65?
         </h5>
 
         <div

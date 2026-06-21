@@ -139,7 +139,7 @@ const Unit10_Page5_Q3 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             B
           </span>
-          Look and write.
+   Look, drag, and drop.
         </h5>
         <div
           style={{

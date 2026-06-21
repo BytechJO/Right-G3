@@ -133,8 +133,8 @@ const Unit9_Page5_Q2 = () => {
       <div className="div-forall" style={{ gap: "25px" }}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-3">B</span>
-          Listen and circle the words with the same final
-          <span style={{ color: "#2e3192" }}>-s sound </span>?
+          Listen and tap or click the words with the same final
+          <span style={{ color: "#2e3192" }}> -s sound</span>?
         </h5>
         <QuestionAudioPlayer
           src={sound1}

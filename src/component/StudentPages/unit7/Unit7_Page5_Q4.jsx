@@ -273,8 +273,7 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          Where was the playground in The New Boy in
-School on page 59?
+          Where was the playground in The New Boy in School on page 59?
         </h5>
 
         {/* Words List

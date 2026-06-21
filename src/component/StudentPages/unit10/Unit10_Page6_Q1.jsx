@@ -129,7 +129,7 @@ const Unit10_Page6_Q1 = () => {
       <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8 mb-5">
           <span className="ex-A mr-3">D</span>
-          Read, look, and write <span className="text-[#D1232A]">
+         Read, look, drag, and drop <span className="text-[#D1232A]">
             ✓
           </span> and <span className="text-[#D1232A]">✕</span>
         </h5>

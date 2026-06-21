@@ -123,7 +123,7 @@ const Unit10_Page6_Q2 = () => {
     >
       <div className="div-forall" style={{gap:"30px"}}>
         <h5 className="header-title-page8">
-          <span className="ex-A mr-5">E</span>Write.
+          <span className="ex-A mr-5">E</span>Drag and drop.
         </h5>
         <div className="flex flex-col gap-5">
         {questions.map((item, i) => (

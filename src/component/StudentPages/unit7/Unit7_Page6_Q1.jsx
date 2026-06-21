@@ -149,7 +149,7 @@ const Unit7_Page6_Q1 = () => {
           >
             D
           </span>
-          Read and complete.
+       Read and completes.
         </h5>
 
         <div className="flex-1 bg-white rounded-2xl p-6 space-y-10 text-xl">

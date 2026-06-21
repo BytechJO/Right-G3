@@ -109,7 +109,7 @@ const Review8_Page1_Q1 = () => {
       <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>A</span>
-          Read and look at the picture. Then answer the questions.
+        Read and look at the picture. Then answer the questions.
         </h5>
         <div
           style={{

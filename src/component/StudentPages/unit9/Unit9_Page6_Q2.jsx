@@ -116,7 +116,7 @@ const Unit9_Page6_Q2 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             E
           </span>
-          Read, look, and circle
+          Read, look, and tap or click.
         </h5>
 
         <div className="grid grid-cols-2 gap-y-5 gap-x-20 mb-10">
@@ -147,8 +147,6 @@ const Unit9_Page6_Q2 = () => {
                 style={{
                   width: "250px",
                   height: "auto",
-               
-               
                 }}
               />
 

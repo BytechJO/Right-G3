@@ -326,8 +326,7 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What does Tom have to sell in order to buy a new bike in Preparing for
-          a Garage Sale on page 83?
+          What does Tom have to sell in order to buy a new bike in Preparing for a Garage Sale on page 83?
         </h5>
 
         <div

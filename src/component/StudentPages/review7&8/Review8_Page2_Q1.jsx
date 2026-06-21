@@ -143,9 +143,7 @@ function DropSlot({ id, content, onRemove }) {
         position: "relative",
         width: "30px",
         height: "30px",
-        border: isOver
-          ? "2px dashed #F79530"
-          : "2px solid #F79530",
+        border: isOver ? "2px dashed #F79530" : "2px solid #F79530",
         borderRadius: "6px",
         background: isOver ? "#fffaeeff" : "white",
         display: "flex",
@@ -219,14 +217,14 @@ const Review8_Page2_Q1 = () => {
     setShowResults(false);
     setLocked(false);
   };
-const handleRemoveLetter = (slotId) => {
-  if (locked) return;
+  const handleRemoveLetter = (slotId) => {
+    if (locked) return;
 
-  setAnswers((prev) => ({
-    ...prev,
-    [slotId]: null,
-  }));
-};
+    setAnswers((prev) => ({
+      ...prev,
+      [slotId]: null,
+    }));
+  };
   return (
     <DndContext
       sensors={sensors}
@@ -253,7 +251,7 @@ const handleRemoveLetter = (slotId) => {
         <div className="div-forall" style={{ gap: "30px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "20px" }}>C</span>
-            Listen and write the{" "}
+            Listen, drag, and drop the
             <span style={{ color: "#2e3192" }}> beginning sound</span> for each
             word.
           </h5>
@@ -299,11 +297,11 @@ const handleRemoveLetter = (slotId) => {
                         zIndex: 2,
                       }}
                     >
-                    <DropSlot
-  id={item.id}
-  content={answers[item.id]}
-  onRemove={handleRemoveLetter}
-/>
+                      <DropSlot
+                        id={item.id}
+                        content={answers[item.id]}
+                        onRemove={handleRemoveLetter}
+                      />
                     </div>
 
                     {/* 🖼️ الصورة */}

@@ -294,8 +294,8 @@ const Page8_Q4 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             C
           </span>
-          What kind of animal was in the park in the
-afternoon in A Brave Mouse on page 77?
+          What kind of animal was in the park in the afternoon in A Brave Mouse
+          on page 77?
         </h5>
 
         <div

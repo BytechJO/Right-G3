@@ -127,7 +127,7 @@ const Review10_Page2_Q1 = () => {
       <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "15px" }}>C</span>
-          Color each box according to the sound you hear in the word.
+         Color each box according to the sound you hear in the word.
         </h5>
         <div
           style={{

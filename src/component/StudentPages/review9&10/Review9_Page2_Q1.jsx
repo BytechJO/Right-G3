@@ -156,7 +156,7 @@ const Review9_Page2_Q1 = () => {
       <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8 mb-10">
           <span style={{ marginRight: "10px" }}>C</span>
-          Look, read, and match.
+         Look, read, and match.
         </h5>
 
         <div className="w-full flex flex-col items-center gap-40">

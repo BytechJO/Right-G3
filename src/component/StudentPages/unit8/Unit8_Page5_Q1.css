@@ -1,9 +1,9 @@
 /* ====== CONTAINER ====== */
-.CB-review1-p2-q1-container {
+.u8p5-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 كروت بالصف */
+  grid-template-columns: repeat(4, 1fr); /* 3 كروت بالصف */
   gap: 30px;
-  margin-top: 20px;
+  /* margin-top: 20px; */
 }
 
 /* ====== QUESTION CARD ====== */
@@ -114,8 +114,8 @@
     width: 82% !important;
   }
   .u8p5-grid {
-    gap: 16px !important;
-    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
   }
   .u8p5-images-box {
     width: 100% !important;

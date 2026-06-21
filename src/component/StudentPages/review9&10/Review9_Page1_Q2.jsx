@@ -110,7 +110,7 @@ const Review9_Page1_Q2 = () => {
       <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>B</span>
-          Read, look, and circle.
+          Read, look, and tap or click.
         </h5>
 
         <div

@@ -234,7 +234,7 @@ const Review9_Page2_Q3 = () => {
           <div>
             <h5 className="header-title-page8">
               <span style={{ marginRight: "10px" }}>E</span>
-              Look and write.
+              Look, drag, and drop.
             </h5>
           </div>
 

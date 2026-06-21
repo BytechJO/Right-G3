@@ -32,6 +32,7 @@ const DraggableLetter = ({ id, children, disabled }) => {
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: disabled ? 0.4 : isDragging ? 0.5 : 1,
+    touchAction: "none",
     cursor: disabled ? "not-allowed" : "grab",
   };
 
@@ -42,13 +43,7 @@ const DraggableLetter = ({ id, children, disabled }) => {
   );
 };
 
-const DropBox = ({
-  id,
-  children,
-  isWrong,
-  checked,
-  onRemove,
-}) => {
+const DropBox = ({ id, children, isWrong, checked, onRemove }) => {
   const { isOver, setNodeRef } = useDroppable({
     id,
   });
@@ -192,14 +187,14 @@ const Review7_Page2_Q2 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
   };
-const handleRemoveLetter = (id) => {
-  if (locked) return;
+  const handleRemoveLetter = (id) => {
+    if (locked) return;
 
-  setUserAnswers((prev) => ({
-    ...prev,
-    [id]: "",
-  }));
-};
+    setUserAnswers((prev) => ({
+      ...prev,
+      [id]: "",
+    }));
+  };
   const handleStartAgain = () => {
     setUserAnswers({
       1: "",
@@ -240,9 +235,9 @@ const handleRemoveLetter = (id) => {
         >
           <div>
             <h5 className="header-title-page8">
-              <span style={{ marginRight: "10px" }}>D</span> What is the{" "}
-              <span style={{ color: "#2e3192" }}>beginning sound</span> of the
-              word? Listen and write.
+              <span style={{ marginRight: "10px" }}>D</span>What is the
+              <span style={{ color: "#2e3192" }}> beginning sound </span> of the
+              word? Listen, drag, and drop.
             </h5>
           </div>
 
@@ -353,41 +348,41 @@ const handleRemoveLetter = (id) => {
                       />
                     </div>
                     <DropBox
-  id={String(q.id)}
-  checked={checked}
-  isWrong={userAnswers[q.id] !== correctAnswers[q.id]}
-  onRemove={handleRemoveLetter}
->
-  {userAnswers[q.id]}
+                      id={String(q.id)}
+                      checked={checked}
+                      isWrong={userAnswers[q.id] !== correctAnswers[q.id]}
+                      onRemove={handleRemoveLetter}
+                    >
+                      {userAnswers[q.id]}
 
-  {checked &&
-    userAnswers[q.id] !== correctAnswers[q.id] && (
-      <span
-        style={{
-          position: "absolute",
-          left: "25%",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "20px",
-          height: "20px",
-          background: "red",
-          color: "white",
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "12px",
-          fontWeight: "bold",
-          border: "2px solid white",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-          pointerEvents: "none",
-          zIndex: 3,
-        }}
-      >
-        ✕
-      </span>
-    )}
-</DropBox>
+                      {checked &&
+                        userAnswers[q.id] !== correctAnswers[q.id] && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: "25%",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              width: "20px",
+                              height: "20px",
+                              background: "red",
+                              color: "white",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                              zIndex: 3,
+                            }}
+                          >
+                            ✕
+                          </span>
+                        )}
+                    </DropBox>
                   </div>
                 ))}
               </div>

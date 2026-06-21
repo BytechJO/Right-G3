@@ -124,7 +124,7 @@ const Unit7_Page6_Q2 = () => {
             >
               E
             </span>
-            Look and write. Use the words below.
+            Look, drag, and drop. Use the words below.
           </h5>
 
           {/* الكلمات */}
@@ -262,8 +262,7 @@ const Unit7_Page6_Q2 = () => {
                     >
                       <span
                         onClick={() => handleRemoveWord(q.id)}
-                  className={`${checked?"":"hover:text-red-500"}`}
-
+                        className={`${checked ? "" : "hover:text-red-500"}`}
                         style={{
                           fontWeight: "bold",
                           cursor: checked ? "default" : "pointer",

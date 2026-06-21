@@ -110,12 +110,12 @@ const Unit8_Page5_Q1 = () => {
               A
             </span>{" "}
             <span style={{ color: "#2e3192" }}>1</span> Do they both have the
-            same <span style={{ color: "#2e3192" }}>consonant blend</span>?
-            Write <span style={{ color: "#D52328" }}>✓</span> or{" "}
+            same <span style={{ color: "#2e3192" }}>consonant blend</span>? Drag
+            and drop <span style={{ color: "#D52328" }}>✓</span> or{" "}
             <span style={{ color: "#D52328" }}>✗</span>.
           </h5>
 
-          <div className="grid grid-cols-4 gap-[30px] mt-5 u8p5-grid">
+          <div className="u8p5-grid">
             {questions.map((q, index) => (
               <div
                 key={q.id}
@@ -123,7 +123,7 @@ const Unit8_Page5_Q1 = () => {
               >
                 <div className="flex flex-col items-center gap-3.5">
                   {/* الصور */}
-                  <div className="w-[200px]">
+                  <div className="w-[150px]">
                     {/* الديف الأول */}
                     <div className="flex gap-2">
                       {/* رقم السؤال */}
