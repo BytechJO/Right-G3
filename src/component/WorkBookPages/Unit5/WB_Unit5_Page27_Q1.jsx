@@ -273,7 +273,7 @@ const WB_Unit7_Page27_Q1 = () => {
          
         >
           <span className="WB-ex-A">A</span>
-          Look, read, and circle.
+          Look, read, and tap or click.
         </h1>
 
         <div className="wb-u7-q1-grid" style={styles.grid}>

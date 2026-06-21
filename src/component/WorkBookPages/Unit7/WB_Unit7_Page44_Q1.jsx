@@ -100,8 +100,8 @@ export default function WB_ListenAndCircle_PageA() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
-          Listen and circle the{" "}
-          <strong className="text-blue-800">beginning sound</strong>.
+          Listen and tap or click the
+          <strong className="text-blue-800"> beginning sound</strong>.
         </h1>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer

@@ -96,7 +96,7 @@ export default function WB_Unit5_Page30_Q2() {
       >
         {/* ── Title ── */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">H</span> Label the rooms and ask a friend.
+          <span className="WB-ex-A">H</span>Label the rooms and ask a friend
         </h1>
 
         {/* ── House image + overlaid dropdowns ── */}

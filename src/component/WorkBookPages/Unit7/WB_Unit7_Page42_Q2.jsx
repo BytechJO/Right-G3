@@ -88,6 +88,7 @@ const DraggableItem = ({ item, isUsed, showAns }) => {
         fontWeight: 700,
         display: "flex",
         alignItems: "center",
+        touchAction: "none",
         justifyContent: "center",
         boxShadow: isUsed ? "none" : "0 2px 6px rgba(0,0,0,0.07)",
       }}
@@ -261,7 +262,7 @@ export default function WB_LookReadMatch_PageH() {
               flexWrap: "wrap",
             }}
           >
-            <span className="WB-ex-A">H</span> Look, read, and match.
+            <span className="WB-ex-A">H</span>Look, read, and match.
           </h1>
 
           {/* ── الصورة ── */}
@@ -308,7 +309,7 @@ export default function WB_LookReadMatch_PageH() {
                   key={item.id}
                   item={item}
                   isUsed={isUsed}
-                  showAns={showAns||showResults}
+                  showAns={showAns || showResults}
                 />
               );
             })}
@@ -329,7 +330,7 @@ export default function WB_LookReadMatch_PageH() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                 gap: "clamp(6px,1vw,16px)",
+                gap: "clamp(6px,1vw,16px)",
               }}
             >
               {LEFT_ITEMS.map((item) => {
@@ -351,7 +352,7 @@ export default function WB_LookReadMatch_PageH() {
                       boxKey={boxKey}
                       value={value}
                       wrong={wrong}
-                      showAns={showAns||showResults}
+                      showAns={showAns || showResults}
                       onRemove={handleRemove}
                     />
 

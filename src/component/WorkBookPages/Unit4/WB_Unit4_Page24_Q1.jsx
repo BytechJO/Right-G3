@@ -208,7 +208,7 @@ export default function WB_Unit3_Page24_QG() {
       <div className="div-forall">
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">G</span>
-          Read and complete the conversations.
+        Read and complete the conversations.
         </h1>
 
         <div className="wb-g24-list">

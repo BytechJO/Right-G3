@@ -283,7 +283,7 @@ export default function WB_UnitX_Page25_QI() {
           }}
         >
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">I</span> Number the months in order.
+            <span className="WB-ex-A">I</span>Number the months in order.
           </h1>
 
           <div className="months-card">

@@ -20,12 +20,6 @@ import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folde
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10/SVG/Asset 6.svg";
 
-const ACTIVE_COLOR = "#f39b42";
-const SOFT_COLOR = "#ffca94";
-const BORDER_COLOR = "#f39b42";
-const WRONG_COLOR = "#ef4444";
-const ANSWER_COLOR = "#000000";
-
 const DRAG_ITEMS = [
   { id: 1, value: "France" },
   { id: 2, value: "Nile River" },
@@ -61,7 +55,7 @@ const DraggableWord = ({ item, disabled }) => {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      // style={style}
+      style={{ touchAction: "none" }}
       className={`px-4 py-2 rounded-xl border-1 text-sm font-medium transition
         ${
           disabled
@@ -106,10 +100,7 @@ export default function WB_LookAndWrite_PageC() {
   const [showAns, setShowAns] = useState(false);
   const [activeWord, setActiveWord] = useState(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(TouchSensor)
-  );
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 
   const usedWords = Object.values(answers).map((a) => a.value);
 
@@ -143,9 +134,7 @@ export default function WB_LookAndWrite_PageC() {
   const handleCheck = () => {
     if (showAns) return;
 
-    const allAnswered = ANSWERS.every(
-      (item) => answers[`a-${item.id}`]?.value
-    );
+    const allAnswered = ANSWERS.every((item) => answers[`a-${item.id}`]?.value);
 
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -199,37 +188,41 @@ export default function WB_LookAndWrite_PageC() {
     >
       <div className="main-container-component">
         <div className="div-forall" style={{ gap: "25px" }}>
-  <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">C</span> Look and write.
+          <h1 className="WB-header-title-page8">
+            <span className="WB-ex-A">C</span> Look, drag and drop.
           </h1>
           <div>
-          {/* WORD BANK */}
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {DRAG_ITEMS.map((item) => (
-              <DraggableWord
-                key={item.id}
-                item={item}
-                disabled={usedWords.includes(item.value)}
-              />
-            ))}
-          </div>
-
-          {/* GRID */}
-          <div className="grid grid-cols-3 gap-10">
-            {ANSWERS.map((item) => (
-              <div key={item.id} className="flex flex-col items-center gap-3">
-                <img src={item.img} className="h-32 object-contain" style={{height:"110px"}} />
-
-                <DropBox
-                  id={`a-${item.id}`}
-                  value={answers[`a-${item.id}`]?.value}
-                  isWrong={isWrong(item)}
-                  showAns={showAns}
+            {/* WORD BANK */}
+            <div className="flex flex-wrap justify-center gap-2 mb-10">
+              {DRAG_ITEMS.map((item) => (
+                <DraggableWord
+                  key={item.id}
+                  item={item}
+                  disabled={usedWords.includes(item.value)}
                 />
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* GRID */}
+            <div className="grid grid-cols-3 gap-10">
+              {ANSWERS.map((item) => (
+                <div key={item.id} className="flex flex-col items-center gap-3">
+                  <img
+                    src={item.img}
+                    className="h-32 object-contain"
+                    style={{ height: "110px" }}
+                  />
+
+                  <DropBox
+                    id={`a-${item.id}`}
+                    value={answers[`a-${item.id}`]?.value}
+                    isWrong={isWrong(item)}
+                    showAns={showAns}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-</div>
           {/* BUTTONS */}
           <div className="flex justify-center">
             <Button

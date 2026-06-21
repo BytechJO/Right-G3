@@ -16,9 +16,8 @@ const CORRECT_ORDER = ["Hansel", "Harley", "Helen", "John", "Stella", "Tom"];
 
 const NAME_IMGS = {
   Hansel: img1,
-  Harley:img2,
-  Helen:img3,
- 
+  Harley: img2,
+  Helen: img3,
 };
 function DraggableName({ name, disabled, style }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -42,6 +41,7 @@ function DraggableName({ name, disabled, style }) {
       style={{
         ...dragStyle,
         ...style,
+        touchAction: "none",
         // background: "#f3f4f6",
         // color: "#374151",
       }}
@@ -251,8 +251,8 @@ export default function WB_Unit6_Page33_Q1() {
       <div className="main-container-component">
         <div className="div-forall" style={{ gap: "18px" }}>
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span> Write the names in ABC order.
-            Answer the questions.
+            <span className="WB-ex-A">A</span> Drag and drop the names in ABC
+            order. Answer the questions.
           </h1>
 
           {/* Word Bank */}
@@ -282,13 +282,11 @@ export default function WB_Unit6_Page33_Q1() {
                 const name = CORRECT_ORDER[slot - 1]; // ترتيب الصور ثابت
 
                 return (
-                
-                    <img
-                      src={NAME_IMGS[name]}
-                      alt={name}
-                      style={{ width: "auto", height: 120,  }}
-                    />
-
+                  <img
+                    src={NAME_IMGS[name]}
+                    alt={name}
+                    style={{ width: "auto", height: 120 }}
+                  />
                 );
               })}
             </div>
@@ -318,7 +316,7 @@ export default function WB_Unit6_Page33_Q1() {
                         style={{
                           flex: 1,
                           minHeight: 36,
-                          borderBottom: `1px solid ${isOver ? "#f59e0b" :  (wrongSlots[slot] )? "red" :"#464646ff"}`,
+                          borderBottom: `1px solid ${isOver ? "#f59e0b" : wrongSlots[slot] ? "red" : "#464646ff"}`,
                           // borderRadius: 12,
                           background: isOver ? "#fff7ed" : "#fff",
                           display: "flex",

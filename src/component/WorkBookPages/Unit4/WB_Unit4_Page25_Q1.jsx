@@ -98,6 +98,7 @@ export default function WB_Unit_Months_Page232_QH() {
           alignItems: "center",
           justifyContent: "center",
           fontWeight: "700",
+          touchAction: "none",
           fontSize: "clamp(18px, 2.3vw, 21px)",
           cursor: "grab",
           opacity: isDragging ? 0.3 : usedNumbers.includes(num) ? 0.5 : 1,
@@ -236,8 +237,6 @@ export default function WB_Unit_Months_Page232_QH() {
             Look, read, and match.
           </h1>
 
-        
-
           {/* 🔥 Images */}
           <div
             style={{
@@ -259,7 +258,7 @@ export default function WB_Unit_Months_Page232_QH() {
               ))}
             </div>
           </div>
-  {/* 🔥 Numbers */}
+          {/* 🔥 Numbers */}
           <div
             style={{
               display: "flex",

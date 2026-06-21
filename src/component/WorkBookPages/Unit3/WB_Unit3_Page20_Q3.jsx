@@ -215,7 +215,7 @@ export default function WB_Unit3_Page18_QC() {
         }
       >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span> Listen, read, and circle.
+          <span className="WB-ex-A">C</span>Listen, read, and tap or click.
         </h1>
 
         <div style={{ display: "flex", justifyContent: "center" }}>

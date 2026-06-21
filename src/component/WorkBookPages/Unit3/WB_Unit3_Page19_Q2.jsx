@@ -298,12 +298,11 @@ export default function WB_Unit3_Page17_QJ() {
           display: "flex",
           flexDirection: "column",
           gap: "28px",
-          maxWidth: "1100px",
-          margin: "0 auto",
+
         }}
       >
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A"> J </span> Read, look, and circle.
+          <span className="WB-ex-A"> J </span>Look, read, and tap or click.
         </h1>
 
         <div className="wb-j-wrap">

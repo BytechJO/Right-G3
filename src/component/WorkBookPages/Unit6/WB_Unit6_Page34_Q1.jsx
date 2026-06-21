@@ -42,6 +42,7 @@ function DraggableNumber({ num, disabled }) {
         color: "#fff",
         display: "flex",
         alignItems: "center",
+        touchAction: "none",
         justifyContent: "center",
         fontSize: "20px",
         fontWeight: "bold",
@@ -117,7 +118,7 @@ export default function SB_ReadLookNumber_PageC() {
   };
 
   const handleRemoveNumber = (cardId) => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
     setImageAnswers((prev) => {
       const updated = { ...prev };
       delete updated[cardId];
@@ -127,7 +128,7 @@ export default function SB_ReadLookNumber_PageC() {
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || checked) return;
     const allAnswered = IMAGE_CARDS.every((c) => imageAnswers[c.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -197,7 +198,7 @@ export default function SB_ReadLookNumber_PageC() {
           {/* Title */}
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">C</span>
-            Read, look, and number the pictures. Point and say.
+          Read, look, and number the pictures. Point and say.
           </h1>
 
           {/* Sentences */}

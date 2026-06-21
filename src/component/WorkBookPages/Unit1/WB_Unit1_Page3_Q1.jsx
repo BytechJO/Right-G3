@@ -175,15 +175,18 @@ const WB_TrueFalse_Table = () => {
   const renderMark = (item, optionValue) => {
     if (answers[item.id] !== optionValue) return null;
     return (
-      <span style={{ ...styles.checkMark, color: getCheckColor(item) }}><img src={trueIcon} style={{height:"30px"}}/></span>
+      <span style={{ ...styles.checkMark, color: getCheckColor(item) }}>
+        <img src={trueIcon} style={{ height: "30px" }} />
+      </span>
     );
   };
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"45px"}}>
+      <div className="div-forall" style={{ gap: "45px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span> Read and write <img src={trueIcon} style={{height:"25px"}}/>.
+          <span className="WB-ex-A">A</span> Read, drag and drop
+          <span className="text-red-600"> ✓</span>.
         </h1>
 
         <div style={styles.wrapper}>

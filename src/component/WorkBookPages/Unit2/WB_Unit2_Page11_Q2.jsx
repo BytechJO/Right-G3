@@ -197,7 +197,7 @@ export default function WB_Unit2_Page11_QF() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">F</span>
-          Look at Exercise E. Write the questions and answers.
+       Look at Exercise E. Drag and drop the questions and answers.
         </h1>
         <div>
           {ITEMS.map((item) => (

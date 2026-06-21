@@ -40,6 +40,7 @@ function DraggableItem({ item, disabled }) {
         border: `1px solid ${BORDER_COLOR}`,
         background: disabled ? "#eee" : "",
         opacity: disabled ? 0.5 : 1,
+        touchAction: "none",
         cursor: disabled ? "not-allowed" : "grab",
         fontWeight: "600",
         // boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
@@ -130,11 +131,10 @@ export default function SB_ReadLookWrite_PageI() {
     updated[boxKey] = { dragId: item.id, value: item.value };
 
     setAnswers(updated);
-   
   };
 
   const handleCheck = () => {
-    if(showResults||showAns)return
+    if (showResults || showAns) return;
     const editables = ITEMS.filter((i) => !i.example);
 
     const allAnswered = editables.every((i) => answers[`a-${i.id}`]);
@@ -192,7 +192,7 @@ export default function SB_ReadLookWrite_PageI() {
       <div className="main-container-component">
         <div className="div-forall" style={{ gap: "55px" }}>
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">I</span> Read, look, and write.
+            <span className="WB-ex-A">I</span>  Read, look, drag and drop.
           </h1>
 
           {/* Word Bank */}
@@ -232,7 +232,7 @@ export default function SB_ReadLookWrite_PageI() {
                   style={{
                     display: "flex",
                     // flexDirection: "column",
-                    alignItems:"center",
+                    alignItems: "center",
                     gap: "10px",
                   }}
                 >

@@ -111,6 +111,7 @@ function DraggableImage({ item, isUsed, showAns }) {
         width: "100%",
         height: "100%",
         display: "flex",
+        touchAction:"none",
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -467,8 +468,7 @@ export default function WB_MissingLetter_PageC() {
             }}
           >
             <span className="WB-ex-A">C</span>
-            Write the missing letter for the pictures below. Then draw the
-            pictures <br /> in the correct boxes.
+         Drag and drop the missing letter for the pictures below. Then draw the pictures in the correct boxes.
           </h1>
           <div className="flex flex-col gap-10">
           <div

@@ -388,7 +388,7 @@ const WB_ReadAndMatch_Page22 = () => {
           className="WB-header-title-page8"
         
         >
-          <span className="WB-ex-A">D</span> Read and match.
+          <span className="WB-ex-A">D</span>Read and match.
         </h1>
 
         <div ref={containerRef} style={styles.matchArea}>

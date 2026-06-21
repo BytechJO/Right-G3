@@ -52,23 +52,7 @@ const Unit2_Page1_Vocab = () => {
     { start: 32.95, end: 35.79, text: "12. globe." },
   ];
   // 🎵 فترات الكلمات داخل الأوديو الرئيسي
-  const wordTimings = [
-    { start: 3.9, end: 4.8 }, // 1. scoreboard
-    { start: 5.7, end: 7.59 }, // 2. young
-    { start: 7.9, end: 10.31 }, // 3. old
-    { start: 10.5, end: 12.8 }, // 4. small
 
-    { start: 13.23, end: 15.52 }, // 5. big
-    { start: 15.83, end: 17.97 }, // 6. referee
-    { start: 18.48, end: 20.69 }, // 7. whistle
-    { start: 20.77, end: 22.91 }, // 8. fast
-
-    { start: 23.3, end: 25.87 }, // 9. slow
-    { start: 26.06, end: 28.79 }, // 10. tall
-
-    { start: 29.02, end: 31.43 }, // 11. short
-    { start: 32.95, end: 35.79 }, // 12. basketball court
-  ];
 
   const wordAudios = [
     sound1,
@@ -101,18 +85,18 @@ const Unit2_Page1_Vocab = () => {
   ];
 
 const positions = [
-  { id: 1, top: "48.5%", left: "65%" },
-  { id: 2, top: "36%", left: "64%" },
-  { id: 3, top: "33%", left: "74%" },
-  { id: 4, top: "53%", left: "57%" },
-  { id: 5, top: "75%", left: "55.5%" },
+  { id: 1, top: "31.5%", left: "64%" },
+  { id: 2, top: "7%", left: "63%" },
+  { id: 3, top: "1%", left: "74%" },
+  { id: 4, top: "39%", left: "57%" },
+  { id: 5, top: "86%", left: "54.5%" },
   { id: 6, top: "66.8%", left: "50.5%" },
-  { id: 7, top: "70%", left: "45.5%" },
-  { id: 8, top: "59.5%", left: "75%" },
-  { id: 9, top: "55.5%", left: "30.5%" },
-  { id: 10, top: "41.5%", left: "35.5%" },
-  { id: 11, top: "79.5%", left: "37%" },
-  { id: 12, top: "71.5%", left: "77%" },
+  { id: 7, top: "74%", left: "45.5%" },
+  { id: 8, top: "52.5%", left: "77%" },
+  { id: 9, top: "46.5%", left: "30.5%" },
+  { id: 10, top: "15.5%", left: "34.5%" },
+  { id: 11, top: "93.5%", left: "35%" },
+  { id: 12, top: "77.5%", left: "77%" },
 ];
 
   return (

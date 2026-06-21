@@ -70,7 +70,9 @@ function DraggableNumber({ num, disabled, showAns, activeId }) {
         alignItems: "center",
         justifyContent: "center",
         fontSize: "20px",
+        touchAction: "none",
         fontWeight: 700,
+
         cursor: disabled || showAns ? "not-allowed" : "grab",
         userSelect: "none",
         opacity: disabled ? 0.5 : 1,
@@ -103,8 +105,8 @@ function DroppableBox({ month, children }) {
         gap: "clamp(8px,1.2vw,16px)",
         minWidth: 0,
         position: "relative",
-        border:"1px solid #1111117a",
-        padding:"10px",
+        border: "1px solid #1111117a",
+        padding: "10px",
 
         // 🔥 الايفيكت
         boxShadow: isOver ? "0 0 0 4px rgba(243,155,66,0.35)" : "none",

@@ -271,7 +271,7 @@ export default function WB_Unit3_Page17_QI() {
         }}
       >
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A"> I </span> Read, look, and write.
+          <span className="WB-ex-A"> I </span> Read, look, drag and drop.
         </h1>
 
         <div className="wb-i19-wrap">

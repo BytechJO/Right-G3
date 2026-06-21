@@ -183,7 +183,7 @@ export default function WB_Unit1_Page9_QA() {
   const allItems = SECTIONS.flatMap((section) => section.items);
 
   const handleSelect = (itemId) => {
-    if (showAns ||showResults) return;
+    if (showAns || showResults) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -194,7 +194,7 @@ export default function WB_Unit1_Page9_QA() {
   };
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || showResults) return;
 
     const total = allItems.length / 2;
     let score = 0;
@@ -208,9 +208,9 @@ export default function WB_Unit1_Page9_QA() {
 
     setShowResults(true);
 
-    if (score/2 === total) {
+    if (score / 2 === total) {
       ValidationAlert.success(`Score: ${Math.floor(score / 2)} / ${total}`);
-    } else if (score/2 > 0) {
+    } else if (score / 2 > 0) {
       ValidationAlert.warning(`Score: ${Math.floor(score / 2)} / ${total}`);
     } else {
       ValidationAlert.error(`Score: ${Math.floor(score / 2)} / ${total}`);
@@ -259,7 +259,8 @@ export default function WB_Unit1_Page9_QA() {
       <div className="div-forall" style={{ gap: "60px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
-          Does it have a <b>short u</b> or <b>long u</b> sound? Read and circle.
+          Does it have a <b>short u</b> or <b>long u</b> sound? Read and tap or
+          click.
         </h1>
 
         <div style={styles.pageWrap}>

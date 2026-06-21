@@ -44,6 +44,7 @@ function DraggableItem({ item, disabled }) {
         justifyContent: "center",
         fontWeight: "700",
         fontSize: "20px",
+        touchAction:"none",
         // boxShadow: "0 3px 10px rgba(0,0,0,0.12)",
         transition: "0.2s",
       }}
@@ -188,7 +189,7 @@ export default function WB_ReadAndWrite_PageH() {
         <div className="div-forall" style={{ gap: "20px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">H</span>
-            Read and write the answers.
+         Read, drag and drop the answers.
           </h1>
           <div className="flex flex-col gap-10">
           {/* Image */}

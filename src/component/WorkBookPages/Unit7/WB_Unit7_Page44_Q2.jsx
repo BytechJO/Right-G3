@@ -372,7 +372,7 @@ export default function WB_Unit7_Page44_QB() {
         <h1 className="WB-header-title-page8">
           {" "}
           <span className="WB-ex-A">B</span>
-          Listen and match.
+           Listen and match.
         </h1>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer

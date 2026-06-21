@@ -332,7 +332,7 @@ export default function WB_Unit3_Page6_QC() {
         <h1 className="WB-header-title-page8">
           {" "}
           <span className="WB-ex-A">C</span>
-          Look and read. Circle the correct pair.
+          Look, drag and drop.
         </h1>
 
         <div className="wb-c6-grid">

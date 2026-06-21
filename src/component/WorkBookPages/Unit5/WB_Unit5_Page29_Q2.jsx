@@ -308,7 +308,7 @@ export default function WB_Unit5_Page29_QF() {
          
         >
           <span className="WB-ex-A">F</span>
-          Read, look, and circle.
+         Read, look, and tap or click.
         </h1>
 
         <div className="wb-f-grid" style={styles.grid}>

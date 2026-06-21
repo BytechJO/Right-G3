@@ -246,14 +246,9 @@ export default function WB_Unit3_Page20_QC() {
       >
         <h1
           className="WB-header-title-page8"
-          style={{
-            margin: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
+          
         >
-          <span className="WB-ex-A">C</span> Read and write.
+          <span className="WB-ex-A">C</span>Read, drag and drop.
         </h1>
         <div className="wb-months-list">
           {ITEMS.map((item) => (

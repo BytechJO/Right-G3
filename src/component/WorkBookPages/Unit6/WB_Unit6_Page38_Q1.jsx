@@ -151,7 +151,7 @@ export default function WB_TrueFalse_PageA() {
          
         >
           <span className="WB-ex-A">A</span>
-          Look, read, and write <strong style={{ color: "red" }}>✓</strong> for{" "}
+          Look, read, drag and drop <strong style={{ color: "red" }}>✓</strong> for{" "}
           <strong style={{ fontWeight: 900,color: "navy" }}>true</strong> or{" "}
           <strong style={{ fontWeight: 900,color: "navy" }}>false</strong>.
         </h1>

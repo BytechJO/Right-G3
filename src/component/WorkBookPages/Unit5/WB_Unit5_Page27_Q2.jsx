@@ -447,7 +447,7 @@ export default function WB_Unit5_Page27_Q2() {
         <div className="div-forall" style={{ gap: "55px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">B</span>
-            Label the rooms in Tom’s house.
+           Label the rooms in Tom’s house
           </h1>
 
           <div className="wb-house-chips">

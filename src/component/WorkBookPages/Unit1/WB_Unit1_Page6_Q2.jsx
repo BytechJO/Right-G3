@@ -291,7 +291,7 @@ export default function WB_Unit1_Page6_QH() {
         <div className="div-forall" style={{ gap: "clamp(16px,2vw,24px)" }}>
           {/* ── العنوان ── */}
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">H</span> Read, look, and number.
+            <span className="WB-ex-A">H</span>Read, look, and number.
           </h1>
 
           {/* ── الأرقام للسحب ── */}

@@ -394,7 +394,7 @@ const WB_UnitX_Page21_QB = () => {
                     <div
                       style={{
                         display: "flex",
-                        width: "100%",
+                        // width: "100%",
                         justifyContent: "flex-start",
                         paddingLeft: "6px",
                         fontSize: "20px",

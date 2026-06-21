@@ -15,7 +15,7 @@ const WRONG = "red";
 const TEXT = "#111";
 
 // الكلمات المتاحة في الـ dropdown
-const WORD_OPTIONS = ["usually", "sometimes"];
+const WORD_OPTIONS = ["usually", "sometimes","rarely"];
 
 const SENTENCES = [
   {
@@ -34,7 +34,7 @@ const SENTENCES = [
   {
     id: 4,
     before: "Helen's mom",
-    correctWord: "sometimes",
+    correctWord: "rarely",
     after: "takes the subway to the supermarket.",
   },
 ];
@@ -362,8 +362,7 @@ export default function WB_Unit3_Page22_QJ() {
 
       <div className="div-forall" style={{ gap: "25px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span> Look and complete the sentences.
-          Number the pictures.
+          <span className="WB-ex-A">J</span> Look and complete the sentences. Number the pictures.
         </h1>
         <img src={img} style={{ width: "auto", height: "85px" }} />
 

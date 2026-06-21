@@ -181,7 +181,7 @@ export default function WB_ReadAndMatch_PageF() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span> Read and match.
+          <span className="WB-ex-A">F</span>Read and match.
         </h1>
 
         {/* Board */}

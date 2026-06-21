@@ -322,7 +322,7 @@ export default function WB_Unit3_Page8_QC() {
       <div className="div-forall">
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span>
-          Read, look, and match.
+        Read, look, and match.
         </h1>
 
         <div ref={containerRef} className="wb-c-board">

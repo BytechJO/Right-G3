@@ -96,9 +96,9 @@ export default function WB_ListenAndCircle_PageB() {
           
         >
           <span className="WB-ex-A">B</span>
-          Listen and circle <strong className="text-blue-900">fl</strong>,{" "}
-          <strong className="text-blue-900">pl</strong>, or{" "}
-          <strong className="text-blue-900">sl</strong>.
+         Listen and tap or click <strong className="text-blue-900"> fl</strong>,{" "}
+          <strong className="text-blue-900"> pl </strong>or{" "}
+          <strong className="text-blue-900"> sl</strong>.
         </h1>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer

@@ -116,7 +116,7 @@ export default function WB_LookReadWrite_PageD() {
       <div className="div-forall">
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span> Look, read, and choose.
+          <span className="WB-ex-A">D</span>Look, read, drag and drop. 
         </h1>
            
        <div className="flex flex-col justify-start items-start gap-20">

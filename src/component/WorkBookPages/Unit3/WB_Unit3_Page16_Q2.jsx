@@ -298,7 +298,7 @@ export default function WB_Unit3_Page16_QC() {
 
       <div className="div-forall" style={{gap:"25px"}}>
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">D</span> Look, circle, and answer.
+          <span className="WB-ex-A">D</span> Read, look, and tap or click.
         </h1>
 
         <div className="wb-d16-wrap">

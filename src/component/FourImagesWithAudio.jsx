@@ -24,6 +24,8 @@ const FourImagesWithAudio = ({
   const settingsRef = useRef(null);
   const [forceRender, setForceRender] = useState(0);
   // زر الكابشن
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [current, setCurrent] = useState(0);
@@ -130,7 +132,7 @@ const FourImagesWithAudio = ({
     }
   };
   return (
-    <div className={`four-wrapper ${images.length > 5 ? "four-wrapper-gap" : ""}`}>
+    <div className="four-wrapper">
       <div
         style={{
           display: "flex",
@@ -141,7 +143,15 @@ const FourImagesWithAudio = ({
           marginTop: "25px",
         }}
       >
-        <h5 className="header-title-page8" style={{ fontSize: "25px" }}>
+        <h5
+          className="header-title-page8"
+          style={{
+            fontSize: "25px",
+            display: "flex",
+            gap: "5px",
+            alignItems: "center",
+          }}
+        >
           {images[0] && (
             <img src={images[0]} className="main-image" alt="main" />
           )}
@@ -259,6 +269,25 @@ const FourImagesWithAudio = ({
                         audioRef.current.volume = e.target.value;
                       }}
                     />
+
+                    <label style={{ marginRight: "10px", marginTop: "10px" }}>
+                      Speed :
+                    </label>
+                    <select
+                      value={playbackRate}
+                      onChange={(e) => {
+                        const rate = Number(e.target.value);
+                        setPlaybackRate(rate);
+                        audioRef.current.playbackRate = rate;
+                      }}
+                    >
+                      <option value="0.5">0.5x</option>
+                      <option value="0.75">0.75x</option>
+                      <option value="1">1x</option>
+                      <option value="1.25">1.25x</option>
+                      <option value="1.5">1.5x</option>
+                      <option value="2">2x</option>
+                    </select>
                   </div>
                 )}
               </div>
@@ -269,9 +298,7 @@ const FourImagesWithAudio = ({
 
       <div className="images-layout">
         {/* الصور الصغيرة الثلاث */}
-        <div
-          className={`small-images ${images.length > 5 ? "wrap-images" : ""}`}
-        >
+        <div className="small-images">
           {images.length <= 3 ? (
             <>
               {images.slice(1).map((src, i) => {
@@ -289,12 +316,7 @@ const FourImagesWithAudio = ({
                     <img
                       src={src}
                       className="small-img1"
-                      style={{
-                        cursor: "pointer",
-                        width:  "auto",
-                        objectFit:"contain",
-                        height: "175px",
-                      }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => playImageSound(globalIndex)}
                     />
                   </div>
@@ -317,12 +339,8 @@ const FourImagesWithAudio = ({
                   >
                     <img
                       src={src}
-                      className="small-img1"
-                      style={{
-                        cursor: "pointer",
-                        width: images.length > 4 ? "150px" : "",
-                        height: "auto",
-                      }}
+                      className="small-img2"
+                      style={{ cursor: "pointer" }}
                       onClick={() => playImageSound(globalIndex)}
                     />
                   </div>

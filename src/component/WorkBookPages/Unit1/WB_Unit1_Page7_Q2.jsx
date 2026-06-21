@@ -417,7 +417,7 @@ export default function WB_Unit3_Page7_QJ() {
       <div className="div-forall">
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">J</span>
-          Read and look. Write the questions or answers.
+     Read and look. Drag and drop the questions or answers.
         </h1>
 
         {ITEMS.map((item) => (

@@ -198,7 +198,7 @@ export default function WB_Vocabulary_Page214_QI() {
       <div className="main-container-component">
         <div className="div-forall mb-15" style={{gap:"20px"}}>
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">I</span>Look and write a vocabulary word.
+            <span className="WB-ex-A">I</span> Look, drag and drop a vocabulary word.
           </h1>
             <div className="flex gap-10 items-center justify-center">
           <div className="flex flex-col gap-10 items-center justify-center w-[70%]">

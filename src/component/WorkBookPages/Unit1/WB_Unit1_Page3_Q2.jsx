@@ -75,7 +75,7 @@ export default function WB_Unit3_Page3_QB() {
   const [showAns, setShowAns] = useState(false);
 
   const handleImageSelect = (itemId, imageKey) => {
- if (showAns ||checked) return;
+    if (showAns || checked) return;
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { ...prev[itemId], image: imageKey },
@@ -84,7 +84,7 @@ export default function WB_Unit3_Page3_QB() {
   };
 
   const handleTextSelect = (itemId, text) => {
-     if (showAns ||checked) return;
+    if (showAns || checked) return;
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { ...prev[itemId], text },
@@ -93,7 +93,7 @@ export default function WB_Unit3_Page3_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns ||checked) return;
+    if (showAns || checked) return;
 
     const allAnswered = ITEMS.every(
       (item) => answers[item.id]?.image && answers[item.id]?.text,
@@ -381,10 +381,11 @@ export default function WB_Unit3_Page3_QB() {
         }
       `}</style>
 
-      <div className="div-forall " style={{gap:"30px"}}>
+      <div className="div-forall " style={{ gap: "30px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>
-          Read, look, circle, and write <img src={trueIcon} style={{height:"25px"}}/>.
+          Read, look, tap or click and drag the word{" "}
+          <span className="text-red-600">✓</span>.
         </h1>
 
         <div className="wb-qb-main-list">
@@ -451,7 +452,7 @@ export default function WB_Unit3_Page3_QB() {
                           style={{ cursor: showAns ? "default" : "pointer" }}
                         >
                           {(selected || showCorrect) && (
-                            <img src={trueIcon} style={{height:"25px"}}/>
+                            <img src={trueIcon} style={{ height: "25px" }} />
                           )}
 
                           {wrong && <div className="wb-qb-wrong">✕</div>}

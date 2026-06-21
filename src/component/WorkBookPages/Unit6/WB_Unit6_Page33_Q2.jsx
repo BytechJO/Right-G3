@@ -72,6 +72,7 @@ function DraggableWord({ word, disabled }) {
     //   ? `translate(${transform.x}px, ${transform.y}px)`
     //   : undefined,
     cursor: disabled ? "not-allowed" : "grab",
+    touchAction: "none",
     opacity: disabled ? 0.4 : 1,
   };
 
@@ -340,7 +341,7 @@ export default function WB_Unit6_Page33_Q2() {
         <div className="div-forall" style={{ gap: 40 }}>
           {/* ── العنوان ── */}
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">B</span> Read, color, and complete.
+            <span className="WB-ex-A">B</span>Read, color, and complete.
           </h1>
 
           {/* ── السيارات للتلوين ── */}

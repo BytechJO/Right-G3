@@ -311,9 +311,9 @@ min-width: 16px;
       <div className="div-forall">
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span> Do they both have the same{" "}
-          <span className="text-blue-800">u sound</span> ? Listen and write{" "}
-          <span className="text-red-500">✓</span> or
-          <span className="text-red-500">✕</span> .
+          <span className="text-blue-800">u sound</span> ? Listen, drag and drop
+          <span className="text-red-600"> ✓</span> or
+          <span className="text-red-600"> ✕</span> .
         </h1>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer src={sound1} captions={captions} />

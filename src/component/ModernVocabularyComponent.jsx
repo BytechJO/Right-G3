@@ -11,6 +11,7 @@ const ModernVocabularyComponent = ({
   vocabulary,
   markers,
   captions,
+  hight
 }) => {
   const mainAudioRef = useRef(null);
   const wordRefs = useRef(wordAudios.map(() => React.createRef()));
@@ -24,7 +25,8 @@ const ModernVocabularyComponent = ({
   const [showCaption, setShowCaption] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [volume, setVolume] = useState(1);
-
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [forceRender, setForceRender] = useState(0);
   // =========================
   // Sync captions + words
   // =========================
@@ -111,11 +113,11 @@ const ModernVocabularyComponent = ({
       <div className="w-full bg-white p-5 rounded-[2rem] overflow-hidden border border-slate-100 flex flex-col lg:flex-row relative justify-center">
         {/* ================= AUDIO ================= */}
         <div className="flex flex-col justify-center items-center">
-          <div className="flex justify-center w-[85%]">
+          <div className="flex w-full justify-center w-full">
             <div
               className="audio-popup-vocab-container"
               style={{
-                width: "70%",
+                width: "60%",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -135,6 +137,13 @@ const ModernVocabularyComponent = ({
                       updateSync(t);
                     }}
                     onLoadedMetadata={(e) => setDuration(e.target.duration)}
+                    onEnded={(e) => {
+                      e.target.currentTime = 0;
+                      setCurrent(0);
+                      setIsPlaying(false);
+                      setActiveIndex(null);
+                      setActiveIndex2(null);
+                    }}
                   />
 
                   {/* time + slider */}
@@ -201,6 +210,29 @@ const ModernVocabularyComponent = ({
                               mainAudioRef.current.volume = e.target.value;
                             }}
                           />
+                          <label
+                            style={{ marginRight: "10px", marginTop: "10px" }}
+                          >
+                            Speed :
+                          </label>
+                          <select
+                            value={playbackRate}
+                            onChange={(e) => {
+                              const rate = Number(e.target.value);
+                              setPlaybackRate(rate);
+
+                              if (mainAudioRef.current) {
+                                mainAudioRef.current.playbackRate = rate;
+                              }
+                            }}
+                          >
+                            <option value="0.5">0.5x</option>
+                            <option value="0.75">0.75x</option>
+                            <option value="1">1x</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                          </select>
                         </div>
                       )}
                     </div>
@@ -254,6 +286,8 @@ const ModernVocabularyComponent = ({
                   style={{
                     top: marker.top,
                     left: marker.left,
+                    // width: "30px",
+                    // height: "30px",
                   }}
                   onClick={() => playWordAudio(i)}
                 >
@@ -273,7 +307,7 @@ const ModernVocabularyComponent = ({
           </div>
 
           {/* tip */}
-          <div className="rounded-[1.5rem]" style={{ alignSelf: "baseline" }}>
+          <div className="rounded-[1.5rem] w-full">
             <p className="text-red-700">
               💡 Tip: Click on the numbers or words to hear the pronunciation!
             </p>
@@ -281,7 +315,7 @@ const ModernVocabularyComponent = ({
         </div>
 
         {/* ================= SIDEBAR ================= */}
-        <div className="w-full lg:w-80 bg-white p-6 lg:border-l border-slate-100 flex flex-col justify-center">
+        <div className={`w-full lg:w-80 bg-white p-6 lg:border-l border-slate-100 flex flex-col justify-center h-[${hight}vh]`}>
           <h2 className="text-2xl font-black mb-6">VOCABULARY</h2>
 
           <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
@@ -291,7 +325,7 @@ const ModernVocabularyComponent = ({
                 onClick={() => playWordAudio(i)}
                 className={`flex items-center p-2 rounded-2xl transition ${
                   activeIndex2 === i || clickedIndex === i
-                    ? "bg-orange-600 text-white"
+                    ? "bg-blue-600 text-white"
                     : "bg-slate-50"
                 }`}
               >

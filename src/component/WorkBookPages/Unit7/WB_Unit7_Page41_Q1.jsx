@@ -36,13 +36,13 @@ export default function WB_ReadLookWrite_PageE() {
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, value) => {
-    if (showAns||showResults) return;
+    if (showAns || showResults) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
     setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || showResults) return;
     const allAnswered = ITEMS.every((i) => selected[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -82,15 +82,14 @@ export default function WB_ReadLookWrite_PageE() {
     <div className="main-container-component">
       <div
         className="div-forall"
-       style={{
-             
-              gap: "70px",
-            }}
+        style={{
+          gap: "70px",
+        }}
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Read, look, and write{" "}
+          Read, look, drag and drop
           <strong className="text-blue-900" style={{ fontWeight: 900 }}>
             in
           </strong>
@@ -109,7 +108,7 @@ export default function WB_ReadLookWrite_PageE() {
         <div
           style={{
             display: "flex",
-           
+
             gap: "clamp(20px,3vw,40px)",
             alignItems: "center",
             width: "100%",
@@ -120,9 +119,8 @@ export default function WB_ReadLookWrite_PageE() {
             style={{
               display: "flex",
               flexDirection: "column",
-              height:"400px",
-                justifyContent:"space-around"
-            
+              height: "400px",
+              justifyContent: "space-around",
             }}
           >
             {ITEMS.map((item) => {
@@ -184,7 +182,7 @@ export default function WB_ReadLookWrite_PageE() {
                       }}
                     >
                       <select
-                        disabled={showAns||showResults}
+                        disabled={showAns || showResults}
                         value={selected[item.id] || ""}
                         onChange={(e) => handleChange(item.id, e.target.value)}
                         style={{
@@ -202,7 +200,8 @@ export default function WB_ReadLookWrite_PageE() {
                           // color: RED_COLOR,
                           padding: "0 clamp(4px,0.6vw,8px) 3px 2px",
                           background: "transparent",
-                          cursor: showAns||showResults ? "default" : "pointer",
+                          cursor:
+                            showAns || showResults ? "default" : "pointer",
                           appearance: "auto",
                           boxSizing: "border-box",
                         }}

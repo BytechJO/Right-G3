@@ -247,7 +247,7 @@ export default function WB_LookReadFind_PageD() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span> Look, read, and find. Write.
+          <span className="WB-ex-A">D</span>Look, read, and find. Drag and drop.
         </h1>
 
         {/* ── Layout: يسار أسئلة + يمين صورة ── */}

@@ -292,7 +292,7 @@ export default function SB_WordSearch_PageI() {
         }}
       >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span> Find and circle the words.
+          <span className="WB-ex-A">I</span> Find and tap or click the words.
         </h1>
 
         <div className="wb-i-layout">

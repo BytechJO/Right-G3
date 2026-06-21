@@ -211,8 +211,7 @@ export default function WB_Unit3_Page15_QB() {
     <div className="main-container-component">
       <div className="div-forall" style={{gap:"40px"}}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Look and write the questions and
-          answers.
+          <span className="WB-ex-A">B</span>  Look, drag and drop the questions and answers.
         </h1>
 
         <div

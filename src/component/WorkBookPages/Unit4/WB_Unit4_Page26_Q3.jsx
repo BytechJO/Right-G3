@@ -217,9 +217,9 @@ export default function WB_Unit4_Page26_QC() {
 
       <div className="div-forall" style={{ gap: "150px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span>Do they both have the same <span className="text-blue-900">th sound</span>? Listen and write
-          <span className="text-red-500">✓</span> or
-          <span className="text-red-500">✕</span> .
+          <span className="WB-ex-A">B</span>Do they both have the same <span className="text-blue-900">th sound</span>? Listen, drag and drop
+          <span className="text-red-600"> ✓</span> or
+          <span className="text-red-600"> ✕</span> .
         </h1>
 
         <div className="wb-b-grid">

@@ -47,7 +47,12 @@ function DraggableWrapper({ item, disabled, showAns, children }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={{ ...style, touchAction: "none" }}
+      {...listeners}
+      {...attributes}
+    >
       {children}
     </div>
   );
@@ -89,7 +94,7 @@ export default function WB_Unit3_Page17_QB() {
 
   // ✅ dnd-kit handler
   const handleDragEnd = (event) => {
-    if (showAns ||showResults) return;
+    if (showAns || showResults) return;
 
     const { active, over } = event;
     if (!over) return;
@@ -113,7 +118,7 @@ export default function WB_Unit3_Page17_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || showResults) return;
 
     const allAnswered = ANSWERS.every((item) => answers[`a-${item.id}`]?.value);
 
@@ -178,9 +183,9 @@ export default function WB_Unit3_Page17_QB() {
         onClick={() => handleRemoveAnswer(boxKey)}
         style={{
           width: "100%",
-        minWidth: "220px",
+          minWidth: "220px",
           minHeight: "42px",
-          borderBottom: wrong ?"2px solid red":"1px solid #2f2f2f",
+          borderBottom: wrong ? "2px solid red" : "1px solid #2f2f2f",
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "center",
@@ -208,9 +213,9 @@ export default function WB_Unit3_Page17_QB() {
               alignItems: "center",
               justifyContent: "center",
               fontSize: "12px",
-              fontWeight:"700",
-              border:"2px solid white",
-              boxShadow:"0 2px 6px rgba(0,0,0,0.25)"
+              fontWeight: "700",
+              border: "2px solid white",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
             }}
           >
             ✕
@@ -223,10 +228,10 @@ export default function WB_Unit3_Page17_QB() {
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="main-container-component">
-        <div className="div-forall" style={{gap:"35px"}}>
+        <div className="div-forall" style={{ gap: "35px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">B</span>
-            Look and write.
+            Look, drag and drop.
           </h1>
           {/* 🔹 نفس UI بدون تغيير */}
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -268,11 +273,17 @@ export default function WB_Unit3_Page17_QB() {
             }}
           >
             {ANSWERS.map((item) => (
-              <div key={item.id}className="flex flex-col gap-5 justify-center items-center w-full"> 
-                <div className="flex gap-5"> 
-                <span className="text-[20px] font-semibold">{item.id} </span>
-                <img src={item.img} style={{ width: "90px", height: "110px" }} />
-</div>
+              <div
+                key={item.id}
+                className="flex flex-col gap-5 justify-center items-center w-full"
+              >
+                <div className="flex gap-5">
+                  <span className="text-[20px] font-semibold">{item.id} </span>
+                  <img
+                    src={item.img}
+                    style={{ width: "90px", height: "110px" }}
+                  />
+                </div>
                 <DropWrapper id={`a-${item.id}`}>
                   {renderDropBox(`a-${item.id}`, isWrong(item))}
                 </DropWrapper>

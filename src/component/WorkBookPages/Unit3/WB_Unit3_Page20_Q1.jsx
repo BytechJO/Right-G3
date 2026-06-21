@@ -617,7 +617,7 @@ export default function WB_Phonics_Page227_QA() {
         <div className="div-forall" style={{ gap: "70px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">A</span>
-            Write ch, tch, or sh. Then number the pictures.
+            Drag and drop ch, tch, or sh. Then number the pictures.
           </h1>
 
           <div className="wb-a20-wrap">

@@ -79,10 +79,10 @@ export default function SB_LookReadWrite_PageI() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span> Look, read, and write{" "}
-          <strong className="text-blue-900">me</strong>,{" "}
-          <strong className="text-blue-900">you</strong>, or{" "}
-          <strong className="text-blue-900">it</strong>.
+          <span className="WB-ex-A">I</span>Look, read, drag and drop 
+          <strong className="text-blue-900"> me</strong>,{" "}
+          <strong className="text-blue-900"> you</strong>, or{" "}
+          <strong className="text-blue-900"> it</strong>.
         </h1>
 
         {/* 🖼️ الصورة + dropdowns */}

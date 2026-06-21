@@ -450,8 +450,7 @@ export default function WB_Unit3_Page16_QE() {
       `}</style>
         <div className="div-forall" style={{ gap: "25px" }}>
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">E</span> Look and write the questions or
-            answers.
+            <span className="WB-ex-A">E</span>  Look, drag and drop the questions or answers.
           </h1>
 
           <div className="wb-e17-wrap">
