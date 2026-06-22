@@ -246,8 +246,7 @@ const Review4_Page1_Q1 = () => {
       >
         <div className="div-forall" style={{ gap: "5px" }}>
           <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>A</span> Read, drag, and drop
-            the season. Number the pictures.
+            <span style={{ marginRight: "10px" }}>A</span>Read and write the season. Number the pictures.
           </h5>
 
           {/* ========================= */}

@@ -137,7 +137,7 @@ export default function Unit3_Page5_Q2() {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             B
           </span>
-          Look, read, drag, and drop.
+          Look, read, and write.
         </h5>
 
         {/* QUESTIONS */}

@@ -162,8 +162,7 @@ const Review4_Page1_Q3 = () => {
     >
       <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>C</span> Match, drag, and drop
-          the words.
+          <span style={{ marginRight: "10px" }}>C</span> Match and write the words.
         </h5>
 
         {/* TEXTS TOP */}

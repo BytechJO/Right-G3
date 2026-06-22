@@ -103,7 +103,7 @@ const Unit4_Page6_Q1 = () => {
       <div className="div-forall" style={{ gap: "40px" }}>
         <h5 className="header-title-page8">
           <span className="ex-A">D</span>
-         Read, drag and drop. Which season is it?
+        Read and write. Which season is it?
         </h5>
 
         {/* IMAGES */}

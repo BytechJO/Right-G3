@@ -106,7 +106,7 @@ const Review8_Page2_Q2 = () => {
       >
         <h5 className="header-title-page8 pb-2.5">
           <span style={{ marginRight: "10px" }}>D</span>
-       Look, drag, and drop 
+       Look and write 
           <span style={{ color: "#2e3192" }}> d</span>,
           <span style={{ color: "#2e3192" }}> f </span>
           or

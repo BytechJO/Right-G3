@@ -101,7 +101,7 @@ const handleChange = (id, value) => {
         <div className="div-forall" style={{ gap: "10px" }}>
           <h5 className="header-title-page8">
             <span style={{ marginRight: "10px" }}>A</span>
-            Read and match. Drag and drop the letters.
+            Read and match. Write the letters.
           </h5>
 
           <div className="w-full mx-auto mb-10">

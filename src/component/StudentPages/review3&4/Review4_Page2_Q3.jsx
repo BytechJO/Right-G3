@@ -133,8 +133,7 @@ const Review4_Page2_Q3 = () => {
         <h5 className="header-title-page8">
           <span style={{ marginRight: "20px" }}>F</span>
           Does the word have a 
-          <span style={{ color: "#2e3192" }}> voiceless th </span>sound? Listen,
-          drag and drop <span style={{ color: "#D52328" }}> ✓ </span>or
+          <span style={{ color: "#2e3192" }}> voiceless th </span>sound? Listen and write <span style={{ color: "#D52328" }}> ✓ </span>or
           <span style={{ color: "#D52328" }}> ✗</span>
         </h5>
         <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11} />

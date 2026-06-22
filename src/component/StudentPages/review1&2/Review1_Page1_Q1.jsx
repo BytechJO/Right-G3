@@ -95,7 +95,7 @@ const Review1_Page1_Q1 = () => {
       <div className="div-forall" style={{ gap: "20px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>A</span>
-          Look, read, and drag the correct letter.
+          Look, read, and answer the questions.
         </h5>
 
         {/* IMAGES */}

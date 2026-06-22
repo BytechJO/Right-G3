@@ -106,7 +106,7 @@ const Review9_Page1_Q1 = () => {
       <div className="div-forall" style={{ gap: "10px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>A</span>
-      Look, read, drag, and drop. Use the words below.
+      Look, read, and write. Use the words below.
         </h5>
   <div
           style={{

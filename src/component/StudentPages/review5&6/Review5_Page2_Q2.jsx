@@ -173,12 +173,11 @@ const Review5_Page2_Q2 = () => {
         }}
       >
         <h3 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
+          <span style={{ marginRight: "10px" }}>
             D
           </span>{" "}
           Do both words have the same ?
-          <span style={{ color: "#2e3192" }}> -y sound </span>? Listen, drag and
-          drop
+          <span style={{ color: "#2e3192" }}> -y sound </span>? Listen and write
           <span style={{ color: "#D52328" }}> ✓ </span> or{" "}
           <span style={{ color: "#D52328" }}> ✗ </span>.
         </h3>

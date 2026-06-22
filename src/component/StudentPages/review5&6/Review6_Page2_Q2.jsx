@@ -88,7 +88,7 @@ const Review6_Page2_Q2 = () => {
       <div className="div-forall" style={{ gap: "40px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>E</span>
-          Drag and drop <span style={{ color: "#2e3192" }}> y </span> in the
+          Write <span style={{ color: "#2e3192" }}> y </span> in the
           blank only under the pictures that end with
           <span style={{ color: "#2e3192" }}> y </span>.
         </h5>

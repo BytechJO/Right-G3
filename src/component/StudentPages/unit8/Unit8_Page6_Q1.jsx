@@ -106,7 +106,7 @@ const Unit8_Page6_Q1 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             D
           </span>
-         Read and number the pictures.
+       Look and write the answers.
         </h5>
         <div
           style={{

@@ -123,7 +123,7 @@ const Unit8_Page5_Q2 = () => {
           <h5 className="header-title-page8">
             <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>{" "}
             Does it have the same<span style={{ color: "#2e3192" }}>-es </span>
-            sound? Listen, drag, and drop
+            sound? Listen and write
             <span style={{ color: "#D52328" }}>✓</span> or{" "}
             <span style={{ color: "#D52328" }}>✗</span>.
           </h5>

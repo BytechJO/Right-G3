@@ -177,7 +177,7 @@ const Review9_Page2_Q2 = () => {
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>D</span> Do both words have the
           same final <span style={{ color: "#2e3192" }}> -s sound</span>?
-          Listen, drag, and drop and write{" "}
+          Listen, and write{" "}
           <span style={{ color: "#D52328" }}>✓</span> or{" "}
           <span style={{ color: "#D52328" }}>✗</span>.
         </h5>

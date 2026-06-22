@@ -118,7 +118,7 @@ const Review10_Page1_Q2 = () => {
     >
       <div className="div-forall" style={{gap:"20px"}}>
         <h5 className="header-title-page8 mb-7">
-          <span className="mr-3">B</span> Look, read, drag, and drop the questions or answers.
+          <span className="mr-3">B</span>Look, read, and write the questions or answers.
         </h5>
 
         <div className="questions-grid">

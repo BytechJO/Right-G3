@@ -230,8 +230,8 @@ export default function Review2_Page1_Q2() {
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "40px" }}>
         <h1 className="header-title-page8">
-          <span className="ex-A">B</span>
-          Look at Exercise A. Drag and drop the questions and answers.
+          <span className="mr-1">B </span>
+          Look at Exercise A. Write the questions and answers.
         </h1>
         <div>
           {ITEMS.map((item) => (

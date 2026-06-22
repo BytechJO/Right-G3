@@ -266,7 +266,7 @@ const Unit6_Page6_Q2 = () => {
           <span style={{ marginRight: "15px" }} className="ex-A">
             E
           </span>
-         Look, drag and drop.
+       Look and write.
         </h5>
         <div className="flex gap-10">
           {/* الكلمات */}

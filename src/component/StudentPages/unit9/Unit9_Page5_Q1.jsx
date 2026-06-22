@@ -134,7 +134,7 @@ const Unit9_Page5_Q1 = () => {
             <span className="ex-A mr-3">A</span>
             Do they both have the same final{" "}
             <span style={{ color: "#2e3192" }}> -s sound </span>
-            Drag and drop
+            Write
             <span style={{ color: "#D52328" }}> ✓</span> or{" "}
             <span style={{ color: "#D52328" }}> ✗</span>.
           </h5>

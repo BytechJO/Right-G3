@@ -91,7 +91,7 @@ const Review6_Page1_Q3 = () => {
       <div className="div-forall w-[60%]">
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>C</span>
-          Read, drag, and drop.
+          Read and write.
         </h5>
 
         {/* QUESTIONS */}

@@ -93,8 +93,8 @@ const Review1_Page2_Q2 = () => {
         <h5 className="header-title-page8">
           <span style={{ marginRight: "20px" }}>D</span>
           Does it have a
-          <span style={{ color: "#2e3192" }}> long vowel sound </span>? Listen,
-          drag and drop<span style={{ color: "#D52328" }}> ✓ </span>or
+          <span style={{ color: "#2e3192" }}> long vowel sound </span>? Listen
+          and write<span style={{ color: "#D52328" }}> ✓ </span>or
           <span style={{ color: "#D52328" }}> ✗</span>
         </h5>
         <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11} />

@@ -115,7 +115,7 @@ const [locked ,setLocked]=useState(false)
         <h5 className="header-title-page8 pb-2.5">
           <span className="ex-A mr-3">A</span>
           <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
-          Look, drag, and drop
+          Look and write
           <span style={{ color: "#2e3192" }}> dr </span>
           or
           <span style={{ color: "#2e3192" }}> tr</span>.

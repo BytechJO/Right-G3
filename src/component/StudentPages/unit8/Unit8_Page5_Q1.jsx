@@ -110,8 +110,7 @@ const Unit8_Page5_Q1 = () => {
               A
             </span>{" "}
             <span style={{ color: "#2e3192" }}>1</span> Do they both have the
-            same <span style={{ color: "#2e3192" }}>consonant blend</span>? Drag
-            and drop <span style={{ color: "#D52328" }}>✓</span> or{" "}
+            same <span style={{ color: "#2e3192" }}>consonant blend</span>? Write <span style={{ color: "#D52328" }}>✓</span> or{" "}
             <span style={{ color: "#D52328" }}>✗</span>.
           </h5>
 

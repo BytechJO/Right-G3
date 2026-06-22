@@ -116,7 +116,7 @@ const Unit3_Page6_Q2 = () => {
       >
         <h5 className="header-title-page8">
           <span className="ex-A">E</span>Read the first sentences carefully. Are
-          the second sentences right or wrong? Drag and drop 
+          the second sentences right or wrong? Write
           <span style={{ color: "#D1232A" }}> ✓ </span>or
           <span style={{ color: "#D1232A" }}> ✗ </span>.
         </h5>

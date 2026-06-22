@@ -159,7 +159,7 @@ const Unit7_Page5_Q1 = () => {
               </span>{" "}
               <span style={{ color: "#2e3192" ,marginRight: "10px"}}>1</span>
               Look, drag, and drop the 
-              <span style={{ color: "#2e3192" }}>beginning sound</span> for each
+              <span style={{ color: "#2e3192" }}> beginning sound</span> for each
               word.
             </h5>
           </div>

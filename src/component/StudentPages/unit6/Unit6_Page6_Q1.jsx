@@ -116,8 +116,8 @@ const Unit6_Page6_Q1 = () => {
           <span style={{ marginRight: "15px" }} className="ex-A">
             D
           </span>
-          Look, drag and drop <span style={{ color: "#D1232A" }}> ✓ </span>or
-          <span style={{ color: "#D1232A" }}> ✗ </span>Then drag and drop.
+          Look and write <span style={{ color: "#D1232A" }}> ✓ </span>or
+          <span style={{ color: "#D1232A" }}> ✗ </span>Then write.
         </h5>
         <div style={{ padding: "20px" }}>
           {questions.map((q, index) => (

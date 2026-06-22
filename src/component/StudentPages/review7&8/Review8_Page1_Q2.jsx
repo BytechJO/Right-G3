@@ -41,7 +41,7 @@ export default function Review8_Page1_Q3() {
       <div className="div-forall" style={{ gap: "30px" }}>
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px", marginBottom: 20 }}>B</span>
-         Drag and drop about the picture.
+         Write about the picture.
         </h5>
         <p style={{ fontSize: "20px", fontWeight: "500" }}>
           {items[0].starter}

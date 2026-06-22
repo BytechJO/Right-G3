@@ -108,7 +108,7 @@ const Page8_Q3 = () => {
           <span className="ex-A" style={{ marginRight: "10px" }}>
             B
           </span>
-          Look, drag, and drop
+          Look, and write
           <span style={{ color: "#2e3192" }}> true</span> or
           <span style={{ color: "#2e3192" }}> false</span>.
         </h5>

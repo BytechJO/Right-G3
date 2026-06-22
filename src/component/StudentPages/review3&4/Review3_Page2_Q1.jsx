@@ -97,7 +97,7 @@ const Review3_Page2_Q1 = () => {
       >
         <h5 className="header-title-page8">
           <span style={{ marginRight: "10px" }}>C</span>
-          Read and complete the sentences. Drag and drop
+          Read and complete the sentences. Write
           <span style={{ color: "#2e3192" }}> sh </span> or{" "}
           <span style={{ color: "#2e3192" }}> ch </span>.
         </h5>
