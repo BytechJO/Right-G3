@@ -134,7 +134,7 @@ export default function SB_LookAndWrite_PageJ() {
         }}
       >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span>  Look, drag and drop.
+          <span className="WB-ex-A">J</span> Look and write.
         </h1>
         <div className="flex flex-col gap-10 px-10">
           {ITEMS.map((item) => {

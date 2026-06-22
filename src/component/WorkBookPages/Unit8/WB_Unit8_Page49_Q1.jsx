@@ -175,7 +175,7 @@ export default function WB_Unit8_Page48_QI() {
         }}
       >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span> Look, read, and write{" "}
+          <span className="WB-ex-A">I</span>Look, read, and write
           <strong className="text-red-600"> ✓</strong>.
         </h1>
 

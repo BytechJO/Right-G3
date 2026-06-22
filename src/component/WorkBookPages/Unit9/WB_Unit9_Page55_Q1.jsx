@@ -382,7 +382,7 @@ export default function WB_Unit9_Page55_QI() {
           {/* العنوان */}
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">I</span>
-            Read, look, and number.
+           Read, look, and number.
           </h1>
 
           {/* الأرقام */}

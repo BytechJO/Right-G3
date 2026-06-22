@@ -204,7 +204,7 @@ export default function WB_LookReadWrite_PageE() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>Look, read, drag and drop.
+          <span className="WB-ex-A">E</span>Look, read, and write.
         </h1>
 
         {/* ── Cards Grid 2×3 ── */}

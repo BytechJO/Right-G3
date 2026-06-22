@@ -140,7 +140,7 @@ export default function WB_Page47_F() {
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">F</span>
-          Read and write.
+          Read, and write.
         </h1>
 <div className="flex flex-col gap-5">
         <img

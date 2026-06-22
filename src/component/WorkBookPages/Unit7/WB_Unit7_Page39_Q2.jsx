@@ -97,8 +97,8 @@ export default function WB_NewVersion() {
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "50px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Complete the sentences, drag and drop
-          <span className="text-blue-900">him</span>,{" "}
+          <span className="WB-ex-A">B</span> Complete the sentences, and write
+          <span className="text-blue-900"> him</span>,{" "}
           <span className="text-blue-900">her</span>,
           <span className="text-blue-900">you</span> ,
           <span className="text-blue-900">me</span> , and{" "}

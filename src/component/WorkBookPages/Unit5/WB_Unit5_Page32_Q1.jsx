@@ -211,7 +211,7 @@ export default function WB_Unit5_Page32_QA() {
 
       <div className="div-forall" style={{ gap: "150px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>Does it have a<span className="text-blue-900"> -y sound </span>? Drag and drop 
+          <span className="WB-ex-A">A</span>Does it have a<span className="text-blue-900"> -y sound </span>? Write
           <span className="text-red-600"> ✓ </span> or
           <span className="text-red-600"> ✕</span> .
         </h1>

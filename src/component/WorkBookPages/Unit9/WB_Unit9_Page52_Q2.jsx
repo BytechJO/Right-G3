@@ -351,7 +351,7 @@ export default function WB_Unit8_Page52_QD() {
         {/* العنوان */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span>
-          Read, look, and number the pictures.
+      Read, look, and number the pictures.
         </h1>
 
         {/* الجمل */}

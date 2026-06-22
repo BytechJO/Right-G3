@@ -129,7 +129,7 @@ export default function WB_Unit9_Page56_QC() {
       <div className="div-forall" style={{ gap: "120px" }}>
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span> Look, read, and circle. Say.
+          <span className="WB-ex-A">C</span>Look, read, and tap or click. Say.
         </h1>
 
         {/* ── البطاقات 4 في صف ── */}

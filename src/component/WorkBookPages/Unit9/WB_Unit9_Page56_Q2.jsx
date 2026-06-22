@@ -126,8 +126,7 @@ export default function WB_Unit9_Page56_QB() {
         }}
       >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Read and say. Circle the word with
-          a different -s sound.
+          <span className="WB-ex-A">B</span>Read and say. Tap or click the word with a different -s sound.
         </h1>
 
         <div

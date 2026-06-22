@@ -142,7 +142,7 @@ const WB_Unit9_Page54_QG = () => {
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">G</span>
-          Read, look, and circle.
+        Read, look, and tap or click.
         </h1>
 
         {/* Grid 2×2 */}

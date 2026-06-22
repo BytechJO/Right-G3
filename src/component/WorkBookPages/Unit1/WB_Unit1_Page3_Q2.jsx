@@ -384,7 +384,7 @@ export default function WB_Unit3_Page3_QB() {
       <div className="div-forall " style={{ gap: "30px" }}>
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>
-          Read, look, tap or click and drag the word{" "}
+       Read, look, circle, and write
           <span className="text-red-600">✓</span>.
         </h1>
 

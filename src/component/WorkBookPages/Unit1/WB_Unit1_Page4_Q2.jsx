@@ -102,7 +102,7 @@ export default function WB_Unit1_Page4_Q2() {
       <div className="div-forall">
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span>
-          Look and read. Tap or click the correct pair.
+          Look and write.
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

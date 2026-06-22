@@ -187,7 +187,7 @@ export default function WB_Unit8_Page59_QF() {
       <div className="div-forall" style={{ gap: "30px" }}>
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span> Look and write.
+          <span className="WB-ex-A">F</span>Look and write.
         </h1>
 
         {/* ── شبكة 2×2 ── */}

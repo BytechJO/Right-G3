@@ -106,7 +106,7 @@ export default function WB_LookAndWrite_PageE() {
     <div className="main-container-component">
       <div className="div-forall mb-5" style={{ gap: "25px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>Look, drag and drop sentences. Use the words from the box
+          <span className="WB-ex-A">E</span>Look and write sentences. Use the words from the box.
         </h1>
 
         <div className="flex flex-col gap-10 items-center justify-center">

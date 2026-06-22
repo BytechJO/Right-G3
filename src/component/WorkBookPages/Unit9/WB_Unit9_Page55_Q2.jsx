@@ -158,7 +158,7 @@ export default function WB_Unit8_Page55_QJ() {
         {/* ── Title ───────────────────────────────────────── */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">J</span>
-          Read, look, and choose.
+           Read, look, and write.
         </h1>
 
         {/* ── Questions ───────────────────────────────────── */}

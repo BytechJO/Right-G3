@@ -90,7 +90,7 @@ export default function WB_Unit8_Page59_QE() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">E</span> Read, look, and write.
+          <span className="WB-ex-A">E</span>Read, look, and write.
         </h1>
 
         {/* ── Top layout: Stella | Take | Not Take ── */}

@@ -125,7 +125,7 @@ export default function WB_LookReadCircle_PageB() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Look, read, and circle.
+          <span className="WB-ex-A">B</span>Look, read, and tap or click.
         </h1>
 
         {/* ── Grid 2×2 ── */}

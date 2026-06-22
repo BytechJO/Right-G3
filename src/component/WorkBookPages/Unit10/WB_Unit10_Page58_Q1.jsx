@@ -80,7 +80,7 @@ export default function WB_Unit8_Page58_QC() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span> Look, read, and circle.
+          <span className="WB-ex-A">C</span>Look, read, and tap or click.
         </h1>
 
         {/* Grid 2×3 */}

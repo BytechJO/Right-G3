@@ -52,8 +52,7 @@ export default function WB_Unit8_Page57_QB() {
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>{" "}
-          What will you do tomorrow? Read and answer the questions.
-        </h1>
+What will you do tomorrow? Read and answer the questions        </h1>
 
         {/* ── صناديق الخيارات العلوية ── */}
         <div

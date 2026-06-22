@@ -428,7 +428,7 @@ export default function WB_Months_Page230_QE() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Read, look, drag and drop.
+          Read, look, and write.
         </h1>
 
         <div style={styles.pageWrap}>

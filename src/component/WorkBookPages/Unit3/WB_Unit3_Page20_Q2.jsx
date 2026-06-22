@@ -214,7 +214,7 @@ export default function WB_Unit3_Page18_QB() {
 
       <div className="div-forall" style={{ gap: "50px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Do they both have the same sound? Drag and drop
+          <span className="WB-ex-A">B</span> Do they both have the same sound? Write
           <span className="text-red-600"> ✓</span> or
           <span className="text-red-600"> ✕</span> .
         </h1>

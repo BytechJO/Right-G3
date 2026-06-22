@@ -89,10 +89,9 @@ export default function WB_ReadLookWrite_PageE() {
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Read, look, drag and drop
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}>
-            in
-          </strong>
+          Read, look, and write
+          <span className="text-blue-900" style={{ fontWeight: 900 }}> in
+          </span>
           ,{" "}
           <strong className="text-blue-900" style={{ fontWeight: 900 }}>
             on

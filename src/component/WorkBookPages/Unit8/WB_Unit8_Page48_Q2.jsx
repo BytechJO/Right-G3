@@ -226,7 +226,7 @@ export default function WB_Unit8_Page48_QH() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">H</span>
-          Read, draw, and color.
+         Read, draw, and color.
         </h1>
 
         {/* Toolbar */}

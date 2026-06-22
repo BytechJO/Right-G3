@@ -273,9 +273,9 @@ export default function WB_LookAndWrite_PageJ() {
     <div className="main-container-component mb-15">
       <div className="div-forall" style={{ gap: "30px" }}>
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span> Look, drag and drop 
+          <span className="WB-ex-A">J</span> Look and write
           <span className="text-red-600"> ✓ </span> and
-          <span className="text-red-600"> ✕</span>. Drag and drop sentences.
+          <span className="text-red-600"> ✕</span>. Write sentences.
         </h1>
         <div className="w-full flex flex-col gap-10">
           {ITEMS.map((item) => (

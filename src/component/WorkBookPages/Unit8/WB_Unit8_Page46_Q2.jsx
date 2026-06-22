@@ -167,7 +167,7 @@ export default function WB_Unit8_Page46_QD() {
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span>
-          Find and write sentences.
+        Find and write sentences.
         </h1>
 
         {/* Images */}

@@ -72,7 +72,7 @@ export default function WB_Transport_Dropdown() {
       <div className="div-forall" style={{ gap: "45px" }}>
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span> Look, drag and drop.
+          <span className="WB-ex-A">A</span>Look and write.
         </h1>
 
         {/* ── Main layout: word bank LEFT  |  grid RIGHT ── */}

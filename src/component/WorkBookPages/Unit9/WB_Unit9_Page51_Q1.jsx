@@ -152,7 +152,7 @@ export default function WB_Unit8_Page49_QA() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
-          Read, look, and write.
+      Read, look, and write.
         </h1>
 
         <div

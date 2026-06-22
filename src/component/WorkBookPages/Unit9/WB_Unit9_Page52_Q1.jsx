@@ -288,7 +288,7 @@ export default function WB_Unit8_Page52_QC() {
         >
           {/* Title */}
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">C</span> Read and write in the chart.
+            <span className="WB-ex-A">C</span>Read, drag, and drop in the chart.
           </h1>
 
           {/* Sentences */}

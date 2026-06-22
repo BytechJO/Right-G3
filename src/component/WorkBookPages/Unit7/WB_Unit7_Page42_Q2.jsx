@@ -254,13 +254,6 @@ export default function WB_LookReadMatch_PageH() {
           {/* Title */}
           <h1
             className="WB-header-title-page8"
-            style={{
-              margin: 0,
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              flexWrap: "wrap",
-            }}
           >
             <span className="WB-ex-A">H</span>Look, read, and match.
           </h1>

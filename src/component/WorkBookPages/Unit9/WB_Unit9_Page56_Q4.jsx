@@ -126,9 +126,9 @@ export default function Phonics_Page56_QD() {
         {/* ── العنوان ── */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">D</span> Do they both have the same{" "}
-          <strong className="text-blue-900"> -s sound</strong>? Listen and write{" "}
-          <strong className="text-red-600">✓</strong> or{" "}
-          <strong className="text-red-600">✕</strong>.
+          <strong className="text-blue-900"> -s sound</strong>? Listen, and write
+          <strong className="text-red-600"> ✓</strong> or{" "}
+          <strong className="text-red-600"> ✕</strong>.
         </h1>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer

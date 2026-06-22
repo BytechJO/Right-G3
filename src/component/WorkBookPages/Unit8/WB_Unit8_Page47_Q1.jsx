@@ -196,8 +196,8 @@ export default function WB_Unit8_Page46_QD() {
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Look and write <strong className="text-red-600">✓ </strong> . Then
-          write sentences.
+         Look and write <strong className="text-red-600">✓ </strong> . Then
+          Then write sentences.
         </h1>
 
         {/* Top Checkboxes */}

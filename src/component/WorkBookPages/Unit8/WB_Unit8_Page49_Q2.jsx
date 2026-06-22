@@ -360,7 +360,7 @@ export default function WB_LookReadWrite_PageJ() {
        
         >
           <span className="WB-ex-A">J</span>
-          Look, read, and write.
+        Look, read, and write.
         </h1>
 
         {/* Grid */}

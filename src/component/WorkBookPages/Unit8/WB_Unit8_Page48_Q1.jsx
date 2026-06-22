@@ -94,13 +94,13 @@ export default function WB_FindMissingLetters_PageG() {
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (key, value) => {
-    if (showAns||showResults) return;
+    if (showAns || showResults) return;
     setSelected((prev) => ({ ...prev, [key]: value }));
     setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || showResults) return;
     const allKeys = Object.keys(CORRECT);
     const allAnswered = allKeys.every((k) => selected[k]);
     if (!allAnswered) {
@@ -186,7 +186,7 @@ export default function WB_FindMissingLetters_PageG() {
             }}
           >
             <select
-              disabled={showAns||showResults}
+              disabled={showAns || showResults}
               value={val}
               onChange={(e) => handleChange(key, e.target.value)}
               style={{
@@ -300,55 +300,51 @@ export default function WB_FindMissingLetters_PageG() {
       {renderWord(item)}
 
       {/* سطر الكلمة الكاملة — تظهر لما تكون كل الأشكال صح */}
-{/* سطر الكلمة — يظهر تدريجياً مع الحفاظ على الفراغات */}
-<div
-  style={{
-    width: "100%",
-    borderBottom: `1px solid ${LINE_COLOR}`,
-    textAlign: "center",
-    fontSize: "18px",
-    paddingBottom: "2px",
-    minHeight: "clamp(20px,2.2vw,28px)",
-    lineHeight: 1.2,
-    letterSpacing: "1px",
-    whiteSpace: "nowrap",
-  }}
->
-  {item.parts.map((part, idx) => {
-    // النصوص الثابتة
-    if (!part.shape) {
-      return (
-        <span key={idx}>
-          {part.text}
-        </span>
-      );
-    }
-
-    const key = `${item.id}-${idx}`;
-
-    // الحرف المختار
-    let letter = "";
-
-    if (showAns) {
-      letter = SHAPE_MAP[CORRECT[key]];
-    } else if (selected[key]) {
-      letter = SHAPE_MAP[selected[key]];
-    }
-
-    return (
-      <span
-        key={idx}
+      {/* سطر الكلمة — يظهر تدريجياً مع الحفاظ على الفراغات */}
+      <div
         style={{
-          display: "inline-block",
-          minWidth: "12px",
+          width: "100%",
+          borderBottom: `1px solid ${LINE_COLOR}`,
           textAlign: "center",
+          fontSize: "18px",
+          paddingBottom: "2px",
+          minHeight: "clamp(20px,2.2vw,28px)",
+          lineHeight: 1.2,
+          letterSpacing: "1px",
+          whiteSpace: "nowrap",
         }}
       >
-        {letter}
-      </span>
-    );
-  })}
-</div>
+        {item.parts.map((part, idx) => {
+          // النصوص الثابتة
+          if (!part.shape) {
+            return <span key={idx}>{part.text}</span>;
+          }
+
+          const key = `${item.id}-${idx}`;
+
+          // الحرف المختار
+          let letter = "";
+
+          if (showAns) {
+            letter = SHAPE_MAP[CORRECT[key]];
+          } else if (selected[key]) {
+            letter = SHAPE_MAP[selected[key]];
+          }
+
+          return (
+            <span
+              key={idx}
+              style={{
+                display: "inline-block",
+                minWidth: "12px",
+                textAlign: "center",
+              }}
+            >
+              {letter}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 
@@ -362,8 +358,7 @@ export default function WB_FindMissingLetters_PageG() {
       >
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span> Find the missing letters. Write the
-          words.
+          <span className="WB-ex-A">G</span>Find the missing letters. Write the words.
         </h1>
 
         {/* Layout: أسئلة يسار + legend يمين */}

@@ -101,9 +101,9 @@ function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
         opacity: disabled ? 0.5 : 1,
         userSelect: "none",
         touchAction: "none",
-        transform: transform
-          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-          : undefined,
+        // transform: transform
+        //   ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+        //   : undefined,
         transition: "0.2s",
         boxShadow:
           draggedNumber === num
@@ -296,8 +296,7 @@ export default function WB_Unit10_Page57_QA() {
         <div className="div-forall" style={{ gap: "clamp(16px,2vw,24px)" }}>
           {/* ── العنوان ── */}
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span> Read, look, and number the
-            pictures.
+            <span className="WB-ex-A">A</span> Read, look, and number the pictures.
           </h1>
 
           {/* ── الأرقام للسحب ── */}

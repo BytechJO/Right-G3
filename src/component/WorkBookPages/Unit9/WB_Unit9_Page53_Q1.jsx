@@ -124,7 +124,7 @@ export default function WB_Unit8_Page53_QE() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">E</span>
-          Read, look, and write <strong className="text-red-600">✓</strong>.
+         Read, look, and write <span className="text-red-600"> ✓</span>.
         </h1>
 
         <div

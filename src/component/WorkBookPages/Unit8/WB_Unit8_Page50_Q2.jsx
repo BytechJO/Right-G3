@@ -149,7 +149,7 @@ export default function WB_LookReadCircle_PageJ() {
         }}
       >
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Listen and circle.
+          <span className="WB-ex-A">B</span>Listen and tap or click.
         </h1>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer

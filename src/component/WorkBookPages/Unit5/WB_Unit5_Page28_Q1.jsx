@@ -520,7 +520,7 @@ export default function WB_Unit5_Page28_QC() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span>
-          Look, read, drag and drop. 
+          Look, read, and write. 
         </h1>
 
         <div className="wb-c-top-images">

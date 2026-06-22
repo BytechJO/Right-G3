@@ -124,9 +124,7 @@ export default function WB_Phonics_Page227_QA() {
           /* 🔥 hover effect */
           transform: isOver ? "scale(1.05)" : "scale(1)",
           transition: "all 0.2s ease",
-          boxShadow: isOver
-            ? "0 0 0 3px rgba(243,155,66,0.25)"
-            : "none",
+          boxShadow: isOver ? "0 0 0 3px rgba(243,155,66,0.25)" : "none",
         }}
       >
         <img
@@ -135,13 +133,9 @@ export default function WB_Phonics_Page227_QA() {
           className="wb-a20-image"
         />
 
-        <div className="wb-a20-image-number">
-          {imageAnswers[item.id] || ""}
-        </div>
+        <div className="wb-a20-image-number">{imageAnswers[item.id] || ""}</div>
 
-        {isImageWrong(item.id) && (
-          <div className="wb-a20-image-wrong">✕</div>
-        )}
+        {isImageWrong(item.id) && <div className="wb-a20-image-wrong">✕</div>}
       </div>
     );
   };
@@ -171,13 +165,11 @@ export default function WB_Phonics_Page227_QA() {
 
     const allSelectsAnswered = SENTENCES.every((sentence) =>
       sentence.answers.every(
-        (_, idx) => selectAnswers[`s${sentence.id}-b${idx}`]
-      )
+        (_, idx) => selectAnswers[`s${sentence.id}-b${idx}`],
+      ),
     );
 
-    const allImagesAnswered = IMAGES.every(
-      (img) => imageAnswers[img.id]
-    );
+    const allImagesAnswered = IMAGES.every((img) => imageAnswers[img.id]);
 
     if (!allSelectsAnswered || !allImagesAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -242,14 +234,10 @@ export default function WB_Phonics_Page227_QA() {
         <select
           value={value}
           disabled={showAns || checked}
-          onChange={(e) =>
-            handleSelectChange(key, e.target.value)
-          }
+          onChange={(e) => handleSelectChange(key, e.target.value)}
           className="wb-a20-select"
           style={{
-            borderBottom: wrong
-              ? "1px solid red"
-              : "1px solid #111111cf",
+            borderBottom: wrong ? "1px solid red" : "1px solid #111111cf",
           }}
         >
           <option value="" disabled></option>
@@ -260,13 +248,9 @@ export default function WB_Phonics_Page227_QA() {
           ))}
         </select>
 
-        {!showAns && (
-          <span className="wb-a20-select-arrow">▼</span>
-        )}
+        {!showAns && <span className="wb-a20-select-arrow">▼</span>}
 
-        {wrong && (
-          <span className="wb-a20-wrong-badge">✕</span>
-        )}
+        {wrong && <span className="wb-a20-wrong-badge">✕</span>}
       </span>
     );
   };
@@ -278,7 +262,7 @@ export default function WB_Phonics_Page227_QA() {
     >
       <div className="main-container-component">
         {/* 🔥 نفس CSS تبعك بدون تعديل */}
- <style>{`
+        <style>{`
         .wb-a20-wrap {
           display: flex;
           flex-direction: column;
@@ -617,7 +601,9 @@ export default function WB_Phonics_Page227_QA() {
         <div className="div-forall" style={{ gap: "70px" }}>
           <h1 className="WB-header-title-page8">
             <span className="WB-ex-A">A</span>
-            Drag and drop ch, tch, or sh. Then number the pictures.
+            Write <span className="text-blue-800">ch</span>,{" "}
+            <span className="text-blue-800">tch</span>, or{" "}
+            <span className="text-blue-800">sh</span>. Then number the pictures.
           </h1>
 
           <div className="wb-a20-wrap">
@@ -626,15 +612,12 @@ export default function WB_Phonics_Page227_QA() {
                 {/* sentences نفسهم */}
                 {SENTENCES.map((s) => (
                   <div key={s.id} className="wb-a20-sentence-row">
-                    <span className="wb-a20-sentence-num">
-                      {s.id}
-                    </span>
+                    <span className="wb-a20-sentence-num">{s.id}</span>
                     <div className="wb-a20-sentence-text">
                       {s.parts.map((part, i) => (
                         <React.Fragment key={i}>
                           <span>{part}</span>
-                          {s.answers[i] &&
-                            renderSelect(s.id, i, s.answers[i])}
+                          {s.answers[i] && renderSelect(s.id, i, s.answers[i])}
                         </React.Fragment>
                       ))}
                     </div>
@@ -668,9 +651,7 @@ export default function WB_Phonics_Page227_QA() {
         {/* 🔥 DragOverlay */}
         <DragOverlay>
           {activeNumber ? (
-            <div className="wb-a20-touch-preview">
-              {activeNumber}
-            </div>
+            <div className="wb-a20-touch-preview">{activeNumber}</div>
           ) : null}
         </DragOverlay>
       </div>

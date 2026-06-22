@@ -149,7 +149,7 @@ export default function Phonics_QA() {
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">A</span>
           Do the words ending in "s" have the same
-          <strong className="text-blue-900"> -s sound</strong>? Write{" "}
+          <strong className="text-blue-900"> -s sound</strong>? Listen, and write
           <strong className="text-red-600">✓</strong> or{" "}
           <strong className="text-red-600">✕</strong>.
         </h1>

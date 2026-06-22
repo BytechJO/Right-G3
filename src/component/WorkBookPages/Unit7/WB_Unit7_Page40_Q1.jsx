@@ -88,9 +88,8 @@ export default function SB_ReadLookWrite_PageC() {
         {/* Title */}
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">C</span>
-         Read, look, drag and drop
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}>
-            him
+         Read, look, and write 
+          <strong className="text-blue-900" style={{ fontWeight: 900 }}> him
           </strong>
           ,{" "}
           <strong className="text-blue-900" style={{ fontWeight: 900 }}>

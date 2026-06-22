@@ -181,7 +181,7 @@ export default function WB_Unit8_Page45_QB() {
       >
         <h1 className="WB-header-title-page8">
           <span className="WB-ex-A">B</span>
-          Read and build the sentences.
+         Read, look, drag, and drop.
         </h1>
 
         <div

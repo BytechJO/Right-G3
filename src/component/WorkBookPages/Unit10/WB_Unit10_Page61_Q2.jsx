@@ -392,8 +392,7 @@ export default function WB_Unit10_Page61_QJ() {
         <div className="div-forall" style={{ gap: "clamp(16px,2.5vw,28px)" }}>
           {/* ── العنوان ── */}
           <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">J</span> Read and write. Number the
-            pictures in order.
+            <span className="WB-ex-A">J</span>Read and write. Number the pictures in order.
           </h1>
 
           {/* ── الصف الأعلى: الصور + الفقرة ── */}

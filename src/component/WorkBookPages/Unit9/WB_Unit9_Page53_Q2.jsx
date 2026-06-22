@@ -192,7 +192,7 @@ export default function WB_ReadLookMatch_PageA() {
       <div className="div-forall" style={{gap:"40px"}}>
         {/* Title */}
         <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span> Look, read, and match.
+          <span className="WB-ex-A">F</span>Look, read, and match..
         </h1>
 
         {/* Board */}

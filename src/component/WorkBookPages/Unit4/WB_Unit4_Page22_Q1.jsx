@@ -248,7 +248,7 @@ export default function WB_Unit3_Page20_QC() {
           className="WB-header-title-page8"
           
         >
-          <span className="WB-ex-A">C</span>Read, drag and drop.
+          <span className="WB-ex-A">C</span>Read and write.
         </h1>
         <div className="wb-months-list">
           {ITEMS.map((item) => (
