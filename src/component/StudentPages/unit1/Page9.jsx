@@ -1,11 +1,9 @@
 import React from "react";
 import page_9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9.png";
-import "./Page9.css"
-// import song from "../../../assets/audio/placeholders/song.mp3";
+import "./Page9.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-const Page9 = ({ openPopup }) => {
- 
 
+const Page9 = ({ openPopup }) => {
   return (
     <div
       className="page1-img-wrapper"
@@ -19,10 +17,23 @@ const Page9 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 4 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 4 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
-          <image className="svg-img"
+          <image
+            className="svg-img"
             href={arrowBtn}
             x="0"
             y="0"
@@ -32,6 +43,7 @@ const Page9 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="click-icon-page9-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -40,10 +52,23 @@ const Page9 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 5 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 5 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
-          <image className="svg-img"
+          <image
+            className="svg-img"
             href={arrowBtn}
             x="0"
             y="0"

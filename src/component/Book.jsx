@@ -46,15 +46,36 @@ import { postersVocabPages } from "./BookData/postersVocabPages";
 // import PosterVocabNavigator from "./PostersVocabPages/PosterVocabNavigator";
 import TeacherBook from "./TeacherBookPages/TeacherBook";
 
+const BOOK_TABS = new Set([
+  "student",
+  "work",
+  "teacher",
+  "flash",
+  "posterVocab",
+]);
+
+const getInitialActiveTab = () => {
+  const savedTab = localStorage.getItem("activeTab");
+  return BOOK_TABS.has(savedTab) ? savedTab : "student";
+};
+
+const getSavedPageIndex = (tab, includeLegacyValue = false) => {
+  const savedValue = localStorage.getItem(`pageIndex-${tab}`);
+  const valueToRead =
+    savedValue ??
+    (includeLegacyValue ? localStorage.getItem("pageIndex") : null);
+  const parsedValue = Number(valueToRead);
+  return Number.isInteger(parsedValue) && parsedValue >= 0 ? parsedValue : 0;
+};
 
 export default function Book() {
   // ===========================================================
   //                 📌 STATE
   // ===========================================================
-  const [pageIndex, setPageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("activeTab") || "student";
-  });
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
+  const [pageIndex, setPageIndex] = useState(() =>
+    getSavedPageIndex(getInitialActiveTab(), true),
+  );
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1200);
   const touchStart = useRef({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -65,6 +86,8 @@ export default function Book() {
 
   const [leftBarOpen, setLeftBarOpen] = useState(false);
   const [rightBarOpen, setRightBarOpen] = useState(false);
+  const menuButtonRef = useRef(null);
+  const iconKeyButtonRef = useRef(null);
 
   //------------------ swipe function -----------------------------
 
@@ -98,6 +121,12 @@ export default function Book() {
     setPopupOpen(false);
   }
 
+  const handleTabChange = (nextTab) => {
+    if (!BOOK_TABS.has(nextTab) || nextTab === activeTab) return;
+    setActiveTab(nextTab);
+    setPageIndex(getSavedPageIndex(nextTab));
+  };
+
   // ===========================================================
   //                 📌 RESIZE LISTENER
   // ===========================================================
@@ -116,11 +145,8 @@ export default function Book() {
   }, []);
 
   useEffect(() => {
-    setPageIndex(0);
     setOffset({ x: 0, y: 0 });
     setZoom(1);
-    localStorage.setItem("activeTab", activeTab);
-    localStorage.setItem("pageIndex", pageIndex);
     if (
       activeTab === "poster" ||
       activeTab === "flash" ||
@@ -135,6 +161,13 @@ export default function Book() {
       }
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+    localStorage.setItem(`pageIndex-${activeTab}`, String(pageIndex));
+    localStorage.removeItem("pageIndex");
+  }, [activeTab, pageIndex]);
+
   useEffect(() => {
     if (viewMode === "spread" && !isMobile) {
       const currentPageNumber = pageIndex + 1;
@@ -514,7 +547,7 @@ export default function Book() {
       {/* ===================== TOP NAV ===================== */}
       <TopNavbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         logo={logo}
         menuIcon={menu}
         tabs={tabs}
@@ -542,6 +575,15 @@ export default function Book() {
             height="30"
             viewBox="0 0 90 90"
             onClick={prevPage}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                prevPage();
+              }
+            }}
+            tabIndex={0}
+            role="button"
+            aria-label="Previous page"
             className="nav-btn absolute left-10 w-14 h-14 rounded-full flex items-center justify-center z-[9999]  transition"
           >
             <image href={back} x="0" y="0" width="90" height="90" />
@@ -554,6 +596,15 @@ export default function Book() {
             height="30"
             viewBox="0 0 90 90"
             onClick={nextPage}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                nextPage();
+              }
+            }}
+            tabIndex={0}
+            role="button"
+            aria-label="Next page"
             className="nav-btn absolute right-10 w-14 h-14 rounded-full  flex items-center justify-center z-[99999999] transition"
           >
             <image href={next} x="0" y="0" width="90" height="90" />
@@ -613,6 +664,8 @@ export default function Book() {
         viewMode={viewMode}
         activeTab={activeTab}
         setViewMode={setViewMode}
+        menuButtonRef={menuButtonRef}
+        iconKeyButtonRef={iconKeyButtonRef}
         icons={{
           menu,
           home,
@@ -659,8 +712,6 @@ export default function Book() {
             mode="workbook"
           />
         )}
-
-
 
         {/* ========== STUDENT + TEACHER ONLY ========== */}
         {(popupContent?.tab === "student" || popupContent?.tab === "teacher") &&

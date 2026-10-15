@@ -1,324 +1,510 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/core";
+import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import ValidationAlert from "../../Popup/ValidationAlert";
+import WrongMark from "../../WrongMark";
+import Unit1PlayingAudioIcon from "./Unit1PlayingAudioIcon";
+import useUnit1Audio from "./useUnit1Audio";
+import useUnit1TabDrag from "./useUnit1TabDrag";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 2.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 3.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 4.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 5.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 6.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 9/Asset 7.svg";
-import WrongMark from "../../WrongMark";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import sentence1 from "../../../assets/audio/ClassBook/Unit 1/Page 9 - Exercise D/Item_001_The_clown_is_taller_than_the_boy.mp3";
+import sentence2 from "../../../assets/audio/ClassBook/Unit 1/Page 9 - Exercise D/Item_002_The_car_is_faster_than_the_bike.mp3";
+import sentence3 from "../../../assets/audio/ClassBook/Unit 1/Page 9 - Exercise D/Item_003_The_couch_is_bigger_than_the_TV.mp3";
+import sentence4 from "../../../assets/audio/ClassBook/Unit 1/Page 9 - Exercise D/Item_004_The_book_is_heavier_than_the_pen.mp3";
+import sentence5 from "../../../assets/audio/ClassBook/Unit 1/Page 9 - Exercise D/Item_005_The_clown_is_thinner_than_the_panda_bear.mp3";
+import sentence6 from "../../../assets/audio/ClassBook/Unit 1/Page 9 - Exercise D/Item_006_The_feather_is_lighter_than_the_bag.mp3";
 import "./Page9_Q1.css";
-import Button from "../../Button";
+import "./unit1Interactions.css";
 
-import {
-  DndContext,
-  useDraggable,
-  useDroppable,
-  DragOverlay,
-} from "@dnd-kit/core";
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "The clown is taller than the boy.",
+    answer: 2,
+    audio: sentence1,
+  },
+  {
+    id: 2,
+    text: "The car is faster than the bike.",
+    answer: 3,
+    audio: sentence2,
+  },
+  {
+    id: 3,
+    text: "The couch is bigger than the TV.",
+    answer: 6,
+    audio: sentence3,
+  },
+  {
+    id: 4,
+    text: "The book is heavier than the pen.",
+    answer: 1,
+    audio: sentence4,
+  },
+  {
+    id: 5,
+    text: "The clown is thinner than the panda bear.",
+    answer: 4,
+    audio: sentence5,
+  },
+  {
+    id: 6,
+    text: "The feather is lighter than the bag.",
+    answer: 5,
+    audio: sentence6,
+  },
+];
 
-const DraggableItem = ({ word, isUsed }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: `season-${word}`,
-      disabled: isUsed,
-    });
+const IMAGES = [
+  { src: img1, alt: "A car moving faster than a bicycle" },
+  { src: img2, alt: "A couch that is bigger than a television" },
+  { src: img3, alt: "A feather that is lighter than a bag" },
+  { src: img4, alt: "A clown standing taller than a boy" },
+  { src: img5, alt: "A clown that is thinner than a panda bear" },
+  { src: img6, alt: "A book that is heavier than a pen" },
+];
 
+const ITEM_IDS = QUESTIONS.map((question) => `number-${question.id}`);
+const TARGET_IDS = IMAGES.map((_, index) => `image-${index}`);
+
+const NUMBER_SLOT_STYLE = {
+  position: "absolute",
+  left: "0.41%",
+  top: "73.77%",
+  width: "16%",
+  height: "25.47%",
+  display: "grid",
+  placeItems: "center",
+  boxSizing: "border-box",
+  borderRadius: "42%",
+  background: "#f39b42",
+  color: "#fff",
+  fontWeight: 700,
+  fontSize: "clamp(13px, 2vw, 20px)",
+};
+
+function NumberTile({
+  id,
+  value,
+  disabled,
+  registerItem,
+  onActivate,
+  onKeyDown,
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id,
+    disabled,
+  });
   return (
-    <span
-      ref={setNodeRef}
+    <button
+      type="button"
+      ref={(element) => {
+        setNodeRef(element);
+        registerItem(id, element);
+      }}
       {...listeners}
       {...attributes}
+      disabled={disabled}
+      className="unit1-drag-item"
+      onKeyDown={onKeyDown}
+      onClick={(event) => {
+        event.preventDefault();
+        onActivate();
+      }}
       style={{
         width: "45px",
         height: "45px",
+        border: 0,
         borderRadius: "50%",
-        backgroundColor: isUsed ? "#cfcfd4" : "#f39b42",
+        background: disabled ? "#cfcfd4" : "#f39b42",
         color: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         fontWeight: 700,
         fontSize: "20px",
-        touchAction: "none",
-        cursor: isUsed ? "not-allowed" : "grab",
-        opacity: isUsed ? 0.5 : 1,
-        userSelect: "none",
-
-        // ❌ احذف هاد:
-        // transform: CSS.Transform.toString(transform),
-
-        // ✔ خليه بدون transform نهائيًا
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : "grab",
         boxShadow: isDragging
-          ? "0 20px 40px rgba(0,0,0,0.3)"
-          : "0 3px 10px rgba(0,0,0,0.12)",
-
-        zIndex: isDragging ? 9999 : "auto",
+          ? "0 16px 32px rgba(0,0,0,.25)"
+          : "0 3px 10px rgba(0,0,0,.12)",
+        touchAction: "none",
       }}
     >
-      {word}
-    </span>
+      {value}
+    </button>
   );
-};
+}
 
-const BankDrop = ({ children }) => {
-  const { setNodeRef } = useDroppable({
-    id: "bank",
-  });
-
+function ImageTarget({
+  id,
+  children,
+  registerTarget,
+  onKeyDown,
+  tabIndex,
+  preview,
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <div
-      ref={setNodeRef}
-      style={{
-        display: "flex",
-        width: "100%",
-        gap: "20px",
-        justifyContent: "center",
+      ref={(element) => {
+        setNodeRef(element);
+        registerTarget(id, element);
       }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const ImageDrop = ({ i, children }) => {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `image-${i}`,
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      className={`unit1-drop-target ${preview ? "unit1-keyboard-preview" : ""}`}
       style={{
-        position: "absolute",
-        inset: 0,
+        position: "relative",
         borderRadius: "16px",
-
-        transition: "all 0.25s ease",
         transform: isOver ? "scale(1.03)" : "scale(1)",
-
         boxShadow: isOver ? "0 0 12px #f39b429a" : "none",
-        zIndex: 5,
+        transition: "all .2s ease",
       }}
     >
       {children}
     </div>
   );
-};
+}
 
-const Page9_Q1 = () => {
-  const questions = [
-    { id: 1, text: "The clown is taller than the boy.", answer: 2 },
-    { id: 2, text: "The car is faster than the bike.", answer: 3 },
-    { id: 3, text: "The couch is bigger than the TV.", answer: 6 },
-    { id: 4, text: "The book is heavier than the pen.", answer: 1 },
-    { id: 5, text: "The clown is thinner than the panda bear.", answer: 5 },
-    { id: 6, text: "The feather is lighter than the bag.", answer: 4 },
-  ];
-  const wordBank = ["1", "2", "3", "4", "5", "6"];
-  const images = [img1, img2, img3, img4, img5, img6];
+export default function Page9_Q1() {
+  const { activeAudioKey, playAudio, stopAudio } = useUnit1Audio();
   const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل
+  const [checked, setChecked] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [correctTargets, setCorrectTargets] = useState([]);
   const [activeId, setActiveId] = useState(null);
-  const [showResult, setShowResult] = useState(false);
 
-  const handleDragStart = (event) => {
-    setActiveId(event.active.id);
-  };
+  const numberAt = (targetIndex) => answers[targetIndex];
+  const usedNumbers = Object.values(answers);
+  const isItemDisabled = (id) =>
+    usedNumbers.includes(Number(id.replace("number-", "")));
+  const isTargetDisabled = (id) =>
+    correctTargets.includes(Number(id.replace("image-", "")));
 
-  const handleDragEnd = (event) => {
-    setActiveId(null);
-
-    const { active, over } = event;
-    if (!over || locked) return;
-
-    const value = Number(active.id.replace("season-", ""));
-
-    if (over.id === "bank") {
-      setAnswers((prev) => {
-        const newAnswers = { ...prev };
-
-        Object.keys(newAnswers).forEach((key) => {
-          if (newAnswers[key] === value) {
-            delete newAnswers[key];
-          }
-        });
-
-        return newAnswers;
+  const placeNumber = (itemId, targetId) => {
+    const value = Number(itemId.replace("number-", ""));
+    const target = Number(targetId.replace("image-", ""));
+    if (revealed || correctTargets.includes(target)) return;
+    setAnswers((previous) => {
+      const next = { ...previous };
+      Object.keys(next).forEach((key) => {
+        if (next[key] === value) delete next[key];
       });
-      return;
-    }
-
-    const imageIndex = Number(over.id.split("-")[1]);
-
-    setAnswers((prev) => ({
-      ...prev,
-      [imageIndex]: value,
-    }));
-  };
-  const checkAnswers = () => {
-    if (locked) return;
-
-    if (Object.keys(answers).length < images.length) {
-      ValidationAlert.info();
-      return;
-    }
-
-    setShowResult(true); // 🔥 مهم
-
-    let correct = 0;
-
-    questions.forEach((q, index) => {
-      if (answers[index] === q.answer) {
-        correct++;
-      }
+      next[target] = value;
+      return next;
     });
+    setChecked(false);
+  };
 
-    const total = questions.length;
+  const keyboard = useUnit1TabDrag({
+    itemIds: ITEM_IDS,
+    targetIds: TARGET_IDS,
+    isItemDisabled,
+    isTargetDisabled,
+    onPick: (id) => {
+      const number = Number(id.replace("number-", ""));
+      playAudio(`number-${number}`, QUESTIONS[number - 1].audio);
+    },
+    onPlace: placeNumber,
+  });
 
-    const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
+  const returnNumber = (event, targetIndex) => {
+    event.stopPropagation();
+    if (revealed || correctTargets.includes(targetIndex)) return;
+    const value = answers[targetIndex];
+    setAnswers((previous) => {
+      const next = { ...previous };
+      delete next[targetIndex];
+      return next;
+    });
+    setChecked(false);
+    if (value) keyboard.focusItem(`number-${value}`);
+  };
 
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <b style="color:${color};">Score: ${correct} / ${total}</b>
-    </div>
-  `;
+  const handleDragEnd = ({ active, over }) => {
+    setActiveId(null);
+    if (!over || !String(over.id).startsWith("image-")) return;
+    placeNumber(String(active.id), String(over.id));
+  };
 
-    if (correct === total) ValidationAlert.success(msg);
-    else if (correct === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+  const checkAnswers = () => {
+    if (revealed || correctTargets.length === QUESTIONS.length) return;
+    if (Object.keys(answers).length < IMAGES.length)
+      return ValidationAlert.info(
+        "Please number every picture before checking.",
+      );
+    const correct = IMAGES.map(
+      (_, index) => QUESTIONS[index].answer === answers[index],
+    );
+    const ids = correct
+      .map((value, index) => (value ? index : null))
+      .filter((value) => value !== null);
+    setCorrectTargets(ids);
+    setChecked(true);
+    if (ids.length === QUESTIONS.length)
+      ValidationAlert.success(`Score: ${ids.length} / ${QUESTIONS.length}`);
+    else if (ids.length === 0)
+      ValidationAlert.error(`Score: 0 / ${QUESTIONS.length}`);
+    else ValidationAlert.warning(`Score: ${ids.length} / ${QUESTIONS.length}`);
+  };
 
-    setLocked(true);
+  const showAnswer = () => {
+    setAnswers(
+      Object.fromEntries(
+        QUESTIONS.map((question, index) => [index, question.answer]),
+      ),
+    );
+    setCorrectTargets(IMAGES.map((_, index) => index));
+    setChecked(true);
+    setRevealed(true);
+    stopAudio();
   };
 
   const reset = () => {
     setAnswers({});
-    setLocked(false); // ⭐ NEW — إعادة التعديل
-    setShowResult(false);
+    setCorrectTargets([]);
+    setChecked(false);
+    setRevealed(false);
+    setActiveId(null);
+    keyboard.cancel();
+    stopAudio();
   };
 
-  // ⭐⭐⭐ NEW — showAnswer
-  const showAnswer = () => {
-    const correct = {};
-
-    questions.forEach((q, index) => {
-      correct[index] = q.answer;
-    });
-
-    setAnswers(correct);
-    setLocked(true);
-  };
-  const usedWords = Object.values(answers).filter(Boolean);
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "30px",
-        }}
-      >
-        <div className="div-forall" style={{ gap: "15px" }}>
-          <h5 className="header-title-page8 pb-2.5">
-            <span className="ex-A" style={{ marginRight: "10px" }}>
-              D
-            </span>
-          Read and number the pictures.
-          </h5>
+    <DndContext
+      onDragStart={({ active }) => {
+        setActiveId(String(active.id));
+        const number = Number(String(active.id).replace("number-", ""));
+        playAudio(`number-${number}`, QUESTIONS[number - 1].audio);
+      }}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
+    >
+      <div className="main-container-component">
+        <div className="div-forall mb-10" style={{ gap: "10px" }}>
+          <ExerciseHeader
+            sectionLetter="D"
+            title="Read and number the pictures."
+            subTitle="Read one sentence at a time, then place its number on the picture that matches it."
+          />
 
-          <BankDrop>
-            {wordBank.map((word, index) => (
-              <DraggableItem
-                key={word}
-                word={word}
-                isUsed={usedWords.includes(Number(word))}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "18px",
+              width: "100%",
+            }}
+          >
+            {QUESTIONS.map((question) => (
+              <NumberTile
+                key={question.id}
+                id={`number-${question.id}`}
+                value={question.id}
+                disabled={isItemDisabled(`number-${question.id}`)}
+                registerItem={keyboard.registerItem}
+                onActivate={() => keyboard.pickItem(`number-${question.id}`)}
+                onKeyDown={(event) =>
+                  keyboard.handleItemKeyDown(event, `number-${question.id}`)
+                }
               />
             ))}
-          </BankDrop>
-          <div className=" mt-6 flex gap-10">
-            <div className="flex flex-col gap-10 w-1/2">
-              {questions.map((q) => (
-                <p key={q.id} className="text-[18px]">
-                  <span className="font-bold mr-2 text-[20px]">{q.id}</span>
-                  {q.text}
-                </p>
-              ))}
-            </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4 w-1/2">
-              {images.map((img, i) => (
-                <div
-                  key={i}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "34px",
+              width: "100%",
+            }}
+          >
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "24px" }}
+            >
+              {QUESTIONS.map((question) => (
+                <button
+                  type="button"
+                  key={question.id}
+                  className="unit1-audio-control unit1-interactive"
+                  onClick={() =>
+                    playAudio(`sentence-${question.id}`, question.audio)
+                  }
                   style={{
-                    position: "relative",
-                    width: "100%",
                     display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    gap: "10px",
+                    padding: "8px",
+                    border: 0,
+                    background: "transparent",
+                    textAlign: "left",
+                    fontSize: "18px",
+                    cursor: "pointer",
                   }}
                 >
-                  <div style={{ position: "relative", width: "fit-content" }}>
-                    <img
-                      src={img}
-                      alt=""
-                      style={{
-                        width: "100%",
-                        // maxWidth: "220px",
-                        height: "auto",
-                        objectFit: "contain",
-                        display: "block",
-                      }}
-                    />
-
-                    {/* ⭐ هنا بتحط ImageDrop */}
-                    <ImageDrop i={i}>
-                      {/* الرقم */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          bottom: "1px",
-                          left: "10px",
-                          width: "clam(26px,2vw,32px)",
-                          height: "clam(26px,2vw,32px)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50%",
-                          fontSize: "20px",
-                          fontWeight: "bold",
-                          zIndex: 20,
-                        }}
-                      >
-                        {answers[i]}
-                      </div>
-
-                      {/* ❌ WrongMark */}
-                      {showResult &&
-                        answers[i] &&
-                        Number(answers[i]) !== questions[i].answer && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "1px",
-                              right: "21px",
-                            }}
-                          >
-                            <WrongMark />
-                          </div>
-                        )}
-                    </ImageDrop>
-                  </div>
-                </div>
+                  <strong>{question.id}.</strong>
+                  <span>{question.text}</span>
+                  <Unit1PlayingAudioIcon
+                    active={activeAudioKey === `sentence-${question.id}`}
+                  />
+                </button>
               ))}
             </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "16px",
+              }}
+            >
+              {IMAGES.map((image, index) => {
+                const assigned = numberAt(index);
+                const correct = correctTargets.includes(index);
+                const fullAudioEnabled = checked && correct;
+                const fullQuestion = assigned ? QUESTIONS[assigned - 1] : null;
+                return (
+                  <ImageTarget
+                    key={index}
+                    id={`image-${index}`}
+                    registerTarget={keyboard.registerTarget}
+                    preview={keyboard.keyboardTargetId === `image-${index}`}
+                    tabIndex={
+                      keyboard.keyboardItemId || fullAudioEnabled ? 0 : -1
+                    }
+                    onKeyDown={(event) => {
+                      if (keyboard.keyboardItemId)
+                        keyboard.handleTargetKeyDown(event, `image-${index}`);
+                      else if (
+                        fullAudioEnabled &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`full-${index}`, fullQuestion.audio);
+                      }
+                    }}
+                  >
+                    <div
+                      className={`unit1-audio-control ${fullAudioEnabled ? "unit1-completed-audio" : ""}`}
+                      onClick={() =>
+                        fullAudioEnabled &&
+                        playAudio(`full-${index}`, fullQuestion.audio)
+                      }
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "16px",
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                        }}
+                      >
+                        <img
+                          src={image.src}
+                          alt={image.alt}
+                          style={{
+                            width: "80%",
+                            height: "auto",
+                            display: "block",
+                          }}
+                        />
+                        {!assigned &&
+                          keyboard.keyboardTargetId === `image-${index}` &&
+                          keyboard.keyboardItemId && (
+                            <span
+                              aria-hidden="true"
+                              style={{
+                                ...NUMBER_SLOT_STYLE,
+                              }}
+                            >
+                              {keyboard.keyboardItemId.replace("number-", "")}
+                            </span>
+                          )}
+                        {assigned && (
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              if (fullAudioEnabled) {
+                                event.stopPropagation();
+                                playAudio(`full-${index}`, fullQuestion.audio);
+                              } else {
+                                returnNumber(event, index);
+                              }
+                            }}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                if (fullAudioEnabled) {
+                                  event.stopPropagation();
+                                  playAudio(
+                                    `full-${index}`,
+                                    fullQuestion.audio,
+                                  );
+                                } else {
+                                  returnNumber(event, index);
+                                }
+                              }
+                            }}
+                            aria-label={
+                              fullAudioEnabled
+                                ? `Number ${assigned}. Play the complete sentence.`
+                                : `Number ${assigned}. Activate to return it to the choices.`
+                            }
+                            style={{
+                              ...NUMBER_SLOT_STYLE,
+                              border: 0,
+                              cursor:
+                                correct || revealed ? "default" : "pointer",
+                            }}
+                          >
+                            {assigned}
+                          </button>
+                        )}
+                      </div>
+                      <Unit1PlayingAudioIcon
+                        active={activeAudioKey === `full-${index}`}
+                      />
+                      {checked && assigned && !correct && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "4px",
+                            right: "8px",
+                          }}
+                        >
+                          <WrongMark />
+                        </div>
+                      )}
+                    </div>
+                  </ImageTarget>
+                );
+              })}
+            </div>
           </div>
-          {/* BUTTONS */}
+
           <Button
             handleShowAnswer={showAnswer}
             handleStartAgain={reset}
             checkAnswers={checkAnswers}
+            checkDisabled={
+              revealed || correctTargets.length === QUESTIONS.length
+            }
           />
         </div>
       </div>
@@ -326,25 +512,21 @@ const Page9_Q1 = () => {
         {activeId ? (
           <div
             style={{
-              width: "40px",
-              height: "40px",
+              width: "45px",
+              height: "45px",
+              display: "grid",
+              placeItems: "center",
               borderRadius: "50%",
-              backgroundColor: "#f39b42",
+              background: "#f39b42",
               color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               fontWeight: 700,
               fontSize: "20px",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
             }}
           >
-            {activeId.replace("season-", "")}
+            {activeId.replace("number-", "")}
           </div>
         ) : null}
       </DragOverlay>
     </DndContext>
   );
-};
-
-export default Page9_Q1;
+}

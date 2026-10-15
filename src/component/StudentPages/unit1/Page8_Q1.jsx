@@ -1,263 +1,225 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import "./Page8_Q1.css";
 import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit1PlayingAudioIcon from "./Unit1PlayingAudioIcon";
+import useUnit1Audio from "./useUnit1Audio";
+import shortA from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A1/Item_001_Short_a.mp3";
+import shortE from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A1/Item_002_Short_e.mp3";
+import shortI from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A1/Item_003_Short_i.mp3";
+import shortO from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A1/Item_004_Short_o.mp3";
+import shortU from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A1/Item_005_Short_u.mp3";
+import "./Page8_Q1.css";
+import "./unit1Interactions.css";
 
-const Page8_Q1 = () => {
-  const [locked, setLocked] = useState(false); // ⭐ NEW — قفل التعديل بعد Show Answer
+const ROWS = [
+  {
+    vowel: "a",
+    color: "#2ecc71",
+    letters: "nsmaphicatybagaot".split(""),
+    words: ["map", "cat", "bag"],
+    audio: shortA,
+  },
+  {
+    vowel: "e",
+    color: "#e84393",
+    letters: "penbybedmnetbevct".split(""),
+    words: ["pen", "bed", "net"],
+    audio: shortE,
+  },
+  {
+    vowel: "i",
+    color: "#0984e3",
+    letters: "dbdxgsitfishdsick".split(""),
+    words: ["sit", "fish", "sick"],
+    audio: shortI,
+  },
+  {
+    vowel: "o",
+    color: "#8e44ad",
+    letters: "ptboxmmopgisockun".split(""),
+    words: ["box", "mop", "sock"],
+    audio: shortO,
+  },
+  {
+    vowel: "u",
+    color: "#e74c3c",
+    letters: "apisnutzygumcbusr".split(""),
+    words: ["nut", "gum", "bus"],
+    audio: shortU,
+  },
+];
 
-  const rows = [
-    {
-      vowel: "a",
-      color: "#2ecc71",
-      letters: [
-        "n",
-        "s",
-        "m",
-        "a",
-        "p",
-        "h",
-        "i",
-        "c",
-        "a",
-        "t",
-        "y",
-        "b",
-        "a",
-        "g",
-        "a",
-        "o",
-        "t",
-      ],
-      words: ["map", "cat", "bag"],
-    },
-    {
-      vowel: "e",
-      color: "#e84393",
-      letters: [
-        "p",
-        "e",
-        "n",
-        "b",
-        "y",
-        "b",
-        "e",
-        "d",
-        "m",
-        "n",
-        "e",
-        "t",
-        "b",
-        "e",
-        "v",
-        "c",
-        "t",
-      ],
-      words: ["pen", "bed", "net"],
-    },
-    {
-      vowel: "i",
-      color: "#0984e3",
-      letters: [
-        "d",
-        "b",
-        "d",
-        "x",
-        "g",
-        "s",
-        "i",
-        "t",
-        "f",
-        "i",
-        "s",
-        "h",
-        "d",
-        "s",
-        "i",
-        "c",
-        "k",
-      ],
-      words: ["sit", "fish", "sick"],
-    },
-    {
-      vowel: "o",
-      color: "#8e44ad",
-      letters: [
-        "p",
-        "t",
-        "b",
-        "o",
-        "x",
-        "m",
-        "m",
-        "o",
-        "p",
-        "g",
-        "i",
-        "s",
-        "o",
-        "c",
-        "k",
-        "u",
-        "n",
-      ],
-      words: ["box", "mop", "sock"],
-    },
-    {
-      vowel: "u",
-      color: "#e74c3c",
-      letters: [
-        "a",
-        "p",
-        "i",
-        "s",
-        "n",
-        "u",
-        "t",
-        "z",
-        "y",
-        "g",
-        "u",
-        "m",
-        "c",
-        "b",
-        "u",
-        "s",
-        "r",
-      ],
-      words: ["nut", "gum", "bus"],
-    },
-  ];
+const cellId = (row, col) => `${row}-${col}`;
 
-  const [selected, setSelected] = useState([]);
-  const [currentRow, setCurrentRow] = useState(null);
-  const [foundSelections, setFoundSelections] = useState([]);
+export default function Page8_Q1() {
+  const { activeAudioKey, playAudio, stopAudio } = useUnit1Audio();
+  const [found, setFound] = useState([]);
+  const [pointerSelection, setPointerSelection] = useState([]);
+  const [pointerRow, setPointerRow] = useState(null);
+  const [keyboardStart, setKeyboardStart] = useState(null);
+  const [keyboardPreview, setKeyboardPreview] = useState([]);
+  const [checked, setChecked] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [invalidSelectionRow, setInvalidSelectionRow] = useState(null);
 
-  /* ================= Selection ================= */
-  const startSelect = (rowIndex, colIndex) => {
-    if (locked) return;
+  const foundCellIds = useMemo(
+    () =>
+      new Set(
+        found.flatMap((entry) =>
+          entry.cells.map((cell) => cellId(cell.row, cell.col)),
+        ),
+      ),
+    [found],
+  );
 
-    setCurrentRow(rowIndex);
-    setSelected([{ row: rowIndex, col: colIndex }]);
-  };
-
-  const addSelect = (rowIndex, colIndex) => {
-    if (currentRow !== rowIndex) return;
-
-    setSelected((prev) => {
-      if (prev.some((c) => c.col === colIndex && c.row === rowIndex))
-        return prev;
-      return [...prev, { row: rowIndex, col: colIndex }];
-    });
-  };
-
-  const endSelect = () => {
-    if (locked) return;
-
-    if (!selected.length) return;
-
-    const rowIndex = selected[0].row;
-    const row = rows[rowIndex];
-
-    const word = selected
-      .map((c) => row.letters[c.col])
+  const selectionWord = (cells) => {
+    if (!cells.length) return null;
+    const row = ROWS[cells[0].row];
+    const text = cells
+      .map((cell) => row.letters[cell.col])
       .join("")
       .toLowerCase();
-
-    const reversed = word.split("").reverse().join("");
-
-    if (row.words.includes(word) || row.words.includes(reversed)) {
-      const correctWord = row.words.includes(word) ? word : reversed;
-
-      setFoundSelections((prev) => {
-        if (prev.some((f) => f.word === correctWord)) return prev;
-
-        return [
-          ...prev,
-          {
-            word: correctWord,
-            cells: [...selected],
-            row: rowIndex,
-          },
-        ];
-      });
-    }
-
-    setSelected([]);
-    setCurrentRow(null);
+    const reverse = text.split("").reverse().join("");
+    return row.words.includes(text)
+      ? text
+      : row.words.includes(reverse)
+        ? reverse
+        : null;
   };
 
-  /* ================= Check ================= */
+  const commitSelection = (cells) => {
+    const word = selectionWord(cells);
+    if (!word) return false;
+    if (found.some((entry) => entry.word === word)) return true;
+    setFound((previous) => [...previous, { word, row: cells[0].row, cells }]);
+    setChecked(false);
+    return true;
+  };
+
+  const showInvalidSelection = (row) => {
+    setInvalidSelectionRow(null);
+    window.requestAnimationFrame(() => setInvalidSelectionRow(row));
+  };
+
+  const startPointer = (row, col) => {
+    if (locked) return;
+    setPointerRow(row);
+    setPointerSelection([{ row, col }]);
+  };
+
+  const extendPointer = (row, col) => {
+    if (locked || pointerRow !== row) return;
+    setPointerSelection((previous) => {
+      const first = previous[0]?.col;
+      if (first === undefined) return previous;
+      const direction = col >= first ? 1 : -1;
+      const next = [];
+      for (
+        let current = first;
+        direction > 0 ? current <= col : current >= col;
+        current += direction
+      ) {
+        next.push({ row, col: current });
+      }
+      return next;
+    });
+  };
+
+  const endPointer = () => {
+    if (locked) return;
+    if (pointerSelection.length && !commitSelection(pointerSelection)) {
+      showInvalidSelection(pointerSelection[0].row);
+    }
+    setPointerSelection([]);
+    setPointerRow(null);
+  };
+
+  const handleCellKeyDown = (event, row, col) => {
+    if (locked || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    if (!keyboardStart || keyboardStart.row !== row) {
+      setKeyboardStart({ row, col });
+      setKeyboardPreview([{ row, col }]);
+      return;
+    }
+
+    const direction = col >= keyboardStart.col ? 1 : -1;
+    const cells = [];
+    for (
+      let current = keyboardStart.col;
+      direction > 0 ? current <= col : current >= col;
+      current += direction
+    ) {
+      cells.push({ row, col: current });
+    }
+    if (!commitSelection(cells)) showInvalidSelection(row);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
+  };
+
+  const handleCellFocus = (row, col) => {
+    if (!keyboardStart || keyboardStart.row !== row) return;
+    const direction = col >= keyboardStart.col ? 1 : -1;
+    const cells = [];
+    for (
+      let current = keyboardStart.col;
+      direction > 0 ? current <= col : current >= col;
+      current += direction
+    ) {
+      cells.push({ row, col: current });
+    }
+    setKeyboardPreview(cells);
+  };
+
   const checkAnswers = () => {
     if (locked) return;
-
-    if (foundSelections.length === 0) {
-      ValidationAlert.info();
-      return;
+    const total = ROWS.reduce((sum, row) => sum + row.words.length, 0);
+    if (!found.length)
+      return ValidationAlert.info("Find the words before checking.");
+    const score = found.length;
+    setChecked(true);
+    if (score === total) {
+      setLocked(true);
+      ValidationAlert.success(`Score: ${score} / ${total}`);
+    } else {
+      ValidationAlert.warning(`Score: ${score} / ${total}`);
     }
-
-    // ✅ التأكد إنو بكل row في كلمة وحدة عالأقل
-    const missingRows = rows.filter((_, rowIndex) => {
-      return !foundSelections.some((selection) => selection.row === rowIndex);
-    });
-
-    if (missingRows.length > 0) {
-      ValidationAlert.info(
-        `
-      <div style="font-size:18px;text-align:center;">
-        Please find at least one word in each box.
-      </div>
-      `,
-      );
-      return;
-    }
-
-    const total = rows.reduce((acc, r) => acc + r.words.length, 0);
-    const score = foundSelections.length;
-
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${score} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setLocked(true);
   };
-  const showAnswers = () => {
-    let answers = [];
 
-    rows.forEach((row, i) => {
+  const showAnswers = () => {
+    const answers = [];
+    ROWS.forEach((row, rowIndex) => {
+      const full = row.letters.join("");
       row.words.forEach((word) => {
-        const start = row.letters.join("").indexOf(word);
-        if (start !== -1) {
-          const cells = [];
-          for (let j = 0; j < word.length; j++) {
-            cells.push({ row: i, col: start + j });
-          }
-          answers.push({ word, cells, row: i });
-        }
+        const start = full.indexOf(word);
+        const cells = Array.from({ length: word.length }, (_, offset) => ({
+          row: rowIndex,
+          col: start + offset,
+        }));
+        answers.push({ word, row: rowIndex, cells });
       });
     });
+    setFound(answers);
+    setChecked(true);
     setLocked(true);
-    setFoundSelections(answers);
+    setPointerSelection([]);
+    setKeyboardPreview([]);
+    stopAudio();
   };
 
-  const resetAll = () => {
-    setFoundSelections([]);
-    setSelected([]);
-    setCurrentRow(null);
+  const reset = () => {
+    setFound([]);
+    setPointerSelection([]);
+    setPointerRow(null);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
+    setChecked(false);
     setLocked(false);
+    setInvalidSelectionRow(null);
+    stopAudio();
   };
 
-  /* ================= UI ================= */
   return (
     <div
       style={{
@@ -267,15 +229,13 @@ const Page8_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall" style={{ gap: "50px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            A
-          </span>
-          <span style={{ color: "#2e3192", marginRight: "10px" }}>1</span>
-          Find and tap or click three words in each box with{" "}
-          <span className="text-blue-800">short vowel</span> sounds.
-        </h5>
+      <div className="div-forall" style={{ gap: "20px" }}>
+        <ExerciseHeader
+          sectionLetter="A"
+          questionNumber="1"
+          title="Find and circle three words in each box with short vowel sounds."
+          subTitle="Find one word at a time in each short-vowel row, then tap all the letters that form the three correct words."
+        />
 
         <div
           style={{
@@ -285,15 +245,28 @@ const Page8_Q1 = () => {
             width: "100%",
           }}
         >
-          {rows.map((row, rowIndex) => (
+          {ROWS.map((row, rowIndex) => (
             <div
-              key={rowIndex}
+              key={row.vowel}
+              className={
+                invalidSelectionRow === rowIndex
+                  ? "unit1-invalid-selection-shake"
+                  : undefined
+              }
+              onAnimationEnd={(event) => {
+                if (
+                  event.animationName === "shake-invalid-selection-unit1" &&
+                  invalidSelectionRow === rowIndex
+                ) {
+                  setInvalidSelectionRow(null);
+                }
+              }}
               style={{
-                margin: "15px 0",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "15px",
+                margin: "15px 0",
               }}
             >
               <div
@@ -306,120 +279,136 @@ const Page8_Q1 = () => {
                   alignItems: "center",
                 }}
               >
-                Short {row.vowel}
-                {/* ❌ إذا لسا مو كل الكلمات موجودة */}
-                {locked &&
-                  foundSelections.filter((f) => f.row === rowIndex).length <
+                <button
+                  type="button"
+                  className="unit1-audio-control unit1-interactive"
+                  onClick={() => playAudio(`row-${row.vowel}`, row.audio)}
+                  aria-label={`Play short ${row.vowel}`}
+                  style={{
+                    width: "100%",
+                    padding: 0,
+                    border: 0,
+                    background: "transparent",
+                    color: "inherit",
+                    fontWeight: "inherit",
+                    cursor: "pointer",
+                  }}
+                >
+                  Short {row.vowel}
+                  <Unit1PlayingAudioIcon
+                    active={activeAudioKey === `row-${row.vowel}`}
+                  />
+                </button>
+                {checked &&
+                  found.filter((entry) => entry.row === rowIndex).length <
                     row.words.length && (
-                    <div
+                    <span
+                      aria-label={`Short ${row.vowel} row is incomplete`}
                       style={{
                         position: "absolute",
                         top: "-12px",
                         right: "-12px",
+                        display: "flex",
                         width: "22px",
                         height: "22px",
-                        borderRadius: "50%",
-                        background: "red",
-                        color: "#fff",
-                        display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        border: "2px solid #fff",
+                        borderRadius: "50%",
+                        background: "#dc2626",
+                        color: "#fff",
                         fontSize: "14px",
-                        fontWeight: "bold",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        fontWeight: 700,
+                        boxShadow: "0 2px 6px rgba(0,0,0,.2)",
                       }}
                     >
                       ✕
-                    </div>
+                    </span>
                   )}
               </div>
 
               <div
                 style={{
-                  border: "1.5px solid orange",
-                  borderRadius: "20px",
-                  padding: "10px 10px",
                   display: "flex",
                   flexWrap: "nowrap",
                   justifyContent: "center",
                   gap: "6px",
+                  padding: "10px 10px",
+                  border: "1.5px solid orange",
+                  borderRadius: "20px",
                   background: "#fff",
                 }}
               >
                 {row.letters.map((letter, colIndex) => {
-                  const isSelected = selected.some(
-                    (c) => c.row === rowIndex && c.col === colIndex,
+                  const id = cellId(rowIndex, colIndex);
+                  const pointerActive = pointerSelection.some(
+                    (cell) => cellId(cell.row, cell.col) === id,
                   );
-
-                  const isFound = foundSelections.some((f) =>
-                    f.cells.some(
-                      (c) => c.row === rowIndex && c.col === colIndex,
-                    ),
+                  const keyboardActive = keyboardPreview.some(
+                    (cell) => cellId(cell.row, cell.col) === id,
                   );
-
+                  const isFound = foundCellIds.has(id);
                   return (
-                    <span
-                      key={colIndex}
+                    <button
+                      type="button"
+                      key={id}
                       data-row={rowIndex}
                       data-col={colIndex}
-                      onMouseDown={() => startSelect(rowIndex, colIndex)}
-                      onMouseEnter={() => addSelect(rowIndex, colIndex)}
-                      onMouseUp={endSelect}
-                      onTouchStart={() => startSelect(rowIndex, colIndex)}
-                      onTouchMove={(e) => {
-                        const touch = e.touches[0];
+                      className={`unit1-interactive ${keyboardActive ? "unit1-keyboard-preview" : ""}`}
+                      onMouseDown={() => startPointer(rowIndex, colIndex)}
+                      onMouseEnter={() => extendPointer(rowIndex, colIndex)}
+                      onMouseUp={endPointer}
+                      onTouchStart={() => startPointer(rowIndex, colIndex)}
+                      onTouchMove={(event) => {
+                        const touch = event.touches[0];
                         const element = document.elementFromPoint(
                           touch.clientX,
                           touch.clientY,
                         );
-
-                        if (!element) return;
-
-                        const col = element.getAttribute("data-col");
-                        const row = element.getAttribute("data-row");
-
-                        if (row !== null && col !== null) {
-                          addSelect(Number(row), Number(col));
-                        }
+                        const nextRow = element?.getAttribute("data-row");
+                        const nextCol = element?.getAttribute("data-col");
+                        if (nextRow !== null && nextCol !== null)
+                          extendPointer(Number(nextRow), Number(nextCol));
                       }}
-                      onTouchEnd={endSelect}
+                      onTouchEnd={endPointer}
+                      onKeyDown={(event) =>
+                        handleCellKeyDown(event, rowIndex, colIndex)
+                      }
+                      onFocus={() => handleCellFocus(rowIndex, colIndex)}
+                      aria-label={`${letter}, row short ${row.vowel}, position ${colIndex + 1}`}
                       style={{
                         width: "32px",
                         height: "32px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        background: isFound
+                          ? "rgba(52, 152, 219, 0.4)"
+                          : pointerActive || keyboardActive
+                            ? "rgba(180, 218, 241, 0.4)"
+                            : "#fff",
+                        color: "#111",
                         fontSize: "16px",
                         fontWeight: "bold",
                         cursor: locked ? "default" : "pointer",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
                         userSelect: "none",
-                        WebkitUserSelect: "none",
-                        background: isFound
-                          ? "rgba(52, 152, 219, 0.4)"
-                          : isSelected
-                            ? "rgba(180, 218, 241, 0.4)"
-                            : "#fff",
                       }}
                     >
                       {letter}
-                    </span>
+                    </button>
                   );
                 })}
               </div>
             </div>
           ))}
         </div>
+
         <Button
           handleShowAnswer={showAnswers}
-          handleStartAgain={resetAll}
+          handleStartAgain={reset}
           checkAnswers={checkAnswers}
+          checkDisabled={locked}
         />
       </div>
     </div>
   );
-};
-
-export default Page8_Q1;
+}
