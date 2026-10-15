@@ -127,7 +127,12 @@ export default function Page8_Q3() {
       <div className="div-forall" style={{ gap: "20px" }}>
         <ExerciseHeader
           sectionLetter="B"
-          title="Look and write true or false."
+          title={
+            <>
+              Look and write <span className="text-blue-800">true</span> or{" "}
+              <span className="text-blue-800">false</span>.
+            </>
+          }
           subTitle="Read each statement and compare it with the picture or sentence before choosing the two-way answer."
         />
 

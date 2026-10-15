@@ -233,7 +233,12 @@ export default function Page8_Q1() {
         <ExerciseHeader
           sectionLetter="A"
           questionNumber="1"
-          title="Find and circle three words in each box with short vowel sounds."
+          title={
+            <>
+              Find and circle three words in each box with{" "}
+              <span className="text-blue-800">short vowel</span> sounds.
+            </>
+          }
           subTitle="Find one word at a time in each short-vowel row, then tap all the letters that form the three correct words."
         />
 

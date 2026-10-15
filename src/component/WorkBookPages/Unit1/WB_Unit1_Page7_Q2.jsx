@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import question1Audio from "../../../assets/audio/WorkBook/unit1/Page 7 - Exercise J/Item_001_Which_is_bigger,_the_deer_or_the_elephant.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit1/Page 7 - Exercise J/Item_002_Who_is_taller,_the_girl_or_the_man.mp3";
+import answer3Audio from "../../../assets/audio/WorkBook/unit1/Page 7 - Exercise J/Item_003_The_car_is_faster_than_the_bike.mp3";
+import "./workbookUnit1Interactions.css";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 2.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 7/SVG/Asset 3.svg";
@@ -23,6 +30,9 @@ const ITEMS = [
       "The deer is bigger than the elephant.",
     ],
     correct: "The elephant is bigger than the deer.",
+    questionAudio: question1Audio,
+    leftAlt: "A deer",
+    rightAlt: "A large elephant",
   },
 
   {
@@ -36,6 +46,9 @@ const ITEMS = [
       "The girl is taller than the man.",
     ],
     correct: "The man is taller than the girl.",
+    questionAudio: question2Audio,
+    leftAlt: "A girl",
+    rightAlt: "A tall man",
   },
 
   {
@@ -49,6 +62,9 @@ const ITEMS = [
     ],
     correct: "Which is faster, the bike or the car?",
     fixedAnswer: "The car is faster than the bike.",
+    answerAudio: answer3Audio,
+    leftAlt: "A car",
+    rightAlt: "A bicycle",
   },
 
   {
@@ -59,15 +75,19 @@ const ITEMS = [
     rightImg: img4b,
     options: ["Sarah is younger than John.", "John is younger than Sarah."],
     correct: "Sarah is younger than John.",
+    leftAlt: "John",
+    rightAlt: "Sarah",
   },
 ];
 export default function WB_Unit3_Page7_QJ() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctItems, setCorrectItems] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
 
   const handleChange = (id, value) => {
-    if (showAns || checked) return;
+    if (showAns || correctItems.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -77,7 +97,7 @@ export default function WB_Unit3_Page7_QJ() {
     setChecked(false);
   };
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || correctItems.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -86,14 +106,12 @@ export default function WB_Unit3_Page7_QJ() {
       return;
     }
 
-    let score = 0;
+    const nextCorrect = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    const score = nextCorrect.length;
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
+    setCorrectItems(nextCorrect);
     setChecked(true);
 
     if (score === ITEMS.length) {
@@ -115,12 +133,16 @@ export default function WB_Unit3_Page7_QJ() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
+    setCorrectItems(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setCorrectItems([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
@@ -132,7 +154,7 @@ export default function WB_Unit3_Page7_QJ() {
     <div className="wb-j-select-wrap">
       <select
         value={answers[item.id] || ""}
-        disabled={showAns}
+        disabled={showAns || correctItems.includes(item.id)}
         onChange={(e) => handleChange(item.id, e.target.value)}
         className={`wb-j-select ${
           answers[item.id] ? "wb-j-select--filled" : ""
@@ -415,10 +437,11 @@ export default function WB_Unit3_Page7_QJ() {
       `}</style>
 
       <div className="div-forall">
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span>
-    Read and look. Write the questions or answers.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="J"
+          title="Read and look. Write the questions or answers."
+          subTitle="Use the comparative question or answer beside each picture to choose the missing sentence, then reread the completed pair."
+        />
 
         {ITEMS.map((item) => (
           <div key={item.id} className="wb-j-row">
@@ -427,7 +450,15 @@ export default function WB_Unit3_Page7_QJ() {
             <div className="wb-j-text-col">
               {item.type === "answer" ? (
                 <>
-                  <div className="wb-j-question">{item.question}</div>
+                  <button
+                    type="button"
+                    className="wb-j-question wb-unit1-audio-control wb-unit1-interactive"
+                    onClick={() => playAudio(`question-${item.id}`, item.questionAudio)}
+                    style={{ border: 0, background: "transparent", textAlign: "left", cursor: item.questionAudio ? "pointer" : "default" }}
+                  >
+                    {item.question}
+                    <WorkbookUnit1PlayingAudioIcon active={activeAudioKey === `question-${item.id}`} />
+                  </button>
                   <div className="wb-j-line-wrap">
                     <div className="wb-j-line">{renderSelect(item)}</div>
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
@@ -439,7 +470,15 @@ export default function WB_Unit3_Page7_QJ() {
                     <div className="wb-j-line">{renderSelect(item)}</div>
                     {isWrong(item) && <div className="wb-j-wrong">✕</div>}
                   </div>
-                  <div className="wb-j-answer">{item.fixedAnswer}</div>
+                  <button
+                    type="button"
+                    className="wb-j-answer wb-unit1-audio-control wb-unit1-interactive"
+                    onClick={() => playAudio(`answer-${item.id}`, item.answerAudio)}
+                    style={{ border: 0, background: "transparent", textAlign: "left", cursor: item.answerAudio ? "pointer" : "default" }}
+                  >
+                    {item.fixedAnswer}
+                    <WorkbookUnit1PlayingAudioIcon active={activeAudioKey === `answer-${item.id}`} />
+                  </button>
                 </>
               )}
             </div>
@@ -448,14 +487,14 @@ export default function WB_Unit3_Page7_QJ() {
               <div className="wb-j-img-box">
                 <img
                   src={item.leftImg}
-                  alt={`left-${item.id}`}
+                  alt={item.leftAlt}
                   className="wb-j-img"
                 />
               </div>
               <div className="wb-j-img-box">
                 <img
                   src={item.rightImg}
-                  alt={`right-${item.id}`}
+                  alt={item.rightAlt}
                   className="wb-j-img"
                 />
               </div>
@@ -468,6 +507,7 @@ export default function WB_Unit3_Page7_QJ() {
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
+            checkDisabled={showAns || correctItems.length === ITEMS.length}
           />
         </div>
       </div>

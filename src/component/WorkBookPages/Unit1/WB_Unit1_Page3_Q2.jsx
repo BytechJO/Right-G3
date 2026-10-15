@@ -1,6 +1,21 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import question1Audio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_001_Which_is_the_biggest_animal.mp3";
+import lionAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_002_The_lion_is_the_biggest_animal.mp3";
+import catAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_003_The_cat_is_the_biggest_animal.mp3";
+import birdAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_004_The_bird_is_the_biggest_animal.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_005_Which_is_the_fastest.mp3";
+import carAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_006_The_car_is_the_fastest.mp3";
+import bikeAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_007_The_bike_is_the_fastest.mp3";
+import skateboardAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_008_The_skateboard_is_the_fastest.mp3";
+import question3Audio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_009_Which_is_the_heaviest.mp3";
+import penAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_010_The_pen_is_the_heaviest.mp3";
+import bookAudio from "../../../assets/audio/WorkBook/unit1/Page 3 - Exercise B/Item_011_The_book_is_the_heaviest.mp3";
+import "./workbookUnit1Interactions.css";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 1.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 3/SVG/Asset 2.svg";
@@ -23,9 +38,9 @@ const ITEMS = [
     id: 1,
     question: "Which is the biggest animal?",
     images: [
-      { key: "lion", src: img1a, alt: "lion" },
-      { key: "cat", src: img1b, alt: "cat" },
-      { key: "bird", src: img1c, alt: "bird" },
+      { key: "lion", src: img1a, alt: "A large lion" },
+      { key: "cat", src: img1b, alt: "A small house cat" },
+      { key: "bird", src: img1c, alt: "A small bird" },
     ],
     correctImage: "lion",
     options: [
@@ -34,14 +49,20 @@ const ITEMS = [
       "The bird is the biggest animal.",
     ],
     correctText: "The lion is the biggest animal.",
+    questionAudio: question1Audio,
+    optionAudio: {
+      "The lion is the biggest animal.": lionAudio,
+      "The cat is the biggest animal.": catAudio,
+      "The bird is the biggest animal.": birdAudio,
+    },
   },
   {
     id: 2,
     question: "Which is the fastest?",
     images: [
-      { key: "car", src: img2a, alt: "car" },
-      { key: "bike", src: img2b, alt: "bike" },
-      { key: "skateboard", src: img2c, alt: "skateboard" },
+      { key: "car", src: img2a, alt: "A fast car" },
+      { key: "bike", src: img2b, alt: "A bicycle" },
+      { key: "skateboard", src: img2c, alt: "A skateboard" },
     ],
     correctImage: "car",
     options: [
@@ -50,14 +71,20 @@ const ITEMS = [
       "The skateboard is the fastest.",
     ],
     correctText: "The car is the fastest.",
+    questionAudio: question2Audio,
+    optionAudio: {
+      "The car is the fastest.": carAudio,
+      "The bike is the fastest.": bikeAudio,
+      "The skateboard is the fastest.": skateboardAudio,
+    },
   },
   {
     id: 3,
     question: "Which is the heaviest?",
     images: [
-      { key: "pen", src: img3a, alt: "pen" },
-      { key: "book", src: img3b, alt: "book" },
-      { key: "desk", src: img3c, alt: "desk" },
+      { key: "pen", src: img3a, alt: "A pen" },
+      { key: "book", src: img3b, alt: "A book" },
+      { key: "desk", src: img3c, alt: "A desk" },
     ],
     correctImage: "desk",
     options: [
@@ -66,6 +93,11 @@ const ITEMS = [
       "The desk is the heaviest.",
     ],
     correctText: "The desk is the heaviest.",
+    questionAudio: question3Audio,
+    optionAudio: {
+      "The pen is the heaviest.": penAudio,
+      "The book is the heaviest.": bookAudio,
+    },
   },
 ];
 
@@ -73,9 +105,12 @@ export default function WB_Unit3_Page3_QB() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctImages, setCorrectImages] = useState([]);
+  const [correctTexts, setCorrectTexts] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
 
   const handleImageSelect = (itemId, imageKey) => {
-    if (showAns || checked) return;
+    if (showAns || correctImages.includes(itemId)) return;
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { ...prev[itemId], image: imageKey },
@@ -84,7 +119,7 @@ export default function WB_Unit3_Page3_QB() {
   };
 
   const handleTextSelect = (itemId, text) => {
-    if (showAns || checked) return;
+    if (showAns || correctTexts.includes(itemId)) return;
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { ...prev[itemId], text },
@@ -93,7 +128,12 @@ export default function WB_Unit3_Page3_QB() {
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (
+      showAns ||
+      (correctImages.length === ITEMS.length &&
+        correctTexts.length === ITEMS.length)
+    )
+      return;
 
     const allAnswered = ITEMS.every(
       (item) => answers[item.id]?.image && answers[item.id]?.text,
@@ -104,16 +144,20 @@ export default function WB_Unit3_Page3_QB() {
       return;
     }
 
-    let score = 0;
+    const nextCorrectImages = ITEMS.filter(
+      (item) => answers[item.id]?.image === item.correctImage,
+    ).map((item) => item.id);
+    const nextCorrectTexts = ITEMS.filter(
+      (item) => answers[item.id]?.text === item.correctText,
+    ).map((item) => item.id);
+    const score = ITEMS.filter(
+      (item) =>
+        nextCorrectImages.includes(item.id) &&
+        nextCorrectTexts.includes(item.id),
+    ).length;
 
-    ITEMS.forEach((item) => {
-      const imageCorrect = answers[item.id]?.image === item.correctImage;
-      const textCorrect = answers[item.id]?.text === item.correctText;
-      if (imageCorrect && textCorrect) {
-        score += 1;
-      }
-    });
-
+    setCorrectImages(nextCorrectImages);
+    setCorrectTexts(nextCorrectTexts);
     setChecked(true);
 
     if (score === ITEMS.length) {
@@ -133,12 +177,18 @@ export default function WB_Unit3_Page3_QB() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
+    setCorrectImages(ITEMS.map((item) => item.id));
+    setCorrectTexts(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setCorrectImages([]);
+    setCorrectTexts([]);
+    stopAudio();
   };
 
   const isImageSelected = (itemId, imageKey) =>
@@ -382,11 +432,16 @@ export default function WB_Unit3_Page3_QB() {
       `}</style>
 
       <div className="div-forall " style={{ gap: "30px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span>
-       Read, look, circle, and write
-          <span className="text-red-600">✓</span>.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Read, look, circle, and write{" "}
+              <span className="text-red-600">✓</span>.
+            </>
+          }
+          subTitle="Look at the biggest, fastest, and heaviest picture set first, compare all available options, then tap only the answer that matches."
+        />
 
         <div className="wb-qb-main-list">
           {ITEMS.map((item) => {
@@ -397,7 +452,24 @@ export default function WB_Unit3_Page3_QB() {
                 <div className="wb-qb-left-col">
                   <div className="wb-qb-question-wrap">
                     <div className="wb-qb-number">{item.id}</div>
-                    <div className="wb-qb-question">{item.question}</div>
+                    <button
+                      type="button"
+                      className="wb-qb-question wb-unit1-audio-control wb-unit1-interactive"
+                      onClick={() =>
+                        playAudio(`question-${item.id}`, item.questionAudio)
+                      }
+                      style={{
+                        border: 0,
+                        background: "transparent",
+                        textAlign: "left",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {item.question}
+                      <WorkbookUnit1PlayingAudioIcon
+                        active={activeAudioKey === `question-${item.id}`}
+                      />
+                    </button>
                   </div>
 
                   <div className="wb-qb-images-row">
@@ -409,7 +481,17 @@ export default function WB_Unit3_Page3_QB() {
                         <div
                           key={img.key}
                           className="wb-qb-image-click"
+                          role="button"
+                          tabIndex={
+                            correctImages.includes(item.id) || showAns ? -1 : 0
+                          }
                           onClick={() => handleImageSelect(item.id, img.key)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleImageSelect(item.id, img.key);
+                            }
+                          }}
                           style={{ cursor: showAns ? "default" : "pointer" }}
                         >
                           {selected && !isThisWrong && (
@@ -440,19 +522,93 @@ export default function WB_Unit3_Page3_QB() {
                   {item.options.map((option) => {
                     const selected = isTextSelected(item.id, option);
                     const wrong = isWrongText(item, option);
+
                     const showCorrect = showAns && item.correctText === option;
+
+                    const textLocked =
+                      correctTexts.includes(item.id) || showAns;
+
+                    const optionAudio = item.optionAudio[option];
 
                     return (
                       <div key={option} className="wb-qb-option-row">
-                        <div className="wb-qb-option-text">{option}</div>
+                        {/* =====================================
+          SENTENCE AUDIO
+      ===================================== */}
 
                         <div
-                          onClick={() => handleTextSelect(item.id, option)}
+                          className="wb-qb-option-text wb-unit1-audio-control wb-unit1-interactive"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Play audio: ${option}`}
+                          onClick={() => {
+                            if (!optionAudio) return;
+
+                            playAudio(
+                              `option-${item.id}-${option}`,
+                              optionAudio,
+                            );
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+
+                              if (!optionAudio) return;
+
+                              playAudio(
+                                `option-${item.id}-${option}`,
+                                optionAudio,
+                              );
+                            }
+                          }}
+                          style={{
+                            cursor: optionAudio ? "pointer" : "default",
+                          }}
+                        >
+                          <WorkbookUnit1PlayingAudioIcon
+                            active={
+                              activeAudioKey === `option-${item.id}-${option}`
+                            }
+                          />
+
+                          {option}
+                        </div>
+
+                        {/* =====================================
+          CHECKBOX — SELECT ONLY
+      ===================================== */}
+
+                        <div
+                          role="button"
+                          tabIndex={textLocked ? -1 : 0}
+                          aria-label={`Select: ${option}`}
+                          onClick={() => {
+                            if (textLocked) return;
+
+                            handleTextSelect(item.id, option);
+                          }}
+                          onKeyDown={(event) => {
+                            if (textLocked) return;
+
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+
+                              handleTextSelect(item.id, option);
+                            }
+                          }}
                           className={`wb-qb-checkbox ${wrong ? "wrong" : ""}`}
-                          style={{ cursor: showAns ? "default" : "pointer" }}
+                          style={{
+                            cursor: textLocked ? "default" : "pointer",
+                          }}
                         >
                           {(selected || showCorrect) && (
-                            <img src={trueIcon} style={{ height: "25px" }} />
+                            <img
+                              src={trueIcon}
+                              alt=""
+                              style={{
+                                height: "25px",
+                              }}
+                            />
                           )}
 
                           {wrong && <div className="wb-qb-wrong">✕</div>}
@@ -478,6 +634,11 @@ export default function WB_Unit3_Page3_QB() {
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
+            checkDisabled={
+              showAns ||
+              (correctImages.length === ITEMS.length &&
+                correctTexts.length === ITEMS.length)
+            }
           />
         </div>
       </div>

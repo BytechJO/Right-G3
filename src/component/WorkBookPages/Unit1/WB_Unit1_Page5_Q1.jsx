@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import question1Audio from "../../../assets/audio/WorkBook/unit1/Page 5 - Exercise E/Item_001_Which_one_is_lighter,_the_tiger_or_the_cat.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit1/Page 5 - Exercise E/Item_002_Which_one_is_taller,_the_man_or_the_boy.mp3";
+import question3Audio from "../../../assets/audio/WorkBook/unit1/Page 5 - Exercise E/Item_003_Which_one_is_faster,_the_skateboard_or_the_car.mp3";
+import question4Audio from "../../../assets/audio/WorkBook/unit1/Page 5 - Exercise E/Item_004_Which_one_is_thinner,_the_tree_or_the_flower.mp3";
+import "./workbookUnit1Interactions.css";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 1.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 5/SVG/Asset 4.svg";
@@ -18,6 +26,8 @@ const ITEMS = [
       "The tiger is lighter than the cat",
     ],
     correct: "The cat is lighter than the tiger",
+    audio: question1Audio,
+    alt: "A tiger beside a smaller cat for a weight comparison",
   },
   {
     id: 2,
@@ -29,6 +39,8 @@ const ITEMS = [
       "The boy is taller than the man",
     ],
     correct: "The man is taller than the boy",
+    audio: question2Audio,
+    alt: "A tall man beside a shorter boy",
   },
   {
     id: 3,
@@ -40,6 +52,8 @@ const ITEMS = [
       "The skateboard is faster than the car",
     ],
     correct: "The car is faster than the skateboard",
+    audio: question3Audio,
+    alt: "A skateboard beside a car for a speed comparison",
   },
   {
     id: 4,
@@ -51,6 +65,8 @@ const ITEMS = [
       "The tree is thinner than the flower",
     ],
     correct: "The flower is thinner than the tree",
+    audio: question4Audio,
+    alt: "A thick tree beside a thin flower",
   },
 ];
 
@@ -58,9 +74,11 @@ export default function WB_Unit3_Page19_QE() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctItems, setCorrectItems] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || checked) return;
+    if (showAns || correctItems.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -71,21 +89,19 @@ export default function WB_Unit3_Page19_QE() {
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || correctItems.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
 
-    let score = 0;
+    const nextCorrect = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    const score = nextCorrect.length;
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
+    setCorrectItems(nextCorrect);
     setChecked(true);
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -106,12 +122,16 @@ export default function WB_Unit3_Page19_QE() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
+    setCorrectItems(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setCorrectItems([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
@@ -368,10 +388,11 @@ export default function WB_Unit3_Page19_QE() {
       `}</style>
 
       <div className="div-forall" style={{gap:"25px"}}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-         Look and read. Answer the questions.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Look and read. Answer the questions."
+          subTitle="Use each comparison question with lighter, taller, faster, or thinner to choose the correct answer, then reread the completed sentence."
+        />
 
         <div className="wb-e-grid">
           {ITEMS.map((item) => (
@@ -383,19 +404,27 @@ export default function WB_Unit3_Page19_QE() {
                   <div className="wb-e-images">
                     <img
                       src={item.leftImg}
-                      alt={`left-${item.id}`}
+                      alt={item.alt}
                       className="wb-e-img"
                     />
                   </div>
 
-                  <div className="wb-e-question">{item.question}</div>
+                  <button
+                    type="button"
+                    className="wb-e-question wb-unit1-audio-control wb-unit1-interactive"
+                    onClick={() => playAudio(`question-${item.id}`, item.audio)}
+                    style={{ border: 0, background: "transparent", textAlign: "left", cursor: "pointer" }}
+                  >
+                    {item.question}
+                    <WorkbookUnit1PlayingAudioIcon active={activeAudioKey === `question-${item.id}`} />
+                  </button>
 
                   <div className="wb-e-answer-block">
                     <div className="wb-e-answer-line">
                       <div className="wb-e-select-wrap">
                         <select
                           value={answers[item.id] || ""}
-                          disabled={showAns}
+                          disabled={showAns || correctItems.includes(item.id)}
                           onChange={(e) =>
                             handleSelect(item.id, e.target.value)
                           }
@@ -434,6 +463,7 @@ export default function WB_Unit3_Page19_QE() {
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
+            checkDisabled={showAns || correctItems.length === ITEMS.length}
           />
         </div>
       </div>

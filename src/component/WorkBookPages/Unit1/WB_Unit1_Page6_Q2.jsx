@@ -1,6 +1,16 @@
-import React, { useMemo, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import useWorkbookUnit1TabDrag from "./useWorkbookUnit1TabDrag";
+import scoreboardAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise H/Item_001_scoreboard.mp3";
+import refereeAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise H/Item_002_referee.mp3";
+import whistleAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise H/Item_003_whistle.mp3";
+import bikeAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise H/Item_004_bike.mp3";
+import "./workbookUnit1Interactions.css";
 
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/00.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/0000.svg";
@@ -25,10 +35,10 @@ const BORDER_COLOR = "#f39b42";
 
 // ── بيانات ─────────────────────────────────────────────────────
 const SENTENCES = [
-  { id: 1, text: "scoreboard" },
-  { id: 2, text: "referee" },
-  { id: 3, text: "whistle" },
-  { id: 4, text: "bike" },
+  { id: 1, text: "scoreboard", audio: scoreboardAudio },
+  { id: 2, text: "referee", audio: refereeAudio },
+  { id: 3, text: "whistle", audio: whistleAudio },
+  { id: 4, text: "bike", audio: bikeAudio },
 ];
 
 const ITEMS = [
@@ -73,22 +83,36 @@ const ErrorBadge = () => (
     ✕
   </div>
 );
-function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+function DraggableNumber({
+  num,
+  disabled,
+  draggedNumber,
+  setDraggedNumber,
+  registerItem,
+  onKeyDown,
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: String(num),
     disabled,
   });
 
   return (
-    <div
-      ref={setNodeRef}
+    <button
+      type="button"
+      ref={(element) => {
+        setNodeRef(element);
+        registerItem(String(num), element);
+      }}
       {...listeners}
       {...attributes}
       onMouseDown={() => setDraggedNumber(num)}
       onTouchStart={() => setDraggedNumber(num)}
+      onKeyDown={onKeyDown}
+      className="wb-unit1-drag-item"
       style={{
         width: "clamp(38px,5vw,52px)",
         height: "clamp(38px,5vw,52px)",
+        border: 0,
         borderRadius: "50%",
         backgroundColor: disabled ? "#cfcfd4" : DRAG_COLOR,
         color: "#fff",
@@ -110,18 +134,34 @@ function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
       }}
     >
       {num}
-    </div>
+    </button>
   );
 }
 
-function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
+function DroppableImage({
+  item,
+  num,
+  wrong,
+  locked,
+  handleRemove,
+  registerTarget,
+  onKeyDown,
+  tabIndex,
+  previewNumber,
+}) {
   const { setNodeRef, isOver } = useDroppable({
     id: String(item.id),
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        registerTarget(`target-${item.id}`, element);
+      }}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      className={`wb-unit1-drop-target ${previewNumber ? "wb-unit1-keyboard-preview" : ""}`}
       style={{
         position: "relative",
         width: "180px",
@@ -137,7 +177,7 @@ function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
     >
       <img
         src={item.img}
-        alt={`item-${item.id}`}
+        alt={item.alt}
         style={{
           width: "100%",
           height: "100%",
@@ -168,14 +208,14 @@ function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
           // color: wrong ? WRONG_COLOR : DRAG_COLOR,
           boxShadow: "0 2px 8px rgba(0,0,0,.15)",
           zIndex: 10,
-          cursor: num && !showAns ? "pointer" : "default",
+          cursor: num && !locked ? "pointer" : "default",
           transition: "0.25s ease",
           transform: isOver ? "scale(1.05)" : "scale(1)",
           filter: isOver ? "brightness(1.05)" : "brightness(1)",
           boxSizing: "border-box",
         }}
       >
-        {num || ""}
+        {previewNumber || num || ""}
       </div>
 
       {/* بادج الخطأ */}
@@ -190,6 +230,9 @@ export default function WB_Unit1_Page6_QH() {
 
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctTargets, setCorrectTargets] = useState([]);
+  const [shakeGrid, setShakeGrid] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -204,8 +247,17 @@ export default function WB_Unit1_Page6_QH() {
     }),
   );
   const usedNumbers = Object.values(answers);
+  const keyboard = useWorkbookUnit1TabDrag({
+    itemIds: NUMBERS.map(String),
+    targetIds: ITEMS.map((item) => `target-${item.id}`),
+    isItemDisabled: (id) => usedNumbers.includes(Number(id)) || showAns,
+    isTargetDisabled: (id) =>
+      correctTargets.includes(Number(id.replace("target-", ""))) || showAns,
+    onPlace: (itemId, targetId) =>
+      applyDrop(Number(targetId.replace("target-", "")), Number(itemId)),
+  });
   const applyDrop = (id, num) => {
-    if (!num || showAns) return;
+    if (!num || showAns || correctTargets.includes(id)) return;
 
     setChecked(false);
 
@@ -226,12 +278,16 @@ export default function WB_Unit1_Page6_QH() {
 
     setDraggedNumber(null);
 
-    if (!over || showAns) return;
+    if (!over || showAns) {
+      setShakeGrid(false);
+      window.requestAnimationFrame(() => setShakeGrid(true));
+      return;
+    }
 
     applyDrop(Number(over.id), Number(active.id));
   };
   const handleRemove = (id) => {
-    if (showAns || checked) return;
+    if (showAns || correctTargets.includes(id)) return;
     setChecked(false);
     setAnswers((prev) => {
       const u = { ...prev };
@@ -242,16 +298,17 @@ export default function WB_Unit1_Page6_QH() {
 
   // ── Check / Show / Reset ──
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || correctTargets.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first! ✏️");
       return;
     }
-    let correct = 0;
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === CORRECT_ANSWERS[item.id]) correct++;
-    });
+    const nextCorrect = ITEMS.filter(
+      (item) => answers[item.id] === CORRECT_ANSWERS[item.id],
+    ).map((item) => item.id);
+    const correct = nextCorrect.length;
+    setCorrectTargets(nextCorrect);
     setChecked(true);
     const total = ITEMS.length;
     if (correct === total) {
@@ -265,10 +322,13 @@ export default function WB_Unit1_Page6_QH() {
 
   const handleShowAnswer = () => {
     setAnswers({ ...CORRECT_ANSWERS });
-    setChecked(false);
+    setChecked(true);
     setShowAns(true);
+    setCorrectTargets(ITEMS.map((item) => item.id));
 
     setDraggedNumber(null);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
@@ -277,6 +337,10 @@ export default function WB_Unit1_Page6_QH() {
 
     setChecked(false);
     setShowAns(false);
+    setCorrectTargets([]);
+    setShakeGrid(false);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
@@ -290,9 +354,11 @@ export default function WB_Unit1_Page6_QH() {
       >
         <div className="div-forall" style={{ gap: "clamp(16px,2vw,24px)" }}>
           {/* ── العنوان ── */}
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">H</span>Read, look, and number.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="H"
+            title="Read, look, and number."
+            subTitle="Read all scoreboard, referee, whistle, and bike picture clues first, then assign each number to its matching picture."
+          />
 
           {/* ── الأرقام للسحب ── */}
           <div
@@ -311,6 +377,10 @@ export default function WB_Unit1_Page6_QH() {
                   disabled={usedNumbers.includes(num) || showAns}
                   draggedNumber={draggedNumber}
                   setDraggedNumber={setDraggedNumber}
+                  registerItem={keyboard.registerItem}
+                  onKeyDown={(event) =>
+                    keyboard.handleItemKeyDown(event, String(num))
+                  }
                 />
               );
             })}
@@ -338,6 +408,16 @@ export default function WB_Unit1_Page6_QH() {
               {SENTENCES.map((item) => (
                 <div
                   key={item.id}
+                  role="button"
+                  tabIndex={0}
+                  className="wb-unit1-audio-control wb-unit1-interactive"
+                  onClick={() => playAudio(`word-${item.id}`, item.audio)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`word-${item.id}`, item.audio);
+                    }
+                  }}
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -371,12 +451,20 @@ export default function WB_Unit1_Page6_QH() {
                   >
                     {item.text}
                   </p>
+                  <WorkbookUnit1PlayingAudioIcon
+                    active={activeAudioKey === `word-${item.id}`}
+                  />
                 </div>
               ))}
             </div>
 
             {/* الصور 2×3 */}
             <div
+              className={shakeGrid ? "wb-unit1-invalid-drop-shake" : undefined}
+              onAnimationEnd={(event) => {
+                if (event.animationName === "shake-invalid-drop-wb-unit1")
+                  setShakeGrid(false);
+              }}
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(2, minmax(0,1fr))",
@@ -393,8 +481,48 @@ export default function WB_Unit1_Page6_QH() {
                     item={item}
                     num={num}
                     wrong={wrong}
-                    showAns={showAns || checked}
+                    locked={showAns || correctTargets.includes(item.id)}
                     handleRemove={handleRemove}
+                    registerTarget={keyboard.registerTarget}
+                    tabIndex={
+                      !showAns &&
+                      !correctTargets.includes(item.id) &&
+                      (keyboard.keyboardItemId || num)
+                        ? 0
+                        : -1
+                    }
+                    previewNumber={
+                      keyboard.keyboardTargetId === `target-${item.id}`
+                        ? keyboard.keyboardItemId
+                        : null
+                    }
+                    onKeyDown={(event) => {
+                      /*
+      إذا ما في رقم picked
+      والخانة فيها رقم:
+      Enter / Space يرجعه للبنك
+    */
+                      if (
+                        !keyboard.keyboardItemId &&
+                        num &&
+                        !showAns &&
+                        !correctTargets.includes(item.id) &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        handleRemove(item.id);
+
+                        return;
+                      }
+
+                      /*
+      إذا في رقم picked:
+      نفس drag keyboard العادي
+    */
+                      keyboard.handleTargetKeyDown(event, `target-${item.id}`);
+                    }}
                   />
                 );
               })}
@@ -407,6 +535,7 @@ export default function WB_Unit1_Page6_QH() {
               checkAnswers={handleCheck}
               handleShowAnswer={handleShowAnswer}
               handleStartAgain={handleReset}
+              checkDisabled={showAns || correctTargets.length === ITEMS.length}
             />
           </div>
         </div>

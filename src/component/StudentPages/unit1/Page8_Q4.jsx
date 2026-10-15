@@ -180,7 +180,6 @@ export default function Page8_Q4() {
     setLocked(false);
     setShakeInvalidSelection(false);
   };
-
   const displayedSentence = WORDS.map((word) =>
     foundWords.includes(word) ? word : "_______",
   ).join(" ");

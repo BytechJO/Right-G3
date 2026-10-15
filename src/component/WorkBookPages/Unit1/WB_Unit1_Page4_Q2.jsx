@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 4/SVG/Asset 5.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 4/SVG/Asset 6.svg";
@@ -34,22 +35,31 @@ const ITEMS = [
   },
 ];
 
+const IMAGE_ALTS = {
+  1: "A refrigerator beside a television for a size comparison",
+  2: "A car beside a bicycle for a speed comparison",
+  3: "Harley standing beside his dad for an age comparison",
+  4: "A ball beside feathers for a weight comparison",
+};
+
 export default function WB_Unit1_Page4_Q2() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctItems, setCorrectItems] = useState([]);
 
   const handleChange = (id, value) => {
-    if (showAns || checked) return;
+    if (showAns || correctItems.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setChecked(false);
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || correctItems.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -58,12 +68,12 @@ export default function WB_Unit1_Page4_Q2() {
       return;
     }
 
-    let score = 0;
+    const nextCorrect = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    const score = nextCorrect.length;
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) score++;
-    });
-
+    setCorrectItems(nextCorrect);
     setChecked(true);
 
     if (score === ITEMS.length) {
@@ -84,12 +94,14 @@ export default function WB_Unit1_Page4_Q2() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
+    setCorrectItems(ITEMS.map((item) => item.id));
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setCorrectItems([]);
   };
 
   const isWrong = (item) => {
@@ -100,37 +112,44 @@ export default function WB_Unit1_Page4_Q2() {
   return (
     <div className="main-container-component">
       <div className="div-forall">
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>
-          Look and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Look and write."
+          subTitle="Use the comparison sentence shown by each picture to decide the missing word or phrase, then reread the completed sentence."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {ITEMS.map((item) => (
             <div key={item.id} className="flex flex-col gap-4 relative">
-
               {/* Image */}
               <div className="flex items-start gap-3">
                 <span className="font-bold text-lg">{item.id}</span>
-                <img src={item.img} className="h-[130px] object-contain" style={{height:"120px"}}/>
+                <img
+                  src={item.img}
+                  alt={IMAGE_ALTS[item.id]}
+                  className="h-[130px] object-contain"
+                  style={{ height: "120px" }}
+                />
               </div>
 
               {/* Select */}
               <div className="relative">
                 <select
                   value={answers[item.id] || ""}
-                  disabled={showAns}
+                  disabled={showAns || correctItems.includes(item.id)}
                   onChange={(e) => handleChange(item.id, e.target.value)}
                   className={`w-[80%] border-b-1 p-2 text-lg outline-none
-                    ${isWrong(item) ? "border-b-2 border-red-500" : "border-gray-400"}
-                  `}
+    ${isWrong(item) ? "border-b-2 border-red-500" : "border-gray-400"}
+    focus-visible:ring-2
+    focus-visible:ring-blue-500
+    focus-visible:ring-offset-2
+  `}
                 >
                   <option value="" disabled hidden>
                     Select
                   </option>
 
-                  {/* خيارين فقط */}
-                  {[item.correct, item.wrong].sort(() => Math.random() - 0.5).map((opt) => (
+                  {[item.correct, item.wrong].map((opt) => (
                     <option key={opt} value={opt}>
                       {opt}
                     </option>
@@ -153,6 +172,7 @@ export default function WB_Unit1_Page4_Q2() {
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
+            checkDisabled={showAns || correctItems.length === ITEMS.length}
           />
         </div>
       </div>

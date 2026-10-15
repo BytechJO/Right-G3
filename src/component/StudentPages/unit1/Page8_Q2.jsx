@@ -178,7 +178,12 @@ export default function Page8_Q2() {
         <ExerciseHeader
           sectionLetter="A"
           questionNumber="2"
-          title="Listen and circle the words with long vowel sounds."
+          title={
+            <>
+              Listen and circle the words with{" "}
+              <span className="text-blue-800">long vowel</span> sounds.
+            </>
+          }
           subTitle="Listen for the vowel sound, replay if needed, then select only the words with the long sound."
         />
         <QuestionAudioPlayer

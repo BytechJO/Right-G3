@@ -1,6 +1,17 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import slowFastAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_001_slow_fast.mp3";
+import youngOldAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_002_young_old.mp3";
+import oldYoungAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_003_old_young.mp3";
+import bigSmallAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_004_big_small.mp3";
+import fastSlowAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_005_fast_slow.mp3";
+import shortTallAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_006_short_tall.mp3";
+import heavyLightAudio from "../../../assets/audio/WorkBook/unit1/Page 4 - Exercise C/Item_007_heavy_light.mp3";
+import "./workbookUnit1Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 4/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 4/SVG/Asset 2.svg";
@@ -34,13 +45,32 @@ const ITEMS = [
   },
 ];
 
+const AUDIO_BY_PAIR = {
+  "slow   fast": slowFastAudio,
+  "young   old": youngOldAudio,
+  "old   young": oldYoungAudio,
+  "big   small": bigSmallAudio,
+  "fast   slow": fastSlowAudio,
+  "short   tall": shortTallAudio,
+  "heavy   light": heavyLightAudio,
+};
+
+const IMAGE_ALTS = {
+  1: "A bicycle beside a red car for a speed comparison",
+  2: "A large dog beside a small bee for a size comparison",
+  3: "A short child beside a tall clown for a height comparison",
+  4: "A television beside a feather for a weight comparison",
+};
+
 export default function WB_Unit3_Page6_QC() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctItems, setCorrectItems] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
 
   const handleSelect = (id, value) => {
-       if (showAns ||showResults) return;
+    if (showAns || correctItems.includes(id)) return;
 
 
     setAnswers((prev) => ({
@@ -52,7 +82,7 @@ export default function WB_Unit3_Page6_QC() {
   };
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || correctItems.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -61,14 +91,12 @@ export default function WB_Unit3_Page6_QC() {
       return;
     }
 
-    let score = 0;
+    const nextCorrect = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    const score = nextCorrect.length;
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
+    setCorrectItems(nextCorrect);
     setShowResults(true);
 
     if (score === ITEMS.length) {
@@ -90,12 +118,16 @@ export default function WB_Unit3_Page6_QC() {
     setAnswers(correctMap);
     setShowResults(true);
     setShowAns(true);
+    setCorrectItems(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setCorrectItems([]);
+    stopAudio();
   };
 
   const renderPair = (item, pair) => {
@@ -118,7 +150,20 @@ export default function WB_Unit3_Page6_QC() {
 
     return (
       <div
-        onClick={() => handleSelect(item.id, pair)}
+        role="button"
+        tabIndex={0}
+        className="wb-unit1-audio-control wb-unit1-interactive"
+        onClick={() => {
+          playAudio(`pair-${item.id}-${pair}`, AUDIO_BY_PAIR[pair]);
+          handleSelect(item.id, pair);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            playAudio(`pair-${item.id}-${pair}`, AUDIO_BY_PAIR[pair]);
+            handleSelect(item.id, pair);
+          }
+        }}
         style={{
           position: "relative",
           display: "inline-flex",
@@ -142,6 +187,7 @@ export default function WB_Unit3_Page6_QC() {
         }}
       >
         {pair}
+        <WorkbookUnit1PlayingAudioIcon active={activeAudioKey === `pair-${item.id}-${pair}`} />
 
         {showResults && selected && !isCorrect && (
           <div
@@ -329,11 +375,11 @@ export default function WB_Unit3_Page6_QC() {
           }
         `}</style>
 
-        <h1 className="WB-header-title-page8">
-          {" "}
-          <span className="WB-ex-A">C</span>
-           Look and read. Tap or click the correct pair. 
-        </h1>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Look and read. Circle the correct pair."
+          subTitle="Look at the adjective pair that describes each picture pair first, compare all available options, then tap only the answer that matches."
+        />
 
         <div className="wb-c6-grid">
           {ITEMS.map((item) => (
@@ -344,7 +390,7 @@ export default function WB_Unit3_Page6_QC() {
                 <div className="wb-c6-img-frame">
                   <img
                     src={item.img}
-                    alt={`question-${item.id}`}
+                    alt={IMAGE_ALTS[item.id]}
                     className="wb-c6-img"
                   />
                 </div>
@@ -366,6 +412,7 @@ export default function WB_Unit3_Page6_QC() {
             checkAnswers={handleCheck}
             handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
+            checkDisabled={showAns || correctItems.length === ITEMS.length}
           />
         </div>
       </div>
