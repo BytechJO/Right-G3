@@ -1,292 +1,174 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes Shopping Folder/Page 26/Ex C 2.svg";
+import "./unit3Interactions.css";
 
-const Page8_Q4 = () => {
-  const grid = [
-    [
-      "p",
-      "l",
-      "k",
-      "j",
-      "t",
-      "h",
-      "e",
-      "b",
-      "g",
-      "h",
-      "j",
-      "n",
-      "s",
-      "h",
-      "o",
-      "p",
-      "k",
-      "e",
-      "e",
-      "p",
-      "e",
-      "r",
-      "v",
-      "e",
-      "r",
-      "x",
-      "b",
-      "h",
-      "a",
-      "s",
-      "u",
-      "v",
-    ],
-    [
-      "i",
-      "e",
-      "y",
-      "p",
-      "u",
-      "r",
-      "p",
-      "l",
-      "e",
-      "d",
-      "c",
-      "x",
-      "d",
-      "s",
-      "x",
-      "o",
-      "b",
-      "x",
-      "g",
-      "r",
-      "e",
-      "e",
-      "n",
-      "r",
-      "e",
-      "x",
-      "n",
-      "a",
-      "n",
-      "d",
-      "c",
-    ],
-    [
-      "f",
-      "d",
-      "s",
-      "s",
-      "n",
-      "j",
-      "b",
-      "l",
-      "u",
-      "e",
-      "k",
-      "l",
-      "j",
-      "m",
-      "i",
-      "n",
-      "w",
-      "q",
-      "s",
-      "z",
-      "g",
-      "l",
-      "o",
-      "v",
-      "e",
-      "s",
-      "p",
-    ],
-  ];
+const GRID = [
+  "plkjthebghjnshopkeeperverxbhasuv".split(""),
+  "ieypurpledcxdsxobxgreenrexnandc".split(""),
+  "fdssnjbluekljminwqszglovesp".split(""),
+];
 
-  const letters = grid;
-  const wordsToFind = [
-    "the",
-    "shopkeeper",
-    "has",
-    "purple",
-    "green",
-    "and",
-    "blue",
-    "gloves",
-  ];
+const WORDS = ["the", "shopkeeper", "has", "purple", "green", "and", "blue", "gloves"];
 
-  const correctPositions = {
-    the: [4, 5, 6],
+const POSITIONS = {
+  the: [[0, 4], [0, 5], [0, 6]],
+  shopkeeper: [[0, 12], [0, 13], [0, 14], [0, 15], [0, 16], [0, 17], [0, 18], [0, 19], [0, 20], [0, 21]],
+  has: [[0, 27], [0, 28], [0, 29]],
+  purple: [[1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8]],
+  green: [[1, 18], [1, 19], [1, 20], [1, 21], [1, 22]],
+  and: [[1, 27], [1, 28], [1, 29]],
+  blue: [[2, 6], [2, 7], [2, 8], [2, 9]],
+  gloves: [[2, 20], [2, 21], [2, 22], [2, 23], [2, 24], [2, 25]],
+};
 
-    shopkeeper: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+const idFor = (row, column) => `${row}-${column}`;
 
-    has: [27, 28, 29],
-
-    purple: [100 + 3, 100 + 4, 100 + 5, 100 + 6, 100 + 7, 100 + 8],
-
-    green: [100 + 18, 100 + 19, 100 + 20, 100 + 21, 100 + 22],
-
-    and: [100 + 27, 100 + 28, 100 + 29],
-
-    blue: [200 + 6, 200 + 7, 200 + 8, 200 + 9],
-
-    gloves: [200 + 20, 200 + 21, 200 + 22, 200 + 23, 200 + 24, 200 + 25],
-  };
-  const correctAnswers = [
-    { word: "the", order: 0 },
-    { word: "shopkeeper", order: 1 },
-    { word: "has", order: 2 },
-    { word: "purple", order: 3 },
-    { word: "green", order: 4 },
-    { word: "and", order: 5 },
-    { word: "blue", order: 6 },
-    { word: "gloves", order: 7 },
-  ];
-  const [locked, setLocked] = useState(false);
-  const [sentence, setSentence] = useState("");
-  const [selected, setSelected] = useState([]);
+export default function Unit3_Page5_Q3() {
   const [foundWords, setFoundWords] = useState([]);
-  const [coloredCells, setColoredCells] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const fullSentence = [
-    "the",
-    "shopkeeper",
-    "has",
-    "purple",
-    "green",
-    "and",
-    "blue",
-    "gloves",
-  ];
-  const handleMouseDown = (index) => {
-    if (locked) return;
-    setIsDragging(true);
-    setSelected([index]);
-  };
-  const handleMouseEnter = (index) => {
-    if (!isDragging || locked) return;
+  const [pointerSelection, setPointerSelection] = useState([]);
+  const [pointerRow, setPointerRow] = useState(null);
+  const [keyboardStart, setKeyboardStart] = useState(null);
+  const [keyboardPreview, setKeyboardPreview] = useState([]);
+  const [locked, setLocked] = useState(false);
+  const [shakeInvalidSelection, setShakeInvalidSelection] = useState(false);
 
-    const lastIndex = selected[selected.length - 1];
+  const foundCells = useMemo(
+    () =>
+      new Set(
+        foundWords.flatMap((word) =>
+          POSITIONS[word].map(([row, column]) => idFor(row, column)),
+        ),
+      ),
+    [foundWords],
+  );
 
-    if (index === lastIndex + 1 || index === lastIndex - 1) {
-      if (!selected.includes(index)) {
-        setSelected((prev) => [...prev, index]);
-      }
+  const buildRange = (row, start, end) => {
+    const direction = end >= start ? 1 : -1;
+    const cells = [];
+    for (
+      let column = start;
+      direction > 0 ? column <= end : column >= end;
+      column += direction
+    ) {
+      cells.push({ row, column });
     }
-  };
-
-  const displayedSentence = fullSentence.map((word, index) => {
-    const isFound = foundWords.some(
-      (foundWord) =>
-        correctAnswers.find((c) => c.word === foundWord)?.order === index,
-    );
-
-    const SLOT_LENGTH = 8;
-
-    if (isFound) {
-      return word.padEnd(SLOT_LENGTH, "");
-    }
-
-    return "_".repeat(SLOT_LENGTH);
-  });
-  const handleTouchMove = (e) => {
-    if (!isDragging || locked) return;
-    e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
-
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
-
-    const index = element.getAttribute("data-index");
-    if (index !== null) {
-      handleMouseEnter(Number(index));
-    }
+    return cells;
   };
 
-  const handleMouseUp = () => {
-    if (locked) return;
-    setIsDragging(false);
+  const commit = (cells) => {
+    const matched = WORDS.find((word) => {
+      const positions = POSITIONS[word];
+      if (positions.length !== cells.length) return false;
 
-    const matchedWord = wordsToFind.find((word) => {
-      const positions = correctPositions[word];
-      if (!positions) return false;
-
-      // تحقق نفس الترتيب
-      const isSame =
-        positions.length === selected.length &&
-        positions.every((pos, i) => pos === selected[i]);
-
-      // تحقق بالعكس (reverse)
-      const isReverse =
-        positions.length === selected.length &&
-        positions
-          .slice()
-          .reverse()
-          .every((pos, i) => pos === selected[i]);
-
-      return isSame || isReverse;
-    });
-    if (matchedWord && !foundWords.includes(matchedWord)) {
-      setFoundWords((prev) => [...prev, matchedWord]);
-      setColoredCells((prev) => [...prev, ...selected]);
-      setSentence(
-        wordsToFind
-          .filter((word) => [...foundWords, matchedWord].includes(word))
-          .join(" "),
+      const forward = positions.every(
+        ([row, column], index) =>
+          row === cells[index].row && column === cells[index].column,
       );
+      const reverse = [...positions]
+        .reverse()
+        .every(
+          ([row, column], index) =>
+            row === cells[index].row && column === cells[index].column,
+        );
+      return forward || reverse;
+    });
+
+    if (!matched) return false;
+    if (!foundWords.includes(matched)) {
+      setFoundWords((previous) => [...previous, matched]);
+    }
+    return true;
+  };
+
+  const showInvalidSelection = () => {
+    setShakeInvalidSelection(false);
+    window.requestAnimationFrame(() => setShakeInvalidSelection(true));
+  };
+
+  const startPointer = (row, column) => {
+    if (locked) return;
+    setPointerRow(row);
+    setPointerSelection([{ row, column }]);
+  };
+
+  const extendPointer = (row, column) => {
+    if (locked || pointerRow !== row || !pointerSelection.length) return;
+    setPointerSelection(buildRange(row, pointerSelection[0].column, column));
+  };
+
+  const endPointer = () => {
+    if (locked) return;
+    if (pointerSelection.length && !commit(pointerSelection)) {
+      showInvalidSelection();
+    }
+    setPointerSelection([]);
+    setPointerRow(null);
+  };
+
+  const handleCellKeyDown = (event, row, column) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setKeyboardStart(null);
+      setKeyboardPreview([]);
+      return;
     }
 
-    setSelected([]);
-  };
+    if (locked || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
 
-  const reset = () => {
-    setSelected([]);
-    setFoundWords([]);
-    setColoredCells([]);
-    setSentence("");
-    setLocked(false);
-  };
+    if (!keyboardStart || keyboardStart.row !== row) {
+      setKeyboardStart({ row, column });
+      setKeyboardPreview([{ row, column }]);
+      return;
+    }
 
-  const showAnswers = () => {
-    let allCells = [];
-    wordsToFind.forEach((word) => {
-      if (correctPositions[word]) {
-        allCells.push(...correctPositions[word]);
-      }
-    });
-    setFoundWords(wordsToFind);
-    setColoredCells(allCells);
-    setSelected([]);
-    setSentence(wordsToFind.join(" "));
-    setLocked(true);
+    const cells = buildRange(row, keyboardStart.column, column);
+    if (!commit(cells)) showInvalidSelection();
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
   };
 
   const checkAnswers = () => {
     if (locked) return;
-    const total = wordsToFind.length;
-    const score = foundWords.length;
-
-    if (score === 0) {
-      ValidationAlert.info();
+    if (!foundWords.length) {
+      ValidationAlert.info("Find the hidden words before checking.");
       return;
     }
 
-    if (score < total) {
-      ValidationAlert.warning(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:orange;">Score: ${score} / ${total}</b>
-        </div>
-      `);
+    if (foundWords.length === WORDS.length) {
+      setLocked(true);
+      ValidationAlert.success(`Score: ${WORDS.length} / ${WORDS.length}`);
     } else {
-      ValidationAlert.success(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:green;">Score: ${score} / ${total}</b>
-        </div>
-      `);
+      ValidationAlert.warning(`Score: ${foundWords.length} / ${WORDS.length}`);
     }
+  };
+
+  const showAnswers = () => {
+    setFoundWords([...WORDS]);
+    setPointerSelection([]);
+    setPointerRow(null);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
     setLocked(true);
   };
+
+  const reset = () => {
+    setFoundWords([]);
+    setPointerSelection([]);
+    setPointerRow(null);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
+    setLocked(false);
+    setShakeInvalidSelection(false);
+  };
+
+  const displayedSentence = WORDS.map((word) =>
+    foundWords.includes(word) ? word : "________",
+  ).join(" ");
 
   return (
     <div
@@ -300,73 +182,100 @@ const Page8_Q4 = () => {
       }}
     >
       <div className="div-forall">
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            C
-          </span>
-          What color gloves does the shopkeeper have in Picky Shopper on page
-          23?{" "}
-        </h5>
-        <div
-          style={{ width: "100%", display: "flex", justifyContent: "center" }}
-        >
-          {/* Grid Wrapper */}
-          <div
-            className="px-4 pt-4 pb-5"
-            style={{ width: "fit-content", margin: "0 auto" }}
-          >
+        <ExerciseHeader
+          sectionLetter="C"
+          title="What color gloves does the shopkeeper have in Picky Shopper on page 23?"
+          subTitle="Find the hidden color word, then reread the answer about the shopkeeper's gloves."
+        />
+
+        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+          <div className="px-4 pt-4 pb-5" style={{ width: "fit-content", margin: "0 auto" }}>
             <div
-              className="bg-[#daf5ff] mb-10 rounded-[15px] p-2 sm:p-[15px]"
+              className={`bg-[#daf5ff] mb-10 rounded-[15px] p-2 sm:p-[15px] ${shakeInvalidSelection ? "unit3-invalid-selection-shake" : ""}`}
+              onAnimationEnd={(event) => {
+                if (event.animationName === "shake-invalid-selection-unit3") {
+                  setShakeInvalidSelection(false);
+                }
+              }}
               style={{
                 userSelect: "none",
                 width: "max-content",
-                touchAction: "none", // 🔥 الحل السحري لمنع تحريك الصفحة أثناء السحب على الآيباد
+                touchAction: "none",
                 WebkitOverflowScrolling: "touch",
               }}
             >
-              {letters.map((row, rowIndex) => (
+              {GRID.map((row, rowIndex) => (
                 <div
                   key={rowIndex}
                   style={{
                     display: "flex",
-                    gap: "clamp(1px, 0.3vw, 4px)", // مسافة تتغير حسب الشاشة
+                    gap: "clamp(1px, 0.3vw, 4px)",
                     width: "fit-content",
                   }}
                 >
-                  {row.map((letter, colIndex) => {
-                    const index = rowIndex * 100 + colIndex;
-                    const isSelected = selected.includes(index);
-                    const isFound = coloredCells.includes(index);
+                  {row.map((letter, columnIndex) => {
+                    const id = idFor(rowIndex, columnIndex);
+                    const pointerActive = pointerSelection.some(
+                      (cell) => idFor(cell.row, cell.column) === id,
+                    );
+                    const keyboardActive = keyboardPreview.some(
+                      (cell) => idFor(cell.row, cell.column) === id,
+                    );
+                    const isFound = foundCells.has(id);
 
                     return (
-                      <span
-                        key={index}
-                        data-index={index}
-                        onMouseDown={() => handleMouseDown(index)}
-                        onMouseEnter={() => handleMouseEnter(index)}
-                        onMouseUp={handleMouseUp}
-                        onDragStart={(e) => e.preventDefault()}
-                        onTouchStart={(e) => {
-                          e.preventDefault(); // 🔥 منع تحريك الصفحة عند بدء اللمس
-                          handleMouseDown(index);
+                      <button
+                        type="button"
+                        key={id}
+                        data-row={rowIndex}
+                        data-column={columnIndex}
+                        className={`unit3-interactive unit3-word-cell ${keyboardActive ? "unit3-keyboard-preview" : ""}`}
+                        onMouseDown={() => startPointer(rowIndex, columnIndex)}
+                        onMouseEnter={() => extendPointer(rowIndex, columnIndex)}
+                        onMouseUp={endPointer}
+                        onTouchStart={() => startPointer(rowIndex, columnIndex)}
+                        onTouchMove={(event) => {
+                          event.preventDefault();
+                          const touch = event.touches[0];
+                          const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                          const nextRow = element?.getAttribute("data-row");
+                          const nextColumn = element?.getAttribute("data-column");
+                          if (nextRow !== null && nextColumn !== null) {
+                            extendPointer(Number(nextRow), Number(nextColumn));
+                          }
                         }}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleMouseUp}
-                        className={`
-                          flex items-center justify-center mb-2
-                          cursor-pointer
-                          transition
-                          ${isSelected ? "bg-[#ffd54f] rounded-sm" : ""}
-                          ${isFound ? "bg-[#4caf50] text-white rounded-sm" : ""}
-                        `}
+                        onTouchEnd={endPointer}
+                        onFocus={() => {
+                          if (keyboardStart?.row === rowIndex) {
+                            setKeyboardPreview(
+                              buildRange(rowIndex, keyboardStart.column, columnIndex),
+                            );
+                          }
+                        }}
+                        onKeyDown={(event) =>
+                          handleCellKeyDown(event, rowIndex, columnIndex)
+                        }
+                        aria-label={`${letter}, row ${rowIndex + 1}, position ${columnIndex + 1}`}
                         style={{
-                          width: "clamp(16px, 2.5vw, 25px)", // 🔥 عرض ديناميكي
-                          height: "clamp(22px, 3.5vw, 35px)", // 🔥 طول ديناميكي
-                          fontSize: "clamp(12px, 1.8vw, 18px)", // 🔥 حجم خط ديناميكي
+                          width: "clamp(16px, 2.5vw, 25px)",
+                          height: "clamp(22px, 3.5vw, 35px)",
+                          flexShrink: 0,
+                          padding: 0,
+                          marginBottom: "8px",
+                          border: 0,
+                          borderRadius: "4px",
+                          background: isFound
+                            ? "#4caf50"
+                            : pointerActive || keyboardActive
+                              ? "#ffd54f"
+                              : "transparent",
+                          color: isFound ? "#fff" : "#111",
+                          fontSize: "clamp(12px, 1.8vw, 18px)",
+                          cursor: locked ? "default" : "pointer",
                         }}
                       >
                         {letter}
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
@@ -376,32 +285,25 @@ const Page8_Q4 = () => {
             <div className="flex justify-center items-center">
               <img
                 src={img1}
-                alt="end"
-                style={{
-                  width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
-                  height: "auto",
-                }}
+                alt="An orange cat beside the answer sentence"
+                style={{ width: "clamp(40px, 10vw, 100px)", height: "auto" }}
               />
               <input
                 className="answer-input-CB-unit3-p5-q4"
-                value={displayedSentence.join(" ")}
+                value={displayedSentence}
                 readOnly
-                style={{ fontFamily: "monospace", width: "100%" }} // 🔥 مهم جدا
+                aria-label="Completed sentence from the word search"
+                style={{ fontFamily: "monospace", width: "100%" }}
               />
-
               <img
                 src={img2}
-                alt="end"
-                style={{
-                  width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
-                  height: "auto",
-                }}
+                alt="A brown mouse beside the answer sentence"
+                style={{ width: "clamp(40px, 10vw, 100px)", height: "auto" }}
               />
             </div>
           </div>
         </div>
 
-        {/* BUTTONS */}
         <Button
           handleShowAnswer={showAnswers}
           handleStartAgain={reset}
@@ -410,6 +312,4 @@ const Page8_Q4 = () => {
       </div>
     </div>
   );
-};
-
-export default Page8_Q4;
+}
