@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
-import AudioWithCaption from "../../AudioWithCaption";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd2pg14instruction-adult-lady_tUKGw1L9.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 19.svg";
@@ -47,22 +47,24 @@ const OPTIONS = ["✓", "✕"];
 
 export default function WB_Unit3_Page18_QB() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const [forceStop, setForceStop] = useState(false);
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || correctIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setShowResults(false);
+    setCheckedIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || correctIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -79,7 +81,12 @@ export default function WB_Unit3_Page18_QB() {
       }
     });
 
-    setShowResults(true);
+    setCheckedIds(ITEMS.map((item) => item.id));
+    setCorrectIds(
+      ITEMS.filter((item) => answers[item.id] === item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -105,18 +112,24 @@ export default function WB_Unit3_Page18_QB() {
     });
 
     setAnswers(correctMap);
-    setShowResults(true);
+    setCheckedIds(ITEMS.map((item) => item.id));
+    setCorrectIds(ITEMS.map((item) => item.id));
     setShowAns(true);
+    setForceStop(true);
+    window.requestAnimationFrame(() => setForceStop(false));
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
     setShowAns(false);
+    setForceStop(true);
+    window.requestAnimationFrame(() => setForceStop(false));
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
+    if (!checkedIds.includes(item.id)) return false;
     return answers[item.id] !== item.correct;
   };
 
@@ -127,8 +140,18 @@ export default function WB_Unit3_Page18_QB() {
 
     return (
       <div
+        role="button"
+        tabIndex={0}
+        aria-pressed={selected || correctSelected}
+        aria-disabled={showAns || correctIds.includes(item.id)}
         onClick={() => {
           handleSelect(item.id, value);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleSelect(item.id, value);
+          }
         }}
         style={{
           position: "relative",
@@ -143,7 +166,8 @@ export default function WB_Unit3_Page18_QB() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: showAns || showResults ? "default" : "pointer",
+          cursor:
+            showAns || correctIds.includes(item.id) ? "default" : "pointer",
           boxSizing: "border-box",
           userSelect: "none",
         }}
@@ -157,9 +181,9 @@ export default function WB_Unit3_Page18_QB() {
           }}
         >
           {value === "✓" ? (
-            <img src={trueIcon} style={{ height: "25px" }} />
+            <img src={trueIcon} alt="" style={{ height: "25px" }} />
           ) : (
-            <img src={falseIcon} style={{ height: "25px" }} />
+            <img src={falseIcon} alt="" style={{ height: "25px" }} />
           )}
         </span>
 
@@ -309,14 +333,29 @@ min-width: 16px;
   }
 `}</style>
       <div className="div-forall">
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span> Do they both have the same{" "}
-          <span className="text-blue-800">u sound</span> ? Listen and write
-          <span className="text-red-600"> ✓</span> or
-          <span className="text-red-600"> ✕</span> .
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <QuestionAudioPlayer src={sound1} captions={captions} />
+        <ExerciseHeader
+          sectionLetter="C"
+          title={
+            <>
+              Do they both have the same{" "}
+              <span style={{ color: "#2e3192" }}>u sound</span>? Listen and
+              write <span style={{ color: "red" }}>✓</span> or{" "}
+              <span style={{ color: "red" }}>✗</span>.
+            </>
+          }
+          subTitle="Listen to each item more than once if needed, compare the whether each picture pair has the same u sound, then mark whether the sounds match."
+        />
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <QuestionAudioPlayer
+            src={sound1}
+            captions={captions}
+            pageId="WB_Unit2_Page14_Q3"
+            forceStop={forceStop}
+            stopAtSecond={10}
+          />
         </div>{" "}
         <div className="wb-b-grid">
           {ITEMS.map((item) => (
@@ -336,7 +375,15 @@ min-width: 16px;
                   <div className="wb-b-half">
                     <img
                       src={item.leftImg}
-                      alt={`left-${item.id}`}
+                      alt={
+                        item.id === 1
+                          ? "A duck"
+                          : item.id === 2
+                            ? "A tube"
+                            : item.id === 3
+                              ? "A cup"
+                              : "The sun"
+                      }
                       className="wb-b-img"
                     />
                   </div>
@@ -344,7 +391,15 @@ min-width: 16px;
                   <div className="wb-b-half">
                     <img
                       src={item.rightImg}
-                      alt={`right-${item.id}`}
+                      alt={
+                        item.id === 1
+                          ? "A bottle of glue"
+                          : item.id === 2
+                            ? "Sue"
+                            : item.id === 3
+                              ? "A cube"
+                              : "A bug"
+                      }
                       className="wb-b-img"
                     />
                   </div>
@@ -353,9 +408,17 @@ min-width: 16px;
                     <div className="wb-b-answer-box">
                       <span className="wb-b-answer-text">
                         {answers[item.id] === "✓" ? (
-                          <img src={trueIcon} style={{ height: "25px" }} />
+                          <img
+                            src={trueIcon}
+                            alt=""
+                            style={{ height: "25px" }}
+                          />
                         ) : (
-                          <img src={falseIcon} style={{ height: "25px" }} />
+                          <img
+                            src={falseIcon}
+                            alt=""
+                            style={{ height: "25px" }}
+                          />
                         )}
                       </span>
                     </div>

@@ -1,29 +1,16 @@
-import React , {useRef} from "react";
+import React from "react";
+
 import page_4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 10.png";
 import "./WB_unit1.css";
+
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
-const WB_Unit1_Page4 = ({ openPopup }) => {
-  const audioRef = useRef(null);
-  const captionsExample = [
-    { start: 0, end: 2.29, text: " Page 9, exercise F." },
-    { start: 2.32, end: 4.11, text: "Let's sing." },
-    { start: 4.15, end: 6.0, text: "Good morning, good morning." },
-    {
-      start: 6.04,
-      end: 10.02,
-      text: " How are you? How are you? How are you?",
-    },
-    { start: 10.06, end: 11.19, text: " Good morning, good morning." },
-    { start: 11.23, end: 15.19, text: "You are well? I am too." },
-  ];
-
+const WB_Unit2_Page10 = ({ openPopup }) => {
   return (
-    <div className="page1-img-wrapper"
-            
-              style={{ backgroundImage: `url(${page_4})` }}>
-      {/* <img src={page_4} /> */}
-     
+    <div
+      className="page1-img-wrapper"
+      style={{ backgroundImage: `url(${page_4})` }}
+    >
       <div
         className="q3-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -32,10 +19,23 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 15 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 15 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
-          <image className="svg-img"
+          <image
+            className="svg-img"
             href={arrowBtn}
             x="0"
             y="0"
@@ -45,7 +45,6 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
           />
         </svg>
       </div>
-
 
       <div
         className="q4-2 hover:scale-110 transition"
@@ -55,10 +54,23 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 16 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 16 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
-          <image className="svg-img"
+          <image
+            className="svg-img"
             href={arrowBtn}
             x="0"
             y="0"
@@ -68,10 +80,8 @@ const WB_Unit1_Page4 = ({ openPopup }) => {
           />
         </svg>
       </div>
-
-      <audio ref={audioRef} style={{ display: "none" }} />
     </div>
   );
 };
 
-export default WB_Unit1_Page4;
+export default WB_Unit2_Page10;

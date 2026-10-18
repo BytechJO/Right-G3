@@ -1,16 +1,30 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit2PlayingAudioIcon from "./WorkbookUnit2PlayingAudioIcon";
+import useWorkbookUnit2Audio from "./useWorkbookUnit2Audio";
+import "./workbookUnit2Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 2.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 5.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 9/SVG/Asset 4.svg";
+import taxiAudio from "../../../assets/audio/WorkBook/unit2/Page 9 - Exercise A/Item_001_take_a_taxi.mp3";
+import subwayAudio from "../../../assets/audio/WorkBook/unit2/Page 9 - Exercise A/Item_002_take_a_subway.mp3";
+import busAudio from "../../../assets/audio/WorkBook/unit2/Page 9 - Exercise A/Item_003_take_a_bus.mp3";
+import bikeAudio from "../../../assets/audio/WorkBook/unit2/Page 9 - Exercise A/Item_004_ride_a_bike.mp3";
 
 const WRONG_COLOR = "#ef4444";
 const BORDER_COLOR = "#f39b42";
 
 const OPTIONS = ["take a taxi", "take a subway", "take a bus", "ride a bike"];
+const OPTION_AUDIO = {
+  "take a taxi": taxiAudio,
+  "take a subway": subwayAudio,
+  "take a bus": busAudio,
+  "ride a bike": bikeAudio,
+};
 
 const ANSWERS = [
   { id: 1, correct: "take a subway", img: img1 },
@@ -21,17 +35,20 @@ const ANSWERS = [
 
 export default function WB_Transport_Dropdown() {
   const [selected, setSelected] = useState({ 1: "", 2: "", 3: "", 4: "" });
-  const [showResults, setShowResults] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit2Audio();
 
   const handleChange = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || correctIds.includes(id)) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setCheckedIds((previous) => previous.filter((itemId) => itemId !== id));
+    playAudio(`option-${id}-${value}`, OPTION_AUDIO[value]);
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || correctIds.length === ANSWERS.length) return;
     const allAnswered = ANSWERS.every((a) => selected[a.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -41,7 +58,12 @@ export default function WB_Transport_Dropdown() {
     ANSWERS.forEach((a) => {
       if (selected[a.id] === a.correct) score++;
     });
-    setShowResults(true);
+    setCheckedIds(ANSWERS.map((answer) => answer.id));
+    setCorrectIds(
+      ANSWERS.filter((answer) => selected[answer.id] === answer.correct).map(
+        (answer) => answer.id,
+      ),
+    );
     if (score === ANSWERS.length)
       ValidationAlert.success(`Score: ${score} / ${ANSWERS.length}`);
     else if (score > 0)
@@ -55,25 +77,31 @@ export default function WB_Transport_Dropdown() {
       filled[a.id] = a.correct;
     });
     setSelected(filled);
-    setShowResults(true);
+    setCheckedIds(ANSWERS.map((answer) => answer.id));
+    setCorrectIds(ANSWERS.map((answer) => answer.id));
     setShowAns(true);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setSelected({ 1: "", 2: "", 3: "", 4: "" });
-    setShowResults(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
-  const isWrong = (item) => showResults && selected[item.id] !== item.correct;
+  const isWrong = (item) =>
+    checkedIds.includes(item.id) && selected[item.id] !== item.correct;
 
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "45px" }}>
-        {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>Look and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title="Look and write."
+          subTitle="Use the transportation picture to the correct travel phrase to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* ── Main layout: word bank LEFT  |  grid RIGHT ── */}
         <div
@@ -101,18 +129,27 @@ export default function WB_Transport_Dropdown() {
               }}
             >
               {OPTIONS.map((opt) => (
-                <div
+                <button
+                  type="button"
                   key={opt}
+                  className="wb-unit2-audio-control wb-unit2-interactive"
+                  onClick={() => playAudio(`bank-${opt}`, OPTION_AUDIO[opt])}
                   style={{
                     textAlign: "center",
                     fontSize: "clamp(12px, 1.4vw, 18px)",
                     fontWeight: 500,
                     color: "#222",
                     lineHeight: 1.3,
+                    background: "transparent",
+                    border: 0,
+                    cursor: "pointer",
                   }}
                 >
                   {opt}
-                </div>
+                  <WorkbookUnit2PlayingAudioIcon
+                    active={activeAudioKey === `bank-${opt}`}
+                  />
+                </button>
               ))}
             </div>
           </div>
@@ -163,7 +200,15 @@ export default function WB_Transport_Dropdown() {
 
                     <img
                       src={item.img}
-                      alt={`transport-${item.id}`}
+                      alt={
+                        item.id === 1
+                          ? "A subway train at a station"
+                          : item.id === 2
+                            ? "A person riding a bicycle"
+                            : item.id === 3
+                              ? "Passengers riding a bus"
+                              : "Passengers riding in a taxi"
+                      }
                       style={{
                         width: "auto",
                         height: "100px",
@@ -176,7 +221,7 @@ export default function WB_Transport_Dropdown() {
                   {/* Dropdown answer */}
                   <div style={{ width: "100%", position: "relative" }}>
                     <select
-                      disabled={showAns || showResults}
+                      disabled={showAns || correctIds.includes(item.id)}
                       value={selected[item.id]}
                       onChange={(e) => handleChange(item.id, e.target.value)}
                       style={{
@@ -192,7 +237,10 @@ export default function WB_Transport_Dropdown() {
                         color: "#000",
                         padding: "4px clamp(4px, 0.8vw, 10px) 4px 2px",
                         background: "transparent",
-                        cursor: showAns || showResults ? "default" : "pointer",
+                        cursor:
+                          showAns || correctIds.includes(item.id)
+                            ? "default"
+                            : "pointer",
                         appearance: "auto",
                         boxSizing: "border-box",
                       }}
@@ -204,6 +252,12 @@ export default function WB_Transport_Dropdown() {
                         </option>
                       ))}
                     </select>
+                    <WorkbookUnit2PlayingAudioIcon
+                      active={
+                        activeAudioKey ===
+                        `option-${item.id}-${selected[item.id]}`
+                      }
+                    />
 
                     {/* Wrong badge */}
                     {wrong && (

@@ -1,15 +1,16 @@
 import React from "react";
+
 import page from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 12.png";
 import "./WB_unit1.css";
+
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
-const WB_Unit1_Page6 = ({ openPopup }) => {
+const WB_Unit2_Page12 = ({ openPopup }) => {
   return (
     <div
       className="page1-img-wrapper"
       style={{ backgroundImage: `url(${page})` }}
     >
-      {/* <img src={page} /> */}
       <div
         className="q7-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -18,9 +19,20 @@ const WB_Unit1_Page6 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 19 })}
-          // className="click-icon-page8-1 hover:scale-110 transition"
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 19 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -33,6 +45,7 @@ const WB_Unit1_Page6 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="q8-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -41,9 +54,20 @@ const WB_Unit1_Page6 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 20 })}
-          style={{ overflow: "visible" }}
-          // className="click-icon-page8-2 hover:scale-110 transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 20 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -56,10 +80,8 @@ const WB_Unit1_Page6 = ({ openPopup }) => {
           />
         </svg>
       </div>
-
-      
     </div>
   );
 };
 
-export default WB_Unit1_Page6;
+export default WB_Unit2_Page12;

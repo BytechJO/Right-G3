@@ -1,29 +1,55 @@
 import React, { useMemo, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit2PlayingAudioIcon from "./WorkbookUnit2PlayingAudioIcon";
+import useWorkbookUnit2Audio from "./useWorkbookUnit2Audio";
+import useWorkbookUnit2TabDrag from "./useWorkbookUnit2TabDrag";
+import "./workbookUnit2Interactions.css";
 
 import busImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 1.svg";
 import scooterImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 2.svg";
 import carImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 3.svg";
 import motorcycleImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 4.svg";
 import img from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 24.svg";
+import alwaysAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_001_always.mp3";
+import usuallyAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_002_usually.mp3";
+import sometimesAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_003_sometimes.mp3";
+import rarelyAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_004_rarely.mp3";
+import neverAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_005_never.mp3";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_006_She_usually_takes_a_bus_to_work.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_007_She_usually_drives_a_car_to_the_library.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_008_She_sometimes_rides_a_scooter_to_the_park.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise I/Item_009_She_rarely_rides_a_motorcycle_to_the_mall.mp3";
 
+const FREQUENCY_AUDIO = {
+  always: alwaysAudio,
+  usually: usuallyAudio,
+  sometimes: sometimesAudio,
+  rarely: rarelyAudio,
+  never: neverAudio,
+};
+const frequencyPositions = ["18%", "33.5%", "49%", "63%", "78%"];
 const SENTENCES = [
   {
     id: 1,
     text: "She usually takes a bus to work.",
+    audio: sentence1Audio,
   },
   {
     id: 2,
     text: "She usually drives a car to the library.",
+    audio: sentence2Audio,
   },
   {
     id: 3,
     text: "She sometimes rides a scooter to the park.",
+    audio: sentence3Audio,
   },
   {
     id: 4,
     text: "She rarely rides a motorcycle to the mall.",
+    audio: sentence4Audio,
   },
 ];
 
@@ -64,16 +90,15 @@ const DRAG_BG = "#f29a1f";
 const styles = {
   pageWrap: {
     width: "100%",
-     display: "flex",
-      justifyContent: "center",
-
+    display: "flex",
+    justifyContent: "center",
   },
 
   contentWrap: {
     display: "flex",
     flexDirection: "column",
     gap: "clamp(14px, 6vw, 15px)",
-    
+
     width: "88%",
   },
 
@@ -219,10 +244,14 @@ export default function WB_Unit3_Page21_QI() {
   const [draggedNumber, setDraggedNumber] = useState(null);
   const [touchItem, setTouchItem] = useState(null);
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
-  const [checked, setChecked] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [hoveredCard, setHoveredCard] = useState(null);
   const dropRefs = useRef({});
+  const dropSucceededRef = useRef(false);
+  const [shakeGrid, setShakeGrid] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit2Audio();
 
   const usedNumbers = useMemo(
     () => Object.values(imageAnswers),
@@ -230,6 +259,8 @@ export default function WB_Unit3_Page21_QI() {
   );
 
   const applyDrop = (cardId, num) => {
+    const targetId = `card-${cardId}`;
+    if (showAns || correctIds.includes(targetId)) return;
     const updated = { ...imageAnswers };
 
     Object.keys(updated).forEach((key) => {
@@ -239,18 +270,40 @@ export default function WB_Unit3_Page21_QI() {
     });
 
     updated[cardId] = num;
+    dropSucceededRef.current = true;
     setImageAnswers(updated);
     setDraggedNumber(null);
-    setChecked(false);
+    setCheckedIds((previous) => previous.filter((id) => id !== targetId));
   };
 
+  const placeNumber = (num, targetId) => {
+    applyDrop(Number(String(targetId).replace("card-", "")), Number(num));
+  };
+
+  const keyboard = useWorkbookUnit2TabDrag({
+    itemIds: DRAG_NUMBERS,
+    targetIds: IMAGE_CARDS.map((card) => `card-${card.id}`),
+    isItemDisabled: (id) => usedNumbers.includes(id) || showAns,
+    isTargetDisabled: (id) => correctIds.includes(id) || showAns,
+    onPlace: placeNumber,
+  });
+
   const handleDragStart = (num) => {
-    if (showAns || usedNumbers.includes(num)||checked) return;
+    if (showAns || usedNumbers.includes(num)) return;
+    dropSucceededRef.current = false;
     setDraggedNumber(num);
   };
 
+  const handleDragEnd = () => {
+    if (!dropSucceededRef.current) {
+      setShakeGrid(false);
+      window.requestAnimationFrame(() => setShakeGrid(true));
+    }
+    setDraggedNumber(null);
+  };
+
   const handleDrop = (cardId) => {
-    if (showAns || draggedNumber === null||checked) return;
+    if (showAns || draggedNumber === null) return;
     applyDrop(cardId, draggedNumber);
   };
 
@@ -272,6 +325,7 @@ export default function WB_Unit3_Page21_QI() {
 
   const handleTouchEnd = () => {
     if (touchItem === null) return;
+    let matched = false;
 
     Object.entries(dropRefs.current).forEach(([key, ref]) => {
       if (!ref) return;
@@ -285,15 +339,23 @@ export default function WB_Unit3_Page21_QI() {
         touchPos.y <= rect.bottom
       ) {
         applyDrop(Number(key), touchItem);
+        matched = true;
       }
     });
+
+    if (!matched) {
+      setShakeGrid(false);
+      window.requestAnimationFrame(() => setShakeGrid(true));
+    }
 
     setTouchItem(null);
     setDraggedNumber(null);
   };
 
   const handleRemoveNumber = (cardId) => {
-    if (showAns||checked) return;
+    const targetId = `card-${cardId}`;
+    if (showAns || correctIds.includes(targetId)) return;
+    const removedNumber = imageAnswers[cardId];
 
     setImageAnswers((prev) => {
       const updated = { ...prev };
@@ -301,7 +363,8 @@ export default function WB_Unit3_Page21_QI() {
       return updated;
     });
 
-    setChecked(false);
+    setCheckedIds((previous) => previous.filter((id) => id !== targetId));
+    if (removedNumber) keyboard.focusItem(removedNumber);
   };
 
   const getScore = () => {
@@ -317,7 +380,7 @@ export default function WB_Unit3_Page21_QI() {
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || correctIds.length === IMAGE_CARDS.length) return;
 
     const allAnswered = IMAGE_CARDS.every((card) => imageAnswers[card.id]);
 
@@ -329,7 +392,12 @@ export default function WB_Unit3_Page21_QI() {
     const total = IMAGE_CARDS.length;
     const score = getScore();
 
-    setChecked(true);
+    setCheckedIds(IMAGE_CARDS.map((card) => `card-${card.id}`));
+    setCorrectIds(
+      IMAGE_CARDS.filter(
+        (card) => imageAnswers[card.id] === card.correctNumber,
+      ).map((card) => `card-${card.id}`),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -348,22 +416,29 @@ export default function WB_Unit3_Page21_QI() {
     });
 
     setImageAnswers(correctMap);
-    setChecked(true);
+    setCheckedIds(IMAGE_CARDS.map((card) => `card-${card.id}`));
+    setCorrectIds(IMAGE_CARDS.map((card) => `card-${card.id}`));
     setShowAns(true);
     setDraggedNumber(null);
     setTouchItem(null);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
     setImageAnswers({});
     setDraggedNumber(null);
     setTouchItem(null);
-    setChecked(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
     setShowAns(false);
+    setShakeGrid(false);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const isCardWrong = (cardId) => {
-    if (!checked || showAns) return false;
+    if (!checkedIds.includes(`card-${cardId}`) || showAns) return false;
     const card = IMAGE_CARDS.find((item) => item.id === cardId);
     return imageAnswers[cardId] !== card.correctNumber;
   };
@@ -449,85 +524,187 @@ export default function WB_Unit3_Page21_QI() {
       `}</style>
 
       <div className="div-forall" style={{ gap: "35px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span>
-          Read, look, and number.
-        </h1>
-        <div className="flex flex-col gap-3">
-       <img src={img} style={{ width: "auto", height: "80px" }} />
+        <ExerciseHeader
+          sectionLetter="I"
+          title="Read, look, and number."
+          subTitle="Read all frequency statement to the correct transportation picture clues first, then assign the numbers carefully so the picture or order is used correctly."
+        />
+        <div className="flex flex-col gap-3 w-full">
+          <div
+            className="flex flex-col gap-3 w-full"
+            style={{ position: "relative", width: "auto", height: "80px" }}
+          >
+            <img
+              src={img}
+              alt="Frequency chart for always, usually, sometimes, rarely, and never"
+              style={{ width: "auto", height: "80px" }}
+            />
+            {Object.entries(FREQUENCY_AUDIO).map(
+              ([frequency, audio], index) => (
+                <button
+                  key={frequency}
+                  type="button"
+                  aria-label={`Play ${frequency}`}
+                  className="wb-unit2-audio-control wb-unit2-interactive"
+                  onClick={() => playAudio(`frequency-${frequency}`, audio)}
+                  style={{
+                    position: "absolute",
+                    left: frequencyPositions[index],
+                    bottom: 0,
+                    width: "10%",
+                    height: "45%",
+                    border: 0,
+                    background: "transparent",
+                    cursor: "pointer",
+                  }}
+                >
+                  <WorkbookUnit2PlayingAudioIcon
+                    active={activeAudioKey === `frequency-${frequency}`}
+                  />
+                </button>
+              ),
+            )}
+          </div>
 
-        <div style={styles.pageWrap}>
-          <div style={styles.contentWrap}>
-            <div style={styles.sentencesWrap}>
-              {SENTENCES.map((item) => (
-                <div key={item.id} style={styles.sentenceRow}>
-                  <div style={styles.sentenceNumber}>{item.id}</div>
-                  <div style={styles.sentenceText}>{item.text}</div>
-                </div>
-              ))}
-            </div>
-            <div style={styles.dragNumbersWrap}>
-              {DRAG_NUMBERS.map((num) => {
-                const disabled = usedNumbers.includes(num);
-                const selected = draggedNumber === num || touchItem === num;
-
-                return (
-                  <div
-                    key={num}
-                    draggable={!disabled && !showAns}
-                    onDragStart={() => handleDragStart(num)}
-                    onTouchStart={(e) => handleTouchStart(e, num)}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    style={styles.dragCircle}
-                    className={`${disabled || showAns ? "wb-i-drag-disabled" : ""} ${
-                      selected ? "wb-i-drag-selected" : ""
-                    }`}
-                  >
-                    {num}
+          <div style={styles.pageWrap}>
+            <div style={styles.contentWrap}>
+              <div style={styles.sentencesWrap}>
+                {SENTENCES.map((item) => (
+                  <div key={item.id} style={styles.sentenceRow}>
+                    <div style={styles.sentenceNumber}>{item.id}</div>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Play sentence: ${item.text}`}
+                      className="wb-unit2-audio-control wb-unit2-interactive"
+                      onClick={() =>
+                        playAudio(`sentence-${item.id}`, item.audio)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`sentence-${item.id}`, item.audio);
+                        }
+                      }}
+                      style={styles.sentenceText}
+                    >
+                      {item.text}
+                      <WorkbookUnit2PlayingAudioIcon
+                        active={activeAudioKey === `sentence-${item.id}`}
+                      />
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-            <div className="wb-i-cards-grid">
-              {IMAGE_CARDS.map((item) => (
-                <div
-                  key={item.id}
-                  ref={(el) => (dropRefs.current[item.id] = el)}
-                  style={styles.cardDropArea}
-                 className={`
+                ))}
+              </div>
+              <div style={styles.dragNumbersWrap}>
+                {DRAG_NUMBERS.map((num) => {
+                  const disabled = usedNumbers.includes(num);
+                  const selected = draggedNumber === num || touchItem === num;
+
+                  return (
+                    <div
+                      key={num}
+                      role="button"
+                      tabIndex={0}
+                      aria-disabled={disabled || showAns}
+                      ref={(element) => keyboard.registerItem(num, element)}
+                      draggable={!disabled && !showAns}
+                      onDragStart={() => handleDragStart(num)}
+                      onDragEnd={handleDragEnd}
+                      onTouchStart={(e) => handleTouchStart(e, num)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      onKeyDown={(event) =>
+                        keyboard.handleItemKeyDown(event, num)
+                      }
+                      style={styles.dragCircle}
+                      className={`${disabled || showAns ? "wb-i-drag-disabled" : ""} ${
+                        selected ? "wb-i-drag-selected" : ""
+                      }`}
+                    >
+                      {num}
+                    </div>
+                  );
+                })}
+              </div>
+              <div
+                className={`wb-i-cards-grid ${shakeGrid ? "wb-unit2-invalid-drop-shake" : ""}`}
+                onAnimationEnd={() => setShakeGrid(false)}
+              >
+                {IMAGE_CARDS.map((item) => (
+                  <div
+                    key={item.id}
+                    ref={(el) => {
+                      dropRefs.current[item.id] = el;
+                      keyboard.registerTarget(`card-${item.id}`, el);
+                    }}
+                    role="button"
+                    tabIndex={
+                      !showAns &&
+                      !correctIds.includes(`card-${item.id}`) &&
+                      (keyboard.keyboardItemId || imageAnswers[item.id])
+                        ? 0
+                        : -1
+                    }
+                    aria-disabled={
+                      showAns || correctIds.includes(`card-${item.id}`)
+                    }
+                    style={styles.cardDropArea}
+                    className={`
   ${hoveredCard === item.id ? "wb-i-card-active" : ""}
   ${imageAnswers[item.id] ? "wb-i-card-filled" : ""}
 `}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => handleDrop(item.id)}
-                  onClick={() => handleRemoveNumber(item.id)}
-                 onDragEnter={() => setHoveredCard(item.id)}
-onDragLeave={() => setHoveredCard(null)}
-onMouseEnter={() => setHoveredCard(item.id)}
-onMouseLeave={() => setHoveredCard(null)}
-                >
-                  <div style={styles.imageWrap}>
-                    <img
-                      src={item.img}
-                      alt={item.alt}
-                      style={styles.image}
-                      draggable={false}
-                    />
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleDrop(item.id)}
+                    onClick={() => handleRemoveNumber(item.id)}
+                    onKeyDown={(event) => {
+                      if (
+                        !keyboard.keyboardItemId &&
+                        imageAnswers[item.id] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        handleRemoveNumber(item.id);
+                        return;
+                      }
+                      keyboard.handleTargetKeyDown(event, `card-${item.id}`);
+                    }}
+                    onDragEnter={() => setHoveredCard(item.id)}
+                    onDragLeave={() => setHoveredCard(null)}
+                    onMouseEnter={() => setHoveredCard(item.id)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <div style={styles.imageWrap}>
+                      <img
+                        src={item.img}
+                        alt={item.alt}
+                        style={styles.image}
+                        draggable={false}
+                      />
 
-                    <div style={styles.numberOverlay}>
-                      {imageAnswers[item.id] || ""}
-                      {isCardWrong(item.id) && (
-                        <span style={styles.wrongBadge}>✕</span>
-                      )}
+                      <div style={styles.numberOverlay}>
+                        <span
+                          className={
+                            keyboard.keyboardTargetId === `card-${item.id}`
+                              ? "wb-unit2-keyboard-preview"
+                              : undefined
+                          }
+                        >
+                          {keyboard.keyboardTargetId === `card-${item.id}`
+                            ? keyboard.keyboardItemId
+                            : imageAnswers[item.id] || ""}
+                        </span>
+                        {isCardWrong(item.id) && (
+                          <span style={styles.wrongBadge}>✕</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
-</div>
         <div style={styles.buttonsWrap}>
           <Button
             handleShowAnswer={handleShowAnswer}

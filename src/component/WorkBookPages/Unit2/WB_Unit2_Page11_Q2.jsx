@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 5.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 6.svg";
@@ -42,7 +43,7 @@ const ITEMS = [
   },
 ];
 
-const FREQUENCIES = ["always", "usually", "sometimes", "never","rarely"];
+const FREQUENCIES = ["always", "usually", "sometimes", "never", "rarely"];
 
 /* سؤال = خيارين */
 const buildQuestionOptions = (correctQuestion) => {
@@ -55,7 +56,7 @@ const buildQuestionOptions = (correctQuestion) => {
 const buildAnswerOptions = (sentence) => {
   const words = sentence.split(" ");
 
-  const subject = words[0];        // She
+  const subject = words[0]; // She
   const rest = words.slice(2).join(" "); // irons clothes.
 
   return FREQUENCIES.map((freq) => `${subject} ${freq} ${rest}`);
@@ -63,20 +64,23 @@ const buildAnswerOptions = (sentence) => {
 
 export default function WB_Unit2_Page11_QF() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [checkedFields, setCheckedFields] = useState([]);
+  const [correctFields, setCorrectFields] = useState([]);
   const [showAns, setShowAns] = useState(false);
 
   const handleChange = (id, type, value) => {
-    if (showAns || showResults) return;
+    const fieldKey = `${type}-${id}`;
+    if (showAns || correctFields.includes(fieldKey)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [`${type}-${id}`]: value,
     }));
+    setCheckedFields((previous) => previous.filter((key) => key !== fieldKey));
   };
 
   const isWrong = (item, type) => {
-    if (!showResults || showAns) return false;
+    if (!checkedFields.includes(`${type}-${item.id}`) || showAns) return false;
 
     if (type === "question") {
       return answers[`question-${item.id}`] !== item.question;
@@ -85,7 +89,7 @@ export default function WB_Unit2_Page11_QF() {
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || correctFields.length === ITEMS.length * 2) return;
 
     const editable = ITEMS.filter((i) => !i.example);
 
@@ -106,7 +110,17 @@ export default function WB_Unit2_Page11_QF() {
       if (answers[`answer-${item.id}`] === item.answer) score++;
     });
 
-    setShowResults(true);
+    const nextCorrect = [];
+    editable.forEach((item) => {
+      if (answers[`question-${item.id}`] === item.question)
+        nextCorrect.push(`question-${item.id}`);
+      if (answers[`answer-${item.id}`] === item.answer)
+        nextCorrect.push(`answer-${item.id}`);
+    });
+    setCheckedFields(
+      editable.flatMap((item) => [`question-${item.id}`, `answer-${item.id}`]),
+    );
+    setCorrectFields(nextCorrect);
 
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -122,13 +136,19 @@ export default function WB_Unit2_Page11_QF() {
     });
 
     setAnswers(filled);
-    setShowResults(true);
+    setCheckedFields(
+      ITEMS.flatMap((item) => [`question-${item.id}`, `answer-${item.id}`]),
+    );
+    setCorrectFields(
+      ITEMS.flatMap((item) => [`question-${item.id}`, `answer-${item.id}`]),
+    );
     setShowAns(true);
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setCheckedFields([]);
+    setCorrectFields([]);
     setShowAns(false);
   };
 
@@ -146,7 +166,7 @@ export default function WB_Unit2_Page11_QF() {
         <select
           value={value}
           onChange={(e) => handleChange(item.id, type, e.target.value)}
-          disabled={showResults||showAns}
+          disabled={showAns || correctFields.includes(`${type}-${item.id}`)}
           style={{
             width: "100%",
             borderBottom: `1px solid ${wrong ? "red" : "navy"}`,
@@ -179,7 +199,7 @@ export default function WB_Unit2_Page11_QF() {
               fontSize: "14px",
               fontWeight: "bold",
               boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-              border:"2px solid white"
+              border: "2px solid white",
             }}
           >
             ✕
@@ -191,14 +211,13 @@ export default function WB_Unit2_Page11_QF() {
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{gap:"20px" }}
-      >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span>
-Look at Exercise E. Write the questions and answers.       </h1>
-        <div>
+      <div className="div-forall" style={{ gap: "20px" }}>
+        <ExerciseHeader
+          sectionLetter="F"
+          title="Look at Exercise E. Write the questions and answers."
+          subTitle="Use the How often question and answer for each person to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
+        <div className="w-full">
           {ITEMS.map((item) => (
             <div
               key={item.id}
@@ -207,7 +226,15 @@ Look at Exercise E. Write the questions and answers.       </h1>
             >
               <img
                 src={item.img}
-                alt=""
+                alt={
+                  item.id === 1
+                    ? "The woman from Exercise E"
+                    : item.id === 2
+                      ? "The man from Exercise E"
+                      : item.id === 3
+                        ? "The boy from Exercise E"
+                        : "The girl from Exercise E"
+                }
                 style={{ width: "20%", height: "100px" }}
               />
               <div className="w-[70%] flex flex-col gap-5">

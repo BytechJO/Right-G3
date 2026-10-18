@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit2PlayingAudioIcon from "./WorkbookUnit2PlayingAudioIcon";
+import useWorkbookUnit2Audio from "./useWorkbookUnit2Audio";
+import "./workbookUnit2Interactions.css";
 
 import tuneImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 1.svg";
 import gumImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 2.svg";
@@ -13,6 +17,33 @@ import sunImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Fol
 import sueImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 9.svg";
 import juneImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 11.svg";
 import glueImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 14/SVG/Asset 10.svg";
+import shortUAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_001_short_u.mp3";
+import longUAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_002_long_u.mp3";
+import tuneAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_003_tune.mp3";
+import gumAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_004_gum.mp3";
+import runAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_005_run.mp3";
+import sunAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_006_sun.mp3";
+import sueAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_007_sue.mp3";
+import cupAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_008_cup.mp3";
+import busAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_009_bus.mp3";
+import tubeAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_010_tube.mp3";
+import upAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_011_up.mp3";
+import juneAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_012_June.mp3";
+import glueAudio from "../../../assets/audio/WorkBook/unit2/Page 14 - Exercise A/Item_013_glue.mp3";
+
+const WORD_AUDIO = {
+  tune: tuneAudio,
+  gum: gumAudio,
+  run: runAudio,
+  sun: sunAudio,
+  sue: sueAudio,
+  cup: cupAudio,
+  bus: busAudio,
+  tube: tubeAudio,
+  up: upAudio,
+  June: juneAudio,
+  glue: glueAudio,
+};
 
 const CIRCLE_COLOR = "red";
 const BORDER_COLOR = "#a9a9a9";
@@ -23,12 +54,13 @@ const SECTIONS = [
   {
     id: "short-u",
     title: "short u",
+    audio: shortUAudio,
     items: [
       { id: "s1", img: tuneImg, text: "tune", correct: false },
       { id: "s2", img: gumImg, text: "gum", correct: true },
       { id: "s3", img: runImg, text: "run", correct: true },
-      { id: "s4", img: cupImg, text: "cup", correct: false },
-      { id: "s5", img: busImg, text: "bus", falseText: false, correct: false },
+      { id: "s4", img: cupImg, text: "cup", correct: true },
+      { id: "s5", img: busImg, text: "bus", correct: true },
       { id: "s6", img: tubeImg, text: "tube", correct: false },
       { id: "s7", img: upImg, text: "up", correct: true },
     ],
@@ -36,6 +68,7 @@ const SECTIONS = [
   {
     id: "long-u",
     title: "long u",
+    audio: longUAudio,
     items: [
       { id: "l1", img: sunImg, text: "sun", correct: false },
       { id: "l2", img: tuneImg, text: "tune", correct: true },
@@ -177,26 +210,28 @@ const styles = {
 
 export default function WB_Unit1_Page9_QA() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit2Audio();
 
   const allItems = SECTIONS.flatMap((section) => section.items);
 
   const handleSelect = (itemId) => {
-    if (showAns || showResults) return;
+    if (showAns || correctIds.includes(itemId)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [itemId]: !prev[itemId],
     }));
 
-    setShowResults(false);
+    setCheckedIds((previous) => previous.filter((id) => id !== itemId));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || correctIds.length === allItems.length) return;
 
-    const total = allItems.length / 2;
+    const total = allItems.length;
     let score = 0;
 
     allItems.forEach((item) => {
@@ -206,14 +241,19 @@ export default function WB_Unit1_Page9_QA() {
       }
     });
 
-    setShowResults(true);
+    setCheckedIds(allItems.map((item) => item.id));
+    setCorrectIds(
+      allItems
+        .filter((item) => !!answers[item.id] === item.correct)
+        .map((item) => item.id),
+    );
 
-    if (score / 2 === total) {
-      ValidationAlert.success(`Score: ${Math.floor(score / 2)} / ${total}`);
-    } else if (score / 2 > 0) {
-      ValidationAlert.warning(`Score: ${Math.floor(score / 2)} / ${total}`);
+    if (score === total) {
+      ValidationAlert.success(`Score: ${score} / ${total}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${total}`);
     } else {
-      ValidationAlert.error(`Score: ${Math.floor(score / 2)} / ${total}`);
+      ValidationAlert.error(`Score: ${score} / ${total}`);
     }
   };
 
@@ -225,21 +265,25 @@ export default function WB_Unit1_Page9_QA() {
     });
 
     setAnswers(filled);
-    setShowResults(true);
+    setCheckedIds(allItems.map((item) => item.id));
+    setCorrectIds(allItems.map((item) => item.id));
     setShowAns(true);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isSelected = (itemId) => !!answers[itemId];
 
   const isWrong = (item) => {
-    if (!showResults || showAns) return false;
-    return !!answers[item.id] !== item.correct && !!answers[item.id];
+    if (!checkedIds.includes(item.id) || showAns) return false;
+    return !!answers[item.id] !== item.correct;
   };
 
   return (
@@ -257,17 +301,42 @@ export default function WB_Unit1_Page9_QA() {
       `}</style>
 
       <div className="div-forall" style={{ gap: "60px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>
-          Does it have a <b>short u</b> or <b>long u</b> sound? Read and tap or
-          click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title={
+            <>
+              Does it have a <span style={{ color: "#2e3192" }}>short u </span>
+              or <span style={{ color: "#2e3192" }}>long u</span> sound? Read
+              and circle.
+            </>
+          }
+          subTitle="Look at the short-u or long-u sound for each word first, compare all available options, then tap only the answer that matches."
+        />
 
         <div style={styles.pageWrap}>
           <div style={styles.sectionsWrap} className="wb-a-sections">
             {SECTIONS.map((section) => (
               <div key={section.id} style={styles.sectionBox}>
-                <div style={styles.badge}>{section.title}</div>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="wb-unit2-audio-control wb-unit2-interactive"
+                  onClick={() =>
+                    playAudio(`section-${section.id}`, section.audio)
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`section-${section.id}`, section.audio);
+                    }
+                  }}
+                  style={styles.badge}
+                >
+                  {section.title}
+                  <WorkbookUnit2PlayingAudioIcon
+                    active={activeAudioKey === `section-${section.id}`}
+                  />
+                </div>
 
                 <div style={styles.itemsGrid}>
                   {section.items.map((item) => {
@@ -275,18 +344,35 @@ export default function WB_Unit1_Page9_QA() {
                     const wrong = isWrong(item);
 
                     return (
-                      <div key={item.id} style={styles.itemBox}>
+                      <div
+                        key={item.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={selected}
+                        aria-disabled={showAns || correctIds.includes(item.id)}
+                        className="wb-unit2-audio-control wb-unit2-interactive"
+                        onClick={() => {
+                          playAudio(`word-${item.id}`, WORD_AUDIO[item.text]);
+                          handleSelect(item.id);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            playAudio(`word-${item.id}`, WORD_AUDIO[item.text]);
+                            handleSelect(item.id);
+                          }
+                        }}
+                        style={styles.itemBox}
+                      >
                         <div style={styles.imgWrap}>
                           <img
-                            onClick={() => handleSelect(item.id)}
                             src={item.img}
-                            alt={item.text}
+                            alt={`Illustration of ${item.text}`}
                             style={styles.img}
                           />
                         </div>
 
                         <div
-                          onClick={() => handleSelect(item.id)}
                           style={{
                             ...styles.wordBtn,
                             borderColor: selected
@@ -298,6 +384,9 @@ export default function WB_Unit1_Page9_QA() {
                           {item.text}
                           {wrong && <div style={styles.wrongBadge}>✕</div>}
                         </div>
+                        <WorkbookUnit2PlayingAudioIcon
+                          active={activeAudioKey === `word-${item.id}`}
+                        />
                       </div>
                     );
                   })}

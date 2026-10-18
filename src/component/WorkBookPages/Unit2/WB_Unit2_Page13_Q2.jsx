@@ -1,12 +1,42 @@
 import React, { useMemo, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit2PlayingAudioIcon from "./WorkbookUnit2PlayingAudioIcon";
+import useWorkbookUnit2Audio from "./useWorkbookUnit2Audio";
+import useWorkbookUnit2TabDrag from "./useWorkbookUnit2TabDrag";
+import "./workbookUnit2Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 5.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 6.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 7.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 13/SVG/Asset 8.svg";
 import img from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U2 Folder/Page 11/SVG/Asset 24.svg";
+import full1 from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/full1.mp3";
+import full2 from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/full2.mp3";
+import full3 from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/full3.mp3";
+import full4 from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/full4.mp3";
+import alwaysAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_001_always.mp3";
+import usuallyAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_002_usually.mp3";
+import sometimesAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_003_sometimes.mp3";
+import rarelyAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_004_rarely.mp3";
+import neverAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_005_never.mp3";
+import sheAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_006_She.mp3";
+import busSchoolAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_007_takes_a_bus_to_school.mp3";
+import stellaDadAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_008_Stella's_dad.mp3";
+import taxiAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_009_takes_a_taxi.mp3";
+import heAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_010_He.mp3";
+import scooterAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_011_rides_a_scooter.mp3";
+import helenMomAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_012_Helen's_mom.mp3";
+import subwayAudio from "../../../assets/audio/WorkBook/unit2/Page 13 - Exercise J/Item_013_takes_the_subway_to_the_supermarket.mp3";
+
+const FREQUENCY_AUDIO = {
+  always: alwaysAudio,
+  usually: usuallyAudio,
+  sometimes: sometimesAudio,
+  rarely: rarelyAudio,
+  never: neverAudio,
+};
 
 const RED = "#000000ff";
 const ORANGE = "#f29a1f";
@@ -15,7 +45,7 @@ const WRONG = "red";
 const TEXT = "#111";
 
 // الكلمات المتاحة في الـ dropdown
-const WORD_OPTIONS = ["usually", "sometimes","rarely"];
+const WORD_OPTIONS = ["usually", "sometimes", "rarely"];
 
 const SENTENCES = [
   {
@@ -23,19 +53,36 @@ const SENTENCES = [
     before: "She",
     correctWord: "usually",
     after: "takes a bus to school.",
+    beforeAudio: sheAudio,
+    afterAudio: busSchoolAudio,
+    fullAudio: full1,
   },
   {
     id: 2,
     before: "Stella's dad",
     correctWord: "usually",
     after: "takes a taxi.",
+    beforeAudio: stellaDadAudio,
+    afterAudio: taxiAudio,
+    fullAudio: full2,
   },
-  { id: 3, before: "He", correctWord: "sometimes", after: "rides a scooter." },
+  {
+    id: 3,
+    before: "He",
+    correctWord: "sometimes",
+    after: "rides a scooter.",
+    beforeAudio: heAudio,
+    afterAudio: scooterAudio,
+    fullAudio: full3,
+  },
   {
     id: 4,
     before: "Helen's mom",
     correctWord: "rarely",
     after: "takes the subway to the supermarket.",
+    beforeAudio: helenMomAudio,
+    afterAudio: subwayAudio,
+    fullAudio: full4,
   },
 ];
 
@@ -49,7 +96,7 @@ const PICTURES = [
 const DRAG_NUMBERS = [1, 2, 3, 4];
 
 const styles = {
-  pageWrap: { width: "100%" ,display: "flex", justifyContent: "center",},
+  pageWrap: { width: "100%", display: "flex", justifyContent: "center" },
   contentWrap: {
     display: "flex",
     flexDirection: "column",
@@ -192,10 +239,16 @@ export default function WB_Unit3_Page22_QJ() {
   const [draggedNumber, setDraggedNumber] = useState(null);
   const [touchItem, setTouchItem] = useState(null);
   const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
-  const [checked, setChecked] = useState(false);
+  const [checkedWordIds, setCheckedWordIds] = useState([]);
+  const [correctWordIds, setCorrectWordIds] = useState([]);
+  const [checkedPictureIds, setCheckedPictureIds] = useState([]);
+  const [correctPictureIds, setCorrectPictureIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const [shakeGrid, setShakeGrid] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit2Audio();
 
   const numberDropRefs = useRef({});
+  const dropSucceededRef = useRef(false);
   const usedNumbers = useMemo(
     () => Object.values(imageAnswers),
     [imageAnswers],
@@ -203,30 +256,59 @@ export default function WB_Unit3_Page22_QJ() {
 
   // ── Word select ──
   const handleWordChange = (sentenceId, value) => {
-    if (showAns || checked) return;
+    if (showAns || correctWordIds.includes(sentenceId)) return;
 
     setWordAnswers((prev) => ({ ...prev, [sentenceId]: value }));
-    setChecked(false);
+    setCheckedWordIds((previous) => previous.filter((id) => id !== sentenceId));
+    playAudio(`frequency-${sentenceId}-${value}`, FREQUENCY_AUDIO[value]);
   };
 
   // ── Number drag ──
   const applyNumberDrop = (cardId, num) => {
+    const targetId = `picture-${cardId}`;
+    if (showAns || correctPictureIds.includes(targetId)) return;
     const updated = { ...imageAnswers };
     Object.keys(updated).forEach((k) => {
       if (updated[k] === num) delete updated[k];
     });
     updated[cardId] = num;
+    dropSucceededRef.current = true;
     setImageAnswers(updated);
     setDraggedNumber(null);
-    setChecked(false);
+    setCheckedPictureIds((previous) =>
+      previous.filter((id) => id !== targetId),
+    );
   };
+
+  const placeNumber = (num, targetId) => {
+    applyNumberDrop(
+      Number(String(targetId).replace("picture-", "")),
+      Number(num),
+    );
+  };
+
+  const keyboard = useWorkbookUnit2TabDrag({
+    itemIds: DRAG_NUMBERS,
+    targetIds: PICTURES.map((picture) => `picture-${picture.id}`),
+    isItemDisabled: (id) => usedNumbers.includes(id) || showAns,
+    isTargetDisabled: (id) => correctPictureIds.includes(id) || showAns,
+    onPlace: placeNumber,
+  });
 
   const handleNumberDragStart = (num) => {
     if (showAns || usedNumbers.includes(num)) return;
+    dropSucceededRef.current = false;
     setDraggedNumber(num);
   };
+  const handleNumberDragEnd = () => {
+    if (!dropSucceededRef.current) {
+      setShakeGrid(false);
+      window.requestAnimationFrame(() => setShakeGrid(true));
+    }
+    setDraggedNumber(null);
+  };
   const handleNumberDrop = (cardId) => {
-    if (showAns || draggedNumber === null || checked) return;
+    if (showAns || draggedNumber === null) return;
     applyNumberDrop(cardId, draggedNumber);
   };
 
@@ -244,6 +326,7 @@ export default function WB_Unit3_Page22_QJ() {
   };
   const handleTouchEnd = () => {
     if (touchItem === null) return;
+    let matched = false;
     Object.entries(numberDropRefs.current).forEach(([key, ref]) => {
       if (!ref) return;
       const r = ref.getBoundingClientRect();
@@ -252,27 +335,43 @@ export default function WB_Unit3_Page22_QJ() {
         touchPos.x <= r.right &&
         touchPos.y >= r.top &&
         touchPos.y <= r.bottom
-      )
+      ) {
         applyNumberDrop(Number(key), touchItem);
+        matched = true;
+      }
     });
+    if (!matched) {
+      setShakeGrid(false);
+      window.requestAnimationFrame(() => setShakeGrid(true));
+    }
     setTouchItem(null);
     setDraggedNumber(null);
   };
 
   const handleRemoveNumber = (cardId) => {
-    if (showAns || checked) return;
+    const targetId = `picture-${cardId}`;
+    if (showAns || correctPictureIds.includes(targetId)) return;
+    const removedNumber = imageAnswers[cardId];
 
     setImageAnswers((prev) => {
       const u = { ...prev };
       delete u[cardId];
       return u;
     });
-    setChecked(false);
+    setCheckedPictureIds((previous) =>
+      previous.filter((id) => id !== targetId),
+    );
+    if (removedNumber) keyboard.focusItem(removedNumber);
   };
 
   // ── Check / Show / Reset ──
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (
+      showAns ||
+      (correctWordIds.length === SENTENCES.length &&
+        correctPictureIds.length === PICTURES.length)
+    )
+      return;
     const allWords = SENTENCES.every((s) => wordAnswers[s.id]);
     const allNumbers = PICTURES.every((p) => imageAnswers[p.id]);
     if (!allWords || !allNumbers) {
@@ -288,7 +387,18 @@ export default function WB_Unit3_Page22_QJ() {
     PICTURES.forEach((p) => {
       if (imageAnswers[p.id] === p.correctNumber) score++;
     });
-    setChecked(true);
+    setCheckedWordIds(SENTENCES.map((sentence) => sentence.id));
+    setCorrectWordIds(
+      SENTENCES.filter(
+        (sentence) => wordAnswers[sentence.id] === sentence.correctWord,
+      ).map((sentence) => sentence.id),
+    );
+    setCheckedPictureIds(PICTURES.map((picture) => `picture-${picture.id}`));
+    setCorrectPictureIds(
+      PICTURES.filter(
+        (picture) => imageAnswers[picture.id] === picture.correctNumber,
+      ).map((picture) => `picture-${picture.id}`),
+    );
 
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -306,10 +416,15 @@ export default function WB_Unit3_Page22_QJ() {
     });
     setWordAnswers(filledWords);
     setImageAnswers(filledNumbers);
-    setChecked(true);
+    setCheckedWordIds(SENTENCES.map((sentence) => sentence.id));
+    setCorrectWordIds(SENTENCES.map((sentence) => sentence.id));
+    setCheckedPictureIds(PICTURES.map((picture) => `picture-${picture.id}`));
+    setCorrectPictureIds(PICTURES.map((picture) => `picture-${picture.id}`));
     setShowAns(true);
     setDraggedNumber(null);
     setTouchItem(null);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
@@ -317,20 +432,26 @@ export default function WB_Unit3_Page22_QJ() {
     setImageAnswers({});
     setDraggedNumber(null);
     setTouchItem(null);
-    setChecked(false);
+    setCheckedWordIds([]);
+    setCorrectWordIds([]);
+    setCheckedPictureIds([]);
+    setCorrectPictureIds([]);
     setShowAns(false);
+    setShakeGrid(false);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const isWordWrong = (id) =>
-    checked &&
+    checkedWordIds.includes(id) &&
     wordAnswers[id] !== SENTENCES.find((s) => s.id === id)?.correctWord;
   const isNumberWrong = (id) =>
-    checked &&
+    checkedPictureIds.includes(`picture-${id}`) &&
     imageAnswers[id] !== PICTURES.find((p) => p.id === id)?.correctNumber;
 
   // لون الرقم فوق الصورة بعد الفحص
   const getNumberColor = (cardId) => {
-    if (!checked) return "#000";
+    if (!checkedPictureIds.includes(`picture-${cardId}`)) return "#000";
     return imageAnswers[cardId] ===
       PICTURES.find((p) => p.id === cardId)?.correctNumber
       ? "#000000ff"
@@ -361,10 +482,41 @@ export default function WB_Unit3_Page22_QJ() {
       `}</style>
 
       <div className="div-forall" style={{ gap: "25px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span> Look and complete the sentences. Number the pictures.
-        </h1>
-        <img src={img} style={{ width: "auto", height: "85px" }} />
+        <ExerciseHeader
+          sectionLetter="J"
+          title="Look and complete the sentences. Number the pictures."
+          subTitle="Complete the frequency adverb and picture number for each sentence in two passes: choose the missing word first, then number the matching pictures."
+        />
+        <div style={{ position: "relative", width: "auto", height: "85px" }}>
+          <img
+            src={img}
+            alt="Frequency chart for always, usually, sometimes, rarely, and never"
+            style={{ width: "auto", height: "85px" }}
+          />
+          {Object.entries(FREQUENCY_AUDIO).map(([frequency, audio], index) => (
+            <button
+              key={frequency}
+              type="button"
+              aria-label={`Play ${frequency}`}
+              className="wb-unit2-audio-control wb-unit2-interactive"
+              onClick={() => playAudio(`legend-${frequency}`, audio)}
+              style={{
+                position: "absolute",
+                left: `${index * 20}%`,
+                bottom: 0,
+                width: "20%",
+                height: "45%",
+                border: 0,
+                background: "transparent",
+                cursor: "pointer",
+              }}
+            >
+              <WorkbookUnit2PlayingAudioIcon
+                active={activeAudioKey === `legend-${frequency}`}
+              />
+            </button>
+          ))}
+        </div>
 
         <div style={styles.pageWrap}>
           <div style={styles.contentWrap}>
@@ -372,18 +524,71 @@ export default function WB_Unit3_Page22_QJ() {
             <div style={styles.sentencesWrap}>
               {SENTENCES.map((item) => {
                 const wrong = isWordWrong(item.id);
+                const fullAudioEnabled = correctWordIds.includes(item.id);
                 return (
-                  <div key={item.id} style={styles.sentenceRow}>
+                  <div
+                    key={item.id}
+                    role={fullAudioEnabled ? "button" : undefined}
+                    tabIndex={fullAudioEnabled ? 0 : undefined}
+                    aria-label={
+                      fullAudioEnabled
+                        ? `Play complete sentence ${item.id}`
+                        : undefined
+                    }
+                    className={`wb-unit2-audio-control ${fullAudioEnabled ? "wb-unit2-completed-audio" : ""}`}
+                    onClick={() => {
+                      if (fullAudioEnabled)
+                        playAudio(`full-${item.id}`, item.fullAudio);
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        fullAudioEnabled &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`full-${item.id}`, item.fullAudio);
+                      }
+                    }}
+                    style={styles.sentenceRow}
+                  >
+                    <WorkbookUnit2PlayingAudioIcon
+                      active={activeAudioKey === `full-${item.id}`}
+                    />
                     <div style={styles.sentenceNumber}>{item.id}</div>
-                    <span style={styles.sentenceText}>{item.before}</span>
+                    <span
+                      role="button"
+                      tabIndex={fullAudioEnabled ? -1 : 0}
+                      className="wb-unit2-audio-control wb-unit2-interactive"
+                      onClick={(event) => {
+                        if (fullAudioEnabled) return;
+                        event.stopPropagation();
+                        playAudio(`before-${item.id}`, item.beforeAudio);
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          !fullAudioEnabled &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          playAudio(`before-${item.id}`, item.beforeAudio);
+                        }
+                      }}
+                      style={styles.sentenceText}
+                    >
+                      {item.before}
+                      <WorkbookUnit2PlayingAudioIcon
+                        active={activeAudioKey === `before-${item.id}`}
+                      />
+                    </span>
 
                     {/* Dropdown */}
                     <div style={styles.selectWrap}>
                       <select
-                        disabled={showAns || checked}
+                        disabled={showAns || fullAudioEnabled}
                         value={wordAnswers[item.id]}
                         onChange={(e) => {
-                          if (showAns || checked) return;
+                          if (showAns || fullAudioEnabled) return;
 
                           handleWordChange(item.id, e.target.value);
                         }}
@@ -409,7 +614,32 @@ export default function WB_Unit3_Page22_QJ() {
                       {wrong && <div style={styles.wrongBadge}>✕</div>}
                     </div>
 
-                    <span style={styles.sentenceText}>{item.after}</span>
+                    <span
+                      role="button"
+                      tabIndex={fullAudioEnabled ? -1 : 0}
+                      className="wb-unit2-audio-control wb-unit2-interactive"
+                      onClick={(event) => {
+                        if (fullAudioEnabled) return;
+                        event.stopPropagation();
+                        playAudio(`after-${item.id}`, item.afterAudio);
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          !fullAudioEnabled &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          playAudio(`after-${item.id}`, item.afterAudio);
+                        }
+                      }}
+                      style={styles.sentenceText}
+                    >
+                      {item.after}
+                      <WorkbookUnit2PlayingAudioIcon
+                        active={activeAudioKey === `after-${item.id}`}
+                      />
+                    </span>
                   </div>
                 );
               })}
@@ -422,11 +652,19 @@ export default function WB_Unit3_Page22_QJ() {
                 return (
                   <div
                     key={num}
+                    role="button"
+                    tabIndex={0}
+                    aria-disabled={disabled || showAns}
+                    ref={(element) => keyboard.registerItem(num, element)}
                     draggable={!disabled && !showAns}
                     onDragStart={() => handleNumberDragStart(num)}
+                    onDragEnd={handleNumberDragEnd}
                     onTouchStart={(e) => handleTouchStartNumber(e, num)}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
+                    onKeyDown={(event) =>
+                      keyboard.handleItemKeyDown(event, num)
+                    }
                     style={styles.dragCircle}
                     className={`${disabled || showAns ? "wb-j-drag-disabled" : ""} ${selected ? "wb-j-drag-selected" : ""}`}
                   >
@@ -436,17 +674,35 @@ export default function WB_Unit3_Page22_QJ() {
               })}
             </div>
             {/* ── Image cards — الصورة فقط بدون overlay ── */}
-            <div className="wb-j-cards-grid">
+            <div
+              className={`wb-j-cards-grid ${shakeGrid ? "wb-unit2-invalid-drop-shake" : ""}`}
+              onAnimationEnd={() => setShakeGrid(false)}
+            >
               {PICTURES.map((item) => {
                 const wrong = isNumberWrong(item.id);
                 return (
                   <div
                     key={item.id}
-                    ref={(el) => (numberDropRefs.current[item.id] = el)}
+                    ref={(el) => {
+                      numberDropRefs.current[item.id] = el;
+                      keyboard.registerTarget(`picture-${item.id}`, el);
+                    }}
+                    role="button"
+                    tabIndex={
+                      !showAns &&
+                      !correctPictureIds.includes(`picture-${item.id}`) &&
+                      (keyboard.keyboardItemId || imageAnswers[item.id])
+                        ? 0
+                        : -1
+                    }
+                    aria-disabled={
+                      showAns ||
+                      correctPictureIds.includes(`picture-${item.id}`)
+                    }
                     style={{ position: "relative" }}
                     onDragOver={(e) => e.preventDefault()}
                     onDragEnter={() => {
-                      if (!checked && !showAns) setHoveredCard(item.id);
+                      if (!showAns) setHoveredCard(item.id);
                     }}
                     onDragLeave={() => setHoveredCard(null)}
                     onDrop={() => {
@@ -454,6 +710,18 @@ export default function WB_Unit3_Page22_QJ() {
                       setHoveredCard(null);
                     }}
                     onClick={() => handleRemoveNumber(item.id)}
+                    onKeyDown={(event) => {
+                      if (
+                        !keyboard.keyboardItemId &&
+                        imageAnswers[item.id] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        handleRemoveNumber(item.id);
+                        return;
+                      }
+                      keyboard.handleTargetKeyDown(event, `picture-${item.id}`);
+                    }}
                   >
                     <div
                       style={{
@@ -476,7 +744,8 @@ export default function WB_Unit3_Page22_QJ() {
                     </div>
 
                     {/* الرقم فوق الصورة — يمين أعلى */}
-                    {imageAnswers[item.id] && (
+                    {(imageAnswers[item.id] ||
+                      keyboard.keyboardTargetId === `picture-${item.id}`) && (
                       <div
                         style={{
                           position: "absolute",
@@ -491,7 +760,17 @@ export default function WB_Unit3_Page22_QJ() {
                           textShadow: "0 1px 3px rgba(255,255,255,0.8)",
                         }}
                       >
-                        {imageAnswers[item.id]}
+                        <span
+                          className={
+                            keyboard.keyboardTargetId === `picture-${item.id}`
+                              ? "wb-unit2-keyboard-preview"
+                              : undefined
+                          }
+                        >
+                          {keyboard.keyboardTargetId === `picture-${item.id}`
+                            ? keyboard.keyboardItemId
+                            : imageAnswers[item.id]}
+                        </span>
                       </div>
                     )}
 

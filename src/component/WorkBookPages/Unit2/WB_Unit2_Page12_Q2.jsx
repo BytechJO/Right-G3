@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit2PlayingAudioIcon from "./WorkbookUnit2PlayingAudioIcon";
+import useWorkbookUnit2Audio from "./useWorkbookUnit2Audio";
+import "./workbookUnit2Interactions.css";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 9.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 11.svg";
@@ -11,6 +15,10 @@ import img3b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 13.s
 import img4a from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 15.svg";
 import img4b from "../../../assets/imgs/pages/WB_Right_3/Page 121/SVG/Asset 16.svg";
 import trueIcon from "../../../assets/imgs/true.svg";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit2/Page 12 - Exercise H/Item_001_She_usually_rides_a_bike_to_school.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit2/Page 12 - Exercise H/Item_002_He_never_rides_a_taxi_to_work.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit2/Page 12 - Exercise H/Item_003_She_always_rides_the_bus_to_school.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit2/Page 12 - Exercise H/Item_004_She_sometimes_walks_to_school.mp3";
 const RED_COLOR = "#d62828";
 const BORDER_COLOR = "#f39b42";
 const ACTIVE_BORDER = "#f39b42";
@@ -21,6 +29,7 @@ const ITEMS = [
   {
     id: 1,
     sentence: "She usually rides a bike to school.",
+    audio: sentence1Audio,
     correct: "bike",
     images: [
       {
@@ -46,6 +55,7 @@ const ITEMS = [
   {
     id: 2,
     sentence: "He never rides a taxi to work.",
+    audio: sentence2Audio,
     correct: "taxi",
     images: [
       {
@@ -71,6 +81,7 @@ const ITEMS = [
   {
     id: 3,
     sentence: "She always rides the bus to school.",
+    audio: sentence3Audio,
     correct: "bus",
     images: [
       {
@@ -96,6 +107,7 @@ const ITEMS = [
   {
     id: 4,
     sentence: "She sometimes walks to school.",
+    audio: sentence4Audio,
     correct: "walk",
     images: [
       {
@@ -250,17 +262,19 @@ const styles = {
 
 export default function WB_Unit2_Page12_QH() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit2Audio();
 
   const handleSelect = (itemId, optionKey) => {
-    if (showAns || checked) return;
+    if (showAns || correctIds.includes(itemId)) return;
     setAnswers((prev) => ({ ...prev, [itemId]: optionKey }));
-    setChecked(false);
+    setCheckedIds((previous) => previous.filter((id) => id !== itemId));
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || correctIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all items first.");
@@ -270,7 +284,12 @@ export default function WB_Unit2_Page12_QH() {
     ITEMS.forEach((item) => {
       if (answers[item.id] === item.correct) score += 1;
     });
-    setChecked(true);
+    setCheckedIds(ITEMS.map((item) => item.id));
+    setCorrectIds(
+      ITEMS.filter((item) => answers[item.id] === item.correct).map(
+        (item) => item.id,
+      ),
+    );
     if (score === ITEMS.length)
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     else if (score > 0)
@@ -284,35 +303,45 @@ export default function WB_Unit2_Page12_QH() {
       filledAnswers[item.id] = item.correct;
     });
     setAnswers(filledAnswers);
-    setChecked(true);
+    setCheckedIds(ITEMS.map((item) => item.id));
+    setCorrectIds(ITEMS.map((item) => item.id));
     setShowAns(true);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setChecked(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isWrong = (itemId, optionKey, correctKey) => {
-    if (!checked || showAns) return false;
+    if (!checkedIds.includes(itemId) || showAns) return false;
     return answers[itemId] === optionKey && optionKey !== correctKey;
   };
 
   // ✅ FIX: المربع يظهر ✓ على الخيار المحدد دايماً
   // عند Show Answer: الـ answers تتحدث للصحيح فبيظهر ✓ تلقائياً محله
   const getBoxContent = (itemId, imgKey, selected) => {
-    if (selected) return <img src={trueIcon} style={{ height: "25px" }} />;
+    if (selected)
+      return <img src={trueIcon} alt="" style={{ height: "25px" }} />;
     return "";
   };
 
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "55px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">H</span>
-       Read, look and write <span className="text-red-600">✓</span>.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="H"
+          title={
+            <>
+              Read, look, and write <span style={{ color: "red" }}>✓</span>.
+            </>
+          }
+          subTitle="Look at the frequency statement against the two pictured options first, compare all available options, then tap only the answer that matches."
+        />
 
         <div style={styles.pageWrap}>
           <div style={styles.gridWrap}>
@@ -320,18 +349,46 @@ export default function WB_Unit2_Page12_QH() {
               <div key={item.id} style={styles.itemCard}>
                 <div style={styles.topLine}>
                   <div style={styles.number}>{item.id}</div>
-                  <div style={styles.sentence}>{item.sentence}</div>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    className="wb-unit2-audio-control wb-unit2-interactive"
+                    aria-label={`Play sentence: ${item.sentence}`}
+                    onClick={() => playAudio(`sentence-${item.id}`, item.audio)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`sentence-${item.id}`, item.audio);
+                      }
+                    }}
+                    style={styles.sentence}
+                  >
+                    {item.sentence}
+                    <WorkbookUnit2PlayingAudioIcon
+                      active={activeAudioKey === `sentence-${item.id}`}
+                    />
+                  </div>
                 </div>
 
                 <div style={styles.imagesRow}>
-                  {item.images.map((img, index) => {
+                  {item.images.map((img) => {
                     const selected = answers[item.id] === img.key;
                     const wrong = isWrong(item.id, img.key, item.correct);
 
                     return (
                       <div
                         key={img.key}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={selected}
+                        aria-disabled={showAns || correctIds.includes(item.id)}
                         onClick={() => handleSelect(item.id, img.key)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            handleSelect(item.id, img.key);
+                          }
+                        }}
                         style={{
                           ...styles.imageOption,
                           borderColor: selected ? ACTIVE_BORDER : BORDER_COLOR,
