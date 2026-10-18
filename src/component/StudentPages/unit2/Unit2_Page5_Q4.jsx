@@ -3,6 +3,8 @@ import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 14/Ex C 2.svg";
+import ExerciseHeader from "../../ExerciseHeader";
+import "./unit2Interactions.css";
 
 const Page8_Q4 = () => {
   const grid = [
@@ -132,11 +134,13 @@ const Page8_Q4 = () => {
   };
 
   const [locked, setLocked] = useState(false);
-  const [sentence, setSentence] = useState("");
   const [selected, setSelected] = useState([]);
   const [foundWords, setFoundWords] = useState([]);
   const [coloredCells, setColoredCells] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [keyboardStart, setKeyboardStart] = useState(null);
+  const [keyboardPreview, setKeyboardPreview] = useState([]);
+  const [invalidSelection, setInvalidSelection] = useState(false);
   const fullSentence = [
     "they",
     "enjoy",
@@ -191,18 +195,15 @@ const Page8_Q4 = () => {
     }
   };
 
-  const handleMouseUp = () => {
-    if (locked) return;
-    setIsDragging(false);
-
+  const commitSelection = (cells) => {
     const matchedWord = wordsToFind.find((word) => {
       const positions = correctPositions[word];
       if (!positions) return false;
 
       // تحقق نفس الترتيب
       const isSame =
-        positions.length === selected.length &&
-        positions.every((pos, i) => pos === selected[i]);
+        positions.length === cells.length &&
+        positions.every((pos, i) => pos === cells[i]);
 
       // تحقق بالعكس (reverse)
       const isReverse =
@@ -210,29 +211,73 @@ const Page8_Q4 = () => {
         positions
           .slice()
           .reverse()
-          .every((pos, i) => pos === selected[i]);
+          .every((pos, i) => pos === cells[i]);
 
       return isSame || isReverse;
     });
     if (matchedWord && !foundWords.includes(matchedWord)) {
       setFoundWords((prev) => [...prev, matchedWord]);
-      setColoredCells((prev) => [...prev, ...selected]);
-      setSentence(
-        wordsToFind
-          .filter((word) => [...foundWords, matchedWord].includes(word))
-          .join(" "),
-      );
+      setColoredCells((prev) => [...prev, ...cells]);
+    } else if (cells.length) {
+      setInvalidSelection(false);
+      window.requestAnimationFrame(() => setInvalidSelection(true));
     }
+  };
+
+  const handleMouseUp = () => {
+    if (locked) return;
+    setIsDragging(false);
+    commitSelection(selected);
 
     setSelected([]);
+  };
+
+  const handleCellKeyDown = (event, rowIndex, colIndex) => {
+    if (locked) return;
+    const index = rowIndex * 100 + colIndex;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setKeyboardStart(null);
+      setKeyboardPreview([]);
+      return;
+    }
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    if (keyboardStart === null) {
+      setKeyboardStart(index);
+      setKeyboardPreview([index]);
+      return;
+    }
+    commitSelection(keyboardPreview);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
+  };
+
+  const handleCellFocus = (rowIndex, colIndex) => {
+    if (keyboardStart === null) return;
+    const startRow = Math.floor(keyboardStart / 100);
+    if (startRow !== rowIndex) return;
+    const startCol = keyboardStart % 100;
+    const direction = colIndex >= startCol ? 1 : -1;
+    const cells = [];
+    for (
+      let current = startCol;
+      direction > 0 ? current <= colIndex : current >= colIndex;
+      current += direction
+    ) {
+      cells.push(rowIndex * 100 + current);
+    }
+    setKeyboardPreview(cells);
   };
 
   const reset = () => {
     setSelected([]);
     setFoundWords([]);
     setColoredCells([]);
-    setSentence("");
     setLocked(false);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
+    setInvalidSelection(false);
   };
 
   const showAnswers = () => {
@@ -245,8 +290,9 @@ const Page8_Q4 = () => {
     setFoundWords(wordsToFind);
     setColoredCells(allCells);
     setSelected([]);
-    setSentence(wordsToFind.join(" "));
     setLocked(true);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
   };
 
   const checkAnswers = () => {
@@ -272,7 +318,7 @@ const Page8_Q4 = () => {
         </div>
       `);
     }
-    setLocked(true);
+    setLocked(score === total);
   };
 
   return (
@@ -287,13 +333,11 @@ const Page8_Q4 = () => {
       }}
     >
       <div className="div-forall">
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            C
-          </span>
-          What do Tom and his family enjoy about France in Vacation in France on
-          page 11? Tap or click the hidden words.
-        </h5>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="What do Tom and his family enjoy about France in Vacation in France on page 11?"
+          subTitle="Find the hidden words in order, then read the completed answer before checking."
+        />
 
         {/* Words List */}
         {/* <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
@@ -321,7 +365,10 @@ const Page8_Q4 = () => {
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] mb-10 rounded-[15px] p-2 sm:p-[15px]"
+              className={`bg-[#daf5ff] mb-10 rounded-[15px] p-2 sm:p-[15px] ${
+                invalidSelection ? "unit2-invalid-drop-shake" : ""
+              }`}
+              onAnimationEnd={() => setInvalidSelection(false)}
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -342,9 +389,11 @@ const Page8_Q4 = () => {
                     const index = rowIndex * 100 + colIndex;
                     const isSelected = selected.includes(index);
                     const isFound = coloredCells.includes(index);
+                    const isKeyboardPreview = keyboardPreview.includes(index);
 
                     return (
-                      <span
+                      <button
+                        type="button"
                         key={index}
                         data-index={index}
                         onMouseDown={() => handleMouseDown(index)}
@@ -357,21 +406,33 @@ const Page8_Q4 = () => {
                         }}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleMouseUp}
+                        onKeyDown={(event) =>
+                          handleCellKeyDown(event, rowIndex, colIndex)
+                        }
+                        onFocus={() => handleCellFocus(rowIndex, colIndex)}
+                        aria-label={`${letter}, row ${rowIndex + 1}, position ${colIndex + 1}`}
                         className={`
+                          unit2-interactive
                           flex items-center justify-center mb-2
                           cursor-pointer
                           transition
                           ${isSelected ? "bg-[#ffd54f] rounded-sm" : ""}
                           ${isFound ? "bg-[#4caf50] text-white rounded-sm" : ""}
+                          ${isKeyboardPreview ? "unit2-keyboard-preview" : ""}
                         `}
                         style={{
                           width: "clamp(16px, 2.5vw, 25px)", // 🔥 عرض ديناميكي
                           height: "clamp(22px, 3.5vw, 35px)", // 🔥 طول ديناميكي
                           fontSize: "clamp(12px, 1.8vw, 18px)", // 🔥 حجم خط ديناميكي
+                          background: isFound
+                            ? "#4caf50"
+                            : isSelected || isKeyboardPreview
+                              ? "#ffd54f"
+                              : "transparent",
                         }}
                       >
                         {letter}
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
@@ -381,7 +442,7 @@ const Page8_Q4 = () => {
             <div className="flex justify-center items-center">
               <img
                 src={img1}
-                alt="end"
+                alt="An airplane flying toward France"
                 style={{
                   width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
                   height: "auto",
@@ -396,7 +457,7 @@ const Page8_Q4 = () => {
 
               <img
                 src={img2}
-                alt="end"
+                alt="The Eiffel Tower in France"
                 style={{
                   width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
                   height: "auto",

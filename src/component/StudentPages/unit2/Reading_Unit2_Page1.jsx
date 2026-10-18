@@ -1,23 +1,28 @@
+import React, { useState, useContext } from "react";
+
 import page24 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 20.png";
-import React, { useState, useRef } from "react";
 import "./Reading_Unit2_Page1.css";
+
 import sound1 from "../../../assets/audio/ClassBook/Unit 2/P 20/unit2-pg20-readingall.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 2/P 20/Pg20_1.1_Adult Lady.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 2/P 20/Pg20_1.2_Adult Lady.mp3";
 import sound4 from "../../../assets/audio/ClassBook/Unit 2/P 20/Pg20_1.3_Adult Lady.mp3";
 import sound5 from "../../../assets/audio/ClassBook/Unit 2/P 20/Pg20_1.4_Adult Lady.mp3";
+
 import AudioWithCaption from "../../AudioWithCaption";
+
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
+
 import video from "../../../assets/videos/reading/grade 3 unit 2 page 20-21 reading.mp4";
-import { useContext } from "react";
+
 import { AudioContext } from "../../../AudioContext";
 
 const Reading_Unit2_Page1 = ({ openPopup }) => {
-    const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+  const { audioRef, activeId, setActiveId } = useContext(AudioContext);
 
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+
   const captionsExample = [
     {
       start: 0.44,
@@ -55,29 +60,57 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
       text: '"What\'s your favorite TV show, Jack?" asks Helen. Jack explains, "I usually watch sports on TV. I never watch movies or the news. My dad likes watching news programs." Helen says, "I like nature programs. There is so much to learn. I learned that a deer runs faster than a polar bear, and that dolphins and monkeys are the most intelligent animals." "Which is more intelligent?" asks Jack. "They\'re the same," answers Helen. Helen hopes to be a news reporter one day so she can interview people and ask questions. That\'s Helen\'s biggest dream.',
     },
   ];
+
   const clickableAreas = [
-    { x1: 15.29, y1: 38.7, x2: 53.75, y2: 49.98, sound: sound2 },
-    { x1: 55.83, y1:37.95, x2:93.81, y2: 50.29, sound: sound3 },
-    { x1: 15.29, y1: 83.40, x2: 53.75, y2: 95.5, sound: sound4 },
-    { x1: 56.0, y1: 83.5, x2: 93.7, y2: 95.9, sound: sound5 },
+    {
+      x1: 15.29,
+      y1: 38.7,
+      x2: 53.75,
+      y2: 49.98,
+      sound: sound2,
+    },
+    {
+      x1: 55.83,
+      y1: 37.95,
+      x2: 93.81,
+      y2: 50.29,
+      sound: sound3,
+    },
+    {
+      x1: 15.29,
+      y1: 83.4,
+      x2: 53.75,
+      y2: 95.5,
+      sound: sound4,
+    },
+    {
+      x1: 56.0,
+      y1: 83.5,
+      x2: 93.7,
+      y2: 95.9,
+      sound: sound5,
+    },
   ];
+
   const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
+
     const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
+
   const playSound = (path, id) => {
     if (!audioRef.current) return;
 
-    // 🔥 وقف أي صوت شغال بأي صفحة
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
 
     audioRef.current.src = path;
     audioRef.current.play();
 
-    setActiveId(id); // 🔥 مهم للهايلايت
+    setActiveId(id);
 
     audioRef.current.onended = () => {
       setActiveId(null);
@@ -90,39 +123,9 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
       onClick={handleImageClick}
       style={{ backgroundImage: `url(${page24})` }}
     >
-      {/* <img
-        src={page24}
-        style={{ display: "block" }}
-        onClick={handleImageClick}
-      /> */}
+      <audio ref={audioRef} style={{ display: "none" }} />
 
-      {clickableAreas.map((area, index) => (
-        <div
-          key={index}
-          className={`clickable-area ${
-            hoveredAreaIndex === index || activeId === index
-              ? "highlight"
-              : ""
-          }`}
-          style={{
-            position: "absolute",
-            left: `${area.x1}%`,
-            top: `${area.y1}%`,
-            width: `${area.x2 - area.x1}%`,
-            height: `${area.y2 - area.y1}%`,
-          }}
-          onClick={() => {
-                playSound(area.sound, `p20-${area.sound}`);
-              }}
-          onMouseEnter={() => {
-            if (!isPlaying) setHoveredAreaIndex(index);
-          }}
-          onMouseLeave={() => {
-            if (!isPlaying) setHoveredAreaIndex(null);
-          }}
-        ></div>
-      ))}
-
+      {/* MAIN READING AUDIO */}
       <div
         className="headset-icon-CD-unit2-page11-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -131,6 +134,9 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Play page 20 reading audio with captions"
           onClick={() =>
             openPopup(
               "audio",
@@ -141,11 +147,40 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
                   alignContent: "center",
                 }}
               >
-                <AudioWithCaption src={sound1} captions={captionsExample} />
+                <AudioWithCaption
+                  src={sound1}
+                  captions={captionsExample}
+                  pageId="unit2-page20-reading"
+                />
               </div>,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "audio",
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                  }}
+                >
+                  <AudioWithCaption
+                    src={sound1}
+                    captions={captionsExample}
+                    pageId="unit2-page20-reading"
+                  />
+                </div>,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -158,6 +193,7 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
         </svg>
       </div>
 
+      {/* VIDEO */}
       <div
         className="pauseBtn-icon-CD-page21 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -166,6 +202,9 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Play page 20 reading video"
           onClick={() =>
             openPopup(
               "video",
@@ -194,7 +233,42 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
               </div>,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "video",
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    width: "100%",
+                  }}
+                >
+                  <video
+                    autoPlay
+                    controls
+                    style={{
+                      width: "auto",
+                      height: "80%",
+                      objectFit: "fill",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    <source src={video} type="video/mp4" />
+                  </video>
+                </div>,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -206,7 +280,56 @@ const Reading_Unit2_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
-      <audio ref={audioRef} style={{ display: "none" }} />
+
+      {/* SENTENCE AUDIOS - LAST */}
+      {clickableAreas.map((area, index) => {
+        const areaId = `p20-${index}`;
+        const isActive = activeId === areaId;
+
+        return (
+          <div
+            key={index}
+            role="button"
+            tabIndex={0}
+            aria-label={`Play sentence audio ${index + 1}`}
+            aria-pressed={isActive}
+            className={`clickable-area ${
+              isActive || hoveredAreaIndex === index ? "highlight" : ""
+            }`}
+            style={{
+              position: "absolute",
+              left: `${area.x1}%`,
+              top: `${area.y1}%`,
+              width: `${area.x2 - area.x1}%`,
+              height: `${area.y2 - area.y1}%`,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              playSound(area.sound, areaId);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+
+                playSound(area.sound, areaId);
+              }
+            }}
+            onFocus={() => {
+              setHoveredAreaIndex(index);
+            }}
+            onBlur={() => {
+              setHoveredAreaIndex(null);
+            }}
+            onMouseEnter={() => {
+              setHoveredAreaIndex(index);
+            }}
+            onMouseLeave={() => {
+              setHoveredAreaIndex(null);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

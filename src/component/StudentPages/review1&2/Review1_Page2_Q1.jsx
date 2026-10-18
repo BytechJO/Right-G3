@@ -7,6 +7,30 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vac
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex C 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 17/Ex C 4.svg";
 import Button from "../../Button";
+import Unit2PlayingAudioIcon from "../unit2/Unit2PlayingAudioIcon";
+import useUnit2Audio from "../unit2/useUnit2Audio";
+import "../unit2/unit2Interactions.css";
+import longAAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_001_long_a.mp3";
+import shortAAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_002_short_a.mp3";
+import longOAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_003_long_o.mp3";
+import shortOAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_004_short_o.mp3";
+import longIAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_005_long_i.mp3";
+import shortIAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_006_short_i.mp3";
+import longEAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_007_long_e.mp3";
+import shortEAudio from "../../../assets/audio/ClassBook/Unit 2/Page 17 - Exercise C/Item_008_short_e.mp3";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+
+const OPTION_AUDIO = {
+  "long a": longAAudio,
+  "short a": shortAAudio,
+  "long o": longOAudio,
+  "short o": shortOAudio,
+  "long i": longIAudio,
+  "short i": shortIAudio,
+  "long e": longEAudio,
+  "short e": shortEAudio,
+};
+const IMAGE_ALTS = ["A birthday cake", "A house", "A fish", "A bee"];
 
 const Review1_Page2_Q1 = () => {
   const items = [
@@ -34,11 +58,13 @@ const Review1_Page2_Q1 = () => {
 
   const [selected, setSelected] = useState(Array(items.length).fill(""));
   const [answers, setAnswers] = useState(Array(items.length).fill(""));
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit2Audio();
 
   const chooseOption = (i, value) => {
-    if (locked) return;
+    if (showAnswer || correctIds.includes(i)) return;
 
     const newSelected = [...selected];
     newSelected[i] = value;
@@ -47,23 +73,29 @@ const Review1_Page2_Q1 = () => {
     const newAnswers = [...answers];
     newAnswers[i] = items[i].start + value + items[i].end;
     setAnswers(newAnswers);
+    setCheckedIds((previous) => previous.filter((id) => id !== i));
   };
 
   const resetAll = () => {
     setSelected(Array(items.length).fill(""));
     setAnswers(Array(items.length).fill(""));
-    setLocked(false);
-    setShowResult(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
+    setShowAnswer(false);
+    stopAudio();
   };
 
   const showAnswers = () => {
     setSelected(items.map((i) => i.correct));
     setAnswers(items.map((i) => i.start + i.correct + i.end));
-    setLocked(true);
+    setCheckedIds(items.map((_, index) => index));
+    setCorrectIds(items.map((_, index) => index));
+    setShowAnswer(true);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer || correctIds.length === items.length) return;
 
     if (selected.includes("")) {
       ValidationAlert.info();
@@ -77,6 +109,12 @@ const Review1_Page2_Q1 = () => {
         score++;
       }
     });
+    setCorrectIds(
+      items.flatMap((item, index) =>
+        selected[index] === item.correct ? [index] : [],
+      ),
+    );
+    setCheckedIds(items.map((_, index) => index));
 
     const total = items.length;
 
@@ -93,9 +131,6 @@ const Review1_Page2_Q1 = () => {
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
-
-    setLocked(true);
-    setShowResult(true); // 🔥 مهم
   };
 
   return (
@@ -107,15 +142,19 @@ const Review1_Page2_Q1 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall"   style={{
-                gap: "40px",
-              }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>C</span>
-          Look and tap or click.
-        </h5>
+      <div
+        className="div-forall"
+        style={{
+          gap: "40px",
+        }}
+      >
+        <ExerciseHeaderReview
+          sectionLetter="C"
+          title="Look and choose."
+          subTitle="Say each pair aloud, compare the vowel sounds, then tap the correct sound label."
+        />
 
-        <div className="grid grid-cols-2 gap-y-16 gap-x-20 mt-10 ">
+        <div className="grid grid-cols-2 gap-y-16 gap-x-20 mt-10 w-full">
           {items.map((item, i) => (
             <div
               key={i}
@@ -140,7 +179,7 @@ const Review1_Page2_Q1 = () => {
 
               <img
                 src={item.img}
-                alt=""
+                alt={IMAGE_ALTS[i]}
                 style={{
                   width: "15vw",
                   height: "20vh",
@@ -157,7 +196,21 @@ const Review1_Page2_Q1 = () => {
                     }}
                   >
                     <span
-                      onClick={() => chooseOption(i, opt)}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected[i] === opt}
+                      aria-disabled={showAnswer || correctIds.includes(i)}
+                      className="unit2-audio-control unit2-interactive"
+                      onClick={() => {
+                        playAudio(`option-${i}-${opt}`, OPTION_AUDIO[opt]);
+                        chooseOption(i, opt);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key !== "Enter" && event.key !== " ") return;
+                        event.preventDefault();
+                        playAudio(`option-${i}-${opt}`, OPTION_AUDIO[opt]);
+                        chooseOption(i, opt);
+                      }}
                       style={{
                         display: "inline-block",
                         padding: "6px 14px",
@@ -168,7 +221,7 @@ const Review1_Page2_Q1 = () => {
 
                         border:
                           selected[i] === opt
-                            ? locked
+                            ? checkedIds.includes(i)
                               ? opt === item.correct
                                 ? "1px solid #f39b42"
                                 : "2px solid red"
@@ -177,9 +230,12 @@ const Review1_Page2_Q1 = () => {
                       }}
                     >
                       {opt}
+                      <Unit2PlayingAudioIcon
+                        active={activeAudioKey === `option-${i}-${opt}`}
+                      />
                     </span>
 
-                    {showResult &&
+                    {checkedIds.includes(i) &&
                       selected[i] === opt &&
                       opt !== item.correct && (
                         <div

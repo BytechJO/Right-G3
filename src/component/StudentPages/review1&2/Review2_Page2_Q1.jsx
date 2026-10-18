@@ -8,6 +8,7 @@ import {
   MouseSensor,
   TouchSensor,
   DragOverlay,
+  useDroppable,
 } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -31,6 +32,34 @@ import img13 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Va
 import img14 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 19/Ex C 14.svg";
 import img15 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 19/Ex C 15.svg";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import Unit2PlayingAudioIcon from "../unit2/Unit2PlayingAudioIcon";
+import useUnit2Audio from "../unit2/useUnit2Audio";
+import useUnit2TabDrag from "../unit2/useUnit2TabDrag";
+import "../unit2/unit2Interactions.css";
+import toastAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_001_toast.mp3";
+import biteAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_002_bite.mp3";
+import fiveAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_003_five.mp3";
+import meAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_004_me.mp3";
+import topAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_005_top.mp3";
+import capAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_006_cap.mp3";
+import cupAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_007_cup.mp3";
+import bikeAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_008_bike.mp3";
+import cubeAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_009_cube.mp3";
+import kittenAudio from "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise C/Item_010_kitten.mp3";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+
+const WORD_AUDIO = {
+  q1: toastAudio,
+  q2: biteAudio,
+  q3: fiveAudio,
+  q4: meAudio,
+  q5: topAudio,
+  q6: capAudio,
+  q7: cupAudio,
+  q8: bikeAudio,
+  q9: cubeAudio,
+  q10: kittenAudio,
+};
 
 /* ===== البيانات ===== */
 
@@ -80,7 +109,7 @@ const captions = [
 ];
 /* ===== draggable ===== */
 
-function DraggableLetter({ item, locked }) {
+function DraggableLetter({ item, registerItem, onKeyboardPick }) {
   const {
     attributes,
     listeners,
@@ -90,12 +119,15 @@ function DraggableLetter({ item, locked }) {
     isDragging,
   } = useSortable({
     id: item,
-    disabled: locked,
   });
 
   return (
-    <div
-      ref={setNodeRef}
+    <button
+      type="button"
+      ref={(element) => {
+        setNodeRef(element);
+        registerItem(item, element);
+      }}
       {...attributes}
       {...listeners}
       style={{
@@ -112,33 +144,60 @@ function DraggableLetter({ item, locked }) {
         color: "#F79530",
         fontWeight: "bold",
         fontSize: "18px",
-        cursor: locked ? "default" : "grab",
+        cursor: "grab",
         minWidth: "35px",
         touchAction: "none",
         boxShadow: isDragging
           ? "0 4px 10px rgba(247,149,48,0.25)"
           : "0 1px 3px rgba(0,0,0,0.08)",
       }}
-      className="hover:border-[#F79530]"
+      className="unit2-drag-item hover:border-[#F79530]"
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onKeyboardPick();
+        }
+      }}
     >
       {item}
-    </div>
+    </button>
   );
 }
 
 /* ===== drop slot ===== */
 
-function DropSlot({ id, content, locked, onRemove }) {
-  const { setNodeRef, isOver } = useSortable({ id });
+function DropSlot({
+  id,
+  content,
+  locked,
+  wrong,
+  preview,
+  tabIndex,
+  registerTarget,
+  onRemove,
+  onKeyDown,
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        registerTarget(id, element);
+      }}
+      role="button"
+      tabIndex={tabIndex}
+      aria-disabled={locked}
+      onKeyDown={onKeyDown}
+      onClick={() => content && !locked && onRemove(id)}
+      className="unit2-drop-target"
       style={{
         position: "relative",
         width: "30px",
         height: "30px",
-        border: `1px solid ${isOver ? "#fb923c" : "#F79530"}`,
+        border: `${wrong ? 2 : 1}px solid ${
+          wrong ? "#ef4444" : isOver ? "#fb923c" : "#F79530"
+        }`,
         borderRadius: "6px",
         background: isOver ? "#fff7ed" : "white",
         display: "flex",
@@ -151,18 +210,13 @@ function DropSlot({ id, content, locked, onRemove }) {
         boxShadow: isOver ? "0 0 0 4px rgba(251,146,60,0.18)" : "none",
       }}
     >
-      {content && (
+      {(content || preview) && (
         <span
-          onClick={() => {
-            if (!locked) {
-              onRemove(id);
-            }
-          }}
           className={`text-[20px] ${
             locked ? "" : "cursor-pointer hover:text-red-500"
-          }`}
+          } ${preview ? "unit2-keyboard-preview" : ""}`}
         >
-          {content}
+          {preview || content}
         </span>
       )}
     </div>
@@ -175,8 +229,12 @@ const Review2_Page2_Q1 = () => {
     Object.fromEntries(ITEMS.map((i) => [i.id, null])),
   );
   const [activeId, setActiveId] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-  const [locked, setLocked] = useState(false);
+  const [correctTargets, setCorrectTargets] = useState([]);
+  const [wrongTargets, setWrongTargets] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [shakeGrid, setShakeGrid] = useState(false);
+  const [forceStop, setForceStop] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit2Audio();
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -184,8 +242,24 @@ const Review2_Page2_Q1 = () => {
     useSensor(PointerSensor),
   );
 
+  const placeLetter = (letter, slotId) => {
+    if (showAnswer || correctTargets.includes(slotId)) return;
+    setAnswers((previous) => ({ ...previous, [slotId]: letter }));
+    setWrongTargets((previous) =>
+      previous.filter((target) => target !== slotId),
+    );
+  };
+
+  const keyboard = useUnit2TabDrag({
+    itemIds: LETTERS,
+    targetIds: ITEMS.map((item) => item.id),
+    isItemDisabled: () => showAnswer,
+    isTargetDisabled: (id) => correctTargets.includes(id) || showAnswer,
+    onPlace: placeLetter,
+  });
+
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer || correctTargets.length === ITEMS.length) return;
 
     if (Object.values(answers).includes(null)) {
       ValidationAlert.info();
@@ -197,44 +271,65 @@ const Review2_Page2_Q1 = () => {
     ITEMS.forEach((item) => {
       if (answers[item.id] === item.correct) score++;
     });
+    const nextCorrect = ITEMS.flatMap((item) =>
+      answers[item.id] === item.correct ? [item.id] : [],
+    );
+    setCorrectTargets(nextCorrect);
+    setWrongTargets(
+      ITEMS.flatMap((item) =>
+        answers[item.id] !== item.correct ? [item.id] : [],
+      ),
+    );
 
     const total = ITEMS.length;
 
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
     else ValidationAlert.error(`Score: ${score} / ${total}`);
-
-    setShowResults(true);
-    setLocked(true);
   };
 
   const handleReset = () => {
     setAnswers(Object.fromEntries(ITEMS.map((i) => [i.id, null])));
-    setShowResults(false);
-    setLocked(false);
+    setCorrectTargets([]);
+    setWrongTargets([]);
+    setShowAnswer(false);
+    setActiveId(null);
+    setShakeGrid(false);
+    keyboard.cancel();
+    stopAudio();
+    setForceStop(true);
+    window.requestAnimationFrame(() => setForceStop(false));
   };
 
   const removeAnswer = (slotId) => {
-    if (locked) return;
+    if (showAnswer || correctTargets.includes(slotId)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [slotId]: null,
     }));
+    setWrongTargets((previous) =>
+      previous.filter((target) => target !== slotId),
+    );
   };
 
   return (
     <DndContext
       sensors={sensors}
       onDragStart={(e) => setActiveId(e.active.id)}
+      onDragCancel={() => setActiveId(null)}
       onDragEnd={(e) => {
-        if (locked) return;
-        if (e.over) {
-          setAnswers((prev) => ({
-            ...prev,
-            [e.over.id]: e.active.id,
-          }));
+        if (
+          showAnswer ||
+          !e.over ||
+          !ITEMS.some((item) => item.id === e.over.id)
+        ) {
+          setActiveId(null);
+          setShakeGrid(false);
+          window.requestAnimationFrame(() => setShakeGrid(true));
+          return;
         }
+        placeLetter(String(e.active.id), String(e.over.id));
         setActiveId(null);
       }}
     >
@@ -247,23 +342,32 @@ const Review2_Page2_Q1 = () => {
         }}
       >
         <div className="div-forall" style={{ gap: "25px" }}>
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>C</span>
-           Listen, read, drag, and drop the 
-            <span style={{ color: "#2e3192" }}> vowel sound</span>.
-          </h5>
+          <ExerciseHeaderReview
+            sectionLetter="C"
+            title={
+              <>
+                Listen, read, and write the{" "}
+                <span style={{ color: "#2e3192" }}>vowel sound</span>.
+              </>
+            }
+            subTitle="Replay the word if needed, identify its sound, then drag the matching sound tile into place."
+          />
           <QuestionAudioPlayer
             src={sound}
             captions={captions}
             stopAtSecond={7.6}
+            pageId="review2-page2-q1"
+            forceStop={forceStop}
+            onInteract={stopAudio}
           />
 
           <div
+            className="w-full"
             style={{
               marginBottom: "30px",
             }}
           >
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row gap-8 w-full">
               {/* 🔤 البنك */}
               <div className="p-3 rounded-2xl border-2 border-gray-200 h-fit w-fit">
                 <h3 className="font-bold text-orange-600 mb-4 text-center">
@@ -273,14 +377,24 @@ const Review2_Page2_Q1 = () => {
                 <div className="flex flex-col gap-3 items-center">
                   <SortableContext items={LETTERS}>
                     {LETTERS.map((l) => (
-                      <DraggableLetter key={l} item={l} locked={locked} />
+                      <DraggableLetter
+                        key={l}
+                        item={l}
+                        registerItem={keyboard.registerItem}
+                        onKeyboardPick={() => keyboard.pickItem(l)}
+                      />
                     ))}
                   </SortableContext>
                 </div>
               </div>
 
               {/* 🧩 الصور */}
-              <div className="flex-2 grid grid-cols-5 gap-x-3 gap-y-3">
+              <div
+                className={`flex-2 grid grid-cols-5 gap-x-3 gap-y-3 ${
+                  shakeGrid ? "unit2-invalid-drop-shake" : ""
+                }`}
+                onAnimationEnd={() => setShakeGrid(false)}
+              >
                 {ITEMS.map((item) => (
                   <div key={item.id} style={{ textAlign: "center" }}>
                     {/* 🔥 wrapper للصورة فقط */}
@@ -302,16 +416,43 @@ const Review2_Page2_Q1 = () => {
                         <DropSlot
                           id={item.id}
                           content={answers[item.id]}
-                          correct={item.correct}
-                          isSubmitted={showResults}
-                          locked={locked}
+                          locked={
+                            showAnswer || correctTargets.includes(item.id)
+                          }
+                          wrong={wrongTargets.includes(item.id)}
+                          registerTarget={keyboard.registerTarget}
+                          tabIndex={
+                            !showAnswer &&
+                            !correctTargets.includes(item.id) &&
+                            (keyboard.keyboardItemId || answers[item.id])
+                              ? 0
+                              : -1
+                          }
+                          preview={
+                            keyboard.keyboardTargetId === item.id
+                              ? keyboard.keyboardItemId
+                              : ""
+                          }
                           onRemove={removeAnswer}
+                          onKeyDown={(event) => {
+                            if (
+                              !keyboard.keyboardItemId &&
+                              answers[item.id] &&
+                              (event.key === "Enter" || event.key === " ")
+                            ) {
+                              event.preventDefault();
+                              removeAnswer(item.id);
+                              return;
+                            }
+                            keyboard.handleTargetKeyDown(event, item.id);
+                          }}
                         />
                       </div>
 
                       {/* 🖼️ الصورة */}
                       <img
                         src={item.img}
+                        alt={`Illustration of ${item.word}`}
                         style={{
                           width: "150px",
                           height: "120px",
@@ -319,7 +460,7 @@ const Review2_Page2_Q1 = () => {
                           borderRadius: "10px",
                         }}
                       />
-                      {showResults &&
+                      {wrongTargets.includes(item.id) &&
                         answers[item.id] &&
                         answers[item.id] !== item.correct && (
                           <div
@@ -336,7 +477,34 @@ const Review2_Page2_Q1 = () => {
                     </div>
 
                     {/* 📝 الكلمة */}
-                    <div style={{ marginTop: "5px" }}>{item.word}</div>
+                    <div
+                      role={WORD_AUDIO[item.id] ? "button" : undefined}
+                      tabIndex={WORD_AUDIO[item.id] ? 0 : undefined}
+                      className={
+                        WORD_AUDIO[item.id]
+                          ? "unit2-audio-control unit2-interactive"
+                          : undefined
+                      }
+                      onClick={() =>
+                        WORD_AUDIO[item.id] &&
+                        playAudio(`word-${item.id}`, WORD_AUDIO[item.id])
+                      }
+                      onKeyDown={(event) => {
+                        if (
+                          WORD_AUDIO[item.id] &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          playAudio(`word-${item.id}`, WORD_AUDIO[item.id]);
+                        }
+                      }}
+                      style={{ marginTop: "5px" }}
+                    >
+                      {item.word}
+                      <Unit2PlayingAudioIcon
+                        active={activeAudioKey === `word-${item.id}`}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -348,8 +516,14 @@ const Review2_Page2_Q1 = () => {
                 setAnswers(
                   Object.fromEntries(ITEMS.map((i) => [i.id, i.correct])),
                 );
-                setShowResults(true);
-                setLocked(true);
+                setCorrectTargets(ITEMS.map((item) => item.id));
+                setWrongTargets([]);
+                setShowAnswer(true);
+                setActiveId(null);
+                keyboard.cancel();
+                stopAudio();
+                setForceStop(true);
+                window.requestAnimationFrame(() => setForceStop(false));
               }}
               handleStartAgain={handleReset}
               checkAnswers={checkAnswers}

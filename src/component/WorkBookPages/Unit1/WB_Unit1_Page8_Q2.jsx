@@ -1413,7 +1413,7 @@ const WB_Unit1_Page8_Q2 = () => {
           subTitle="Listen to the full audio once, then replay as needed and match each picture to the vowel sound heard only after you hear the key sound or word."
         />
 
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-10 w-full">
           {/* =================================================
               QUESTION AUDIO
           ================================================= */}
@@ -1428,7 +1428,7 @@ const WB_Unit1_Page8_Q2 = () => {
               MATCH AREA
           ================================================= */}
 
-          <div ref={containerRef} style={styles.matchArea}>
+          <div ref={containerRef} style={styles.matchArea} className="w-full">
             {/* =============================================
                 SVG
             ============================================= */}

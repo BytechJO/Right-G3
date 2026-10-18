@@ -228,7 +228,7 @@ export default function WB_Unit1_Page6_QH() {
   const [answers, setAnswers] = useState({});
   const [draggedNumber, setDraggedNumber] = useState(null);
 
-  const [checked, setChecked] = useState(false);
+  const [wrongTargets, setWrongTargets] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [correctTargets, setCorrectTargets] = useState([]);
   const [shakeGrid, setShakeGrid] = useState(false);
@@ -259,7 +259,7 @@ export default function WB_Unit1_Page6_QH() {
   const applyDrop = (id, num) => {
     if (!num || showAns || correctTargets.includes(id)) return;
 
-    setChecked(false);
+    setWrongTargets((previous) => previous.filter((target) => target !== id));
 
     setAnswers((prev) => {
       const updated = { ...prev };
@@ -288,7 +288,7 @@ export default function WB_Unit1_Page6_QH() {
   };
   const handleRemove = (id) => {
     if (showAns || correctTargets.includes(id)) return;
-    setChecked(false);
+    setWrongTargets((previous) => previous.filter((target) => target !== id));
     setAnswers((prev) => {
       const u = { ...prev };
       delete u[id];
@@ -307,9 +307,12 @@ export default function WB_Unit1_Page6_QH() {
     const nextCorrect = ITEMS.filter(
       (item) => answers[item.id] === CORRECT_ANSWERS[item.id],
     ).map((item) => item.id);
+    const nextWrong = ITEMS.filter(
+      (item) => answers[item.id] !== CORRECT_ANSWERS[item.id],
+    ).map((item) => item.id);
     const correct = nextCorrect.length;
     setCorrectTargets(nextCorrect);
-    setChecked(true);
+    setWrongTargets(nextWrong);
     const total = ITEMS.length;
     if (correct === total) {
       ValidationAlert.success(`Score: ${correct} / ${total}`);
@@ -322,7 +325,7 @@ export default function WB_Unit1_Page6_QH() {
 
   const handleShowAnswer = () => {
     setAnswers({ ...CORRECT_ANSWERS });
-    setChecked(true);
+    setWrongTargets([]);
     setShowAns(true);
     setCorrectTargets(ITEMS.map((item) => item.id));
 
@@ -335,7 +338,7 @@ export default function WB_Unit1_Page6_QH() {
     setAnswers({});
     setDraggedNumber(null);
 
-    setChecked(false);
+    setWrongTargets([]);
     setShowAns(false);
     setCorrectTargets([]);
     setShakeGrid(false);
@@ -343,7 +346,7 @@ export default function WB_Unit1_Page6_QH() {
     stopAudio();
   };
 
-  const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
+  const isWrong = (id) => wrongTargets.includes(id);
 
   return (
     <div className="main-container-component">
@@ -362,6 +365,7 @@ export default function WB_Unit1_Page6_QH() {
 
           {/* ── الأرقام للسحب ── */}
           <div
+            className="w-full"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -388,6 +392,7 @@ export default function WB_Unit1_Page6_QH() {
 
           {/* ── اليسار: الجمل | اليمين: الصور ── */}
           <div
+            className="w-full"
             style={{
               display: "grid",
               gridTemplateColumns: "0.95fr 1.3fr",

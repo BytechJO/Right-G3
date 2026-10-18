@@ -1516,7 +1516,7 @@ export default function WB_Unit3_Page8_QC() {
             BOARD
         ================================================= */}
 
-        <div ref={containerRef} className="wb-c-board">
+        <div ref={containerRef} className="wb-c-board w-full">
           {/* =================================================
               SVG LINES
           ================================================= */}

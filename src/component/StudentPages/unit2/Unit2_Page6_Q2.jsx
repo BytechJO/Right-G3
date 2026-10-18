@@ -11,6 +11,44 @@ import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vac
 import img8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 15/Ex E 8.svg";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit2PlayingAudioIcon from "./Unit2PlayingAudioIcon";
+import useUnit2Audio from "./useUnit2Audio";
+import "./unit2Interactions.css";
+import taxiAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_001_a_taxi.mp3";
+import busAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_002_a_bus.mp3";
+import airplaneAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_003_an_airplane.mp3";
+import trainAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_004_a_train.mp3";
+import boatAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_005_a_boat.mp3";
+import shipAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_006_a_ship.mp3";
+import carAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_007_a_car.mp3";
+import bikeAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_008_a_bike.mp3";
+import scooterAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_009_a_scooter.mp3";
+import subwayAudio from "../../../assets/audio/ClassBook/Unit 2/Page 15 - Exercise E/Item_010_the_subway.mp3";
+
+const OPTION_AUDIO = {
+  "a taxi": taxiAudio,
+  "a bus": busAudio,
+  "an airplane": airplaneAudio,
+  "a train": trainAudio,
+  "a boat": boatAudio,
+  "a ship": shipAudio,
+  "a car": carAudio,
+  "a bike": bikeAudio,
+  "a scooter": scooterAudio,
+  "the subway": subwayAudio,
+};
+
+const IMAGE_ALTS = [
+  "A bus",
+  "A train",
+  "An airplane",
+  "A ship",
+  "A bicycle",
+  "A taxi",
+  "A car",
+  "A subway train",
+];
 
 const Unit2_Page6_Q2 = () => {
   const questions = [
@@ -25,28 +63,38 @@ const Unit2_Page6_Q2 = () => {
   ];
 
   const [answers, setAnswers] = useState(Array(questions.length).fill(""));
-  const [locked, setLocked] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit2Audio();
 
   const choose = (index, value) => {
-    if (locked) return;
+    if (showAnswer || correctIds.includes(index)) return;
 
     const updated = [...answers];
     updated[index] = value;
     setAnswers(updated);
+    setCheckedIds((previous) => previous.filter((id) => id !== index));
   };
 
   const resetAll = () => {
     setAnswers(Array(questions.length).fill(""));
-    setLocked(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
+    setShowAnswer(false);
+    stopAudio();
   };
 
   const showAnswers = () => {
     setAnswers(questions.map((q) => q.answer));
-    setLocked(true);
+    setCheckedIds(questions.map((_, index) => index));
+    setCorrectIds(questions.map((_, index) => index));
+    setShowAnswer(true);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer || correctIds.length === questions.length) return;
 
     if (answers.includes("")) {
       ValidationAlert.info();
@@ -58,6 +106,13 @@ const Unit2_Page6_Q2 = () => {
     answers.forEach((a, i) => {
       if (a === questions[i].answer) score++;
     });
+
+    setCorrectIds(
+      questions.flatMap((question, index) =>
+        answers[index] === question.answer ? [index] : [],
+      ),
+    );
+    setCheckedIds(questions.map((_, index) => index));
 
     const total = questions.length;
 
@@ -74,8 +129,6 @@ const Unit2_Page6_Q2 = () => {
     if (score === total) ValidationAlert.success(message);
     else if (score === 0) ValidationAlert.error(message);
     else ValidationAlert.warning(message);
-
-    setLocked(true);
   };
   return (
     <div
@@ -86,21 +139,22 @@ const Unit2_Page6_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall"  style={{gap:"15px"}}>
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            E
-          </span>
-          Look, read, and tap or click.
-        </h5>
+      <div className="div-forall mb-10" style={{ gap: "15px" }}>
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Look, read, and circle."
+          subTitle="Read the clue and check the picture, then tap the one option that fits best."
+        />
         {/* 🔥 GRID */}
-        <div className="grid grid-cols-4 gap-x-10 gap-y-15 text-center mt-5">
+        <div className="grid grid-cols-4 gap-x-10 gap-y-15 text-center mt-5 w-full">
+          {" "}
           {questions.map((q, index) => (
             <div key={index} className="flex flex-col items-center gap-3">
               {/* IMAGE + NUMBER */}
               <div className="relative">
                 <img
                   src={q.img}
+                  alt={IMAGE_ALTS[index]}
                   style={{
                     height: "100px",
                     objectFit: "cover",
@@ -115,7 +169,7 @@ const Unit2_Page6_Q2 = () => {
               <div
                 className="bg-orange-100 rounded-xl px-2 py-3  flex flex-col  items-center"
                 style={{
-                  width: "160px", 
+                  width: "160px",
                 }}
               >
                 {q.option.map((type) => {
@@ -124,11 +178,30 @@ const Unit2_Page6_Q2 = () => {
                   return (
                     <div
                       key={type}
-                      onClick={() => choose(index, type)}
-                      className={`cursor-pointer px-2 py-1 rounded-full`}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected}
+                      aria-disabled={showAnswer || correctIds.includes(index)}
+                      onClick={() => {
+                        playAudio(
+                          `option-${index}-${type}`,
+                          OPTION_AUDIO[type],
+                        );
+                        choose(index, type);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key !== "Enter" && event.key !== " ") return;
+                        event.preventDefault();
+                        playAudio(
+                          `option-${index}-${type}`,
+                          OPTION_AUDIO[type],
+                        );
+                        choose(index, type);
+                      }}
+                      className="unit2-audio-control unit2-interactive cursor-pointer px-2 py-1 rounded-full"
                       style={{
                         border: selected
-                          ? locked
+                          ? checkedIds.includes(index)
                             ? type === q.answer
                               ? "1px solid #f39b42" // 🔵 صح
                               : "2px solid red" // 🔴 غلط
@@ -138,7 +211,12 @@ const Unit2_Page6_Q2 = () => {
                       }}
                     >
                       {type}
-                      {locked && selected && type !== q.answer && <WrongMark />}
+                      {checkedIds.includes(index) &&
+                        selected &&
+                        type !== q.answer && <WrongMark />}
+                      <Unit2PlayingAudioIcon
+                        active={activeAudioKey === `option-${index}-${type}`}
+                      />
                     </div>
                   );
                 })}

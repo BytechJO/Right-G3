@@ -18,9 +18,10 @@ const Button = ({
         </button>
 
         <button
-          onClick={checkAnswers}
+          onClick={() => {
+            if (!checkDisabled) checkAnswers();
+          }}
           className="check-button2"
-          disabled={checkDisabled}
           aria-disabled={checkDisabled}
         >
           Check Answer ✓

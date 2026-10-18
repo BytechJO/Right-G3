@@ -29,7 +29,6 @@ import sound11 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound11.mp3";
 import sound12 from "../../../assets/audio/ClassBook/Unit 2/P 10/sound12.mp3";
 
 const Unit2_Page1_Vocab = () => {
-
   // ================================
   // ✔ Captions Array
   // ================================
@@ -52,7 +51,6 @@ const Unit2_Page1_Vocab = () => {
     { start: 32.95, end: 35.79, text: "12. globe." },
   ];
   // 🎵 فترات الكلمات داخل الأوديو الرئيسي
-
 
   const wordAudios = [
     sound1,
@@ -84,20 +82,20 @@ const Unit2_Page1_Vocab = () => {
     num12,
   ];
 
-const positions = [
-  { id: 1, top: "31.5%", left: "64%" },
-  { id: 2, top: "7%", left: "63%" },
-  { id: 3, top: "1%", left: "74%" },
-  { id: 4, top: "39%", left: "57%" },
-  { id: 5, top: "86%", left: "54.5%" },
-  { id: 6, top: "66.8%", left: "50.5%" },
-  { id: 7, top: "74%", left: "45.5%" },
-  { id: 8, top: "52.5%", left: "77%" },
-  { id: 9, top: "46.5%", left: "30.5%" },
-  { id: 10, top: "15.5%", left: "34.5%" },
-  { id: 11, top: "93.5%", left: "35%" },
-  { id: 12, top: "77.5%", left: "77%" },
-];
+  const positions = [
+    { id: 1, top: "31.5%", left: "64%" },
+    { id: 2, top: "7%", left: "63%" },
+    { id: 3, top: "1%", left: "74%" },
+    { id: 4, top: "39%", left: "57%" },
+    { id: 5, top: "86%", left: "54.5%" },
+    { id: 6, top: "66.8%", left: "50.5%" },
+    { id: 7, top: "74%", left: "45.5%" },
+    { id: 8, top: "52.5%", left: "77%" },
+    { id: 9, top: "46.5%", left: "30.5%" },
+    { id: 10, top: "15.5%", left: "34.5%" },
+    { id: 11, top: "93.5%", left: "35%" },
+    { id: 12, top: "77.5%", left: "77%" },
+  ];
 
   return (
     <ModernVocabularyComponent
@@ -107,20 +105,21 @@ const positions = [
       nums={nums}
       vocabulary={[
         "France",
-            "bus",
-            "clock tower",
-            "world map",
-            "Nile River",
-            "Egypt",
-            "pyramids",
-            "Australia",
-            "South America",
-            "Statue of Liberty",
-            "tourist ,tourists",
-            "globe",
+        "bus",
+        "clock tower",
+        "world map",
+        "Nile River",
+        "Egypt",
+        "pyramids",
+        "Australia",
+        "South America",
+        "Statue of Liberty",
+        "tourist ,tourists",
+        "globe",
       ]}
       markers={positions}
       captions={captions}
+      pageId="unit2-page10-vocab"
     />
   );
 };

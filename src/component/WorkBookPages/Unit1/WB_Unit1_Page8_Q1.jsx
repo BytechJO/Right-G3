@@ -274,7 +274,7 @@ function DropBox({
 export default function WB_Vocabulary_Page_A() {
   const [answers, setAnswers] = useState({});
   const [activeItem, setActiveItem] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+  const [wrongCells, setWrongCells] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [correctCells, setCorrectCells] = useState([]);
   const [shakeCharts, setShakeCharts] = useState(false);
@@ -307,7 +307,9 @@ export default function WB_Vocabulary_Page_A() {
 
     newAnswers[boxKey] = { dragId: item.id, value: item.value };
     setAnswers(newAnswers);
-    setShowResults(false);
+    setWrongCells((previous) =>
+      previous.filter((cellKey) => cellKey !== boxKey),
+    );
   };
 
   /* 🔥 Drag End */
@@ -352,9 +354,12 @@ export default function WB_Vocabulary_Page_A() {
     });
     const score = nextCorrect.length;
     const total = ALL_CELLS.length;
+    const nextWrong = ALL_CELLS.filter(
+      (cell) => !nextCorrect.includes(cell.key),
+    ).map((cell) => cell.key);
 
     setCorrectCells(nextCorrect);
-    setShowResults(true);
+    setWrongCells(nextWrong);
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -377,7 +382,7 @@ export default function WB_Vocabulary_Page_A() {
 
     setAnswers(correct);
     setShowAns(true);
-    setShowResults(true);
+    setWrongCells([]);
     setCorrectCells(ALL_CELLS.map((cell) => cell.key));
     keyboard.cancel();
     stopAudio();
@@ -385,7 +390,7 @@ export default function WB_Vocabulary_Page_A() {
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setWrongCells([]);
     setShowAns(false);
     setCorrectCells([]);
     setShakeCharts(false);
@@ -401,23 +406,12 @@ export default function WB_Vocabulary_Page_A() {
       delete next[key];
       return next;
     });
-    setShowResults(false);
+    setWrongCells((previous) => previous.filter((cellKey) => cellKey !== key));
     if (removed) keyboard.focusItem(String(removed));
   };
 
   const isWrong = (cell) => {
-    if (!showResults || showAns) return false;
-
-    for (const group of GROUP_COLUMNS) {
-      for (const column of group) {
-        if (column.keys.includes(cell.key)) {
-          const value = answers[cell.key]?.value;
-          return !column.correctValues.includes(value);
-        }
-      }
-    }
-
-    return false;
+    return wrongCells.includes(cell.key);
   };
 
   return (
@@ -624,7 +618,7 @@ export default function WB_Vocabulary_Page_A() {
             subTitle="Say each short- and long-vowel word aloud, identify its sound, then place it in the correct chart group."
           />
 
-          <div className="flex flex-col gap-10 items-center justify-center">
+          <div className="flex flex-col gap-10 items-center justify-center w-full">
             {/* Word Bank */}
             <div className="wb-a-word-bank">
               <div className="wb-a-word-grid">

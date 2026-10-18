@@ -165,7 +165,7 @@ function DropBox({
 export default function WB_Vocabulary_Page214_QI() {
   const [answers, setAnswers] = useState({});
   const [activeItem, setActiveItem] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+  const [wrongTargets, setWrongTargets] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [correctTargets, setCorrectTargets] = useState([]);
   const [shakeAnswers, setShakeAnswers] = useState(false);
@@ -202,7 +202,10 @@ export default function WB_Vocabulary_Page214_QI() {
       return updated;
     });
 
-    setShowResults(false);
+    const answerId = Number(boxKey.replace("a-", ""));
+    setWrongTargets((previous) =>
+      previous.filter((target) => target !== answerId),
+    );
   };
 
   const handleDragEnd = ({ active, over }) => {
@@ -225,6 +228,9 @@ export default function WB_Vocabulary_Page214_QI() {
       delete updated[key];
       return updated;
     });
+    setWrongTargets((previous) =>
+      previous.filter((target) => target !== answerId),
+    );
   };
 
   const handleCheck = () => {
@@ -240,10 +246,13 @@ export default function WB_Vocabulary_Page214_QI() {
     const nextCorrect = ANSWERS.filter(
       (item) => answers[`a-${item.id}`]?.value === item.correct,
     ).map((item) => item.id);
+    const nextWrong = ANSWERS.filter(
+      (item) => answers[`a-${item.id}`]?.value !== item.correct,
+    ).map((item) => item.id);
     const score = nextCorrect.length;
 
     setCorrectTargets(nextCorrect);
-    setShowResults(true);
+    setWrongTargets(nextWrong);
 
     const total = ANSWERS.length;
 
@@ -264,7 +273,7 @@ export default function WB_Vocabulary_Page214_QI() {
 
     setAnswers(filled);
     setShowAns(true);
-    setShowResults(true);
+    setWrongTargets([]);
     setCorrectTargets(ANSWERS.map((item) => item.id));
     keyboard.cancel();
     stopAudio();
@@ -272,7 +281,7 @@ export default function WB_Vocabulary_Page214_QI() {
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setWrongTargets([]);
     setShowAns(false);
     setCorrectTargets([]);
     setShakeAnswers(false);
@@ -281,8 +290,7 @@ export default function WB_Vocabulary_Page214_QI() {
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[`a-${item.id}`]?.value !== item.correct;
+    return wrongTargets.includes(item.id);
   };
 
   return (
@@ -298,7 +306,7 @@ export default function WB_Vocabulary_Page214_QI() {
             title="Look and write a vocabulary word."
             subTitle="Identify each adjective for the numbered people in the park, then place one word at a time and review every target before checking."
           />
-          <div className="w-full flex justify-center">
+          <div className="w-full flex justify-center ">
             <div className="flex flex-col gap-10 items-center justify-center w-[80%] max-w-[950px] mx-auto">
               {" "}
               {/* IMAGE */}

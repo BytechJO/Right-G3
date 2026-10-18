@@ -118,7 +118,7 @@ export default function WB_Unit1_Page4_Q2() {
           subTitle="Use the comparison sentence shown by each picture to decide the missing word or phrase, then reread the completed sentence."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full">
           {ITEMS.map((item) => (
             <div key={item.id} className="flex flex-col gap-4 relative">
               {/* Image */}

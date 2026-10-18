@@ -16,6 +16,11 @@ export default function useWorkbookUnit1TabDrag({
   const [keyboardTargetId, setKeyboardTargetId] = useState(null);
   const itemRefs = useRef({});
   const targetRefs = useRef({});
+  const isItemDisabledRef = useRef(isItemDisabled);
+  const getItemIdsForItemRef = useRef(getItemIdsForItem);
+
+  isItemDisabledRef.current = isItemDisabled;
+  getItemIdsForItemRef.current = getItemIdsForItem;
 
   const focusItem = (id) =>
     window.requestAnimationFrame(() => itemRefs.current[id]?.focus());
@@ -51,9 +56,15 @@ export default function useWorkbookUnit1TabDrag({
   };
 
   const focusFirstUnused = (placedId) => {
-    const candidates = getItemIdsForItem ? getItemIdsForItem(placedId) : itemIds;
-    const first = candidates.find((id) => id !== placedId && !isItemDisabled(id));
-    focusItem(first || placedId);
+    window.requestAnimationFrame(() => {
+      const getCandidates = getItemIdsForItemRef.current;
+      const candidates = getCandidates ? getCandidates(placedId) : itemIds;
+      const first = candidates.find(
+        (id) => !isItemDisabledRef.current(id),
+      );
+
+      itemRefs.current[first]?.focus();
+    });
   };
 
   const handleTargetKeyDown = (event, targetId) => {
