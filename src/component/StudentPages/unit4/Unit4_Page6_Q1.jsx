@@ -1,6 +1,32 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Unit4_Page6_Q1.css";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "./Unit4PlayingAudioIcon";
+import useUnit4Audio from "./useUnit4Audio";
+import "./unit4Interactions.css";
+import summerAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_001_summer.mp3";
+import springAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_002_spring.mp3";
+import autumnAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_003_autumn.mp3";
+import winterAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_004_winter.mp3";
+import sentence1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_005_It's_hot!_We_can_wear_shorts_and_T-shirts.mp3";
+import sentence2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_006_Sometimes_we_can_ice_skate.mp3";
+import sentence3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_007_It's_often_cool._We_wear_jackets.mp3";
+import sentence4Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_008_We_can_see_baby_birds.mp3";
+import sentence5Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise D/Item_009_It's_cold._There_aren't_any_leaves_on_the_trees.mp3";
+const SEASON_AUDIO = {
+  spring: springAudio,
+  summer: summerAudio,
+  autumn: autumnAudio,
+  winter: winterAudio,
+};
+const SENTENCE_AUDIO = [
+  sentence1Audio,
+  sentence2Audio,
+  sentence3Audio,
+  sentence4Audio,
+  sentence5Audio,
+];
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 33/Ex D 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 33/Ex D 2.svg";
@@ -26,14 +52,17 @@ const Unit4_Page6_Q1 = () => {
   const [answers, setAnswers] = useState(Array(items.length).fill(""));
   const [showCorrect, setShowCorrect] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   // ✅ handle select
   const handleChange = (index, value) => {
-    if (showCorrect) return;
+    if (lockedIds.includes(index)) return;
 
     const updated = [...answers];
     updated[index] = value;
     setAnswers(updated);
+    setWrongMarks((prev) => prev.filter((id) => id !== index));
   };
 
   // ✅ SHOW ANSWERS
@@ -41,6 +70,8 @@ const Unit4_Page6_Q1 = () => {
     setAnswers(items.map((item) => item.answer));
     setShowCorrect(true);
     setWrongMarks([]);
+    setLockedIds(items.map((_, i) => i));
+    stopAudio();
   };
 
   // ✅ RESET
@@ -48,11 +79,13 @@ const Unit4_Page6_Q1 = () => {
     setAnswers(items.map(() => ""));
     setShowCorrect(false);
     setWrongMarks([]);
+    setLockedIds([]);
+    stopAudio();
   };
 
   // ✅ CHECK ANSWERS
   const checkAnswers = () => {
-    if (showCorrect) return;
+    if (lockedIds.length === items.length) return;
 
     if (answers.includes("")) {
       ValidationAlert.info();
@@ -73,6 +106,15 @@ const Unit4_Page6_Q1 = () => {
 
     setWrongMarks(wrong);
     setShowCorrect(true);
+    setLockedIds(
+      items
+        .map((item, i) =>
+          answers[i]?.trim().toLowerCase() === item.answer.toLowerCase()
+            ? i
+            : null,
+        )
+        .filter((id) => id !== null),
+    );
 
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
@@ -96,18 +138,20 @@ const Unit4_Page6_Q1 = () => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom:"50px",
+        marginBottom: "50px",
         padding: "30px",
       }}
     >
       <div className="div-forall" style={{ gap: "40px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A">D</span>
-        Read and write. Which season is it?
-        </h5>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Read and write. Which season is it?"
+          subTitle="Use the weather clues in each picture, then write the correct season before checking."
+        />
 
         {/* IMAGES */}
         <div
+          className="w-full"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -121,29 +165,69 @@ const Unit4_Page6_Q1 = () => {
             { word: "summer", img: img3 },
             { word: "winter", img: img4 },
           ].map((item, index) => (
-            <img
+            <div
               key={index}
-              src={item.img}
-              alt={item.word}
-              style={{
-                width: "auto",
-                height: "130px",
-                borderRadius: "12px",
+              role="button"
+              tabIndex={0}
+              className="unit4-audio-control unit4-interactive"
+              onClick={() =>
+                playAudio(`season-${item.word}`, SEASON_AUDIO[item.word])
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  playAudio(`season-${item.word}`, SEASON_AUDIO[item.word]);
+                }
               }}
-            />
+              style={{ position: "relative" }}
+            >
+              <Unit4PlayingAudioIcon
+                active={activeAudioKey === `season-${item.word}`}
+              />
+              <img
+                src={item.img}
+                alt={`${item.word} season scene`}
+                style={{
+                  width: "auto",
+                  height: "130px",
+                  borderRadius: "12px",
+                }}
+              />
+            </div>
           ))}
         </div>
 
         {/* CONTENT */}
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           {items.map((item, i) => {
             const isWrong = wrongMarks.includes(i);
 
             return (
-              <div key={i} className="flex items-center gap-7">
+              <div
+                key={i}
+                className="flex items-center gap-7 unit4-audio-control"
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `sentence-${i}`}
+                />
                 {/* TEXT */}
-                <span className="text-[18px]">
-                  <span className="text-[20px] font-bold mr-2">{i + 1}</span> {item.text}
+                <span
+                  className="text-[18px] unit4-interactive"
+                  role={SENTENCE_AUDIO[i] ? "button" : undefined}
+                  tabIndex={SENTENCE_AUDIO[i] ? 0 : -1}
+                  onClick={() => playAudio(`sentence-${i}`, SENTENCE_AUDIO[i])}
+                  onKeyDown={(event) => {
+                    if (
+                      SENTENCE_AUDIO[i] &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      playAudio(`sentence-${i}`, SENTENCE_AUDIO[i]);
+                    }
+                  }}
+                >
+                  <span className="text-[20px] font-bold mr-2">{i + 1}</span>{" "}
+                  {item.text}
                 </span>
 
                 {/* DROPDOWN */}
@@ -157,7 +241,7 @@ const Unit4_Page6_Q1 = () => {
                   <select
                     value={answers[i]}
                     onChange={(e) => handleChange(i, e.target.value)}
-                    disabled={showCorrect}
+                    disabled={lockedIds.includes(i)}
                     style={{
                       minWidth: "140px",
                       padding: "6px 10px",
@@ -172,9 +256,8 @@ const Unit4_Page6_Q1 = () => {
                       // fontWeight: "bold",
                       // color: answers[i] ? "#1C398E" : "#000",
                       background: "#fff",
-                      fontSize:"18px",
-                      outline: "none",
-                      cursor: showCorrect ? "default" : "pointer",
+                      fontSize: "18px",
+                      cursor: lockedIds.includes(i) ? "default" : "pointer",
                     }}
                   >
                     <option value="">Select</option>
@@ -189,7 +272,7 @@ const Unit4_Page6_Q1 = () => {
                   {/* ❌ Wrong Mark */}
                   {showCorrect && isWrong && (
                     <div
-                       className="absolute top-0 -right-3 -translate-y-1/2
+                      className="absolute top-0 -right-3 -translate-y-1/2
       w-[22px] h-[22px]
 rounded-full
 bg-[red] text-white

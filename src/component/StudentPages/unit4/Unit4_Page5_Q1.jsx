@@ -2,12 +2,43 @@ import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import image from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex A 1.svg";
 import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "./Unit4PlayingAudioIcon";
+import useUnit4Audio from "./useUnit4Audio";
+import "./unit4Interactions.css";
+import theyAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_002_they.mp3";
+import thatAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_005_that.mp3";
+import thisAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_006_this.mp3";
+import motherAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_004_mother.mp3";
+import brotherAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_010_brother.mp3";
+import fatherAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_011_father.mp3";
+import birthdayAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_009_birthday.mp3";
+import bathAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_003_bath.mp3";
+import thirstyAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_007_thirsty.mp3";
+import thickAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_008_thick.mp3";
+import thinAudio from "../../../assets/audio/ClassBook/Unit 4/Page 32 - Exercise A/Item_012_thin.mp3";
+
+const WORD_AUDIO = {
+  they: theyAudio,
+  that: thatAudio,
+  this: thisAudio,
+  mother: motherAudio,
+  brother: brotherAudio,
+  father: fatherAudio,
+  birthday: birthdayAudio,
+  bath: bathAudio,
+  thirsty: thirstyAudio,
+  thick: thickAudio,
+  thin: thinAudio,
+};
 
 const Unit4_Page5_Q1 = () => {
   const [selected, setSelected] = useState([]);
-  const [locked, setLocked] = useState(false);
+  const [lockedWords, setLockedWords] = useState([]);
   const [showAnswer, setShowAnswer] = useState(false);
   const [wrongWords, setWrongWords] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const [completed, setCompleted] = useState(false);
   // ✅ الكلمات + أماكنها (بالنسب)
   const words = [
     { id: "they", top: "23.32%", left: "32.21%", correct: true },
@@ -26,8 +57,8 @@ const Unit4_Page5_Q1 = () => {
   ];
 
   const handleClick = (word) => {
-    if (locked) return;
-
+    playAudio(`word-${word.id}`, WORD_AUDIO[word.id]);
+    if (showAnswer || completed || lockedWords.includes(word.id)) return;
     const exists = selected.find((w) => w.id === word.id);
 
     if (exists) {
@@ -35,71 +66,79 @@ const Unit4_Page5_Q1 = () => {
     } else {
       setSelected([...selected, word]);
     }
+    setWrongWords((prev) => prev.filter((id) => id !== word.id));
   };
 
   const handleCheck = () => {
-    if (locked || showAnswer) return;
+    // ✅ بعد ما المستخدم يعمل Check ويجيب Full Score فقط
+    if (showAnswer || completed) return;
 
-    const totalCorrect = words.filter((w) => w.correct).length;
+    const correctWords = words.filter((w) => w.correct);
+    const totalCorrect = correctWords.length;
 
-    // ❌ ما اختار ولا شي
     if (selected.length === 0) {
-      return ValidationAlert.info();
+      ValidationAlert.info();
+      return;
     }
 
-    let correctCount = 0;
-    let wrong = [];
+    const selectedCorrect = selected.filter((word) => word.correct);
+    const selectedWrong = selected.filter((word) => !word.correct);
 
-    selected.forEach((w) => {
-      if (w.correct) {
-        correctCount++;
-      } else {
-        wrong.push(w.id);
-      }
-    });
+    const wrong = selectedWrong.map((word) => word.id);
 
-    // 🔥 خصم عدد الإجابات الخاطئة
-    let finalScore = correctCount - wrong.length;
+    // ✅ أي كلمة صح تنقفل بعد Check
+    const correctSelectedIds = selectedCorrect.map((word) => word.id);
 
-    // 🔥 ما ينزل تحت الصفر
+    setLockedWords((prev) => [...new Set([...prev, ...correctSelectedIds])]);
+
+    setWrongWords(wrong);
+
+    let finalScore = selectedCorrect.length - selectedWrong.length;
+
     if (finalScore < 0) {
       finalScore = 0;
     }
 
-    setWrongWords(wrong);
-    setLocked(true);
+    // ✅ Full Score يتحقق فقط عند الضغط على Check
+    const isFullScore =
+      selectedCorrect.length === totalCorrect && selectedWrong.length === 0;
 
-    const color =
-      finalScore === totalCorrect
-        ? "green"
-        : finalScore === 0
-          ? "red"
-          : "orange";
+    if (isFullScore) {
+      // ✅ من هون فقط نقفل Check Answer
+      setCompleted(true);
 
-    ValidationAlert[
-      finalScore === totalCorrect
-        ? "success"
-        : finalScore === 0
-          ? "error"
-          : "warning"
-    ](
-      `
+      ValidationAlert.success(`
+      Score: ${totalCorrect} / ${totalCorrect}
+    `);
+
+      return;
+    }
+
+    if (finalScore === 0) {
+      ValidationAlert.error(`
       Score: ${finalScore} / ${totalCorrect}
-    `,
-    );
+    `);
+    } else {
+      ValidationAlert.warning(`
+      Score: ${finalScore} / ${totalCorrect}
+    `);
+    }
   };
-
   const handleShowAnswer = () => {
     setShowAnswer(true);
-    setLocked(true);
+    setLockedWords(words.filter((w) => w.correct).map((w) => w.id));
     setSelected(words.filter((w) => w.correct));
+    setWrongWords([]);
+    stopAudio();
   };
 
   const handleReset = () => {
     setSelected([]);
     setWrongWords([]);
-    setLocked(false);
+    setLockedWords([]);
     setShowAnswer(false);
+    setCompleted(false);
+    stopAudio();
   };
 
   return (
@@ -118,13 +157,16 @@ const Unit4_Page5_Q1 = () => {
           gap: "30px",
         }}
       >
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            A
-          </span>
-          Follow the words with the
-          <span style={{ color: "#2e3192" }}> voiced th </span>sound.
-        </h5>
+        <ExerciseHeader
+          sectionLetter="A"
+          title={
+            <>
+              Follow the words with the{" "}
+              <span style={{ color: "#2e3192" }}>voiced th</span> sound.
+            </>
+          }
+          subTitle="Say each word quietly, then follow only the words that contain the target th sound."
+        />
 
         <div
           style={{
@@ -137,7 +179,7 @@ const Unit4_Page5_Q1 = () => {
           {/* الصورة */}
           <img
             src={image}
-            alt="interactive"
+            alt="A word maze from Start to Finish with family and object picture clues"
             style={{
               width: "100%",
               height: "auto",
@@ -219,6 +261,24 @@ pointer-events-nonel"
               <div
                 key={i}
                 onClick={() => handleClick(word)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    handleClick(word);
+                  }
+                }}
+                role="button"
+                tabIndex={
+                  showAnswer || completed || lockedWords.includes(word.id)
+                    ? -1
+                    : 0
+                }
+                aria-pressed={selected.some((entry) => entry.id === word.id)}
+                aria-disabled={
+                  showAnswer || completed || lockedWords.includes(word.id)
+                }
+                aria-label={`${word.id} word`}
+                className="unit4-audio-control unit4-interactive"
                 style={{
                   position: "absolute",
                   top: word.top,
@@ -228,12 +288,16 @@ pointer-events-nonel"
                   padding: "0.2vw 0.6vw",
                   borderRadius: "0.5vw",
                   whiteSpace: "nowrap",
-                  cursor: "pointer",
-
-                  // 🔥 هذا المهم
+                  cursor:
+                    showAnswer || completed || lockedWords.includes(word.id)
+                      ? "default"
+                      : "pointer",
                   border: "0.2vw solid orange",
                 }}
               >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `word-${word.id}`}
+                />
                 {word.id}
               </div>
             );

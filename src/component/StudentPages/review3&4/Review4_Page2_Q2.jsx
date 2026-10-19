@@ -12,6 +12,7 @@ import blue from "../../../assets/audio/ClassBook/Unit 4/P 37/full1.mp3";
 
 import Button from "../../Button";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 
 const Review4_Page2_Q2 = () => {
   const items = [
@@ -22,7 +23,8 @@ const Review4_Page2_Q2 = () => {
   ];
 
   const [selected, setSelected] = useState(Array(items.length).fill(""));
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const captions = [
     {
       start: 0.239,
@@ -36,15 +38,16 @@ const Review4_Page2_Q2 = () => {
     },
   ];
   const choose = (i, value) => {
-    if (locked) return;
+    if (lockedIds.includes(i)) return;
 
     const updated = [...selected];
     updated[i] = value;
     setSelected(updated);
+    setWrongIds((prev) => prev.filter((id) => id !== i));
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (lockedIds.length === items.length) return;
 
     if (selected.includes("")) {
       ValidationAlert.info();
@@ -73,17 +76,28 @@ const Review4_Page2_Q2 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setLocked(true);
+    setWrongIds(
+      items
+        .map((item, i) => (selected[i] !== item.correct ? i : null))
+        .filter((id) => id !== null),
+    );
+    setLockedIds(
+      items
+        .map((item, i) => (selected[i] === item.correct ? i : null))
+        .filter((id) => id !== null),
+    );
   };
 
   const showAnswers = () => {
     setSelected(items.map((i) => i.correct));
-    setLocked(true);
+    setWrongIds([]);
+    setLockedIds(items.map((_, i) => i));
   };
 
   const reset = () => {
     setSelected(Array(items.length).fill(""));
-    setLocked(false);
+    setLockedIds([]);
+    setWrongIds([]);
   };
 
   return (
@@ -96,16 +110,27 @@ const Review4_Page2_Q2 = () => {
       }}
     >
       <div className="div-forall">
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>E</span>
-          Does the word have a
-          <span style={{ color: "#2e3192" }}> voiced th </span>sound? Listen and write<span style={{ color: "#D52328" }}> ✓ </span>or
-          <span style={{ color: "#D52328" }}> ✗</span>
-        </h5>
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={11} />
+        <ExerciseHeaderReview
+          sectionLetter="E"
+          title={
+            <>
+              Does the word have a{" "}
+              <span style={{ color: "#2e3192" }}>voiced th</span> sound? Listen
+              and write <span style={{ color: "#D1232A" }}>✓</span> or{" "}
+              <span style={{ color: "#D1232A" }}>✗</span>.
+            </>
+          }
+          subTitle="Listen once, replay if needed, then select the sound or answer that matches what you hear."
+        />
+        <QuestionAudioPlayer
+          src={blue}
+          captions={captions}
+          stopAtSecond={11}
+          pageId="review4-page2-q2"
+        />
 
         {/* GRID */}
-        <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center">
+        <div className="grid grid-cols-4 gap-8 mt-10 justify-items-center w-full">
           {items.map((item, i) => (
             <div key={i} className="relative flex flex-col items-center">
               {/* الرقم */}
@@ -116,6 +141,14 @@ const Review4_Page2_Q2 = () => {
                 <div className="flex flex-col items-center">
                   <img
                     src={item.img}
+                    alt={
+                      [
+                        "A thief carrying a bag",
+                        "A weather presenter",
+                        "A thorn on a rose stem",
+                        "A father standing with his child",
+                      ][i]
+                    }
                     style={{
                       width: "auto",
                       height: "20vh",
@@ -137,10 +170,10 @@ const Review4_Page2_Q2 = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           fontSize: "18px",
-                          cursor: locked ? "default" : "pointer",
+                          cursor: lockedIds.includes(i) ? "default" : "pointer",
                           border:
                             selected[i] === "yes"
-                              ? locked &&
+                              ? wrongIds.includes(i) &&
                                 selected[i] === "yes" &&
                                 item.correct !== "yes"
                                 ? "2px solid red"
@@ -148,10 +181,10 @@ const Review4_Page2_Q2 = () => {
                               : "2px solid #ccc",
                         }}
                       >
-                        <img src={trueIcon} style={{ height: "25px" }} />
+                        <img src={trueIcon} alt="" style={{ height: "25px" }} />
                       </button>
 
-                      {locked &&
+                      {wrongIds.includes(i) &&
                         selected[i] === "yes" &&
                         item.correct !== "yes" && (
                           <div
@@ -183,10 +216,10 @@ const Review4_Page2_Q2 = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           fontSize: "18px",
-                          cursor: locked ? "default" : "pointer",
+                          cursor: lockedIds.includes(i) ? "default" : "pointer",
                           border:
                             selected[i] === "no"
-                              ? locked &&
+                              ? wrongIds.includes(i) &&
                                 selected[i] === "no" &&
                                 item.correct !== "no"
                                 ? "2px solid red"
@@ -194,9 +227,13 @@ const Review4_Page2_Q2 = () => {
                               : "2px solid #ccc",
                         }}
                       >
-                        <img src={falseIcon} style={{ height: "25px" }} />
+                        <img
+                          src={falseIcon}
+                          alt=""
+                          style={{ height: "25px" }}
+                        />
                       </button>
-                      {locked &&
+                      {wrongIds.includes(i) &&
                         selected[i] === "no" &&
                         item.correct !== "no" && (
                           <div

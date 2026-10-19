@@ -1,6 +1,25 @@
 import React, { useMemo, useState } from "react";
 import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "./Unit4PlayingAudioIcon";
+import useUnit4Audio from "./useUnit4Audio";
+import "./unit4Interactions.css";
+import weatherAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_002_weather.mp3";
+import theAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_003_the.mp3";
+import likeAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_004_like.mp3";
+import winterAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_005_winter.mp3";
+import whatsAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_006_What's.mp3";
+import inAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_007_in.mp3";
+import itsAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_008_It's.mp3";
+import summerAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_010_summer.mp3";
+import autumnAudio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_012_autumn.mp3";
+import prompt1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_001_weather_what's_winter_in_like_the.mp3";
+import prompt2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_009_like_summer_the_what's_in_weather.mp3";
+import prompt3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_011_the_in_weather_like_what's_autumn.mp3";
+
+const WORD_AUDIO = { weather: weatherAudio, the: theAudio, like: likeAudio, winter: winterAudio, "What’s": whatsAudio, in: inAudio, "It's": itsAudio, summer: summerAudio, autumn: autumnAudio };
+const PROMPT_AUDIO = { 1: prompt1Audio, 2: prompt2Audio, 3: prompt3Audio };
 
 const shuffleArray = (array) => {
   const newArray = [...array];
@@ -43,11 +62,16 @@ const WEATHER_OPTIONS = ["cool", "hot", "cold", "warm"];
 
 export default function Unit4_Page6_Q2() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [wordBanksSeed, setWordBanksSeed] = useState(0);
   const [seasonAnswers, setSeasonAnswers] = useState({});
+  const [lockedSentences, setLockedSentences] = useState([]);
+  const [lockedSeasons, setLockedSeasons] = useState([]);
+  const [wrongSentences, setWrongSentences] = useState([]);
+  const [wrongSeasons, setWrongSeasons] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const shuffledBanks = useMemo(() => {
+    void wordBanksSeed;
     const banks = {};
     ITEMS.forEach((item) => {
       banks[item.id] = shuffleArray(item.words);
@@ -56,7 +80,7 @@ export default function Unit4_Page6_Q2() {
   }, [wordBanksSeed]);
 
   const handleSelectWord = (itemId, wordIndex) => {
-    if (showAns || checked) return;
+    if (showAns || lockedSentences.includes(itemId)) return;
 
     const currentAnswer = answers[itemId] || [];
     const selectedWord = shuffledBanks[itemId][wordIndex];
@@ -67,14 +91,11 @@ export default function Unit4_Page6_Q2() {
       ...prev,
       [itemId]: [...currentAnswer, selectedWord],
     }));
-
-    if (checked) {
-      setChecked(false);
-    }
+    setWrongSentences((previous) => previous.filter((id) => id !== itemId));
   };
 
   const handleRemoveWord = (itemId, answerIndex) => {
-    if (showAns || checked) return;
+    if (showAns || lockedSentences.includes(itemId)) return;
 
     const currentAnswer = [...(answers[itemId] || [])];
     currentAnswer.splice(answerIndex, 1);
@@ -83,10 +104,7 @@ export default function Unit4_Page6_Q2() {
       ...prev,
       [itemId]: currentAnswer,
     }));
-
-    if (checked) {
-      setChecked(false);
-    }
+    setWrongSentences((previous) => previous.filter((id) => id !== itemId));
   };
   const getVisibleBankWords = (item) => {
     const chosenWords = answers[item.id] || [];
@@ -120,7 +138,7 @@ export default function Unit4_Page6_Q2() {
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || (lockedSentences.length === ITEMS.length && lockedSeasons.length === ITEMS.length)) return;
 
     const allCompleted = ITEMS.every(
       (item) => isSentenceComplete(item) && seasonAnswers[item.id],
@@ -146,7 +164,10 @@ export default function Unit4_Page6_Q2() {
       }
     });
 
-    setChecked(true);
+    setLockedSentences(ITEMS.flatMap((item) => isSentenceCorrect(item) ? [item.id] : []));
+    setLockedSeasons(ITEMS.flatMap((item) => seasonAnswers[item.id] === item.season ? [item.id] : []));
+    setWrongSentences(ITEMS.flatMap((item) => !isSentenceCorrect(item) ? [item.id] : []));
+    setWrongSeasons(ITEMS.flatMap((item) => seasonAnswers[item.id] !== item.season ? [item.id] : []));
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -169,22 +190,25 @@ export default function Unit4_Page6_Q2() {
     setAnswers(solved);
     setSeasonAnswers(solvedSeasons);
 
-    setChecked(true);
     setShowAns(true);
+    setLockedSentences(ITEMS.map((item) => item.id)); setLockedSeasons(ITEMS.map((item) => item.id));
+    setWrongSentences([]); setWrongSeasons([]); stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setSeasonAnswers({});
-    setChecked(false);
     setShowAns(false);
+    setLockedSentences([]); setLockedSeasons([]); setWrongSentences([]); setWrongSeasons([]); stopAudio();
     setWordBanksSeed((prev) => prev + 1);
   };
   const handleSeasonChange = (itemId, value) => {
+    if (showAns || lockedSeasons.includes(itemId)) return;
     setSeasonAnswers((prev) => ({
       ...prev,
       [itemId]: value,
     }));
+    setWrongSeasons((previous) => previous.filter((id) => id !== itemId));
   };
   return (
     <div className="main-container-component">
@@ -194,10 +218,7 @@ export default function Unit4_Page6_Q2() {
           gap: "30px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-           Look, unscramble, and answer. Use the words below.
-        </h1>
+        <ExerciseHeader sectionLetter="E" title="Look, unscramble, and answer. Use the words below." subTitle="Say the complete answer first, then arrange the word tiles in sentence order and add punctuation." />
 
         <div
           style={{
@@ -210,8 +231,8 @@ export default function Unit4_Page6_Q2() {
           {ITEMS.map((item) => {
             const builtWords = answers[item.id] || [];
             const visibleWords = getVisibleBankWords(item);
-            const wrong =
-              checked && isSentenceComplete(item) && !isSentenceCorrect(item);
+            const sentenceWrong = wrongSentences.includes(item.id);
+            const seasonWrong = wrongSeasons.includes(item.id);
 
             return (
               <div
@@ -247,12 +268,18 @@ export default function Unit4_Page6_Q2() {
                   </span>
 
                   <span
+                    role={PROMPT_AUDIO[item.id] ? "button" : undefined}
+                    tabIndex={PROMPT_AUDIO[item.id] ? 0 : -1}
+                    className={PROMPT_AUDIO[item.id] ? "unit4-audio-control unit4-interactive" : undefined}
+                    onClick={() => PROMPT_AUDIO[item.id] && playAudio(`prompt-${item.id}`, PROMPT_AUDIO[item.id])}
+                    onKeyDown={(event) => { if (PROMPT_AUDIO[item.id] && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); playAudio(`prompt-${item.id}`, PROMPT_AUDIO[item.id]); } }}
                     style={{
                       fontSize: "18px",
                       color: "#444",
                       lineHeight: "1.5",
                     }}
                   >
+                    <Unit4PlayingAudioIcon active={activeAudioKey === `prompt-${item.id}`} />
                     {item.prompt}
                   </span>
                 </div>
@@ -261,7 +288,7 @@ export default function Unit4_Page6_Q2() {
                 <div
                   style={{
                     minHeight: "52px",
-                    borderBottom: wrong
+                    borderBottom: sentenceWrong
                       ? "2px solid red"
                       : "1px solid  #8f8f8f",
                     display: "flex",
@@ -281,9 +308,9 @@ export default function Unit4_Page6_Q2() {
                         border: "none",
                         fontSize: "18px",
                         // fontWeight: "500",
-                        cursor: showAns || checked ? "default" : "pointer",
+                        cursor: showAns || lockedSentences.includes(item.id) ? "default" : "pointer",
                       }}
-                      className={`${!showAns && !checked && "hover:text-red-500"}`}
+                      className={`${!showAns && !lockedSentences.includes(item.id) && "hover:text-red-500"}`}
                     >
                       {word}
                     </button>
@@ -302,10 +329,13 @@ export default function Unit4_Page6_Q2() {
                   {visibleWords.map((wordItem, index) => (
                     <button
                       key={`${item.id}-bank-${index}-${wordItem.word}`}
-                      onClick={() =>
-                        !wordItem.disabled && handleSelectWord(item.id, index)
-                      }
-                      disabled={wordItem.disabled}
+                      aria-disabled={wordItem.disabled || lockedSentences.includes(item.id)}
+                      className="unit4-audio-control"
+                      onClick={() => {
+                        const audio = WORD_AUDIO[wordItem.word];
+                        if (audio) playAudio(`word-${item.id}-${index}`, audio);
+                        if (!wordItem.disabled) handleSelectWord(item.id, index);
+                      }}
                       style={{
                         padding: "6px 10px",
                         borderRadius: "8px",
@@ -328,12 +358,13 @@ export default function Unit4_Page6_Q2() {
                             : "pointer",
                       }}
                     >
+                      <Unit4PlayingAudioIcon active={activeAudioKey === `word-${item.id}-${index}`} />
                       {wordItem.word}
                     </button>
                   ))}
                 </div>
 
-                {wrong && (
+                {sentenceWrong && (
                   <div
                     style={{
                       position: "absolute",
@@ -367,11 +398,17 @@ export default function Unit4_Page6_Q2() {
                   }}
                 >
                   <span
+                    role="button"
+                    tabIndex={0}
+                    className="unit4-audio-control unit4-interactive"
+                    onClick={() => playAudio(`its-${item.id}`, itsAudio)}
+                    onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playAudio(`its-${item.id}`, itsAudio); } }}
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
                     }}
                   >
+                    <Unit4PlayingAudioIcon active={activeAudioKey === `its-${item.id}`} />
                     It's
                   </span>
 
@@ -380,17 +417,17 @@ export default function Unit4_Page6_Q2() {
                     onChange={(e) =>
                       handleSeasonChange(item.id, e.target.value)
                     }
-                    disabled={showAns || checked}
+                    disabled={showAns || lockedSeasons.includes(item.id)}
                     style={{
                       padding: "8px 12px",
                       // borderRadius: "8px",
-                      borderBottom: wrong
+                      borderBottom: seasonWrong
                         ? "2px solid red"
                         : "1px solid  #8f8f8f",
                       fontSize: "15px",
                       minWidth: "120px",
                       background: "#fff",
-                      cursor: showAns || checked ? "default" : "pointer",
+                      cursor: showAns || lockedSeasons.includes(item.id) ? "default" : "pointer",
                     }}
                   >
                     <option value="">Select</option>
@@ -401,6 +438,7 @@ export default function Unit4_Page6_Q2() {
                       </option>
                     ))}
                   </select>
+                  {seasonWrong && <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: "50%", background: "red", color: "white", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>✕</span>}
                 </div>
               </div>
             );

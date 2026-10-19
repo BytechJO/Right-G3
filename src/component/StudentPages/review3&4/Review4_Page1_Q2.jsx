@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 
 const items = [
   {
@@ -39,13 +40,12 @@ export default function Review4_Page1_Q2() {
     ),
   );
 
-  const [locked, setLocked] = useState(false);
-  const [checked, setChecked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
 
-  
   // ✅ حذف حرف وإرجاعه للبنك
   const handleRemoveLetter = (questionIndex, letterIndex) => {
-    if (locked) return;
+    if (lockedIds.includes(questionIndex)) return;
 
     const updatedAnswers = [...answers];
     const updatedBank = [...letterBank];
@@ -67,6 +67,7 @@ export default function Review4_Page1_Q2() {
 
     setAnswers(updatedAnswers);
     setLetterBank(updatedBank);
+    setWrongIds((previous) => previous.filter((id) => id !== questionIndex));
   };
 
   const resetAll = () => {
@@ -79,8 +80,8 @@ export default function Review4_Page1_Q2() {
         })),
       ),
     );
-    setLocked(false);
-    setChecked(false);
+    setLockedIds([]);
+    setWrongIds([]);
   };
 
   const showAnswers = () => {
@@ -97,13 +98,15 @@ export default function Review4_Page1_Q2() {
 
     setLetterBank(updatedBank);
 
-    setLocked(true);
-    setChecked(true);
+    setLockedIds(items.map((_, i) => i));
+    setWrongIds([]);
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (lockedIds.length === items.length) return;
 
-    const empty = answers.some((letters) => letters.length === 0);
+    const empty = answers.some(
+      (letters, i) => letters.length !== items[i].correct[0].length,
+    );
 
     if (empty) {
       ValidationAlert.info("Please complete all answers.");
@@ -117,6 +120,16 @@ export default function Review4_Page1_Q2() {
         score++;
       }
     });
+    setLockedIds(
+      items.flatMap((item, i) =>
+        answers[i].join("") === item.correct[0] ? [i] : [],
+      ),
+    );
+    setWrongIds(
+      items.flatMap((item, i) =>
+        answers[i].join("") !== item.correct[0] ? [i] : [],
+      ),
+    );
 
     const total = items.length;
 
@@ -133,13 +146,10 @@ export default function Review4_Page1_Q2() {
     if (score === total) ValidationAlert.success(message);
     else if (score === 0) ValidationAlert.error(message);
     else ValidationAlert.warning(message);
-
-    setLocked(true);
-    setChecked(true);
   };
 
   const handleAddLetter = (i, letterObj, index) => {
-    if (locked) return;
+    if (lockedIds.includes(i)) return;
     if (letterObj.used) return;
 
     const updatedAnswers = [...answers];
@@ -153,14 +163,16 @@ export default function Review4_Page1_Q2() {
 
     setAnswers(updatedAnswers);
     setLetterBank(updatedBank);
+    setWrongIds((previous) => previous.filter((id) => id !== i));
   };
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"90px"}}>
-        <h5 className="header-title-page8">
-          <span className=" mr-4">B</span>
-         Unscramble, drag, and drop.
-        </h5>
+      <div className="div-forall" style={{ gap: "90px" }}>
+        <ExerciseHeaderReview
+          sectionLetter="B"
+          title="Unscramble and write."
+          subTitle="Say the complete answer first, then arrange the word tiles in sentence order and add punctuation."
+        />
         <div className="flex flex-col gap-15">
           {items.map((item, i) => (
             <div key={i} className="flex gap-5">
@@ -176,7 +188,19 @@ export default function Review4_Page1_Q2() {
 
                       return (
                         <span
+                          key={id}
+                          role="button"
+                          tabIndex={
+                            letter.used || lockedIds.includes(i) ? -1 : 0
+                          }
+                          aria-disabled={letter.used || lockedIds.includes(i)}
                           onClick={() => handleAddLetter(i, letter, index)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleAddLetter(i, letter, index);
+                            }
+                          }}
                           className={`
     w-9 h-9 flex items-center justify-center rounded border
     ${
@@ -204,7 +228,7 @@ export default function Review4_Page1_Q2() {
                       position: "relative",
                       borderBottom: "1px solid gray",
                       // ❌ حالة الخطأ
-                      ...(checked && answers[i].join("") !== item.correct[0]
+                      ...(wrongIds.includes(i)
                         ? {
                             borderBottom: "2px solid red",
                             // backgroundColor: "#fee2e2",
@@ -221,9 +245,17 @@ export default function Review4_Page1_Q2() {
                           onMouseEnter={() => setHoveredWord(key)}
                           onMouseLeave={() => setHoveredWord(null)}
                           onClick={() => handleRemoveLetter(i, letterIndex)}
+                          role="button"
+                          tabIndex={lockedIds.includes(i) ? -1 : 0}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleRemoveLetter(i, letterIndex);
+                            }
+                          }}
                           className={`
         text-xl font-semibold
-        ${locked ? "cursor-default" : "cursor-pointer"}
+        ${lockedIds.includes(i) ? "cursor-default" : "cursor-pointer"}
       `}
                           style={{
                             marginRight: "2px",
@@ -236,7 +268,7 @@ export default function Review4_Page1_Q2() {
                       );
                     })}
 
-                    {checked && answers[i].join("") !== item.correct[0] && (
+                    {wrongIds.includes(i) && (
                       <div
                         style={{
                           position: "absolute",

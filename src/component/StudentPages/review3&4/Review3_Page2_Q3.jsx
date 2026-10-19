@@ -8,6 +8,7 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frien
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 35/Ex E 6.svg";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 
 const items = [
   {
@@ -50,7 +51,6 @@ const items = [
 
 export default function Review3_Page2_Q3() {
   const [answers, setAnswers] = useState(items.map(() => []));
-  const [hoveredWord, setHoveredWord] = useState(null);
   // ✅ بنك الحروف مع حالة used
   const [letterBank, setLetterBank] = useState(
     items.map((item) =>
@@ -61,12 +61,12 @@ export default function Review3_Page2_Q3() {
     ),
   );
 
-  const [locked, setLocked] = useState(false);
-  const [checked, setChecked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
-    if (!destination || locked) return;
+    if (!destination) return;
 
     if (
       source.droppableId.startsWith("bank") &&
@@ -74,6 +74,7 @@ export default function Review3_Page2_Q3() {
     ) {
       const sourceIndex = Number(source.droppableId.split("-")[1]);
       const destIndex = Number(destination.droppableId.split("-")[1]);
+      if (lockedIds.includes(destIndex)) return;
 
       // ❌ منع السحب بين الكلمات
       if (sourceIndex !== destIndex) return;
@@ -104,12 +105,13 @@ export default function Review3_Page2_Q3() {
 
       setAnswers(updatedAnswers);
       setLetterBank(updatedBank);
+      setWrongIds((previous) => previous.filter((id) => id !== destIndex));
     }
   };
 
   // ✅ حذف حرف وإرجاعه للبنك
   const handleRemoveLetter = (questionIndex, letterIndex) => {
-    if (locked) return;
+    if (lockedIds.includes(questionIndex)) return;
 
     const updatedAnswers = [...answers];
     const updatedBank = [...letterBank];
@@ -131,6 +133,7 @@ export default function Review3_Page2_Q3() {
 
     setAnswers(updatedAnswers);
     setLetterBank(updatedBank);
+    setWrongIds((previous) => previous.filter((id) => id !== questionIndex));
   };
 
   const resetAll = () => {
@@ -143,8 +146,8 @@ export default function Review3_Page2_Q3() {
         })),
       ),
     );
-    setLocked(false);
-    setChecked(false);
+    setLockedIds([]);
+    setWrongIds([]);
   };
 
   const showAnswers = () => {
@@ -161,13 +164,15 @@ export default function Review3_Page2_Q3() {
 
     setLetterBank(updatedBank);
 
-    setLocked(true);
-    setChecked(true);
+    setLockedIds(items.map((_, i) => i));
+    setWrongIds([]);
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (lockedIds.length === items.length) return;
 
-    const empty = answers.some((letters) => letters.length === 0);
+    const empty = answers.some(
+      (letters, i) => letters.length !== items[i].correct[0].length,
+    );
 
     if (empty) {
       ValidationAlert.info("Please complete all answers.");
@@ -181,6 +186,16 @@ export default function Review3_Page2_Q3() {
         score++;
       }
     });
+    setLockedIds(
+      items.flatMap((item, i) =>
+        answers[i].join("") === item.correct[0] ? [i] : [],
+      ),
+    );
+    setWrongIds(
+      items.flatMap((item, i) =>
+        answers[i].join("") !== item.correct[0] ? [i] : [],
+      ),
+    );
 
     const total = items.length;
 
@@ -197,12 +212,9 @@ export default function Review3_Page2_Q3() {
     if (score === total) ValidationAlert.success(message);
     else if (score === 0) ValidationAlert.error(message);
     else ValidationAlert.warning(message);
-
-    setLocked(true);
-    setChecked(true);
   };
   const addLetter = (letter, questionIndex, letterIndex) => {
-    if (locked) return;
+    if (lockedIds.includes(questionIndex)) return;
 
     const updatedAnswers = [...answers];
     const updatedBank = [...letterBank];
@@ -225,20 +237,34 @@ export default function Review3_Page2_Q3() {
 
     setAnswers(updatedAnswers);
     setLetterBank(updatedBank);
+    setWrongIds((previous) => previous.filter((id) => id !== questionIndex));
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="main-container-component">
-        <div className="div-forall" style={{ gap: "20px" }}>
-          <h5 className="header-title-page8">
-            <span className=" mr-4">E</span>
-            Unscramble the letters to make words with a{" "}
-            <span className="text-blue-800"> ch </span> sound.
-          </h5>
+        <div className="div-forall mb-10" style={{ gap: "20px" }}>
+          <ExerciseHeaderReview
+            sectionLetter="E"
+            title="Unscramble the letters to make words with a ch sound."
+            subTitle="Say the complete answer first, then arrange the word tiles in sentence order and add punctuation."
+          />
           <div className="flex flex-col gap-3">
             {items.map((item, i) => (
               <div key={i} className="flex gap-5">
-                <img src={item.img} style={{ height: "75px", width: "90px" }} />
+                <img
+                  src={item.img}
+                  alt={
+                    [
+                      "A peach",
+                      "A chili pepper",
+                      "A wristwatch",
+                      "A bench",
+                      "A kitchen",
+                      "A child catching a ball",
+                    ][i]
+                  }
+                  style={{ height: "75px", width: "90px" }}
+                />
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-lg">{i + 1}</span>
                   <span className="font-bold text-lg">{item.sentence}</span>
@@ -251,7 +277,19 @@ export default function Review3_Page2_Q3() {
 
                         return (
                           <span
+                            key={id}
+                            role="button"
+                            tabIndex={
+                              letter.used || lockedIds.includes(i) ? -1 : 0
+                            }
+                            aria-disabled={letter.used || lockedIds.includes(i)}
                             onClick={() => addLetter(letter.value, i, index)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                addLetter(letter.value, i, index);
+                              }
+                            }}
                             className={`w-9 h-9 flex items-center justify-center rounded border 
     ${
       letter.used
@@ -277,6 +315,9 @@ export default function Review3_Page2_Q3() {
                         padding: "0 8px",
                         position: "relative",
                         borderBottom: "1px solid gray",
+                        ...(wrongIds.includes(i)
+                          ? { borderBottom: "2px solid red" }
+                          : {}),
                       }}
                     >
                       {answers[i].map((letter, letterIndex) => {
@@ -285,18 +326,35 @@ export default function Review3_Page2_Q3() {
                         return (
                           <span
                             key={key}
-                            className={`${locked ? "" : "hover:text-red-500"}`}
+                            className={`${lockedIds.includes(i) ? "" : "hover:text-red-500"}`}
                             onClick={() => handleRemoveLetter(i, letterIndex)}
+                            role="button"
+                            tabIndex={lockedIds.includes(i) ? -1 : 0}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                handleRemoveLetter(i, letterIndex);
+                              }
+                            }}
                             style={{
                               marginRight: "2px",
                               fontSize: "20px",
-                              cursor: locked ? "default" : "pointer",
+                              cursor: lockedIds.includes(i)
+                                ? "default"
+                                : "pointer",
                             }}
                           >
                             {letter}
                           </span>
                         );
                       })}
+                      {wrongIds.includes(i) && (
+                        <div
+                          style={{ position: "absolute", top: -8, right: -8 }}
+                        >
+                          <WrongMark />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
