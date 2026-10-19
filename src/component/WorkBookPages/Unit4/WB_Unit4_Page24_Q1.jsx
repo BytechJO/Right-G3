@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import conversation1 from "../../../assets/audio/WorkBook/unit4/Page 24 - Exercise G/Item_001_The_trees_don't_have_any_leaves._There_are_a_lot_of_leaves_on_the_ground.mp3";
+import conversation2 from "../../../assets/audio/WorkBook/unit4/Page 24 - Exercise G/Item_002_The_sun_is_shining_in_the_sky_most_days._The_weather_is_getting_warm._Th.mp3";
 
 import left1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 24/Ex G 1.svg";
 import right1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 24/Ex G 2.svg";
@@ -46,24 +52,27 @@ const ITEMS = [
 ];
 
 const OPTIONS = ["spring", "summer", "autumn", "winter"];
+const AUDIO = { 1: conversation1, 2: conversation2 };
 
 export default function WB_Unit3_Page24_QG() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -80,7 +89,15 @@ export default function WB_Unit3_Page24_QG() {
       }
     });
 
-    setShowResults(true);
+    const correctIds = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -98,19 +115,22 @@ export default function WB_Unit3_Page24_QG() {
     });
 
     setAnswers(filled);
-    setShowResults(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   return (
@@ -206,10 +226,11 @@ export default function WB_Unit3_Page24_QG() {
 `}</style>
 
       <div className="div-forall">
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span>
-        Read and complete the conversations.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="G"
+          title="Read and complete the conversations."
+          subTitle="Use the season described in each conversation to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div className="wb-g24-list">
           {ITEMS.map((item) => {
@@ -218,12 +239,63 @@ export default function WB_Unit3_Page24_QG() {
             return (
               <div key={item.id} className="wb-g24-row">
                 <div className="wb-g24-num">{item.id}</div>
+                <div
+                  style={{
+                    position: "relative",
+                    width: "400px",
+                    flexShrink: 0,
+                  }}
+                >
+                  <img
+                    src={item.leftImg}
+                    alt={`Conversation ${item.id} speaker describing the ${item.correct} season`}
+                    role={AUDIO[item.id] ? "button" : undefined}
+                    tabIndex={AUDIO[item.id] ? 0 : -1}
+                    aria-label={
+                      AUDIO[item.id]
+                        ? `Play conversation ${item.id}`
+                        : undefined
+                    }
+                    onClick={() => {
+                      if (!AUDIO[item.id]) return;
 
-                <img
-                  src={item.leftImg}
-                  alt=""
-                  style={{ width: "400px", height: "auto" }}
-                />
+                      playAudio(`conversation-${item.id}`, AUDIO[item.id]);
+                    }}
+                    onKeyDown={(event) => {
+                      if (!AUDIO[item.id]) return;
+
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+
+                        playAudio(`conversation-${item.id}`, AUDIO[item.id]);
+                      }
+                    }}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
+                      cursor: AUDIO[item.id] ? "pointer" : "default",
+                      outline: "none",
+                      borderRadius: "6px",
+                    }}
+                  />
+
+                  {AUDIO[item.id] && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "6px",
+                        right: "6px",
+                        pointerEvents: "none",
+                        zIndex: 2,
+                      }}
+                    >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `conversation-${item.id}`}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 <div className="wb-g24-side-right">
                   <div
@@ -235,7 +307,7 @@ export default function WB_Unit3_Page24_QG() {
                   >
                     <img
                       src={item.rightImg}
-                      alt=""
+                      alt={`Illustrated ${item.correct} season conversation`}
                       className="wb-g24-side-img"
                     />
 
@@ -243,19 +315,18 @@ export default function WB_Unit3_Page24_QG() {
                       className="wb-g24-select-wrap"
                       style={{
                         ...item.selectPos,
-                        
                       }}
                     >
                       <select
                         value={value}
-                        disabled={showAns}
+                        disabled={showAns || lockedIds.includes(item.id)}
                         onChange={(e) => handleSelect(item.id, e.target.value)}
                         className="wb-g24-select"
                         style={{
                           borderBottom: isWrong(item)
                             ? "2px solid red"
                             : "1px solid black",
-                          position:"relative"
+                          position: "relative",
                         }}
                       >
                         <option value="" disabled>
@@ -268,12 +339,10 @@ export default function WB_Unit3_Page24_QG() {
                         ))}
                       </select>
 
-                      {!showAns && <span className="wb-g24-arrow">▼</span>}  
-                       {isWrong(item) && <div className="wb-g24-wrong">✕</div>}
+                      {!showAns && <span className="wb-g24-arrow">▼</span>}
+                      {isWrong(item) && <div className="wb-g24-wrong">✕</div>}
                     </div>
                   </div>
-
-               
                 </div>
               </div>
             );

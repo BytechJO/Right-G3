@@ -1,6 +1,22 @@
 import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import a1 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_001_March.mp3";
+import a2 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_002_April.mp3";
+import a3 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_003_November.mp3";
+import a4 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_004_August.mp3";
+import a5 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_005_July.mp3";
+import a6 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_006_December.mp3";
+import a7 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_007_January.mp3";
+import a8 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_008_June.mp3";
+import a9 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_009_September.mp3";
+import a10 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_010_February.mp3";
+import a11 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_011_October.mp3";
+import a12 from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise I/Item_012_May.mp3";
 
 const MONTHS = [
   { id: 1, name: "March", correct: 3 },
@@ -18,8 +34,10 @@ const MONTHS = [
 ];
 
 const NUMBER_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
+const MONTH_AUDIO = { March: a1, April: a2, November: a3, August: a4, July: a5, December: a6, January: a7, June: a8, September: a9, February: a10, October: a11, May: a12 };
 
-function MonthItem({ item, value, onChange, showAns, wrong }) {
+// eslint-disable-next-line react-refresh/only-export-components
+function MonthItem({ item, value, onChange, showAns, locked, wrong, active, onPlay }) {
   const currentValue = showAns ? item.correct : (value ?? "");
 
   return (
@@ -28,7 +46,7 @@ function MonthItem({ item, value, onChange, showAns, wrong }) {
         <select
           aria-label={`Select the order number for ${item.name}`}
           value={currentValue}
-          disabled={showAns}
+          disabled={showAns || locked}
           onChange={(e) => onChange(item.id, Number(e.target.value))}
           className="month-select"
         >
@@ -42,7 +60,19 @@ function MonthItem({ item, value, onChange, showAns, wrong }) {
         {!showAns && <span className="select-arrow">▼</span>}
       </div>
 
-      <span className="month-name">{item.name}</span>
+      <span
+        className="month-name"
+        role="button"
+        tabIndex={0}
+        onClick={onPlay}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onPlay();
+          }
+        }}
+        aria-label={`Play ${item.name}`}
+      ><Unit4PlayingAudioIcon active={active} />{item.name}</span>
 
       {wrong && !showAns && <span className="wrong-badge">✕</span>}
     </div>
@@ -51,8 +81,10 @@ function MonthItem({ item, value, onChange, showAns, wrong }) {
 
 export default function WB_UnitX_Page25_QI() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const allAnswered = useMemo(
     () => MONTHS.every((item) => answers[item.id]),
@@ -66,17 +98,20 @@ export default function WB_UnitX_Page25_QI() {
   }, [answers]);
 
   const handleChange = (id, value) => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || lockedIds.length === MONTHS.length) return;
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-    setChecked(true);
+    const correctIds = MONTHS.filter((item) => answers[item.id] === item.correct).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
+    setWrongIds(MONTHS.filter((item) => answers[item.id] !== item.correct).map((item) => item.id));
     if (score === MONTHS.length)
       ValidationAlert.success(`Score: ${score} / ${MONTHS.length}`);
     else if (score > 0)
@@ -90,19 +125,22 @@ export default function WB_UnitX_Page25_QI() {
       return acc;
     }, {});
     setAnswers(filledAnswers);
-    setChecked(true);
+    setLockedIds(MONTHS.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setChecked(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!checked || showAns) return false;
-    return answers[item.id] !== item.correct;
+    return !showAns && wrongIds.includes(item.id);
   };
 
   return (
@@ -282,9 +320,7 @@ export default function WB_UnitX_Page25_QI() {
             gap: "90px",
           }}
         >
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">I</span>Number the months in order.
-          </h1>
+          <ExerciseHeader sectionLetter="I" title="Number the months in order." subTitle="Work through the months from January to December in sequence from the beginning, then assign each number only once." />
 
           <div className="months-card">
             <div className="months-grid">
@@ -295,7 +331,10 @@ export default function WB_UnitX_Page25_QI() {
                   value={answers[item.id]}
                   onChange={handleChange}
                   showAns={showAns}
+                  locked={lockedIds.includes(item.id)}
                   wrong={isWrong(item)}
+                  active={activeAudioKey === `month-${item.id}`}
+                  onPlay={() => playAudio(`month-${item.id}`, MONTH_AUDIO[item.name])}
                 />
               ))}
             </div>

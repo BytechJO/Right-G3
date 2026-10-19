@@ -1,8 +1,10 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
 import AudioWithCaption from "../../AudioWithCaption";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
+import useWorkbookMatchingKeyboard from "./useWorkbookMatchingKeyboard";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd5pg26instruction2-adult-lady_CHBq9E0z.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 const ACTIVE_COLOR = "#f39b42";
@@ -35,11 +37,15 @@ const exerciseData = {
     6: 4, // 6 -> they
   },
 };
+const TOP_IDS = exerciseData.top.map((item) => item.id);
+const BOTTOM_IDS = exerciseData.bottom.map((item) => item.id);
 
 export default function WB_Unit5_Page26_QD() {
   const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedBottom, setSelectedBottom] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [lines, setLines] = useState([]);
 
@@ -90,13 +96,22 @@ export default function WB_Unit5_Page26_QD() {
   }, [matches]);
 
   const handleTopClick = (id) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
+    if (selectedBottom !== null) {
+      assignMatch(id, selectedBottom);
+      return;
+    }
     setSelectedTop(id);
+    setSelectedBottom(null);
     setShowResults(false);
   };
 
-  const handleBottomClick = (bottomId) => {
-    if (showAns || selectedTop === null || showResults) return;
+  const assignMatch = (topId, bottomId) => {
+    if (showAns || lockedIds.includes(topId)) return;
+    const lockedOwner = Object.keys(matches).find(
+      (key) => matches[key] === bottomId && lockedIds.includes(Number(key)),
+    );
+    if (lockedOwner) return;
 
     const newMatches = { ...matches };
 
@@ -106,15 +121,27 @@ export default function WB_Unit5_Page26_QD() {
       }
     });
 
-    newMatches[selectedTop] = bottomId;
+    newMatches[topId] = bottomId;
 
     setMatches(newMatches);
     setSelectedTop(null);
+    setSelectedBottom(null);
     setShowResults(false);
+  };
+  const handleBottomClick = (bottomId) => {
+    const isLockedTarget = Object.keys(matches).some(
+      (key) => matches[key] === bottomId && lockedIds.includes(Number(key)),
+    );
+    if (showAns || isLockedTarget) return;
+    if (selectedTop !== null) assignMatch(selectedTop, bottomId);
+    else {
+      setSelectedBottom(bottomId);
+      setSelectedTop(null);
+    }
   };
 
   const checkAnswers = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === exerciseData.top.length) return;
 
     const allConnected = exerciseData.top.every((item) => matches[item.id]);
 
@@ -122,8 +149,17 @@ export default function WB_Unit5_Page26_QD() {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
+    keyboardMatch.clear();
+    setSelectedTop(null);
+    setSelectedBottom(null);
 
     setShowResults(true);
+    const correctIds = exerciseData.top
+      .filter(
+        (item) => matches[item.id] === exerciseData.correctMatches[item.id],
+      )
+      .map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
 
     let score = 0;
     Object.keys(exerciseData.correctMatches).forEach((topId) => {
@@ -144,17 +180,23 @@ export default function WB_Unit5_Page26_QD() {
   };
 
   const handleShowAnswer = () => {
+    keyboardMatch.clear();
     setMatches(exerciseData.correctMatches);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(exerciseData.top.map((item) => item.id));
     setSelectedTop(null);
+    setSelectedBottom(null);
   };
 
   const handleStartAgain = () => {
+    keyboardMatch.clear();
     setMatches({});
     setSelectedTop(null);
+    setSelectedBottom(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
     setLines([]);
   };
 
@@ -179,7 +221,46 @@ export default function WB_Unit5_Page26_QD() {
   const isTopConnected = (id) => !!matches[id];
   const isBottomConnected = (id) => Object.values(matches).includes(id);
   const isSelectedBottomMatch = (id) =>
-    selectedTop !== null && matches[selectedTop] === id;
+    selectedBottom === id ||
+    (selectedTop !== null && matches[selectedTop] === id);
+  const getKeyboardElement = useCallback(
+    (side, id) =>
+      elementRefs.current[
+        side === "left" ? `top-button-${id}` : `bottom-button-${id}`
+      ],
+    [],
+  );
+  const getKeyboardAnchor = useCallback(
+    (side, id) =>
+      elementRefs.current[side === "left" ? `top-${id}` : `bottom-${id}`],
+    [],
+  );
+  const isTopLocked = useCallback((id) => lockedIds.includes(id), [lockedIds]);
+  const isBottomLocked = useCallback(
+    (id) =>
+      Object.keys(matches).some(
+        (key) => matches[key] === id && lockedIds.includes(Number(key)),
+      ),
+    [lockedIds, matches],
+  );
+  const keyboardMatch = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: TOP_IDS,
+    rightIds: BOTTOM_IDS,
+    getElement: getKeyboardElement,
+    getAnchorElement: getKeyboardAnchor,
+    isLeftLocked: isTopLocked,
+    isRightLocked: isBottomLocked,
+    onCommit: assignMatch,
+    onStart: (side, id) => {
+      if (side === "left") handleTopClick(id);
+      else handleBottomClick(id);
+    },
+    onCancel: () => {
+      setSelectedTop(null);
+      setSelectedBottom(null);
+    },
+  });
 
   return (
     <div className="main-container-component">
@@ -355,126 +436,181 @@ export default function WB_Unit5_Page26_QD() {
           gap: "40px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          {" "}
-          <span className="WB-ex-A">D</span>
-        Listen and match.
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <QuestionAudioPlayer
-            src={sound1}
-            captions={captions}
-            stopAtSecond={6.54}
-          />
-        </div>
-
-        <div ref={containerRef} className="wb-d-board">
-          <svg
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              pointerEvents: "none",
-              overflow: "visible",
-              zIndex: 1,
-            }}
-          >
-            {lines.map((line) => (
-              <line
-                key={line.id}
-                x1={line.x1}
-                y1={line.y1}
-                x2={line.x2}
-                y2={line.y2}
-                stroke={"#f39b42"}
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            ))}
-          </svg>
-
-          <div className="wb-d-top-row">
-            {exerciseData.top.map((item) => {
-              const selected = isTopSelected(item.id);
-              const connected = isTopConnected(item.id);
-              const wrong = isWrongMatch(item.id);
-
-              return (
-                <div key={item.id} className="wb-d-top-item">
-                  <div
-                    className={`wb-d-number-circle ${
-                      selected
-                        ? "selected"
-                        : connected
-                          ? wrong
-                            ? "wrong"
-                            : "connected"
-                          : ""
-                    }`}
-                    onClick={() => handleTopClick(item.id)}
-                    style={{
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  >
-                    {item.text}
-                  </div>
-
-                  <div
-                    ref={(el) => (elementRefs.current[`top-${item.id}`] = el)}
-                    className={`wb-d-dot ${selected ? "selected" : ""}`}
-                    onClick={() => handleTopClick(item.id)}
-                    style={{
-                      backgroundColor: getDotColor("top", item.id),
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  />
-
-                  {wrong && <div className="wb-d-wrong">✕</div>}
-                </div>
-              );
-            })}
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Listen and match."
+          subTitle="Listen to the full audio once, then replay as needed and match each numbered audio item to the correct th word only after you hear the key sound or word."
+        />
+        <div className="w-full">
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <QuestionAudioPlayer
+              pageId="wb-unit4-page26-q4"
+              src={sound1}
+              captions={captions}
+              stopAtSecond={6.54}
+            />
           </div>
 
-          <div className="wb-d-bottom-row">
-            {exerciseData.bottom.map((item) => {
-              const selectedMatch = isSelectedBottomMatch(item.id);
-              const connected = isBottomConnected(item.id);
+          <div ref={containerRef} className="wb-d-board">
+            <svg
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+                overflow: "visible",
+                zIndex: 1,
+              }}
+            >
+              {lines.map((line) => (
+                <line
+                  key={line.id}
+                  x1={line.x1}
+                  y1={line.y1}
+                  x2={line.x2}
+                  y2={line.y2}
+                  stroke={"#f39b42"}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              ))}
+              {keyboardMatch.preview && (
+                <line
+                  {...keyboardMatch.preview}
+                  stroke={ACTIVE_COLOR}
+                  strokeWidth="3.5"
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                />
+              )}
+            </svg>
 
-              return (
-                <div key={item.id} className="wb-d-bottom-item">
-                  <div
-                    ref={(el) =>
-                      (elementRefs.current[`bottom-${item.id}`] = el)
-                    }
-                    className={`wb-d-dot ${selectedMatch ? "selected" : ""}`}
-                    onClick={() => handleBottomClick(item.id)}
-                    style={{
-                      backgroundColor: getDotColor("bottom", item.id),
-                      marginBottom: "10px",
-                      marginTop: "0",
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  />
+            <div className="wb-d-top-row">
+              {exerciseData.top.map((item) => {
+                const selected = isTopSelected(item.id);
+                const connected = isTopConnected(item.id);
+                const wrong = isWrongMatch(item.id);
 
-                  <div
-                    className={`wb-d-word ${
-                      selectedMatch ? "selected" : connected ? "connected" : ""
-                    }`}
-                    onClick={() => handleBottomClick(item.id)}
-                    style={{
-                      cursor: showAns ? "default" : "pointer",
-                    }}
-                  >
-                    {item.text}
+                return (
+                  <div key={item.id} className="wb-d-top-item">
+                    <div
+                      ref={(el) =>
+                        (elementRefs.current[`top-button-${item.id}`] = el)
+                      }
+                      className={`wb-d-number-circle ${
+                        selected
+                          ? "selected"
+                          : connected
+                            ? wrong
+                              ? "wrong"
+                              : "connected"
+                            : ""
+                      }`}
+                      onClick={() => handleTopClick(item.id)}
+                      role="button"
+                      tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+                      aria-disabled={showAns || lockedIds.includes(item.id)}
+                      aria-label={`Select audio number ${item.text}`}
+                      draggable={!showAns && !lockedIds.includes(item.id)}
+                      onDragStart={() => handleTopClick(item.id)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() =>
+                        selectedBottom !== null &&
+                        assignMatch(item.id, selectedBottom)
+                      }
+                      onKeyDown={(event) => {
+                        keyboardMatch.handleKeyDown(event, "left", item.id);
+                      }}
+                      onFocus={() => keyboardMatch.handleFocus("left", item.id)}
+                      style={{
+                        cursor: showAns ? "default" : "pointer",
+                      }}
+                    >
+                      {item.text}
+                    </div>
+
+                    <div
+                      ref={(el) => (elementRefs.current[`top-${item.id}`] = el)}
+                      className={`wb-d-dot ${selected ? "selected" : ""}`}
+                      onClick={() => handleTopClick(item.id)}
+                      style={{
+                        backgroundColor: getDotColor("top", item.id),
+                        cursor: showAns ? "default" : "pointer",
+                      }}
+                    />
+
+                    {wrong && <div className="wb-d-wrong">✕</div>}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            <div className="wb-d-bottom-row">
+              {exerciseData.bottom.map((item) => {
+                const selectedMatch = isSelectedBottomMatch(item.id);
+                const connected = isBottomConnected(item.id);
+
+                return (
+                  <div key={item.id} className="wb-d-bottom-item">
+                    <div
+                      ref={(el) =>
+                        (elementRefs.current[`bottom-${item.id}`] = el)
+                      }
+                      className={`wb-d-dot ${selectedMatch ? "selected" : ""}`}
+                      onClick={() => handleBottomClick(item.id)}
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      draggable={!showAns && !isBottomLocked(item.id)}
+                      onDragStart={() => handleBottomClick(item.id)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() =>
+                        selectedTop !== null &&
+                        assignMatch(selectedTop, item.id)
+                      }
+                      style={{
+                        backgroundColor: getDotColor("bottom", item.id),
+                        marginBottom: "10px",
+                        marginTop: "0",
+                        cursor: showAns ? "default" : "pointer",
+                      }}
+                    />
+
+                    <div
+                      ref={(el) =>
+                        (elementRefs.current[`bottom-button-${item.id}`] = el)
+                      }
+                      className={`wb-d-word ${
+                        selectedMatch
+                          ? "selected"
+                          : connected
+                            ? "connected"
+                            : ""
+                      }`}
+                      onClick={() => handleBottomClick(item.id)}
+                      role="button"
+                      tabIndex={isBottomLocked(item.id) ? -1 : 0}
+                      aria-disabled={showAns || isBottomLocked(item.id)}
+                      aria-label={`Select word ${item.text}`}
+                      onKeyDown={(event) =>
+                        keyboardMatch.handleKeyDown(event, "right", item.id)
+                      }
+                      onFocus={() =>
+                        keyboardMatch.handleFocus("right", item.id)
+                      }
+                      style={{
+                        cursor: showAns ? "default" : "pointer",
+                      }}
+                    >
+                      {item.text}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-
         <div className="wb-d-buttons">
           <Button
             handleShowAnswer={handleShowAnswer}

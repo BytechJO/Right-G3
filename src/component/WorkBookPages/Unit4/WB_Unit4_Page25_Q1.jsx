@@ -1,6 +1,13 @@
 import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise H/Item_001_It_is_January._It_is_cold._I_made_a_snowman.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit4/Page 25 - Exercise H/Item_002_It_is_June.mp3";
 
 import {
   DndContext,
@@ -40,29 +47,41 @@ const SENTENCES = [
 ];
 
 const NUMBERS = [1, 2, 3, 4, 5];
+const SENTENCE_AUDIO = { 1: null, 2: null };
 
 export default function WB_Unit_Months_Page232_QH() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [activeId, setActiveId] = useState(null);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const usedNumbers = useMemo(() => Object.values(answers), [answers]);
 
   const assignNumber = (sentenceId, number) => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.includes(sentenceId)) return;
 
     setAnswers((prev) => {
       const updated = { ...prev };
 
       Object.keys(updated).forEach((k) => {
-        if (updated[k] === number) delete updated[k];
+        if (updated[k] === number && !lockedIds.includes(Number(k)))
+          delete updated[k];
       });
 
       updated[sentenceId] = number;
       return updated;
     });
+    setWrongIds((prev) => prev.filter((id) => id !== sentenceId));
   };
+  const tabDrag = useUnit4TabDrag({
+    itemIds: NUMBERS,
+    targetIds: SENTENCES.map((sentence) => sentence.id),
+    isItemDisabled: (num) => usedNumbers.includes(num),
+    isTargetDisabled: (id) => lockedIds.includes(id),
+    onPlace: (num, sentenceId) => assignNumber(sentenceId, num),
+  });
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -85,9 +104,26 @@ export default function WB_Unit_Months_Page232_QH() {
 
     return (
       <div
-        ref={setNodeRef}
+        ref={(element) => {
+          setNodeRef(element);
+          tabDrag.registerItem(num, element);
+        }}
         {...listeners}
         {...attributes}
+        tabIndex={usedNumbers.includes(num) || showAns ? -1 : 0}
+        role="button"
+        aria-label={`Pick number ${num}`}
+        aria-disabled={usedNumbers.includes(num) || showAns}
+        onKeyDown={(event) => {
+          if (
+            (event.key === "Enter" || event.key === " ") &&
+            !usedNumbers.includes(num) &&
+            !showAns
+          ) {
+            event.preventDefault();
+            tabDrag.pickItem(num);
+          }
+        }}
         style={{
           width: "clamp(38px, 5vw, 42px)",
           height: "clamp(38px, 5vw, 42px)",
@@ -116,20 +152,47 @@ export default function WB_Unit_Months_Page232_QH() {
     });
 
     const value = answers[sentenceId] || "";
-    const sentence = SENTENCES.find((s) => s.id === sentenceId);
-    const wrong = checked && value !== sentence.correct;
+    const wrong = wrongIds.includes(sentenceId);
 
     return (
       <div
-        ref={setNodeRef}
+        ref={(element) => {
+          setNodeRef(element);
+          tabDrag.registerTarget(sentenceId, element);
+        }}
         onClick={() => value && removeAnswer(sentenceId)}
+        tabIndex={
+          tabDrag.keyboardItemId != null ||
+          (value && !lockedIds.includes(sentenceId))
+            ? 0
+            : -1
+        }
+        role="button"
+        aria-label={`Number slot for sentence ${sentenceId}`}
+        onKeyDown={(event) => {
+          if (tabDrag.keyboardItemId != null)
+            tabDrag.handleTargetKeyDown(event, sentenceId);
+          else if (
+            (event.key === "Enter" || event.key === " ") &&
+            value &&
+            !lockedIds.includes(sentenceId)
+          ) {
+            event.preventDefault();
+            removeAnswer(sentenceId);
+          }
+        }}
         style={{
           width: "clamp(38px, 4.5vw, 45px)",
           height: "clamp(38px,4.5vw, 45px)",
           border: `1px solid ${wrong ? "red" : "#f29a1f"}`,
           borderRadius: "8px",
           background: "#fff",
-          boxShadow: isOver ? "0 0 0 4px rgba(243,155,66,0.35)" : "none",
+          boxShadow:
+            isOver ||
+            (tabDrag.keyboardItemId != null &&
+              tabDrag.keyboardTargetId === sentenceId)
+              ? "0 0 0 4px rgba(243,155,66,0.35)"
+              : "none",
           transform: isOver ? "scale(1.03)" : "scale(1)",
           display: "flex",
           alignItems: "center",
@@ -138,7 +201,10 @@ export default function WB_Unit_Months_Page232_QH() {
           fontWeight: "500",
           position: "relative",
           transition: "0.2s",
-          cursor: value && !checked && !showAns ? "pointer" : "default",
+          cursor:
+            value && !lockedIds.includes(sentenceId) && !showAns
+              ? "pointer"
+              : "default",
         }}
       >
         {value}
@@ -170,7 +236,7 @@ export default function WB_Unit_Months_Page232_QH() {
     );
   };
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.length === SENTENCES.length) return;
 
     const allAnswered = SENTENCES.every((item) => answers[item.id]);
 
@@ -187,7 +253,15 @@ export default function WB_Unit_Months_Page232_QH() {
       }
     });
 
-    setChecked(true);
+    const correctIds = SENTENCES.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
+    setWrongIds(
+      SENTENCES.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === SENTENCES.length) {
       ValidationAlert.success(`Score: ${score} / ${SENTENCES.length}`);
@@ -198,13 +272,17 @@ export default function WB_Unit_Months_Page232_QH() {
     }
   };
   const removeAnswer = (sentenceId) => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.includes(sentenceId)) return;
+
+    const removed = answers[sentenceId];
 
     setAnswers((prev) => {
       const updated = { ...prev };
       delete updated[sentenceId];
       return updated;
     });
+    setWrongIds((prev) => prev.filter((id) => id !== sentenceId));
+    if (removed) tabDrag.focusItem(removed);
   };
   const handleShowAnswer = () => {
     const filled = {};
@@ -214,16 +292,20 @@ export default function WB_Unit_Months_Page232_QH() {
     });
 
     setAnswers(filled);
-    setChecked(true);
+    setLockedIds(SENTENCES.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
     setActiveId(null); // مهم مع dnd-kit
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
     setActiveId(null); // reset drag
+    stopAudio();
   };
   return (
     <DndContext
@@ -232,13 +314,15 @@ export default function WB_Unit_Months_Page232_QH() {
     >
       <div className="main-container-component mb-10">
         <div className="div-forall" style={{ gap: "28px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">H</span>
-            Look, read, and match.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="H"
+            title="Look, read, and match."
+            subTitle="Read all weather and month sentences to the correct scene clues first, then assign the numbers carefully so each picture is used correctly."
+          />
 
           {/* 🔥 Images */}
           <div
+            className=" w-full"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -248,18 +332,29 @@ export default function WB_Unit_Months_Page232_QH() {
           >
             <div style={{ display: "flex", gap: "34px", flexWrap: "wrap" }}>
               {IMAGES.slice(0, 2).map((item) => (
-                <img key={item.id} src={item.img} style={{ height: "160px" }} />
+                <img
+                  key={item.id}
+                  src={item.img}
+                  alt={`Weather and month scene ${item.id}`}
+                  style={{ height: "160px" }}
+                />
               ))}
             </div>
 
             <div style={{ display: "flex", gap: "34px", flexWrap: "wrap" }}>
               {IMAGES.slice(2).map((item) => (
-                <img key={item.id} src={item.img} style={{ height: "160px" }} />
+                <img
+                  key={item.id}
+                  src={item.img}
+                  alt={`Weather and month scene ${item.id}`}
+                  style={{ height: "160px" }}
+                />
               ))}
             </div>
           </div>
           {/* 🔥 Numbers */}
           <div
+            className=" w-full"
             style={{
               display: "flex",
               gap: "14px",
@@ -283,11 +378,38 @@ export default function WB_Unit_Months_Page232_QH() {
           >
             {SENTENCES.map((item) => (
               <div
+                className=" w-full"
                 key={item.id}
                 style={{ display: "flex", gap: "14px", alignItems: "center" }}
               >
                 <DropBox sentenceId={item.id} />
-                <div style={{ fontSize: "clamp(15px, 1.4vw, 18px)" }}>
+                <div
+                  style={{
+                    fontSize: "clamp(15px, 1.4vw, 18px)",
+                    cursor: SENTENCE_AUDIO[item.id] ? "pointer" : "default",
+                    position: "relative",
+                  }}
+                  role={SENTENCE_AUDIO[item.id] ? "button" : undefined}
+                  tabIndex={SENTENCE_AUDIO[item.id] ? 0 : undefined}
+                  onClick={() =>
+                    SENTENCE_AUDIO[item.id] &&
+                    playAudio(`sentence-${item.id}`, SENTENCE_AUDIO[item.id])
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      SENTENCE_AUDIO[item.id] &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      playAudio(`sentence-${item.id}`, SENTENCE_AUDIO[item.id]);
+                    }
+                  }}
+                >
+                  {SENTENCE_AUDIO[item.id] && (
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `sentence-${item.id}`}
+                    />
+                  )}
                   {item.text}
                 </div>
               </div>

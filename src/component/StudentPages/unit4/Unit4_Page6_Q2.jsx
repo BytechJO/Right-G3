@@ -18,7 +18,17 @@ import prompt1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exerc
 import prompt2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_009_like_summer_the_what's_in_weather.mp3";
 import prompt3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 33 - Exercise E/Item_011_the_in_weather_like_what's_autumn.mp3";
 
-const WORD_AUDIO = { weather: weatherAudio, the: theAudio, like: likeAudio, winter: winterAudio, "What’s": whatsAudio, in: inAudio, "It's": itsAudio, summer: summerAudio, autumn: autumnAudio };
+const WORD_AUDIO = {
+  weather: weatherAudio,
+  the: theAudio,
+  like: likeAudio,
+  winter: winterAudio,
+  "What’s": whatsAudio,
+  in: inAudio,
+  "It's": itsAudio,
+  summer: summerAudio,
+  autumn: autumnAudio,
+};
 const PROMPT_AUDIO = { 1: prompt1Audio, 2: prompt2Audio, 3: prompt3Audio };
 
 const shuffleArray = (array) => {
@@ -138,7 +148,12 @@ export default function Unit4_Page6_Q2() {
   };
 
   const handleCheck = () => {
-    if (showAns || (lockedSentences.length === ITEMS.length && lockedSeasons.length === ITEMS.length)) return;
+    if (
+      showAns ||
+      (lockedSentences.length === ITEMS.length &&
+        lockedSeasons.length === ITEMS.length)
+    )
+      return;
 
     const allCompleted = ITEMS.every(
       (item) => isSentenceComplete(item) && seasonAnswers[item.id],
@@ -164,10 +179,22 @@ export default function Unit4_Page6_Q2() {
       }
     });
 
-    setLockedSentences(ITEMS.flatMap((item) => isSentenceCorrect(item) ? [item.id] : []));
-    setLockedSeasons(ITEMS.flatMap((item) => seasonAnswers[item.id] === item.season ? [item.id] : []));
-    setWrongSentences(ITEMS.flatMap((item) => !isSentenceCorrect(item) ? [item.id] : []));
-    setWrongSeasons(ITEMS.flatMap((item) => seasonAnswers[item.id] !== item.season ? [item.id] : []));
+    setLockedSentences(
+      ITEMS.flatMap((item) => (isSentenceCorrect(item) ? [item.id] : [])),
+    );
+    setLockedSeasons(
+      ITEMS.flatMap((item) =>
+        seasonAnswers[item.id] === item.season ? [item.id] : [],
+      ),
+    );
+    setWrongSentences(
+      ITEMS.flatMap((item) => (!isSentenceCorrect(item) ? [item.id] : [])),
+    );
+    setWrongSeasons(
+      ITEMS.flatMap((item) =>
+        seasonAnswers[item.id] !== item.season ? [item.id] : [],
+      ),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -191,15 +218,22 @@ export default function Unit4_Page6_Q2() {
     setSeasonAnswers(solvedSeasons);
 
     setShowAns(true);
-    setLockedSentences(ITEMS.map((item) => item.id)); setLockedSeasons(ITEMS.map((item) => item.id));
-    setWrongSentences([]); setWrongSeasons([]); stopAudio();
+    setLockedSentences(ITEMS.map((item) => item.id));
+    setLockedSeasons(ITEMS.map((item) => item.id));
+    setWrongSentences([]);
+    setWrongSeasons([]);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setSeasonAnswers({});
     setShowAns(false);
-    setLockedSentences([]); setLockedSeasons([]); setWrongSentences([]); setWrongSeasons([]); stopAudio();
+    setLockedSentences([]);
+    setLockedSeasons([]);
+    setWrongSentences([]);
+    setWrongSeasons([]);
+    stopAudio();
     setWordBanksSeed((prev) => prev + 1);
   };
   const handleSeasonChange = (itemId, value) => {
@@ -218,7 +252,11 @@ export default function Unit4_Page6_Q2() {
           gap: "30px",
         }}
       >
-        <ExerciseHeader sectionLetter="E" title="Look, unscramble, and answer. Use the words below." subTitle="Say the complete answer first, then arrange the word tiles in sentence order and add punctuation." />
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Look, unscramble, and answer. Use the words below."
+          subTitle="Say the complete answer first, then arrange the word tiles in sentence order and add punctuation."
+        />
 
         <div
           style={{
@@ -270,16 +308,33 @@ export default function Unit4_Page6_Q2() {
                   <span
                     role={PROMPT_AUDIO[item.id] ? "button" : undefined}
                     tabIndex={PROMPT_AUDIO[item.id] ? 0 : -1}
-                    className={PROMPT_AUDIO[item.id] ? "unit4-audio-control unit4-interactive" : undefined}
-                    onClick={() => PROMPT_AUDIO[item.id] && playAudio(`prompt-${item.id}`, PROMPT_AUDIO[item.id])}
-                    onKeyDown={(event) => { if (PROMPT_AUDIO[item.id] && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); playAudio(`prompt-${item.id}`, PROMPT_AUDIO[item.id]); } }}
+                    className={
+                      PROMPT_AUDIO[item.id]
+                        ? "unit4-audio-control unit4-interactive"
+                        : undefined
+                    }
+                    onClick={() =>
+                      PROMPT_AUDIO[item.id] &&
+                      playAudio(`prompt-${item.id}`, PROMPT_AUDIO[item.id])
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        PROMPT_AUDIO[item.id] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`prompt-${item.id}`, PROMPT_AUDIO[item.id]);
+                      }
+                    }}
                     style={{
                       fontSize: "18px",
                       color: "#444",
                       lineHeight: "1.5",
                     }}
                   >
-                    <Unit4PlayingAudioIcon active={activeAudioKey === `prompt-${item.id}`} />
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `prompt-${item.id}`}
+                    />
                     {item.prompt}
                   </span>
                 </div>
@@ -308,7 +363,10 @@ export default function Unit4_Page6_Q2() {
                         border: "none",
                         fontSize: "18px",
                         // fontWeight: "500",
-                        cursor: showAns || lockedSentences.includes(item.id) ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedSentences.includes(item.id)
+                            ? "default"
+                            : "pointer",
                       }}
                       className={`${!showAns && !lockedSentences.includes(item.id) && "hover:text-red-500"}`}
                     >
@@ -329,12 +387,15 @@ export default function Unit4_Page6_Q2() {
                   {visibleWords.map((wordItem, index) => (
                     <button
                       key={`${item.id}-bank-${index}-${wordItem.word}`}
-                      aria-disabled={wordItem.disabled || lockedSentences.includes(item.id)}
+                      aria-disabled={
+                        wordItem.disabled || lockedSentences.includes(item.id)
+                      }
                       className="unit4-audio-control"
                       onClick={() => {
                         const audio = WORD_AUDIO[wordItem.word];
                         if (audio) playAudio(`word-${item.id}-${index}`, audio);
-                        if (!wordItem.disabled) handleSelectWord(item.id, index);
+                        if (!wordItem.disabled)
+                          handleSelectWord(item.id, index);
                       }}
                       style={{
                         padding: "6px 10px",
@@ -358,7 +419,9 @@ export default function Unit4_Page6_Q2() {
                             : "pointer",
                       }}
                     >
-                      <Unit4PlayingAudioIcon active={activeAudioKey === `word-${item.id}-${index}`} />
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `word-${item.id}-${index}`}
+                      />
                       {wordItem.word}
                     </button>
                   ))}
@@ -402,13 +465,20 @@ export default function Unit4_Page6_Q2() {
                     tabIndex={0}
                     className="unit4-audio-control unit4-interactive"
                     onClick={() => playAudio(`its-${item.id}`, itsAudio)}
-                    onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playAudio(`its-${item.id}`, itsAudio); } }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`its-${item.id}`, itsAudio);
+                      }
+                    }}
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
                     }}
                   >
-                    <Unit4PlayingAudioIcon active={activeAudioKey === `its-${item.id}`} />
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `its-${item.id}`}
+                    />
                     It's
                   </span>
 
@@ -427,7 +497,10 @@ export default function Unit4_Page6_Q2() {
                       fontSize: "15px",
                       minWidth: "120px",
                       background: "#fff",
-                      cursor: showAns || lockedSeasons.includes(item.id) ? "default" : "pointer",
+                      cursor:
+                        showAns || lockedSeasons.includes(item.id)
+                          ? "default"
+                          : "pointer",
                     }}
                   >
                     <option value="">Select</option>
@@ -438,7 +511,24 @@ export default function Unit4_Page6_Q2() {
                       </option>
                     ))}
                   </select>
-                  {seasonWrong && <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: "50%", background: "red", color: "white", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>✕</span>}
+                  {seasonWrong && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: "50%",
+                        background: "red",
+                        color: "white",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ✕
+                    </span>
+                  )}
                 </div>
               </div>
             );

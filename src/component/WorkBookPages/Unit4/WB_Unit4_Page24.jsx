@@ -1,4 +1,5 @@
 import React from "react";
+
 import page from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 24.png";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
@@ -8,7 +9,6 @@ const WB_Unit4_Page24 = ({ openPopup }) => {
       className="page1-img-wrapper"
       style={{ backgroundImage: `url(${page})` }}
     >
-      {/* <img src={page} /> */}
       <div
         className="q7-4 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -17,9 +17,20 @@ const WB_Unit4_Page24 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 46 })}
-          // className="click-icon-page8-1 hover:scale-110 transition"
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 46 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -32,7 +43,6 @@ const WB_Unit4_Page24 = ({ openPopup }) => {
           />
         </svg>
       </div>
-      
     </div>
   );
 };
