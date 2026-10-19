@@ -6,12 +6,14 @@ import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes
 import FindQuestion from "../../FindQuestion";
 
 const targetArea = {
-  x1: 59,
-  y1: 27,
-  x2: 67,
-  y2: 33.5,
+  x1: 60,
+  y1: 13,
+  x2: 68,
+  y2: 24.5,
 };
-
+// top: 13%;
+//     left: 59%;
+//     height: 9.5%;
 const Unit3_Page1_find = () => {
   return (
     <FindQuestion
@@ -23,9 +25,9 @@ const Unit3_Page1_find = () => {
       targetArea={targetArea}
       answerHighlight={MySVG}
       imageHeight="70vh"
-      highlightTop="27%"
+      highlightTop="13%"
       highlightLeft="59%"
-      highlightHeight="6.5%"
+      highlightHeight="9.5%"
       highlightImageStyle={{
         width: "8%",
       }}

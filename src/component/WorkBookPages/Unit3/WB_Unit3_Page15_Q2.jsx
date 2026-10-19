@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex B 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 15/Ex B 2.svg";
@@ -15,9 +16,10 @@ const ITEMS = [
     fixedAnswer: "He has a glove.",
     correctQuestion: "What does he have?",
     correctAnswer: "He has a glove.",
-    
+
     lockQuestion: false,
-    lockAnswer: false,optionsQuestion: ["What does he has?", "What does he have?"],
+    lockAnswer: false,
+    optionsQuestion: ["What does he has?", "What does he have?"],
     optionsAnswer: ["He has a glove.", "He has a banana.", "He has a doll."],
   },
   {
@@ -26,9 +28,10 @@ const ITEMS = [
     fixedQuestion: "What does she have?",
     correctQuestion: "What does she have?",
     correctAnswer: "She has an apple.",
-    
+
     lockQuestion: false,
-    lockAnswer: false,optionsQuestion: ["What does she has?", "What does she have?"],
+    lockAnswer: false,
+    optionsQuestion: ["What does she has?", "What does she have?"],
     optionsAnswer: [
       "She has an apple.",
       "She has a doll.",
@@ -65,13 +68,22 @@ const ITEMS = [
   },
 ];
 
+const IMAGE_ALTS = {
+  1: "A boy holding a glove",
+  2: "A girl holding an apple",
+  3: "A girl holding a banana",
+  4: "A girl holding a doll",
+};
+
 export default function WB_Unit3_Page15_QB() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const [wrongKeys, setWrongKeys] = useState([]);
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedKeys.length === ITEMS.length * 2) return;
 
     const allAnswered = ITEMS.every((item) => {
       const qReady = item.lockQuestion || answers[`q-${item.id}`];
@@ -103,6 +115,26 @@ export default function WB_Unit3_Page15_QB() {
     });
 
     setShowResults(true);
+    setLockedKeys(
+      ITEMS.flatMap((item) => [
+        ...(answers[`q-${item.id}`] === item.correctQuestion
+          ? [`q-${item.id}`]
+          : []),
+        ...(answers[`a-${item.id}`] === item.correctAnswer
+          ? [`a-${item.id}`]
+          : []),
+      ]),
+    );
+    setWrongKeys(
+      ITEMS.flatMap((item) => [
+        ...(answers[`q-${item.id}`] !== item.correctQuestion
+          ? [`q-${item.id}`]
+          : []),
+        ...(answers[`a-${item.id}`] !== item.correctAnswer
+          ? [`a-${item.id}`]
+          : []),
+      ]),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -128,21 +160,25 @@ export default function WB_Unit3_Page15_QB() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedKeys(ITEMS.flatMap((item) => [`q-${item.id}`, `a-${item.id}`]));
+    setWrongKeys([]);
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedKeys([]);
+    setWrongKeys([]);
   };
 
   const isWrongQuestion = (item) =>
-    showResults &&
+    wrongKeys.includes(`q-${item.id}`) &&
     !item.lockQuestion &&
     answers[`q-${item.id}`] !== item.correctQuestion;
 
   const isWrongAnswer = (item) =>
-    showResults &&
+    wrongKeys.includes(`a-${item.id}`) &&
     !item.lockAnswer &&
     answers[`a-${item.id}`] !== item.correctAnswer;
 
@@ -153,16 +189,17 @@ export default function WB_Unit3_Page15_QB() {
     const options = type === "q" ? item.optionsQuestion : item.optionsAnswer;
 
     return (
-      <div style={{ position: "relative" ,marginBottom:"15px"}}>
+      <div style={{ position: "relative", marginBottom: "15px" }}>
         <select
           value={value}
-          disabled={showAns||showResults}
-          onChange={(e) =>
+          disabled={showAns || lockedKeys.includes(key)}
+          onChange={(e) => {
             setAnswers((prev) => ({
               ...prev,
               [key]: e.target.value,
-            }))
-          }
+            }));
+            setWrongKeys((prev) => prev.filter((entry) => entry !== key));
+          }}
           className="w-[70%] text-[18px] curser-pointer"
           style={{
             borderBottom: isWrong ? "2px solid red" : "1px solid black",
@@ -209,13 +246,15 @@ export default function WB_Unit3_Page15_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"40px"}}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Look and write the questions and answers.
-        </h1>
+      <div className="div-forall" style={{ gap: "40px" }}>
+        <ExerciseHeader
+          sectionLetter="B"
+          title="Look and write the questions and answers."
+          subTitle="Use the question and answer that match each shopping picture to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div
-          className="grid grid-cols-2 justify-center gap-y-5 px-5"
+          className="grid grid-cols-2 justify-center gap-y-5 px-5 w-full"
           style={{ justifyItems: "center" }}
         >
           {ITEMS.map((item) => (
@@ -224,7 +263,7 @@ export default function WB_Unit3_Page15_QB() {
                 <span className="text-xl font-semibold">{item.id}</span>{" "}
                 <img
                   src={item.img}
-                  
+                  alt={IMAGE_ALTS[item.id]}
                   style={{ height: "auto", width: "140px" }}
                 />
               </div>

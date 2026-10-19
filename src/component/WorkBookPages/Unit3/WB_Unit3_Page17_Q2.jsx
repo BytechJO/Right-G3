@@ -1,6 +1,35 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import "./workbookUnit3Interactions.css";
+import passageAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_001_Stella,_Helen,_and_Sarah_are_at_a_picnic_in_the_park._Stella_has_brought.mp3";
+import question1Audio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_002_Does_Stella_have_any.mp3";
+import chipsAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_003_chips.mp3";
+import fruitAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_004_fruit.mp3";
+import cookiesAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_005_cookies.mp3";
+import yesAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_006_Yes.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_007_Does_Sarah_have_any.mp3";
+import peachesAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_008_peaches.mp3";
+import sandwichesAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_009_sandwiches.mp3";
+import question3Audio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_010_Does_Helen_have_any.mp3";
+import applesAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise F/Item_011_apples.mp3";
+
+const QUESTION_AUDIO = {
+  1: question1Audio,
+  2: question2Audio,
+  3: question3Audio,
+};
+const OPTION_AUDIO = {
+  "chips?": chipsAudio,
+  "fruit?": fruitAudio,
+  "cookies?": cookiesAudio,
+  "peaches?": peachesAudio,
+  "sandwiches?": sandwichesAudio,
+  "apples?": applesAudio,
+};
 
 const ACTIVE_COLOR = "#f39b42";
 const WRONG_COLOR = "red";
@@ -35,37 +64,36 @@ const QUESTIONS = [
 export default function WB_Unit3_Page17_QF() {
   const [answers, setAnswers] = useState({});
   const [pronouns, setPronouns] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const [wrongKeys, setWrongKeys] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
 
   const handleSelectOption = (id, value) => {
-    if (showAns) return;
+    if (showAns || lockedKeys.includes(`option-${id}`)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
-
-    setShowResults(false);
+    setWrongKeys((prev) => prev.filter((entry) => entry !== `option-${id}`));
   };
 
   const handlePronounChange = (id, value) => {
-    if (showAns) return;
+    if (showAns || lockedKeys.includes(`pronoun-${id}`)) return;
 
     setPronouns((prev) => ({
       ...prev,
       [id]: value,
     }));
-
-    setShowResults(false);
+    setWrongKeys((prev) => prev.filter((entry) => entry !== `pronoun-${id}`));
   };
 
   const checkAnswers = () => {
-    if (showAns) return;
+    if (showAns || lockedKeys.length === QUESTIONS.length * 2) return;
 
-    const allAnswered = QUESTIONS.every(
-      (q) => answers[q.id] && pronouns[q.id]
-    );
+    const allAnswered = QUESTIONS.every((q) => answers[q.id] && pronouns[q.id]);
 
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -81,6 +109,18 @@ export default function WB_Unit3_Page17_QF() {
     });
 
     setShowResults(true);
+    setLockedKeys(
+      QUESTIONS.flatMap((q) => [
+        ...(answers[q.id] === q.correctOption ? [`option-${q.id}`] : []),
+        ...(pronouns[q.id] === q.correctPronoun ? [`pronoun-${q.id}`] : []),
+      ]),
+    );
+    setWrongKeys(
+      QUESTIONS.flatMap((q) => [
+        ...(answers[q.id] !== q.correctOption ? [`option-${q.id}`] : []),
+        ...(pronouns[q.id] !== q.correctPronoun ? [`pronoun-${q.id}`] : []),
+      ]),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -104,6 +144,11 @@ export default function WB_Unit3_Page17_QF() {
     setPronouns(correctPronouns);
     setShowResults(true);
     setShowAns(true);
+    setLockedKeys(
+      QUESTIONS.flatMap((q) => [`option-${q.id}`, `pronoun-${q.id}`]),
+    );
+    setWrongKeys([]);
+    stopAudio();
   };
 
   const handleReset = () => {
@@ -111,167 +156,78 @@ export default function WB_Unit3_Page17_QF() {
     setPronouns({});
     setShowResults(false);
     setShowAns(false);
+    setLockedKeys([]);
+    setWrongKeys([]);
+    stopAudio();
   };
 
   const isRowWrong = (q) => {
-    if (!showResults) return false;
-
-    return (
-      answers[q.id] !== q.correctOption ||
-      pronouns[q.id] !== q.correctPronoun
-    );
+    return wrongKeys.includes(`pronoun-${q.id}`);
   };
 
- const renderOption = (q, option) => {
-  const selected = answers[q.id] === option;
-  const wrong = showResults && selected && option !== q.correctOption;
+  const renderOption = (q, option) => {
+    const selected = answers[q.id] === option;
+    const wrong = wrongKeys.includes(`option-${q.id}`) && selected;
 
-  return (
-    <div
-      onClick={() => handleSelectOption(q.id, option)}
-      style={{
-        position: "relative",
-        padding: "6px 16px",
-        borderRadius: "999px",
-        border: selected
-          ? wrong
-            ? `2px solid ${WRONG_COLOR}`
-            : `1px solid ${ACTIVE_COLOR}`
-          : "1px solid transparent",
-        cursor: showAns ? "default" : "pointer",
-        fontSize: "18px",
-        transition: "0.2s ease",
-        userSelect: "none",
-        color: "#222",
-      }}
-    >
-      {option}
-
-      {/* ✕ فوق الدائرة */}
-      {wrong && (
-        <div
-          style={{
-            position: "absolute",
-            top: "-6px",
-            right: "-6px",
-            width: "22px",
-            height: "22px",
-            borderRadius: "50%",
-            backgroundColor: "red",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "11px",
-            fontWeight: "700",
-            border: "2px solid white",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
-          }}
-        >
-          ✕
-        </div>
-      )}
-    </div>
-  );
-};
-
-  return (
-  <div className="main-container-component mb-10">
+    return (
       <div
-        className="div-forall"
-            style={{
-          
-          gap: "28px",
-         
+        className="wb-unit3-audio-control wb-unit3-interactive"
+        role="button"
+        tabIndex={lockedKeys.includes(`option-${q.id}`) ? -1 : 0}
+        aria-disabled={lockedKeys.includes(`option-${q.id}`)}
+        onClick={() => {
+          if (lockedKeys.includes(`option-${q.id}`)) return;
+          handleSelectOption(q.id, option);
+          playAudio(`option-${q.id}-${option}`, OPTION_AUDIO[option]);
+        }}
+        onKeyDown={(event) => {
+          if (
+            (event.key === "Enter" || event.key === " ") &&
+            !lockedKeys.includes(`option-${q.id}`)
+          ) {
+            event.preventDefault();
+            handleSelectOption(q.id, option);
+            playAudio(`option-${q.id}-${option}`, OPTION_AUDIO[option]);
+          }
+        }}
+        style={{
+          position: "relative",
+          padding: "6px 16px",
+          borderRadius: "999px",
+          border: selected
+            ? wrong
+              ? `2px solid ${WRONG_COLOR}`
+              : `1px solid ${ACTIVE_COLOR}`
+            : "1px solid transparent",
+          cursor: showAns ? "default" : "pointer",
+          fontSize: "18px",
+          transition: "0.2s ease",
+          userSelect: "none",
+          color: "#222",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span> Read, tap or click, and answer.
-        </h1>
- <div className="flex flex-col gap-10">
-        <div
-          style={{
-            fontSize: "18px",
-            lineHeight: "1.6",
-            color: "#444",
-          }}
-        >
-          {PASSAGE}
-        </div>
+        <WorkbookUnit3PlayingAudioIcon
+          active={activeAudioKey === `option-${q.id}-${option}`}
+        />
+        {option}
 
-        {QUESTIONS.map((q) => (
+        {/* ✕ فوق الدائرة */}
+        {wrong && (
           <div
-            key={q.id}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              position: "relative",
-              paddingRight: "30px",
+            className="wb-unit3-audio-control wb-unit3-interactive"
+            role="button"
+            tabIndex={0}
+            onClick={() => playAudio("passage", passageAudio)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                playAudio("passage", passageAudio);
+              }
             }}
-          >
-            <div
-              style={{
-                fontSize: "18px",
-                color: "#000000ff",
-                // fontWeight: "500",
-              }}
-            >
-              <span className="font-semibold text-[20px] mr-2">{q.id}</span> {q.text}
-            </div>
-
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-              {q.options.map((opt) => (
-                <React.Fragment key={opt}>
-                  {renderOption(q, opt)}
-                </React.Fragment>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                position: "relative",
-                width: "100%",
-             
-              }}
-            >
-              <span style={{ fontSize: "18px", color: "#000000ff" }}>
-                Yes,
-              </span>
-
-              <select
-                value={pronouns[q.id] || ""}
-                onChange={(e) => handlePronounChange(q.id, e.target.value)}
-                style={{
-                  fontSize: "18px",
-                  borderBottom:isRowWrong(q)? "2px solid red": "1px solid #444",
-                  borderTop: "none",
-                  borderLeft: "none",
-                  borderRight: "none",
-                  outline: "none",
-                  background: "transparent",
-                  color: "#000000ff",
-                  width:"70%"
-                }}
-              >
-                <option value=""></option>
-                <option value="he has some">he has some</option>
-                <option value="she has some">she has some</option>
-                <option value="he have some">he have some</option>
-                <option value="she have some">she have some</option>
-              </select>
-
-          
-
-              {isRowWrong(q) && (
-                <div
-                  style={{
-                   position: "absolute",
-              top: "-7px",
-              right: "25%",
+            style={{
+              position: "absolute",
+              top: "-6px",
+              right: "-6px",
               width: "22px",
               height: "22px",
               borderRadius: "50%",
@@ -280,21 +236,172 @@ export default function WB_Unit3_Page17_QF() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "12px",
+              fontSize: "11px",
               fontWeight: "700",
               border: "2px solid white",
               boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+            }}
+          >
+            ✕
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="main-container-component mb-10">
+      <div
+        className="div-forall"
+        style={{
+          gap: "28px",
+        }}
+      >
+        <ExerciseHeader
+          sectionLetter="F"
+          title="Read, circle, and answer."
+          subTitle="Use the picnic paragraph evidence for each have-any question to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
+        <div className="flex flex-col gap-10">
+          <div
+            style={{
+              fontSize: "18px",
+              lineHeight: "1.6",
+              color: "#444",
+            }}
+          >
+            <WorkbookUnit3PlayingAudioIcon
+              active={activeAudioKey === "passage"}
+            />
+            {PASSAGE}
+          </div>
+
+          {QUESTIONS.map((q) => (
+            <div
+              key={q.id}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                position: "relative",
+                paddingRight: "30px",
+              }}
+            >
+              <div
+                className="wb-unit3-audio-control wb-unit3-interactive"
+                role="button"
+                tabIndex={0}
+                onClick={() =>
+                  playAudio(`question-${q.id}`, QUESTION_AUDIO[q.id])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`question-${q.id}`, QUESTION_AUDIO[q.id]);
+                  }
+                }}
+                style={{
+                  fontSize: "18px",
+                  color: "#000000ff",
+                  // fontWeight: "500",
+                }}
+              >
+                <WorkbookUnit3PlayingAudioIcon
+                  active={activeAudioKey === `question-${q.id}`}
+                />
+                <span className="font-semibold text-[20px] mr-2">{q.id}</span>{" "}
+                {q.text}
+              </div>
+
+              <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                {q.options.map((opt) => (
+                  <React.Fragment key={opt}>
+                    {renderOption(q, opt)}
+                  </React.Fragment>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  position: "relative",
+                  width: "100%",
+                }}
+              >
+                <span
+                  className="wb-unit3-audio-control wb-unit3-interactive"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => playAudio(`yes-${q.id}`, yesAudio)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`yes-${q.id}`, yesAudio);
+                    }
+                  }}
+                  style={{ fontSize: "18px", color: "#000000ff" }}
+                >
+                  <WorkbookUnit3PlayingAudioIcon
+                    active={activeAudioKey === `yes-${q.id}`}
+                  />
+                  Yes,
+                </span>
+
+                <select
+                  value={pronouns[q.id] || ""}
+                  onChange={(e) => handlePronounChange(q.id, e.target.value)}
+                  disabled={showAns || lockedKeys.includes(`pronoun-${q.id}`)}
+                  style={{
+                    fontSize: "18px",
+                    borderBottom: isRowWrong(q)
+                      ? "2px solid red"
+                      : "1px solid #444",
+                    borderTop: "none",
+                    borderLeft: "none",
+                    borderRight: "none",
+                    background: "transparent",
+                    color: "#000000ff",
+                    width: "70%",
                   }}
                 >
-                  ✕
-                </div>
-              )}
-            </div>
+                  <option value="">Select...</option>
+                  <option value="he has some">he has some</option>
+                  <option value="she has some">she has some</option>
+                  <option value="he have some">he have some</option>
+                  <option value="she have some">she have some</option>
+                </select>
 
-            {/* <div style={{ borderBottom: "1px solid #444", width: "100%" }} /> */}
-          </div>
-        ))}
-</div>
+                {isRowWrong(q) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-7px",
+                      right: "25%",
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      backgroundColor: "red",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                    }}
+                  >
+                    ✕
+                  </div>
+                )}
+              </div>
+
+              {/* <div style={{ borderBottom: "1px solid #444", width: "100%" }} /> */}
+            </div>
+          ))}
+        </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Button
             checkAnswers={checkAnswers}

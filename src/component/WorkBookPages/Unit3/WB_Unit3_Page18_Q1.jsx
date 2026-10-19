@@ -1,12 +1,28 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import useWorkbookUnit3TabDrag from "./useWorkbookUnit3TabDrag";
+import {
+  WorkbookUnit3DragItem,
+  WorkbookUnit3DropTarget,
+} from "./WorkbookUnit3DragControls";
+import "./workbookUnit3Interactions.css";
+import dollsAudio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise G/Item_001_dolls.mp3";
+import carsAudio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise G/Item_002_cars.mp3";
+import ballsAudio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise G/Item_003_balls.mp3";
+import trainsAudio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise G/Item_004_trains.mp3";
+import kitesAudio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise G/Item_005_kites.mp3";
+import prefixAudio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise G/Item_006_Do_you_have_any.mp3";
 import exerciseImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 18/Ex G 1.svg";
 
 import {
   DndContext,
-  useDraggable,
-  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
   DragOverlay,
 } from "@dnd-kit/core";
 
@@ -23,11 +39,11 @@ const ITEMS = [
 ];
 
 const DRAG_ITEMS = [
-  { id: 1, value: "dolls?" },
-  { id: 2, value: "cars?" },
-  { id: 3, value: "balls?" },
-  { id: 4, value: "trains?" },
-  { id: 5, value: "kites?" },
+  { id: 1, value: "dolls?", audio: dollsAudio },
+  { id: 2, value: "cars?", audio: carsAudio },
+  { id: 3, value: "balls?", audio: ballsAudio },
+  { id: 4, value: "trains?", audio: trainsAudio },
+  { id: 5, value: "kites?", audio: kitesAudio },
 ];
 
 export default function WB_Unit3_Page18_QB() {
@@ -35,13 +51,18 @@ export default function WB_Unit3_Page18_QB() {
   const [activeItem, setActiveItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
     .map((entry) => entry.dragId);
 
   const applyDrop = (boxKey, item) => {
-    if (showAns || !item ||showResults) return;
+    if (showAns || !item || lockedKeys.includes(boxKey)) return;
 
     const newAnswers = { ...answers };
 
@@ -58,9 +79,23 @@ export default function WB_Unit3_Page18_QB() {
 
     setAnswers(newAnswers);
     setActiveItem(null);
-    setShowResults(false);
   };
 
+  const keyboard = useWorkbookUnit3TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => item.id),
+    targetIds: ITEMS.map((item) => `a-${item.id}`),
+    isItemDisabled: (id) => usedDragIds.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedKeys.includes(id) || showAns,
+    onPick: (id) => {
+      const item = DRAG_ITEMS.find((entry) => entry.id === id);
+      playAudio(`drag-${id}`, item?.audio);
+    },
+    onPlace: (id, boxKey) =>
+      applyDrop(
+        boxKey,
+        DRAG_ITEMS.find((item) => item.id === id),
+      ),
+  });
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (!over) return;
@@ -69,53 +104,58 @@ export default function WB_Unit3_Page18_QB() {
     applyDrop(over.id, dragged);
   };
 
-  /* draggable */
-  const DraggableChip = ({ item }) => {
-    const { attributes, listeners, setNodeRef } = useDraggable({
-      id: item.id,
-    });
-
-    const isUsed = usedDragIds.includes(item.id);
-
-    return (
-      <div
-        ref={setNodeRef}
-        {...listeners}
-        {...attributes}
-        className={`wb-g18-chip ${
-          isUsed || showAns ||showResults? "wb-g18-chip-disabled" : ""
-        }`}
-        style={{
-          border: `1px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-          backgroundColor: isUsed ? "#eeeeee" : "",
-          color: isUsed ? "#999" : "#222",
-          cursor: isUsed || showAns ||showResults ? "not-allowed" : "grab",
-        }}
-      >
-        {item.value}
-      </div>
-    );
-  };
-
-  /* droppable */
-  const DropBox = ({ boxKey, wrong }) => {
-    const { setNodeRef, isOver } = useDroppable({
-      id: boxKey,
-    });
-
+  const renderDropBox = (boxKey, wrong) => {
     const value = answers[boxKey]?.value || "";
+    const filledEditable =
+      Boolean(value) && !lockedKeys.includes(boxKey) && !showAns;
+    const preview =
+      keyboard.keyboardItemId && keyboard.keyboardTargetId === boxKey;
+    const previewValue = preview
+      ? DRAG_ITEMS.find((item) => item.id === keyboard.keyboardItemId)?.value
+      : "";
 
     return (
-      <div
-        ref={setNodeRef}
-        className={`wb-g18-drop-box ${wrong ? "wrong" : ""}`}
-        style={{
-          color:  "#111",
+      <WorkbookUnit3DropTarget
+        id={boxKey}
+        registerTarget={keyboard.registerTarget}
+        locked={lockedKeys.includes(boxKey) || showAns}
+        tabIndex={keyboard.keyboardItemId || filledEditable ? 0 : -1}
+        ariaLabel={`${value || "Empty answer slot"}${
+          lockedKeys.includes(boxKey) ? ", correct and locked" : ""
+        }`}
+        onRemove={() => {
+          if (!filledEditable) return;
+          const removedId = answers[boxKey]?.dragId;
+          setAnswers((prev) => {
+            const next = { ...prev };
+            delete next[boxKey];
+            return next;
+          });
+          if (removedId) keyboard.focusItem(removedId);
+        }}
+        onKeyDown={(event) => {
+          if (keyboard.keyboardItemId)
+            keyboard.handleTargetKeyDown(event, boxKey);
+          else if (
+            filledEditable &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            const removedId = answers[boxKey]?.dragId;
+            setAnswers((prev) => {
+              const next = { ...prev };
+              delete next[boxKey];
+              return next;
+            });
+            if (removedId) keyboard.focusItem(removedId);
+          }
+        }}
+        className={`wb-g18-drop-box wb-unit3-drop-target ${wrong ? "wrong" : ""}`}
+        getStyle={(isOver) => ({
+          color: "#111",
 
           /* 🔥 hover effect */
-          backgroundColor: isOver
-            ? "rgba(243, 155, 66, 0.15)"
-            :"transparent",
+          backgroundColor: isOver ? "rgba(243, 155, 66, 0.15)" : "transparent",
 
           borderBottom: isOver
             ? "1px solid #f39b42"
@@ -126,49 +166,48 @@ export default function WB_Unit3_Page18_QB() {
           transform: isOver ? "scale(1.05)" : "scale(1)",
 
           transition: "all 0.2s ease",
-        }}
-      >
-        {value}
-
-        {wrong && <div className="wb-g18-wrong-badge">✕</div>}
-      </div>
+        })}
+        value={value}
+        preview={previewValue}
+        wrongNode={
+          wrong ? <div className="wb-g18-wrong-badge">✕</div> : null
+        }
+      />
     );
   };
 
-const isWrong = () => false;
+  const isWrong = (item) =>
+    showResults && answers[`a-${item.id}`]?.value !== item.correct;
 
- const handleCheck = () => {
-  if (showAns || showResults) return;
+  const handleCheck = () => {
+    if (showAns || lockedKeys.length === ITEMS.length) return;
 
-  const allAnswered = ITEMS.every(
-    (item) => answers[`a-${item.id}`]?.value
-  );
+    const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
 
-  if (!allAnswered) {
-    ValidationAlert.info("Please complete all answers first.");
-    return;
-  }
+    if (!allAnswered) {
+      ValidationAlert.info("Please complete all answers first.");
+      return;
+    }
 
-  const studentAnswers = ITEMS.map(
-    (item) => answers[`a-${item.id}`]?.value
-  );
+    const score = ITEMS.filter(
+      (item) => answers[`a-${item.id}`]?.value === item.correct,
+    ).length;
 
-  const correctAnswers = ITEMS.map((item) => item.correct);
+    setShowResults(true);
+    setLockedKeys(
+      ITEMS.filter(
+        (item) => answers[`a-${item.id}`]?.value === item.correct,
+      ).map((item) => `a-${item.id}`),
+    );
 
-  const score = studentAnswers.filter((ans) =>
-    correctAnswers.includes(ans)
-  ).length;
-
-  setShowResults(true);
-
-  if (score === ITEMS.length) {
-    ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
-  } else if (score > 0) {
-    ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
-  } else {
-    ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
-  }
-};
+    if (score === ITEMS.length) {
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
+    }
+  };
 
   const handleShowAnswer = () => {
     const filled = {};
@@ -186,6 +225,9 @@ const isWrong = () => false;
     setShowResults(true);
     setShowAns(true);
     setActiveItem(null);
+    setLockedKeys(ITEMS.map((item) => `a-${item.id}`));
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
@@ -193,14 +235,21 @@ const isWrong = () => false;
     setActiveItem(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedKeys([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   return (
     <DndContext
-      onDragStart={(e) =>
-        setActiveItem(DRAG_ITEMS.find((d) => d.id === e.active.id))
-      }
-      onDragEnd={handleDragEnd}
+      sensors={sensors}
+      onDragStart={(e) => {
+        setActiveItem(DRAG_ITEMS.find((d) => d.id === e.active.id));
+      }}
+      onDragEnd={(event) => {
+        handleDragEnd(event);
+        setActiveItem(null);
+      }}
     >
       <div className="main-container-component">
         <style>{`
@@ -242,7 +291,7 @@ const isWrong = () => false;
 
         .wb-g18-board {
           position: relative;
-          width: 95%;
+          width: 80%;
           // max-width: clamp(320px, 88vw, 860px);
           display: flex;
     // justify-content: center;
@@ -401,25 +450,81 @@ const isWrong = () => false;
         {/* (ما لمسته نهائياً) */}
 
         <div className="div-forall" style={{ gap: "28px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">B</span> Look, drag and drop Helen’s questions.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="G"
+            title="Look and write Helen's questions."
+            subTitle="Identify each toy word into each Do you have any question before dragging it, then place one item at a time and review every target before checking."
+          />
 
-          <div className="wb-g18-bank">
-            {DRAG_ITEMS.map((item) => (
-              <DraggableChip key={item.id} item={item} />
-            ))}
+          <div className="wb-g18-bank w-full">
+            {DRAG_ITEMS.map((item) => {
+              const isUsed = usedDragIds.includes(item.id);
+              return (
+                <WorkbookUnit3DragItem
+                  key={item.id}
+                  id={item.id}
+                  disabled={isUsed || showAns}
+                  registerItem={keyboard.registerItem}
+                  onPlayAudio={() =>
+                    playAudio(`drag-${item.id}`, item.audio)
+                  }
+                  onKeyboardPick={() => keyboard.pickItem(item.id)}
+                  activeAudio={activeAudioKey === `drag-${item.id}`}
+                  ariaLabel={`${item.value} draggable answer${
+                    isUsed ? ", already used" : ""
+                  }`}
+                  className={`wb-g18-chip wb-unit3-drag-item wb-unit3-audio-control ${
+                    isUsed || showAns ? "wb-g18-chip-disabled" : ""
+                  }`}
+                  style={{
+                    border: `1px solid ${
+                      isUsed ? BORDER_COLOR : ACTIVE_COLOR
+                    }`,
+                    backgroundColor: isUsed ? "#eeeeee" : "",
+                    color: isUsed ? "#999" : "#222",
+                    cursor:
+                      isUsed || showAns || showResults
+                        ? "not-allowed"
+                        : "grab",
+                  }}
+                >
+                  {item.value}
+                </WorkbookUnit3DragItem>
+              );
+            })}
           </div>
 
-          <div className="wb-g18-stage">
+          <div className="wb-g18-stage w-full">
             <div className="wb-g18-board">
-              <img src={exerciseImg} alt="exercise" className="wb-g18-image" />
+              <img
+                src={exerciseImg}
+                alt="A toy shop scene with dolls, cars, balls, trains, and kites"
+                className="wb-g18-image"
+              />
 
               <div className="wb-g18-panel">
                 {ITEMS.map((item) => (
                   <div key={item.id} className="wb-g18-row">
-                    <span className="wb-g18-prefix">Do you have any</span>
-                    <DropBox boxKey={`a-${item.id}`} wrong={isWrong(item)} />
+                    <span
+                      className="wb-g18-prefix wb-unit3-audio-control wb-unit3-interactive"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        playAudio(`prefix-${item.id}`, prefixAudio)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`prefix-${item.id}`, prefixAudio);
+                        }
+                      }}
+                    >
+                      <WorkbookUnit3PlayingAudioIcon
+                        active={activeAudioKey === `prefix-${item.id}`}
+                      />
+                      Do you have any
+                    </span>
+                    {renderDropBox(`a-${item.id}`, isWrong(item))}
                   </div>
                 ))}
               </div>

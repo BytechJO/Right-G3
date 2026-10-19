@@ -1,9 +1,40 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import AudioWithCaption from "../../AudioWithCaption";
 import sound from "../../../assets/audio/ClassBook/Grade 3/cd3pg20instruction-adult-lady_6VKGQN60.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import "./workbookUnit3Interactions.css";
+import chinAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_001_chin.mp3";
+import patchAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_002_patch.mp3";
+import lashAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_003_lash.mp3";
+import cheatAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_004_cheat.mp3";
+import chopAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_005_chop.mp3";
+import dishAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_006_dish.mp3";
+import shinAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_007_shin.mp3";
+import sashAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_008_sash.mp3";
+import latchAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_009_latch.mp3";
+import sheetAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_010_sheet.mp3";
+import shopAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_011_shop.mp3";
+import ditchAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise C/Item_012_ditch.mp3";
+
+const WORD_AUDIO = {
+  chin: chinAudio,
+  patch: patchAudio,
+  lash: lashAudio,
+  cheat: cheatAudio,
+  chop: chopAudio,
+  dish: dishAudio,
+  shin: shinAudio,
+  sash: sashAudio,
+  latch: latchAudio,
+  sheet: sheetAudio,
+  shop: shopAudio,
+  ditch: ditchAudio,
+};
 const ITEMS = [
   { id: 1, options: ["chin", "shin"], correct: "chin" },
   { id: 2, options: ["patch", "sash"], correct: "patch" },
@@ -28,15 +59,25 @@ export default function WB_Unit3_Page18_QC() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [forceStopToken, setForceStopToken] = useState(0);
+  const {
+    activeAudioKey,
+    playAudio: playWordAudio,
+    stopAudio,
+  } = useWorkbookUnit3Audio();
+  const playAudio = (key, source) => {
+    setForceStopToken((value) => value + 1);
+    playWordAudio(key, source);
+  };
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all words first.");
@@ -47,6 +88,11 @@ export default function WB_Unit3_Page18_QC() {
       if (answers[item.id] === item.correct) score++;
     });
     setShowResults(true);
+    setLockedIds(
+      ITEMS.filter((item) => answers[item.id] === item.correct).map(
+        (item) => item.id,
+      ),
+    );
     if (score === ITEMS.length)
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     else if (score > 0)
@@ -62,12 +108,18 @@ export default function WB_Unit3_Page18_QC() {
     setAnswers(filledAnswers);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setForceStopToken((value) => value + 1);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setForceStopToken((value) => value + 1);
+    stopAudio();
   };
 
   const isWrong = (item, option) =>
@@ -78,10 +130,30 @@ export default function WB_Unit3_Page18_QC() {
   const renderOption = (item, option) => {
     const selected = isSelected(item, option);
     const wrong = isWrong(item, option);
+    const audioKey = `word-${item.id}-${option}`;
 
     return (
       <div
-        onClick={() => handleSelect(item.id, option)}
+        className="wb-unit3-audio-control wb-unit3-interactive"
+        role="button"
+        tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+        aria-label={`${option}${selected ? ", selected" : ""}`}
+        aria-disabled={lockedIds.includes(item.id)}
+        onClick={() => {
+          if (lockedIds.includes(item.id)) return;
+          handleSelect(item.id, option);
+          playAudio(audioKey, WORD_AUDIO[option]);
+        }}
+        onKeyDown={(event) => {
+          if (
+            (event.key === "Enter" || event.key === " ") &&
+            !lockedIds.includes(item.id)
+          ) {
+            event.preventDefault();
+            handleSelect(item.id, option);
+            playAudio(audioKey, WORD_AUDIO[option]);
+          }
+        }}
         style={{
           position: "relative",
           display: "inline-flex",
@@ -106,6 +178,7 @@ export default function WB_Unit3_Page18_QC() {
           lineHeight: "1.1",
         }}
       >
+        <WorkbookUnit3PlayingAudioIcon active={activeAudioKey === audioKey} />
         {option}
         {wrong && (
           <div
@@ -214,15 +287,23 @@ export default function WB_Unit3_Page18_QC() {
           }
         }
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span>Listen, read, and tap or click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Listen, read, and circle."
+          subTitle="Listen carefully for the target sound, replay if needed, then choose the word with the ch, tch, or sh sound heard that matches what you hear."
+        />
 
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <QuestionAudioPlayer
             src={sound}
             captions={captions}
             stopAtSecond={6.0}
+            pageId="WB_Unit3_Page20_Q3"
+            forceStop={forceStopToken}
+            onInteract={stopAudio}
           />
         </div>
 

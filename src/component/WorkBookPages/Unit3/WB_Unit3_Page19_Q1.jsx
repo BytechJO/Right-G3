@@ -1,6 +1,21 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import "./workbookUnit3Interactions.css";
+import question1Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise I/Item_001_Does_he_have_any_grapes.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise I/Item_002_Does_he_have_any_eggplants.mp3";
+import question3Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise I/Item_003_Does_he_have_any_carrots.mp3";
+import question4Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise I/Item_004_Does_he_have_any_apples.mp3";
+
+const QUESTION_AUDIO = {
+  1: question1Audio,
+  2: question2Audio,
+  3: question3Audio,
+  4: question4Audio,
+};
 import exerciseImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 19/Ex I  1.svg";
 
 const QUESTIONS = [
@@ -35,22 +50,24 @@ const OPTIONS = [
 
 export default function WB_Unit3_Page17_QI() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
 
   const handleSelectChange = (id, value) => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [`a-${id}`]: value,
     }));
-
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((entry) => entry !== id));
   };
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.length === QUESTIONS.length) return;
 
     const allAnswered = QUESTIONS.every((item) => answers[`a-${item.id}`]);
 
@@ -69,6 +86,16 @@ export default function WB_Unit3_Page17_QI() {
     });
 
     setShowResults(true);
+    setLockedIds(
+      QUESTIONS.filter((item) => answers[`a-${item.id}`] === item.correct).map(
+        (item) => item.id,
+      ),
+    );
+    setWrongIds(
+      QUESTIONS.filter((item) => answers[`a-${item.id}`] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -89,17 +116,22 @@ export default function WB_Unit3_Page17_QI() {
     setAnswers(filledAnswers);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(QUESTIONS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[`a-${item.id}`] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   return (
@@ -263,23 +295,23 @@ export default function WB_Unit3_Page17_QI() {
       `}</style>
 
       <div
-        className="div-forall"
+        className="div-forall mb-10"
         style={{
-        
           gap: "10px",
-          
         }}
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A"> I </span>Read, look, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="I"
+          title="Read, look, and write."
+          subTitle="Use the Yes/No answer to the produce questions to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div className="wb-i19-wrap">
           <div className="wb-i19-image-wrap">
             <div className="wb-i19-image-card">
               <img
                 src={exerciseImg}
-                alt="exercise-i"
+                alt="A produce vendor standing behind grapes, eggplants, carrots, and apples"
                 className="wb-i19-image"
               />
             </div>
@@ -293,19 +325,42 @@ export default function WB_Unit3_Page17_QI() {
                 <div key={item.id} className="wb-i19-row">
                   <div className="wb-i19-num">{index + 1}</div>
 
-                  <div className="wb-i19-question">{item.question}</div>
+                  <div
+                    className="wb-i19-question wb-unit3-audio-control wb-unit3-interactive"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      playAudio(`question-${item.id}`, QUESTION_AUDIO[item.id])
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(
+                          `question-${item.id}`,
+                          QUESTION_AUDIO[item.id],
+                        );
+                      }
+                    }}
+                  >
+                    <WorkbookUnit3PlayingAudioIcon
+                      active={activeAudioKey === `question-${item.id}`}
+                    />
+                    {item.question}
+                  </div>
 
                   <div className="wb-i19-select-wrap">
                     <select
                       value={value}
-                      disabled={showAns||showResults}
+                      disabled={showAns || lockedIds.includes(item.id)}
                       onChange={(e) =>
                         handleSelectChange(item.id, e.target.value)
                       }
                       className="wb-i19-select"
                       style={{
                         cursor: showAns ? "default" : "pointer",
-                        borderBottom: isWrong(item) ? "2px solid red":"1px solid #1111118f"
+                        borderBottom: isWrong(item)
+                          ? "2px solid red"
+                          : "1px solid #1111118f",
                       }}
                     >
                       <option value="" disabled>
