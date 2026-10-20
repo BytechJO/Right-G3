@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import "../../StudentPages/unit4/unit4Interactions.css";
 import {
   DndContext,
   useDraggable,
   useDroppable,
   DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/I.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/I.3.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/I.2.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/I.4.svg";
+import julyAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise I/Item_001_It's_July.mp3";
+import aprilAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise I/Item_002_It's_April.mp3";
+import septemberAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise I/Item_003_It's_September.mp3";
+import novemberAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise I/Item_004_It's_November.mp3";
+import questionAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise I/Item_005_What_month_is_it.mp3";
 
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "#ef4444";
@@ -20,17 +33,33 @@ const SOFT_COLOR = "#ffca94";
 const LINE_COLOR = "#333";
 
 /* ───────── Draggable ───────── */
-function DraggableItem({ item, disabled }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+function DraggableItem({
+  item,
+  disabled,
+  register,
+  active,
+  onClick,
+  onKeyDown,
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: item.id,
     disabled,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(element);
+      }}
       {...listeners}
       {...attributes}
+      role="button"
+      tabIndex={0}
+      aria-disabled={disabled}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      className="unit4-audio-control unit4-interactive"
       style={{
         // transform: transform
         //   ? `translate(${transform.x}px, ${transform.y}px)`
@@ -46,13 +75,14 @@ function DraggableItem({ item, disabled }) {
         // boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
       }}
     >
+      <Unit4PlayingAudioIcon active={active} />
       {item.value}
     </div>
   );
 }
 
 /* ───────── Drop ───────── */
-function DropBox({ id, children, wrong }) {
+function DropBox({ id, children, wrong, keyboardActive }) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
@@ -64,7 +94,7 @@ function DropBox({ id, children, wrong }) {
         borderBottom: `2px solid ${
           wrong ? WRONG_COLOR : isOver ? HOVER_COLOR : LINE_COLOR
         }`,
-        background: isOver ? "#fce8d3" : "",
+        background: isOver || keyboardActive ? "#fce8d3" : "",
         transition: "0.2s",
       }}
     >
@@ -109,17 +139,53 @@ const DRAG_ITEMS = ITEMS.filter((i) => !i.example).map((i) => ({
   id: `ans-${i.id}`,
   value: i.answer,
 }));
+const ANSWER_AUDIO = {
+  "ans-1": julyAudio,
+  "ans-2": aprilAudio,
+  "ans-3": septemberAudio,
+  "ans-4": novemberAudio,
+};
+const IMAGE_ALT = {
+  1: "A calendar showing the number 7 for July",
+  2: "A calendar showing the number 4 for April",
+  3: "A calendar showing the number 9 for September",
+  4: "A calendar showing the number 11 for November",
+};
 
 /* ───────── Component ───────── */
 export default function SB_ReadLookWrite_PageI() {
   const [answers, setAnswers] = useState({});
   const [activeItem, setActiveItem] = useState(null);
+  const [shakeDrops, setShakeDrops] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   const usedIds = Object.values(answers).map((a) => a.dragId);
+  const tabDrag = useUnit4TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => item.id),
+    targetIds: ITEMS.map((item) => `a-${item.id}`),
+    isItemDisabled: (id) => usedIds.includes(id) || showAns,
+    isTargetDisabled: (id) =>
+      lockedIds.includes(Number(String(id).replace("a-", ""))) || showAns,
+    onPick: (id) => playAudio(`answer-${id}`, ANSWER_AUDIO[id]),
+    onPlace: (itemId, boxKey) => applyDrop(boxKey, itemId),
+  });
 
   const applyDrop = (boxKey, itemId) => {
+    const targetId = Number(String(boxKey).replace("a-", ""));
+    if (showAns || lockedIds.includes(targetId)) return;
+    const previousBoxKey = Object.keys(answers).find(
+      (key) => answers[key]?.dragId === itemId,
+    );
+    const previousTargetId = previousBoxKey
+      ? Number(previousBoxKey.replace("a-", ""))
+      : null;
     const item = DRAG_ITEMS.find((i) => i.id === itemId);
 
     const updated = { ...answers };
@@ -131,10 +197,30 @@ export default function SB_ReadLookWrite_PageI() {
     updated[boxKey] = { dragId: item.id, value: item.value };
 
     setAnswers(updated);
+    setWrongIds((previous) =>
+      previous.filter(
+        (id) =>
+          id !== targetId &&
+          (previousTargetId == null || id !== previousTargetId),
+      ),
+    );
+  };
+
+  const removeAnswer = (item) => {
+    const boxKey = `a-${item.id}`;
+    if (showAns || lockedIds.includes(item.id) || !answers[boxKey]) return;
+    const removedId = answers[boxKey].dragId;
+    setAnswers((previous) => {
+      const updated = { ...previous };
+      delete updated[boxKey];
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== item.id));
+    tabDrag.focusItem(removedId);
   };
 
   const handleCheck = () => {
-    if (showResults || showAns) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const editables = ITEMS.filter((i) => !i.example);
 
     const allAnswered = editables.every((i) => answers[`a-${i.id}`]);
@@ -149,6 +235,15 @@ export default function SB_ReadLookWrite_PageI() {
     });
 
     setShowResults(true);
+    const correctIds = editables
+      .filter((item) => answers[`a-${item.id}`]?.value === item.answer)
+      .map((item) => item.id);
+    setLockedIds((previous) => [...new Set([...previous, ...correctIds])]);
+    setWrongIds(
+      editables
+        .filter((item) => answers[`a-${item.id}`]?.value !== item.answer)
+        .map((item) => item.id),
+    );
 
     if (score === editables.length)
       ValidationAlert.success(`Score: ${score} / ${editables.length}`);
@@ -167,36 +262,52 @@ export default function SB_ReadLookWrite_PageI() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   const isWrong = (item) =>
-    showResults && !showAns && answers[`a-${item.id}`]?.value !== item.answer;
+    showResults && !showAns && wrongIds.includes(item.id);
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={({ active }) => {
         const item = DRAG_ITEMS.find((i) => i.id === active.id);
         setActiveItem(item);
       }}
       onDragEnd={({ active, over }) => {
         if (over) applyDrop(over.id, active.id);
+        else {
+          setShakeDrops(false);
+          window.requestAnimationFrame(() => setShakeDrops(true));
+        }
         setActiveItem(null);
       }}
     >
       <div className="main-container-component">
         <div className="div-forall" style={{ gap: "55px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">I</span>  Read, look, drag and drop.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="I"
+            title="Read, look, and write."
+            subTitle="Identify each month answer to each numbered calendar before dragging it, then place one item at a time and review every target before checking."
+          />
 
           {/* Word Bank */}
           <div
+            className="w-full"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -209,12 +320,27 @@ export default function SB_ReadLookWrite_PageI() {
                 key={item.id}
                 item={item}
                 disabled={usedIds.includes(item.id) || showAns}
+                register={(element) => tabDrag.registerItem(item.id, element)}
+                active={activeAudioKey === `answer-${item.id}`}
+                onClick={(event) => {
+                  if (event.detail > 0)
+                    playAudio(`answer-${item.id}`, ANSWER_AUDIO[item.id]);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  if (usedIds.includes(item.id) || showAns)
+                    playAudio(`answer-${item.id}`, ANSWER_AUDIO[item.id]);
+                  else tabDrag.pickItem(item.id);
+                }}
               />
             ))}
           </div>
 
           {/* Grid */}
           <div
+            className={shakeDrops ? "unit4-invalid-selection-shake" : ""}
+            onAnimationEnd={() => setShakeDrops(false)}
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2,1fr)",
@@ -240,6 +366,7 @@ export default function SB_ReadLookWrite_PageI() {
                     <span className="text-xl font-semibold">{item.id}</span>
                     <img
                       src={item.img}
+                      alt={IMAGE_ALT[item.id]}
                       style={{
                         width: "auto",
                         height: "120px",
@@ -249,11 +376,28 @@ export default function SB_ReadLookWrite_PageI() {
                   </div>
                   <div className="flex flex-col gap-5 w-70">
                     <div
+                      className="unit4-audio-control unit4-interactive"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        playAudio(`question-${item.id}`, questionAudio)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`question-${item.id}`, questionAudio);
+                        }
+                      }}
                       style={{
                         borderBottom: `2px solid ${LINE_COLOR}`,
                         fontWeight: "600",
+                        position: "relative",
+                        cursor: "pointer",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `question-${item.id}`}
+                      />
                       {item.question}
                     </div>
 
@@ -262,10 +406,73 @@ export default function SB_ReadLookWrite_PageI() {
                         {item.answer}
                       </div>
                     ) : (
-                      <DropBox id={boxKey} wrong={wrong}>
+                      <DropBox
+                        id={boxKey}
+                        wrong={wrong}
+                        keyboardActive={
+                          tabDrag.keyboardItemId != null &&
+                          tabDrag.keyboardTargetId === boxKey
+                        }
+                      >
                         {() => (
-                          <div style={{ minHeight: "40px" }}>
-                            {value && <span>{value}</span>}
+                          <div
+                            ref={(element) =>
+                              tabDrag.registerTarget(boxKey, element)
+                            }
+                            role="button"
+                            tabIndex={
+                              showAns || lockedIds.includes(item.id)
+                                ? -1
+                                : tabDrag.keyboardItemId != null || value
+                                  ? 0
+                                  : -1
+                            }
+                            aria-disabled={
+                              lockedIds.includes(item.id) || showAns
+                            }
+                            onClick={() => removeAnswer(item)}
+                            onKeyDown={(event) => {
+                              if (tabDrag.keyboardItemId != null)
+                                tabDrag.handleTargetKeyDown(event, boxKey);
+                              else if (
+                                (event.key === "Enter" || event.key === " ") &&
+                                value &&
+                                !lockedIds.includes(item.id)
+                              ) {
+                                event.preventDefault();
+                                removeAnswer(item);
+                              }
+                            }}
+                            className="unit4-interactive"
+                            style={{
+                              minHeight: "40px",
+                              outlineOffset: "3px",
+                              cursor:
+                                showAns || lockedIds.includes(item.id)
+                                  ? "default"
+                                  : "pointer",
+                            }}
+                          >
+                            {(value ||
+                              (tabDrag.keyboardItemId != null &&
+                                tabDrag.keyboardTargetId === boxKey)) && (
+                              <span
+                                className={
+                                  tabDrag.keyboardItemId != null &&
+                                  tabDrag.keyboardTargetId === boxKey
+                                    ? "unit4-keyboard-preview"
+                                    : ""
+                                }
+                              >
+                                {tabDrag.keyboardItemId != null &&
+                                tabDrag.keyboardTargetId === boxKey
+                                  ? DRAG_ITEMS.find(
+                                      (entry) =>
+                                        entry.id === tabDrag.keyboardItemId,
+                                    )?.value
+                                  : value}
+                              </span>
+                            )}
 
                             {wrong && (
                               <div

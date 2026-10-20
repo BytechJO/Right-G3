@@ -1,17 +1,37 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import "../../StudentPages/unit4/unit4Interactions.css";
 import {
   DndContext,
   useDraggable,
   useDroppable,
   DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 // ─── استبدل هذه المسارات بمساراتك الحقيقية ──────────────────
 import imgCar1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/B.1.svg";
 import imgCar2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/B.1.svg";
 import imgCar3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/B.1.svg";
 import imgMedals from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 33/B.2.svg";
+import secondAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_001_second.mp3";
+import blueAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_002_blue.mp3";
+import firstAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_003_first.mp3";
+import redAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_004_red.mp3";
+import thirdAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_005_third.mp3";
+import orangeAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_006_orange.mp3";
+import theAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_007_The.mp3";
+import carIsInAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_008_car_is_in.mp3";
+import placeAudio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/Item_009_place.mp3";
+import full1Audio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/full1.mp3";
+import full2Audio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/full2.mp3";
+import full3Audio from "../../../assets/audio/WorkBook/unit6/Page 33 - Exercise B/full3.mp3";
 // ─────────────────────────────────────────────────────────────
 
 // ─── ألوان الفرشاة ───────────────────────────────────────────
@@ -61,8 +81,26 @@ const SENTENCES = [
 ];
 
 const WORD_BANK_WORDS = ["second", "blue", "first", "red", "third", "orange"];
-function DraggableWord({ word, disabled }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+const WORD_AUDIO = {
+  second: secondAudio,
+  blue: blueAudio,
+  first: firstAudio,
+  red: redAudio,
+  third: thirdAudio,
+  orange: orangeAudio,
+};
+const FIXED_AUDIO = [theAudio, carIsInAudio, placeAudio];
+const FULL_AUDIO = { 1: full1Audio, 2: full2Audio, 3: full3Audio };
+
+function DraggableWord({
+  word,
+  disabled,
+  register,
+  onClick,
+  onKeyDown,
+  active,
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: word,
     disabled,
   });
@@ -78,12 +116,21 @@ function DraggableWord({ word, disabled }) {
 
   return (
     <span
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(element);
+      }}
       {...listeners}
       {...attributes}
-      className="px-4 py-1 rounded-full text-[17px] border border-[#f39b42]"
+      role="button"
+      tabIndex={0}
+      aria-disabled={disabled}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      className="unit4-audio-control unit4-interactive px-4 py-1 rounded-full text-[17px] border border-[#f39b42]"
       style={style}
     >
+      <Unit4PlayingAudioIcon active={active} />
       {word}
     </span>
   );
@@ -148,14 +195,22 @@ function ColorableSVG({
   activeItem,
   setActiveItem,
 }) {
-  const [svgContent, setSvgContent] = useState("");
   const [processedSvg, setProcessedSvg] = useState("");
+  const carRef = useRef(null);
+  const colorRefs = useRef([]);
+
+  useEffect(() => {
+    if (activeItem === id) {
+      window.requestAnimationFrame(() => {
+        colorRefs.current[0]?.focus({ preventScroll: true });
+      });
+    }
+  }, [activeItem, id]);
 
   useEffect(() => {
     fetch(svgSrc)
       .then((res) => res.text())
       .then((data) => {
-        setSvgContent(data);
         setProcessedSvg(processSvgForColoring(data));
       });
   }, [svgSrc]);
@@ -163,11 +218,32 @@ function ColorableSVG({
   const handleColorSelect = (color) => {
     setColors((prev) => ({ ...prev, [id]: color }));
     setActiveItem(null);
+    window.requestAnimationFrame(() =>
+      carRef.current?.focus({ preventScroll: true }),
+    );
   };
 
   return (
     <div
-      onClick={() => setActiveItem(id)}
+      ref={carRef}
+      onClick={(event) => {
+        if (event.target.closest("button")) return;
+        setActiveItem(id);
+      }}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === "Escape") {
+          event.preventDefault();
+          setActiveItem(null);
+        } else if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setActiveItem(id);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      className="unit4-interactive"
+      aria-label={`Select race car ${id.replace("car", "")} for coloring`}
       style={{
         width: 200,
         height: 120,
@@ -212,11 +288,25 @@ function ColorableSVG({
           }}
         >
           {BRUSH_COLORS.map((c) => (
-            <div
+            <button
+              type="button"
               key={c.name}
+              ref={(element) => {
+                colorRefs.current[BRUSH_COLORS.indexOf(c)] = element;
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleColorSelect(c.hex);
+              }}
+              onKeyDown={(event) => {
+                event.stopPropagation();
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  setActiveItem(null);
+                  window.requestAnimationFrame(() =>
+                    carRef.current?.focus({ preventScroll: true }),
+                  );
+                }
               }}
               style={{
                 width: 20,
@@ -225,7 +315,9 @@ function ColorableSVG({
                 background: c.hex,
                 cursor: "pointer",
                 border: "2px solid #fff",
+                padding: 0,
               }}
+              aria-label={`Color this car ${c.name}`}
             />
           ))}
         </div>
@@ -235,9 +327,8 @@ function ColorableSVG({
 }
 // ─── المكوّن الرئيسي ──────────────────────────────────────────
 export default function WB_Unit6_Page33_Q2() {
-  const [selectedColor, setSelectedColor] = useState(BRUSH_COLORS[0].hex);
-  const [brushSize, setBrushSize] = useState(12);
   const [activeDrag, setActiveDrag] = useState(null);
+  const [shakeDrops, setShakeDrops] = useState(false);
   const [colors, setColors] = useState({});
   const [activeItem, setActiveItem] = useState(null);
   // drag & drop
@@ -245,16 +336,48 @@ export default function WB_Unit6_Page33_Q2() {
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [wrongIds, setWrongIds] = useState({});
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   const usedWords = Object.values(slots).filter(Boolean);
+  const allSlotIds = SENTENCES.flatMap((sentence) =>
+    sentence.parts
+      .filter((part) => part.type === "slot")
+      .map((part) => part.slotId),
+  );
+  const tabDrag = useUnit4TabDrag({
+    itemIds: WORD_BANK_WORDS,
+    targetIds: allSlotIds,
+    isItemDisabled: (id) => usedWords.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedIds.includes(id) || showAns,
+    onPick: (id) => playAudio(`word-${id}`, WORD_AUDIO[id]),
+    onPlace: (word, slotId) => applyDrop(word, slotId),
+  });
+
+  const applyDrop = (word, slotId) => {
+    if (showAns || lockedIds.includes(slotId)) return;
+    const previousSlot = Object.keys(slots).find((key) => slots[key] === word);
+    setSlots((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key] === word) updated[key] = null;
+      });
+      updated[slotId] = word;
+      return updated;
+    });
+    setWrongIds((previous) => ({
+      ...previous,
+      [slotId]: false,
+      ...(previousSlot ? { [previousSlot]: false } : {}),
+    }));
+  };
 
   // ── Check ──
   const handleCheck = () => {
-    if (showAns || checked) return;
-
-    const allSlotIds = SENTENCES.flatMap((s) =>
-      s.parts.filter((p) => p.type === "slot").map((p) => p.slotId),
-    );
+    if (showAns || lockedIds.length === allSlotIds.length) return;
     if (!allSlotIds.every((id) => slots[id])) {
       ValidationAlert.info("Please fill all the blanks first! ✏️");
       return;
@@ -271,6 +394,19 @@ export default function WB_Unit6_Page33_Q2() {
     );
     setWrongIds(newWrong);
     setChecked(true);
+    setLockedIds((previous) => [
+      ...new Set([
+        ...previous,
+        ...SENTENCES.flatMap((sentence) =>
+          sentence.parts
+            .filter(
+              (part) =>
+                part.type === "slot" && slots[part.slotId] === part.answer,
+            )
+            .map((part) => part.slotId),
+        ),
+      ]),
+    ]);
     setShowAns(false);
     const total = allSlotIds.length;
     if (correct === total)
@@ -294,6 +430,9 @@ export default function WB_Unit6_Page33_Q2() {
     setWrongIds({});
     setChecked(false);
     setShowAns(true);
+    setLockedIds(allSlotIds);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   // ── Reset ──
@@ -302,6 +441,9 @@ export default function WB_Unit6_Page33_Q2() {
     setChecked(false);
     setShowAns(false);
     setWrongIds({});
+    setLockedIds([]);
+    tabDrag.cancel();
+    stopAudio();
 
     // 👇 هاي المهمة
     setColors({});
@@ -310,6 +452,7 @@ export default function WB_Unit6_Page33_Q2() {
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={(event) => {
         setActiveDrag(event.active.id);
       }}
@@ -317,32 +460,21 @@ export default function WB_Unit6_Page33_Q2() {
         const { active, over } = event;
         setActiveDrag(null);
 
-        if (!over) return;
-
-        const slotId = over.id;
-
-        setChecked(false);
-        setWrongIds({});
-
-        const newSlots = { ...slots };
-
-        // شيل من أي مكان
-        Object.keys(newSlots).forEach((k) => {
-          if (newSlots[k] === active.id) newSlots[k] = null;
-        });
-
-        // حط بالمكان الجديد
-        newSlots[slotId] = active.id;
-
-        setSlots(newSlots);
+        if (over) applyDrop(active.id, over.id);
+        else {
+          setShakeDrops(false);
+          window.requestAnimationFrame(() => setShakeDrops(true));
+        }
       }}
     >
       <div className="main-container-component">
         <div className="div-forall" style={{ gap: 40 }}>
           {/* ── العنوان ── */}
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">B</span>Read, color, and complete.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="B"
+            title="Read, color, and complete."
+            subTitle="Use the picture and ordinal clues to color the cars by place and color, then complete each sentence after the visual is finished."
+          />
 
           {/* ── السيارات للتلوين ── */}
           <div
@@ -390,6 +522,19 @@ export default function WB_Unit6_Page33_Q2() {
                   key={word}
                   word={word}
                   disabled={isUsed || showAns}
+                  register={(element) => tabDrag.registerItem(word, element)}
+                  active={activeAudioKey === `word-${word}`}
+                  onClick={(event) => {
+                    if (event.detail > 0)
+                      playAudio(`word-${word}`, WORD_AUDIO[word]);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    if (isUsed || showAns)
+                      playAudio(`word-${word}`, WORD_AUDIO[word]);
+                    else tabDrag.pickItem(word);
+                  }}
                 />
               );
             })}
@@ -407,22 +552,72 @@ export default function WB_Unit6_Page33_Q2() {
             <div style={{ display: "flex", justifyContent: "flex-start" }}>
               <img
                 src={imgMedals}
-                alt="medals 1st 2nd 3rd"
+                alt="Gold, silver, and bronze medals labeled first, second, and third"
                 style={{ height: 130, objectFit: "contain" }}
               />
             </div>
             {/* ── الجمل ── */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div
+              className={shakeDrops ? "unit4-invalid-selection-shake" : ""}
+              onAnimationEnd={() => setShakeDrops(false)}
+              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+            >
               {SENTENCES.map((sentence) => (
                 <div
                   key={sentence.id}
+                  className={
+                    sentence.parts
+                      .filter((part) => part.type === "slot")
+                      .every((part) => lockedIds.includes(part.slotId))
+                      ? "unit4-full-audio-enabled unit4-audio-control"
+                      : ""
+                  }
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: 4,
                     flexWrap: "wrap",
+                    position: "relative",
+                  }}
+                  role={
+                    sentence.parts
+                      .filter((part) => part.type === "slot")
+                      .every((part) => lockedIds.includes(part.slotId))
+                      ? "button"
+                      : undefined
+                  }
+                  tabIndex={
+                    sentence.parts
+                      .filter((part) => part.type === "slot")
+                      .every((part) => lockedIds.includes(part.slotId))
+                      ? 0
+                      : undefined
+                  }
+                  onClick={() => {
+                    const complete = sentence.parts
+                      .filter((part) => part.type === "slot")
+                      .every((part) => lockedIds.includes(part.slotId));
+                    if (complete)
+                      playAudio(`full-${sentence.id}`, FULL_AUDIO[sentence.id]);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      const complete = sentence.parts
+                        .filter((part) => part.type === "slot")
+                        .every((part) => lockedIds.includes(part.slotId));
+                      if (complete) {
+                        event.preventDefault();
+                        playAudio(
+                          `full-${sentence.id}`,
+                          FULL_AUDIO[sentence.id],
+                        );
+                      }
+                    }
                   }}
                 >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `full-${sentence.id}`}
+                  />
                   <span
                     style={{
                       fontWeight: 700,
@@ -436,27 +631,67 @@ export default function WB_Unit6_Page33_Q2() {
 
                   {sentence.parts.map((part, i) => {
                     if (part.type === "text") {
+                      const audioIndex = i === 0 ? 0 : i === 2 ? 1 : 2;
                       return (
                         <span
                           key={i}
                           style={{
                             fontSize: 18,
                             color: "#1f2937",
+                            position: "relative",
+                            cursor: "pointer",
                             // fontWeight: 500,
                           }}
+                          role="button"
+                          tabIndex={0}
+                          onClick={(event) => {
+                            const complete = sentence.parts
+                              .filter((entry) => entry.type === "slot")
+                              .every((entry) =>
+                                lockedIds.includes(entry.slotId),
+                              );
+                            if (complete) return;
+                            event.stopPropagation();
+                            playAudio(
+                              `fixed-${sentence.id}-${i}`,
+                              FIXED_AUDIO[audioIndex],
+                            );
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              const complete = sentence.parts
+                                .filter((entry) => entry.type === "slot")
+                                .every((entry) =>
+                                  lockedIds.includes(entry.slotId),
+                                );
+                              if (complete) return;
+                              event.preventDefault();
+                              event.stopPropagation();
+                              playAudio(
+                                `fixed-${sentence.id}-${i}`,
+                                FIXED_AUDIO[audioIndex],
+                              );
+                            }
+                          }}
                         >
+                          <Unit4PlayingAudioIcon
+                            active={
+                              activeAudioKey === `fixed-${sentence.id}-${i}`
+                            }
+                          />
                           {part.value}
                         </span>
                       );
                     }
 
                     const word = slots[part.slotId];
-                    const isWrong = checked && wrongIds[part.slotId];
-
                     return (
                       <DroppableSlot id={part.slotId}>
                         {(isOver) => (
                           <span
+                            ref={(element) =>
+                              tabDrag.registerTarget(part.slotId, element)
+                            }
                             style={{
                               minWidth: 120,
                               minHeight: 34,
@@ -477,19 +712,67 @@ export default function WB_Unit6_Page33_Q2() {
                               position: "relative",
                               padding: "0 10px",
                             }}
+                            role="button"
+                            tabIndex={
+                              tabDrag.keyboardItemId != null ||
+                              (word && !lockedIds.includes(part.slotId))
+                                ? 0
+                                : -1
+                            }
+                            aria-disabled={
+                              lockedIds.includes(part.slotId) || showAns
+                            }
                             onClick={() => {
-                              if (showAns || checked) return;
-
+                              if (
+                                showAns ||
+                                lockedIds.includes(part.slotId) ||
+                                !word
+                              )
+                                return;
                               setSlots((prev) => ({
                                 ...prev,
                                 [part.slotId]: null,
                               }));
-
-                              setChecked(false);
-                              setWrongIds({});
+                              setWrongIds((prev) => ({
+                                ...prev,
+                                [part.slotId]: false,
+                              }));
+                              tabDrag.focusItem(word);
+                            }}
+                            onKeyDown={(event) => {
+                              if (tabDrag.keyboardItemId != null)
+                                tabDrag.handleTargetKeyDown(event, part.slotId);
+                              else if (
+                                (event.key === "Enter" || event.key === " ") &&
+                                word &&
+                                !lockedIds.includes(part.slotId)
+                              ) {
+                                event.preventDefault();
+                                setSlots((prev) => ({
+                                  ...prev,
+                                  [part.slotId]: null,
+                                }));
+                                setWrongIds((prev) => ({
+                                  ...prev,
+                                  [part.slotId]: false,
+                                }));
+                                tabDrag.focusItem(word);
+                              }
                             }}
                           >
-                            {slots[part.slotId]}
+                            <span
+                              className={
+                                tabDrag.keyboardItemId &&
+                                tabDrag.keyboardTargetId === part.slotId
+                                  ? "unit4-keyboard-preview"
+                                  : ""
+                              }
+                            >
+                              {tabDrag.keyboardItemId &&
+                              tabDrag.keyboardTargetId === part.slotId
+                                ? tabDrag.keyboardItemId
+                                : slots[part.slotId]}
+                            </span>
 
                             {checked && wrongIds[part.slotId] && <ErrorBadge />}
                           </span>

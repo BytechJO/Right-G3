@@ -1,20 +1,34 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/B.5.svg";
-import AudioWithCaption from "../../AudioWithCaption";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd7pg38instruction-adult-lady_MkitoI5l.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import flAudio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise B/Item_001_fl.mp3";
+import plAudio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise B/Item_002_pl.mp3";
+import slAudio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise B/Item_003_sl.mp3";
 const BORDER_COLOR = "#e0e0e0";
 const WRONG_COLOR = "#ef4444";
 const SELECT_COLOR = "#f39b42";
 
 const OPTIONS = ["fl", "pl", "sl"];
+const OPTION_AUDIO = { fl: flAudio, pl: plAudio, sl: slAudio };
+const IMAGE_ALT = {
+  1: "A plate",
+  2: "A fly",
+  3: "A playground slide",
+  4: "A potted plant",
+  5: "A blue flag",
+};
 
 const ITEMS = [
   { id: 1, img: img1, correct: "pl" },
@@ -28,6 +42,9 @@ export default function WB_ListenAndCircle_PageB() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const captions = [
     { start: 0.58, end: 4.36, text: "Page 38, phonics exercise B." },
     { start: 4.36, end: 8.74, text: "Listen and circle FL, PL, or SL." },
@@ -38,13 +55,14 @@ export default function WB_ListenAndCircle_PageB() {
     { start: 21.6, end: 23.6, text: "5- flag." },
   ];
   const handleSelect = (id, value) => {
-    if (showAns ||showResults) return;
+    playAudio(`option-${id}-${value}`, OPTION_AUDIO[value]);
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -55,6 +73,19 @@ export default function WB_ListenAndCircle_PageB() {
       if (answers[i.id] === i.correct) score++;
     });
     setShowResults(true);
+    setLockedIds((previous) => [
+      ...new Set([
+        ...previous,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
     const total = ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -69,39 +100,51 @@ export default function WB_ListenAndCircle_PageB() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) =>
-    showResults && !showAns && answers[item.id] !== item.correct;
+    showResults && !showAns && wrongIds.includes(item.id);
 
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{
-         
-          // gap: "50px",
-       
-        }}
+        style={
+          {
+            // gap: "50px",
+          }
+        }
       >
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-          
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Listen and circle <span style={{ color: "#2e3192" }}>fl</span>,{" "}
+              <span style={{ color: "#2e3192" }}>pl</span>, or{" "}
+              <span style={{ color: "#2e3192" }}>sl</span>.
+            </>
+          }
+          subTitle="Listen carefully for the target sound, replay if needed, then choose the fl, pl, or sl beginning blend for each word that matches what you hear."
+        />
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
         >
-          <span className="WB-ex-A">B</span>
-         Listen and tap or click <strong className="text-blue-900"> fl</strong>,{" "}
-          <strong className="text-blue-900"> pl </strong>or{" "}
-          <strong className="text-blue-900"> sl</strong>.
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
           <QuestionAudioPlayer
+            pageId="wb-unit6-page38-q2"
             src={sound1}
             captions={captions}
             stopAtSecond={8.74}
@@ -130,8 +173,6 @@ export default function WB_ListenAndCircle_PageB() {
                   gap: "30px",
                 }}
               >
-                
-
                 {/* الصورة */}
                 <div
                   style={{
@@ -148,18 +189,18 @@ export default function WB_ListenAndCircle_PageB() {
                   }}
                 >
                   {/* رقم */}
-                <span
-                  style={{
-                    fontSize: "clamp(16px,1.8vw,24px)",
-                    fontWeight: 700,
-                    color: "#1e1e1eff",
-                  }}
-                >
-                  {item.id}
-                </span>
+                  <span
+                    style={{
+                      fontSize: "clamp(16px,1.8vw,24px)",
+                      fontWeight: 700,
+                      color: "#1e1e1eff",
+                    }}
+                  >
+                    {item.id}
+                  </span>
                   <img
                     src={item.img}
-                    alt={`item-${item.id}`}
+                    alt={IMAGE_ALT[item.id]}
                     style={{
                       width: "auto",
                       height: "100px",
@@ -174,18 +215,18 @@ export default function WB_ListenAndCircle_PageB() {
                         position: "absolute",
                         top: "-8px",
                         right: "-8px",
-                           width: "22px",
-              height: "22px",
-              borderRadius: "50%",
-              background: "red",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "14px",
-              fontWeight: "bold",
-              border: "2px solid white",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        background: "red",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                       }}
                     >
                       ✕
@@ -212,15 +253,14 @@ export default function WB_ListenAndCircle_PageB() {
                     const isSelected = answers[item.id] === opt;
                     const isCorrectShown = showAns && item.correct === opt;
                     const isWrongSelected =
-                      showResults &&
-                      !showAns &&
-                      answers[item.id] === opt &&
-                      opt !== item.correct;
+                      wrong && !showAns && answers[item.id] === opt;
 
                     return (
                       <button
                         key={opt}
                         onClick={() => handleSelect(item.id, opt)}
+                        aria-disabled={showAns || lockedIds.includes(item.id)}
+                        className="unit4-audio-control unit4-interactive"
                         style={{
                           fontSize: "clamp(13px,1.5vw,19px)",
                           // fontWeight: isSelected || isCorrectShown ? 800 : 500,
@@ -236,12 +276,18 @@ export default function WB_ListenAndCircle_PageB() {
                               : "2px solid transparent",
                           borderRadius: "999px",
                           padding: "clamp(2px,0.4vw,5px) clamp(6px,0.8vw,10px)",
-                          cursor: showAns||showResults ? "default" : "pointer",
+                          cursor:
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                           transition: "all 0.15s",
                           lineHeight: 1,
                           userSelect: "none",
                         }}
                       >
+                        <Unit4PlayingAudioIcon
+                          active={activeAudioKey === `option-${item.id}-${opt}`}
+                        />
                         {opt}
                       </button>
                     );
