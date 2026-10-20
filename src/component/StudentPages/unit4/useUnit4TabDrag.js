@@ -4,7 +4,11 @@ const isActivateKey = (event) => event.key === "Enter" || event.key === " ";
 const focusAndReveal = (element) => {
   if (!element) return;
   element.focus({ preventScroll: true });
-  element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  element.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+    inline: "nearest",
+  });
 };
 
 export default function useUnit4TabDrag({
@@ -26,10 +30,14 @@ export default function useUnit4TabDrag({
   isItemDisabledRef.current = isItemDisabled;
   getItemIdsForItemRef.current = getItemIdsForItem;
 
-  const focusItem = (id) => window.requestAnimationFrame(() => focusAndReveal(itemRefs.current[id]));
-  const focusTarget = (id) => window.requestAnimationFrame(() => focusAndReveal(targetRefs.current[id]));
+  const focusItem = (id) =>
+    window.requestAnimationFrame(() => focusAndReveal(itemRefs.current[id]));
+  const focusTarget = (id) =>
+    window.requestAnimationFrame(() => focusAndReveal(targetRefs.current[id]));
   const availableTargets = (itemId = keyboardItemId) =>
-    (getTargetIds ? getTargetIds(itemId) : targetIds).filter((id) => !isTargetDisabled(id));
+    (getTargetIds ? getTargetIds(itemId) : targetIds).filter(
+      (id) => !isTargetDisabled(id),
+    );
 
   const pickItem = (id) => {
     if (isItemDisabled(id)) return;
@@ -50,7 +58,9 @@ export default function useUnit4TabDrag({
 
   const focusFirstUnused = (placedId) => {
     window.requestAnimationFrame(() => {
-      const candidates = getItemIdsForItemRef.current ? getItemIdsForItemRef.current(placedId) : itemIds;
+      const candidates = getItemIdsForItemRef.current
+        ? getItemIdsForItemRef.current(placedId)
+        : itemIds;
       const first = candidates.find((id) => !isItemDisabledRef.current(id));
       focusAndReveal(itemRefs.current[first]);
     });
@@ -69,7 +79,8 @@ export default function useUnit4TabDrag({
       if (!targets.length) return;
       const index = targets.indexOf(targetId);
       const direction = event.shiftKey ? -1 : 1;
-      const next = targets[(index + direction + targets.length) % targets.length];
+      const next =
+        targets[(index + direction + targets.length) % targets.length];
       setKeyboardTargetId(next);
       focusTarget(next);
       return;
@@ -90,8 +101,12 @@ export default function useUnit4TabDrag({
     keyboardTargetId,
     pickItem,
     handleTargetKeyDown,
-    registerItem: (id, element) => { itemRefs.current[id] = element; },
-    registerTarget: (id, element) => { targetRefs.current[id] = element; },
+    registerItem: (id, element) => {
+      itemRefs.current[id] = element;
+    },
+    registerTarget: (id, element) => {
+      targetRefs.current[id] = element;
+    },
     focusItem,
     cancel,
   };

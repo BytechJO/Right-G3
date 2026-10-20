@@ -6,10 +6,10 @@ import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frie
 import FindQuestion from "../../FindQuestion";
 
 const targetArea = {
-  x1: 60.345,
-  y1: 50.88,
-  x2: 73.06,
-  y2: 55.56,
+  x1: 59.345,
+  y1: 76.88,
+  x2: 70.06,
+  y2: 94.56,
 };
 
 const Unit4_Page1_find = () => {
@@ -23,9 +23,9 @@ const Unit4_Page1_find = () => {
       targetArea={targetArea}
       answerHighlight={MySVG}
       imageHeight="70vh"
-      highlightTop="54%"
-      highlightLeft="65%"
-      highlightHeight="7%"
+      highlightTop="78%"
+      highlightLeft="60%"
+      highlightHeight="14%"
       highlightImageStyle={{
         transform: "translate(-50%, -50%)",
       }}

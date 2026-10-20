@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import question1Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise H/Item_001_Where's_the_telephone.mp3";
+import answer1Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise H/Item_002_It's_in_the_living_room.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise H/Item_003_Is_there_a_bathtub_in_the_kitchen.mp3";
+import answer2Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise H/Item_004_No,_there_isn't.mp3";
 
 // ── House image (one full image)
 import houseImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/H1.svg";
@@ -28,6 +36,12 @@ const LABELS = [
 ];
 
 const OPTIONS = ["bedroom", "living room", "bathroom", "kitchen"];
+const DIALOGUE_AUDIO = {
+  "Where's the telephone?": question1Audio,
+  "It's in the living room.": answer1Audio,
+  "Is there a bathtub in the kitchen?": question2Audio,
+  "No, there isn't.": answer2Audio,
+};
 
 const BOTTOM_ITEMS = [
   { id: 1, img: armchairImg, alt: "armchair" },
@@ -39,17 +53,19 @@ const BOTTOM_ITEMS = [
 
 export default function WB_Unit5_Page30_Q2() {
   const [selected, setSelected] = useState({ 1: "", 2: "", 3: "", 4: "" });
-  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, value) => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((entry) => entry !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === LABELS.length) return;
     const allAnswered = LABELS.every((l) => selected[l.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -59,7 +75,19 @@ export default function WB_Unit5_Page30_Q2() {
     LABELS.forEach((l) => {
       if (selected[l.id] === l.correct) score++;
     });
-    setShowResults(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...LABELS.filter((label) => selected[label.id] === label.correct).map(
+          (label) => label.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      LABELS.filter((label) => selected[label.id] !== label.correct).map(
+        (label) => label.id,
+      ),
+    );
     if (score === LABELS.length)
       ValidationAlert.success(`Score: ${score} / ${LABELS.length}`);
     else if (score > 0)
@@ -73,18 +101,21 @@ export default function WB_Unit5_Page30_Q2() {
       filled[l.id] = l.correct;
     });
     setSelected(filled);
-    setShowResults(true);
     setShowAns(true);
+    setLockedIds(LABELS.map((label) => label.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setSelected({ 1: "", 2: "", 3: "", 4: "" });
-    setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
-  const isWrong = (label) =>
-    showResults && selected[label.id] !== label.correct;
+  const isWrong = (label) => wrongIds.includes(label.id);
 
   return (
     <div className="main-container-component">
@@ -95,12 +126,14 @@ export default function WB_Unit5_Page30_Q2() {
         }}
       >
         {/* ── Title ── */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">H</span>Label the rooms and ask a friend
-        </h1>
+        <ExerciseHeader
+          sectionLetter="H"
+          title="Label the rooms and ask a friend."
+          subTitle="Choose the correct room labels and location questions with a partner from the picture first, then say the full sentence aloud using the model pattern."
+        />
 
         {/* ── House image + overlaid dropdowns ── */}
-        <div className="flex justify-center">
+        <div className="flex justify-center w-full">
           <div
             style={{
               position: "relative",
@@ -113,7 +146,7 @@ export default function WB_Unit5_Page30_Q2() {
           >
             <img
               src={houseImg}
-              alt="house rooms"
+              alt="A two-story house showing a bedroom, living room, bathroom, and kitchen"
               style={{ width: "100%", height: "auto", display: "block" }}
             />
 
@@ -133,7 +166,7 @@ export default function WB_Unit5_Page30_Q2() {
                     style={{ position: "relative", display: "inline-block" }}
                   >
                     <select
-                      disabled={showAns||showResults}
+                      disabled={showAns || lockedIds.includes(label.id)}
                       value={selected[label.id]}
                       onChange={(e) => handleChange(label.id, e.target.value)}
                       style={{
@@ -145,7 +178,6 @@ export default function WB_Unit5_Page30_Q2() {
                         // fontWeight: 700,
                         color: RED_COLOR,
                         cursor: showAns ? "default" : "pointer",
-                        outline: "none",
                         appearance: "auto",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
                         width: "150px",
@@ -191,6 +223,7 @@ export default function WB_Unit5_Page30_Q2() {
         </div>
         {/* ── Dialogue section: girl LEFT | boy RIGHT ── */}
         <div
+          className="w-full"
           style={{
             display: "flex",
             alignItems: "center",
@@ -224,6 +257,18 @@ export default function WB_Unit5_Page30_Q2() {
               ].map((text, i) => (
                 <div
                   key={i}
+                  className="unit4-audio-control unit4-interactive"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() =>
+                    playAudio(`dialogue-${text}`, DIALOGUE_AUDIO[text])
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`dialogue-${text}`, DIALOGUE_AUDIO[text]);
+                    }
+                  }}
                   style={{
                     background: "#fff",
                     border: "1px solid #ccc",
@@ -235,8 +280,13 @@ export default function WB_Unit5_Page30_Q2() {
                     maxWidth: "clamp(160px,24vw,280px)",
                     lineHeight: 1.3,
                     boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+                    position: "relative",
+                    cursor: "pointer",
                   }}
                 >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `dialogue-${text}`}
+                  />
                   {text}
                 </div>
               ))}
@@ -245,7 +295,7 @@ export default function WB_Unit5_Page30_Q2() {
             {/* Girl image */}
             <img
               src={girlImg}
-              alt="girl"
+              alt="A girl asking location questions"
               style={{
                 height: "clamp(70px,11vw,130px)",
                 width: "auto",
@@ -269,7 +319,7 @@ export default function WB_Unit5_Page30_Q2() {
             {/* Boy image */}
             <img
               src={boyImg}
-              alt="boy"
+              alt="A boy answering location questions"
               style={{
                 height: "clamp(70px,11vw,130px)",
                 width: "auto",
@@ -291,6 +341,18 @@ export default function WB_Unit5_Page30_Q2() {
                 (text, i) => (
                   <div
                     key={i}
+                    className="unit4-audio-control unit4-interactive"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      playAudio(`dialogue-${text}`, DIALOGUE_AUDIO[text])
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`dialogue-${text}`, DIALOGUE_AUDIO[text]);
+                      }
+                    }}
                     style={{
                       background: "#fff",
                       border: "1px solid #ccc",
@@ -302,8 +364,13 @@ export default function WB_Unit5_Page30_Q2() {
                       maxWidth: "clamp(160px,24vw,280px)",
                       lineHeight: 1.3,
                       boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+                      position: "relative",
+                      cursor: "pointer",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `dialogue-${text}`}
+                    />
                     {text}
                   </div>
                 ),

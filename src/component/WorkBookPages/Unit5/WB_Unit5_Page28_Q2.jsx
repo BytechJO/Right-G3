@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise D/Item_001_The_mirror_is.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise D/Item_002_The_clock_is_next_to_the.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise D/Item_003_The_rug_is.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise D/Item_004_The_chair_is.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise D/Item_005_The_window_is.mp3";
+import audio6 from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise D/Item_006_The_bed_is.mp3";
 
 import roomImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/Asset 92.svg";
 
@@ -75,25 +85,28 @@ const ITEMS = [
     correct: "next to the chair.",
   },
 ];
+const ITEM_AUDIO = { 1: audio1, 2: audio2, 3: audio3, 4: audio4, 5: audio5, 6: audio6 };
 
 export default function WB_Unit5_Page28_QD() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, value) => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setChecked(false);
+    setWrongIds((prev) => prev.filter((entry) => entry !== id));
   };
 
   const handleCheck = () => {
-    if (showAns ||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.filter((item) => !item.fixed).every(
       (item) => answers[item.id],
@@ -114,7 +127,15 @@ export default function WB_Unit5_Page28_QD() {
       }
     });
 
-    setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map((item) => item.id),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map((item) => item.id),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -135,19 +156,22 @@ export default function WB_Unit5_Page28_QD() {
     });
 
     setAnswers(filled);
-    setChecked(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!checked || showAns || item.fixed) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   const getValue = (id) => answers[id] || "";
@@ -157,7 +181,7 @@ export default function WB_Unit5_Page28_QD() {
       <div className="wb-room-select-wrap">
         <select
           value={getValue(item.id)}
-          disabled={showAns||checked}
+          disabled={showAns || lockedIds.includes(item.id)}
           onChange={(e) => handleChange(item.id, e.target.value)}
           className={`wb-room-select ${
             getValue(item.id) ? "wb-room-select--filled" : ""
@@ -432,14 +456,19 @@ export default function WB_Unit5_Page28_QD() {
           gap: "35px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>
-         Read, look, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Read, look, and write."
+          subTitle="Use the preposition for each object in the bedroom scene to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div className="wb-room-image-wrap">
           <div className="wb-room-image-box">
-            <img src={roomImg} alt="room" className="wb-room-image" />
+            <img
+              src={roomImg}
+              alt="A bedroom with a mirror, dresser, clock, window, rug, chair, and bed"
+              className="wb-room-image"
+            />
           </div>
         </div>
 
@@ -457,7 +486,21 @@ export default function WB_Unit5_Page28_QD() {
                       : "1px solid #2f2f2f",
                   }}
                 >
-                  <span className="wb-room-prefix">{item.prefix}</span>
+                  <span
+                    className="wb-room-prefix unit4-audio-control unit4-interactive"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => playAudio(`prefix-${item.id}`, ITEM_AUDIO[item.id])}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`prefix-${item.id}`, ITEM_AUDIO[item.id]);
+                      }
+                    }}
+                  >
+                    <Unit4PlayingAudioIcon active={activeAudioKey === `prefix-${item.id}`} />
+                    {item.prefix}
+                  </span>
 
                   {item.fixed ? (
                     <span className="wb-room-answer-fixed">{item.correct}</span>

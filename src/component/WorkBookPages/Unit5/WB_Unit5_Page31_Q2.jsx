@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import bowlAudio from "../../../assets/audio/WorkBook/unit5/Page 31 - Exercise J/Item_001_The_bowl_of_fruit_is.mp3";
+import roomAudio from "../../../assets/audio/WorkBook/unit5/Page 31 - Exercise J/Item_002_room.mp3";
+import catAudio from "../../../assets/audio/WorkBook/unit5/Page 31 - Exercise J/Item_003_The_cat_is.mp3";
+import fridgeAudio from "../../../assets/audio/WorkBook/unit5/Page 31 - Exercise J/Item_004_The_fridge_is.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/J1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/J2.svg";
@@ -46,23 +54,28 @@ const ITEMS = [
     after: ".",
   },
 ];
+const BEFORE_AUDIO = { 1: bowlAudio, 2: catAudio, 3: fridgeAudio };
+const fieldKey = (id, key) => `${id}-${key}`;
 
 export default function SB_LookAndWrite_PageJ() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const [wrongKeys, setWrongKeys] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, key, value) => {
-    if (showAns || showResults) return;
+    const currentKey = fieldKey(id, key);
+    if (showAns || lockedKeys.includes(currentKey)) return;
     setAnswers((prev) => ({
       ...prev,
       [id]: { ...prev[id], [key]: value },
     }));
-    setShowResults(false);
+    setWrongKeys((prev) => prev.filter((entry) => entry !== currentKey));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedKeys.length === ITEMS.length * 2) return;
 
     const allAnswered = ITEMS.every(
       (i) => answers[i.id]?.a1 && answers[i.id]?.a2,
@@ -84,7 +97,18 @@ export default function SB_LookAndWrite_PageJ() {
       }
     });
 
-    setShowResults(true);
+    const correctKeys = [];
+    const incorrectKeys = [];
+    ITEMS.forEach((item) => {
+      ["a1", "a2"].forEach((key) => {
+        const expected = key === "a1" ? item.correct1 : item.correct2;
+        const currentKey = fieldKey(item.id, key);
+        if (answers[item.id]?.[key] === expected) correctKeys.push(currentKey);
+        else incorrectKeys.push(currentKey);
+      });
+    });
+    setLockedKeys((prev) => [...new Set([...prev, ...correctKeys])]);
+    setWrongKeys(incorrectKeys);
 
     if (score === ITEMS.length)
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -99,31 +123,31 @@ export default function SB_LookAndWrite_PageJ() {
       filled[i.id] = { a1: i.correct1, a2: i.correct2 };
     });
     setAnswers(filled);
-    setShowResults(true);
     setShowAns(true);
+    setLockedKeys(
+      ITEMS.flatMap((item) => [
+        fieldKey(item.id, "a1"),
+        fieldKey(item.id, "a2"),
+      ]),
+    );
+    setWrongKeys([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
     setShowAns(false);
+    setLockedKeys([]);
+    setWrongKeys([]);
+    stopAudio();
   };
 
-  const isWrong = (item) => {
-    if (!showResults || showAns) return false;
-    return (
-      answers[item.id]?.a1 !== item.correct1 ||
-      answers[item.id]?.a2 !== item.correct2
-    );
-  };
   const isWrongA1 = (item) => {
-    if (!showResults || showAns) return false;
-    return answers[item.id]?.a1 !== item.correct1;
+    return wrongKeys.includes(fieldKey(item.id, "a1"));
   };
 
   const isWrongA2 = (item) => {
-    if (!showResults || showAns) return false;
-    return answers[item.id]?.a2 !== item.correct2;
+    return wrongKeys.includes(fieldKey(item.id, "a2"));
   };
   return (
     <div className="main-container-component mb-10">
@@ -133,15 +157,15 @@ export default function SB_LookAndWrite_PageJ() {
           gap: "30px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span> Look and write.
-        </h1>
-        <div className="flex flex-col gap-10 px-10">
+        <ExerciseHeader
+          sectionLetter="J"
+          title="Look and write."
+          subTitle="Use the object, preposition, and room in each sentence to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
+        <div className="flex flex-col gap-10 px-10 w-full">
           {ITEMS.map((item) => {
             const val1 = answers[item.id]?.a1 || "";
             const val2 = answers[item.id]?.a2 || "";
-            const wrong = isWrong(item);
-
             return (
               <div
                 key={item.id}
@@ -156,7 +180,13 @@ export default function SB_LookAndWrite_PageJ() {
 
                   <img
                     src={item.img}
-                    alt=""
+                    alt={
+                      [
+                        "A bowl of fruit on a table in the living room",
+                        "A cat in a basket in the living room",
+                        "A fridge in the kitchen",
+                      ][item.id - 1]
+                    }
                     style={{ width: "auto", height: "120px" }}
                   />
                 </div>
@@ -167,7 +197,26 @@ export default function SB_LookAndWrite_PageJ() {
                     paddingBottom: "10px",
                   }}
                 >
-                  <span className="text-[20px] m-2">{item.before} </span>
+                  <span
+                    className="text-[20px] m-2 unit4-audio-control unit4-interactive"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      playAudio(`before-${item.id}`, BEFORE_AUDIO[item.id])
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`before-${item.id}`, BEFORE_AUDIO[item.id]);
+                      }
+                    }}
+                    style={{ position: "relative", cursor: "pointer" }}
+                  >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `before-${item.id}`}
+                    />
+                    {item.before}{" "}
+                  </span>
 
                   {!showAns ? (
                     <div
@@ -175,7 +224,10 @@ export default function SB_LookAndWrite_PageJ() {
                     >
                       <select
                         value={val1}
-                        disabled={showResults}
+                        disabled={
+                          showAns ||
+                          lockedKeys.includes(fieldKey(item.id, "a1"))
+                        }
                         onChange={(e) =>
                           handleChange(item.id, "a1", e.target.value)
                         }
@@ -232,7 +284,10 @@ export default function SB_LookAndWrite_PageJ() {
                     >
                       <select
                         value={val2}
-                        disabled={showResults}
+                        disabled={
+                          showAns ||
+                          lockedKeys.includes(fieldKey(item.id, "a2"))
+                        }
                         onChange={(e) =>
                           handleChange(item.id, "a2", e.target.value)
                         }
@@ -283,7 +338,33 @@ export default function SB_LookAndWrite_PageJ() {
                     <span className="text-[20px] m-2">{item.correct2}</span>
                   )}
 
-                  <span className="text-[20px] m-2"> {item.after}</span>
+                  <span
+                    className="text-[20px] m-2 unit4-audio-control unit4-interactive"
+                    role={item.after === "room." ? "button" : undefined}
+                    tabIndex={item.after === "room." ? 0 : undefined}
+                    onClick={() =>
+                      item.after === "room." &&
+                      playAudio(`room-${item.id}`, roomAudio)
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        item.after === "room." &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`room-${item.id}`, roomAudio);
+                      }
+                    }}
+                    style={{
+                      position: "relative",
+                      cursor: item.after === "room." ? "pointer" : "default",
+                    }}
+                  >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `room-${item.id}`}
+                    />{" "}
+                    {item.after}
+                  </span>
                 </div>
               </div>
             );

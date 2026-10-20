@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import instruction1Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise G/Item_001_The_hat_is_under_the_table.mp3";
+import instruction2Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise G/Item_002_The_cat_is_next_to_the_chair.mp3";
+import instruction3Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise G/Item_003_The_ball_is_on_the_bed.mp3";
+import instruction4Audio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise G/Item_004_The_apple_is_in_the_fridge.mp3";
 
 import imgHat from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/G1.svg";
 import imgCat from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 30/G2.svg";
@@ -19,6 +27,12 @@ const SENTENCES = [
   { id: 3, before: "The ball", img: imgBall, after: "is on the bed." },
   { id: 4, before: "The apple", img: imgApple, after: "is in the fridge." },
 ];
+const SENTENCE_AUDIO = {
+  1: instruction1Audio,
+  2: instruction2Audio,
+  3: instruction3Audio,
+  4: instruction4Audio,
+};
 
 const FURNITURE = [
   { id: 1, img: imgFridge, alt: "fridge" },
@@ -40,54 +54,151 @@ const COLORS = [
 const SIZES = [2, 4, 8, 12];
 
 // ── Single canvas drawing box ──
+// eslint-disable-next-line react-refresh/only-export-components
 function DrawCanvas({ width, height, tool, color, size, resetKey }) {
   const canvasRef = useRef(null);
+
   const drawing = useRef(false);
   const lastPos = useRef(null);
-  useEffect(() => {
+
+  // Undo history
+  const historyRef = useRef([]);
+
+  // Keyboard drawing
+  const [canvasFocused, setCanvasFocused] = useState(false);
+  const [keyboardDrawing, setKeyboardDrawing] = useState(false);
+
+  const [cursorPos, setCursorPos] = useState({
+    x: width / 2,
+    y: height / 2,
+  });
+
+  const keyboardPosRef = useRef({
+    x: width / 2,
+    y: height / 2,
+  });
+
+  /* =====================================================
+     CLEAR WHITE BACKGROUND
+  ===================================================== */
+
+  const fillWhite = () => {
     const canvas = canvasRef.current;
+
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
 
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }, [resetKey]);
+  };
+
+  /* =====================================================
+     RESET
+  ===================================================== */
+
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    fillWhite();
+
+    historyRef.current = [];
+
+    drawing.current = false;
+    lastPos.current = null;
+
+    setKeyboardDrawing(false);
+
+    const center = {
+      x: width / 2,
+      y: height / 2,
+    };
+
+    keyboardPosRef.current = center;
+    setCursorPos(center);
+  }, [resetKey, width, height]);
+
+  useEffect(() => {
+    fillWhite();
   }, []);
+
+  /* =====================================================
+     SAVE FOR UNDO
+  ===================================================== */
+
+  const saveHistory = () => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    historyRef.current.push(snapshot);
+
+    // نحتفظ بآخر 30 خطوة فقط
+    if (historyRef.current.length > 30) {
+      historyRef.current.shift();
+    }
+  };
+
+  /* =====================================================
+     UNDO
+  ===================================================== */
+
+  const undo = () => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const previous = historyRef.current.pop();
+
+    if (!previous) return;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.putImageData(previous, 0, 0);
+
+    drawing.current = false;
+    lastPos.current = null;
+
+    setKeyboardDrawing(false);
+  };
+
+  /* =====================================================
+     POINTER POSITION
+  ===================================================== */
 
   const getPos = (e) => {
     const canvas = canvasRef.current;
+
     const rect = canvas.getBoundingClientRect();
+
     const scaleX = canvas.width / rect.width;
+
     const scaleY = canvas.height / rect.height;
+
     const src = e.touches ? e.touches[0] : e;
+
     return {
       x: (src.clientX - rect.left) * scaleX,
+
       y: (src.clientY - rect.top) * scaleY,
     };
   };
 
-  const startDraw = (e) => {
-    e.preventDefault();
+  /* =====================================================
+     DRAW DOT
+  ===================================================== */
+
+  const drawDot = (pos) => {
     const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
 
-    if (tool === "fill") {
-      ctx.fillStyle = color;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      return;
-    }
-
-    const pos = getPos(e);
-    lastPos.current = pos;
-    drawing.current = true;
-
     ctx.beginPath();
+
     ctx.arc(
       pos.x,
       pos.y,
@@ -95,52 +206,313 @@ function DrawCanvas({ width, height, tool, color, size, resetKey }) {
       0,
       Math.PI * 2,
     );
+
     ctx.fillStyle = tool === "eraser" ? "#fff" : color;
+
     ctx.fill();
   };
 
-  const draw = (e) => {
-    e.preventDefault();
-    if (!drawing.current) return;
-    if (tool !== "pencil" && tool !== "eraser") return;
+  /* =====================================================
+     DRAW LINE BETWEEN TWO POINTS
+  ===================================================== */
 
+  const drawLine = (from, to) => {
     const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
-    const pos = getPos(e);
-    const prev = lastPos.current;
-    if (!prev) return;
 
     ctx.beginPath();
-    ctx.moveTo(prev.x, prev.y);
-    ctx.lineTo(pos.x, pos.y);
+
+    ctx.moveTo(from.x, from.y);
+
+    ctx.lineTo(to.x, to.y);
+
     ctx.strokeStyle = tool === "eraser" ? "#fff" : color;
+
     ctx.lineWidth = tool === "eraser" ? size * 3 : size;
+
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+
     ctx.stroke();
+  };
+
+  /* =====================================================
+     MOUSE / TOUCH START
+  ===================================================== */
+
+  const startDraw = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    // قبل أي تغيير خزّن الحالة
+    saveHistory();
+
+    if (tool === "fill") {
+      ctx.fillStyle = color;
+
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      return;
+    }
+
+    const pos = getPos(e);
+
+    lastPos.current = pos;
+    drawing.current = true;
+
+    drawDot(pos);
+  };
+
+  /* =====================================================
+     MOUSE / TOUCH MOVE
+  ===================================================== */
+
+  const draw = (e) => {
+    if (!drawing.current) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (tool !== "pencil" && tool !== "eraser") {
+      return;
+    }
+
+    const pos = getPos(e);
+
+    const prev = lastPos.current;
+
+    if (!prev) return;
+
+    drawLine(prev, pos);
 
     lastPos.current = pos;
   };
 
+  /* =====================================================
+     END DRAW
+  ===================================================== */
+
   const endDraw = (e) => {
     e?.preventDefault();
+    e?.stopPropagation();
+
     drawing.current = false;
     lastPos.current = null;
   };
 
+  /* =====================================================
+     CLEAR
+  ===================================================== */
+
   const clear = () => {
     const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    // حتى الـClear نقدر نعمله Undo
+    saveHistory();
+
     const ctx = canvas.getContext("2d");
+
     ctx.fillStyle = "#fff";
+
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawing.current = false;
+    lastPos.current = null;
+
+    setKeyboardDrawing(false);
+  };
+
+  /* =====================================================
+     KEYBOARD
+  ===================================================== */
+
+  const handleCanvasKeyDown = (event) => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const isActivate = event.key === "Enter" || event.key === " ";
+
+    /* ENTER / SPACE */
+
+    if (isActivate) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      /*
+        Fill:
+        Enter / Space يلون الكانفس مباشرة
+      */
+
+      if (tool === "fill") {
+        saveHistory();
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = color;
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        return;
+      }
+
+      /*
+        Pencil / Eraser:
+        أول Enter يبدأ الرسم
+        ثاني Enter يوقفه
+      */
+
+      if (!keyboardDrawing) {
+        saveHistory();
+
+        setKeyboardDrawing(true);
+
+        drawDot(keyboardPosRef.current);
+      } else {
+        setKeyboardDrawing(false);
+      }
+
+      return;
+    }
+
+    /* ESC */
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+
+      setKeyboardDrawing(false);
+
+      return;
+    }
+
+    /* ARROWS */
+
+    const arrowKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+
+    if (!arrowKeys.includes(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const step = event.shiftKey ? 15 : 5;
+
+    const oldPos = {
+      ...keyboardPosRef.current,
+    };
+
+    let newX = oldPos.x;
+
+    let newY = oldPos.y;
+
+    if (event.key === "ArrowLeft") {
+      newX -= step;
+    }
+
+    if (event.key === "ArrowRight") {
+      newX += step;
+    }
+
+    if (event.key === "ArrowUp") {
+      newY -= step;
+    }
+
+    if (event.key === "ArrowDown") {
+      newY += step;
+    }
+
+    newX = Math.max(0, Math.min(canvas.width, newX));
+
+    newY = Math.max(0, Math.min(canvas.height, newY));
+
+    const newPos = {
+      x: newX,
+      y: newY,
+    };
+
+    /*
+      إذا وضع الرسم شغال:
+      حركة الأسهم ترسم
+    */
+
+    if (keyboardDrawing && (tool === "pencil" || tool === "eraser")) {
+      drawLine(oldPos, newPos);
+    }
+
+    keyboardPosRef.current = newPos;
+
+    setCursorPos(newPos);
+  };
+
+  /* =====================================================
+     KEYBOARD CURSOR POSITION
+  ===================================================== */
+
+  const cursorStyle = {
+    position: "absolute",
+
+    left: `${(cursorPos.x / width) * 100}%`,
+
+    top: `${(cursorPos.y / height) * 100}%`,
+
+    transform: "translate(-50%, -50%)",
+
+    width: "14px",
+    height: "14px",
+
+    borderRadius: "50%",
+
+    border: keyboardDrawing ? "3px solid #dc2626" : "3px solid #2563eb",
+
+    background: "rgba(255,255,255,0.7)",
+
+    pointerEvents: "none",
+
+    zIndex: 4,
+
+    boxShadow: "0 0 0 2px rgba(255,255,255,0.8)",
   };
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      {/* ===============================
+          CANVAS
+      =============================== */}
+
       <canvas
         ref={canvasRef}
         width={width}
         height={height}
+        tabIndex={0}
+        role="application"
+        aria-label="Drawing area. Press Enter or Space to start drawing, use the arrow keys to move, and press Enter or Space again to stop drawing."
+        onFocus={() => {
+          setCanvasFocused(true);
+        }}
+        onBlur={() => {
+          setCanvasFocused(false);
+          setKeyboardDrawing(false);
+        }}
+        onKeyDown={handleCanvasKeyDown}
         onMouseDown={startDraw}
         onMouseMove={draw}
         onMouseUp={endDraw}
@@ -152,26 +524,163 @@ function DrawCanvas({ width, height, tool, color, size, resetKey }) {
           width: "100%",
           height: "100%",
           display: "block",
+
           cursor: tool === "eraser" ? "cell" : "crosshair",
+
           touchAction: "none",
+
+          outline: canvasFocused ? "3px solid #2563eb" : "none",
+
+          outlineOffset: "-3px",
         }}
       />
+
+      {/* ===============================
+          KEYBOARD CURSOR
+      =============================== */}
+
+      {canvasFocused && (
+        <>
+          <div aria-hidden="true" style={cursorStyle} />
+
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+
+              top: "6px",
+
+              left: "6px",
+
+              padding: "3px 7px",
+
+              borderRadius: "999px",
+
+              background: keyboardDrawing ? "#dc2626" : "#2563eb",
+
+              color: "#fff",
+
+              fontSize: "11px",
+
+              fontWeight: 700,
+
+              pointerEvents: "none",
+
+              zIndex: 4,
+            }}
+          >
+            {keyboardDrawing ? "Drawing" : "Move"}
+          </div>
+        </>
+      )}
+
+      {/* ===============================
+          UNDO - فوق X
+      =============================== */}
+
       <button
-        onClick={clear}
+        type="button"
+        aria-label="Undo last drawing"
+        title="Undo"
+        onKeyDown={(event) => {
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          undo();
+        }}
         style={{
           position: "absolute",
-          bottom: "4px",
+
+          bottom: "34px",
+
           right: "4px",
-          padding: "2px 8px",
+
+          width: "28px",
+
+          height: "28px",
+
+          padding: 0,
+
           borderRadius: "6px",
-          border: "1.5px solid #fca5a5",
-          background: "#fef2f2",
-          color: "#dc2626",
-          fontSize: "11px",
+
+          border: "1.5px solid #93c5fd",
+
+          background: "#eff6ff",
+
+          color: "#2563eb",
+
+          display: "flex",
+
+          alignItems: "center",
+
+          justifyContent: "center",
+
+          fontSize: "18px",
+
           fontWeight: 700,
+
           cursor: "pointer",
-          zIndex: 3,
-          lineHeight: 1.4,
+
+          zIndex: 5,
+
+          lineHeight: 1,
+        }}
+      >
+        ↶
+      </button>
+
+      {/* ===============================
+          CLEAR X
+      =============================== */}
+
+      <button
+        type="button"
+        aria-label="Clear drawing"
+        title="Clear drawing"
+        onKeyDown={(event) => {
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          clear();
+        }}
+        style={{
+          position: "absolute",
+
+          bottom: "4px",
+
+          right: "4px",
+
+          width: "28px",
+
+          height: "28px",
+
+          padding: 0,
+
+          borderRadius: "6px",
+
+          border: "1.5px solid #fca5a5",
+
+          background: "#fef2f2",
+
+          color: "#dc2626",
+
+          display: "flex",
+
+          alignItems: "center",
+
+          justifyContent: "center",
+
+          fontSize: "13px",
+
+          fontWeight: 700,
+
+          cursor: "pointer",
+
+          zIndex: 5,
+
+          lineHeight: 1,
         }}
       >
         ✕
@@ -185,8 +694,10 @@ export default function SB_ReadAndDraw_PageG() {
   const [color, setColor] = useState("#111827");
   const [size, setSize] = useState(4);
   const [resetKey, setResetKey] = useState(0);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const handleStartAgain = () => {
     setResetKey((prev) => prev + 1);
+    stopAudio();
   };
 
   return (
@@ -198,9 +709,11 @@ export default function SB_ReadAndDraw_PageG() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span> Read and draw.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="G"
+          title="Read and draw."
+          subTitle="Read one instruction at a time and draw only the requested hat, cat, ball, and apple in the specified locations before moving to the next instruction."
+        />
 
         {/* ── Main layout ── */}
         <div
@@ -224,14 +737,32 @@ export default function SB_ReadAndDraw_PageG() {
             {SENTENCES.map((s) => (
               <div
                 key={s.id}
+                className="unit4-audio-control unit4-interactive"
+                role="button"
+                tabIndex={0}
+                aria-label={`Play instruction: ${s.before} ${s.after}`}
+                onClick={() =>
+                  playAudio(`sentence-${s.id}`, SENTENCE_AUDIO[s.id])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`sentence-${s.id}`, SENTENCE_AUDIO[s.id]);
+                  }
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "clamp(8px,1vw,14px)",
                   flexWrap: "wrap",
                   minWidth: 0,
+                  position: "relative",
+                  cursor: "pointer",
                 }}
               >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `sentence-${s.id}`}
+                />
                 <span
                   style={{
                     fontSize: "clamp(16px,1.7vw,20px)",
@@ -541,7 +1072,7 @@ export default function SB_ReadAndDraw_PageG() {
             marginTop: "clamp(6px,1vw,12px)",
           }}
         >
-         <Button handleStartAgain={handleStartAgain} />
+          <Button handleStartAgain={handleStartAgain} />
         </div>
       </div>
     </div>

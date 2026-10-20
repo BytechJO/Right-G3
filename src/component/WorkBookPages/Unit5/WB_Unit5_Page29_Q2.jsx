@@ -1,25 +1,33 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise F/Item_001_The_cat_is_under_the_bed.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise F/Item_002_The_duck_is_in_front_of_the_bathtub.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise F/Item_003_The_chair_is_behind_the_table.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise F/Item_004_The_book_is_on_the_table.mp3";
 
 // غيّري المسارات حسب ملفاتك
-import q1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E1.svg"
-import q1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E2.svg"
+import q1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E1.svg";
+import q1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E2.svg";
 
-import q2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F2.svg"
-import q2b from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F3.svg"
+import q2a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F2.svg";
+import q2b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F3.svg";
 
-import q3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E3.svg"
+import q3a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E3.svg";
 import q3b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E4.svg";
 
-import q4a from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F4.svg"
-import q4b from"../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F5.svg"
+import q4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F4.svg";
+import q4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F5.svg";
 
-import q5a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E5.svg"
-import q5b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F1.svg"
+import q5a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/E5.svg";
+import q5b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F1.svg";
 
-import q6a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F6.svg"
-import q6b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F7.svg"
+import q6a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F6.svg";
+import q6b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/F7.svg";
 
 const YELLOW_COLOR = "#f39b42";
 const RED_COLOR = "red";
@@ -82,6 +90,12 @@ const QUESTIONS = [
     correct: "b",
   },
 ];
+const SENTENCE_AUDIO = {
+  1: sentence1Audio,
+  2: sentence2Audio,
+  3: sentence3Audio,
+  4: sentence4Audio,
+};
 
 const initialAnswers = {
   1: null,
@@ -182,21 +196,22 @@ export default function WB_Unit5_Page29_QF() {
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState({});
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (questionId, optionId) => {
-    if (showAns ||checked) return;
+    if (showAns || lockedIds.includes(questionId)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [questionId]: optionId,
     }));
 
-    setChecked(false);
-    setWrongAnswers({});
+    setWrongAnswers((prev) => ({ ...prev, [questionId]: false }));
   };
 
   const checkAnswers = () => {
-    if (showAns ||checked) return;
+    if (showAns || lockedIds.length === QUESTIONS.length) return;
 
     const allAnswered = Object.values(answers).every((value) => value !== null);
 
@@ -221,6 +236,14 @@ export default function WB_Unit5_Page29_QF() {
 
     setWrongAnswers(newWrongAnswers);
     setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...QUESTIONS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
 
     if (score === QUESTIONS.length) {
       ValidationAlert.success(`Score: ${score} / ${QUESTIONS.length}`);
@@ -242,6 +265,8 @@ export default function WB_Unit5_Page29_QF() {
     setChecked(true);
     setShowAns(true);
     setWrongAnswers({});
+    setLockedIds(QUESTIONS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleStartAgain = () => {
@@ -249,14 +274,14 @@ export default function WB_Unit5_Page29_QF() {
     setChecked(false);
     setShowAns(false);
     setWrongAnswers({});
+    setLockedIds([]);
+    stopAudio();
   };
 
   const getCircleStyle = (question, optionId) => {
     const isSelected = answers[question.id] === optionId;
     const isWrongSelected =
-      checked &&
-      wrongAnswers[question.id] &&
-      answers[question.id] === optionId;
+      checked && wrongAnswers[question.id] && answers[question.id] === optionId;
 
     const isCorrectShown = showAns && question.correct === optionId;
 
@@ -297,19 +322,14 @@ export default function WB_Unit5_Page29_QF() {
       <div
         className="div-forall"
         style={{
-        
           gap: "40px",
-       
-
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-         
-        >
-          <span className="WB-ex-A">F</span>
-         Read, look, and tap or click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="F"
+          title="Read, look, and circle."
+          subTitle="Look at the preposition sentence that matches each picture pair first, compare all available options, then tap only the answer that matches."
+        />
 
         <div className="wb-f-grid" style={styles.grid}>
           {QUESTIONS.map((question) => (
@@ -317,10 +337,7 @@ export default function WB_Unit5_Page29_QF() {
               <div style={styles.topRow}>
                 <div style={styles.number}>{question.id}</div>
 
-                <div
-                  className="wb-f-options"
-                  style={styles.optionsWrap}
-                >
+                <div className="wb-f-options" style={styles.optionsWrap}>
                   {question.options.map((option) => {
                     const isWrongSelected =
                       checked &&
@@ -330,20 +347,28 @@ export default function WB_Unit5_Page29_QF() {
                     return (
                       <button
                         key={option.id}
+                        type="button"
                         onClick={() => handleSelect(question.id, option.id)}
+                        tabIndex={
+                          showAns || lockedIds.includes(question.id) ? -1 : 0
+                        }
                         style={{
                           ...styles.imageButton,
                           ...getCircleStyle(question, option.id),
-                          cursor: showAns||checked ? "default" : "pointer",
+                          cursor:
+                            showAns || lockedIds.includes(question.id)
+                              ? "default"
+                              : "pointer",
                         }}
+                        aria-disabled={
+                          showAns || lockedIds.includes(question.id)
+                        }
                       >
-                       
-                          <img
-                            src={option.img}
-                            alt={`q${question.id}-${option.id}`}
-                            style={styles.image}
-                          />
-                      
+                        <img
+                          src={option.img}
+                          alt={`${question.text} Picture option ${option.id.toUpperCase()}`}
+                          style={styles.image}
+                        />
 
                         {isWrongSelected && (
                           <span
@@ -375,7 +400,40 @@ export default function WB_Unit5_Page29_QF() {
                 </div>
               </div>
 
-              <div style={styles.sentence}>{question.text}</div>
+              <div
+                className="unit4-audio-control unit4-interactive"
+                style={{
+                  ...styles.sentence,
+                  position: "relative",
+                  cursor: SENTENCE_AUDIO[question.id] ? "pointer" : "default",
+                }}
+                role={SENTENCE_AUDIO[question.id] ? "button" : undefined}
+                tabIndex={SENTENCE_AUDIO[question.id] ? 0 : undefined}
+                onClick={() =>
+                  SENTENCE_AUDIO[question.id] &&
+                  playAudio(
+                    `sentence-${question.id}`,
+                    SENTENCE_AUDIO[question.id],
+                  )
+                }
+                onKeyDown={(event) => {
+                  if (
+                    SENTENCE_AUDIO[question.id] &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    playAudio(
+                      `sentence-${question.id}`,
+                      SENTENCE_AUDIO[question.id],
+                    );
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `sentence-${question.id}`}
+                />
+                {question.text}
+              </div>
             </div>
           ))}
         </div>

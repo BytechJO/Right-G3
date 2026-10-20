@@ -1,104 +1,132 @@
 import React, { useState } from "react";
-import "./Unit5_Page5_Q2.css";
-
 import ValidationAlert from "../../Popup/ValidationAlert";
-import blue from "../../../assets/audio/ClassBook/Unit 5/P 44/unit5-pg44-EXB.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
+import Button from "../../Button";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import "./Unit5_Page5_Q2.css";
+import "../unit4/unit4Interactions.css";
+import mainAudio from "../../../assets/audio/ClassBook/Unit 5/P 44/unit5-pg44-EXB.mp3";
+import flyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_001_fly.mp3";
+import tryAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_002_try.mp3";
+import funnyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_003_funny.mp3";
+import cryAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_004_cry.mp3";
+import dryAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_005_dry.mp3";
+import slyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_006_sly.mp3";
+import myAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_007_my.mp3";
+import honeyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_008_honey.mp3";
+import whyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_009_why.mp3";
+import buyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_010_buy.mp3";
+import runnyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_011_runny.mp3";
+import candyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise B/Item_012_candy.mp3";
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
-const Unit5_Page5_Q2 = () => {
-  const captions = [
-    {
-      start: 0.419,
-      end: 26.739,
-      text: "Page 44, write activities. Exercise B. Do both words have the same Y sound? Listen and write check or X. Fly. Try. Funny. Cry. Dry. Sly. My. Honey. Why. Buy. Runny. Candy",
-    },
-  ];
 
-  const groups = [
-    { id: 1, word1: "fly", word2: "try", answer: "yes" },
-    { id: 2, word1: "funny", word2: "cry", answer: "no" },
-    { id: 3, word1: "dry", word2: "sly", answer: "yes" },
-    { id: 4, word1: "my", word2: "honey", answer: "no" },
-    { id: 5, word1: "why", word2: "buy", answer: "yes" },
-    { id: 6, word1: "runny", word2: "candy", answer: "yes" },
-  ];
+const WORD_AUDIO = {
+  fly: flyAudio,
+  try: tryAudio,
+  funny: funnyAudio,
+  cry: cryAudio,
+  dry: dryAudio,
+  sly: slyAudio,
+  my: myAudio,
+  honey: honeyAudio,
+  why: whyAudio,
+  buy: buyAudio,
+  runny: runnyAudio,
+  candy: candyAudio,
+};
 
-  const [selected, setSelected] = useState(Array(groups.length).fill(null));
-  const [showResult2, setShowResult2] = useState(false);
-  const [locked, setLocked] = useState(false);
+const GROUPS = [
+  { id: 1, word1: "fly", word2: "try", answer: "yes" },
+  { id: 2, word1: "funny", word2: "cry", answer: "no" },
+  { id: 3, word1: "dry", word2: "sly", answer: "yes" },
+  { id: 4, word1: "my", word2: "honey", answer: "no" },
+  { id: 5, word1: "why", word2: "buy", answer: "yes" },
+  { id: 6, word1: "runny", word2: "candy", answer: "yes" },
+];
 
-  const handleSelect = (groupIndex, value) => {
-    if (locked || showResult2) return;
+const CAPTIONS = [
+  {
+    start: 0.419,
+    end: 26.739,
+    text: "Page 44, write activities. Exercise B. Do both words have the same Y sound? Listen and write check or X. Fly. Try. Funny. Cry. Dry. Sly. My. Honey. Why. Buy. Runny. Candy",
+  },
+];
 
-    const updated = [...selected];
-    updated[groupIndex] = value;
-    setSelected(updated);
-  };
+export default function Unit5_Page5_Q2() {
+  const [selected, setSelected] = useState(Array(GROUPS.length).fill(null));
+  const [wrongIds, setWrongIds] = useState([]);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
-  const showAnswers = () => {
-    const correctSelections = groups.map((g) => g.answer);
-    setSelected(correctSelections);
-    setShowResult2(true);
-    setLocked(true);
+  const handleSelect = (index, value) => {
+    if (lockedIds.includes(index)) return;
+    setSelected((previous) => {
+      const next = [...previous];
+      next[index] = value;
+      return next;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== index));
   };
 
   const checkAnswers = () => {
-    if (locked || showResult2) return;
-
-    if (selected.some((val) => val === null)) {
-      ValidationAlert.info("Please choose ✓ or ✗ for all items!");
+    if (lockedIds.length === GROUPS.length) return;
+    if (selected.some((value) => value === null)) {
+      ValidationAlert.info("Please choose ✓ or ✗ for all items.");
       return;
     }
 
-    let correctCount = 0;
+    const correctIds = GROUPS.flatMap((group, index) =>
+      selected[index] === group.answer ? [index] : [],
+    );
+    const wrong = GROUPS.flatMap((group, index) =>
+      selected[index] !== group.answer ? [index] : [],
+    );
+    setLockedIds((previous) => [...new Set([...previous, ...correctIds])]);
+    setWrongIds(wrong);
 
-    groups.forEach((group, index) => {
-      if (selected[index] === group.answer) {
-        correctCount++;
-      }
-    });
+    const score = correctIds.length;
+    ValidationAlert[
+      score === GROUPS.length ? "success" : score === 0 ? "error" : "warning"
+    ](`Score: ${score} / ${GROUPS.length}`);
+  };
 
-    const total = groups.length;
-    const color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
-
-    const scoreMessage = `
-      <div style="font-size: 20px; margin-top: 10px; text-align:center;">
-        <span style="color:${color}; font-weight:bold;">
-          Score: ${correctCount} / ${total}
-        </span>
-      </div>
-    `;
-
-    if (correctCount === total) {
-      ValidationAlert.success(scoreMessage);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(scoreMessage);
-    } else {
-      ValidationAlert.warning(scoreMessage);
-    }
-
-    setShowResult2(true);
-    setLocked(true);
+  const showAnswers = () => {
+    setSelected(GROUPS.map((group) => group.answer));
+    setWrongIds([]);
+    setLockedIds(GROUPS.map((_, index) => index));
+    stopAudio();
   };
 
   const reset = () => {
-    setSelected(Array(groups.length).fill(null));
-    setShowResult2(false);
-    setLocked(false);
+    setSelected(Array(GROUPS.length).fill(null));
+    setWrongIds([]);
+    setLockedIds([]);
+    stopAudio();
   };
 
-  const renderChoiceBox = (index, value, symbol) => {
+  const renderChoice = (index, value, symbol) => {
     const isSelected = selected[index] === value;
-    const isWrong =
-      showResult2 &&
-      selected[index] === value &&
-      groups[index].answer !== value;
+    const isWrong = wrongIds.includes(index) && isSelected;
+    const isLocked = lockedIds.includes(index);
 
     return (
       <div
+        role="button"
+        tabIndex={isLocked ? -1 : 0}
+        aria-label={`Choose ${symbol} for item ${index + 1}`}
+        aria-pressed={isSelected}
+        aria-disabled={isLocked}
+        className="unit4-interactive"
         onClick={() => handleSelect(index, value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleSelect(index, value);
+          }
+        }}
         style={{
           width: "45px",
           height: "45px",
@@ -107,49 +135,21 @@ const Unit5_Page5_Q2 = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: locked ? "default" : "pointer",
-          background: isSelected ? "#fff" : "#fff",
+          cursor: isLocked ? "default" : "pointer",
+          background: "#fff",
           position: "relative",
-          fontSize: "22px",
-          fontWeight: "700",
-          color: isSelected ? "#2c5287" : "transparent",
-          lineHeight: 1,
           userSelect: "none",
         }}
       >
-        {isSelected ? (
-          symbol === "✓" ? (
-            <img src={trueIcon} style={{ height: "25px" }} />
-          ) : (
-            <img src={falseIcon} style={{ height: "25px" }} />
-          )
-        ) : (
-          ""
+        {isSelected && (
+          <img
+            src={symbol === "✓" ? trueIcon : falseIcon}
+            alt=""
+            style={{ height: "25px" }}
+          />
         )}
-
         {isWrong && (
-          <span
-            style={{
-              position: "absolute",
-              right: "-10px",
-              top: "5%",
-              transform: "translateY(-50%)",
-              width: "22px",
-              height: "22px",
-              background: "red",
-              color: "white",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: "bold",
-              border: "2px solid white",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-              pointerEvents: "none",
-              zIndex: 3,
-            }}
-          >
+          <span className="CB-unit5-p5-q1-wrong-x" aria-hidden="true">
             ✕
           </span>
         )}
@@ -162,34 +162,31 @@ const Unit5_Page5_Q2 = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          gap: "50px",
-        }}
-      >
-        <h3 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            B
-          </span>{" "}
-        Do both words have the same
-          <span style={{ color: "#2e3192" }}> -y sound </span>? Listen and write
-          <span style={{ color: "#D52328" }}> ✓ </span> or{" "}
-          <span style={{ color: "#D52328" }}> ✗ </span>.
-        </h3>
-
-        <QuestionAudioPlayer
-          src={blue}
-          captions={captions}
-          stopAtSecond={11.5}
+      <div className="div-forall" style={{ gap: "50px" }}>
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Do both words have the same{" "}
+              <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and
+              write <span style={{ color: "#D1232A" }}>✓</span> or{" "}
+              <span style={{ color: "#D1232A" }}>✗</span>.
+            </>
+          }
+          subTitle="Listen to both words carefully, then mark whether their final -y sounds match."
         />
-
+        <QuestionAudioPlayer
+          src={mainAudio}
+          captions={CAPTIONS}
+          stopAtSecond={11.5}
+          pageId="unit5-page44-exercise-b"
+        />
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -198,7 +195,7 @@ const Unit5_Page5_Q2 = () => {
             marginTop: "10px",
           }}
         >
-          {groups.map((group, index) => (
+          {GROUPS.map((group, index) => (
             <div
               key={group.id}
               style={{
@@ -210,53 +207,45 @@ const Unit5_Page5_Q2 = () => {
               }}
             >
               <span
-                style={{
-                  fontWeight: "700",
-                  fontSize: "20px",
-                  color: "#1f1f1f",
-                }}
+                style={{ fontWeight: 700, fontSize: "20px", color: "#1f1f1f" }}
               >
                 {group.id}
               </span>
-
-              <span
-                style={{
-                  fontSize: "20px",
-                  color: "#2b2b2b",
-                }}
-              >
-                {group.word1}
-              </span>
-
-              <span
-                style={{
-                  fontSize: "20px",
-                  color: "#2b2b2b",
-                }}
-              >
-                {group.word2}
-              </span>
-
-              {renderChoiceBox(index, "yes", "✓")}
-              {renderChoiceBox(index, "no", "✗")}
+              {[group.word1, group.word2].map((word, wordIndex) => (
+                <span
+                  key={word}
+                  role="button"
+                  tabIndex={0}
+                  className="unit4-audio-control unit4-interactive"
+                  aria-label={`Play ${word}`}
+                  onClick={() =>
+                    playAudio(`word-${index}-${wordIndex}`, WORD_AUDIO[word])
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`word-${index}-${wordIndex}`, WORD_AUDIO[word]);
+                    }
+                  }}
+                  style={{ fontSize: "20px", color: "#2b2b2b" }}
+                >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `word-${index}-${wordIndex}`}
+                  />
+                  {word}
+                </span>
+              ))}
+              {renderChoice(index, "yes", "✓")}
+              {renderChoice(index, "no", "✗")}
             </div>
           ))}
         </div>
       </div>
-
-      <div className="action-buttons-container">
-        <button onClick={reset} className="try-again-button">
-          Start Again ↻
-        </button>
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      <Button
+        handleStartAgain={reset}
+        handleShowAnswer={showAnswers}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
-};
-
-export default Unit5_Page5_Q2;
+}
