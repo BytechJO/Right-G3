@@ -2,10 +2,40 @@ import React, { useState } from "react";
 import "./Review5_Page2_Q2.css";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import "../unit4/unit4Interactions.css";
 import blue from "../../../assets/audio/ClassBook/Unit 6/P 53/unit6-pg53-EXD.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
+import tryAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_001_try.mp3";
+import flyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_002_fly.mp3";
+import bunnyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_003_bunny.mp3";
+import spyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_004_spy.mp3";
+import cryAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_005_cry.mp3";
+import fryAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_006_fry.mp3";
+import candyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_007_candy.mp3";
+import babyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_008_baby.mp3";
+import sunnyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_009_sunny.mp3";
+import slyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_010_sly.mp3";
+import fluffyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_011_fluffy.mp3";
+import skyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise D/Item_012_sky.mp3";
+const WORD_AUDIO = {
+  try: tryAudio,
+  fly: flyAudio,
+  bunny: bunnyAudio,
+  spy: spyAudio,
+  cry: cryAudio,
+  fry: fryAudio,
+  candy: candyAudio,
+  baby: babyAudio,
+  sunny: sunnyAudio,
+  sly: slyAudio,
+  fluffy: fluffyAudio,
+  sky: skyAudio,
+};
 const Review5_Page2_Q2 = () => {
   const captions = [
     {
@@ -24,26 +54,37 @@ const Review5_Page2_Q2 = () => {
   ];
 
   const [selected, setSelected] = useState(Array(groups.length).fill(null));
-  const [showResult2, setShowResult2] = useState(false);
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [forceStop, setForceStop] = useState(0);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const playWordAudio = (key, source) => {
+    setForceStop((value) => value + 1);
+    playAudio(key, source);
+  };
 
   const handleSelect = (groupIndex, value) => {
-    if (locked || showResult2) return;
+    if (lockedIds.includes(groupIndex) || showAnswer) return;
 
     const updated = [...selected];
     updated[groupIndex] = value;
     setSelected(updated);
+    setWrongIds((previous) => previous.filter((id) => id !== groupIndex));
   };
 
   const showAnswers = () => {
     const correctSelections = groups.map((g) => g.answer);
     setSelected(correctSelections);
-    setShowResult2(true);
-    setLocked(true);
+    setLockedIds(groups.map((_, index) => index));
+    setWrongIds([]);
+    setShowAnswer(true);
+    setForceStop((value) => value + 1);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (locked || showResult2) return;
+    if (showAnswer || lockedIds.length === groups.length) return;
 
     if (selected.some((val) => val === null)) {
       ValidationAlert.info("Please choose ✓ or ✗ for all items!");
@@ -78,26 +119,50 @@ const Review5_Page2_Q2 = () => {
       ValidationAlert.warning(scoreMessage);
     }
 
-    setShowResult2(true);
-    setLocked(true);
+    setLockedIds(
+      groups.flatMap((group, index) =>
+        selected[index] === group.answer ? [index] : [],
+      ),
+    );
+    setWrongIds(
+      groups.flatMap((group, index) =>
+        selected[index] !== group.answer ? [index] : [],
+      ),
+    );
   };
 
   const reset = () => {
     setSelected(Array(groups.length).fill(null));
-    setShowResult2(false);
-    setLocked(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAnswer(false);
+    setForceStop((value) => value + 1);
+    stopAudio();
   };
 
   const renderChoiceBox = (index, value, symbol) => {
     const isSelected = selected[index] === value;
     const isWrong =
-      showResult2 &&
+      wrongIds.includes(index) &&
       selected[index] === value &&
       groups[index].answer !== value;
 
     return (
       <div
         onClick={() => handleSelect(index, value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleSelect(index, value);
+          }
+        }}
+        role="button"
+        tabIndex={lockedIds.includes(index) || showAnswer ? -1 : 0}
+        aria-pressed={isSelected}
+        aria-label={
+          value === "yes" ? "The sounds match" : "The sounds do not match"
+        }
+        className="unit4-interactive"
         style={{
           width: "45px",
           height: "45px",
@@ -106,7 +171,8 @@ const Review5_Page2_Q2 = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: locked ? "default" : "pointer",
+          cursor:
+            lockedIds.includes(index) || showAnswer ? "default" : "pointer",
           background: isSelected ? "#fff" : "#fff",
           position: "relative",
           fontSize: "22px",
@@ -118,9 +184,9 @@ const Review5_Page2_Q2 = () => {
       >
         {isSelected ? (
           symbol === "✓" ? (
-            <img src={trueIcon} style={{ height: "25px" }} />
+            <img src={trueIcon} alt="Check mark" style={{ height: "25px" }} />
           ) : (
-            <img src={falseIcon} style={{ height: "25px" }} />
+            <img src={falseIcon} alt="X mark" style={{ height: "25px" }} />
           )
         ) : (
           ""
@@ -172,23 +238,30 @@ const Review5_Page2_Q2 = () => {
           gap: "50px",
         }}
       >
-        <h3 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>
-            D
-          </span>{" "}
-          Do both words have the same ?
-          <span style={{ color: "#2e3192" }}> -y sound </span>? Listen and write
-          <span style={{ color: "#D52328" }}> ✓ </span> or{" "}
-          <span style={{ color: "#D52328" }}> ✗ </span>.
-        </h3>
+        <ExerciseHeaderReview
+          sectionLetter="D"
+          title={
+            <>
+              Do both words have the same{" "}
+              <span style={{ color: "#2e3192" }}>-y sound</span>? Listen and
+              write <span style={{ color: "#D1232A" }}>✓</span> or{" "}
+              <span style={{ color: "#D1232A" }}>✗</span>.
+            </>
+          }
+          subTitle="Listen to both words carefully, then mark whether their final -y sounds match."
+        />
 
         <QuestionAudioPlayer
           src={blue}
           captions={captions}
           stopAtSecond={11.5}
+          pageId="review5-page2-q2"
+          forceStop={forceStop}
+          onInteract={stopAudio}
         />
 
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -209,6 +282,21 @@ const Review5_Page2_Q2 = () => {
               }}
             >
               <span
+                role="button"
+                tabIndex={0}
+                className="unit4-audio-control unit4-interactive"
+                onClick={() =>
+                  playWordAudio(`word-${group.id}-1`, WORD_AUDIO[group.word1])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playWordAudio(
+                      `word-${group.id}-1`,
+                      WORD_AUDIO[group.word1],
+                    );
+                  }
+                }}
                 style={{
                   fontWeight: "700",
                   fontSize: "20px",
@@ -224,15 +312,36 @@ const Review5_Page2_Q2 = () => {
                   color: "#2b2b2b",
                 }}
               >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `word-${group.id}-1`}
+                />
                 {group.word1}
               </span>
 
               <span
+                role="button"
+                tabIndex={0}
+                className="unit4-audio-control unit4-interactive"
+                onClick={() =>
+                  playWordAudio(`word-${group.id}-2`, WORD_AUDIO[group.word2])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playWordAudio(
+                      `word-${group.id}-2`,
+                      WORD_AUDIO[group.word2],
+                    );
+                  }
+                }}
                 style={{
                   fontSize: "20px",
                   color: "#2b2b2b",
                 }}
               >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `word-${group.id}-2`}
+                />
                 {group.word2}
               </span>
 

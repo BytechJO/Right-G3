@@ -1,6 +1,21 @@
-import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useRef, useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import Button from "../../Button";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import useUnit4TabDrag from "../unit4/useUnit4TabDrag";
+import "../unit4/unit4Interactions.css";
 
 import imgA from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 1.svg";
 import imgB from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 2.svg";
@@ -8,324 +23,348 @@ import imgC from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import imgD from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 4.svg";
 import imgE from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 5.svg";
 import imgF from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 53/Ex C 6.svg";
+import skyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise C/Item_001_sky.mp3";
+import babyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise C/Item_002_baby.mp3";
+import partyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise C/Item_003_party.mp3";
+import julyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise C/Item_004_July.mp3";
+import candyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise C/Item_005_candy.mp3";
+import flyAudio from "../../../assets/audio/ClassBook/Unit 6/Page 53 - Exercise C/Item_006_fly.mp3";
 
-const Review5_Page2_Q1 = () => {
-  const senteces = ["sky", "baby", "party", "July", "candy", "fly"];
-  const [wrongMap, setWrongMap] = useState({});
-  const questions = [
-    {
-      id: 1,
-      img: imgA,
-      answer: "sky",
-    },
-    {
-      id: 2,
-      img: imgB,
-      answer: "baby",
-    },
-    {
-      id: 3,
-      img: imgC,
-      answer: "party",
-    },
-    {
-      id: 4,
-      img: imgD,
-      answer: "July",
-    },
-    {
-      id: 5,
-      img: imgE,
-      answer: "candy",
-    },
-    {
-      id: 6,
-      img: imgF,
-      answer: "fly",
-    },
-  ];
-  const [answers, setAnswers] = useState(questions.map(() => ""));
+const WORDS = [
+  { id: "sky", value: "sky", audio: skyAudio },
+  { id: "baby", value: "baby", audio: babyAudio },
+  { id: "party", value: "party", audio: partyAudio },
+  { id: "July", value: "July", audio: julyAudio },
+  { id: "candy", value: "candy", audio: candyAudio },
+  { id: "fly", value: "fly", audio: flyAudio },
+];
+const QUESTIONS = [
+  { id: 1, img: imgA, answer: "sky", alt: "Blue sky and clouds" },
+  { id: 2, img: imgB, answer: "baby", alt: "A baby crawling" },
+  { id: 3, img: imgC, answer: "party", alt: "Children at a birthday party" },
+  { id: 4, img: imgD, answer: "July", alt: "A July calendar page" },
+  { id: 5, img: imgE, answer: "candy", alt: "Colorful pieces of candy" },
+  { id: 6, img: imgF, answer: "fly", alt: "A fly" },
+];
 
-  const [locked, setLocked] = useState(false);
-  const onDragEnd = (result) => {
-    const { destination, draggableId } = result;
-    if (!destination || locked) return;
+export function WordChip({ item, used, register, pick, play, playing }) {
+  const pointerStart = useRef(null);
+  const pointerMoved = useRef(false);
+  const { setNodeRef, listeners, attributes, transform } = useDraggable({
+    id: item.id,
+    disabled: used,
+  });
+  return (
+    <span
+      ref={(element) => {
+        setNodeRef(element);
+        register(item.id, element);
+      }}
+      {...listeners}
+      {...attributes}
+      role="button"
+      tabIndex={0}
+      aria-disabled={used}
+      aria-label={`${used ? "Listen to" : "Pick"} ${item.value}`}
+      onPointerDownCapture={(event) => {
+        pointerStart.current = { x: event.clientX, y: event.clientY };
+        pointerMoved.current = false;
+      }}
+      onPointerMoveCapture={(event) => {
+        if (
+          pointerStart.current &&
+          Math.hypot(
+            event.clientX - pointerStart.current.x,
+            event.clientY - pointerStart.current.y,
+          ) > 5
+        )
+          pointerMoved.current = true;
+      }}
+      onClick={(event) => {
+        if (event.detail !== 0 && !pointerMoved.current) play();
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        if (used) play();
+        else pick();
+      }}
+      className="season-chip unit4-audio-control unit4-interactive"
+      style={{
+        padding: "7px 20px",
+        border: "1px solid #F79530",
+        borderRadius: 8,
+        background: "white",
+        fontWeight: "bold",
+        cursor: used ? "pointer" : "grab",
+        fontSize: 16,
+        opacity: used ? 0.4 : 1,
+        touchAction: "none",
+        transform: transform
+          ? `translate3d(${transform.x}px,${transform.y}px,0)`
+          : undefined,
+      }}
+    >
+      <Unit4PlayingAudioIcon active={playing} />
+      {item.value}
+    </span>
+  );
+}
 
-    const word = draggableId.split("-").slice(1).join("-");
+export function AnswerSlot({
+  id,
+  value,
+  preview,
+  wrong,
+  locked,
+  register,
+  onRemove,
+  onKeyDown,
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div
+      ref={(element) => {
+        setNodeRef(element);
+        register(id, element);
+      }}
+      role="button"
+      tabIndex={preview || (value && !locked) ? 0 : -1}
+      aria-disabled={locked}
+      aria-label={`Answer slot${value ? `, ${value}` : ""}`}
+      onClick={() => value && !locked && onRemove()}
+      onKeyDown={onKeyDown}
+      className="unit4-drop-target unit4-interactive"
+      style={{
+        width: 200,
+        borderBottom: wrong
+          ? "2px solid red"
+          : isOver
+            ? "2px solid #F79530"
+            : "1px solid black",
+        minHeight: 35,
+        marginTop: 10,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+      }}
+    >
+      <span className={preview ? "unit4-keyboard-preview" : undefined}>
+        {preview || value}
+      </span>
+      {wrong && (
+        <span
+          style={{
+            position: "absolute",
+            right: -10,
+            top: -8,
+            width: 20,
+            height: 20,
+            background: "red",
+            color: "white",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 12,
+            border: "2px solid white",
+          }}
+        >
+          ✕
+        </span>
+      )}
+    </div>
+  );
+}
 
-    // 👇 الحل هون
-    const qIndex = Number(destination.droppableId.split("-")[1]) - 1;
+export default function Review5_Page2_Q1() {
+  const [answers, setAnswers] = useState(Array(QUESTIONS.length).fill(""));
+  const [lockedTargets, setLockedTargets] = useState([]);
+  const [wrongTargets, setWrongTargets] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [activeWord, setActiveWord] = useState(null);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+  const used = answers.filter(Boolean);
 
-    setAnswers((prev) => {
-      const updated = [...prev];
-
-      const existingIndex = updated.findIndex((a) => a === word);
-      if (existingIndex !== -1) updated[existingIndex] = "";
-
-      updated[qIndex] = word;
+  const place = (wordId, targetId) => {
+    const index = Number(String(targetId).replace("answer-", ""));
+    if (lockedTargets.includes(index) || showAnswer) return;
+    setAnswers((previous) => {
+      const updated = previous.map((value) => (value === wordId ? "" : value));
+      updated[index] = wordId;
       return updated;
     });
+    setWrongTargets((previous) => previous.filter((id) => id !== index));
   };
 
-  const reset = () => {
-    setAnswers(questions.map(() => ""));
-    setWrongMap({});
-    setLocked(false);
+  const keyboard = useUnit4TabDrag({
+    itemIds: WORDS.map((item) => item.id),
+    targetIds: QUESTIONS.map((_, index) => `answer-${index}`),
+    isItemDisabled: (id) => used.includes(id) || showAnswer,
+    isTargetDisabled: (id) =>
+      lockedTargets.includes(Number(String(id).replace("answer-", ""))) ||
+      showAnswer,
+    onPick: (id) => {
+      const item = WORDS.find((word) => word.id === id);
+      if (item) playAudio(`word-${id}`, item.audio);
+    },
+    onPlace: place,
+  });
+
+  const remove = (index) => {
+    if (lockedTargets.includes(index) || showAnswer) return;
+    const removed = answers[index];
+    setAnswers((previous) =>
+      previous.map((value, answerIndex) =>
+        answerIndex === index ? "" : value,
+      ),
+    );
+    setWrongTargets((previous) => previous.filter((id) => id !== index));
+    if (removed) keyboard.focusItem(removed);
   };
 
-  const showAnswers = () => {
-    const filled = questions.map((q) => q.answer);
-    setAnswers(filled);
-     setWrongMap({});
-    setLocked(true);
-  };
   const checkAnswers = () => {
-    if (locked) return;
-
-    const empty = questions.some((q) => !answers[q.id - 1]);
-
-    if (empty) {
+    if (showAnswer || lockedTargets.length === QUESTIONS.length) return;
+    if (answers.some((answer) => !answer)) {
       ValidationAlert.info("Please complete all answers.");
       return;
     }
-
-    let correct = 0;
-    const wrongs = {};
-
-    questions.forEach((q, i) => {
-      if (answers[i] === q.answer) {
-        correct++;
-      } else {
-        wrongs[q.id] = true;
-      }
-    });
-
-    setWrongMap(wrongs);
-    const total = questions.length;
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <b>Score: ${correct} / ${total}</b>
-    </div>
-  `;
-
-    if (correct === total) ValidationAlert.success(msg);
-    else if (correct === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setLocked(true);
+    const correct = QUESTIONS.flatMap((question, index) =>
+      answers[index] === question.answer ? [index] : [],
+    );
+    const wrong = QUESTIONS.flatMap((question, index) =>
+      answers[index] !== question.answer ? [index] : [],
+    );
+    setLockedTargets(correct);
+    setWrongTargets(wrong);
+    if (correct.length === QUESTIONS.length)
+      ValidationAlert.success(`Score: ${correct.length} / ${QUESTIONS.length}`);
+    else if (correct.length)
+      ValidationAlert.warning(`Score: ${correct.length} / ${QUESTIONS.length}`);
+    else ValidationAlert.error(`Score: 0 / ${QUESTIONS.length}`);
   };
-  const usedWords = answers.flat().filter(Boolean);
-  const removeWord = (word) => {
-    if (locked) return;
 
-    setAnswers((prev) => {
-      const updated = [...prev];
-      const index = updated.findIndex((a) => a === word);
-      if (index !== -1) {
-        updated[index] = "";
-      }
-      return updated;
-    });
+  const reveal = () => {
+    setAnswers(QUESTIONS.map((question) => question.answer));
+    setLockedTargets(QUESTIONS.map((_, index) => index));
+    setWrongTargets([]);
+    setShowAnswer(true);
+    keyboard.cancel();
+    stopAudio();
   };
+
+  const reset = () => {
+    setAnswers(Array(QUESTIONS.length).fill(""));
+    setLockedTargets([]);
+    setWrongTargets([]);
+    setShowAnswer(false);
+    setActiveWord(null);
+    keyboard.cancel();
+    stopAudio();
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "30px",
-        }}
-      >
-        <div className="div-forall" style={{ gap: "30px" }}>
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>C</span>
-           Look, drag and drop the words ending in
-            <span style={{ color: "#2e3192" }}> -y </span>.
-          </h5>
+    <DndContext
+      sensors={sensors}
+      onDragStart={(event) => setActiveWord(String(event.active.id))}
+      onDragCancel={() => setActiveWord(null)}
+      onDragEnd={(event) => {
+        if (event.over) place(String(event.active.id), String(event.over.id));
+        setActiveWord(null);
+      }}
+    >
+      <div className="main-container-component">
+        <div className="div-forall" style={{ gap: 30 }}>
+          <ExerciseHeaderReview
+            sectionLetter="C"
+            title={<>Look and write the words ending in <span style={{ color: "#2e3192" }}>-y</span>.</>}
+            subTitle="Match each word or answer to its target first, then drag it into place and check the snap position."
+          />
 
-          {/* IMAGES */}
-          <div className="flex flex-col gap-5">
-            {/* ANSWERS BANK */}
-
-            <Droppable droppableId="bank" direction="horizontal">
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{
-                    display: "flex",
-                    gap: "25px",
-                    padding: "10px",
-                    // border: "2px dashed #ccc",
-                    borderRadius: "10px",
-                    // marginTop: "20px",
-                    justifyContent: "center",
-                    width: "100%",
-                    // marginBottom: "20px",
-                    // justifyContent: "center",
-                  }}
-                >
-                  {senteces.map((word, index) => {
-                    const isUsed = usedWords.includes(word);
-
-                    return (
-                      <Draggable
-                        key={word}
-                        draggableId={`season-${word}`}
-                        index={index}
-                        isDragDisabled={isUsed} // 🔥 يمنع السحب
-                      >
-                        {(provided) => (
-                          <span
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="season-chip"
-                            style={{
-                              padding: "7px 20px",
-                              border: "1px solid #F79530",
-                              borderRadius: "8px",
-                              background: "white",
-                              fontWeight: "bold",
-                              cursor: isUsed ? "not-allowed" : "grab",
-                              fontSize: "16px",
-                              opacity: isUsed ? 0.4 : 1, // 🔥 تخفيف اللون
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            {word}
-                          </span>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-
-            {/* QUESTIONS GRID */}
+          <div className="flex flex-col gap-5 w-full">
+            <div className="flex gap-6 p-2 justify-center w-full flex-wrap">
+              {WORDS.map((item) => (
+                <WordChip
+                  key={item.id}
+                  item={item}
+                  used={used.includes(item.id)}
+                  register={keyboard.registerItem}
+                  pick={() => keyboard.pickItem(item.id)}
+                  play={() => playAudio(`word-${item.id}`, item.audio)}
+                  playing={activeAudioKey === `word-${item.id}`}
+                />
+              ))}
+            </div>
 
             <div className="grid grid-cols-3 gap-15 mb-5">
-              {questions.map((q) => (
-                <div key={q.id} className="flex flex-col items-start">
-                  <div className="flex gap-2 items-start">
-                    <span className="font-bold text-lg">{q.id}</span>
-                    <img
-                      src={q.img}
-                      style={{
-                        height: "120px",
-                        // border: "2px solid orange",
-                        borderRadius: "10px",
+              {QUESTIONS.map((question, index) => {
+                const previewId =
+                  keyboard.keyboardTargetId === `answer-${index}`
+                    ? keyboard.keyboardItemId
+                    : "";
+                return (
+                  <div key={question.id} className="flex flex-col items-start">
+                    <div className="flex gap-2 items-start">
+                      <b className="text-lg">{question.id}</b>
+                      <img
+                        src={question.img}
+                        alt={question.alt}
+                        style={{ height: 120, borderRadius: 10 }}
+                      />
+                    </div>
+                    <AnswerSlot
+                      id={`answer-${index}`}
+                      value={answers[index]}
+                      preview={previewId}
+                      wrong={wrongTargets.includes(index)}
+                      locked={lockedTargets.includes(index) || showAnswer}
+                      register={keyboard.registerTarget}
+                      onRemove={() => remove(index)}
+                      onKeyDown={(event) => {
+                        if (
+                          !keyboard.keyboardItemId &&
+                          answers[index] &&
+                          !lockedTargets.includes(index) &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          remove(index);
+                          return;
+                        }
+                        keyboard.handleTargetKeyDown(event, `answer-${index}`);
                       }}
                     />
                   </div>
-                  {/* خط */}
-                  <Droppable droppableId={`answer-${q.id}`}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        style={{
-                          width: "200px",
-                          borderBottom: ` ${
-                            wrongMap[q.id] ? "2px solid red" : "1px solid black"
-                          }`,
-                          minHeight: "35px",
-                          marginTop: "10px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {answers[q.id - 1] && (
-                          <Draggable
-                            draggableId={answers[q.id - 1]}
-                            index={0}
-                            isDragDisabled={true}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={{
-                                  ...provided.draggableProps.style,
-                                  position: "relative", // 👈 أضف هذا
-                                }}
-                              >
-                                <span
-                                  onClick={() => removeWord(answers[q.id - 1])}
-                                  className={`font-semibold text-center block ${locked ? "":"hover:text-red-500 cursor-pointer"} `}
-                                  style={{
-                                    userSelect: "none",
-                                  }}
-                                >
-                                  {answers[q.id - 1]}
-                                </span>
-                                {wrongMap[q.id] && (
-                                  <span
-                                    style={{
-                                      position: "absolute",
-                                      right: "100%",
-                                      top: "46%",
-                                      transform: "translateY(-50%)",
-                                      width: "20px",
-                                      height: "20px",
-                                      background: "red",
-                                      color: "white",
-                                      borderRadius: "50%",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      fontSize: "12px",
-                                      fontWeight: "bold",
-                                      border: "2px solid white",
-                                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                      pointerEvents: "none",
-                                      zIndex: 3,
-                                    }}
-                                  >
-                                    ✕
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </Draggable>
-                        )}
-
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
-          {/* BUTTONS */}
-
-          <div className="action-buttons-container mt-10">
-            <button onClick={reset} className="try-again-button">
-              Start Again ↻
-            </button>
-
-            <button
-              onClick={showAnswers}
-              className="show-answer-btn swal-continue"
-            >
-              Show Answer
-            </button>
-
-            <button onClick={checkAnswers} className="check-button2">
-              Check Answer ✓
-            </button>
-          </div>
+          <Button
+            handleShowAnswer={reveal}
+            handleStartAgain={reset}
+            checkAnswers={checkAnswers}
+          />
         </div>
       </div>
-    </DragDropContext>
+      <DragOverlay>
+        {activeWord && (
+          <span
+            style={{
+              padding: "7px 20px",
+              border: "1px solid #F79530",
+              borderRadius: 8,
+              background: "white",
+              fontWeight: "bold",
+            }}
+          >
+            {activeWord}
+          </span>
+        )}
+      </DragOverlay>
+    </DndContext>
   );
-};
-
-export default Review5_Page2_Q1;
+}

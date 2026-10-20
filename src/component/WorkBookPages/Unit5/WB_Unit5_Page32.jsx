@@ -47,7 +47,7 @@ const WB_Unit5_Page32 = ({ openPopup }) => {
       </div>
 
       <div
-        className="q12-5 hover:scale-110 transition"
+        className="q13-5 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -56,12 +56,12 @@ const WB_Unit5_Page32 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           tabIndex={0}
           role="button"
-          aria-label="Open exercise 2"
-          onClick={() => openPopup("exercise", { startIndex: 65 })}
+          aria-label="Open exercise 3"
+          onClick={() => openPopup("exercise", { startIndex: 64 })}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              openPopup("exercise", { startIndex: 65 });
+              openPopup("exercise", { startIndex: 64 });
             }
           }}
           style={{
@@ -80,9 +80,8 @@ const WB_Unit5_Page32 = ({ openPopup }) => {
           />
         </svg>
       </div>
-
       <div
-        className="q13-5 hover:scale-110 transition"
+        className="q12-5 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
@@ -91,12 +90,12 @@ const WB_Unit5_Page32 = ({ openPopup }) => {
           viewBox="0 0 90 90"
           tabIndex={0}
           role="button"
-          aria-label="Open exercise 3"
-          onClick={() => openPopup("exercise", { startIndex: 64 })}
+          aria-label="Open exercise 2"
+          onClick={() => openPopup("exercise", { startIndex: 65 })}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              openPopup("exercise", { startIndex: 64 });
+              openPopup("exercise", { startIndex: 65 });
             }
           }}
           style={{

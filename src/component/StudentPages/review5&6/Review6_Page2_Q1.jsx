@@ -1,5 +1,15 @@
-import React, { useRef, useState } from "react";
+import React, {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import Button from "../../Button";
+import useWorkbookMatchingKeyboard from "../../WorkBookPages/Unit4/useWorkbookMatchingKeyboard";
+import "../unit4/unit4Interactions.css";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 3.svg";
@@ -7,465 +17,510 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 6.svg";
 import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex D 7.svg";
-import qImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Asset 8.svg";
-const items = [
-  {
-    sentence: "onpy",
-    scrambled: ["onpy"],
-    correct: ["pony"],
-  },
-  {
-    sentence: "dyla",
-    scrambled: ["dyla"],
-    correct: ["lady"],
-  },
-  {
-    sentence: "nenpy",
-    scrambled: ["nenpy"],
-    correct: ["penny"],
-  },
-  {
-    sentence: "wentty",
-    scrambled: ["wentty"],
-    correct: ["twenty"],
-  },
-  {
-    sentence: "icyt",
-    scrambled: ["icyt"],
-    correct: ["city"],
-  },
-  {
-    sentence: "ejlly",
-    scrambled: ["ejlly"],
-    correct: ["jelly"],
-  },
-  {
-    sentence: "pyppu",
-    scrambled: ["pyppu"],
-    correct: ["puppy"],
-  },
+
+const ITEMS = [
+  { scrambled: "onpy", correct: "pony" },
+  { scrambled: "dyla", correct: "lady" },
+  { scrambled: "nenpy", correct: "penny" },
+  { scrambled: "wentty", correct: "twenty" },
+  { scrambled: "icyt", correct: "city" },
+  { scrambled: "ejlly", correct: "jelly" },
+  { scrambled: "pyppu", correct: "puppy" },
 ];
-const images = [img1, img2, img3, img4, img5, img6, img7];
+const PICTURES = [
+  { src: img1, alt: "The number twenty" },
+  { src: img2, alt: "A pony" },
+  { src: img3, alt: "A city" },
+  { src: img4, alt: "A puppy" },
+  { src: img5, alt: "A jar of jelly" },
+  { src: img6, alt: "A penny coin" },
+  { src: img7, alt: "A lady" },
+];
+const CORRECT_MATCHES = { 0: 1, 1: 6, 2: 2, 3: 0, 4: 4, 5: 5, 6: 3 };
+const IDS = ITEMS.map((_, index) => index);
+const ORANGE = "#f39b42";
+
 export default function Review6_Page2_Q1() {
-  // ✨ كل كلمة string بدل array
-  const [answers, setAnswers] = useState(
-    items.map((item) => Array(item.correct[0].length).fill("")),
+  const letters = useMemo(
+    () =>
+      ITEMS.map((item, row) =>
+        item.scrambled
+          .split("")
+          .map((char, index) => ({ char, id: `${row}-${index}` })),
+      ),
+    [],
   );
+  const [answers, setAnswers] = useState(
+    ITEMS.map((item) => Array(item.correct.length).fill(null)),
+  );
+  const [matches, setMatches] = useState({});
+  const [selected, setSelected] = useState(null);
+  const [lockedWords, setLockedWords] = useState([]);
+  const [lockedMatches, setLockedMatches] = useState([]);
+  const [wrongWords, setWrongWords] = useState([]);
+  const [wrongMatches, setWrongMatches] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
   const [lines, setLines] = useState([]);
-  const [startDot, setStartDot] = useState(null);
-  const [activeWord, setActiveWord] = useState(null);
-  const imageDotRefs = useRef([]);
-  const textDotRefs = useRef([]);
-  const containerRef = useRef(null);
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const boardRef = useRef(null);
+  const refs = useRef({});
 
-  const handleDotClick = (index, type) => {
-    if (locked) return; // 🔥 يمنع التوصيل بعد check/show
+  const isLeftLocked = useCallback(
+    (id) => lockedMatches.includes(id),
+    [lockedMatches],
+  );
+  const isRightLocked = useCallback(
+    (id) =>
+      Object.keys(matches).some(
+        (key) => matches[key] === id && lockedMatches.includes(Number(key)),
+      ),
+    [lockedMatches, matches],
+  );
 
-    if (!startDot) {
-      setStartDot({ index, type });
-      return;
-    }
-
-    if (startDot.type === type) {
-      setStartDot(null);
-      return;
-    }
-
-    const imageIndex = startDot.type === "image" ? startDot.index : index;
-    const textIndex = startDot.type === "text" ? startDot.index : index;
-
-    setLines((prev) => {
-      let updated = [...prev];
-
-      updated = updated.filter(
-        (l) =>
-          l.from.index !== imageIndex && // image
-          l.to.index !== textIndex, // text
+  const placeLetter = (row, letter) => {
+    if (lockedWords.includes(row) || showAnswer) return;
+    setAnswers((previous) => {
+      const updated = previous.map((entry) => [...entry]);
+      const oldIndex = updated[row].findIndex(
+        (entry) => entry?.id === letter.id,
       );
+      if (oldIndex >= 0) updated[row][oldIndex] = null;
+      const empty = updated[row].findIndex((entry) => !entry);
+      if (empty >= 0) updated[row][empty] = letter;
+      return updated;
+    });
+    setWrongWords((previous) => previous.filter((id) => id !== row));
+  };
+  const removeLetter = (row, slot) => {
+    if (lockedWords.includes(row) || showAnswer) return;
+    setAnswers((previous) =>
+      previous.map((entry, index) =>
+        index === row
+          ? entry.map((letter, letterIndex) =>
+              letterIndex === slot ? null : letter,
+            )
+          : entry,
+      ),
+    );
+    setWrongWords((previous) => previous.filter((id) => id !== row));
+    const removed = answers[row][slot];
+    if (removed)
+      window.requestAnimationFrame(() =>
+        refs.current[`letter-${removed.id}`]?.focus(),
+      );
+  };
 
-      updated.push({
-        from: { index: imageIndex, type: "image" },
-        to: { index: textIndex, type: "text" },
+  const commit = (leftId, rightId) => {
+    if (showAnswer || isLeftLocked(leftId) || isRightLocked(rightId)) return;
+    setMatches((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key] === rightId && !lockedMatches.includes(Number(key)))
+          delete updated[key];
       });
-
+      updated[leftId] = rightId;
       return updated;
     });
-
-    setStartDot(null);
+    setWrongMatches((previous) => previous.filter((id) => id !== leftId));
+    setSelected(null);
   };
-
-  const correctMatches = {
-    0: 1, // onpy → pony → horse
-    1: 6, // dyla → lady → 20
-    2: 5, // nenpy → penny → ship
-    3: 0, // wentty → twenty → coin
-    4: 2, // icyt → city → dog
-    5: 4, // ejlly → jelly → jar
-    6: 3, // pyppu → puppy → ??? (حسب ترتيبك)
-  };
-
-  const handleLetterClick = (letterObj) => {
-    if (locked) return;
-
-    setAnswers((prev) => {
-      const updated = [...prev];
-
-      // إذا الحرف موجود بالفعل احذفه من مكانه
-      for (let i = 0; i < updated.length; i++) {
-        const index = updated[i].findIndex((l) => l?.id === letterObj.id);
-        if (index !== -1) {
-          updated[i][index] = "";
-        }
-      }
-
-      // حطه بأول مكان فاضي
-      for (let i = 0; i < updated.length; i++) {
-        const emptyIndex = updated[i].findIndex((l) => !l);
-        if (emptyIndex !== -1) {
-          updated[i][emptyIndex] = letterObj;
-          break;
-        }
-      }
-
-      return updated;
-    });
-  };
-
-  const handleSlotClick = (qIndex, letterIndex) => {
-    if (locked) return;
-
-    setAnswers((prev) => {
-      const updated = [...prev];
-
-      updated[qIndex][letterIndex] = "";
-
-      return updated;
-    });
-  };
-  const resetAll = () => {
-    setAnswers(items.map((item) => Array(item.correct[0].length).fill("")));
-    setLines([]); // 🔥 مهم
-    setStartDot(null); // 🔥 مهم
-    setLocked(false);
-    setShowResult(false);
-  };
-
-  const showAnswers = () => {
-    // ✅ كلمات
-    const filledAnswers = items.map((item) =>
-      item.correct[0].split("").map((char, index) => ({
-        char,
-        id: `answer-${index}`,
-      })),
+  const choose = (side, id) => {
+    if (showAnswer || (side === "left" ? isLeftLocked(id) : isRightLocked(id)))
+      return;
+    if (!selected || selected.side === side) {
+      setSelected({ side, id });
+      return;
+    }
+    commit(
+      side === "left" ? id : selected.id,
+      side === "right" ? id : selected.id,
     );
-
-    setAnswers(filledAnswers);
-
-    // ✅ خطوط صح
-    const correctLines = Object.entries(correctMatches).map(
-      ([textIndex, imageIndex]) => ({
-        from: { index: Number(imageIndex), type: "image" },
-        to: { index: Number(textIndex), type: "text" },
-      }),
-    );
-
-    setLines(correctLines);
-
-    setLocked(true);
-    setShowResult(true);
   };
 
-  const checkAnswers = () => {
-    if (locked) return;
+  const getElement = useCallback(
+    (side, id) => refs.current[`${side}-button-${id}`],
+    [],
+  );
+  const getAnchor = useCallback(
+    (side, id) => refs.current[`${side}-dot-${id}`],
+    [],
+  );
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef,
+    leftIds: IDS,
+    rightIds: IDS,
+    getElement,
+    getAnchorElement: getAnchor,
+    isLeftLocked,
+    isRightLocked,
+    onCommit: commit,
+    onStart: (side, id) => setSelected({ side, id }),
+    onCancel: () => setSelected(null),
+  });
 
-    // 🔴 تحقق من الكلمات
-    const emptyWords = answers.some((row) => row.some((word) => word === ""));
+  useLayoutEffect(() => {
+    const update = () => {
+      if (!boardRef.current) return;
+      const board = boardRef.current.getBoundingClientRect();
+      setLines(
+        Object.entries(matches).flatMap(([leftId, rightId]) => {
+          const from = getAnchor("left", Number(leftId));
+          const to = getAnchor("right", rightId);
+          if (!from || !to) return [];
+          const a = from.getBoundingClientRect();
+          const b = to.getBoundingClientRect();
+          return [
+            {
+              id: `${leftId}-${rightId}`,
+              x1: a.left + a.width / 2 - board.left,
+              y1: a.top + a.height / 2 - board.top,
+              x2: b.left + b.width / 2 - board.left,
+              y2: b.top + b.height / 2 - board.top,
+            },
+          ];
+        }),
+      );
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [getAnchor, matches, answers]);
 
-    if (emptyWords) {
+  const check = () => {
+    if (
+      showAnswer ||
+      (lockedWords.length === ITEMS.length &&
+        lockedMatches.length === ITEMS.length)
+    )
+      return;
+    if (answers.some((row) => row.some((letter) => !letter))) {
       ValidationAlert.info("Please complete all words.");
       return;
     }
-
-    // 🔵 تحقق من matching
-    if (lines.length !== items.length) {
+    if (Object.keys(matches).length !== ITEMS.length) {
       ValidationAlert.info("Please match all items.");
       return;
     }
-
-    let score = 0;
-
-    answers.forEach((row, i) => {
-      const wordCorrect =
-        row.map((l) => l.char).join("") === items[i].correct[0];
-
-      const line = lines.find((l) => l.to.index === i);
-
-      const matchCorrect = line && correctMatches[i] === line.from.index;
-
-      // ✅ كل سؤال = 2 علامات
-      if (wordCorrect) score++;
-      if (matchCorrect) score++;
-    });
-
-    const total = items.length * 2;
-
-    const message = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:#2e7d32;font-weight:bold;">
-        Score: ${score} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (score === total) ValidationAlert.success(message);
-    else if (score === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
-
-    setShowResult(true);
-    setLocked(true);
+    keyboard.clear();
+    setSelected(null);
+    const correctWords = ITEMS.flatMap((item, index) =>
+      answers[index].map((letter) => letter.char).join("") === item.correct
+        ? [index]
+        : [],
+    );
+    const correctMatches = ITEMS.flatMap((_, index) =>
+      matches[index] === CORRECT_MATCHES[index] ? [index] : [],
+    );
+    setLockedWords(correctWords);
+    setLockedMatches(correctMatches);
+    setWrongWords(IDS.filter((id) => !correctWords.includes(id)));
+    setWrongMatches(IDS.filter((id) => !correctMatches.includes(id)));
+    const score = correctWords.length + correctMatches.length;
+    const total = ITEMS.length * 2;
+    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score) ValidationAlert.warning(`Score: ${score} / ${total}`);
+    else ValidationAlert.error(`Score: 0 / ${total}`);
+  };
+  const reveal = () => {
+    setAnswers(
+      ITEMS.map((item, row) =>
+        item.correct
+          .split("")
+          .map((char, index) => ({ char, id: `${row}-answer-${index}` })),
+      ),
+    );
+    setMatches(CORRECT_MATCHES);
+    setLockedWords(IDS);
+    setLockedMatches(IDS);
+    setWrongWords([]);
+    setWrongMatches([]);
+    setShowAnswer(true);
+    setSelected(null);
+    keyboard.clear();
+  };
+  const reset = () => {
+    setAnswers(ITEMS.map((item) => Array(item.correct.length).fill(null)));
+    setMatches({});
+    setLockedWords([]);
+    setLockedMatches([]);
+    setWrongWords([]);
+    setWrongMatches([]);
+    setShowAnswer(false);
+    setSelected(null);
+    keyboard.clear();
   };
 
   return (
-    <div className="flex justify-center p-8">
-      <div
-        className="div-forall"
-        style={{
-          touchAction: "manipulation",
-        }}
-      >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>D</span>
-          Unscramble the letters to make words with the end sound you hear in.
-          Then match each word to its picture.
-        </h5>
-
-        <div
-          ref={containerRef}
-          className="relative grid grid-cols-[1fr_150px] gap-20 mb-10"
-        >
-          {" "}
-          <div className="flex flex-col gap-4">
-            {items.map((item, i) => {
+    <div className="main-container-component">
+      <div className="div-forall" style={{ touchAction: "manipulation" }}>
+        <ExerciseHeaderReview
+          sectionLetter="D"
+          title="Unscramble the letters to make words with the end sound you hear in. Then match each word to its picture."
+          subTitle="Say the complete answer first, then arrange the word tiles in sentence order and add punctuation."
+        />
+        <div ref={boardRef} className="relative mb-10 w-full">
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            aria-hidden="true"
+          >
+            {lines.map((line) => (
+              <line
+                key={line.id}
+                {...line}
+                stroke={ORANGE}
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            ))}
+            {keyboard.preview && (
+              <line
+                {...keyboard.preview}
+                stroke={ORANGE}
+                strokeWidth="3"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
+            )}
+          </svg>
+          <div
+            className="relative z-10 grid items-center gap-x-20 gap-y-4"
+            style={{ gridTemplateColumns: "minmax(0, 1fr) 180px" }}
+          >
+            {ITEMS.map((item, row) => {
+              const picture = PICTURES[row];
+              const leftHeld = selected?.side === "left" && selected.id === row;
+              const rightHeld =
+                selected?.side === "right" && selected.id === row;
               return (
-                <div key={i} className="flex items-center gap-2">
-                  {/* 🔵 المحتوى */}
-                  <div className="flex flex-col gap-1">
-                    {/* السطر الأول */}
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-base w-5">{i + 1}</span>
-                      <span
-                        className="text-base transition-all duration-200"
-                        style={{
-                          cursor: locked || showResult ? "default" : "pointer",
-                          display: "inline-block",
-                          padding: "2px 6px",
-                          borderRadius: "6px",
-                          border:
-                            activeWord === i
-                              ? `1px solid #F79530`
-                              : "2px solid transparent",
-                          background:
-                            activeWord === i ? "#ffe8a3" : "transparent",
-                          transform:
-                            activeWord === i ? "scale(1.08)" : "scale(1)",
-                          boxShadow:
-                            activeWord === i
-                              ? "0 0 10px rgba(255,165,0,0.6)"
-                              : "none",
+                <React.Fragment key={item.scrambled}>
+                  <div className="flex min-h-20 items-center gap-2">
+                    <div className="flex flex-col gap-1">
+                      <div
+                        ref={(el) => {
+                          refs.current[`left-button-${row}`] = el;
                         }}
-                        onClick={() => {
-                          handleDotClick(i, "text");
-                          setActiveWord(i);
+                        role="button"
+                        tabIndex={isLeftLocked(row) ? -1 : 0}
+                        aria-disabled={isLeftLocked(row) || showAnswer}
+                        draggable={!isLeftLocked(row) && !showAnswer}
+                        onDragStart={() => choose("left", row)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() =>
+                          selected?.side === "right" && commit(row, selected.id)
+                        }
+                        onClick={() => choose("left", row)}
+                        onKeyDown={(event) =>
+                          keyboard.handleKeyDown(event, "left", row)
+                        }
+                        onFocus={() => keyboard.handleFocus("left", row)}
+                        className="unit4-interactive flex items-center gap-2 rounded-lg px-2"
+                        style={{
+                          border: leftHeld
+                            ? `2px solid ${ORANGE}`
+                            : "2px solid transparent",
+                          background: leftHeld
+                            ? "rgba(243,155,66,.1)"
+                            : "transparent",
                         }}
                       >
-                        {item.sentence}
-                      </span>
-                    </div>
-
-                    {/* السطر الثاني */}
-                    <div className="flex flex-col gap-2 ml-7 relative w-[350px]">
-                      {/* 🔤 الحروف */}
-
-                      <div className="flex gap-1">
-                        {item.scrambled.map((word, wordIndex) => {
-                          const letters = word
-                            .split("")
-                            .map((letter, index) => ({
-                              char: letter,
-                              id: `${letter}-${i}-${wordIndex}-${index}`,
-                            }));
-
+                        <b className="w-5">{row + 1}</b>
+                        <span>{item.scrambled}</span>
+                      </div>
+                      <div className="flex gap-1 ml-7">
+                        {letters[row].map((letter) => {
+                          const used = answers[row].some(
+                            (entry) => entry?.id === letter.id,
+                          );
                           return (
-                            <div key={wordIndex} className="flex gap-1">
-                              {letters.map((letterObj, letterIndex) => {
-                                const isUsed = answers[i].some(
-                                  (l) => l?.id === letterObj.id,
-                                );
-
-                                return (
-                                  <span
-                                    onClick={() => handleLetterClick(letterObj)}
-                                    className={`w-8 h-8 text-sm flex items-center justify-center rounded border border-[#F79530] font-bold
-    ${
-      answers[i].some((l) => l?.id === letterObj.id)
-        ? "bg-gray-300 opacity-40 cursor-not-allowed"
-        : "cursor-pointer"
-    }`}
-                                  >
-                                    {letterObj.char}
-                                  </span>
-                                );
-                              })}
-                            </div>
+                            <button
+                              type="button"
+                              key={letter.id}
+                              ref={(el) => {
+                                refs.current[`letter-${letter.id}`] = el;
+                              }}
+                              onClick={() => placeLetter(row, letter)}
+                              onKeyDown={(event) => {
+                                if (
+                                  event.key === "Enter" ||
+                                  event.key === " "
+                                ) {
+                                  event.preventDefault();
+                                  placeLetter(row, letter);
+                                }
+                              }}
+                              disabled={lockedWords.includes(row) || showAnswer}
+                              aria-disabled={used}
+                              className="unit4-interactive w-8 h-8 text-sm flex items-center justify-center rounded border border-[#F79530] font-bold"
+                              style={{
+                                opacity: used ? 0.4 : 1,
+                                cursor: used ? "default" : "pointer",
+                              }}
+                            >
+                              {letter.char}
+                            </button>
                           );
                         })}
                       </div>
-
-                      {/* 🔲 البوكسات */}
-                      <div className="flex items-center gap-2 ml-0 relative w-[260px]">
-                        {item.correct[0].split("").map((_, letterIndex) => {
-                          const isCorrect =
-                            answers[i][letterIndex]?.char ===
-                            item.correct[0][letterIndex];
-
-                          const isWrong =
-                            showResult && answers[i][letterIndex] && !isCorrect;
-
-                          return (
-                            <div
-                              onClick={() => handleSlotClick(i, letterIndex)}
-                              className={`w-8 h-8 border-b-1 flex items-center justify-center font-bold relative cursor-pointer
-    ${isWrong ? "border-red-500" : "border-black"}
-  `}
-                            >
-                              {answers[i][letterIndex]?.char}
-                            </div>
-                          );
-                        })}
-                        <div
-                          ref={(el) => (textDotRefs.current[i] = el)}
-                          onClick={() => handleDotClick(i, "text")}
-                          className={`absolute right-0 -top-8 -translate-y-1/2 w-3 h-3 rounded-full cursor-pointer transition-all duration-200
-                              ${
-                                startDot?.index === i &&
-                                startDot?.type === "text"
-                                  ? "bg-orange-400 ring-4 ring-orange-200 shadow-lg scale-125"
-                                  : "bg-orange-400 hover:scale-110"
+                      <div className="flex items-center gap-1 ml-7 relative w-[300px]">
+                        {answers[row].map((letter, slot) => (
+                          <button
+                            type="button"
+                            key={slot}
+                            onClick={() => removeLetter(row, slot)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                removeLetter(row, slot);
                               }
-                            `}
+                            }}
+                            tabIndex={
+                              letter && !lockedWords.includes(row) ? 0 : -1
+                            }
+                            className="unit4-interactive w-8 h-8 border-b flex items-center justify-center font-bold"
+                            style={{
+                              borderColor: wrongWords.includes(row)
+                                ? "red"
+                                : "black",
+                            }}
+                          >
+                            {letter?.char}
+                          </button>
+                        ))}
+                        <span
+                          ref={(el) => {
+                            refs.current[`left-dot-${row}`] = el;
+                          }}
+                          onClick={() => choose("left", row)}
+                          className="absolute right-0 rounded-full"
+                          style={{
+                            width: 14,
+                            height: 14,
+                            background:
+                              leftHeld || matches[row] !== undefined
+                                ? ORANGE
+                                : "#9ca3af",
+                            cursor: "pointer",
+                          }}
                         />
+                        {wrongWords.includes(row) && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: "0px",
+                              right: "70px",
+                              width: "24px",
+                              height: "24px",
+                              background: "red",
+                              color: "white",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                              border: "2px solid white",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            ✕
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
-                </div>
+                  <div className="flex items-center gap-3 relative h-20">
+                    <span
+                      ref={(el) => {
+                        refs.current[`right-dot-${row}`] = el;
+                      }}
+                      onClick={() => choose("right", row)}
+                      className="rounded-full shrink-0"
+                      style={{
+                        width: 14,
+                        height: 14,
+                        background:
+                          rightHeld || Object.values(matches).includes(row)
+                            ? ORANGE
+                            : "#9ca3af",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <div
+                      ref={(el) => {
+                        refs.current[`right-button-${row}`] = el;
+                      }}
+                      role="button"
+                      tabIndex={isRightLocked(row) ? -1 : 0}
+                      aria-disabled={isRightLocked(row) || showAnswer}
+                      draggable={!isRightLocked(row) && !showAnswer}
+                      onDragStart={() => choose("right", row)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() =>
+                        selected?.side === "left" && commit(selected.id, row)
+                      }
+                      onClick={() => choose("right", row)}
+                      onKeyDown={(event) =>
+                        keyboard.handleKeyDown(event, "right", row)
+                      }
+                      onFocus={() => keyboard.handleFocus("right", row)}
+                      className="unit4-interactive rounded-lg p-1"
+                      style={{
+                        border: rightHeld
+                          ? `2px solid ${ORANGE}`
+                          : "2px solid transparent",
+                        background: rightHeld
+                          ? "rgba(243,155,66,.1)"
+                          : "transparent",
+                      }}
+                    >
+                      <img
+                        src={picture.src}
+                        alt={picture.alt}
+                        style={{
+                          width: "clamp(60px,8vw,100px)",
+                          height: "clamp(60px,8vw,100px)",
+                          objectFit: "contain",
+                        }}
+                      />
+                    </div>
+                    {wrongMatches.includes(
+                      Object.keys(matches).find((key) => matches[key] === row) *
+                        1,
+                    ) && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: "-8px",
+                          right: "-8px",
+                          width: "24px",
+                          height: "24px",
+                          background: "red",
+                          color: "white",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          border: "2px solid white",
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        ✕
+                      </span>
+                    )}
+                  </div>
+                </React.Fragment>
               );
             })}
           </div>
-          <div className="flex flex-col gap-10 ml-6 mt-0 shrink-0">
-            {images.map((img, i) => {
-              const wrongMatch =
-                showResult &&
-                lines.some((l) => l.from.index === i) && // مربوط
-                !lines.some(
-                  (l) => l.from.index === i && correctMatches[l.to.index] === i,
-                );
-              return (
-                <div
-                  key={i}
-                  onClick={() => handleDotClick(i, "image")}
-                  className="flex items-center gap-3 cursor-pointer relative h-20"
-                >
-                  <div
-                    ref={(el) => (imageDotRefs.current[i] = el)}
-                    className="w-3 h-3 bg-orange-400 rounded-full shrink-0 z-10"
-                  />
-                  <img
-                    src={img}
-                    onClick={() => {
-                      // handleDotClick(i, "image");
-                      setActiveWord(null);
-                    }}
-                    style={{
-                      width: "clamp(60px, 8vw, 100px)",
-                      height: "clamp(60px, 8vw, 100px)",
-                      objectFit: "contain",
-                    }}
-                  />
-                  {showResult && wrongMatch && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: "-25px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        width: "22px",
-                        height: "22px",
-                        background: "red",
-                        color: "white",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      ✕
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>{" "}
-          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-            {lines.map((line, i) => {
-              const imgDot = imageDotRefs.current[line.from.index];
-              const txtDot = textDotRefs.current[line.to.index];
-
-              if (!imgDot || !txtDot || !containerRef.current) return null;
-
-              const imgRect = imgDot.getBoundingClientRect();
-              const txtRect = txtDot.getBoundingClientRect();
-              const containerRect =
-                containerRef.current.getBoundingClientRect();
-
-              const x1 = imgRect.left + imgRect.width / 2 - containerRect.left;
-              const y1 = imgRect.top + imgRect.height / 2 - containerRect.top;
-
-              const x2 = txtRect.left + txtRect.width / 2 - containerRect.left;
-              const y2 = txtRect.top + txtRect.height / 2 - containerRect.top;
-
-              return (
-                <path
-                  key={i}
-                  d={`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`}
-                  stroke="orange"
-                  strokeWidth="3"
-                  fill="none"
-                />
-              );
-            })}
-          </svg>
         </div>
-
-        {/* buttons */}
-        <div className="action-buttons-container">
-          <button className="try-again-button" onClick={resetAll}>
-            Start Again ↻
-          </button>
-
-          <button onClick={showAnswers} className="show-answer-btn">
-            Show Answer
-          </button>
-
-          <button className="check-button2" onClick={checkAnswers}>
-            Check Answer ✓
-          </button>
-        </div>
+        <Button
+          handleShowAnswer={reveal}
+          handleStartAgain={reset}
+          checkAnswers={check}
+        />
       </div>
     </div>
   );

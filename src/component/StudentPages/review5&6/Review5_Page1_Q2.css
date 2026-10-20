@@ -1,0 +1,52 @@
+/* =========================
+   MATCHING ACCESSIBILITY
+========================= */
+
+.review5-match-source,
+.review5-match-target {
+  outline: none;
+  border-radius: 8px;
+  transition:
+    outline 0.15s ease,
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* لما أوصل بالـTab */
+.review5-match-source:focus-visible,
+.review5-match-target:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 4px;
+}
+
+/* Mouse hover */
+.review5-match-source:hover,
+.review5-match-target:hover {
+  transform: scale(1.02);
+}
+
+/* العنصر اللي اخترته كبداية للتوصيل */
+.review5-match-selected {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 4px;
+}
+
+/* الهدف الحالي أثناء التوصيل بالكيبورد */
+.review5-match-keyboard-target {
+  outline: 3px dashed #2563eb !important;
+  outline-offset: 4px;
+}
+
+/* لما العنصر الصح يتقفل */
+.review5-match-locked {
+  cursor: default;
+}
+
+/* الصورة نفسها */
+.review5-match-image {
+  width: 80px;
+  height: 60px;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}

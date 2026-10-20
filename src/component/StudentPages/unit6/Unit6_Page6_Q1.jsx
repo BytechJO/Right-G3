@@ -5,12 +5,22 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Ex D 4.svg";
 import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
 import WrongMark from "../../WrongMark";
+import "../unit4/unit4Interactions.css";
+const IMAGE_ALT = [
+  "A girl studying at a desk",
+  "A boy standing under the hot sun",
+  "Children being quiet in class",
+  "A girl brushing her hair",
+];
 const Unit6_Page6_Q1 = () => {
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
   const [answers, setAnswers] = useState({});
 
   const questions = [
@@ -39,15 +49,18 @@ const Unit6_Page6_Q1 = () => {
   ];
 
   const handleAnswer = (id, value) => {
-    if (locked) return;
+    if (lockedIds.includes(id) || showAnswer) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
   const reset = () => {
-    setLocked(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAnswer(false);
     setAnswers({});
   };
   const showAnswers = () => {
@@ -57,10 +70,12 @@ const Unit6_Page6_Q1 = () => {
     });
 
     setAnswers(correctAnswers);
-    setLocked(true);
+    setLockedIds(questions.map((q) => q.id));
+    setWrongIds([]);
+    setShowAnswer(true);
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (lockedIds.length === questions.length || showAnswer) return;
 
     // تأكد إنو كل الأسئلة مجاوبة
     const unanswered = questions.some((q) => !answers[q.id]);
@@ -93,7 +108,12 @@ const Unit6_Page6_Q1 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setLocked(true);
+    setLockedIds(
+      questions.flatMap((q) => (answers[q.id] === q.correct ? [q.id] : [])),
+    );
+    setWrongIds(
+      questions.flatMap((q) => (answers[q.id] !== q.correct ? [q.id] : [])),
+    );
   };
   return (
     <div
@@ -112,14 +132,12 @@ const Unit6_Page6_Q1 = () => {
           // width: "60%",
         }}
       >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "15px" }} className="ex-A">
-            D
-          </span>
-          Look and write <span style={{ color: "#D1232A" }}> ✓ </span>or
-          <span style={{ color: "#D1232A" }}> ✗ </span>Then write.
-        </h5>
-        <div style={{ padding: "20px" }}>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Look and write ✓ or ✗. Then write."
+          subTitle="Read each statement and compare it with the picture or sentence before choosing the two-way answer."
+        />
+        <div className="w-full" style={{ padding: "20px" }}>
           {questions.map((q, index) => (
             <div
               key={q.id}
@@ -147,7 +165,7 @@ const Unit6_Page6_Q1 = () => {
                 >
                   <img
                     src={q.img}
-                    alt=""
+                    alt={IMAGE_ALT[index]}
                     style={{
                       width: "100%",
                       height: "100%",
@@ -160,12 +178,23 @@ const Unit6_Page6_Q1 = () => {
               <div style={{ display: "flex", gap: "10px" }}>
                 <div
                   onClick={() => handleAnswer(q.id, "must")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleAnswer(q.id, "must");
+                    }
+                  }}
+                  role="button"
+                  tabIndex={lockedIds.includes(q.id) || showAnswer ? -1 : 0}
+                  aria-label="Choose check mark"
+                  aria-pressed={answers[q.id] === "must"}
+                  className="unit4-interactive"
                   style={{
                     width: "40px",
                     height: "40px",
                     border:
                       answers[q.id] === "must"
-                        ? locked && answers[q.id] !== q.correct
+                        ? wrongIds.includes(q.id)
                           ? "2px solid red"
                           : "2px solid orange"
                         : "1px solid gray",
@@ -178,17 +207,32 @@ const Unit6_Page6_Q1 = () => {
                     color: answers[q.id] === "must" ? "white" : "black",
                   }}
                 >
-                  <img src={trueIcon} style={{ height: "25px" }} />
+                  <img
+                    src={trueIcon}
+                    alt="Check mark"
+                    style={{ height: "25px" }}
+                  />
                 </div>
 
                 <div
                   onClick={() => handleAnswer(q.id, "mustnt")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleAnswer(q.id, "mustnt");
+                    }
+                  }}
+                  role="button"
+                  tabIndex={lockedIds.includes(q.id) || showAnswer ? -1 : 0}
+                  aria-label="Choose X mark"
+                  aria-pressed={answers[q.id] === "mustnt"}
+                  className="unit4-interactive"
                   style={{
                     width: "40px",
                     height: "40px",
                     border:
                       answers[q.id] === "mustnt"
-                        ? locked && answers[q.id] !== q.correct
+                        ? wrongIds.includes(q.id)
                           ? "2px solid red"
                           : "2px solid orange"
                         : "1px solid gray",
@@ -202,7 +246,11 @@ const Unit6_Page6_Q1 = () => {
                     color: answers[q.id] === "mustnt" ? "white" : "black",
                   }}
                 >
-                  <img src={falseIcon} style={{ height: "25px" }} />
+                  <img
+                    src={falseIcon}
+                    alt="X mark"
+                    style={{ height: "25px" }}
+                  />
                 </div>
               </div>
 
@@ -212,7 +260,7 @@ const Unit6_Page6_Q1 = () => {
                   position: "relative",
                   flex: 1,
                   borderBottom: `2px solid ${
-                    locked && answers[q.id] !== q.correct ? "red" : "black"
+                    wrongIds.includes(q.id) ? "red" : "black"
                   }`,
                   paddingBottom: "5px",
                   minHeight: "24px",
@@ -224,7 +272,7 @@ const Unit6_Page6_Q1 = () => {
                   <span>
                     {q.subject} {answers[q.id] === "must" ? "must" : "mustn't"}{" "}
                     {q.action}.{/* ❌ فقط عند الغلط */}
-                    {locked && answers[q.id] !== q.correct && (
+                    {wrongIds.includes(q.id) && (
                       <span className="absolute -top-2 -right-1 ">
                         <WrongMark />
                       </span>

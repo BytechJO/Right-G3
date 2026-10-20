@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 import "./Review6_Page2_Q2.css";
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 1.svg";
@@ -10,8 +11,9 @@ import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! 
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 55/Ex E 7.svg";
 
 const Review6_Page2_Q2 = () => {
-  const [locked, setLocked] = useState(false);
-  const [showedAnswer, setShowedAnswer] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
   const items = [
     { word: "an", correct: false, img: img1 },
     { word: "fl", correct: true, img: img2 },
@@ -27,29 +29,28 @@ const Review6_Page2_Q2 = () => {
     const correct = items.map((item) => (item.correct ? "y" : ""));
     setAnswers(correct);
     setShowResult(true);
-    setShowedAnswer(true);
-    setLocked(true);
+    setLockedIds(items.map((_, index) => index));
+    setWrongIds([]);
+    setShowAnswer(true);
   };
   const resetAll = () => {
     setAnswers(Array(items.length).fill(""));
     setShowResult(false);
-    setLocked(false);
-    setShowedAnswer(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAnswer(false);
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer || lockedIds.length === items.length) return;
 
     let score = 0;
 
     items.forEach((item, i) => {
       const userAnswer = answers[i];
 
-      // فقط نحسب إذا في إجابة
-      if (userAnswer === "" || userAnswer === null) return;
-
       const isCorrect =
         (item.correct && userAnswer === "y") ||
-        (!item.correct && userAnswer === "");
+        (!item.correct && (userAnswer === "" || userAnswer === null));
 
       if (isCorrect) score++;
     });
@@ -58,8 +59,20 @@ const Review6_Page2_Q2 = () => {
 
     const message = `Score: ${score} / ${total}`;
 
+    const correctIds = items.flatMap((item, index) => {
+      const value = answers[index];
+      return (item.correct && value === "y") ||
+        (!item.correct && (value === "" || value === null))
+        ? [index]
+        : [];
+    });
     setShowResult(true);
-    setLocked(true);
+    setLockedIds(correctIds);
+    setWrongIds(
+      items
+        .map((_, index) => index)
+        .filter((index) => !correctIds.includes(index)),
+    );
 
     if (score === total) ValidationAlert.success(message);
     else if (score === 0) ValidationAlert.error(message);
@@ -67,13 +80,14 @@ const Review6_Page2_Q2 = () => {
   };
 
   const handleSelect = (index, value) => {
-    if (locked) return;
+    if (lockedIds.includes(index) || showAnswer) return;
 
     setAnswers((prev) => {
       const updated = [...prev];
       updated[index] = value;
       return updated;
     });
+    setWrongIds((previous) => previous.filter((id) => id !== index));
   };
   return (
     <div
@@ -86,19 +100,20 @@ const Review6_Page2_Q2 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "40px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>E</span>
-          Write <span style={{ color: "#2e3192" }}> y </span> in the
-          blank only under the pictures that end with
-          <span style={{ color: "#2e3192" }}> y </span>.
-        </h5>
-        <div className="grid grid-cols-3 gap-10">
+        <ExerciseHeaderReview
+          sectionLetter="E"
+          title={
+            <>
+              Write <span style={{ color: "#2e3192" }}>y</span> in the blank
+              only under the pictures that end with{" "}
+              <span style={{ color: "#2e3192" }}>y</span>.
+            </>
+          }
+          subTitle="Say each picture name aloud, then write y only under the words that end with the /y/ sound."
+        />
+        <div className="grid grid-cols-3 gap-10 w-full">
           {items.map((item, i) => {
-            const isWrong =
-              showResult &&
-              answers[i] !== "" &&
-              ((item.correct && answers[i] !== "y") ||
-                (!item.correct && answers[i] !== ""));
+            const isWrong = showResult && wrongIds.includes(i);
 
             return (
               <div
@@ -108,6 +123,16 @@ const Review6_Page2_Q2 = () => {
                 {/* الصورة */}
                 <img
                   src={item.img}
+                  alt={
+                    [
+                      "An ant",
+                      "A fly",
+                      "A crying boy",
+                      "A crayfish",
+                      "A lion",
+                      "The sky and clouds",
+                    ][i]
+                  }
                   style={{ width: "auto", height: "150px" }}
                 />
 
@@ -121,7 +146,7 @@ const Review6_Page2_Q2 = () => {
                   <select
                     value={answers[i]}
                     onChange={(e) => handleSelect(i, e.target.value)}
-                    disabled={locked}
+                    disabled={lockedIds.includes(i) || showAnswer}
                     className="border-b px-2 py-1 text-[20px] font-bold"
                   >
                     <option value="">__</option>

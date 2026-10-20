@@ -1,391 +1,133 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import Button from "../../Button";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import useWorkbookMatchingKeyboard from "../../WorkBookPages/Unit4/useWorkbookMatchingKeyboard";
+import "../unit4/unit4Interactions.css";
 
-const DOT_COLOR = "#9ca3af";
-const ACTIVE_COLOR = "#f39b42";
-const WRONG_COLOR = "#ef4444";
-const PATH_COLOR = "#f39b42";
-const TEXT_COLOR = "#111";
+const AUDIO_MODULES = import.meta.glob(
+  "../../../assets/audio/ClassBook/Unit 6/Page 54 - Exercise B/*.mp3",
+  { eager: true, query: "?url", import: "default" },
+);
+const audioEndingWith = (ending) =>
+  Object.entries(AUDIO_MODULES).find(([path]) => path.endsWith(ending))?.[1];
 
-const LEFT_ITEMS = [
-  { id: 1, text: "first" },
-  { id: 2, text: "second" },
-  { id: 3, text: "third" },
-  { id: 4, text: "fourth" },
-  { id: 5, text: "fifth" },
-  { id: 6, text: "sixth" },
-  { id: 7, text: "seventh" },
-  { id: 8, text: "eighth" },
-  { id: 9, text: "ninth" },
-  { id: 10, text: "tenth" },
-];
-
-const RIGHT_ITEMS = [
-  { id: 1, letter: "a", text: "3rd" },
-  { id: 2, letter: "b", text: "4th" },
-  { id: 3, letter: "c", text: "1st" },
-  { id: 4, letter: "d", text: "2nd" },
-  { id: 5, letter: "e", text: "8th" },
-  { id: 6, letter: "f", text: "6th" },
-  { id: 7, letter: "g", text: "9th" },
-  { id: 8, letter: "h", text: "10th" },
-  { id: 9, letter: "i", text: "7th" },
-  { id: 10, letter: "j", text: "5th" },
-];
-
-// 7th→seventh, 8th→eighth, 9th→ninth, 10th→tenth, 1st→first, 2nd→second
-const CORRECT_MATCHES = {
-  1: 3, // b → fourth
-  2: 4, // c → first
-  3: 1, // d → second
-  4: 2, // e → eighth
-  5: 10, // f → sixth
-  6: 6, // g → ninth
-  7: 9, // h → tenth
-  8: 5, // i → seventh
-  9: 7, // j → fifth
-  10: 8,
+const LEFT = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"].map((text, index) => ({ id: index + 1, text }));
+const RIGHT = ["3rd", "4th", "1st", "2nd", "8th", "6th", "9th", "10th", "7th", "5th"].map((text, index) => ({ id: index + 1, text, letter: String.fromCharCode(97 + index) }));
+const CORRECT = { 1: 3, 2: 4, 3: 1, 4: 2, 5: 10, 6: 6, 7: 9, 8: 5, 9: 7, 10: 8 };
+const AUDIO = {
+  first: audioEndingWith("Item_001_first.mp3"), "3rd": audioEndingWith("Item_002_3rd.mp3"),
+  second: audioEndingWith("Item_003_second.mp3"), "4th": audioEndingWith("Item_004_4th.mp3"),
+  third: audioEndingWith("Item_005_third.mp3"), "1st": audioEndingWith("Item_006_1st.mp3"),
+  fourth: audioEndingWith("Item_007_fourth.mp3"), "2nd": audioEndingWith("Item_008_2nd.mp3"),
+  fifth: audioEndingWith("Item_009_fifth.mp3"), "8th": audioEndingWith("Item_010_8th.mp3"),
+  sixth: audioEndingWith("Item_011_sixth.mp3"), "6th": audioEndingWith("Item_012_6th.mp3"),
+  seventh: audioEndingWith("Item_013_seventh.mp3"), "9th": audioEndingWith("Item_014_9th.mp3"),
+  eighth: audioEndingWith("Item_015_eighth.mp3"), "10th": audioEndingWith("Item_016_10th.mp3"),
+  ninth: audioEndingWith("Item_017_ninth.mp3"), "7th": audioEndingWith("Item_018_7th.mp3"),
+  tenth: audioEndingWith("Item_019_tenth.mp3"), "5th": audioEndingWith("Item_020_5th.mp3"),
 };
+const ORANGE = "#f39b42";
 
 export default function Review6_Page1_Q2() {
-  const [selectedLeft, setSelectedLeft] = useState(null);
   const [matches, setMatches] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [showAns, setShowAns] = useState(false);
-  const [paths, setPaths] = useState([]);
-
+  const [selected, setSelected] = useState(null);
+  const [locked, setLocked] = useState([]);
+  const [wrong, setWrong] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [lines, setLines] = useState([]);
   const boardRef = useRef(null);
-  const pointRefs = useRef({});
+  const refs = useRef({});
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const isLeftLocked = useCallback((id) => locked.includes(id), [locked]);
+  const isRightLocked = useCallback((id) => Object.keys(matches).some((key) => matches[key] === id && locked.includes(Number(key))), [locked, matches]);
 
-  // ── SVG paths ──
+  const commit = (leftId, rightId) => {
+    if (showAnswer || isLeftLocked(leftId) || isRightLocked(rightId)) return;
+    setMatches((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => { if (updated[key] === rightId && !locked.includes(Number(key))) delete updated[key]; });
+      updated[leftId] = rightId;
+      return updated;
+    });
+    setWrong((previous) => previous.filter((id) => id !== leftId));
+    setSelected(null);
+  };
+
+  const choose = (side, id) => {
+    if (showAnswer || (side === "left" ? isLeftLocked(id) : isRightLocked(id))) return;
+    if (!selected || selected.side === side) { setSelected({ side, id }); return; }
+    commit(side === "left" ? id : selected.id, side === "right" ? id : selected.id);
+  };
+
+  const getElement = useCallback((side, id) => refs.current[`${side}-button-${id}`], []);
+  const getAnchor = useCallback((side, id) => refs.current[`${side}-dot-${id}`], []);
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef, leftIds: LEFT.map((item) => item.id), rightIds: RIGHT.map((item) => item.id),
+    getElement, getAnchorElement: getAnchor, isLeftLocked, isRightLocked, onCommit: commit,
+    onStart: (side, id) => {
+      setSelected({ side, id });
+      const item = (side === "left" ? LEFT : RIGHT).find((entry) => entry.id === id);
+      if (item) playAudio(`${side}-${id}`, AUDIO[item.text]);
+    },
+    onCancel: () => setSelected(null),
+  });
+
   useLayoutEffect(() => {
     const update = () => {
       if (!boardRef.current) return;
-      const br = boardRef.current.getBoundingClientRect();
-
-      const newPaths = Object.entries(matches)
-        .map(([leftId, rightId]) => {
-          const s = pointRefs.current[`left-${leftId}`];
-          const e = pointRefs.current[`right-${rightId}`];
-          if (!s || !e) return null;
-
-          const sr = s.getBoundingClientRect();
-          const er = e.getBoundingClientRect();
-          const x1 = sr.left + sr.width / 2 - br.left;
-          const y1 = sr.top + sr.height / 2 - br.top;
-          const x2 = er.left + er.width / 2 - br.left;
-          const y2 = er.top + er.height / 2 - br.top;
-          const dx = Math.abs(x2 - x1);
-
-          const isWrong =
-            showResults &&
-            matches[Number(leftId)] !== CORRECT_MATCHES[Number(leftId)];
-
-          return {
-            id: `path-${leftId}-${rightId}`,
-            d: `M ${x1} ${y1} C ${x1 + dx * 0.45} ${y1}, ${x2 - dx * 0.45} ${y2}, ${x2} ${y2}`,
-            color: isWrong ? WRONG_COLOR : PATH_COLOR,
-          };
-        })
-        .filter(Boolean);
-
-      setPaths(newPaths);
+      const board = boardRef.current.getBoundingClientRect();
+      setLines(Object.entries(matches).flatMap(([leftId, rightId]) => {
+        const from = getAnchor("left", Number(leftId)); const to = getAnchor("right", rightId);
+        if (!from || !to) return [];
+        const a = from.getBoundingClientRect(); const b = to.getBoundingClientRect();
+        return [{ id: `${leftId}-${rightId}`, x1: a.left + a.width / 2 - board.left, y1: a.top + a.height / 2 - board.top, x2: b.left + b.width / 2 - board.left, y2: b.top + b.height / 2 - board.top }];
+      }));
     };
+    update(); window.addEventListener("resize", update); return () => window.removeEventListener("resize", update);
+  }, [getAnchor, matches]);
 
-    update();
-    window.addEventListener("resize", update);
-    let obs;
-    if (boardRef.current && typeof ResizeObserver !== "undefined") {
-      obs = new ResizeObserver(update);
-      obs.observe(boardRef.current);
-    }
-    return () => {
-      window.removeEventListener("resize", update);
-      obs?.disconnect();
-    };
-  }, [matches, showResults]);
-
-  const handleLeftSelect = (id) => {
-    if (showAns || showResults) return;
-    setSelectedLeft((prev) => (prev === id ? null : id));
-    setShowResults(false);
+  const check = () => {
+    if (showAnswer || locked.length === LEFT.length) return;
+    if (Object.keys(matches).length !== LEFT.length) { ValidationAlert.info("Please connect all items first."); return; }
+    keyboard.clear(); setSelected(null);
+    const correct = LEFT.flatMap((item) => matches[item.id] === CORRECT[item.id] ? [item.id] : []);
+    setLocked(correct); setWrong(LEFT.flatMap((item) => matches[item.id] !== CORRECT[item.id] ? [item.id] : []));
+    if (correct.length === LEFT.length) ValidationAlert.success(`Score: ${correct.length} / ${LEFT.length}`);
+    else if (correct.length) ValidationAlert.warning(`Score: ${correct.length} / ${LEFT.length}`);
+    else ValidationAlert.error(`Score: 0 / ${LEFT.length}`);
   };
-
-  const handleRightSelect = (rightId) => {
-    if (showAns || selectedLeft === null || showResults) return;
-    const upd = { ...matches };
-    Object.keys(upd).forEach((k) => {
-      if (upd[k] === rightId) delete upd[k];
-    });
-    upd[selectedLeft] = rightId;
-    setMatches(upd);
-    setSelectedLeft(null);
-    setShowResults(false);
-  };
-
-  const handleCheck = () => {
-    if (showAns || showResults) return;
-    const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
-    if (!allConnected) {
-      ValidationAlert.info("Please connect all items first.");
-      return;
-    }
-    let score = 0;
-    LEFT_ITEMS.forEach((i) => {
-      if (matches[i.id] === CORRECT_MATCHES[i.id]) score++;
-    });
-    setShowResults(true);
-    const total = LEFT_ITEMS.length;
-    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else ValidationAlert.error(`Score: ${score} / ${total}`);
-  };
-
-  const handleShowAnswer = () => {
-    setMatches({ ...CORRECT_MATCHES });
-    setShowResults(true);
-    setShowAns(true);
-    setSelectedLeft(null);
-  };
-
-  const handleStartAgain = () => {
-    setSelectedLeft(null);
-    setMatches({});
-    setShowResults(false);
-    setShowAns(false);
-    setPaths([]);
-  };
-
-  const getLeftConn = (id) => !!matches[id];
-  const getRightConn = (id) => Object.values(matches).includes(id);
-  const isWrongMatch = (leftId) =>
-    showResults &&
-    !!matches[leftId] &&
-    matches[leftId] !== CORRECT_MATCHES[leftId];
-
-  const WrongBadge = () => (
-    <div
-      style={{
-        position: "absolute",
-        top: "-7px",
-        right: "-7px",
-        width: "22px",
-        height: "22px",
-        borderRadius: "50%",
-        background: "red",
-        color: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "14px",
-        fontWeight: "bold",
-        border: "2px solid white",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        zIndex: 5,
-        pointerEvents: "none",
-      }}
-    >
-      ✕
-    </div>
-  );
+  const reveal = () => { keyboard.clear(); setMatches(CORRECT); setLocked(LEFT.map((item) => item.id)); setWrong([]); setSelected(null); setShowAnswer(true); stopAudio(); };
+  const reset = () => { keyboard.clear(); setMatches({}); setLocked([]); setWrong([]); setSelected(null); setShowAnswer(false); stopAudio(); };
 
   return (
     <div className="main-container-component">
-      <div
-        className="div-forall"
-        style={{
-          gap: "28px",
-        }}
-      >
-        {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span style={{ marginRight: "10px" }}>B</span> Match.
-        </h1>
-
-        {/* Board */}
+      <div className="div-forall" style={{ gap: 28 }}>
+        <ExerciseHeaderReview sectionLetter="B" title="Match." subTitle="Start with one word or picture, then connect it to the partner that means the same thing." />
         <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
-          {/* SVG lines */}
-          <svg
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              pointerEvents: "none",
-              overflow: "visible",
-              zIndex: 1,
-            }}
-          >
-            {paths.map((p) => (
-              <path
-                key={p.id}
-                d={p.d}
-                fill="none"
-                stroke={ACTIVE_COLOR}
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            ))}
+          <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", overflow: "visible", zIndex: 1 }} aria-hidden="true">
+            {lines.map((line) => <line key={line.id} {...line} stroke={ORANGE} strokeWidth="3" strokeLinecap="round" />)}
+            {keyboard.preview && <line {...keyboard.preview} stroke={ORANGE} strokeWidth="3" strokeDasharray="6 4" strokeLinecap="round" />}
           </svg>
-
-          {/* Grid: left text | left dot | right dot | right text */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "auto auto 1fr auto",
-              columnGap: "clamp(8px,2vw,24px)",
-              rowGap: "11px",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            {LEFT_ITEMS.map((lItem, idx) => {
-              const rItem = RIGHT_ITEMS[idx];
-              const lConn = getLeftConn(lItem.id);
-              const rConn = getRightConn(rItem.id);
-              const lSelected = selectedLeft === lItem.id;
-              const wrong = isWrongMatch(lItem.id);
-
+          <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr auto", columnGap: "clamp(8px,2vw,24px)", rowGap: 11, alignItems: "center", width: "100%" }}>
+            {LEFT.map((leftItem, index) => {
+              const rightItem = RIGHT[index];
+              const leftHeld = selected?.side === "left" && selected.id === leftItem.id;
+              const rightHeld = selected?.side === "right" && selected.id === rightItem.id;
               return (
-                <React.Fragment key={lItem.id}>
-                  {/* ── Left text ── */}
-                  <div
-                    onClick={() => handleLeftSelect(lItem.id)}
-                    style={{
-                      position: "relative",
-                      fontSize: "clamp(16px,1.5vw,20px)",
-                      // fontWeight:   700,
-                      color: wrong
-                        ? TEXT_COLOR
-                        : lSelected
-                          ? ACTIVE_COLOR
-                          : TEXT_COLOR,
-                      lineHeight: 1,
-                      cursor: showAns || showResults ? "default" : "pointer",
-                      userSelect: "none",
-                      padding: "clamp(4px,0.6vw,8px) clamp(10px,1.2vw,16px)",
-                      borderRadius: "clamp(8px,1vw,12px)",
-                      border: lSelected
-                        ? `1px solid ${ACTIVE_COLOR}`
-                        : lConn
-                          ? `2px solid ${wrong ? WRONG_COLOR : "transparent"}`
-                          : "2px solid transparent",
-                      background: lSelected
-                        ? "rgba(243,155,66,0.08)"
-                        : "transparent",
-                      transition:
-                        "border-color 0.2s, color 0.2s, background 0.2s",
-                      whiteSpace: "nowrap",
-                      zIndex: 2,
-                    }}
-                  >
-                    <span className="text-[20px] font-bold mr-2">{lItem.id}</span>
-                    {lItem.text}
-                    {wrong && <WrongBadge />}
-                  </div>
-
-                  {/* ── Left dot ── */}
-                  <div
-                    ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
-                    onClick={() => handleLeftSelect(lItem.id)}
-                    style={{
-                      width: "clamp(10px,1.4vw,16px)",
-                      height: "clamp(10px,1.4vw,16px)",
-                      borderRadius: "50%",
-                      flexShrink: 0,
-                      background: lSelected
-                        ? ACTIVE_COLOR
-                        : lConn
-                          ? wrong
-                            ? ACTIVE_COLOR
-                            : ACTIVE_COLOR
-                          : DOT_COLOR,
-                      cursor: showAns || showResults ? "default" : "pointer",
-                      transition: "background 0.2s",
-                      boxShadow: lSelected
-                        ? `0 0 0 3px rgba(243,155,66,0.3)`
-                        : "none",
-                      zIndex: 2,
-                    }}
-                  />
-
-                  {/* ── Right dot ── */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      zIndex: 2,
-                    }}
-                  >
-                    <div
-                      ref={(el) =>
-                        (pointRefs.current[`right-${rItem.id}`] = el)
-                      }
-                      onClick={() => handleRightSelect(rItem.id)}
-                      style={{
-                        width: "clamp(10px,1.4vw,16px)",
-                        height: "clamp(10px,1.4vw,16px)",
-                        borderRadius: "50%",
-                        background: rConn ? ACTIVE_COLOR : DOT_COLOR,
-                        cursor:
-                          showAns || selectedLeft === null
-                            ? "default"
-                            : "pointer",
-                        transition: "background 0.2s",
-                        zIndex: 2,
-                      }}
-                    />
-                  </div>
-
-                  {/* ── Right text ── */}
-                  <div
-                    onClick={() => handleRightSelect(rItem.id)}
-                    style={{
-                      position: "relative",
-                      fontSize: "clamp(16px,1.4vw,20px)",
-                      fontWeight: 500,
-                      color: TEXT_COLOR,
-                      lineHeight: 1,
-                      cursor:
-                        showAns || selectedLeft === null
-                          ? "default"
-                          : "pointer",
-                      userSelect: "none",
-                      whiteSpace: "nowrap",
-                      zIndex: 2,
-                      padding: "clamp(4px,0.6vw,8px) clamp(10px,1.2vw,16px)",
-                      borderRadius: "clamp(8px,1vw,12px)",
-                      border: rConn
-                        ? `1px solid transparent`
-                        : "2px solid transparent",
-                      transition: "border-color 0.2s",
-                    }}
-                  >
-                    <span className="text-[20px] font-bold mr-2">{rItem.letter}</span>{" "}
-                    {rItem.text}
-                  </div>
+                <React.Fragment key={leftItem.id}>
+                  <div ref={(el) => { refs.current[`left-button-${leftItem.id}`] = el; }} role="button" tabIndex={isLeftLocked(leftItem.id) ? -1 : 0} aria-disabled={isLeftLocked(leftItem.id) || showAnswer} draggable={!isLeftLocked(leftItem.id) && !showAnswer} onDragStart={() => choose("left", leftItem.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => selected?.side === "right" && commit(leftItem.id, selected.id)} onClick={() => { playAudio(`left-${leftItem.id}`, AUDIO[leftItem.text]); choose("left", leftItem.id); }} onKeyDown={(event) => keyboard.handleKeyDown(event, "left", leftItem.id)} onFocus={() => keyboard.handleFocus("left", leftItem.id)} className="unit4-audio-control unit4-interactive" style={{ position: "relative", fontSize: "clamp(16px,1.5vw,20px)", padding: "6px 14px", borderRadius: 10, border: leftHeld ? `2px solid ${ORANGE}` : "2px solid transparent", background: leftHeld ? "rgba(243,155,66,.1)" : "transparent", zIndex: 2 }}><Unit4PlayingAudioIcon active={activeAudioKey === `left-${leftItem.id}`} /><b className="mr-2">{leftItem.id}</b>{leftItem.text}{wrong.includes(leftItem.id) && <span style={{ position: "absolute", right: -8, top: -6, color: "red", fontWeight: 700 }}>✕</span>}</div>
+                  <span ref={(el) => { refs.current[`left-dot-${leftItem.id}`] = el; }} onClick={() => choose("left", leftItem.id)} style={{ width: 16, height: 16, borderRadius: "50%", background: leftHeld || matches[leftItem.id] ? ORANGE : "#9ca3af", zIndex: 2, cursor: "pointer" }} />
+                  <span ref={(el) => { refs.current[`right-dot-${rightItem.id}`] = el; }} onClick={() => choose("right", rightItem.id)} style={{ justifySelf: "end", width: 16, height: 16, borderRadius: "50%", background: rightHeld || Object.values(matches).includes(rightItem.id) ? ORANGE : "#9ca3af", zIndex: 2, cursor: "pointer" }} />
+                  <div ref={(el) => { refs.current[`right-button-${rightItem.id}`] = el; }} role="button" tabIndex={isRightLocked(rightItem.id) ? -1 : 0} aria-disabled={isRightLocked(rightItem.id) || showAnswer} draggable={!isRightLocked(rightItem.id) && !showAnswer} onDragStart={() => choose("right", rightItem.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => selected?.side === "left" && commit(selected.id, rightItem.id)} onClick={() => { playAudio(`right-${rightItem.id}`, AUDIO[rightItem.text]); choose("right", rightItem.id); }} onKeyDown={(event) => keyboard.handleKeyDown(event, "right", rightItem.id)} onFocus={() => keyboard.handleFocus("right", rightItem.id)} className="unit4-audio-control unit4-interactive" style={{ fontSize: "clamp(16px,1.4vw,20px)", padding: "6px 14px", borderRadius: 10, border: rightHeld ? `2px solid ${ORANGE}` : "2px solid transparent", background: rightHeld ? "rgba(243,155,66,.1)" : "transparent", zIndex: 2 }}><Unit4PlayingAudioIcon active={activeAudioKey === `right-${rightItem.id}`} /><b className="mr-2">{rightItem.letter}</b>{rightItem.text}</div>
                 </React.Fragment>
               );
             })}
           </div>
         </div>
-
-        {/* Buttons */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "clamp(8px,1.5vw,16px)",
-            zIndex: 100,
-          }}
-        >
-          <Button
-            checkAnswers={handleCheck}
-            handleShowAnswer={handleShowAnswer}
-            handleStartAgain={handleStartAgain}
-          />
-        </div>
+        <Button checkAnswers={check} handleShowAnswer={reveal} handleStartAgain={reset} />
       </div>
     </div>
   );

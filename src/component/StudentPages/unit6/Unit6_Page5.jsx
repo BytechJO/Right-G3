@@ -1,14 +1,13 @@
 import page_5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 50.png";
 import "./Unit6_Page5.css";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
+
 const Unit6_Page5 = ({ openPopup }) => {
   return (
     <div
       className="page1-img-wrapper"
       style={{ backgroundImage: `url(${page_5})` }}
     >
-      {/* <img src={page_5} /> */}
-
       <div
         className="click-icon-unit6-page5-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -17,8 +16,20 @@ const Unit6_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 48 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 48 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -39,8 +50,20 @@ const Unit6_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 49 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 49 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -61,8 +84,20 @@ const Unit6_Page5 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 3"
           onClick={() => openPopup("exercise", { startIndex: 50 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 50 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"

@@ -10,7 +10,15 @@ import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folde
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 31/I6.svg";
 import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
 
+import bedroomAudio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise I/Item_002_bedroom.mp3";
+import bathroomAudio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise I/Item_004_bathroom.mp3";
+import livingRoomAudio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise I/Item_006_living_room.mp3";
+import kitchenAudio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise I/Item_008_kitchen.mp3";
+import garageAudio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise I/Item_010_garage.mp3";
+import basementAudio from "../../../assets/audio/WorkBook/unit5/Page 30 - Exercise I/Item_012_basement.mp3";
 const BORDER_COLOR = "#f39b42";
 const FOUND_COLOR = "#ef4444";
 const SELECT_COLOR = "rgba(251,191,36,0.45)";
@@ -157,7 +165,14 @@ const SIDE_IMAGES = [
     alt: "A living room.",
   },
 ];
-
+const WORD_AUDIO = {
+  1: bathroomAudio,
+  2: garageAudio,
+  3: kitchenAudio,
+  4: bedroomAudio,
+  5: livingRoomAudio,
+  6: basementAudio,
+};
 const cellKey = (r, c) => `${r}-${c}`;
 
 /* =====================================================
@@ -223,6 +238,7 @@ const buildPath = (r1, c1, r2, c2) => {
 ===================================================== */
 
 export default function SB_WordSearch_PageI() {
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   /* =====================================================
      SELECTION
   ===================================================== */
@@ -325,6 +341,11 @@ export default function SB_WordSearch_PageI() {
           cells: match.cells,
         },
       ]);
+
+      // شغل صوت الكلمة مباشرة لما يجيبها صح
+      if (WORD_AUDIO[match.id]) {
+        playAudio(`word-${match.id}`, WORD_AUDIO[match.id]);
+      }
     } else {
       setWrongCells(cells.map(([r, c]) => cellKey(r, c)));
 
@@ -674,7 +695,7 @@ export default function SB_WordSearch_PageI() {
     setKeyboardStartCell(null);
 
     setActiveCell([0, 0]);
-
+    stopAudio();
     pointerIdRef.current = null;
 
     window.requestAnimationFrame(() => {
@@ -936,129 +957,127 @@ export default function SB_WordSearch_PageI() {
               const found = isWordFound(item.wordId);
               return (
                 <div
-                  key={item.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Play ${item.alt.replace(".", "")}`}
+                  onClick={() => {
+                    if (WORD_AUDIO[item.wordId]) {
+                      playAudio(`word-${item.wordId}`, WORD_AUDIO[item.wordId]);
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+
+                      if (WORD_AUDIO[item.wordId]) {
+                        playAudio(
+                          `word-${item.wordId}`,
+                          WORD_AUDIO[item.wordId],
+                        );
+                      }
+                    }
+                  }}
                   style={{
+                    position: "relative",
+                    width: "100%",
                     display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxSizing: "border-box",
+                    cursor: "pointer",
+                    borderRadius: "8px",
+                    outline: "none",
+                  }}
+                  onFocus={(event) => {
+                    event.currentTarget.style.outline = "3px solid #2563eb";
 
-                    alignItems: "flex-start",
-
-                    gap: "clamp(3px,0.4vw,6px)",
+                    event.currentTarget.style.outlineOffset = "3px";
+                  }}
+                  onBlur={(event) => {
+                    event.currentTarget.style.outline = "none";
                   }}
                 >
-                  {/* NUMBER */}
-
-                  <span
+                  <img
+                    src={item.img}
+                    alt={item.alt}
                     style={{
-                      fontSize: "clamp(13px,1.4vw,20px)",
-
-                      fontWeight: 500,
-
-                      color: "#111",
-
-                      lineHeight: 1,
-                    }}
-                  >
-                    {item.id}
-                  </span>
-
-                  {/* IMAGE */}
-
-                  <div
-                    style={{
-                      position: "relative",
-
                       width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      display: "block",
+                      pointerEvents: "none",
+                    }}
+                  />
 
-                      display: "flex",
-
-                      alignItems: "center",
-
-                      justifyContent: "center",
-
-                      boxSizing: "border-box",
+                  {/* AUDIO ICON */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      top: "6px",
+                      right: "6px",
+                      pointerEvents: "none",
+                      zIndex: 3,
                     }}
                   >
-                    <img
-                      src={item.img}
-                      alt={item.alt}
-                      style={{
-                        width: "100%",
-
-                        height: "100%",
-
-                        objectFit: "contain",
-
-                        display: "block",
-                      }}
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `word-${item.wordId}`}
                     />
-                    {found && (
-                      <span
-                        aria-hidden="true"
-                        style={{
-                          position: "absolute",
-                          top: "-8px",
-                          right: "-8px",
-                          width: "22px",
-                          height: "22px",
-                          borderRadius: "50%",
-                          backgroundColor: "#22c55e",
-                          color: "#fff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "13px",
-                          fontWeight: 700,
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                          border: "2px solid white",
-                          zIndex: 2,
-                        }}
-                      >
-                        ✓
-                      </span>
-                    )}
-                    {/* WRONG X */}
-
-                    {missed && (
-                      <span
-                        aria-hidden="true"
-                        style={{
-                          position: "absolute",
-
-                          top: "-8px",
-
-                          right: "-8px",
-
-                          width: "22px",
-
-                          height: "22px",
-
-                          borderRadius: "50%",
-
-                          backgroundColor: "red",
-
-                          color: "#fff",
-
-                          display: "flex",
-
-                          alignItems: "center",
-
-                          justifyContent: "center",
-
-                          fontSize: "clamp(9px,0.9vw,12px)",
-
-                          fontWeight: 700,
-
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-
-                          border: "2px solid white",
-
-                          zIndex: 2,
-                        }}
-                      >
-                        ✕
-                      </span>
-                    )}
                   </div>
+
+                  {/* CORRECT */}
+                  {found && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        top: "-8px",
+                        right: "-8px",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        backgroundColor: "#22c55e",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        border: "2px solid white",
+                        zIndex: 4,
+                      }}
+                    >
+                      ✓
+                    </span>
+                  )}
+
+                  {/* WRONG */}
+                  {missed && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        top: "-8px",
+                        right: "-8px",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        backgroundColor: "red",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "clamp(9px,0.9vw,12px)",
+                        fontWeight: 700,
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        border: "2px solid white",
+                        zIndex: 4,
+                      }}
+                    >
+                      ✕
+                    </span>
+                  )}
                 </div>
               );
             })}
