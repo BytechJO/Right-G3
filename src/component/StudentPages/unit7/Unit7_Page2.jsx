@@ -48,6 +48,7 @@ import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
 import AudioWithCaption from "../../AudioWithCaption";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
+import GridImagesWithAudio from "../../GridImagesWithAudio";
 
 const Unit7_Page2 = ({ openPopup }) => {
   const imageSounds = [
@@ -238,7 +239,7 @@ const Unit7_Page2 = ({ openPopup }) => {
   const openRead = () => {
     openPopup(
       "html",
-      <FourImagesWithAudio
+      <GridImagesWithAudio
         images={[
           Rabbit,
           img1,

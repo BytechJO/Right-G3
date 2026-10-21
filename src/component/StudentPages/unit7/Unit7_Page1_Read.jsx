@@ -23,6 +23,7 @@ import img10 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My 
 import img11 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 58-59/1-11.svg";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
 import longAudio from "../../../assets/audio/ClassBook/Unit 7/P 58/unit7-pg58-listen.mp3";
+import GridImagesWithAudio from "../../GridImagesWithAudio";
 
 const Unit5_Page1_Read = () => {
   const imageSounds = [
@@ -50,7 +51,7 @@ const Unit5_Page1_Read = () => {
   ];
   return (
     <>
-      <FourImagesWithAudio
+      <GridImagesWithAudio
         images={[
           Rabbit,
           img1,
@@ -71,7 +72,7 @@ const Unit5_Page1_Read = () => {
           14.5,
         ]}
         popupOpen={true}
-        titleQ={"Listen and read along."}
+        titleQ="Listen and read along."
         audioArr={imageSounds}
         captions={captions}
         pageId="unit7-page58-read"
