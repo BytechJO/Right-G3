@@ -4,6 +4,7 @@ import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets R
 import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Interactive.svg";
 
 import FindQuestion from "../../FindQuestion";
+import targetAudio from "../../../assets/audio/ClassBook/Unit 6/page 46/item-010-girl.mp3";
 
 const targetArea = {
   x1: 39.12,
@@ -20,6 +21,7 @@ const Unit6_Page1_find = () => {
       imageAlt="Children running in an outdoor race, including a girl running near the front in second place"
       targetName="girl in second place"
       targetArea={targetArea}
+      targetAudio={targetAudio}
       answerHighlight={MySVG}
       imageHeight="70vh"
       highlightTop="43%"

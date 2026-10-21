@@ -1,6 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise D/Item_001_Can_you_see_Helen.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise D/Item_002_Yes,_I_can_see_her.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise D/Item_003_Can_you_see_Helen's_brother.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise D/Item_004_Yes,_I_can_see_him.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise D/Item_005_Can_you_see_Helen's_mom.mp3";
 
 import sceneImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 40/SVG/7.svg";
 
@@ -23,6 +32,8 @@ const ITEMS = [
     beforeDrop: "Yes, I can see her",
     afterDrop: ".",
     correct: "in the living room",
+    questionAudio: audio1,
+    prefixAudio: audio2,
   },
   {
     id: 2,
@@ -36,6 +47,8 @@ const ITEMS = [
     correct: "at the computer",
     beforeDrop: "Yes, I can see him",
     afterDrop: ".",
+    questionAudio: audio3,
+    prefixAudio: audio4,
   },
   {
     id: 3,
@@ -44,30 +57,36 @@ const ITEMS = [
     beforeDrop: "Yes, I can see her",
     afterDrop: ".",
     correct: "in the living room ironing clothes",
+    questionAudio: audio5,
   },
 ];
 
 export default function WB_LookReadFind_PageD() {
   const [answers, setAnswers] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
-
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const [focusedSelect, setFocusedSelect] = useState(null);
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const editables = ITEMS.filter((i) => !i.fixed);
     const allAnswered = editables.every((i) => answers[`a-${i.id}`]?.value);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-    let score = 0;
-    editables.forEach((i) => {
-      if (answers[`a-${i.id}`]?.value === i.correct) score++;
-    });
+    const correctIds = editables.flatMap((i) =>
+      answers[`a-${i.id}`]?.value === i.correct ? [i.id] : [],
+    );
+    const incorrectIds = editables.flatMap((i) =>
+      answers[`a-${i.id}`]?.value !== i.correct ? [i.id] : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
     const total = editables.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -83,18 +102,21 @@ export default function WB_LookReadFind_PageD() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((i) => i.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedItem(null);
-    setTouchItem(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
-  const isWrong = (item) =>
-    showResults && !showAns && answers[`a-${item.id}`]?.value !== item.correct;
+  const isWrong = (item) => wrongIds.includes(item.id);
 
   const renderDropZone = (item) => {
     const boxKey = `a-${item.id}`;
@@ -113,12 +135,34 @@ export default function WB_LookReadFind_PageD() {
       >
         {/* before */}
         <span
+          role={item.prefixAudio ? "button" : undefined}
+          tabIndex={item.prefixAudio ? 0 : -1}
+          className={
+            item.prefixAudio
+              ? "unit4-audio-control unit4-interactive"
+              : undefined
+          }
+          onClick={() =>
+            item.prefixAudio && playAudio(`prefix-${item.id}`, item.prefixAudio)
+          }
+          onKeyDown={(event) => {
+            if (
+              item.prefixAudio &&
+              (event.key === "Enter" || event.key === " ")
+            ) {
+              event.preventDefault();
+              playAudio(`prefix-${item.id}`, item.prefixAudio);
+            }
+          }}
           style={{
             fontSize: "18px",
             // fontWeight: 500,
             color: "#111",
           }}
         >
+          <Unit4PlayingAudioIcon
+            active={activeAudioKey === `prefix-${item.id}`}
+          />
           {item.beforeDrop}
         </span>
 
@@ -132,20 +176,28 @@ export default function WB_LookReadFind_PageD() {
           {/* select مخفي */}
           <select
             value={value}
-            onChange={(e) =>
+            onChange={(e) => {
               setAnswers((prev) => ({
                 ...prev,
                 [boxKey]: { value: e.target.value },
-              }))
-            }
-            disabled={showAns||showResults}
+              }));
+              setWrongIds((prev) => prev.filter((id) => id !== item.id));
+            }}
+            disabled={showAns || lockedIds.includes(item.id)}
+            onFocus={(e) => {
+              if (e.target.matches(":focus-visible")) {
+                setFocusedSelect(item.id);
+              }
+            }}
+            onBlur={() => setFocusedSelect(null)}
             style={{
               position: "absolute",
               inset: 0,
               width: "100%",
               height: "100%",
               opacity: 0,
-              cursor: showAns||showResults ?"default":"pointer",
+              cursor:
+                showAns || lockedIds.includes(item.id) ? "default" : "pointer",
               zIndex: 2,
             }}
           >
@@ -169,6 +221,10 @@ export default function WB_LookReadFind_PageD() {
               display: "flex",
               alignItems: "flex-end",
               paddingBottom: "3px",
+
+              outline: focusedSelect === item.id ? "3px solid #2563eb" : "none",
+              outlineOffset: "4px",
+              borderRadius: "4px",
             }}
           >
             {value ? (
@@ -241,20 +297,21 @@ export default function WB_LookReadFind_PageD() {
       <div
         className="div-forall"
         style={{
-             
-              gap: "55px",
-            }}
+          gap: "55px",
+        }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>Look, read, and find. Write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Look, read, and find. Write."
+          subTitle="Use the person and location found in the room scene to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* ── Layout: يسار أسئلة + يمين صورة ── */}
         <div
           style={{
             display: "flex",
-         
+
             gap: "clamp(16px,2.5vw,30px)",
             alignItems: "center",
             width: "100%",
@@ -273,8 +330,8 @@ export default function WB_LookReadFind_PageD() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                height:"400px",
-                justifyContent:"space-between"
+                height: "400px",
+                justifyContent: "space-between",
                 // gap: "45px",
               }}
             >
@@ -306,12 +363,27 @@ export default function WB_LookReadFind_PageD() {
                       {item.id}
                     </span>
                     <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        playAudio(`question-${item.id}`, item.questionAudio)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`question-${item.id}`, item.questionAudio);
+                        }
+                      }}
+                      className="unit4-audio-control unit4-interactive"
                       style={{
                         fontSize: "18px",
                         // fontWeight: 500,
                         color: "#111",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `question-${item.id}`}
+                      />
                       {item.question}
                     </span>
                   </div>
@@ -340,18 +412,20 @@ export default function WB_LookReadFind_PageD() {
 
           {/* ── يمين: الصورة ── */}
           <div
-            style={{
-              // width: "clamp(220px,32vw,400px)",
-              // border: `2px solid ${BORDER_COLOR}`,
-              // borderRadius: "clamp(12px,1.4vw,18px)",
-              // overflow: "hidden",
-              // background: "#f7f7f7",
-              // flexShrink: 0,
-            }}
+            style={
+              {
+                // width: "clamp(220px,32vw,400px)",
+                // border: `2px solid ${BORDER_COLOR}`,
+                // borderRadius: "clamp(12px,1.4vw,18px)",
+                // overflow: "hidden",
+                // background: "#f7f7f7",
+                // flexShrink: 0,
+              }
+            }
           >
             <img
               src={sceneImg}
-              alt="scene"
+              alt="A living room scene with Helen, her brother at a computer, and her mother ironing"
               style={{
                 width: "auto",
                 height: "400px",
@@ -367,7 +441,6 @@ export default function WB_LookReadFind_PageD() {
           style={{
             display: "flex",
             justifyContent: "center",
-         
           }}
         >
           <Button
@@ -377,7 +450,6 @@ export default function WB_LookReadFind_PageD() {
           />
         </div>
       </div>
-
     </div>
   );
 }

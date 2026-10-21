@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import busAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_001_bus_station.mp3";
+import streetAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_002_street.mp3";
+import musicAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_003_music_room.mp3";
+import classAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_004_class.mp3";
+import fieldAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_005_soccer_field.mp3";
+import cafeteriaAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_006_cafeteria.mp3";
+import labAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_007_computer_lab.mp3";
+import libraryAudio from "../../../assets/audio/WorkBook/unit7/Page 43 - Exercise J/Item_008_library.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/8.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 43/SVG/7.svg";
@@ -11,6 +23,16 @@ import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folde
 
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "#ef4444";
+const OPTION_AUDIO = {
+  "bus station": busAudio,
+  street: streetAudio,
+  "music room": musicAudio,
+  class: classAudio,
+  "soccer field": fieldAudio,
+  cafeteria: cafeteriaAudio,
+  "computer lab": labAudio,
+  library: libraryAudio,
+};
 
 const ITEMS = [
   {
@@ -18,62 +40,76 @@ const ITEMS = [
     img: img1,
     options: ["bus station", "music room", "computer lab"],
     correct: "music room",
+    alt: "A music room",
   },
   {
     id: 2,
     img: img2,
     options: ["street", "class", "cafeteria"],
     correct: "cafeteria",
+    alt: "A school cafeteria",
   },
   {
     id: 3,
     img: img3,
     options: ["bus station", "soccer field", "library"],
     correct: "bus station",
+    alt: "A bus station",
   },
   {
     id: 4,
     img: img4,
     options: ["soccer field", "music room", "cafeteria"],
     correct: "soccer field",
+    alt: "A soccer field",
   },
   {
     id: 5,
     img: img5,
     options: ["computer lab", "class", "street"],
     correct: "class",
+    alt: "A classroom",
   },
   {
     id: 6,
     img: img6,
     options: ["soccer field", "bus station", "computer lab"],
     correct: "computer lab",
+    alt: "A computer lab",
   },
 ];
 
 export default function WB_LookReadCircle_PageJ() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
       return;
     }
-    let score = 0;
-    ITEMS.forEach((i) => {
-      if (answers[i.id] === i.correct) score++;
-    });
+    const correctIds = ITEMS.flatMap((i) =>
+      answers[i.id] === i.correct ? [i.id] : [],
+    );
+    const incorrectIds = ITEMS.flatMap((i) =>
+      answers[i.id] !== i.correct ? [i.id] : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
     const total = ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -88,21 +124,23 @@ export default function WB_LookReadCircle_PageJ() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((i) => i.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const getOptionStyle = (item, opt) => {
     const isSelected = answers[item.id] === opt;
-    const isWrong =
-      showResults &&
-      !showAns &&
-      answers[item.id] === opt &&
-      opt !== item.correct;
+    const isWrong = wrongIds.includes(item.id) && answers[item.id] === opt;
     const isCorrectShown = showAns && opt === item.correct;
 
     if (isWrong) {
@@ -132,9 +170,11 @@ export default function WB_LookReadCircle_PageJ() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span>Look, read, and tap or click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="J"
+          title="Look, read, and circle."
+          subTitle="Look at the school room or place that matches each picture first, compare all available options, then tap only the answer that matches."
+        />
 
         {/* ── Grid 3×2 ── */}
         <div
@@ -172,7 +212,7 @@ export default function WB_LookReadCircle_PageJ() {
 
                 <img
                   src={item.img}
-                  alt={`item-${item.id}`}
+                  alt={item.alt}
                   style={{
                     width: "180px",
                     height: "auto",
@@ -195,10 +235,7 @@ export default function WB_LookReadCircle_PageJ() {
                 {item.options.map((opt) => {
                   const isSelected = answers[item.id] === opt;
                   const isWrong =
-                    showResults &&
-                    !showAns &&
-                    answers[item.id] === opt &&
-                    opt !== item.correct;
+                    wrongIds.includes(item.id) && answers[item.id] === opt;
 
                   return (
                     <div
@@ -206,7 +243,29 @@ export default function WB_LookReadCircle_PageJ() {
                       style={{ position: "relative", width: "100%" }}
                     >
                       <button
-                        onClick={() => handleSelect(item.id, opt)}
+                        type="button"
+                        tabIndex={
+                          lockedIds.includes(item.id) || showAns ? -1 : 0
+                        }
+                        aria-pressed={isSelected}
+                        className="unit4-audio-control unit4-interactive"
+                        onClick={() => {
+                          playAudio(
+                            `option-${item.id}-${opt}`,
+                            OPTION_AUDIO[opt],
+                          );
+                          handleSelect(item.id, opt);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            playAudio(
+                              `option-${item.id}-${opt}`,
+                              OPTION_AUDIO[opt],
+                            );
+                            handleSelect(item.id, opt);
+                          }
+                        }}
                         style={{
                           width: "100%",
                           padding:
@@ -214,7 +273,10 @@ export default function WB_LookReadCircle_PageJ() {
                           borderRadius: "999px",
                           fontSize: "clamp(13px,1.4vw,18px)",
                           fontWeight: isSelected ? 500 : 400,
-                          cursor: showAns||showResults ? "default" : "pointer",
+                          cursor:
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                           transition: "all 0.15s",
                           userSelect: "none",
                           textAlign: "center",
@@ -223,6 +285,9 @@ export default function WB_LookReadCircle_PageJ() {
                           ...getOptionStyle(item, opt),
                         }}
                       >
+                        <Unit4PlayingAudioIcon
+                          active={activeAudioKey === `option-${item.id}-${opt}`}
+                        />
                         {opt}
                       </button>
 

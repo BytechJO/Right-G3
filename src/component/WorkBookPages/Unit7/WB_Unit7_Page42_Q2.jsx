@@ -1,12 +1,25 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import {
   DndContext,
   useDraggable,
   useDroppable,
   DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import bagAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise H/Item_001_The_bag.mp3";
+import bedAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise H/Item_002_is_on_the_bed.mp3";
+import guitarAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise H/Item_003_The_guitar.mp3";
+import chairAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise H/Item_004_is_next_to_the_chair.mp3";
+import catAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise H/Item_005_The_cat.mp3";
 import roomImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 42/SVG/2.svg";
 
 const BORDER_COLOR = "#f39b42";
@@ -26,9 +39,9 @@ const DRAG_ITEMS = [
 ];
 
 const LEFT_ITEMS = [
-  { id: 1, text: "The bag" },
-  { id: 2, text: "The guitar" },
-  { id: 3, text: "The cat" },
+  { id: 1, text: "The bag", audio: bagAudio },
+  { id: 2, text: "The guitar", audio: guitarAudio },
+  { id: 3, text: "The cat", audio: catAudio },
   { id: 4, text: "The game" },
   { id: 5, text: "The shirt" },
   { id: 6, text: "The doll" },
@@ -37,8 +50,8 @@ const LEFT_ITEMS = [
 ];
 
 const RIGHT_ITEMS = [
-  { id: "a", text: "is on the bed." },
-  { id: "b", text: "is next to the chair." },
+  { id: "a", text: "is on the bed.", audio: bedAudio },
+  { id: "b", text: "is next to the chair.", audio: chairAudio },
   { id: "c", text: "is next to the bed." },
   { id: "d", text: "is on the chair." },
   { id: "e", text: "is under the bed." },
@@ -57,23 +70,35 @@ const CORRECT = {
   7: "b",
   8: "c",
 };
-const DraggableItem = ({ item, isUsed, showAns }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+const DraggableItem = ({ item, isUsed, showAns, register, pick }) => {
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: item.id,
     disabled: isUsed || showAns,
   });
 
-  const style = {
-    transform: transform
-      ? `translate(${transform.x}px, ${transform.y}px)`
-      : undefined,
-  };
-
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(item.id, element);
+      }}
       {...listeners}
       {...attributes}
+      tabIndex={isUsed || showAns ? -1 : 0}
+      role="button"
+      aria-disabled={isUsed || showAns}
+      aria-label={`Letter ${item.value}, press Enter or Space to pick up`}
+      onKeyDown={(event) => {
+        if (
+          !isUsed &&
+          !showAns &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          pick();
+        }
+      }}
       style={{
         // ...style,
         width: "45px",
@@ -98,15 +123,32 @@ const DraggableItem = ({ item, isUsed, showAns }) => {
   );
 };
 
-const DropZone = ({ boxKey, value, wrong, showAns, onRemove }) => {
+const DropZone = ({
+  boxKey,
+  value,
+  preview,
+  wrong,
+  showAns,
+  onRemove,
+  register,
+  onKeyDown,
+}) => {
   const { setNodeRef } = useDroppable({
     id: boxKey,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(boxKey, element);
+      }}
       onClick={() => value && !showAns && onRemove(boxKey)}
+      onKeyDown={onKeyDown}
+      role="button"
+      tabIndex={!showAns && (Boolean(value) || Boolean(preview)) ? 0 : -1}
+      aria-disabled={showAns}
+      className={`unit4-drop-target unit4-interactive ${preview && !value ? "unit4-keyboard-preview" : ""}`}
       style={{
         position: "relative",
         width: "45px",
@@ -120,8 +162,16 @@ const DropZone = ({ boxKey, value, wrong, showAns, onRemove }) => {
         cursor: value && !showAns ? "pointer" : "default",
       }}
     >
-      {value && (
-        <span style={{ fontSize: "18px", fontWeight: 700 }}>{value}</span>
+      {(value || preview) && (
+        <span
+          style={{
+            fontSize: "18px",
+            fontWeight: 700,
+            color: value ? "#111" : "#777",
+          }}
+        >
+          {value || preview}
+        </span>
       )}
 
       {wrong && (
@@ -152,37 +202,72 @@ const DropZone = ({ boxKey, value, wrong, showAns, onRemove }) => {
 };
 export default function WB_LookReadMatch_PageH() {
   const [answers, setAnswers] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const usedIds = Object.values(answers)
     .filter(Boolean)
     .map((e) => e.dragId);
 
+  const place = (dragId, boxKey) => {
+    const itemId = Number(String(boxKey).replace("a-", ""));
+    if (showAns || lockedIds.includes(itemId)) return;
+    const dragged = DRAG_ITEMS.find((item) => item.id === dragId);
+    if (!dragged) return;
+    setAnswers((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key]?.dragId === dragged.id) delete updated[key];
+      });
+      updated[boxKey] = { dragId: dragged.id, value: dragged.value };
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== itemId));
+  };
+  const keyboard = useUnit4TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => item.id),
+    targetIds: LEFT_ITEMS.map((item) => `a-${item.id}`),
+    isItemDisabled: (id) => usedIds.includes(id) || showAns,
+    isTargetDisabled: (id) =>
+      lockedIds.includes(Number(String(id).replace("a-", ""))) || showAns,
+    onPlace: place,
+  });
   const handleRemove = (boxKey) => {
-    if (showAns || showResults) return;
+    const itemId = Number(String(boxKey).replace("a-", ""));
+    if (showAns || lockedIds.includes(itemId)) return;
+    const removed = answers[boxKey]?.dragId;
     setAnswers((prev) => {
       const u = { ...prev };
       delete u[boxKey];
       return u;
     });
+    setWrongIds((previous) => previous.filter((id) => id !== itemId));
+    if (removed) keyboard.focusItem(removed);
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === LEFT_ITEMS.length) return;
     const allAnswered = LEFT_ITEMS.every((i) => answers[`a-${i.id}`]?.value);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-    let score = 0;
-    LEFT_ITEMS.forEach((i) => {
-      if (answers[`a-${i.id}`]?.value === CORRECT[i.id]) score++;
-    });
+    const correctIds = LEFT_ITEMS.flatMap((i) =>
+      answers[`a-${i.id}`]?.value === CORRECT[i.id] ? [i.id] : [],
+    );
+    const incorrectIds = LEFT_ITEMS.flatMap((i) =>
+      answers[`a-${i.id}`]?.value !== CORRECT[i.id] ? [i.id] : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
     const total = LEFT_ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -199,21 +284,27 @@ export default function WB_LookReadMatch_PageH() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(LEFT_ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setDraggedItem(null);
-    setTouchItem(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
-  const isWrong = (id) =>
-    showResults && !showAns && answers[`a-${id}`]?.value !== CORRECT[id];
+  const isWrong = (id) => wrongIds.includes(id);
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={(event) => {
         const dragged = DRAG_ITEMS.find((d) => d.id === event.active.id);
         setActiveItem(dragged);
@@ -226,21 +317,7 @@ export default function WB_LookReadMatch_PageH() {
           return;
         }
 
-        const dragged = DRAG_ITEMS.find((d) => d.id === active.id);
-
-        const updated = { ...answers };
-
-        Object.keys(updated).forEach((k) => {
-          if (updated[k]?.dragId === dragged.id) delete updated[k];
-        });
-
-        updated[over.id] = {
-          dragId: dragged.id,
-          value: dragged.value,
-        };
-
-        setAnswers(updated);
-        setShowResults(false);
+        place(String(active.id), String(over.id));
         setActiveItem(null);
       }}
     >
@@ -252,11 +329,11 @@ export default function WB_LookReadMatch_PageH() {
           }}
         >
           {/* Title */}
-          <h1
-            className="WB-header-title-page8"
-          >
-            <span className="WB-ex-A">H</span>Look, read, and match.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="H"
+            title="Look, read, and match."
+            subTitle="Read each bedroom object to its location description first, then connect it to the matching picture or answer one pair at a time."
+          />
 
           {/* ── الصورة ── */}
           <div
@@ -275,7 +352,7 @@ export default function WB_LookReadMatch_PageH() {
           >
             <img
               src={roomImg}
-              alt="bedroom"
+              alt="A bedroom containing a bag, guitar, cat, game, shirt, doll, teddy bear, and table lamp"
               style={{
                 width: "auto",
                 height: "300px",
@@ -287,6 +364,7 @@ export default function WB_LookReadMatch_PageH() {
 
           {/* ── Word Bank: الحروف a-h ── */}
           <div
+            className="w-full"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -302,7 +380,9 @@ export default function WB_LookReadMatch_PageH() {
                   key={item.id}
                   item={item}
                   isUsed={isUsed}
-                  showAns={showAns || showResults}
+                  showAns={showAns}
+                  register={keyboard.registerItem}
+                  pick={() => keyboard.pickItem(item.id)}
                 />
               );
             })}
@@ -344,9 +424,28 @@ export default function WB_LookReadMatch_PageH() {
                     <DropZone
                       boxKey={boxKey}
                       value={value}
+                      preview={
+                        keyboard.keyboardTargetId === boxKey
+                          ? keyboard.keyboardItemId?.replace("d", "")
+                          : ""
+                      }
                       wrong={wrong}
-                      showAns={showAns || showResults}
+                      showAns={showAns || lockedIds.includes(item.id)}
                       onRemove={handleRemove}
+                      register={keyboard.registerTarget}
+                      onKeyDown={(event) => {
+                        if (
+                          !keyboard.keyboardItemId &&
+                          value &&
+                          !lockedIds.includes(item.id) &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          handleRemove(boxKey);
+                          return;
+                        }
+                        keyboard.handleTargetKeyDown(event, boxKey);
+                      }}
                     />
 
                     {/* رقم + نص */}
@@ -361,12 +460,34 @@ export default function WB_LookReadMatch_PageH() {
                       {item.id}
                     </span>
                     <span
+                      role={item.audio ? "button" : undefined}
+                      tabIndex={item.audio ? 0 : -1}
+                      className={
+                        item.audio
+                          ? "unit4-audio-control unit4-interactive"
+                          : undefined
+                      }
+                      onClick={() =>
+                        item.audio && playAudio(`left-${item.id}`, item.audio)
+                      }
+                      onKeyDown={(event) => {
+                        if (
+                          item.audio &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          playAudio(`left-${item.id}`, item.audio);
+                        }
+                      }}
                       style={{
                         fontSize: "18px",
                         // fontWeight: 500,
                         color: "#111",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `left-${item.id}`}
+                      />
                       {item.text}
                     </span>
                   </div>
@@ -403,12 +524,34 @@ export default function WB_LookReadMatch_PageH() {
                     {item.id}
                   </span>
                   <span
+                    role={item.audio ? "button" : undefined}
+                    tabIndex={item.audio ? 0 : -1}
+                    className={
+                      item.audio
+                        ? "unit4-audio-control unit4-interactive"
+                        : undefined
+                    }
+                    onClick={() =>
+                      item.audio && playAudio(`right-${item.id}`, item.audio)
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        item.audio &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`right-${item.id}`, item.audio);
+                      }
+                    }}
                     style={{
                       fontSize: "18px",
                       // fontWeight: 500,
                       color: "#111",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `right-${item.id}`}
+                    />
                     {item.text}
                   </span>
                 </div>

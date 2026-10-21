@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import questionAudio from "../../../assets/audio/WorkBook/unit7/Page 39 - Exercise B/Item_001_Can_you_see_Tom.mp3";
+import answerAudio from "../../../assets/audio/WorkBook/unit7/Page 39 - Exercise B/Item_002_No,_I_can't_see.mp3";
 
 import mainImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 39/SVG/2.svg";
 
@@ -36,19 +42,22 @@ const ITEMS = [
 
 export default function WB_NewVersion() {
   const [answers, setAnswers] = useState({});
-  const [openId, setOpenId] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+  const [, setOpenId] = useState(null);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
     setOpenId(null);
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((i) => answers[i.id]);
 
@@ -57,13 +66,17 @@ export default function WB_NewVersion() {
       return;
     }
 
-    let score = 0;
-
-    ITEMS.forEach((i) => {
-      if (answers[i.id] === i.correct) score++;
-    });
+    const correctIds = ITEMS.flatMap((i) =>
+      answers[i.id] === i.correct ? [i.id] : [],
+    );
+    const incorrectIds = ITEMS.flatMap((i) =>
+      answers[i.id] !== i.correct ? [i.id] : [],
+    );
+    const score = correctIds.length;
 
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
 
     const total = ITEMS.length;
 
@@ -81,6 +94,9 @@ export default function WB_NewVersion() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((i) => i.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
@@ -88,26 +104,80 @@ export default function WB_NewVersion() {
     setShowResults(false);
     setShowAns(false);
     setOpenId(null);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
-  const isWrong = (item) =>
-    showResults && !showAns && answers[item.id] !== item.correct;
+  const isWrong = (item) => wrongIds.includes(item.id);
 
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "50px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Complete the sentences, and write
-          <span className="text-blue-900"> him</span>,{" "}
-          <span className="text-blue-900">her</span>,
-          <span className="text-blue-900">you</span> ,
-          <span className="text-blue-900">me</span> , and{" "}
-          <span className="text-blue-900">it</span>.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Complete the sentences and write{" "}
+              <span style={{ color: "#2e3192" }}>him</span>,{" "}
+              <span style={{ color: "#2e3192" }}>her</span>,{" "}
+              <span style={{ color: "#2e3192" }}>you</span>,{" "}
+              <span style={{ color: "#2e3192" }}>me</span>, and{" "}
+              <span style={{ color: "#2e3192" }}>it</span>.
+            </>
+          }
+          subTitle="Use the object pronoun in each conversation to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* الصورة */}
-        <div style={{ position: "relative" }}>
-          <img src={mainImg} style={{ width: "100%", height: "auto" }} />
+        <div className="w-full" style={{ position: "relative" }}>
+          <img
+            src={mainImg}
+            alt="Four short conversations between children and adults"
+            style={{ width: "100%", height: "auto" }}
+          />
+          {[
+            {
+              key: "question",
+              label: "Can you see Tom?",
+              audio: questionAudio,
+              top: "7%",
+              left: "17%",
+            },
+            {
+              key: "answer",
+              label: "No, I can't see",
+              audio: answerAudio,
+              top: "7%",
+              left: "48%",
+            },
+          ].map((area) => (
+            <button
+              type="button"
+              key={area.key}
+              aria-label={`Play: ${area.label}`}
+              className="unit4-audio-control unit4-interactive"
+              onClick={() => playAudio(area.key, area.audio)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  playAudio(area.key, area.audio);
+                }
+              }}
+              style={{
+                position: "absolute",
+                top: area.top,
+                left: area.left,
+                width: "25%",
+                height: "16%",
+                border: 0,
+                background: "transparent",
+                borderRadius: 10,
+              }}
+            >
+              <Unit4PlayingAudioIcon active={activeAudioKey === area.key} />
+            </button>
+          ))}
 
           {/* dropdowns */}
           {ITEMS.map((item) => (
@@ -126,7 +196,7 @@ export default function WB_NewVersion() {
               <select
                 value={answers[item.id] || ""}
                 onChange={(e) => handleSelect(item.id, e.target.value)}
-                disabled={showAns || showResults}
+                disabled={showAns || lockedIds.includes(item.id)}
                 style={{
                   width: "100%",
                   padding: "6px",
@@ -137,7 +207,10 @@ export default function WB_NewVersion() {
                     ? `2px solid ${WRONG_COLOR}`
                     : "1px solid gray",
                   background: "#fff",
-                  cursor: showAns || showResults ? "not-allowed" : "pointer",
+                  cursor:
+                    showAns || lockedIds.includes(item.id)
+                      ? "default"
+                      : "pointer",
                 }}
               >
                 <option value="" disabled>

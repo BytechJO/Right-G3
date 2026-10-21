@@ -1,426 +1,398 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import useUnit4TabDrag from "../unit4/useUnit4TabDrag";
+import "../unit4/unit4Interactions.css";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 71/Ex D 6.svg";
-import blue from "../../../assets/audio/ClassBook/Unit 8/P 71/unit8-pg71-EXD.mp3";
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  useDraggable,
-  useDroppable,
-} from "@dnd-kit/core";
+import sound from "../../../assets/audio/ClassBook/Unit 8/P 71/unit8-pg71-EXD.mp3";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 
-import { CSS } from "@dnd-kit/utilities";
-import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+const BANK = ["s", "v", "w", "b", "m", "d"].map((value, index) => ({
+  id: `${value}-${index}`,
+  value,
+}));
+const QUESTIONS = [
+  { id: 1, image: img1, alt: "A milkshake", correct: "m" },
+  { id: 2, image: img2, alt: "A bike", correct: "b" },
+  { id: 3, image: img3, alt: "A duck", correct: "d" },
+  { id: 4, image: img4, alt: "A van", correct: "v" },
+  { id: 5, image: img5, alt: "A star", correct: "s" },
+  { id: 6, image: img6, alt: "A wheel", correct: "w" },
+];
+const captions = [
+  { start: 0.119, end: 3.439, text: "Page 71, review seven, exercise D." },
+  {
+    start: 4.44,
+    end: 16.219,
+    text: "What is the beginning sound of the word? Listen and write. One, milkshake. Two, bike. Three, duck. Four,",
+  },
+  { start: 17.299, end: 23.159, text: "van. Five, star. Six, wheel" },
+];
 
-const DraggableLetter = ({ id, children, disabled }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id,
-      disabled,
-    });
-
-  const style = {
-    transform: CSS.Translate.toString(transform),
-    opacity: disabled ? 0.4 : isDragging ? 0.5 : 1,
-    touchAction: "none",
-    cursor: disabled ? "not-allowed" : "grab",
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {children}
-    </div>
-  );
-};
-
-const DropBox = ({ id, children, isWrong, checked, onRemove }) => {
-  const { isOver, setNodeRef } = useDroppable({
-    id,
+function BankItem({ item, used, showAns, register, pick }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: item.id,
+    disabled: used || showAns,
   });
-
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(item.id, element);
+      }}
+      {...listeners}
+      {...attributes}
+      role="button"
+      tabIndex={used || showAns ? -1 : 0}
+      aria-disabled={used || showAns}
+      aria-label={`Sound ${item.value}, press Enter or Space to pick up`}
+      onKeyDown={(event) => {
+        if (!used && !showAns && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          event.stopPropagation();
+          pick();
+        }
+      }}
+      className="unit4-interactive"
+      style={{
+        height: 40,
+        width: 80,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1px solid #F79530",
+        borderRadius: 8,
+        background: used ? "#eee" : "white",
+        color: used ? "#999" : "#111",
+        opacity: used ? 0.55 : 1,
+        fontWeight: "bold",
+        fontSize: 20,
+        cursor: used || showAns ? "not-allowed" : "grab",
+        touchAction: "none",
+        transform: transform
+          ? `translate(${transform.x}px,${transform.y}px)`
+          : undefined,
+      }}
+    >
+      {item.value}
+    </div>
+  );
+}
+
+function DropBox({
+  question,
+  answer,
+  preview,
+  wrong,
+  locked,
+  register,
+  onKeyDown,
+  onRemove,
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id: String(question.id) });
+  return (
+    <div
+      ref={(element) => {
+        setNodeRef(element);
+        register(String(question.id), element);
+      }}
+      role="button"
+      tabIndex={!locked && (answer || preview) ? 0 : -1}
+      aria-disabled={locked}
+      aria-label={`Beginning sound for ${question.alt}`}
+      onKeyDown={onKeyDown}
+      onClick={() => answer && !locked && onRemove(question.id)}
+      className={`unit4-drop-target unit4-interactive ${preview && !answer ? "unit4-keyboard-preview" : ""}`}
       style={{
         position: "relative",
-        marginTop: "6px",
+        marginTop: 6,
         width: "70%",
-        borderBottom: `1px solid ${
-          checked && isWrong ? "red" : isOver ? "#F79530" : "#000"
-        }`,
-        minHeight: "32px",
+        borderBottom: `1px solid ${wrong ? "red" : isOver ? "#F79530" : "#000"}`,
+        minHeight: 32,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        fontSize: "20px",
+        fontSize: 20,
         fontWeight: "bold",
-        transition: "0.2s",
-        background: isOver ? "#ffefddff" : "transparent",
-        transform: isOver ? "scale(1.05)" : "scale(1)",
+        background: isOver ? "#ffefdd" : "transparent",
+        cursor: answer && !locked ? "pointer" : "default",
       }}
     >
-      <span
-        onClick={() => onRemove(id)}
-        style={{
-          cursor: children ? "pointer" : "default",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        {children}
-      </span>
+      {answer || preview || ""}
+      {wrong && (
+        <span
+          style={{
+            position: "absolute",
+            right: "10%",
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: 20,
+            height: 20,
+            borderRadius: "50%",
+            background: "red",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 12,
+            border: "2px solid white",
+          }}
+        >
+          ✕
+        </span>
+      )}
     </div>
   );
-};
-const Review7_Page2_Q2 = () => {
-  const [userAnswers, setUserAnswers] = useState({
-    1: "",
-    2: "",
-    3: "",
-    4: "",
-    5: "",
-    6: "",
-  });
-  const [locked, setLocked] = useState(false);
+}
 
-  const [checked, setChecked] = useState(false);
-  const [activeLetter, setActiveLetter] = useState(null);
+export default function Review7_Page2_Q2() {
+  const [answers, setAnswers] = useState({});
+  const [activeItemId, setActiveItemId] = useState(null);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAns, setShowAns] = useState(false);
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
-  const words = ["s", "v", "w", "b", "m", "d"];
-  const captions = [
-    { start: 0.119, end: 3.439, text: "Page 71, review seven, exercise D." },
-    {
-      start: 4.44,
-      end: 16.219,
-      text: "What is the beginning sound of the word? Listen and write. One, milkshake. Two, bike. Three, duck. Four,",
-    },
-    { start: 17.299, end: 23.159, text: "van. Five, star. Six, wheel" },
-  ];
-  const correctAnswers = {
-    1: "m",
-    2: "b",
-    3: "d",
-    4: "v",
-    5: "s",
-    6: "w",
+  const usedItemIds = useMemo(
+    () =>
+      Object.values(answers)
+        .map((entry) => entry?.itemId)
+        .filter(Boolean),
+    [answers],
+  );
+  const place = (itemId, targetId) => {
+    const questionId = Number(targetId);
+    if (showAns || lockedIds.includes(questionId)) return;
+    const item = BANK.find((entry) => entry.id === itemId);
+    if (!item) return;
+    setAnswers((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key]?.itemId === itemId) delete updated[key];
+      });
+      updated[questionId] = { itemId, value: item.value };
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== questionId));
   };
-
-  const questions = [
-    { id: 1, image: img1 },
-    { id: 2, image: img2 },
-    { id: 3, image: img3 },
-    { id: 4, image: img4 },
-    { id: 5, image: img5 },
-    { id: 6, image: img6 },
-  ];
-
-  const onDragEnd = (event) => {
-    const { over, active } = event;
-
-    setActiveLetter(null);
-
-    if (!over) return;
-
-    const letter = active.id.split("-")[0];
-
-    setUserAnswers((prev) => ({
-      ...prev,
-      [over.id]: letter,
-    }));
+  const keyboard = useUnit4TabDrag({
+    itemIds: BANK.map((item) => item.id),
+    targetIds: QUESTIONS.map((question) => String(question.id)),
+    isItemDisabled: (id) => usedItemIds.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedIds.includes(Number(id)) || showAns,
+    onPlace: place,
+  });
+  const remove = (questionId) => {
+    if (showAns || lockedIds.includes(questionId)) return;
+    const itemId = answers[questionId]?.itemId;
+    setAnswers((previous) => {
+      const updated = { ...previous };
+      delete updated[questionId];
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== questionId));
+    if (itemId) keyboard.focusItem(itemId);
   };
-  const showAnswer = () => {
-    setUserAnswers(correctAnswers);
-    setLocked(true);
-  };
-  const checkAnswers = () => {
-    if (locked) return;
-
-    const empty = Object.values(userAnswers).some((v) => !v?.trim());
-    if (empty) {
-      ValidationAlert.info();
+  const check = () => {
+    if (showAns || lockedIds.length === QUESTIONS.length) return;
+    if (!QUESTIONS.every((question) => answers[question.id]?.value)) {
+      ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
-    let score = 0;
-
-    Object.keys(correctAnswers).forEach((id) => {
-      if (
-        userAnswers[id]?.toLowerCase().trim() ===
-        correctAnswers[id].toLowerCase()
-      ) {
-        score++;
-      }
-    });
-
-    const total = Object.keys(correctAnswers).length;
-
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${score} / ${total}
-      </span>
-    </div>
-  `;
-
-    setChecked(true);
-    setLocked(true);
-
-    if (score === total) ValidationAlert.success(msg);
-    else if (score === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
+    const correct = QUESTIONS.flatMap((question) =>
+      answers[question.id]?.value === question.correct ? [question.id] : [],
+    );
+    const wrong = QUESTIONS.flatMap((question) =>
+      answers[question.id]?.value !== question.correct ? [question.id] : [],
+    );
+    setLockedIds(correct);
+    setWrongIds(wrong);
+    if (correct.length === QUESTIONS.length)
+      ValidationAlert.success(`Score: ${correct.length} / ${QUESTIONS.length}`);
+    else if (correct.length)
+      ValidationAlert.warning(`Score: ${correct.length} / ${QUESTIONS.length}`);
+    else ValidationAlert.error(`Score: 0 / ${QUESTIONS.length}`);
   };
-  const handleRemoveLetter = (id) => {
-    if (locked) return;
-
-    setUserAnswers((prev) => ({
-      ...prev,
-      [id]: "",
-    }));
+  const show = () => {
+    setAnswers(
+      Object.fromEntries(
+        QUESTIONS.map((question) => {
+          const item = BANK.find((entry) => entry.value === question.correct);
+          return [question.id, { itemId: item.id, value: item.value }];
+        }),
+      ),
+    );
+    setLockedIds(QUESTIONS.map((question) => question.id));
+    setWrongIds([]);
+    setShowAns(true);
+    setActiveItemId(null);
+    keyboard.cancel();
   };
-  const handleStartAgain = () => {
-    setUserAnswers({
-      1: "",
-      2: "",
-      3: "",
-      4: "",
-      5: "",
-      6: "",
-    });
-    setChecked(false);
-    setLocked(false);
+  const reset = () => {
+    setAnswers({});
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAns(false);
+    setActiveItemId(null);
+    keyboard.cancel();
   };
-
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={(event) => {
-        setActiveLetter(event.active.id.split("-")[0]);
+      onDragStart={(event) => setActiveItemId(String(event.active.id))}
+      onDragEnd={(event) => {
+        if (event.over) place(String(event.active.id), String(event.over.id));
+        setActiveItemId(null);
       }}
-      onDragEnd={onDragEnd}
+      onDragCancel={() => setActiveItemId(null)}
     >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
-          marginBottom: "30px",
-          padding: "30px",
+          padding: 30,
         }}
       >
-        <div
-          className="div-forall"
-          style={{
-            gap: "20px",
-          }}
-        >
-          <div>
-            <h5 className="header-title-page8">
-              <span style={{ marginRight: "10px" }}>D</span>What is the
-              <span style={{ color: "#2e3192" }}> beginning sound </span> of the
-              word? Listen, drag, and drop.
-            </h5>
-          </div>
-
+        <div className="div-forall mb-10" style={{ gap: 20 }}>
+          <ExerciseHeaderReview
+            sectionLetter="D"
+            title={
+              <>
+                What is the{" "}
+                <span style={{ color: "#2e3192" }}>beginning sound</span> of the
+                word? Listen and write.
+              </>
+            }
+            subTitle="Replay the word if needed, identify its sound, then drag the matching sound tile into place."
+          />
           <QuestionAudioPlayer
-            src={blue}
+            src={sound}
             captions={captions}
             stopAtSecond={8.5}
+            pageId="review7-page71-d"
           />
-
           <div
+            className="w-full"
             style={{
               display: "flex",
+              gap: 30,
               justifyContent: "center",
-              padding: "20px",
+              padding: 10,
             }}
           >
-            <div
-              style={{
-                width: "100%",
-                // maxWidth: "900px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "20px",
-              }}
-            >
-              {/* الكلمات */}
-
-              <div
-                style={{
-                  display: "flex",
-                  gap: "30px",
-                  padding: "10px",
-                  // border: "2px dashed #ccc",
-                  borderRadius: "10px",
-                  justifyContent: "center",
-                  width: "100%",
-                  marginBottom: "10px",
-                  // justifyContent: "center",
-                }}
-              >
-                {words.map((word, index) => {
-                  const usedCount = Object.values(userAnswers).filter(
-                    (v) => v === word,
-                  ).length;
-
-                  const totalCount = words.filter((w) => w === word).length;
-
-                  const isUsed = usedCount >= totalCount;
-                  return (
-                    <DraggableLetter
-                      id={`${word}-${index}`}
-                      disabled={checked || isUsed}
-                    >
-                      <div
-                        style={{
-                          height: "40px",
-                          width: "80px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border: "1px solid #F79530",
-                          borderRadius: "8px",
-                          background: "white",
-                          fontWeight: "bold",
-                          fontSize: "20px",
-                        }}
-                      >
-                        {word}
-                      </div>
-                    </DraggableLetter>
-                  );
-                })}
-              </div>
-
-              {/* الأسئلة بالصور */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "12px",
-                }}
-              >
-                {questions.map((q) => (
-                  <div
-                    key={q.id}
-                    style={{
-                      padding: "6px",
-                      textAlign: "center",
-                      position: "relative",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "5px",
-                      }}
-                    >
-                      <span className="text-[20px] font-bold">{q.id}</span>
-
-                      <img
-                        src={q.image}
-                        alt={`q${q.id}`}
-                        style={{
-                          width: "auto",
-                          height: "120px",
-                          objectFit: "contain",
-                        }}
-                      />
-                    </div>
-                    <DropBox
-                      id={String(q.id)}
-                      checked={checked}
-                      isWrong={userAnswers[q.id] !== correctAnswers[q.id]}
-                      onRemove={handleRemoveLetter}
-                    >
-                      {userAnswers[q.id]}
-
-                      {checked &&
-                        userAnswers[q.id] !== correctAnswers[q.id] && (
-                          <span
-                            style={{
-                              position: "absolute",
-                              left: "25%",
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                              width: "20px",
-                              height: "20px",
-                              background: "red",
-                              color: "white",
-                              borderRadius: "50%",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                              border: "2px solid white",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                              pointerEvents: "none",
-                              zIndex: 3,
-                            }}
-                          >
-                            ✕
-                          </span>
-                        )}
-                    </DropBox>
-                  </div>
-                ))}
-              </div>
-
-              <Button
-                handleShowAnswer={showAnswer}
-                handleStartAgain={handleStartAgain}
-                checkAnswers={checkAnswers}
+            {BANK.map((item) => (
+              <BankItem
+                key={item.id}
+                item={item}
+                used={usedItemIds.includes(item.id)}
+                showAns={showAns}
+                register={keyboard.registerItem}
+                pick={() => keyboard.pickItem(item.id)}
               />
-            </div>
+            ))}
           </div>
+          <div
+            className="w-full"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3,1fr)",
+              gap: 12,
+            }}
+          >
+            {QUESTIONS.map((question) => {
+              const answer = answers[question.id]?.value;
+              const previewItem =
+                keyboard.keyboardTargetId === String(question.id)
+                  ? BANK.find((item) => item.id === keyboard.keyboardItemId)
+                  : null;
+              const locked = lockedIds.includes(question.id) || showAns;
+              return (
+                <div
+                  key={question.id}
+                  style={{ padding: 6, textAlign: "center" }}
+                >
+                  <div style={{ display: "flex", gap: 5 }}>
+                    <strong style={{ fontSize: 20 }}>{question.id}</strong>
+                    <img
+                      src={question.image}
+                      alt={question.alt}
+                      style={{
+                        width: "auto",
+                        height: 120,
+                        objectFit: "contain",
+                      }}
+                    />
+                  </div>
+                  <DropBox
+                    question={question}
+                    answer={answer}
+                    preview={previewItem?.value}
+                    wrong={wrongIds.includes(question.id)}
+                    locked={locked}
+                    register={keyboard.registerTarget}
+                    onRemove={remove}
+                    onKeyDown={(event) => {
+                      if (
+                        !keyboard.keyboardItemId &&
+                        answer &&
+                        !locked &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        remove(question.id);
+                        return;
+                      }
+                      keyboard.handleTargetKeyDown(event, String(question.id));
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <Button
+            handleShowAnswer={show}
+            handleStartAgain={reset}
+            checkAnswers={check}
+          />
         </div>
       </div>
       <DragOverlay>
-        {activeLetter ? (
+        {activeItemId ? (
           <div
             style={{
-              height: "40px",
-              width: "80px",
+              height: 40,
+              width: 80,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               border: "1px solid #F79530",
-              borderRadius: "10px",
+              borderRadius: 10,
               background: "white",
               fontWeight: "bold",
-              fontSize: "20px",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-              transform: "scale(1.08)",
-              opacity: 0.95,
+              fontSize: 20,
             }}
           >
-            {activeLetter}
+            {BANK.find((item) => item.id === activeItemId)?.value}
           </div>
         ) : null}
       </DragOverlay>
     </DndContext>
   );
-};
-
-export default Review7_Page2_Q2;
+}

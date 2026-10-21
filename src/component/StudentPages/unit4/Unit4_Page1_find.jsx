@@ -5,6 +5,8 @@ import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frie
 
 import FindQuestion from "../../FindQuestion";
 
+import targetAudio from "../../../assets/audio/ClassBook/Unit 4/page 28/umbrella.mp3";
+
 const targetArea = {
   x1: 59.345,
   y1: 76.88,
@@ -18,9 +20,10 @@ const Unit4_Page1_find = () => {
       title="Can you help me find the umbrella in the picture?"
       subtitle="Scan the whole picture first, then tap the umbrella."
       image={find_img}
-      imageAlt="A scene with different objects, including an umbrella."
+      imageAlt="A girl sitting on a sofa using a laptop in a living room, with a chat window and pictures displayed on the screen"
       targetName="umbrella"
       targetArea={targetArea}
+      targetAudio={targetAudio}
       answerHighlight={MySVG}
       imageHeight="70vh"
       highlightTop="78%"

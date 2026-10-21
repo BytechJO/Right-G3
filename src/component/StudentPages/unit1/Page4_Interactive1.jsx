@@ -4,6 +4,8 @@ import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 1
 import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/interactive svg.svg";
 
 import FindQuestion from "../../FindQuestion";
+import targetAudio from "../../../assets/audio/ClassBook/Unit 1/Page 4/basketball_hoop.mp3";
+
 const targetArea = {
   x1: 80.6,
   y1: 0.2,
@@ -20,6 +22,7 @@ const Page4_Interactive1 = () => {
       imageAlt="A basketball scene with children and a basketball hoop visible in the picture."
       targetName="basketball hoop"
       targetArea={targetArea}
+      targetAudio={targetAudio}
       answerHighlight={MySVG}
       imageHeight="70vh"
       highlightTop="-0.5%"

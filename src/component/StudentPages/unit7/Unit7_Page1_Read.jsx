@@ -74,6 +74,8 @@ const Unit5_Page1_Read = () => {
         titleQ={"Listen and read along."}
         audioArr={imageSounds}
         captions={captions}
+        pageId="unit7-page58-read"
+        subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed"
       />
     </>
   );

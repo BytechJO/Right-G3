@@ -5,6 +5,8 @@ import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 3 Lala Goes
 
 import FindQuestion from "../../FindQuestion";
 
+import targetAudio from "../../../assets/audio/ClassBook/Unit 3/page 22/green_peppers.mp3";
+
 const targetArea = {
   x1: 60,
   y1: 13,
@@ -20,9 +22,10 @@ const Unit3_Page1_find = () => {
       title="Can you help me find the green pepper in the picture?"
       subtitle="Scan the whole picture first, then tap the green peppers."
       image={find_img}
-      imageAlt="A shopping scene with different items, including green peppers."
+      imageAlt="A supermarket scene with shoppers, a clown pushing a shopping cart, and shelves displaying fruits, vegetables, milk, drinks, and other groceries"
       targetName="green peppers"
       targetArea={targetArea}
+      targetAudio={targetAudio}
       answerHighlight={MySVG}
       imageHeight="70vh"
       highlightTop="13%"

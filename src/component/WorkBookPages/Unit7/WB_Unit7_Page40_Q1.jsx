@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise C/Item_001_Hansel_likes.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise C/Item_002_Stella_likes.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise C/Item_003_I_like.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise C/Item_004_Tom_likes.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit7/Page 40 - Exercise C/Item_005_Look_at.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 40/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 40/SVG/2.svg";
@@ -15,43 +24,92 @@ const LINE_COLOR = "#333";
 const OPTIONS = ["him", "her", "it"];
 
 const ITEMS = [
-  { id: 1, before: "Hansel likes", after: ".", correct: "him", img: img1 },
-  { id: 2, before: "Stella likes", after: ".", correct: "her", img: img2 },
-  { id: 3, before: "I like", after: ".", correct: "it", img: img3 },
-  { id: 4, before: "Tom likes", after: ".", correct: "him", img: img4 },
-  { id: 5, before: "Look at", after: ".", correct: "it", img: img5 },
+  {
+    id: 1,
+    before: "Hansel likes",
+    after: ".",
+    correct: "him",
+    img: img1,
+    alt: "Hansel",
+    audio: audio1,
+  },
+  {
+    id: 2,
+    before: "Stella likes",
+    after: ".",
+    correct: "her",
+    img: img2,
+    alt: "Stella",
+    audio: audio2,
+  },
+  {
+    id: 3,
+    before: "I like",
+    after: ".",
+    correct: "it",
+    img: img3,
+    alt: "A kite",
+    audio: audio3,
+  },
+  {
+    id: 4,
+    before: "Tom likes",
+    after: ".",
+    correct: "him",
+    img: img4,
+    alt: "Tom",
+    audio: audio4,
+  },
+  {
+    id: 5,
+    before: "Look at",
+    after: ".",
+    correct: "it",
+    img: img5,
+    alt: "A toy car",
+    audio: audio5,
+  },
   {
     id: 6,
     before: "Helen sits next to",
     after: ".",
     correct: "her",
     img: img6,
+    alt: "Helen sitting next to a woman",
   },
 ];
 
 export default function SB_ReadLookWrite_PageC() {
   const [selected, setSelected] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => selected[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
       return;
     }
-    let score = 0;
-    ITEMS.forEach((i) => {
-      if (selected[i.id] === i.correct) score++;
-    });
+    const correctIds = ITEMS.flatMap((i) =>
+      selected[i.id] === i.correct ? [i.id] : [],
+    );
+    const incorrectIds = ITEMS.flatMap((i) =>
+      selected[i.id] !== i.correct ? [i.id] : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
     const total = ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -66,16 +124,21 @@ export default function SB_ReadLookWrite_PageC() {
     setSelected(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((i) => i.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setSelected({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
-  const isWrong = (item) =>
-    showResults && !showAns && selected[item.id] !== item.correct;
+  const isWrong = (item) => wrongIds.includes(item.id);
 
   return (
     <div className="main-container-component">
@@ -86,21 +149,18 @@ export default function SB_ReadLookWrite_PageC() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span>
-         Read, look, and write 
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}> him
-          </strong>
-          ,{" "}
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}>
-            her
-          </strong>
-          , or{" "}
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}>
-            it
-          </strong>
-          .
-        </h1>
+        <ExerciseHeader
+          sectionLetter="C"
+          title={
+            <>
+              Read, look, and write{" "}
+              <span style={{ color: "#2e3192" }}>him</span>,{" "}
+              <span style={{ color: "#2e3192" }}>her</span>, or{" "}
+              <span style={{ color: "#2e3192" }}>it</span>.
+            </>
+          }
+          subTitle="Use the him, her, or it after likes or look at to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* Items */}
         <div
@@ -108,7 +168,7 @@ export default function SB_ReadLookWrite_PageC() {
             display: "flex",
             flexDirection: "column",
             gap: "20px",
-            marginLeft:"35px",
+            marginLeft: "35px",
             width: "100%",
           }}
         >
@@ -152,6 +212,25 @@ export default function SB_ReadLookWrite_PageC() {
                 >
                   {/* before text */}
                   <span
+                    role={item.audio ? "button" : undefined}
+                    tabIndex={item.audio ? 0 : -1}
+                    className={
+                      item.audio
+                        ? "unit4-audio-control unit4-interactive"
+                        : undefined
+                    }
+                    onClick={() =>
+                      item.audio && playAudio(`item-${item.id}`, item.audio)
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        item.audio &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`item-${item.id}`, item.audio);
+                      }
+                    }}
                     style={{
                       fontSize: "18px",
                       // fontWeight: 500,
@@ -160,6 +239,9 @@ export default function SB_ReadLookWrite_PageC() {
                       whiteSpace: "nowrap",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `item-${item.id}`}
+                    />
                     {item.before}
                   </span>
 
@@ -172,7 +254,7 @@ export default function SB_ReadLookWrite_PageC() {
                     }}
                   >
                     <select
-                      disabled={showAns || showResults}
+                      disabled={showAns || lockedIds.includes(item.id)}
                       value={selected[item.id] || ""}
                       onChange={(e) => handleChange(item.id, e.target.value)}
                       style={{
@@ -184,13 +266,15 @@ export default function SB_ReadLookWrite_PageC() {
                           ? `2px solid ${WRONG_COLOR}`
                           : `1px solid ${LINE_COLOR}`,
                         borderRadius: 0,
-                        outline: "none",
                         fontSize: "18PX",
                         // fontWeight:      700,
                         // color: wrong ? WRONG_COLOR : RED_COLOR,
                         padding: "0 clamp(4px,0.6vw,8px) 3px 2px",
                         background: "transparent",
-                        cursor: showAns || showResults ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedIds.includes(item.id)
+                            ? "default"
+                            : "pointer",
                         appearance: "auto",
                         boxSizing: "border-box",
                       }}
@@ -257,7 +341,7 @@ export default function SB_ReadLookWrite_PageC() {
                 >
                   <img
                     src={item.img}
-                    alt={`item-${item.id}`}
+                    alt={item.alt}
                     style={{
                       width: "100%",
                       height: "100%",

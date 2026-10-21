@@ -1,345 +1,401 @@
-import React, { useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import useWorkbookMatchingKeyboard from "../../WorkBookPages/Unit4/useWorkbookMatchingKeyboard";
+import "../unit4/unit4Interactions.css";
 import "./Unit7_Page5_Q2.css";
-
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex A2-6.svg";
-import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-import blue from "../../../assets/audio/ClassBook/Unit 7/P 62/unit7-pg62-EXA2.mp3";
+import exerciseAudio from "../../../assets/audio/ClassBook/Unit 7/P 62/unit7-pg62-EXA2.mp3";
+
+const IMAGES = [
+  { id: "0", image: img1, alt: "A pen" },
+  { id: "1", image: img2, alt: "A mouse" },
+  { id: "2", image: img3, alt: "A rabbit" },
+  { id: "3", image: img4, alt: "A nurse" },
+  { id: "4", image: img5, alt: "A zoo" },
+  { id: "5", image: img6, alt: "An umbrella" },
+];
+const LETTERS = ["r", "u", "p", "z", "m", "n"].map((text, index) => ({
+  id: String(index),
+  text,
+}));
+const CORRECT = { 0: "2", 1: "4", 2: "0", 3: "5", 4: "3", 5: "1" };
+const CAPTIONS = [
+  { start: 0.239, end: 4, text: "Page 62, write activities." },
+  { start: 4, end: 8.42, text: "Exercise A, number 2. Listen and match." },
+  { start: 8.42, end: 10, text: "One, pen." },
+  { start: 10, end: 12, text: "Two, mouse." },
+  { start: 12, end: 14, text: "Three, rabbit." },
+  { start: 14, end: 16, text: "Four, nurse." },
+  { start: 16, end: 19.379, text: "Five, zoo." },
+  { start: 20.559, end: 22.459, text: "Six, umbrella." },
+];
 
 const Unit7_Page5_Q2 = () => {
-  const [selectedImg, setSelectedImg] = useState(null);
   const [matches, setMatches] = useState({});
-  const [showResult, setShowResult] = useState(false);
-  const [locked, setLocked] = useState(false);
-  const [selectedSentence, setSelectedSentence] = useState(null);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [pointerOrigin, setPointerOrigin] = useState(null);
+  const [, setLayoutTick] = useState(0);
+  const boardRef = useRef(null);
+  const elementRefs = useRef({ left: {}, right: {} });
+  const dotRefs = useRef({ left: {}, right: {} });
+  const lockedRightIds = lockedIds.map((id) => matches[id]).filter(Boolean);
 
-  const imageRefs = useRef([]);
-  const sentenceRefs = useRef([]);
-  const containerRef = useRef(null);
-  const captions = [
-    { start: 0.239, end: 4.0, text: "Page 62, write activities." },
-    { start: 4.0, end: 8.42, text: "Exercise A, number 2. Listen and match." },
-
-    { start: 8.42, end: 10.0, text: "One, pen." },
-    { start: 10.0, end: 12.0, text: "Two, mouse." },
-    { start: 12.0, end: 14.0, text: "Three, rabbit." },
-    { start: 14.0, end: 16.0, text: "Four, nurse." },
-    { start: 16.0, end: 19.379, text: "Five, zoo." },
-
-    { start: 20.559, end: 22.459, text: "Six, umbrella." },
-  ];
-  const images = [
-    { id: 0, img: img1 },
-    { id: 1, img: img2 },
-    { id: 2, img: img3 },
-    { id: 3, img: img4 },
-    { id: 4, img: img5 },
-    { id: 5, img: img6 },
-  ];
-
-  const sentences = [
-    { id: 0, text: "r" },
-    { id: 1, text: "u" },
-    { id: 2, text: "p" },
-    { id: 3, text: "z" },
-    { id: 4, text: "m" },
-    { id: 5, text: "n" },
-  ];
-
-  const correct = {
-    0: 2,
-    1: 4,
-    2: 0,
-    3: 5,
-    4: 3,
-    5: 1,
-  };
-
-  const selectImage = (id) => {
-    if (locked || showResult) return;
-
-    // إذا اختار جملة → اربط
-    if (selectedSentence !== null) {
-      setMatches((prev) => {
-        const updated = { ...prev };
-
-        Object.keys(updated).forEach((imgKey) => {
-          if (updated[imgKey] === selectedSentence) {
-            delete updated[imgKey];
-          }
+  const getElement = useCallback(
+    (side, id) => elementRefs.current[side][id],
+    [],
+  );
+  const getAnchorElement = useCallback(
+    (side, id) => dotRefs.current[side][id],
+    [],
+  );
+  const commit = useCallback(
+    (leftId, rightId) => {
+      if (
+        lockedIds.includes(leftId) ||
+        lockedRightIds.includes(rightId) ||
+        showAnswer
+      )
+        return;
+      setMatches((previous) => {
+        const updated = { ...previous };
+        Object.keys(updated).forEach((key) => {
+          if (updated[key] === rightId && !lockedIds.includes(key))
+            delete updated[key];
         });
-
-        updated[id] = selectedSentence;
+        updated[leftId] = rightId;
         return updated;
       });
+      setWrongIds((previous) => previous.filter((id) => id !== leftId));
+    },
+    [lockedIds, lockedRightIds, showAnswer],
+  );
 
-      setSelectedSentence(null);
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef,
+    leftIds: IMAGES.map((item) => item.id),
+    rightIds: LETTERS.map((item) => item.id),
+    getElement,
+    getAnchorElement,
+    isLeftLocked: (id) => lockedIds.includes(id),
+    isRightLocked: (id) => lockedRightIds.includes(id),
+    onCommit: commit,
+  });
+
+  useEffect(() => {
+    const refresh = () => setLayoutTick((value) => value + 1);
+    window.addEventListener("resize", refresh);
+    return () => window.removeEventListener("resize", refresh);
+  }, []);
+
+  const pointerSelect = (side, id) => {
+    if (
+      showAnswer ||
+      (side === "left" ? lockedIds.includes(id) : lockedRightIds.includes(id))
+    )
+      return;
+    if (!pointerOrigin || pointerOrigin.side === side) {
+      setPointerOrigin({ side, id });
       return;
     }
-
-    // السلوك القديم (اختيار صورة)
-    setSelectedImg(id);
+    const leftId = side === "left" ? id : pointerOrigin.id;
+    const rightId = side === "right" ? id : pointerOrigin.id;
+    commit(leftId, rightId);
+    setPointerOrigin(null);
   };
-
-  const selectSentence = (id) => {
-    if (locked || showResult) return;
-
-    // إذا في صورة مختارة → اربط
-    if (selectedImg !== null) {
-      setMatches((prev) => {
-        const updated = { ...prev };
-
-        Object.keys(updated).forEach((imgKey) => {
-          if (updated[imgKey] === id) {
-            delete updated[imgKey];
-          }
-        });
-
-        updated[selectedImg] = id;
-        return updated;
-      });
-
-      setSelectedImg(null);
-      return;
-    }
-    setSelectedSentence(id);
+  const lineFor = (leftId, rightId) => {
+    const board = boardRef.current;
+    const left = dotRefs.current.left[leftId];
+    const right = dotRefs.current.right[rightId];
+    if (!board || !left || !right) return null;
+    const b = board.getBoundingClientRect();
+    const l = left.getBoundingClientRect();
+    const r = right.getBoundingClientRect();
+    return {
+      x1: l.left + l.width / 2 - b.left,
+      y1: l.top + l.height / 2 - b.top,
+      x2: r.left + r.width / 2 - b.left,
+      y2: r.top + r.height / 2 - b.top,
+    };
   };
   const checkAnswers = () => {
-    if (locked || showResult) return;
-
-    if (Object.keys(matches).length !== images.length) {
+    if (showAnswer || lockedIds.length === IMAGES.length) return;
+    if (Object.keys(matches).length !== IMAGES.length) {
       ValidationAlert.info("Please match all.");
       return;
     }
-
-    let correctCount = 0;
-
-    Object.entries(matches).forEach(([imgId, sentId]) => {
-      if (correct[imgId] === sentId) correctCount++;
-    });
-
-    const total = images.length;
-
-    const message = `
-        Score: ${correctCount} / ${total}
-  `;
-
-    if (correctCount === total) {
-      ValidationAlert.success(message);
-    } else if (correctCount === 0) {
-      ValidationAlert.error(message);
-    } else {
-      ValidationAlert.warning(message);
-    }
-
-    setShowResult(true);
-    setLocked(true);
+    const correctIds = IMAGES.flatMap((item) =>
+      matches[item.id] === CORRECT[item.id] ? [item.id] : [],
+    );
+    const incorrectIds = IMAGES.flatMap((item) =>
+      matches[item.id] !== CORRECT[item.id] ? [item.id] : [],
+    );
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
+    setPointerOrigin(null);
+    keyboard.clear();
+    ValidationAlert[
+      correctIds.length === IMAGES.length
+        ? "success"
+        : correctIds.length
+          ? "warning"
+          : "error"
+    ](`Score: ${correctIds.length} / ${IMAGES.length}`);
   };
-
-  const showAnswers = () => {
-    setMatches(correct);
-    setLocked(true);
-    setShowResult(true);
+  const reveal = () => {
+    setMatches({ ...CORRECT });
+    setLockedIds(IMAGES.map((item) => item.id));
+    setWrongIds([]);
+    setShowAnswer(true);
+    setPointerOrigin(null);
+    keyboard.clear();
   };
-
   const reset = () => {
-    setSelectedSentence(null);
-    setSelectedImg(null);
     setMatches({});
-    setShowResult(false);
-    setLocked(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAnswer(false);
+    setPointerOrigin(null);
+    keyboard.clear();
   };
 
   return (
     <div
-      ref={containerRef}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: "30px",
+        padding: 30,
         position: "relative",
       }}
     >
-      <div
-        className="div-forall"
-        style={{
-          
-          gap: "30px",
-        }}
-      >
-        <h5 className="header-title-page8">
-          <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
-        Listen and match.
-        </h5>
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={8} />
-
-        <div className="w-full flex flex-col items-center gap-30">
-          {/* 🔥 الصور فوق */}
-          <div className="grid grid-cols-6 gap-10 w-full justify-items-center">
-            {images.map((img, i) => (
-              <div
-                key={i}
-                onClick={() => selectImage(i)}
-                className="flex flex-col items-center gap-2 cursor-pointer transition"
-              >
-                <img
-                  src={img.img}
-                  style={{
-                    width: "auto",
-                    height: "85px",
-                    objectFit: "contain",
-                    border:
-                      selectedImg === i
-                        ? "3px solid #f97316"
-                        : "3px solid transparent",
-                    borderRadius: "12px",
-                    padding: "4px",
-                    backgroundColor:
-                      selectedImg === i ? "#ffedd5" : "transparent",
-                  }}
+      <div className="div-forall" style={{ gap: 30 }}>
+        <ExerciseHeader
+          sectionLetter="A"
+          questionNumber="2"
+          title="Listen and match."
+          subTitle="Listen to one item at a time, then match it to the sound, letter, or picture you hear."
+        />
+        <QuestionAudioPlayer
+          src={exerciseAudio}
+          captions={CAPTIONS}
+          pageId="unit7-page5-q2"
+        />
+        <div
+          ref={boardRef}
+          style={{
+            position: "relative",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 70,
+            padding: "10px 15px",
+          }}
+        >
+          <svg
+            className="lines-layer"
+            width="100%"
+            height="100%"
+            aria-hidden="true"
+          >
+            {Object.entries(matches).map(([leftId, rightId]) => {
+              const line = lineFor(leftId, rightId);
+              if (!line) return null;
+              const color = lockedIds.includes(leftId)
+                ? "#22c55e"
+                : wrongIds.includes(leftId)
+                  ? "#ef4444"
+                  : "#fb923c";
+              return (
+                <line
+                  key={leftId}
+                  {...line}
+                  stroke={color}
+                  strokeWidth="4"
+                  strokeLinecap="round"
                 />
-
-                <div
-                  ref={(el) => (imageRefs.current[i] = el)} // 🔥 الريف هون على الدوت
-                  className="w-3 h-3 rounded-full mt-2 transition"
-                  style={{
-                    backgroundColor: selectedImg === i ? "#f97316" : "#fb923c",
-                    transform: selectedImg === i ? "scale(1.4)" : "scale(1)",
-                    boxShadow:
-                      selectedImg === i
-                        ? "0 0 0 4px rgba(249,115,22,0.2)"
-                        : "none",
+              );
+            })}
+            {keyboard.preview && (
+              <line
+                {...keyboard.preview}
+                stroke="#fb923c"
+                strokeWidth="4"
+                strokeDasharray="8 7"
+                strokeLinecap="round"
+                className="unit4-keyboard-preview"
+              />
+            )}
+          </svg>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(6, 1fr)",
+              gap: 24,
+              position: "relative",
+              zIndex: 2,
+            }}
+          >
+            {IMAGES.map((item) => {
+              const selected =
+                (pointerOrigin?.side === "left" &&
+                  pointerOrigin.id === item.id) ||
+                (keyboard.origin?.side === "left" &&
+                  keyboard.origin.id === item.id);
+              const locked = lockedIds.includes(item.id);
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  ref={(element) => {
+                    elementRefs.current.left[item.id] = element;
                   }}
-                ></div>
-              </div>
-            ))}
-          </div>
-
-          {/* 🔥 الجمل تحت */}
-          <div className="grid grid-cols-6 gap-8 w-full justify-items-center mt-10">
-            {sentences.map((sent, i) => (
-              <div
-                key={i}
-                onClick={() => selectSentence(i)}
-                className="relative flex flex-col items-center cursor-pointer"
-              >
-                {/* 🔥 الدوت */}
-                <div
-                  ref={(el) => (sentenceRefs.current[i] = el)} // 🔥 هون كمان
-                  className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full z-10 transition"
+                  tabIndex={locked ? -1 : 0}
+                  aria-disabled={locked}
+                  aria-label={`Match ${item.alt}`}
+                  onClick={() => pointerSelect("left", item.id)}
+                  onKeyDown={(event) =>
+                    keyboard.handleKeyDown(event, "left", item.id)
+                  }
+                  onFocus={() => keyboard.handleFocus("left", item.id)}
+                  className="unit4-interactive"
                   style={{
-                    width: "12px",
-                    height: "12px",
-                    backgroundColor: "#f97316",
-                    transform:
-                      selectedSentence === i ? "scale(1.4)" : "scale(1)",
-                    boxShadow:
-                      selectedSentence === i
-                        ? "0 0 0 4px rgba(249,115,22,0.2)"
-                        : "none",
-                  }}
-                ></div>
-
-                {/* 🔥 البوكس */}
-                <div
-                  className="relative px-4 py-2 rounded-2xl text-[20px] text-center transition"
-                  style={{
-                    backgroundColor:
-                      selectedSentence === i ? "#fed7aa" : "#ffedd5",
-                    border:
-                      selectedSentence === i
-                        ? "2px solid #f97316"
-                        : "2px solid transparent",
+                    border: 0,
+                    background: "transparent",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 8,
+                    cursor: locked ? "default" : "pointer",
                   }}
                 >
-                  {sent.text}
-                  {showResult &&
-                    Object.entries(matches).some(
-                      ([imgId, sentId]) =>
-                        sentId == i && correct[imgId] !== sentId,
-                    ) && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          top: "-10px",
-                          right: "-10px",
-                          transform: "translateY(-50%)",
-                          width: "20px",
-                          height: "20px",
-                          background: "red",
-                          color: "white",
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                          border: "2px solid white",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                          pointerEvents: "none",
-                          zIndex: 3,
-                        }}
-                      >
-                        ✕
-                      </span>
-                    )}
-                </div>
-              </div>
-            ))}
+                  <img
+                    src={item.image}
+                    alt={item.alt}
+                    style={{
+                      width: "auto",
+                      height: 85,
+                      objectFit: "contain",
+                      border: selected
+                        ? "3px solid #f97316"
+                        : "3px solid transparent",
+                      borderRadius: 12,
+                      padding: 4,
+                      backgroundColor: selected ? "#ffedd5" : "transparent",
+                    }}
+                  />
+                  <span
+                    ref={(element) => {
+                      dotRefs.current.left[item.id] = element;
+                    }}
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      background: selected
+                        ? "#f97316"
+                        : locked
+                          ? "#22c55e"
+                          : "#fb923c",
+                      transform: selected ? "scale(1.4)" : "scale(1)",
+                      boxShadow: selected
+                        ? "0 0 0 4px rgba(249,115,22,.2)"
+                        : "none",
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(6, 1fr)",
+              gap: 24,
+              position: "relative",
+              zIndex: 2,
+            }}
+          >
+            {LETTERS.map((item) => {
+              const selected =
+                (pointerOrigin?.side === "right" &&
+                  pointerOrigin.id === item.id) ||
+                (keyboard.origin?.side === "right" &&
+                  keyboard.origin.id === item.id);
+              const locked = lockedRightIds.includes(item.id);
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  ref={(element) => {
+                    elementRefs.current.right[item.id] = element;
+                  }}
+                  tabIndex={locked ? -1 : 0}
+                  aria-disabled={locked}
+                  aria-label={`Match letter ${item.text}`}
+                  onClick={() => pointerSelect("right", item.id)}
+                  onKeyDown={(event) =>
+                    keyboard.handleKeyDown(event, "right", item.id)
+                  }
+                  onFocus={() => keyboard.handleFocus("right", item.id)}
+                  className="unit4-interactive"
+                  style={{
+                    border: 0,
+                    background: "transparent",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 10,
+                    cursor: locked ? "default" : "pointer",
+                  }}
+                >
+                  <span
+                    ref={(element) => {
+                      dotRefs.current.right[item.id] = element;
+                    }}
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      background: selected
+                        ? "#f97316"
+                        : locked
+                          ? "#22c55e"
+                          : "#fb923c",
+                      transform: selected ? "scale(1.4)" : "scale(1)",
+                      boxShadow: selected
+                        ? "0 0 0 4px rgba(249,115,22,.2)"
+                        : "none",
+                    }}
+                  />
+                  <span
+                    className="WB-unit3-page18-q2-word"
+                    style={{
+                      borderColor: selected ? "#f97316" : "black",
+                      background: selected ? "#ffedd5" : "white",
+                    }}
+                  >
+                    {item.text}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
-
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {Object.entries(matches).map(([imgId, sentId], i) => {
-          const imgDot = imageRefs.current[imgId];
-          const sentDot = sentenceRefs.current[sentId];
-
-          if (!imgDot || !sentDot || !containerRef.current) return null;
-
-          const imgRect = imgDot.getBoundingClientRect();
-          const sentRect = sentDot.getBoundingClientRect();
-          const containerRect = containerRef.current.getBoundingClientRect();
-
-          const x1 = sentRect.left + sentRect.width / 2 - containerRect.left;
-          const y1 = sentRect.top + sentRect.height / 2 - containerRect.top;
-
-          const x2 = imgRect.left + imgRect.width / 2 - containerRect.left;
-          const y2 = imgRect.top + imgRect.height / 2 - containerRect.top;
-          return (
-            <g key={i}>
-              <line
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                stroke="orange"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </g>
-          );
-        })}
-      </svg>
-
-      <div className="action-buttons-container">
-        <button className="try-again-button" onClick={reset}>
-          Start Again ↻
-        </button>
-
-        <button onClick={showAnswers} className="show-answer-btn">
-          Show Answer
-        </button>
-
-        <button className="check-button2" onClick={checkAnswers}>
-          Check Answer ✓
-        </button>
+        <Button
+          handleShowAnswer={reveal}
+          handleStartAgain={reset}
+          checkAnswers={checkAnswers}
+        />
       </div>
     </div>
   );

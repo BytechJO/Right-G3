@@ -5,8 +5,10 @@ import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms H
 
 import FindQuestion from "../../FindQuestion";
 
+import targetAudio from "../../../assets/audio/ClassBook/Unit 5/page 40/stove.mp3";
+
 const targetArea = {
-  x1: 80.4,
+  x1: 79.8,
   y1: 60.9,
   x2: 86.1,
   y2: 77.9,
@@ -18,9 +20,10 @@ const Unit5_Page1_find = () => {
       title="Can you help me find the stove in the picture?"
       subtitle="Scan the whole picture first, then tap the stove."
       image={find_img}
-      imageAlt="A room inside Tom's house with furniture and household objects"
+      imageAlt="A cutaway view of a house showing several rooms with furniture and household objects, including a kitchen, living room, bedroom, bathroom, garage, and stove"
       targetName="stove"
       targetArea={targetArea}
+      targetAudio={targetAudio}
       answerHighlight={MySVG}
       imageHeight="70vh"
       highlightTop="61.9%"

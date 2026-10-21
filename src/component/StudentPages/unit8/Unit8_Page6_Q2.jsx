@@ -7,6 +7,15 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Gra
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 69/Ex E 4.svg";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import "../unit4/unit4Interactions.css";
+import cleanAudio from "../../../assets/audio/ClassBook/Unit 8/Page 69 - Exercise E/Item_001_(clean).mp3";
+import noSheAudio from "../../../assets/audio/ClassBook/Unit 8/Page 69 - Exercise E/Item_002_No,_she_didn't.mp3";
+import helpAudio from "../../../assets/audio/ClassBook/Unit 8/Page 69 - Exercise E/Item_003_(help).mp3";
+import yesHeAudio from "../../../assets/audio/ClassBook/Unit 8/Page 69 - Exercise E/Item_004_Yes,_he_did.mp3";
+import playAudioFile from "../../../assets/audio/ClassBook/Unit 8/Page 69 - Exercise E/Item_005_(play).mp3";
 
 const Unit8_Page6_Q2 = () => {
   const items = [
@@ -16,6 +25,9 @@ const Unit8_Page6_Q2 = () => {
       options: ["Did Stella clean her shoes?", "Did Stella comb her hair?"],
       img: img1,
       sentenc: "No, she didn’t.",
+      alt: "A pair of shoes",
+      promptAudio: cleanAudio,
+      answerAudio: noSheAudio,
     },
     {
       text: "(help)",
@@ -23,6 +35,9 @@ const Unit8_Page6_Q2 = () => {
       options: ["Did Tom help his mom?", "Did Tom wash the dishes?"],
       img: img2,
       sentenc: "Yes, he did.",
+      alt: "A boy helping his mother",
+      promptAudio: helpAudio,
+      answerAudio: yesHeAudio,
     },
     {
       text: "(play)",
@@ -30,6 +45,8 @@ const Unit8_Page6_Q2 = () => {
       options: ["Did Jack play soccer?", "Did Jack play basketball?"],
       img: img3,
       sentenc: "No, he didn’t.",
+      alt: "A soccer ball",
+      promptAudio: playAudioFile,
     },
     {
       text: "(watch)",
@@ -37,23 +54,23 @@ const Unit8_Page6_Q2 = () => {
       options: ["Did John watch TV?", "Did John clean his shoes?"],
       img: img4,
       sentenc: "Yes, he did.",
+      alt: "A television",
     },
   ];
 
-  const wordBank = [
-    "Did Jack play soccer?",
-    "Did John watch TV?",
-    "Did Tom help his mom?",
-    "Did Stella clean her shoes?",
-  ];
-
   const [answers, setAnswers] = useState(Array(items.length).fill(""));
-  const [showCorrect, setShowCorrect] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [showAns, setShowAns] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const handleChange = (index, value) => {
+    if (showAns || lockedIds.includes(index)) return;
     const updated = [...answers];
     updated[index] = value;
     setAnswers(updated);
+    setWrongMarks((previous) =>
+      previous.filter((wrong) => wrong.qIndex !== index),
+    );
   };
 
   // =========================
@@ -61,8 +78,10 @@ const Unit8_Page6_Q2 = () => {
   // =========================
   const showAnswers = () => {
     setAnswers(items.map((item) => item.answer));
-    setShowCorrect(true);
+    setLockedIds(items.map((_, index) => index));
+    setShowAns(true);
     setWrongMarks([]);
+    stopAudio();
   };
 
   // =========================
@@ -70,15 +89,17 @@ const Unit8_Page6_Q2 = () => {
   // =========================
   const resetAll = () => {
     setAnswers(items.map(() => ""));
-    setShowCorrect(false);
+    setLockedIds([]);
+    setShowAns(false);
     setWrongMarks([]);
+    stopAudio();
   };
 
   // =========================
   // CHECK ANSWERS (🔥 FIXED)
   // =========================
   const checkAnswers = () => {
-    if (showCorrect) return;
+    if (showAns || lockedIds.length === items.length) return;
 
     // ❌ إذا في فراغ
     if (answers.includes("")) {
@@ -99,7 +120,13 @@ const Unit8_Page6_Q2 = () => {
     });
 
     setWrongMarks(wrong);
-    setShowCorrect(true);
+    setLockedIds(
+      items.flatMap((item, index) =>
+        answers[index]?.trim().toLowerCase() === item.answer.toLowerCase()
+          ? [index]
+          : [],
+      ),
+    );
 
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
@@ -126,13 +153,13 @@ const Unit8_Page6_Q2 = () => {
       }}
     >
       <div className="div-forall" style={{ marginBottom: "40px", gap: "40px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            E
-          </span>
-          Look, read, and write the questions. Use the pictures from Ex. D.
-        </h5>
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Look, read, and write the questions. Use the pictures from Ex. D."
+          subTitle="Use each picture from Exercise D, then build a complete question before checking."
+        />
         <div
+          className="w-full"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -143,6 +170,7 @@ const Unit8_Page6_Q2 = () => {
         >
           <img
             src={bigImage}
+            alt="A family diagram showing daily activities from Exercise D"
             style={{ width: "auto", height: "auto", objectFit: "cover" }}
           />
         </div>
@@ -153,7 +181,30 @@ const Unit8_Page6_Q2 = () => {
           {items.map((item, i) => (
             <div key={i} className="flex items-center gap-3">
               {/* TEXT */}
-              <span className="text-2xl md:text-xl lg:text-1xl w-[100px]">
+              <span
+                role={item.promptAudio ? "button" : undefined}
+                tabIndex={item.promptAudio ? 0 : -1}
+                className={
+                  item.promptAudio
+                    ? "unit4-audio-control unit4-interactive text-2xl md:text-xl lg:text-1xl w-[100px]"
+                    : "text-2xl md:text-xl lg:text-1xl w-[100px]"
+                }
+                onClick={() =>
+                  item.promptAudio && playAudio(`prompt-${i}`, item.promptAudio)
+                }
+                onKeyDown={(event) => {
+                  if (
+                    item.promptAudio &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    playAudio(`prompt-${i}`, item.promptAudio);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `prompt-${i}`}
+                />
                 {i + 1}. {item.text}
               </span>
 
@@ -166,25 +217,23 @@ const Unit8_Page6_Q2 = () => {
               >
                 <select
                   value={answers[i]}
-                  disabled={showCorrect}
+                  disabled={showAns || lockedIds.includes(i)}
+                  aria-label={`Question for item ${i + 1}`}
                   onChange={(e) => handleChange(i, e.target.value)}
                   style={{
                     width: "350px",
                     border: "none",
                     borderBottom: `1px solid ${
-                      showCorrect
-                        ? wrongMarks.some((w) => w.qIndex === i)
-                          ? "red"
-                          : "black"
-                        : "black"
+                      wrongMarks.some((w) => w.qIndex === i) ? "red" : "black"
                     }`,
                     background: "transparent",
                     paddingBottom: "4px",
                     fontSize: "18px",
                     fontWeight: "500",
                     // color: answers[i] ? "#1C398E" : "black",
-                    outline: "none",
-                    cursor: showCorrect ? "not-allowed" : "pointer",
+                    // outline: "none",
+                    cursor:
+                      showAns || lockedIds.includes(i) ? "default" : "pointer",
                   }}
                 >
                   <option value="">Select question</option>
@@ -196,7 +245,7 @@ const Unit8_Page6_Q2 = () => {
                   ))}
                 </select>
 
-                {showCorrect && wrongMarks.some((w) => w.qIndex === i) && (
+                {wrongMarks.some((w) => w.qIndex === i) && (
                   <div
                     style={{
                       position: "absolute",
@@ -231,6 +280,7 @@ const Unit8_Page6_Q2 = () => {
               >
                 <img
                   src={item.img}
+                  alt={item.alt}
                   style={{
                     width: "auto",
                     height: "70px",
@@ -238,7 +288,34 @@ const Unit8_Page6_Q2 = () => {
                   }}
                 />
 
-                <span style={{ fontSize: 18 }}>{item.sentenc}</span>
+                <span
+                  role={item.answerAudio ? "button" : undefined}
+                  tabIndex={item.answerAudio ? 0 : -1}
+                  className={
+                    item.answerAudio
+                      ? "unit4-audio-control unit4-interactive"
+                      : undefined
+                  }
+                  onClick={() =>
+                    item.answerAudio &&
+                    playAudio(`answer-${i}`, item.answerAudio)
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      item.answerAudio &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      playAudio(`answer-${i}`, item.answerAudio);
+                    }
+                  }}
+                  style={{ fontSize: 18 }}
+                >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `answer-${i}`}
+                  />
+                  {item.sentenc}
+                </span>
               </div>
             </div>
           ))}
