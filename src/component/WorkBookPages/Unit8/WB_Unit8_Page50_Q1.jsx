@@ -1,6 +1,17 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useWorkbookMatchingKeyboard from "../Unit4/useWorkbookMatchingKeyboard";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise A/Item_001_and_mother.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise A/Item_002_bus.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise A/Item_003_esent.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise A/Item_004_box.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise A/Item_005_ize.mp3";
+import audio6 from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise A/Item_006_sandwich.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/2.svg";
@@ -10,7 +21,6 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 50/SVG/6-1.svg";
 // استبدلي فقط imports تبعون dnd والـ chunk bank + drop zones
 // والباقي خلييه نفسه
-
 
 const DOT_COLOR = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
@@ -26,6 +36,7 @@ const WORDS = [
     correctChunk: "gr",
     fullWord: "grandmother",
     correctImage: 2,
+    audio: audio1,
   },
   {
     id: 2,
@@ -34,6 +45,7 @@ const WORDS = [
     correctChunk: "es",
     fullWord: "buses",
     correctImage: 1,
+    audio: audio2,
   },
   {
     id: 3,
@@ -42,6 +54,7 @@ const WORDS = [
     correctChunk: "pr",
     fullWord: "present",
     correctImage: 6,
+    audio: audio3,
   },
   {
     id: 4,
@@ -50,6 +63,7 @@ const WORDS = [
     correctChunk: "es",
     fullWord: "boxes",
     correctImage: 3,
+    audio: audio4,
   },
   {
     id: 5,
@@ -58,6 +72,7 @@ const WORDS = [
     correctChunk: "pr",
     fullWord: "prize",
     correctImage: 4,
+    audio: audio5,
   },
   {
     id: 6,
@@ -66,6 +81,7 @@ const WORDS = [
     correctChunk: "es",
     fullWord: "sandwiches",
     correctImage: 5,
+    audio: audio6,
   },
 ];
 
@@ -77,6 +93,8 @@ const IMAGES = [
   { id: 5, img: img5, alt: "sandwiches" },
   { id: 6, img: img6, alt: "present" },
 ];
+const LEFT_IDS = WORDS.map((item) => item.id);
+const RIGHT_IDS = IMAGES.map((item) => item.id);
 
 const CHUNKS = [
   { id: "es-1", value: "es" },
@@ -90,13 +108,7 @@ const CHUNKS = [
 const ROW_HEIGHT = 72;
 // ضيفي هاد فوق return الرئيسي
 
-const DropZone = ({
-  item,
-  chunkAnswers,
-  setChunkAnswers,
-  showAns,
-  showResults,
-}) => {
+const DropZone = ({ item, chunkAnswers, onChange, locked, wrong }) => {
   const options =
     item.correctChunk === "gr"
       ? ["", "gr", "pr", "es"]
@@ -106,36 +118,20 @@ const DropZone = ({
 
   return (
     <select
-      disabled={showAns||showResults}
+      disabled={locked}
       value={chunkAnswers[item.id]?.chunk || ""}
-      onChange={(e) => {
-        const selectedValue = e.target.value;
-
-        setChunkAnswers((prev) => ({
-          ...prev,
-          [item.id]: {
-            chunk: selectedValue,
-            chunkId: selectedValue,
-          },
-        }));
-      }}
+      onChange={(e) => onChange(item.id, e.target.value)}
       style={{
         minWidth: "88px",
         minHeight: "38px",
-        borderBottom:
-          showResults &&
-          !showAns &&
-          chunkAnswers[item.id]?.chunk &&
-          chunkAnswers[item.id]?.chunk !== item.correctChunk
-            ? `2px solid ${WRONG_COLOR}`
-            : "1px solid #333",
+        borderBottom: wrong ? `2px solid ${WRONG_COLOR}` : "1px solid #333",
         // borderRadius: "8px",
         textAlign: "center",
         fontSize: "20px",
         fontWeight: "700",
         background: "#fff",
-        outline: "none",
-        cursor: showAns ||showResults? "default" : "pointer",
+        // outline: "none",
+        cursor: locked ? "default" : "pointer",
       }}
     >
       {options.map((option) => (
@@ -148,20 +144,18 @@ const DropZone = ({
 };
 const WB_Unit8_Page48_QA = () => {
   const [chunkAnswers, setChunkAnswers] = useState({});
-  const [usedChunkIds, setUsedChunkIds] = useState({});
-  const [draggedChunk, setDraggedChunk] = useState(null);
-
-  const [touchChunk, setTouchChunk] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
-
   const [selectedLeft, setSelectedLeft] = useState(null);
+  const [selectedRight, setSelectedRight] = useState(null);
   const [matches, setMatches] = useState({});
-  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedChunkIds, setLockedChunkIds] = useState([]);
+  const [lockedMatchIds, setLockedMatchIds] = useState([]);
+  const [wrongChunkIds, setWrongChunkIds] = useState([]);
+  const [wrongMatchIds, setWrongMatchIds] = useState([]);
   const [lines, setLines] = useState([]);
-  const [activeChunk, setActiveChunk] = useState(null);
   const containerRef = useRef(null);
   const elementRefs = useRef({});
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   useLayoutEffect(() => {
     const updateLines = () => {
@@ -191,21 +185,56 @@ const WB_Unit8_Page48_QA = () => {
   }, [matches]);
 
   // ── Matching ──
-  const handleLeftClick = (id) => {
-    if (showAns || showResults) return;
-    setSelectedLeft(id);
-    setShowResults(false);
-  };
-  const handleRightClick = (rightId) => {
-    if (showAns || selectedLeft === null || showResults) return;
+  const commitMatch = (leftId, rightId) => {
+    if (showAns || lockedMatchIds.includes(leftId)) return;
+    const occupyingLeft = Number(
+      Object.keys(matches).find((key) => matches[key] === rightId),
+    );
+    if (occupyingLeft && lockedMatchIds.includes(occupyingLeft)) return;
     const newMatches = { ...matches };
     Object.keys(newMatches).forEach((k) => {
       if (newMatches[k] === rightId) delete newMatches[k];
     });
-    newMatches[selectedLeft] = rightId;
+    newMatches[leftId] = rightId;
     setMatches(newMatches);
     setSelectedLeft(null);
-    setShowResults(false);
+    setSelectedRight(null);
+    setWrongMatchIds((previous) =>
+      previous.filter((id) => id !== leftId && id !== occupyingLeft),
+    );
+  };
+  const handleLeftClick = (id) => {
+    if (showAns || lockedMatchIds.includes(id)) return;
+    if (selectedRight !== null) commitMatch(id, selectedRight);
+    else {
+      setSelectedLeft(id);
+      setSelectedRight(null);
+    }
+  };
+  const handleRightClick = (rightId) => {
+    if (
+      showAns ||
+      Object.entries(matches).some(
+        ([leftId, imageId]) =>
+          Number(imageId) === rightId &&
+          lockedMatchIds.includes(Number(leftId)),
+      )
+    )
+      return;
+    if (selectedLeft !== null) commitMatch(selectedLeft, rightId);
+    else {
+      setSelectedRight(rightId);
+      setSelectedLeft(null);
+    }
+  };
+
+  const handleChunkChange = (itemId, value) => {
+    if (showAns || lockedChunkIds.includes(itemId)) return;
+    setChunkAnswers((previous) => ({
+      ...previous,
+      [itemId]: { chunk: value, chunkId: value },
+    }));
+    setWrongChunkIds((previous) => previous.filter((id) => id !== itemId));
   };
 
   // ── Check / Show / Reset ──
@@ -214,7 +243,12 @@ const WB_Unit8_Page48_QA = () => {
     matches[item.id] === item.correctImage;
 
   const checkAnswers = () => {
-    if (showAns || showResults) return;
+    if (
+      showAns ||
+      (lockedChunkIds.length === WORDS.length &&
+        lockedMatchIds.length === WORDS.length)
+    )
+      return;
     if (
       !WORDS.every((i) => chunkAnswers[i.id]?.chunk) ||
       !WORDS.every((i) => matches[i.id])
@@ -226,7 +260,26 @@ const WB_Unit8_Page48_QA = () => {
     WORDS.forEach((i) => {
       if (getItemResult(i)) score++;
     });
-    setShowResults(true);
+    setLockedChunkIds(
+      WORDS.flatMap((item) =>
+        chunkAnswers[item.id]?.chunk === item.correctChunk ? [item.id] : [],
+      ),
+    );
+    setLockedMatchIds(
+      WORDS.flatMap((item) =>
+        matches[item.id] === item.correctImage ? [item.id] : [],
+      ),
+    );
+    setWrongChunkIds(
+      WORDS.flatMap((item) =>
+        chunkAnswers[item.id]?.chunk !== item.correctChunk ? [item.id] : [],
+      ),
+    );
+    setWrongMatchIds(
+      WORDS.flatMap((item) =>
+        matches[item.id] !== item.correctImage ? [item.id] : [],
+      ),
+    );
     if (score === WORDS.length)
       ValidationAlert.success(`Score: ${score} / ${WORDS.length}`);
     else if (score > 0)
@@ -236,7 +289,6 @@ const WB_Unit8_Page48_QA = () => {
 
   const handleShowAnswer = () => {
     const correctChunks = {};
-    const correctUsed = {};
     const correctMatches = {};
     const usedIndexes = new Set();
     WORDS.forEach((item) => {
@@ -248,43 +300,57 @@ const WB_Unit8_Page48_QA = () => {
           chunk: CHUNKS[idx].value,
           chunkId: CHUNKS[idx].id,
         };
-        correctUsed[CHUNKS[idx].id] = true;
         usedIndexes.add(idx);
       }
       correctMatches[item.id] = item.correctImage;
     });
     setChunkAnswers(correctChunks);
-    setUsedChunkIds(correctUsed);
     setMatches(correctMatches);
     setShowAns(true);
-    setShowResults(true);
+    setLockedChunkIds(WORDS.map((item) => item.id));
+    setLockedMatchIds(WORDS.map((item) => item.id));
+    setWrongChunkIds([]);
+    setWrongMatchIds([]);
     setSelectedLeft(null);
+    setSelectedRight(null);
+    keyboard.clear();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setChunkAnswers({});
-    setUsedChunkIds({});
-    setDraggedChunk(null);
-    setTouchChunk(null);
     setSelectedLeft(null);
+    setSelectedRight(null);
     setMatches({});
-    setShowResults(false);
     setShowAns(false);
+    setLockedChunkIds([]);
+    setLockedMatchIds([]);
+    setWrongChunkIds([]);
+    setWrongMatchIds([]);
     setLines([]);
+    keyboard.clear();
+    stopAudio();
   };
 
   // ── Helpers ──
-  const isWrongItem = (item) => showResults && !showAns && !getItemResult(item);
+  const isWrongItem = (item) =>
+    wrongChunkIds.includes(item.id) || wrongMatchIds.includes(item.id);
 
   const getDotColor = (side, id) => {
-    if (side === "left" && selectedLeft === id) return ACTIVE_COLOR;
+    if (
+      (side === "left" && selectedLeft === id) ||
+      (side === "right" && selectedRight === id)
+    )
+      return ACTIVE_COLOR;
     const connected =
       side === "left" ? !!matches[id] : Object.values(matches).includes(id);
     return connected ? ACTIVE_COLOR : DOT_COLOR;
   };
 
   const getLeftRowStyle = (itemId) => {
-    const isActive = selectedLeft === itemId;
+    const isActive =
+      selectedLeft === itemId ||
+      (keyboard.origin?.side === "left" && keyboard.origin.id === itemId);
     return {
       position: "relative",
       height: `${ROW_HEIGHT}px`,
@@ -301,16 +367,58 @@ const WB_Unit8_Page48_QA = () => {
     };
   };
 
+  const getEndpoint = useCallback(
+    (side, id) => elementRefs.current[`${side}-${id}`],
+    [],
+  );
+  const isLeftLocked = useCallback(
+    (id) => showAns || lockedMatchIds.includes(id),
+    [lockedMatchIds, showAns],
+  );
+  const isRightLocked = useCallback(
+    (id) =>
+      showAns ||
+      Object.entries(matches).some(
+        ([leftId, imageId]) =>
+          Number(imageId) === id && lockedMatchIds.includes(Number(leftId)),
+      ),
+    [lockedMatchIds, matches, showAns],
+  );
+
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: LEFT_IDS,
+    rightIds: RIGHT_IDS,
+    getElement: getEndpoint,
+    isLeftLocked,
+    isRightLocked,
+    onCommit: commitMatch,
+    onStart: (side, id) => {
+      if (side === "left") {
+        setSelectedLeft(id);
+        setSelectedRight(null);
+      } else {
+        setSelectedRight(id);
+        setSelectedLeft(null);
+      }
+    },
+    onCancel: () => {
+      setSelectedLeft(null);
+      setSelectedRight(null);
+    },
+  });
+
   return (
     <div className="main-container-component">
       <div
         className="div-forall"
         style={{ display: "flex", flexDirection: "column", gap: "18px" }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>
-         Look, write, and match.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title="Look, write, and match."
+          subTitle="Complete the missing blend letters and the matching picture first, then make the matching connection and reread the full result."
+        />
 
         {/* // استبدلي chunk bank كامل بهاد */}
 
@@ -341,6 +449,10 @@ const WB_Unit8_Page48_QA = () => {
             {WORDS.map((item) => (
               <div key={item.id} style={getLeftRowStyle(item.id)}>
                 <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Play ${item.fullWord}`}
+                  className="unit4-audio-control unit4-interactive"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -348,7 +460,16 @@ const WB_Unit8_Page48_QA = () => {
                     flex: 1,
                     minHeight: "38px",
                   }}
-                  onClick={() => handleLeftClick(item.id)}
+                  onClick={() => {
+                    playAudio(`word-${item.id}`, item.audio);
+                    handleLeftClick(item.id);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`word-${item.id}`, item.audio);
+                    }
+                  }}
                 >
                   <span
                     style={{
@@ -375,16 +496,15 @@ const WB_Unit8_Page48_QA = () => {
                       <div
                         style={{ position: "relative", display: "inline-flex" }}
                       >
-                       <DropZone
-  item={item}
-  chunkAnswers={chunkAnswers}
-  setChunkAnswers={setChunkAnswers}
-  showAns={showAns}
-  showResults={showResults}
-/>
+                        <DropZone
+                          item={item}
+                          chunkAnswers={chunkAnswers}
+                          onChange={handleChunkChange}
+                          locked={showAns || lockedChunkIds.includes(item.id)}
+                          wrong={wrongChunkIds.includes(item.id)}
+                        />
 
-                        {showResults &&
-                          !showAns &&
+                        {wrongChunkIds.includes(item.id) &&
                           chunkAnswers[item.id]?.chunk &&
                           chunkAnswers[item.id]?.chunk !==
                             item.correctChunk && (
@@ -420,15 +540,14 @@ const WB_Unit8_Page48_QA = () => {
                         style={{ position: "relative", display: "inline-flex" }}
                       >
                         <DropZone
-  item={item}
-  chunkAnswers={chunkAnswers}
-  setChunkAnswers={setChunkAnswers}
-  showAns={showAns}
-  showResults={showResults}
-/>
+                          item={item}
+                          chunkAnswers={chunkAnswers}
+                          onChange={handleChunkChange}
+                          locked={showAns || lockedChunkIds.includes(item.id)}
+                          wrong={wrongChunkIds.includes(item.id)}
+                        />
 
-                        {showResults &&
-                          !showAns &&
+                        {wrongChunkIds.includes(item.id) &&
                           chunkAnswers[item.id]?.chunk &&
                           chunkAnswers[item.id]?.chunk !==
                             item.correctChunk && (
@@ -468,22 +587,41 @@ const WB_Unit8_Page48_QA = () => {
                       </span>
                     </>
                   )}
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `word-${item.id}`}
+                  />
                 </div>
 
                 {/* Left dot */}
                 <div
                   ref={(el) => (elementRefs.current[`left-${item.id}`] = el)}
+                  role="button"
+                  tabIndex={
+                    showAns || lockedMatchIds.includes(item.id) ? -1 : 0
+                  }
+                  aria-disabled={showAns || lockedMatchIds.includes(item.id)}
+                  aria-label={`Match ${item.fullWord}`}
                   onClick={() => handleLeftClick(item.id)}
+                  onKeyDown={(event) =>
+                    keyboard.handleKeyDown(event, "left", item.id)
+                  }
+                  onFocus={() => keyboard.handleFocus("left", item.id)}
+                  className="unit4-interactive"
                   style={{
                     width: "20px",
                     height: "20px",
                     borderRadius: "50%",
                     backgroundColor: getDotColor("left", item.id),
-                    cursor: showAns||showResults ? "default" : "pointer",
+                    cursor:
+                      showAns || lockedMatchIds.includes(item.id)
+                        ? "default"
+                        : "pointer",
                     flexShrink: 0,
                     transition: "all 0.2s ease",
                     boxShadow:
-                      selectedLeft === item.id
+                      selectedLeft === item.id ||
+                      (keyboard.origin?.side === "left" &&
+                        keyboard.origin.id === item.id)
                         ? "0 0 0 4px rgba(243,155,66,0.25)"
                         : "none",
                   }}
@@ -541,14 +679,38 @@ const WB_Unit8_Page48_QA = () => {
               >
                 <div
                   ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
+                  role="button"
+                  tabIndex={
+                    showAns ||
+                    Object.entries(matches).some(
+                      ([leftId, imageId]) =>
+                        Number(imageId) === item.id &&
+                        lockedMatchIds.includes(Number(leftId)),
+                    )
+                      ? -1
+                      : 0
+                  }
+                  aria-disabled={
+                    showAns ||
+                    Object.entries(matches).some(
+                      ([leftId, imageId]) =>
+                        Number(imageId) === item.id &&
+                        lockedMatchIds.includes(Number(leftId)),
+                    )
+                  }
+                  aria-label={`Match picture of ${item.alt}`}
                   onClick={() => handleRightClick(item.id)}
+                  onKeyDown={(event) =>
+                    keyboard.handleKeyDown(event, "right", item.id)
+                  }
+                  onFocus={() => keyboard.handleFocus("right", item.id)}
+                  className="unit4-interactive"
                   style={{
                     width: "20px",
                     height: "20px",
                     borderRadius: "50%",
                     backgroundColor: getDotColor("right", item.id),
-                    cursor:
-                      showAns || selectedLeft === null||showResults ? "default" : "pointer",
+                    cursor: showAns ? "default" : "pointer",
                     flexShrink: 0,
                     transition: "all 0.2s ease",
                   }}
@@ -600,6 +762,18 @@ const WB_Unit8_Page48_QA = () => {
                 strokeLinecap="round"
               />
             ))}
+            {keyboard.preview && (
+              <line
+                x1={keyboard.preview.x1}
+                y1={keyboard.preview.y1}
+                x2={keyboard.preview.x2}
+                y2={keyboard.preview.y2}
+                stroke={ACTIVE_COLOR}
+                strokeWidth="3"
+                strokeDasharray="7 6"
+                strokeLinecap="round"
+              />
+            )}
           </svg>
         </div>
 

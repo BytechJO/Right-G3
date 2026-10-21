@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/Asset 92.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/Asset 93.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 45/SVG/Asset 94.svg";
@@ -113,6 +114,7 @@ function DiagonalCell({
 }) {
   const topActive = selected === "top";
   const bottomActive = selected === "bottom";
+  const [focusedSide, setFocusedSide] = useState(null);
 
   return (
     <div
@@ -128,11 +130,17 @@ function DiagonalCell({
         flexShrink: 0,
       }}
     >
-      {/* منطقة الضغط - الجزء العلوي */}
+      {/* top button */}
       <button
         type="button"
         disabled={disabled}
         onClick={onSelectTop}
+        onFocus={(e) => {
+          if (e.target.matches(":focus-visible")) setFocusedSide("top");
+        }}
+        onBlur={() => {
+          setFocusedSide((prev) => (prev === "top" ? null : prev));
+        }}
         style={{
           position: "absolute",
           inset: 0,
@@ -141,14 +149,22 @@ function DiagonalCell({
           backgroundColor: topActive ? SELECT_COLOR : "transparent",
           cursor: disabled ? "default" : "pointer",
           zIndex: 1,
+          outline: "none",
         }}
+        aria-label={`Select ${pair.top}`}
       />
 
-      {/* منطقة الضغط - الجزء السفلي */}
+      {/* bottom button */}
       <button
         type="button"
         disabled={disabled}
         onClick={onSelectBottom}
+        onFocus={(e) => {
+          if (e.target.matches(":focus-visible")) setFocusedSide("bottom");
+        }}
+        onBlur={() => {
+          setFocusedSide((prev) => (prev === "bottom" ? null : prev));
+        }}
         style={{
           position: "absolute",
           inset: 0,
@@ -157,10 +173,12 @@ function DiagonalCell({
           backgroundColor: bottomActive ? SELECT_COLOR : "transparent",
           cursor: disabled ? "default" : "pointer",
           zIndex: 1,
+          outline: "none",
         }}
+        aria-label={`Select ${pair.bottom}`}
       />
 
-      {/* الخط القطري */}
+      {/* diagonal line */}
       <svg
         width={CELL_SIZE}
         height={CELL_SIZE}
@@ -180,16 +198,37 @@ function DiagonalCell({
           stroke="#2b2b2b"
           strokeWidth="1.5"
         />
+
+        {/* focus for top triangle */}
+        {focusedSide === "top" && (
+          <polyline
+            points={`2,${CELL_SIZE - 2} 2,2 ${CELL_SIZE - 2},2 2,${CELL_SIZE - 2}`}
+            fill="none"
+            stroke="#2563eb"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+        )}
+
+        {/* focus for bottom triangle */}
+        {focusedSide === "bottom" && (
+          <polyline
+            points={`2,${CELL_SIZE - 2} ${CELL_SIZE - 2},${CELL_SIZE - 2} ${CELL_SIZE - 2},2 2,${CELL_SIZE - 2}`}
+            fill="none"
+            stroke="#2563eb"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+        )}
       </svg>
 
-      {/* الحرف العلوي */}
+      {/* top letter */}
       <span
         style={{
           position: "absolute",
           top: "6px",
           left: "10px",
-         fontSize: "clamp(14px,1.7vw,22px)",
-          // fontWeight: 600,
+          fontSize: "clamp(14px,1.7vw,22px)",
           color: "#111",
           zIndex: 3,
           userSelect: "none",
@@ -200,14 +239,13 @@ function DiagonalCell({
         {pair.top}
       </span>
 
-      {/* الحرف السفلي */}
+      {/* bottom letter */}
       <span
         style={{
           position: "absolute",
           bottom: "6px",
           right: "10px",
-       fontSize: "clamp(14px,1.7vw,22px)",
-          // fontWeight: 600,
+          fontSize: "clamp(14px,1.7vw,22px)",
           color: "#111",
           zIndex: 3,
           userSelect: "none",
@@ -251,9 +289,9 @@ const ErrorBadge = () => (
 // ── المكوّن الرئيسي ─────────────────────────────────────────────
 export default function WB_Unit8_Page45_QA() {
   const [selections, setSelections] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [lockedRows, setLockedRows] = useState({});
+  const [wrongRows, setWrongRows] = useState({});
   const [showAns, setShowAns] = useState(false);
-
   // ── بناء الكلمة من الاختيارات ──
   const buildWord = (itemId) => {
     const item = ITEMS.find((x) => x.id === itemId);
@@ -277,17 +315,22 @@ export default function WB_Unit8_Page45_QA() {
 
   // ── handlers ──
   const handleSelect = (itemId, index, side) => {
-    if (showAns || checked) return;
-    setChecked(false);
+    if (showAns || lockedRows[itemId]) return;
     setSelections((prev) => {
       const current = prev[itemId] ? [...prev[itemId]] : [];
       current[index] = side;
       return { ...prev, [itemId]: current };
     });
+    setWrongRows((prev) => {
+      if (!prev[itemId]) return prev;
+      const next = { ...prev };
+      delete next[itemId];
+      return next;
+    });
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || ITEMS.every((item) => lockedRows[item.id])) return;
 
     const allAnswered = ITEMS.every((item) => isRowComplete(item));
     if (!allAnswered) {
@@ -296,10 +339,18 @@ export default function WB_Unit8_Page45_QA() {
     }
 
     let correct = 0;
+    const nextLockedRows = { ...lockedRows };
+    const nextWrongRows = {};
     ITEMS.forEach((item) => {
-      if (isRowCorrect(item)) correct++;
+      if (isRowCorrect(item)) {
+        correct++;
+        nextLockedRows[item.id] = true;
+      } else {
+        nextWrongRows[item.id] = true;
+      }
     });
-    setChecked(true);
+    setLockedRows(nextLockedRows);
+    setWrongRows(nextWrongRows);
     setShowAns(false);
 
     const total = ITEMS.length;
@@ -319,13 +370,17 @@ export default function WB_Unit8_Page45_QA() {
       });
     });
     setSelections(solved);
-    setChecked(false);
+    setLockedRows(
+      ITEMS.reduce((rows, item) => ({ ...rows, [item.id]: true }), {}),
+    );
+    setWrongRows({});
     setShowAns(true);
   };
 
   const handleReset = () => {
     setSelections({});
-    setChecked(false);
+    setLockedRows({});
+    setWrongRows({});
     setShowAns(false);
   };
 
@@ -333,10 +388,11 @@ export default function WB_Unit8_Page45_QA() {
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "35px" }}>
         {/* ── العنوان ── */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>
-          Find and write the words.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title="Find and write the words."
+          subTitle="Use the picture and sound pattern to identify the farm word from the letter choices, then check every missing letter before moving on."
+        />
 
         {/* ── الأسئلة ── */}
         <div
@@ -348,8 +404,7 @@ export default function WB_Unit8_Page45_QA() {
         >
           {ITEMS.map((item) => {
             const word = buildWord(item.id);
-            const isWrong =
-              checked && isRowComplete(item) && !isRowCorrect(item);
+            const isWrong = Boolean(wrongRows[item.id]);
 
             return (
               <div
@@ -364,7 +419,7 @@ export default function WB_Unit8_Page45_QA() {
                 {/* رقم */}
                 <span
                   style={{
-                   fontSize: "clamp(14px,1.7vw,22px)",
+                    fontSize: "clamp(14px,1.7vw,22px)",
                     fontWeight: 700,
                     color: "#111",
                     minWidth: "clamp(16px,1.9vw,24px)",
@@ -381,7 +436,7 @@ export default function WB_Unit8_Page45_QA() {
                       key={`${item.id}-${index}`}
                       pair={pair}
                       selected={(selections[item.id] || [])[index]}
-                      disabled={showAns || checked}
+                      disabled={showAns || Boolean(lockedRows[item.id])}
                       onSelectTop={() => handleSelect(item.id, index, "top")}
                       onSelectBottom={() =>
                         handleSelect(item.id, index, "bottom")
@@ -393,7 +448,7 @@ export default function WB_Unit8_Page45_QA() {
                 {/* الصورة */}
                 <img
                   src={item.img}
-                  alt={`item-${item.id}`}
+                  alt={item.answer}
                   style={{
                     width: "90px",
                     height: "clamp(56px,7vw,84px)",
@@ -410,7 +465,7 @@ export default function WB_Unit8_Page45_QA() {
                       borderBottom: `2px solid ${isWrong ? WRONG_COLOR : "#888"}`,
                       fontSize: "clamp(14px,1.7vw,22px)",
                       fontWeight: 600,
-                      
+
                       paddingBottom: "3px",
                       minHeight: "32px",
                       textTransform: "lowercase",

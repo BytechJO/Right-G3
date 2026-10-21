@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit8/Page 46 - Exercise D/Item_001_She_..._a_doll,_but_she_..._a_computer.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit8/Page 46 - Exercise D/Item_002_He_..._a_kite,_but_he_..._a_car.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit8/Page 46 - Exercise D/Item_003_He_..._a_ball,_but_he_..._a_train.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit8/Page 46 - Exercise D/Item_004_They_..._a_radio,_but_they_..._a_TV.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit8/Page 46 - Exercise D/Item_005_She_..._a_book,_but_she_..._a_robot.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/2.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 46/SVG/3.svg";
@@ -19,6 +28,7 @@ const SENTENCES = [
     middle: "a doll, but she",
     secondAnswer: "didn't have",
     end: "a computer.",
+    audio: audio1,
   },
   {
     id: 2,
@@ -27,6 +37,7 @@ const SENTENCES = [
     middle: "a kite, but he",
     secondAnswer: "didn't have",
     end: "a car.",
+    audio: audio2,
   },
   {
     id: 3,
@@ -35,6 +46,7 @@ const SENTENCES = [
     middle: "a ball, but he",
     secondAnswer: "didn't have",
     end: "a train.",
+    audio: audio3,
   },
   {
     id: 4,
@@ -43,6 +55,7 @@ const SENTENCES = [
     middle: "a radio, but they",
     secondAnswer: "didn't have",
     end: "a TV.",
+    audio: audio4,
   },
   {
     id: 5,
@@ -51,6 +64,7 @@ const SENTENCES = [
     middle: "a book, but she",
     secondAnswer: "didn't have",
     end: "a robot.",
+    audio: audio5,
   },
 ];
 
@@ -83,11 +97,13 @@ const ErrorBadge = () => (
 
 export default function WB_Unit8_Page46_QD() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, field, value) => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -97,7 +113,7 @@ export default function WB_Unit8_Page46_QD() {
       },
     }));
 
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const isComplete = (item) => {
@@ -112,7 +128,7 @@ export default function WB_Unit8_Page46_QD() {
   };
 
   const handleCheck = () => {
-       if (showAns||showResults) return;
+    if (showAns || lockedIds.length === SENTENCES.length) return;
     const allAnswered = SENTENCES.every((item) => isComplete(item));
 
     if (!allAnswered) {
@@ -126,7 +142,12 @@ export default function WB_Unit8_Page46_QD() {
       if (isCorrect(item)) score++;
     });
 
-    setShowResults(true);
+    setLockedIds(
+      SENTENCES.flatMap((item) => (isCorrect(item) ? [item.id] : [])),
+    );
+    setWrongIds(
+      SENTENCES.flatMap((item) => (!isCorrect(item) ? [item.id] : [])),
+    );
 
     const total = SENTENCES.length;
 
@@ -147,13 +168,17 @@ export default function WB_Unit8_Page46_QD() {
 
     setAnswers(solved);
     setShowAns(true);
-    setShowResults(false);
+    setLockedIds(SENTENCES.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   return (
@@ -165,10 +190,11 @@ export default function WB_Unit8_Page46_QD() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>
-        Find and write sentences.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Find and write sentences."
+          subTitle="Use the had/didn't have sentence from each person and object pair to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* Images */}
         <div
@@ -182,13 +208,13 @@ export default function WB_Unit8_Page46_QD() {
         >
           <img
             src={img1}
-            alt="img1"
+            alt="Children and toys used to form sentences"
             style={{ height: "220px", width: "auto" }}
           />
 
           <img
             src={img2}
-            alt="img2"
+            alt="Objects used to complete the sentences"
             style={{ height: "150px", width: "auto" }}
           />
         </div>
@@ -203,11 +229,21 @@ export default function WB_Unit8_Page46_QD() {
           }}
         >
           {SENTENCES.map((item) => {
-            const wrong = showResults && isComplete(item) && !isCorrect(item);
+            const wrong = wrongIds.includes(item.id);
 
             return (
               <div
                 key={item.id}
+                role="button"
+                tabIndex={0}
+                className="unit4-audio-control unit4-interactive"
+                onClick={() => playAudio(`sentence-${item.id}`, item.audio)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`sentence-${item.id}`, item.audio);
+                  }
+                }}
                 style={{
                   position: "relative",
                   display: "flex",
@@ -241,7 +277,9 @@ export default function WB_Unit8_Page46_QD() {
                 {/* First Select */}
                 <div style={{ position: "relative", display: "inline-block" }}>
                   <select
-                    disabled={showAns||showResults}
+                    disabled={showAns || lockedIds.includes(item.id)}
+                    onClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
                     value={answers[item.id]?.first || ""}
                     onChange={(e) =>
                       handleSelect(item.id, "first", e.target.value)
@@ -249,12 +287,12 @@ export default function WB_Unit8_Page46_QD() {
                     style={{
                       minWidth: "120px",
                       minHeight: "36px",
-                      borderBottom: wrong && answers[item.id]?.first !== item.firstAnswer 
-                        ? `2px solid ${WRONG_COLOR}`
-                        : `1px solid ${BORDER_COLOR}`,
+                      borderBottom:
+                        wrong && answers[item.id]?.first !== item.firstAnswer
+                          ? `2px solid ${WRONG_COLOR}`
+                          : `1px solid ${BORDER_COLOR}`,
                       padding: "4px 8px",
                       fontSize: "18px",
-                      outline: "none",
                       background: "#fff",
                       color: "#111",
                     }}
@@ -287,7 +325,9 @@ export default function WB_Unit8_Page46_QD() {
                 {/* Second Select */}
                 <div style={{ position: "relative", display: "inline-block" }}>
                   <select
-                    disabled={showAns||showResults}
+                    disabled={showAns || lockedIds.includes(item.id)}
+                    onClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
                     value={answers[item.id]?.second || ""}
                     onChange={(e) =>
                       handleSelect(item.id, "second", e.target.value)
@@ -295,12 +335,12 @@ export default function WB_Unit8_Page46_QD() {
                     style={{
                       minWidth: "150px",
                       minHeight: "36px",
-                      borderBottom: wrong && answers[item.id]?.second !== item.secondAnswer
-                        ? `2px solid ${WRONG_COLOR}`
-                        : `1px solid ${BORDER_COLOR}`,
+                      borderBottom:
+                        wrong && answers[item.id]?.second !== item.secondAnswer
+                          ? `2px solid ${WRONG_COLOR}`
+                          : `1px solid ${BORDER_COLOR}`,
                       padding: "4px 8px",
                       fontSize: "18px",
-                      outline: "none",
                       background: "#fff",
                       color: "#111",
                     }}
@@ -329,6 +369,9 @@ export default function WB_Unit8_Page46_QD() {
                 >
                   {item.end}
                 </span>
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `sentence-${item.id}`}
+                />
               </div>
             );
           })}

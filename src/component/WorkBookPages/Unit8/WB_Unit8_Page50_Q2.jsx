@@ -2,6 +2,17 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import drAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_001_dr.mp3";
+import brAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_002_br.mp3";
+import frAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_003_fr.mp3";
+import trAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_004_tr.mp3";
+import crAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_005_cr.mp3";
+import prAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_006_pr.mp3";
+import grAudio from "../../../assets/audio/WorkBook/unit8/Page 50 - Exercise B/Item_007_gr.mp3";
 
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd10pg50instruction1-adult-lady_B8YFlmMv.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
@@ -62,20 +73,39 @@ const ITEMS = [
     correct: "gr",
   },
 ];
+const BLEND_AUDIO = {
+  dr: drAudio,
+  br: brAudio,
+  fr: frAudio,
+  tr: trAudio,
+  cr: crAudio,
+  pr: prAudio,
+  gr: grAudio,
+};
+const IMAGE_ALTS = [
+  "A princess",
+  "A bracelet",
+  "A present",
+  "A grandfather",
+  "A broom",
+  "Grapes",
+];
 
 export default function WB_LookReadCircle_PageJ() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -87,7 +117,16 @@ export default function WB_LookReadCircle_PageJ() {
       if (answers[i.id] === i.correct) score++;
     });
 
-    setShowResults(true);
+    setLockedIds(
+      ITEMS.flatMap((item) =>
+        answers[item.id] === item.correct ? [item.id] : [],
+      ),
+    );
+    setWrongIds(
+      ITEMS.flatMap((item) =>
+        answers[item.id] !== item.correct ? [item.id] : [],
+      ),
+    );
     const total = ITEMS.length;
 
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -101,24 +140,28 @@ export default function WB_LookReadCircle_PageJ() {
       filled[i.id] = i.correct;
     });
     setAnswers(filled);
-    setShowResults(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const getOptionStyle = (item, opt) => {
     const isSelected = answers[item.id] === opt;
     const isWrong =
-      showResults &&
-      !showAns &&
+      wrongIds.includes(item.id) &&
       answers[item.id] === opt &&
       opt !== item.correct;
-    const isCorrectShown = showAns && opt === item.correct;
+    const isCorrectShown =
+      (showAns || lockedIds.includes(item.id)) && opt === item.correct;
 
     if (isWrong) {
       return {
@@ -148,14 +191,20 @@ export default function WB_LookReadCircle_PageJ() {
           gap: "35px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span>Listen and tap or click.
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <ExerciseHeader
+          sectionLetter="B"
+          title="Listen and circle."
+          subTitle="Listen carefully for the target sound, replay if needed, then choose the beginning blend heard for each picture that matches what you hear."
+        />
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <QuestionAudioPlayer
             src={sound1}
             captions={captions}
             stopAtSecond={4.9}
+            pageId="wb-unit8-page50-b"
           />
         </div>
 
@@ -190,7 +239,7 @@ export default function WB_LookReadCircle_PageJ() {
                 </span>
                 <img
                   src={item.img}
-                  alt={`item-${item.id}`}
+                  alt={IMAGE_ALTS[item.id - 1]}
                   style={{
                     width: "auto",
                     height: "100px",
@@ -214,8 +263,7 @@ export default function WB_LookReadCircle_PageJ() {
                 {item.options.map((opt) => {
                   const isSelected = answers[item.id] === opt;
                   const isWrong =
-                    showResults &&
-                    !showAns &&
+                    wrongIds.includes(item.id) &&
                     answers[item.id] === opt &&
                     opt !== item.correct;
 
@@ -228,7 +276,33 @@ export default function WB_LookReadCircle_PageJ() {
                       }}
                     >
                       <button
-                        onClick={() => handleSelect(item.id, opt)}
+                        tabIndex={
+                          showAns || lockedIds.includes(item.id) ? -1 : 0
+                        }
+                        aria-disabled={showAns || lockedIds.includes(item.id)}
+                        onClick={() => {
+                          if (!showAns && !lockedIds.includes(item.id)) {
+                            playAudio(
+                              `blend-${item.id}-${opt}`,
+                              BLEND_AUDIO[opt],
+                            );
+                            handleSelect(item.id, opt);
+                          }
+                        }}
+                        onKeyDown={(event) => {
+                          if (
+                            (event.key === "Enter" || event.key === " ") &&
+                            !showAns &&
+                            !lockedIds.includes(item.id)
+                          ) {
+                            event.preventDefault();
+                            playAudio(
+                              `blend-${item.id}-${opt}`,
+                              BLEND_AUDIO[opt],
+                            );
+                            handleSelect(item.id, opt);
+                          }
+                        }}
                         style={{
                           width: "auto",
                           minWidth: "44px",
@@ -238,7 +312,9 @@ export default function WB_LookReadCircle_PageJ() {
                           fontSize: "clamp(13px,1.4vw,18px)",
                           fontWeight: isSelected ? 700 : 500,
                           cursor:
-                            showAns || showResults ? "default" : "pointer",
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                           transition: "all 0.15s",
                           userSelect: "none",
                           textAlign: "center",
@@ -247,6 +323,9 @@ export default function WB_LookReadCircle_PageJ() {
                           ...getOptionStyle(item, opt),
                         }}
                       >
+                        <Unit4PlayingAudioIcon
+                          active={activeAudioKey === `blend-${item.id}-${opt}`}
+                        />
                         {opt}
                       </button>
 

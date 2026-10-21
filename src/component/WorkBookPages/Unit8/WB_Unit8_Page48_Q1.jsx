@@ -1,6 +1,17 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_001_g_rd_n.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_002_r_f.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_003_ch_mn_y.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_004_n_st.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_005_sw_ng.mp3";
+import audio6 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_006_w_ll.mp3";
+import audio7 from "../../../assets/audio/WorkBook/unit8/Page 48 - Exercise G/Item_007_fl_r.mp3";
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 48/SVG/3.svg";
@@ -30,13 +41,13 @@ const ITEMS = [
       { shape: "◆" },
       { text: "n" },
     ],
-    answer: "garden",
+    answer: "garden", audio: audio1,
   },
   {
     id: 2,
     img: img2,
     parts: [{ text: "r" }, { shape: "▲" }, { shape: "▲" }, { text: "f" }],
-    answer: "roof",
+    answer: "roof", audio: audio2,
   },
   {
     id: 3,
@@ -48,31 +59,31 @@ const ITEMS = [
       { shape: "◆" },
       { text: "y" },
     ],
-    answer: "chimney",
+    answer: "chimney", audio: audio3,
   },
   {
     id: 4,
     img: img4,
     parts: [{ text: "n" }, { shape: "◆" }, { text: "st" }],
-    answer: "nest",
+    answer: "nest", audio: audio4,
   },
   {
     id: 5,
     img: img5,
     parts: [{ text: "sw" }, { shape: "★" }, { text: "ng" }],
-    answer: "swing",
+    answer: "swing", audio: audio5,
   },
   {
     id: 6,
     img: img6,
     parts: [{ text: "w" }, { shape: "■" }, { text: "ll" }],
-    answer: "wall",
+    answer: "wall", audio: audio6,
   },
   {
     id: 7,
     img: img7,
     parts: [{ text: "fl" }, { shape: "▲" }, { shape: "▲" }, { text: "r" }],
-    answer: "floor",
+    answer: "floor", audio: audio7,
   },
 ];
 
@@ -90,17 +101,20 @@ const CORRECT = buildCorrect();
 
 export default function WB_FindMissingLetters_PageG() {
   const [selected, setSelected] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongKeys, setWrongKeys] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (key, value) => {
-    if (showAns || showResults) return;
+    const itemId = Number(key.split("-")[0]);
+    if (showAns || lockedIds.includes(itemId)) return;
     setSelected((prev) => ({ ...prev, [key]: value }));
-    setShowResults(false);
+    setWrongKeys((previous) => previous.filter((wrongKey) => wrongKey !== key));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allKeys = Object.keys(CORRECT);
     const allAnswered = allKeys.every((k) => selected[k]);
     if (!allAnswered) {
@@ -111,7 +125,8 @@ export default function WB_FindMissingLetters_PageG() {
     allKeys.forEach((k) => {
       if (selected[k] === CORRECT[k]) score++;
     });
-    setShowResults(true);
+    setLockedIds(ITEMS.flatMap((item) => isItemAllCorrect(item) ? [item.id] : []));
+    setWrongKeys(allKeys.filter((key) => selected[key] !== CORRECT[key]));
     const total = allKeys.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -120,18 +135,22 @@ export default function WB_FindMissingLetters_PageG() {
 
   const handleShowAnswer = () => {
     setSelected({ ...CORRECT });
-    setShowResults(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongKeys([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setSelected({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongKeys([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isKeyWrong = (key) =>
-    showResults && !showAns && selected[key] !== CORRECT[key];
+    wrongKeys.includes(key);
 
   const isItemAllCorrect = (item) =>
     item.parts
@@ -186,7 +205,9 @@ export default function WB_FindMissingLetters_PageG() {
             }}
           >
             <select
-              disabled={showAns || showResults}
+              disabled={showAns || lockedIds.includes(item.id)}
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(event) => event.stopPropagation()}
               value={val}
               onChange={(e) => handleChange(key, e.target.value)}
               style={{
@@ -203,7 +224,7 @@ export default function WB_FindMissingLetters_PageG() {
                   ? `2px solid ${WRONG_COLOR}`
                   : `1px solid ${LINE_COLOR}`,
                 borderRadius: 0,
-                outline: "none",
+                // outline: "none",
                 // حجم خط الشكل
                 fontSize: "18px",
                 // fontWeight: 700,
@@ -259,6 +280,11 @@ export default function WB_FindMissingLetters_PageG() {
   const renderItem = (item) => (
     <div
       key={item.id}
+      role="button"
+      tabIndex={0}
+      className="unit4-audio-control unit4-interactive"
+      onClick={() => playAudio(`word-${item.id}`, item.audio)}
+      onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playAudio(`word-${item.id}`, item.audio); } }}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -288,7 +314,7 @@ export default function WB_FindMissingLetters_PageG() {
 
         <img
           src={item.img}
-          alt={`item-${item.id}`}
+          alt={item.answer}
           style={{
             width: "auto",
             height: "100px",
@@ -298,6 +324,7 @@ export default function WB_FindMissingLetters_PageG() {
 
       {/* الكلمة مع dropdowns الأشكال */}
       {renderWord(item)}
+      <Unit4PlayingAudioIcon active={activeAudioKey === `word-${item.id}`} />
 
       {/* سطر الكلمة الكاملة — تظهر لما تكون كل الأشكال صح */}
       {/* سطر الكلمة — يظهر تدريجياً مع الحفاظ على الفراغات */}
@@ -357,9 +384,7 @@ export default function WB_FindMissingLetters_PageG() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span>Find the missing letters. Write the words.
-        </h1>
+        <ExerciseHeader sectionLetter="G" title="Find the missing letters. Write the words." subTitle="Use the picture and sound pattern to identify the missing vowel letters in the farm and place words, then check every missing letter before moving on." />
 
         {/* Layout: أسئلة يسار + legend يمين */}
         <div
