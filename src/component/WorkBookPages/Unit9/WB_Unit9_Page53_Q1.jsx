@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/1.svg";
 import img1b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/2.svg";
@@ -12,6 +16,10 @@ import img4a from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Fold
 import img4b from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/8.svg";
 
 import trueIcon from "../../../assets/imgs/true.svg";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise E/Item_001_They_are_at_the_bus_stop.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise E/Item_002_She_is_at_the_train_station.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise E/Item_003_He_was_at_school.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise E/Item_004_They_were_at_the_airport.mp3";
 const ITEMS = [
   {
     id: 1,
@@ -21,6 +29,11 @@ const ITEMS = [
       { id: "b", img: img1b },
     ],
     correct: "a",
+    audio: sentence1Audio,
+    optionAlts: [
+      "People waiting at a bus stop",
+      "People waiting at an airport",
+    ],
   },
   {
     id: 2,
@@ -30,6 +43,8 @@ const ITEMS = [
       { id: "b", img: img2b },
     ],
     correct: "b",
+    audio: sentence2Audio,
+    optionAlts: ["A woman at a bus stop", "A woman at a train station"],
   },
   {
     id: 3,
@@ -39,6 +54,8 @@ const ITEMS = [
       { id: "b", img: img3b },
     ],
     correct: "b",
+    audio: sentence3Audio,
+    optionAlts: ["A boy at home", "A boy at school"],
   },
   {
     id: 4,
@@ -48,27 +65,31 @@ const ITEMS = [
       { id: "b", img: img4b },
     ],
     correct: "b",
+    audio: sentence4Audio,
+    optionAlts: ["Travelers at a train station", "Travelers at an airport"],
   },
 ];
 
 export default function WB_Unit8_Page53_QE() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (questionId, optionId) => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.includes(questionId)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [questionId]: optionId,
     }));
+    setWrongIds((prev) => prev.filter((id) => id !== questionId));
   };
 
-
-
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -83,6 +104,19 @@ export default function WB_Unit8_Page53_QE() {
     });
 
     setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -102,17 +136,24 @@ export default function WB_Unit8_Page53_QE() {
     setAnswers(correctMap);
     setChecked(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
   const isWrongOption = (questionId, optionId, correctId) => {
-    if (!checked) return false;
-
-    return answers[questionId] === optionId && optionId !== correctId;
+    return (
+      wrongIds.includes(questionId) &&
+      answers[questionId] === optionId &&
+      optionId !== correctId
+    );
   };
   return (
     <div className="main-container-component">
@@ -122,12 +163,18 @@ export default function WB_Unit8_Page53_QE() {
           gap: "35px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-         Read, look, and write <span className="text-red-600"> ✓</span>.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="E"
+          title={
+            <>
+              Read, look, and write <span style={{ color: "#D1232A" }}>✓</span>.
+            </>
+          }
+          subTitle="Look at the picture that matches each past-location sentence first, compare all available options, then tap only the answer that matches."
+        />
 
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
@@ -164,6 +211,17 @@ export default function WB_Unit8_Page53_QE() {
                 </span>
 
                 <p
+                  className="unit4-audio-control unit4-interactive"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Play: ${item.sentence}`}
+                  onClick={() => playAudio(`sentence-${item.id}`, item.audio)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`sentence-${item.id}`, item.audio);
+                    }
+                  }}
                   style={{
                     margin: 0,
                     fontSize: "18px",
@@ -173,6 +231,9 @@ export default function WB_Unit8_Page53_QE() {
                   }}
                 >
                   {item.sentence}
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `sentence-${item.id}`}
+                  />
                 </p>
               </div>
 
@@ -195,6 +256,18 @@ export default function WB_Unit8_Page53_QE() {
                   >
                     {/* wrapper للصورة */}
                     <div
+                      className="unit4-interactive"
+                      role="radio"
+                      aria-checked={answers[item.id] === option.id}
+                      aria-disabled={lockedIds.includes(item.id)}
+                      tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+                      onClick={() => handleSelect(item.id, option.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleSelect(item.id, option.id);
+                        }
+                      }}
                       style={{
                         position: "relative",
 
@@ -203,20 +276,22 @@ export default function WB_Unit8_Page53_QE() {
                     >
                       <img
                         src={option.img}
-                         onClick={() => handleSelect(item.id, option.id)}
-                        alt={`${item.id}-${option.id}`}
+                        alt={item.optionAlts[option.id === "a" ? 0 : 1]}
                         style={{
                           width: "100%",
                           height: "auto",
                           display: "block",
                           objectFit: "contain",
-                           cursor: showAns||checked ? "default" : "pointer",
+                          cursor:
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                         }}
                       />
 
                       {/* مربع الاختيار */}
                       <div
-                        onClick={() => handleSelect(item.id, option.id)}
+                        aria-hidden="true"
                         style={{
                           position: "absolute",
 
@@ -235,7 +310,10 @@ export default function WB_Unit8_Page53_QE() {
                           alignItems: "center",
                           justifyContent: "center",
 
-                          cursor: showAns||checked ? "default" : "pointer",
+                          cursor:
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
 
                           zIndex: 2,
                           boxSizing: "border-box",
@@ -246,6 +324,7 @@ export default function WB_Unit8_Page53_QE() {
                         {answers[item.id] === option.id && (
                           <img
                             src={trueIcon}
+                            alt=""
                             style={{
                               width: "65%",
                               height: "65%",

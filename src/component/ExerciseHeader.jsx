@@ -40,6 +40,7 @@ const ExerciseHeader = ({
         className="header-title-page8"
         style={{
           display: "grid",
+          alignItems: "start",
           gridTemplateColumns: `
             ${sectionLetter ? "auto" : ""}
             ${questionNumber ? "auto" : ""}
@@ -47,7 +48,6 @@ const ExerciseHeader = ({
           `,
           columnGap: "8px",
           rowGap: "8px",
-          alignItems: "center",
         }}
       >
         {sectionLetter && <span className="ex-A">{sectionLetter}</span>}

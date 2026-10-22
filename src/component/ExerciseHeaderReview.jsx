@@ -47,7 +47,7 @@ const ExerciseHeaderReview = ({
           `,
           columnGap: "8px",
           rowGap: "8px",
-          alignItems: "center",
+          alignItems: "start",
         }}
       >
         {sectionLetter && <span>{sectionLetter}</span>}

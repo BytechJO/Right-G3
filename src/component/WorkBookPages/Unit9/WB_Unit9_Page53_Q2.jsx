@@ -1,11 +1,24 @@
-import React ,{ useState, useRef, useLayoutEffect } from "react";
+import React, { useCallback, useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import Button from "../Button";
+import useWorkbookMatchingKeyboard from "../Unit4/useWorkbookMatchingKeyboard";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/9.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/12.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/11.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 53/SVG/10.svg";
+import left1Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_001_Where_were_they_this_morning.mp3";
+import left2Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_002_Where_is_she_now.mp3";
+import left3Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_003_Where_was_she_this_morning.mp3";
+import left4Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_004_Where_is_he_now.mp3";
+import right1Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_005_She_was_in_the_computer_lab.mp3";
+import right2Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_006_She_is_on_the_playground.mp3";
+import right3Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_007_He_is_at_the_swimming_pool.mp3";
+import right4Audio from "../../../assets/audio/WorkBook/unit 9/Page 53 - Exercise F/Item_008_They_were_at_the_circus.mp3";
 
 const DOT_COLOR = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
@@ -15,27 +28,55 @@ const PATH_COLOR = "#f39b42";
 const TEXT_COLOR = "#111";
 
 const LEFT_ITEMS = [
-  { id: 1, img: img1, text: "Where were they this morning?" },
-  { id: 2, img: img2, text: "Where is she now?" },
-  { id: 3, img: img3, text: "Where was she this morning?" },
-  { id: 4, img: img4, text: "Where is he now?" },
+  {
+    id: 1,
+    img: img1,
+    alt: "Children at a circus",
+    text: "Where were they this morning?",
+    audio: left1Audio,
+  },
+  {
+    id: 2,
+    img: img2,
+    alt: "A girl on a playground",
+    text: "Where is she now?",
+    audio: left2Audio,
+  },
+  {
+    id: 3,
+    img: img3,
+    alt: "A girl in a computer lab",
+    text: "Where was she this morning?",
+    audio: left3Audio,
+  },
+  {
+    id: 4,
+    img: img4,
+    alt: "A boy at a swimming pool",
+    text: "Where is he now?",
+    audio: left4Audio,
+  },
 ];
 
 const RIGHT_ITEMS = [
-  { id: 1, text: "She was in the computer lab." },
-  { id: 2, text: "She is on the playground." },
-  { id: 3, text: "He is at the swimming pool." },
-  { id: 4, text: "hey were at the circus." },
+  { id: 1, text: "She was in the computer lab.", audio: right1Audio },
+  { id: 2, text: "She is on the playground.", audio: right2Audio },
+  { id: 3, text: "He is at the swimming pool.", audio: right3Audio },
+  { id: 4, text: "They were at the circus.", audio: right4Audio },
 ];
 
 const CORRECT_MATCHES = { 1: 4, 2: 2, 3: 1, 4: 3 };
 
 export default function WB_ReadLookMatch_PageA() {
   const [selectedLeft, setSelectedLeft] = useState(null);
+  const [selectedRight, setSelectedRight] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [paths, setPaths] = useState([]);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const boardRef = useRef(null);
   const pointRefs = useRef({});
@@ -85,26 +126,53 @@ export default function WB_ReadLookMatch_PageA() {
     };
   }, [matches, showResults]);
 
-  const handleLeftSelect = (id) => {
-    if (showAns || showResults) return;
-    setSelectedLeft((prev) => (prev === id ? null : id));
-    setShowResults(false);
-  };
-
-  const handleRightSelect = (rightId) => {
-    if (showAns || selectedLeft === null || showResults) return;
+  const commitMatch = (leftId, rightId) => {
+    if (showAns || lockedIds.includes(leftId)) return;
+    const occupyingLeft = Number(
+      Object.keys(matches).find((key) => matches[key] === rightId),
+    );
+    if (occupyingLeft && lockedIds.includes(occupyingLeft)) return;
     const upd = { ...matches };
     Object.keys(upd).forEach((k) => {
       if (upd[k] === rightId) delete upd[k];
     });
-    upd[selectedLeft] = rightId;
+    upd[leftId] = rightId;
     setMatches(upd);
     setSelectedLeft(null);
-    setShowResults(false);
+    setSelectedRight(null);
+    setWrongIds((prev) =>
+      prev.filter((id) => id !== leftId && id !== occupyingLeft),
+    );
+  };
+  const handleLeftSelect = (id) => {
+    if (showAns || lockedIds.includes(id)) return;
+    if (selectedRight !== null) commitMatch(id, selectedRight);
+    else {
+      setSelectedLeft(id);
+      setSelectedRight(null);
+    }
+  };
+
+  const isRightLocked = useCallback(
+    (rightId) =>
+      showAns ||
+      Object.entries(matches).some(
+        ([leftId, value]) =>
+          Number(value) === rightId && lockedIds.includes(Number(leftId)),
+      ),
+    [lockedIds, matches, showAns],
+  );
+  const handleRightSelect = (rightId) => {
+    if (isRightLocked(rightId)) return;
+    if (selectedLeft !== null) commitMatch(selectedLeft, rightId);
+    else {
+      setSelectedRight(rightId);
+      setSelectedLeft(null);
+    }
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === LEFT_ITEMS.length) return;
     const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
     if (!allConnected) {
       ValidationAlert.info("Please connect all items first.");
@@ -115,6 +183,19 @@ export default function WB_ReadLookMatch_PageA() {
       if (matches[i.id] === CORRECT_MATCHES[i.id]) score++;
     });
     setShowResults(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...LEFT_ITEMS.filter(
+          (item) => matches[item.id] === CORRECT_MATCHES[item.id],
+        ).map((item) => item.id),
+      ]),
+    ]);
+    setWrongIds(
+      LEFT_ITEMS.filter(
+        (item) => matches[item.id] !== CORRECT_MATCHES[item.id],
+      ).map((item) => item.id),
+    );
     const total = LEFT_ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -126,23 +207,52 @@ export default function WB_ReadLookMatch_PageA() {
     setShowResults(true);
     setShowAns(true);
     setSelectedLeft(null);
+    setSelectedRight(null);
+    setLockedIds(LEFT_ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    keyboard.clear();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setSelectedLeft(null);
+    setSelectedRight(null);
     setMatches({});
     setShowResults(false);
     setShowAns(false);
     setPaths([]);
+    setLockedIds([]);
+    setWrongIds([]);
+    keyboard.clear();
+    stopAudio();
   };
 
   const getLeftConn = (id) => !!matches[id];
   const getRightConn = (id) => Object.values(matches).includes(id);
-  const isWrongMatch = (leftId) =>
-    showResults &&
-    !showAns &&
-    !!matches[leftId] &&
-    matches[leftId] !== CORRECT_MATCHES[leftId];
+  const isWrongMatch = (leftId) => wrongIds.includes(leftId);
+
+  const getEndpoint = useCallback(
+    (side, id) => pointRefs.current[`${side}-${id}`],
+    [],
+  );
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef,
+    leftIds: LEFT_ITEMS.map((item) => item.id),
+    rightIds: RIGHT_ITEMS.map((item) => item.id),
+    getElement: getEndpoint,
+    getAnchorElement: getEndpoint,
+    isLeftLocked: (id) => showAns || lockedIds.includes(id),
+    isRightLocked,
+    onCommit: commitMatch,
+    onStart: (side, id) => {
+      setSelectedLeft(side === "left" ? id : null);
+      setSelectedRight(side === "right" ? id : null);
+    },
+    onCancel: () => {
+      setSelectedLeft(null);
+      setSelectedRight(null);
+    },
+  });
 
   const WrongBadge = () => (
     <div
@@ -189,11 +299,13 @@ export default function WB_ReadLookMatch_PageA() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"40px"}}>
+      <div className="div-forall" style={{ gap: "40px" }}>
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span>Look, read, and match..
-        </h1>
+        <ExerciseHeader
+          sectionLetter="F"
+          title="Look, read, and match."
+          subTitle="Read each where/when question to the correct answer first, then connect it to the matching picture or answer one pair at a time."
+        />
 
         {/* Board */}
         <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
@@ -219,6 +331,18 @@ export default function WB_ReadLookMatch_PageA() {
                 strokeLinecap="round"
               />
             ))}
+            {keyboard.preview && (
+              <line
+                x1={keyboard.preview.x1}
+                y1={keyboard.preview.y1}
+                x2={keyboard.preview.x2}
+                y2={keyboard.preview.y2}
+                stroke={ACTIVE_COLOR}
+                strokeWidth="3"
+                strokeDasharray="7 6"
+                strokeLinecap="round"
+              />
+            )}
           </svg>
 
           <div style={GRID}>
@@ -249,9 +373,11 @@ export default function WB_ReadLookMatch_PageA() {
                   <div
                     onClick={() => handleLeftSelect(lItem.id)}
                     style={{
-                 
                       zIndex: 2,
-                      cursor: showAns ||showResults ? "default" : "pointer",
+                      cursor:
+                        showAns || lockedIds.includes(lItem.id)
+                          ? "default"
+                          : "pointer",
                       overflow: "hidden",
                       // borderRadius: "clamp(6px,0.8vw,12px)",
                       border: `1px solid ${lSelected ? ACTIVE_COLOR : "transparent"}`,
@@ -262,7 +388,7 @@ export default function WB_ReadLookMatch_PageA() {
                   >
                     <img
                       src={lItem.img}
-                      alt={`img-${lItem.id}`}
+                      alt={lItem.alt}
                       style={{
                         width: "auto",
                         height: "90px",
@@ -276,7 +402,20 @@ export default function WB_ReadLookMatch_PageA() {
 
                   {/* col 3 – left sentence */}
                   <div
-                    onClick={() => handleLeftSelect(lItem.id)}
+                    onClick={() => {
+                      playAudio(`left-audio-${lItem.id}`, lItem.audio);
+                      handleLeftSelect(lItem.id);
+                    }}
+                    className="unit4-audio-control unit4-interactive"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play: ${lItem.text}`}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`left-audio-${lItem.id}`, lItem.audio);
+                      }
+                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -290,7 +429,7 @@ export default function WB_ReadLookMatch_PageA() {
                       background: lSelected
                         ? "rgba(243,155,66,0.08)"
                         : "transparent",
-                      cursor: showAns ||showResults ? "default" : "pointer",
+                      cursor: showAns || showResults ? "default" : "pointer",
                       transition: "border-color 0.2s, background 0.2s",
                       userSelect: "none",
                       position: "relative",
@@ -312,6 +451,9 @@ export default function WB_ReadLookMatch_PageA() {
                     >
                       {lItem.text}
                     </span>
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `left-audio-${lItem.id}`}
+                    />
                     {wrong && <WrongBadge />}
                   </div>
 
@@ -319,6 +461,15 @@ export default function WB_ReadLookMatch_PageA() {
                   <div
                     ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
                     onClick={() => handleLeftSelect(lItem.id)}
+                    role="button"
+                    tabIndex={showAns || lockedIds.includes(lItem.id) ? -1 : 0}
+                    aria-disabled={showAns || lockedIds.includes(lItem.id)}
+                    aria-label={`Match ${lItem.text}`}
+                    onKeyDown={(event) =>
+                      keyboard.handleKeyDown(event, "left", lItem.id)
+                    }
+                    onFocus={() => keyboard.handleFocus("left", lItem.id)}
+                    className="unit4-interactive"
                     style={{
                       width: "clamp(10px,1.3vw,16px)",
                       height: "clamp(10px,1.3vw,16px)",
@@ -332,7 +483,10 @@ export default function WB_ReadLookMatch_PageA() {
                             ? WRONG_COLOR
                             : ACTIVE_COLOR
                           : DOT_COLOR,
-                      cursor: showAns||showResults ? "default" : "pointer",
+                      cursor:
+                        showAns || lockedIds.includes(lItem.id)
+                          ? "default"
+                          : "pointer",
                       transition: "background 0.2s",
                       boxShadow: lSelected
                         ? "0 0 0 3px rgba(243,155,66,0.3)"
@@ -348,17 +502,26 @@ export default function WB_ReadLookMatch_PageA() {
                   <div
                     ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
                     onClick={() => handleRightSelect(rItem.id)}
+                    role="button"
+                    tabIndex={isRightLocked(rItem.id) ? -1 : 0}
+                    aria-disabled={isRightLocked(rItem.id)}
+                    aria-label={`Match ${rItem.text}`}
+                    onKeyDown={(event) =>
+                      keyboard.handleKeyDown(event, "right", rItem.id)
+                    }
+                    onFocus={() => keyboard.handleFocus("right", rItem.id)}
+                    className="unit4-interactive"
                     style={{
                       width: "clamp(10px,1.3vw,16px)",
                       height: "clamp(10px,1.3vw,16px)",
                       borderRadius: "50%",
                       justifySelf: "start", // ← يلتصق بيسار الخلية
                       flexShrink: 0,
-                      background: rConn ? ACTIVE_COLOR : DOT_COLOR,
-                      cursor:
-                        showAns || selectedLeft === null
-                          ? "default"
-                          : "pointer",
+                      background:
+                        selectedRight === rItem.id || rConn
+                          ? ACTIVE_COLOR
+                          : DOT_COLOR,
+                      cursor: isRightLocked(rItem.id) ? "default" : "pointer",
                       transition: "background 0.2s",
                       zIndex: 2,
                     }}
@@ -366,17 +529,41 @@ export default function WB_ReadLookMatch_PageA() {
 
                   {/* col 7 – right sentence */}
                   <div
-                    onClick={() => handleRightSelect(rItem.id)}
+                    onClick={() => {
+                      playAudio(`right-audio-${rItem.id}`, rItem.audio);
+                      handleRightSelect(rItem.id);
+                    }}
+                    className="unit4-audio-control unit4-interactive"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play: ${rItem.text}`}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`right-audio-${rItem.id}`, rItem.audio);
+                      }
+                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       minWidth: 0,
                       zIndex: 2,
                       padding: "clamp(4px,0.6vw,8px) clamp(8px,1vw,14px)",
-                      cursor:
-                        showAns || selectedLeft === null
-                          ? "default"
-                          : "pointer",
+                      cursor: showAns || showResults ? "default" : "pointer",
+
+                      border:
+                        selectedRight === rItem.id
+                          ? `1.5px solid ${ACTIVE_COLOR}`
+                          : "2px solid transparent",
+
+                      background:
+                        selectedRight === rItem.id
+                          ? "rgba(243,155,66,0.08)"
+                          : "transparent",
+
+                      borderRadius: "clamp(8px,1vw,12px)",
+                      transition: "border-color 0.2s, background 0.2s",
+
                       userSelect: "none",
                     }}
                   >
@@ -391,6 +578,9 @@ export default function WB_ReadLookMatch_PageA() {
                     >
                       {rItem.text}
                     </span>
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `right-audio-${rItem.id}`}
+                    />
                   </div>
                 </React.Fragment>
               );

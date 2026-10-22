@@ -7,11 +7,13 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad 
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 4.svg";
 import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
 
 const Unit9_Page6_Q2 = () => {
   const items = [
     {
       img: img1,
+      imgAlt: "A boy and a girl at a playground with swings and slides.",
       q: "Was he at the zoo?",
       options: ["Yes, he was.", "No, he wasn’t."],
       correct: "No, he wasn’t.",
@@ -19,68 +21,69 @@ const Unit9_Page6_Q2 = () => {
     {
       q: "Was she in the restaurant?",
       img: img2,
+      imgAlt: "A family eating together at a restaurant.",
       options: ["Yes, she was.", "No, she wasn’t."],
       correct: "Yes, she was.",
     },
     {
       q: "Was she at the bakery?",
       img: img3,
+      imgAlt: "A girl standing at the zoo near animal enclosures.",
       options: ["Yes, she was.", "No, she wasn’t."],
       correct: "No, she wasn’t.",
     },
     {
       q: "Where is she now?",
       img: img4,
+      imgAlt: "A girl sitting at a computer in a computer lab.",
       options: ["She is on the train.", "She is in the computer lab."],
       correct: "She is in the computer lab.",
     },
   ];
 
   const [selected, setSelected] = useState(Array(items.length).fill(""));
-  const [answers, setAnswers] = useState(Array(items.length).fill(""));
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAns, setShowAns] = useState(false);
 
   const chooseOption = (i, value) => {
-    if (locked) return;
+    if (showAns || lockedIds.includes(i)) return;
 
     const newSelected = [...selected];
     newSelected[i] = value;
     setSelected(newSelected);
-
-    const newAnswers = [...answers];
-    newAnswers[i] = items[i].start + value + items[i].end;
-    setAnswers(newAnswers);
+    setWrongIds((previous) => previous.filter((id) => id !== i));
   };
 
   const resetAll = () => {
     setSelected(Array(items.length).fill(""));
-    setAnswers(Array(items.length).fill(""));
-    setLocked(false);
-    setShowResult(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAns(false);
   };
 
   const showAnswers = () => {
     setSelected(items.map((i) => i.correct));
-    setAnswers(items.map((i) => i.start + i.correct + i.end));
-    setLocked(true);
+    setLockedIds(items.map((_, index) => index));
+    setWrongIds([]);
+    setShowAns(true);
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAns || lockedIds.length === items.length) return;
 
     if (selected.includes("")) {
       ValidationAlert.info();
       return;
     }
 
-    let score = 0;
-
-    items.forEach((item, i) => {
-      if (selected[i] === item.correct) {
-        score++;
-      }
-    });
+    const nextLockedIds = items.flatMap((item, index) =>
+      selected[index] === item.correct ? [index] : [],
+    );
+    const nextWrongIds = items.flatMap((item, index) =>
+      selected[index] === item.correct ? [] : [index],
+    );
+    const score = nextLockedIds.length;
 
     const total = items.length;
 
@@ -98,8 +101,8 @@ const Unit9_Page6_Q2 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setLocked(true);
-    setShowResult(true); // 🔥 مهم
+    setLockedIds(nextLockedIds);
+    setWrongIds(nextWrongIds);
   };
 
   return (
@@ -112,14 +115,12 @@ const Unit9_Page6_Q2 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "20px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            E
-          </span>
-          Read, look, and tap or click.
-        </h5>
-
-        <div className="grid grid-cols-2 gap-y-5 gap-x-20 mb-10">
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Read, look, and tap or click."
+          subTitle="Look at each picture, read the question, and choose the correct answer."
+        />
+        <div className="grid grid-cols-2 gap-y-5 gap-x-20 mb-10 w-full">
           {items.map((item, i) => (
             <div
               key={i}
@@ -143,7 +144,7 @@ const Unit9_Page6_Q2 = () => {
               {/* الصورة */}
               <img
                 src={item.img}
-                alt=""
+                alt={item.imgAlt}
                 style={{
                   width: "250px",
                   height: "auto",
@@ -155,7 +156,16 @@ const Unit9_Page6_Q2 = () => {
                 {item.options.map((opt, idx) => (
                   <div key={idx} style={{ position: "relative" }}>
                     <span
+                      role="button"
+                      tabIndex={showAns || lockedIds.includes(i) ? -1 : 0}
+                      aria-disabled={showAns || lockedIds.includes(i)}
                       onClick={() => chooseOption(i, opt)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          chooseOption(i, opt);
+                        }
+                      }}
                       style={{
                         display: "inline-block",
                         padding: "6px 14px",
@@ -165,10 +175,8 @@ const Unit9_Page6_Q2 = () => {
 
                         border:
                           selected[i] === opt
-                            ? locked
-                              ? opt === item.correct
-                                ? "1px solid #F79530"
-                                : "2px solid red"
+                            ? wrongIds.includes(i)
+                              ? "2px solid red"
                               : "1px solid #F79530"
                             : "1px solid transparent",
                       }}
@@ -177,7 +185,7 @@ const Unit9_Page6_Q2 = () => {
                     </span>
 
                     {/* ❌ */}
-                    {showResult &&
+                    {wrongIds.includes(i) &&
                       selected[i] === opt &&
                       opt !== item.correct && (
                         <div
