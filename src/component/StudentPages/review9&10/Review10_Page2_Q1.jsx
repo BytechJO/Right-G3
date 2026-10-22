@@ -1,6 +1,49 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+
+const page91C = (file) =>
+  new URL(
+    `../../../assets/audio/ClassBook/Unit 10/Page 91 - Exercise C/${file}`,
+    import.meta.url,
+  ).href;
+const blendAudio = {
+  cr: page91C("Item_001_cr.mp3"),
+  dr: page91C("Item_002_dr.mp3"),
+  tr: page91C("Item_003_tr.mp3"),
+};
+const colorAudio = {
+  red: page91C("Item_004_red.mp3"),
+  blue: page91C("Item_005_blue.mp3"),
+  green: page91C("Item_006_green.mp3"),
+};
+const wordAudio = Object.fromEntries(
+  [
+    ["train", "Item_007_train.mp3"],
+    ["cry", "Item_008_cry.mp3"],
+    ["draw", "Item_009_draw.mp3"],
+    ["truck", "Item_010_truck.mp3"],
+    ["crescent", "Item_011_crescent.mp3"],
+    ["drop", "Item_012_drop.mp3"],
+    ["tree", "Item_013_tree.mp3"],
+    ["crown", "Item_014_crown.mp3"],
+    ["drapes", "Item_015_drapes.mp3"],
+    ["drill", "Item_016_drill.mp3"],
+    ["crab", "Item_017_crab.mp3"],
+    ["traffic light", "Item_018_traffic_light.mp3"],
+    ["drain", "Item_019_drain.mp3"],
+    ["triangle", "Item_020_triangle.mp3"],
+    ["dress", "Item_021_dress.mp3"],
+    ["drink", "Item_022_drink.mp3"],
+    ["trash", "Item_023_trash.mp3"],
+    ["crowd", "Item_024_crowd.mp3"],
+    ["cream", "Item_025_cream.mp3"],
+    ["driver", "Item_026_driver.mp3"],
+  ].map(([word, file]) => [word, page91C(file)]),
+);
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 91/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 91/Ex C 2.svg";
@@ -30,7 +73,6 @@ const Review10_Page2_Q1 = () => {
     { key: "dr", color: "blue" },
     { key: "tr", color: "green" },
   ];
-
   const questions = [
     { id: 1, img: img1, word: "train", correct: "tr" },
     { id: 2, img: img2, word: "cry", correct: "cr" },
@@ -57,9 +99,11 @@ const Review10_Page2_Q1 = () => {
     { id: 21, img: img21, word: "drink", correct: "dr" },
   ];
 
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [revealed, setRevealed] = useState(false);
   const [answers, setAnswers] = useState({});
   const [showResult, setShowResult] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const showAnswers = () => {
     const corrects = {};
@@ -70,11 +114,13 @@ const Review10_Page2_Q1 = () => {
 
     setAnswers(corrects);
     setShowResult([]);
-    setLocked(true);
+    setLockedIds(questions.map((q) => q.id));
+    setRevealed(true);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (revealed || lockedIds.length === questions.length) return;
 
     const isEmpty = questions.some((q) => !answers[q.id]);
 
@@ -88,7 +134,9 @@ const Review10_Page2_Q1 = () => {
     );
 
     setShowResult(results);
-    setLocked(true);
+    setLockedIds(
+      questions.flatMap((q) => (answers[q.id] === q.correct ? [q.id] : [])),
+    );
 
     const correctCount = results.filter((r) => r === "correct").length;
     const total = questions.length;
@@ -112,7 +160,9 @@ const Review10_Page2_Q1 = () => {
   const resetAnswers = () => {
     setAnswers({});
     setShowResult([]);
-    setLocked(false);
+    setLockedIds([]);
+    setRevealed(false);
+    stopAudio();
   };
 
   return (
@@ -125,11 +175,13 @@ const Review10_Page2_Q1 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "30px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "15px" }}>C</span>
-         Color each box according to the sound you hear in the word.
-        </h5>
+        <ExerciseHeaderReview
+          sectionLetter="C"
+          title="Color each box according to the sound you hear in the word."
+          subTitle="Listen to each word, identify its target sound, then apply the matching color carefully."
+        />
         <div
+          className="w-full"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -140,8 +192,18 @@ const Review10_Page2_Q1 = () => {
         >
           {" "}
           {options.map((opt) => (
-            <div className="flex flex-col gap-1 items-center justify-center">
+            <div className="flex flex-col gap-1 items-center justify-center unit4-interactive unit4-audio-control">
               <button
+                tabIndex={0}
+                onClick={() =>
+                  playAudio(`blend-${opt.key}`, blendAudio[opt.key])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`blend-${opt.key}`, blendAudio[opt.key]);
+                  }
+                }}
                 key={opt.key}
                 style={{
                   backgroundColor: "#fee7ce",
@@ -159,16 +221,43 @@ const Review10_Page2_Q1 = () => {
                   cursor: "pointer",
                 }}
               >
-                {" "}
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `blend-${opt.key}`}
+                />{" "}
                 {opt.key}{" "}
               </button>
-              <span style={{ color: opt.color, fontSize: "18px" }}>
+              <span
+                role="button"
+                tabIndex={0}
+                className="unit4-interactive unit4-audio-control"
+                aria-label={`Play ${opt.color}`}
+                onClick={() =>
+                  playAudio(`color-${opt.color}`, colorAudio[opt.color])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+
+                    playAudio(`color-${opt.color}`, colorAudio[opt.color]);
+                  }
+                }}
+                style={{
+                  color: opt.color,
+                  fontSize: "18px",
+                  cursor: "pointer",
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `color-${opt.color}`}
+                />
+
                 {opt.color}
               </span>
             </div>
           ))}{" "}
         </div>
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, 1fr)",
@@ -192,6 +281,26 @@ const Review10_Page2_Q1 = () => {
               >
                 {/* الصورة */}
                 <div
+                  role={wordAudio[q.word] ? "button" : undefined}
+                  tabIndex={wordAudio[q.word] ? 0 : undefined}
+                  className={
+                    wordAudio[q.word]
+                      ? "unit4-interactive unit4-audio-control"
+                      : ""
+                  }
+                  onClick={() =>
+                    wordAudio[q.word] &&
+                    playAudio(`word-${q.id}`, wordAudio[q.word])
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      wordAudio[q.word] &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      playAudio(`word-${q.id}`, wordAudio[q.word]);
+                    }
+                  }}
                   style={{
                     border: "1px solid #f4a261",
                     borderRadius: "10px",
@@ -201,9 +310,12 @@ const Review10_Page2_Q1 = () => {
                     background: "#fff",
                   }}
                 >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `word-${q.id}`}
+                  />
                   <img
                     src={q.img}
-                    alt=""
+                    alt={q.word}
                     style={{ width: "100%", height: "70px" }}
                   />
 
@@ -226,14 +338,19 @@ const Review10_Page2_Q1 = () => {
                   }}
                 >
                   <select
-                    disabled={locked}
+                    disabled={revealed || lockedIds.includes(q.id)}
                     value={answers[q.id] || ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setAnswers((prev) => ({
                         ...prev,
                         [q.id]: e.target.value,
-                      }))
-                    }
+                      }));
+                      setShowResult((previous) =>
+                        previous.map((result, resultIndex) =>
+                          resultIndex === index ? undefined : result,
+                        ),
+                      );
+                    }}
                     style={{
                       width: "100%",
                       height: "35px",
@@ -242,14 +359,16 @@ const Review10_Page2_Q1 = () => {
                         showResult[index] === "wrong"
                           ? "2px solid red"
                           : "1px solid #f4a261",
-                      outline: "none",
                       // fontWeight: "bold",
                       textAlign: "center",
                       backgroundColor: userAnswer
                         ? selectedOpt?.color
                         : "white",
                       color: userAnswer ? "white" : "black",
-                      cursor: locked ? "default" : "pointer",
+                      cursor:
+                        revealed || lockedIds.includes(q.id)
+                          ? "default"
+                          : "pointer",
                     }}
                   >
                     <option value="">Choose</option>
@@ -277,7 +396,7 @@ const Review10_Page2_Q1 = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         // fontWeight: "bold",
-                        fontSize:"12px",
+                        fontSize: "12px",
                         border: "2px solid white",
                         boxShadow: "0 1px 6px rgba(0,0,0,0.2)",
                         pointerEvents: "none",

@@ -5,12 +5,26 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shal
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 66.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 65.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 86/Asset 67.svg";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+import heAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise B/Item_001_He.mp3";
+import sheAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise B/Item_002_She.mp3";
+import full1 from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise B/full1.mp3";
+import full2 from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise B/full2.mp3";
+import full3 from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise B/full3.mp3";
+import full4 from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise B/full4.mp3";
+
+const fullAudio = [full1, full2, full3, full4];
 
 const Unit10_Page5_Q3 = () => {
   const [userAnswers, setUserAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [revealed, setRevealed] = useState(false);
 
-  const [checked, setChecked] = useState(false);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const actions = [
     "watch a movie",
@@ -58,7 +72,7 @@ const Unit10_Page5_Q3 = () => {
     );
   };
   const handleChange = (id, field, value) => {
-    if (locked) return;
+    if (revealed || lockedIds.includes(id)) return;
 
     setUserAnswers((prev) => ({
       ...prev,
@@ -67,14 +81,19 @@ const Unit10_Page5_Q3 = () => {
         [field]: value,
       },
     }));
+    setWrongIds((previous) =>
+      previous.filter((questionId) => questionId !== id),
+    );
   };
   const showAnswer = () => {
     setUserAnswers(correctAnswers);
-    setLocked(true);
-    setChecked(true);
+    setLockedIds(questions.map((q) => q.id));
+    setRevealed(true);
+    setWrongIds([]);
+    stopAudio();
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (revealed || lockedIds.length === questions.length) return;
 
     // ✅ التحقق إذا في فراغ
     const empty = questions.some(
@@ -112,8 +131,22 @@ const Unit10_Page5_Q3 = () => {
     </div>
   `;
 
-    setChecked(true);
-    setLocked(true);
+    setWrongIds(
+      questions.flatMap((q) =>
+        userAnswers[q.id]?.word1 !== correctAnswers[q.id].word1 ||
+        userAnswers[q.id]?.word2 !== correctAnswers[q.id].word2
+          ? [q.id]
+          : [],
+      ),
+    );
+    setLockedIds(
+      questions.flatMap((q) =>
+        userAnswers[q.id]?.word1 === correctAnswers[q.id].word1 &&
+        userAnswers[q.id]?.word2 === correctAnswers[q.id].word2
+          ? [q.id]
+          : [],
+      ),
+    );
 
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
@@ -121,8 +154,10 @@ const Unit10_Page5_Q3 = () => {
   };
   const handleStartAgain = () => {
     setUserAnswers({});
-    setChecked(false);
-    setLocked(false);
+    setWrongIds([]);
+    setLockedIds([]);
+    setRevealed(false);
+    stopAudio();
   };
 
   return (
@@ -135,13 +170,13 @@ const Unit10_Page5_Q3 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "20px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            B
-          </span>
-   Look and write.
-        </h5>
+        <ExerciseHeader
+          sectionLetter="B"
+          title="Look and write."
+          subTitle="Use each picture clue to write the correct future sentence with will or won't."
+        />
         <div
+          className="w-full"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -169,11 +204,34 @@ const Unit10_Page5_Q3 = () => {
               {questions.map((q) => (
                 <div
                   key={q.id}
+                  role={lockedIds.includes(q.id) ? "button" : undefined}
+                  tabIndex={lockedIds.includes(q.id) ? 0 : undefined}
+                  className={
+                    lockedIds.includes(q.id)
+                      ? "unit4-audio-control unit4-full-audio-enabled"
+                      : ""
+                  }
+                  onClick={() =>
+                    lockedIds.includes(q.id) &&
+                    playAudio(`full-${q.id}`, fullAudio[q.id - 1])
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      lockedIds.includes(q.id) &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      playAudio(`full-${q.id}`, fullAudio[q.id - 1]);
+                    }
+                  }}
                   style={{
                     padding: "12px",
                     position: "relative",
                   }}
                 >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `full-${q.id}`}
+                  />
                   <div className="flex gap-2">
                     <span
                       style={{
@@ -187,7 +245,14 @@ const Unit10_Page5_Q3 = () => {
                     </span>
                     <img
                       src={q.image}
-                      alt={`q${q.id}`}
+                      alt={
+                        [
+                          "A boy at the movie theater with a check mark.",
+                          "A girl reading a book with an X mark.",
+                          "A boy riding a bicycle with an X mark.",
+                          "A girl planting flowers with a check mark.",
+                        ][q.id - 1]
+                      }
                       style={{
                         width: "150px",
                         height: "auto",
@@ -210,7 +275,38 @@ const Unit10_Page5_Q3 = () => {
                       fontSize: "18px",
                     }}
                   >
-                    {q.id === 1 || q.id === 3 ? "He" : "She"}
+                    <span
+                      role="button"
+                      tabIndex={lockedIds.includes(q.id) ? -1 : 0}
+                      className="unit4-interactive unit4-audio-control"
+                      onClick={(event) => {
+                        if (!lockedIds.includes(q.id)) {
+                          event.stopPropagation();
+                          playAudio(
+                            `pronoun-${q.id}`,
+                            q.id === 1 || q.id === 3 ? heAudio : sheAudio,
+                          );
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          !lockedIds.includes(q.id) &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          playAudio(
+                            `pronoun-${q.id}`,
+                            q.id === 1 || q.id === 3 ? heAudio : sheAudio,
+                          );
+                        }
+                      }}
+                    >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `pronoun-${q.id}`}
+                      />
+                      {q.id === 1 || q.id === 3 ? "He" : "She"}
+                    </span>
                     <div
                       style={{ position: "relative", display: "inline-block" }}
                     >
@@ -219,7 +315,8 @@ const Unit10_Page5_Q3 = () => {
                         onChange={(e) =>
                           handleChange(q.id, "word2", e.target.value)
                         }
-                        disabled={locked}
+                        disabled={revealed || lockedIds.includes(q.id)}
+                        onClick={(event) => event.stopPropagation()}
                         style={{
                           appearance: "none",
                           WebkitAppearance: "none",
@@ -227,7 +324,7 @@ const Unit10_Page5_Q3 = () => {
 
                           border: "none",
                           borderBottom:
-                            checked &&
+                            wrongIds.includes(q.id) &&
                             userAnswers[q.id]?.word2 &&
                             userAnswers[q.id]?.word2 !==
                               correctAnswers[q.id].word2
@@ -242,7 +339,10 @@ const Unit10_Page5_Q3 = () => {
                           padding: "2px 18px 2px 4px",
                           minWidth: "90px",
 
-                          cursor: locked ? "not-allowed" : "pointer",
+                          cursor:
+                            revealed || lockedIds.includes(q.id)
+                              ? "default"
+                              : "pointer",
                         }}
                       >
                         <option value="" disabled hidden>
@@ -254,7 +354,7 @@ const Unit10_Page5_Q3 = () => {
                           </option>
                         ))}
                       </select>
-                      {checked &&
+                      {wrongIds.includes(q.id) &&
                         userAnswers[q.id]?.word2 &&
                         userAnswers[q.id]?.word2 !==
                           correctAnswers[q.id].word2 && (
@@ -304,7 +404,8 @@ const Unit10_Page5_Q3 = () => {
                         onChange={(e) =>
                           handleChange(q.id, "word1", e.target.value)
                         }
-                        disabled={locked}
+                        disabled={revealed || lockedIds.includes(q.id)}
+                        onClick={(event) => event.stopPropagation()}
                         style={{
                           appearance: "none",
                           WebkitAppearance: "none",
@@ -312,7 +413,7 @@ const Unit10_Page5_Q3 = () => {
 
                           border: "none",
                           borderBottom:
-                            checked &&
+                            wrongIds.includes(q.id) &&
                             userAnswers[q.id]?.word1 &&
                             userAnswers[q.id]?.word1 !==
                               correctAnswers[q.id].word1
@@ -327,7 +428,10 @@ const Unit10_Page5_Q3 = () => {
                           padding: "2px 18px 2px 4px",
                           minWidth: "90px",
 
-                          cursor: locked ? "not-allowed" : "pointer",
+                          cursor:
+                            revealed || lockedIds.includes(q.id)
+                              ? "default"
+                              : "pointer",
                         }}
                       >
                         <option value="" disabled hidden>
@@ -337,7 +441,6 @@ const Unit10_Page5_Q3 = () => {
                           <option
                             key={i}
                             value={w}
-                            disabled={isWordUsedInAnotherQuestion(q.id, w)}
                             style={{
                               color: isWordUsedInAnotherQuestion(q.id, w)
                                 ? "#999"
@@ -348,7 +451,7 @@ const Unit10_Page5_Q3 = () => {
                           </option>
                         ))}
                       </select>
-                      {checked &&
+                      {wrongIds.includes(q.id) &&
                         userAnswers[q.id]?.word1 &&
                         userAnswers[q.id]?.word1 !==
                           correctAnswers[q.id].word1 && (

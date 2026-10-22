@@ -1,7 +1,7 @@
 import sound1 from "../../../assets/audio/ClassBook/Unit 10/P 82/Pg82_1.1_Adult Lady.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 10/P 82/Pg82_1.2_Adult Lady.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 10/P 82/Pg82_1.3_Adult Lady.mp3";
-import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 82/Pg82_1.4_Adult Lady.mp3"
+import sound4 from "../../../assets/audio/ClassBook/Unit 10/P 82/Pg82_1.4_Adult Lady.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/1-01.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 82-83/1-02.svg";
@@ -16,24 +16,24 @@ const Unit8_Page1_Read = () => {
     new Audio(sound1),
     new Audio(sound2),
     new Audio(sound3),
-    new Audio(sound4)
-  
+    new Audio(sound4),
   ];
 
-const captions = [
-   { start: 0, end: 3.05, text: "Page 82. Listen and read along." },
+  const captions = [
+    { start: 0, end: 3.05, text: "Page 82. Listen and read along." },
     { start: 3.6, end: 6.14, text: "CR, DR, TR. Crab. Dream. Tree" },
-    
   ];
   return (
     <>
       <FourImagesWithAudio
-        images={[Rabbit, img1, img2, img3,img4]}
+        images={[Rabbit, img1, img2, img3, img4]}
         audioSrc={longAudio}
         checkpoints={[0, 3.4, 7.8, 9, 10.14]}
         popupOpen={true}
+        subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
         titleQ={"Listen and read along."}
         audioArr={imageSounds}
+        pageId="unit10-page82-read"
         captions={captions}
       />
     </>

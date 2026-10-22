@@ -1,6 +1,25 @@
 import React, { useState, useRef } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Review9_Page2_Q1.css";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import useWorkbookMatchingKeyboard from "../../WorkBookPages/Unit4/useWorkbookMatchingKeyboard";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+
+const page89C = (file) =>
+  new URL(
+    `../../../assets/audio/ClassBook/Unit 10/Page 89 - Exercise C/${file}`,
+    import.meta.url,
+  ).href;
+const matchAudio = [
+  "Item_001_girls.mp3",
+  "Item_002_ducks.mp3",
+  "Item_003_caps.mp3",
+  "Item_004_cats.mp3",
+  "Item_005_bags.mp3",
+  "Item_006_peas.mp3",
+].map(page89C);
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 89/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 89/Ex C 2.svg";
@@ -12,13 +31,17 @@ import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shal
 const Review9_Page2_Q1 = () => {
   const [selectedImg, setSelectedImg] = useState(null);
   const [matches, setMatches] = useState({});
-  const [showResult, setShowResult] = useState(false);
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [revealed, setRevealed] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState(null);
 
   const imageRefs = useRef([]);
   const sentenceRefs = useRef([]);
   const containerRef = useRef(null);
+  const imageControlRefs = useRef([]);
+  const sentenceControlRefs = useRef([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const images = [
     { id: 0, img: img1 },
@@ -46,26 +69,55 @@ const Review9_Page2_Q1 = () => {
     4: 1,
     5: 3,
   };
+  const isImageLocked = (id) => revealed || lockedIds.includes(id);
+  const isSentenceLocked = (id) =>
+    revealed || lockedIds.some((imageId) => matches[imageId] === id);
+
+  const commitMatch = (imageId, sentenceId) => {
+    if (isImageLocked(imageId) || isSentenceLocked(sentenceId)) return;
+    setMatches((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key] === sentenceId && !lockedIds.includes(Number(key)))
+          delete updated[key];
+      });
+      updated[imageId] = sentenceId;
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== imageId));
+    setSelectedImg(null);
+    setSelectedSentence(null);
+  };
+
+  const keyboardMatch = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: images.map((image) => image.id),
+    rightIds: sentences.map((sentence) => sentence.id),
+    getElement: (side, id) =>
+      side === "left"
+        ? imageControlRefs.current[id]
+        : sentenceControlRefs.current[id],
+    getAnchorElement: (side, id) =>
+      side === "left" ? imageRefs.current[id] : sentenceRefs.current[id],
+    isLeftLocked: isImageLocked,
+    isRightLocked: isSentenceLocked,
+    onCommit: commitMatch,
+    onStart: (side, id) => {
+      if (side === "left") setSelectedImg(id);
+      else setSelectedSentence(id);
+    },
+    onCancel: () => {
+      setSelectedImg(null);
+      setSelectedSentence(null);
+    },
+  });
 
   const selectImage = (id) => {
-    if (locked || showResult) return;
+    if (isImageLocked(id)) return;
 
     // إذا اختار جملة → اربط
     if (selectedSentence !== null) {
-      setMatches((prev) => {
-        const updated = { ...prev };
-
-        Object.keys(updated).forEach((imgKey) => {
-          if (updated[imgKey] === selectedSentence) {
-            delete updated[imgKey];
-          }
-        });
-
-        updated[id] = selectedSentence;
-        return updated;
-      });
-
-      setSelectedSentence(null);
+      commitMatch(id, selectedSentence);
       return;
     }
 
@@ -74,30 +126,17 @@ const Review9_Page2_Q1 = () => {
   };
 
   const selectSentence = (id) => {
-    if (locked || showResult) return;
+    if (isSentenceLocked(id)) return;
 
     // إذا في صورة مختارة → اربط
     if (selectedImg !== null) {
-      setMatches((prev) => {
-        const updated = { ...prev };
-
-        Object.keys(updated).forEach((imgKey) => {
-          if (updated[imgKey] === id) {
-            delete updated[imgKey];
-          }
-        });
-
-        updated[selectedImg] = id;
-        return updated;
-      });
-
-      setSelectedImg(null);
+      commitMatch(selectedImg, id);
       return;
     }
     setSelectedSentence(id);
   };
   const checkAnswers = () => {
-    if (locked || showResult) return;
+    if (revealed || lockedIds.length === images.length) return;
 
     if (Object.keys(matches).length !== images.length) {
       ValidationAlert.info("Please match all.");
@@ -124,22 +163,36 @@ const Review9_Page2_Q1 = () => {
       ValidationAlert.warning(message);
     }
 
-    setShowResult(true);
-    setLocked(true);
+    setLockedIds(
+      images.flatMap((image) =>
+        correct[image.id] === matches[image.id] ? [image.id] : [],
+      ),
+    );
+    setWrongIds(
+      images.flatMap((image) =>
+        correct[image.id] !== matches[image.id] ? [image.id] : [],
+      ),
+    );
   };
 
   const showAnswers = () => {
     setMatches(correct);
-    setLocked(true);
-    setShowResult(true);
+    setLockedIds(images.map((image) => image.id));
+    setRevealed(true);
+    setWrongIds([]);
+    keyboardMatch.clear();
+    stopAudio();
   };
 
   const reset = () => {
     setSelectedSentence(null);
     setSelectedImg(null);
     setMatches({});
-    setShowResult(false);
-    setLocked(false);
+    setWrongIds([]);
+    setLockedIds([]);
+    setRevealed(false);
+    keyboardMatch.clear();
+    stopAudio();
   };
 
   return (
@@ -154,10 +207,11 @@ const Review9_Page2_Q1 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "30px" }}>
-        <h5 className="header-title-page8 mb-10">
-          <span style={{ marginRight: "10px" }}>C</span>
-         Look, read, and match.
-        </h5>
+        <ExerciseHeaderReview
+          sectionLetter="C"
+          title="Look, read, and match."
+          subTitle="Start with one word or picture, then connect it to the partner that means the same thing."
+        />
 
         <div className="w-full flex flex-col items-center gap-40">
           {/* 🔥 الصور فوق */}
@@ -165,7 +219,18 @@ const Review9_Page2_Q1 = () => {
             {images.map((img, i) => (
               <div
                 key={i}
+                ref={(element) => {
+                  imageControlRefs.current[i] = element;
+                }}
                 onClick={() => selectImage(i)}
+                role="button"
+                tabIndex={isImageLocked(i) ? -1 : 0}
+                aria-disabled={isImageLocked(i)}
+                aria-label={`Picture ${i + 1}, start or complete a match`}
+                onKeyDown={(event) =>
+                  keyboardMatch.handleKeyDown(event, "left", i)
+                }
+                onFocus={() => keyboardMatch.handleFocus("left", i)}
                 className="relative flex flex-col items-center gap-2 cursor-pointer transition"
               >
                 <div className="flex gap-2">
@@ -179,6 +244,16 @@ const Review9_Page2_Q1 = () => {
                   </span>
                   <img
                     src={img.img}
+                    alt={
+                      [
+                        "Colorful caps.",
+                        "Colorful school bags.",
+                        "Two girls.",
+                        "Green pea pods.",
+                        "Three ducks.",
+                        "Three cats.",
+                      ][i]
+                    }
                     style={{
                       width: "100px",
                       height: "85px",
@@ -215,9 +290,28 @@ const Review9_Page2_Q1 = () => {
             {sentences.map((sent, i) => (
               <div
                 key={i}
-                onClick={() => selectSentence(i)}
-                className="relative flex flex-col items-center cursor-pointer"
+                ref={(element) => {
+                  sentenceControlRefs.current[i] = element;
+                }}
+                onClick={() => {
+                  playAudio(`match-word-${i}`, matchAudio[i]);
+                  selectSentence(i);
+                }}
+                role="button"
+                tabIndex={isSentenceLocked(i) ? -1 : 0}
+                aria-disabled={isSentenceLocked(i)}
+                aria-label={`${sent.text}, start or complete a match`}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ")
+                    playAudio(`match-word-${i}`, matchAudio[i]);
+                  keyboardMatch.handleKeyDown(event, "right", i);
+                }}
+                onFocus={() => keyboardMatch.handleFocus("right", i)}
+                className="relative flex flex-col items-center cursor-pointer unit4-interactive unit4-audio-control"
               >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `match-word-${i}`}
+                />
                 {/* 🔥 الدوت */}
                 <div
                   ref={(el) => (sentenceRefs.current[i] = el)} // 🔥 هون كمان
@@ -248,10 +342,10 @@ const Review9_Page2_Q1 = () => {
                   }}
                 >
                   {sent.text}
-                  {showResult &&
+                  {wrongIds.length > 0 &&
                     Object.entries(matches).some(
                       ([imgId, sentId]) =>
-                        sentId == i && correct[imgId] !== sentId,
+                        sentId == i && wrongIds.includes(Number(imgId)),
                     ) && (
                       <span
                         style={{
@@ -286,6 +380,15 @@ const Review9_Page2_Q1 = () => {
       </div>
 
       <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        {keyboardMatch.preview && (
+          <line
+            {...keyboardMatch.preview}
+            stroke="orange"
+            strokeWidth="2.5"
+            strokeDasharray="7 6"
+            strokeLinecap="round"
+          />
+        )}
         {Object.entries(matches).map(([imgId, sentId], i) => {
           const imgDot = imageRefs.current[imgId];
           const sentDot = sentenceRefs.current[sentId];

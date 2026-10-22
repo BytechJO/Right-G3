@@ -8,8 +8,6 @@ const Review10_Page1 = ({ openPopup }) => {
       className="page1-img-wrapper"
       style={{ backgroundImage: `url(${page_1})` }}
     >
-      {/* <img src={page_1} /> */}
-
       <div
         className="click-icon-review10-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -18,8 +16,20 @@ const Review10_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 100 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 100 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -31,6 +41,7 @@ const Review10_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="click-icon-review10-page1-3 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -39,8 +50,20 @@ const Review10_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 101 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 101 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
