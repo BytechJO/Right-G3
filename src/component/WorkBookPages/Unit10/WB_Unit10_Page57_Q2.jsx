@@ -128,21 +128,6 @@ export default function WB_Unit8_Page57_QB() {
             return (
               <div
                 key={q.id}
-                className={
-                  checked
-                    ? "unit4-audio-control unit4-full-audio-enabled"
-                    : undefined
-                }
-                role={checked ? "button" : undefined}
-                tabIndex={checked ? 0 : undefined}
-                aria-label={checked ? `Play: ${q.text} ${selected}` : undefined}
-                onClick={() => checked && playAudio(`full-${q.id}`, q.audio)}
-                onKeyDown={(event) => {
-                  if (checked && (event.key === "Enter" || event.key === " ")) {
-                    event.preventDefault();
-                    playAudio(`full-${q.id}`, q.audio);
-                  }
-                }}
                 style={{
                   position: "relative",
                   display: "flex",
@@ -171,15 +156,37 @@ export default function WB_Unit8_Page57_QB() {
                     {q.id}
                   </span>
                   <span
+                    role="button"
+                    tabIndex={0}
+                    className="unit4-interactive unit4-audio-control"
+                    aria-label={`Play: ${q.text}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+
+                      playAudio(`question-${q.id}`, q.audio);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        playAudio(`question-${q.id}`, q.audio);
+                      }
+                    }}
                     style={{
                       fontSize: "18px",
                       color: "#222",
                       lineHeight: 1.4,
-                      // fontWeight: 500,
                       whiteSpace: "nowrap",
+                      cursor: "pointer",
+                      position: "relative",
                     }}
                   >
                     {q.text}
+
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `question-${q.id}`}
+                    />
                   </span>
                 </div>
 
