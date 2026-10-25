@@ -113,7 +113,9 @@ export default function WB_Transport_Dropdown() {
           }}
         >
           {/* Word Bank */}
-          <div style={{ display: "flex", justifyContent: "center" , width: "30%",}}>
+          <div
+            style={{ display: "flex", justifyContent: "center", width: "30%" }}
+          >
             <div
               style={{
                 width: "100%",
@@ -231,7 +233,6 @@ export default function WB_Transport_Dropdown() {
                         borderRight: "none",
                         borderBottom: `${wrong ? `2px solid  ${WRONG_COLOR}` : "1px solid #3f3f3f"}`,
                         borderRadius: 0,
-                        outline: "none",
                         fontSize: "clamp(12px, 1.7vw, 18px)",
                         // fontWeight: 500,
                         color: "#000",

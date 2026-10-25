@@ -380,7 +380,15 @@ const Unit10_Page1 = ({ openPopup }) => {
     >
       <div
         className="headset-icon-CD-unit10-page1-1 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
+        style={{
+          overflow: "visible",
+          position: "absolute",
+          transform: "translate(-50%, -50%)",
+          cursor: "pointer",
+          padding: "5px",
+          top: "8%",
+          right: "14%",
+        }}
       >
         <svg
           width="22"
@@ -414,7 +422,15 @@ const Unit10_Page1 = ({ openPopup }) => {
 
       <div
         className="click-icon-unit10-page1-1 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
+        style={{
+          overflow: "visible",
+          position: "absolute",
+          transform: "translate(-50%, -50%)",
+          cursor: "pointer",
+          padding: "5px",
+          left: "19%",
+          top: "27%",
+        }}
       >
         <svg
           width="22"
@@ -448,7 +464,15 @@ const Unit10_Page1 = ({ openPopup }) => {
 
       <div
         className="headset-icon-CD-unit10-page1-2 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
+        style={{
+          overflow: "visible",
+          position: "absolute",
+          transform: "translate(-50%, -50%)",
+          cursor: "pointer",
+          padding: "5px",
+          bottom: "53.5%",
+          left: "26.2%",
+        }}
       >
         <svg
           width="22"
@@ -482,7 +506,15 @@ const Unit10_Page1 = ({ openPopup }) => {
 
       <div
         className="click-icon-unit10-page1-2 hover:scale-110 transition"
-        style={{ overflow: "visible" }}
+        style={{
+          overflow: "visible",
+          position: "absolute",
+          transform: "translate(-50%, -50%)",
+          cursor: "pointer",
+          padding: "5px",
+          bottom: "10.5%",
+          right: "37%",
+        }}
       >
         <svg
           width="22"

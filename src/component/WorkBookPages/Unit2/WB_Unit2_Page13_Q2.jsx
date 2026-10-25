@@ -149,7 +149,6 @@ const styles = {
     borderRight: "none",
     borderBottom: "1px solid #333",
     borderRadius: 0,
-    outline: "none",
     fontSize: "clamp(12px,1.4vw,18px)",
     // fontWeight: 500,
     // color: RED,

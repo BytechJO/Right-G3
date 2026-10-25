@@ -34,10 +34,32 @@ const MONTHS = [
 ];
 
 const NUMBER_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
-const MONTH_AUDIO = { March: a1, April: a2, November: a3, August: a4, July: a5, December: a6, January: a7, June: a8, September: a9, February: a10, October: a11, May: a12 };
+const MONTH_AUDIO = {
+  March: a1,
+  April: a2,
+  November: a3,
+  August: a4,
+  July: a5,
+  December: a6,
+  January: a7,
+  June: a8,
+  September: a9,
+  February: a10,
+  October: a11,
+  May: a12,
+};
 
 // eslint-disable-next-line react-refresh/only-export-components
-function MonthItem({ item, value, onChange, showAns, locked, wrong, active, onPlay }) {
+function MonthItem({
+  item,
+  value,
+  onChange,
+  showAns,
+  locked,
+  wrong,
+  active,
+  onPlay,
+}) {
   const currentValue = showAns ? item.correct : (value ?? "");
 
   return (
@@ -72,7 +94,10 @@ function MonthItem({ item, value, onChange, showAns, locked, wrong, active, onPl
           }
         }}
         aria-label={`Play ${item.name}`}
-      ><Unit4PlayingAudioIcon active={active} />{item.name}</span>
+      >
+        <Unit4PlayingAudioIcon active={active} />
+        {item.name}
+      </span>
 
       {wrong && !showAns && <span className="wrong-badge">✕</span>}
     </div>
@@ -109,9 +134,15 @@ export default function WB_UnitX_Page25_QI() {
       ValidationAlert.info("Please complete all answers first.");
       return;
     }
-    const correctIds = MONTHS.filter((item) => answers[item.id] === item.correct).map((item) => item.id);
+    const correctIds = MONTHS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
     setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
-    setWrongIds(MONTHS.filter((item) => answers[item.id] !== item.correct).map((item) => item.id));
+    setWrongIds(
+      MONTHS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
     if (score === MONTHS.length)
       ValidationAlert.success(`Score: ${score} / ${MONTHS.length}`);
     else if (score > 0)
@@ -204,7 +235,6 @@ export default function WB_UnitX_Page25_QI() {
           width: 100%;
           height: 100%;
           border: none;
-          outline: none;
           background: transparent;
           appearance: none;
           -webkit-appearance: none;
@@ -320,7 +350,11 @@ export default function WB_UnitX_Page25_QI() {
             gap: "90px",
           }}
         >
-          <ExerciseHeader sectionLetter="I" title="Number the months in order." subTitle="Work through the months from January to December in sequence from the beginning, then assign each number only once." />
+          <ExerciseHeader
+            sectionLetter="I"
+            title="Number the months in order."
+            subTitle="Work through the months from January to December in sequence from the beginning, then assign each number only once."
+          />
 
           <div className="months-card">
             <div className="months-grid">
@@ -334,7 +368,9 @@ export default function WB_UnitX_Page25_QI() {
                   locked={lockedIds.includes(item.id)}
                   wrong={isWrong(item)}
                   active={activeAudioKey === `month-${item.id}`}
-                  onPlay={() => playAudio(`month-${item.id}`, MONTH_AUDIO[item.name])}
+                  onPlay={() =>
+                    playAudio(`month-${item.id}`, MONTH_AUDIO[item.name])
+                  }
                 />
               ))}
             </div>
