@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
 import {
   DndContext,
   PointerSensor,
@@ -18,6 +23,7 @@ import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Fold
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Folder/Page 61/SVG/8.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Folder/Page 61/SVG/9.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Folder/Page 61/SVG/10.svg";
+import paragraphAudio from "../../../assets/audio/WorkBook/unit10/Page 61 - Exercise J/Item_001_We_are_planning_our_vacation_to_the_beach._Tonight,_Dad_will_show_us_a_b.mp3";
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const WRONG_COLOR = "#ef4444";
@@ -80,12 +86,12 @@ const QUESTIONS = [
 ];
 // ── بيانات الصور + الترتيب الصحيح ─────────────────────────────
 const IMAGE_CARDS = [
-  { id: 1, img: img1, correctNumber: 1 },
-  { id: 2, img: img2, correctNumber: 3 },
-  { id: 3, img: img3, correctNumber: 2 },
-  { id: 4, img: img4, correctNumber: 6 },
-  { id: 5, img: img5, correctNumber: 4 },
-  { id: 6, img: img6, correctNumber: 5 },
+  { id: 1, img: img1, alt: "Dad showing a hotel brochure", correctNumber: 1 },
+  { id: 2, img: img2, alt: "Choosing clothes to pack", correctNumber: 3 },
+  { id: 3, img: img3, alt: "Buying new swimsuits", correctNumber: 2 },
+  { id: 4, img: img4, alt: "Returning home after vacation", correctNumber: 6 },
+  { id: 5, img: img5, alt: "Packing a suitcase", correctNumber: 4 },
+  { id: 6, img: img6, alt: "A family at the beach", correctNumber: 5 },
 ];
 
 const DRAG_NUMBERS = [1, 2, 3, 4, 5, 6];
@@ -126,19 +132,38 @@ const ErrorBadge = () => (
   </div>
 );
 
-function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+function DraggableNumber({
+  num,
+  disabled,
+  draggedNumber,
+  setDraggedNumber,
+  keyboard,
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: String(num),
     disabled,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        keyboard.registerItem(num, node);
+      }}
       {...listeners}
       {...attributes}
       onMouseDown={() => setDraggedNumber(num)}
       onTouchStart={() => setDraggedNumber(num)}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled}
+      aria-label={`Number ${num}${disabled ? ", already used" : ""}`}
+      onKeyDown={(event) => {
+        if ((event.key === "Enter" || event.key === " ") && !disabled) {
+          event.preventDefault();
+          keyboard.pickItem(num);
+        }
+      }}
       style={{
         width: "clamp(32px,4vw,46px)",
         height: "clamp(32px,4vw,46px)",
@@ -167,14 +192,37 @@ function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
   );
 }
 
-function DroppableImageCard({ card, num, wrong, showAns, handleRemoveImg }) {
+function DroppableImageCard({
+  card,
+  num,
+  wrong,
+  locked,
+  showAns,
+  handleRemoveImg,
+  keyboard,
+}) {
   const { setNodeRef, isOver } = useDroppable({
     id: String(card.id),
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        keyboard.registerTarget(card.id, node);
+      }}
+      role="button"
+      tabIndex={!locked && (keyboard.keyboardItemId !== null || num) ? 0 : -1}
+      aria-disabled={locked}
+      aria-label={`${card.alt}${num ? `, number ${num}` : ", empty"}`}
+      onKeyDown={(event) => {
+        if (keyboard.keyboardItemId !== null)
+          keyboard.handleTargetKeyDown(event, card.id);
+        else if (num && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          handleRemoveImg(card.id);
+        }
+      }}
       style={{
         position: "relative",
       }}
@@ -182,7 +230,7 @@ function DroppableImageCard({ card, num, wrong, showAns, handleRemoveImg }) {
       {/* الصورة */}
       <img
         src={card.img}
-        alt={`card-${card.id}`}
+        alt={card.alt}
         style={{
           width: "100%",
           height: "100%",
@@ -190,7 +238,7 @@ function DroppableImageCard({ card, num, wrong, showAns, handleRemoveImg }) {
           display: "block",
           userSelect: "none",
           pointerEvents: "none",
-           transition: "all .2s ease",
+          transition: "all .2s ease",
 
           transform: isOver ? "scale(1.03)" : "scale(1)",
 
@@ -237,10 +285,16 @@ function DroppableImageCard({ card, num, wrong, showAns, handleRemoveImg }) {
           cursor: num && !showAns ? "pointer" : "default",
 
           boxSizing: "border-box",
-         
         }}
       >
-        {num || ""}
+        {keyboard.keyboardItemId !== null &&
+        keyboard.keyboardTargetId === card.id ? (
+          <span className="unit4-keyboard-preview">
+            {keyboard.keyboardItemId}
+          </span>
+        ) : (
+          num || ""
+        )}
       </div>
 
       {wrong && <ErrorBadge />}
@@ -260,6 +314,9 @@ export default function WB_Unit10_Page61_QJ() {
   // ── state عام ──
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedImgIds, setLockedImgIds] = useState([]);
+  const [lockedTextIds, setLockedTextIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -279,7 +336,7 @@ export default function WB_Unit10_Page61_QJ() {
 
   // ── applyDrop ──
   const applyDrop = (id, num) => {
-    if (!num || showAns) return;
+    if (!num || showAns || lockedImgIds.includes(Number(id))) return;
     setChecked(false);
     setImgAnswers((prev) => {
       const updated = { ...prev };
@@ -302,18 +359,27 @@ export default function WB_Unit10_Page61_QJ() {
   };
 
   const handleRemoveImg = (id) => {
-    if (showAns || checked) return;
+    if (showAns || lockedImgIds.includes(Number(id))) return;
+    const returnedNumber = imgAnswers[id];
     setChecked(false);
     setImgAnswers((prev) => {
       const u = { ...prev };
       delete u[id];
       return u;
     });
+    if (returnedNumber) keyboard.focusItem(returnedNumber);
   };
+  const keyboard = useUnit4TabDrag({
+    itemIds: DRAG_NUMBERS,
+    targetIds: IMAGE_CARDS.map((card) => card.id),
+    isItemDisabled: (num) => usedNumbers.includes(num) || showAns,
+    isTargetDisabled: (id) => lockedImgIds.includes(Number(id)),
+    onPlace: (num, id) => applyDrop(Number(id), num),
+  });
 
   // ── نص الجمل ──
   const handleTextChange = (id, value) => {
-    if (showAns || checked) return;
+    if (showAns || lockedTextIds.includes(Number(id))) return;
     setChecked(false);
     setTextAnswers((prev) => ({ ...prev, [id]: value }));
   };
@@ -326,14 +392,14 @@ export default function WB_Unit10_Page61_QJ() {
     checked &&
     normalize(textAnswers[id]) !==
       normalize(QUESTIONS.find((q) => q.id === id)?.correctOption);
-  const isTextRight = (id) =>
-    checked &&
-    normalize(textAnswers[id]) ===
-      normalize(QUESTIONS.find((q) => q.id === id)?.correctOption);
-
   // ── Check / Show / Reset ──
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (
+      showAns ||
+      lockedImgIds.length + lockedTextIds.length ===
+        IMAGE_CARDS.length + QUESTIONS.length
+    )
+      return;
     const allImgs = IMAGE_CARDS.every((c) => imgAnswers[c.id]);
     const allTexts = QUESTIONS.every((q) => textAnswers[q.id]?.trim());
     if (!allImgs || !allTexts) {
@@ -349,6 +415,16 @@ export default function WB_Unit10_Page61_QJ() {
     const correct = imgScore + textScore;
     const total = IMAGE_CARDS.length + QUESTIONS.length;
     setChecked(true);
+    setLockedImgIds(
+      IMAGE_CARDS.filter(
+        (card) => imgAnswers[card.id] === card.correctNumber,
+      ).map((card) => card.id),
+    );
+    setLockedTextIds(
+      QUESTIONS.filter(
+        (q) => normalize(textAnswers[q.id]) === normalize(q.correctOption),
+      ).map((q) => q.id),
+    );
     if (correct === total)
       ValidationAlert.success(`Score: ${correct} / ${total}`);
     else if (correct > 0)
@@ -369,17 +445,24 @@ export default function WB_Unit10_Page61_QJ() {
     setTextAnswers(texts);
     setChecked(false);
     setShowAns(true);
+    setLockedImgIds(IMAGE_CARDS.map((card) => card.id));
+    setLockedTextIds(QUESTIONS.map((q) => q.id));
     // setTouchItem(null);
     setDraggedNumber(null);
+    keyboard.cancel();
   };
 
   const handleReset = () => {
     setImgAnswers({});
     setTextAnswers({});
     setDraggedNumber(null);
+    keyboard.cancel();
     // setTouchItem(null);
     setChecked(false);
     setShowAns(false);
+    setLockedImgIds([]);
+    setLockedTextIds([]);
+    stopAudio();
   };
 
   return (
@@ -391,9 +474,11 @@ export default function WB_Unit10_Page61_QJ() {
       >
         <div className="div-forall" style={{ gap: "clamp(16px,2.5vw,28px)" }}>
           {/* ── العنوان ── */}
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">J</span>Read and write. Number the pictures in order.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="J"
+            title="Read and write. Number the pictures in order."
+            subTitle="Read all vacation events in chronological order and the matching time expression clues first, then assign the numbers carefully so the picture or order is used correctly."
+          />
 
           {/* ── الصف الأعلى: الصور + الفقرة ── */}
           <div
@@ -425,9 +510,10 @@ export default function WB_Unit10_Page61_QJ() {
                   <DraggableNumber
                     key={num}
                     num={num}
-                    disabled={usedNumbers.includes(num) || showAns || checked}
+                    disabled={usedNumbers.includes(num) || showAns}
                     draggedNumber={draggedNumber}
                     setDraggedNumber={setDraggedNumber}
+                    keyboard={keyboard}
                   />
                 ))}
               </div>
@@ -450,7 +536,9 @@ export default function WB_Unit10_Page61_QJ() {
                       num={num}
                       wrong={wrong}
                       showAns={showAns || checked}
+                      locked={lockedImgIds.includes(card.id)}
                       handleRemoveImg={handleRemoveImg}
+                      keyboard={keyboard}
                     />
                   );
                 })}
@@ -463,11 +551,22 @@ export default function WB_Unit10_Page61_QJ() {
                 border: "1px solid #e5e7eb",
                 borderRadius: "clamp(10px,1.2vw,16px)",
                 backgroundColor: "#fff",
-                height:"100%",
+                height: "100%",
                 padding: "clamp(12px,1.5vw,20px)",
               }}
             >
               <p
+                className="unit4-audio-control"
+                role="button"
+                tabIndex={0}
+                aria-label="Play the vacation passage"
+                onClick={() => playAudio("paragraph", paragraphAudio)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio("paragraph", paragraphAudio);
+                  }
+                }}
                 style={{
                   margin: 0,
                   fontSize: "clamp(13px,1.6vw,18px)",
@@ -477,6 +576,9 @@ export default function WB_Unit10_Page61_QJ() {
                 }}
               >
                 {PARAGRAPH}
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === "paragraph"}
+                />
               </p>
             </div>
           </div>
@@ -491,7 +593,6 @@ export default function WB_Unit10_Page61_QJ() {
           >
             {QUESTIONS.map((q) => {
               const wrong = isTextWrong(q.id);
-              const right = isTextRight(q.id);
               return (
                 <div
                   key={q.id}
@@ -532,22 +633,26 @@ export default function WB_Unit10_Page61_QJ() {
                   {/* حقل الإجابة */}
                   <div style={{ flex: 1, position: "relative", minWidth: 0 }}>
                     <select
-                      disabled={showAns || checked}
+                      disabled={showAns || lockedTextIds.includes(q.id)}
                       value={textAnswers[q.id] || ""}
-                      onChange={(e) => handleTextChange(q.id, e.target.value)}
+                      onChange={(e) => {
+                        handleTextChange(q.id, e.target.value);
+                      }}
                       style={{
                         width: "100%",
                         borderBottom: wrong
                           ? `2px solid red`
                           : "1px solid #d1d5db",
                         // borderRadius: "10px",
-                        outline: "none",
                         background: "#fff",
                         fontSize: "clamp(13px,1.6vw,17px)",
                         // fontWeight: 600,
                         // color: wrong ? WRONG_COLOR : "#222",
                         padding: "10px 12px",
-                        cursor: showAns || checked ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedTextIds.includes(q.id)
+                            ? "default"
+                            : "pointer",
                         boxSizing: "border-box",
                         transition: "0.2s ease",
                         // appearance: "none",
@@ -562,6 +667,9 @@ export default function WB_Unit10_Page61_QJ() {
                       ))}
                     </select>
                     {wrong && <ErrorBadge />}
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `text-${q.id}`}
+                    />
                   </div>
                 </div>
               );

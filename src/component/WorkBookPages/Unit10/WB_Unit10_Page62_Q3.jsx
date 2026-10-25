@@ -1,10 +1,17 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useCallback, useState, useRef, useLayoutEffect } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useWorkbookMatchingKeyboard from "../Unit4/useWorkbookMatchingKeyboard";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
-import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd13pg62instruction1-adult-lady_lYm3lMP5.mp3"; 
+import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd13pg62instruction1-adult-lady_lYm3lMP5.mp3";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-
+import drAudio from "../../../assets/audio/WorkBook/unit10/Page 62 - Exercise C/Item_001_dr.mp3";
+import trAudio from "../../../assets/audio/WorkBook/unit10/Page 62 - Exercise C/Item_002_tr.mp3";
+import crAudio from "../../../assets/audio/WorkBook/unit10/Page 62 - Exercise C/Item_003_cr.mp3";
 
 const ACTIVE_COLOR = "#f39b42";
 const LINE_COLOR = "#ffca94";
@@ -12,50 +19,53 @@ const INACTIVE_COLOR = "#bdbdbd";
 
 const exerciseData = {
   top: [
-  { id: 1, text: "1" },
-  { id: 2, text: "2" },
-  { id: 3, text: "3" },
-  { id: 4, text: "4" },
-  { id: 5, text: "5" },
-  { id: 6, text: "6" },
+    { id: 1, text: "1" },
+    { id: 2, text: "2" },
+    { id: 3, text: "3" },
+    { id: 4, text: "4" },
+    { id: 5, text: "5" },
+    { id: 6, text: "6" },
   ],
   bottom: [
-   { id: 1, text: "tr" },
-  { id: 2, text: "dr" },
-  { id: 3, text: "cr" },
-  { id: 4, text: "dr" },
-  { id: 5, text: "tr" },
-  { id: 6, text: "cr" },
+    { id: 1, text: "tr", audio: trAudio },
+    { id: 2, text: "dr", audio: drAudio },
+    { id: 3, text: "cr", audio: crAudio },
+    { id: 4, text: "dr", audio: drAudio },
+    { id: 5, text: "tr", audio: trAudio },
+    { id: 6, text: "cr", audio: crAudio },
   ],
-correctMatches: {
-  1: [2, 4],
-  2: [3, 6],
-  3: [5, 1],
-  4: [1, 5],
-  5: [4, 2],
-  6: [6, 3],
-},
+  correctMatches: {
+    1: [2, 4],
+    2: [3, 6],
+    3: [5, 1],
+    4: [1, 5],
+    5: [4, 2],
+    6: [6, 3],
+  },
 };
 
 export default function WB_Unit10_Page62_QC() {
   const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedBottom, setSelectedBottom] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [lines, setLines] = useState([]);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
-const captions = [
-  { start: 0.40, end: 3.08, text: "Page 62, phonics exercise C." },
-  { start: 3.08, end: 4.82, text: "Listen and match." },
-  { start: 5.86, end: 7.32, text: "1- dragon." },
-  { start: 7.32, end: 10.12, text: "2- cranberry." },
-  { start: 11.14, end: 12.78, text: "3- trust." },
-  { start: 12.78, end: 15.38, text: "4- trace." },
-  { start: 15.38, end: 18.22, text: "5- drive." },
-  { start: 18.22, end: 21.00, text: "6- cryon" },
-];
+  const captions = [
+    { start: 0.4, end: 3.08, text: "Page 62, phonics exercise C." },
+    { start: 3.08, end: 4.82, text: "Listen and match." },
+    { start: 5.86, end: 7.32, text: "1- dragon." },
+    { start: 7.32, end: 10.12, text: "2- cranberry." },
+    { start: 11.14, end: 12.78, text: "3- trust." },
+    { start: 12.78, end: 15.38, text: "4- trace." },
+    { start: 15.38, end: 18.22, text: "5- drive." },
+    { start: 18.22, end: 21.0, text: "6- cryon" },
+  ];
   useLayoutEffect(() => {
     const updateLines = () => {
       if (!containerRef.current) return;
@@ -90,85 +100,107 @@ const captions = [
     return () => window.removeEventListener("resize", updateLines);
   }, [matches]);
 
+  const commitMatch = (topId, bottomId) => {
+    if (showAns || lockedIds.includes(Number(topId))) return;
+    if (lockedIds.some((id) => matches[id] === Number(bottomId))) return;
+    const newMatches = { ...matches };
+    Object.keys(newMatches).forEach((key) => {
+      if (
+        newMatches[key] === Number(bottomId) &&
+        !lockedIds.includes(Number(key))
+      )
+        delete newMatches[key];
+    });
+    newMatches[topId] = Number(bottomId);
+    setMatches(newMatches);
+    setSelectedTop(null);
+    setSelectedBottom(null);
+  };
+
   const handleTopClick = (id) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
+    if (selectedBottom !== null) {
+      commitMatch(id, selectedBottom);
+      return;
+    }
     setSelectedTop(id);
+    setSelectedBottom(null);
     setShowResults(false);
   };
 
   const handleBottomClick = (bottomId) => {
-    if (showAns || selectedTop === null || showResults) return;
-
-    const newMatches = { ...matches };
-
-    Object.keys(newMatches).forEach((key) => {
-      if (newMatches[key] === bottomId) {
-        delete newMatches[key];
-      }
-    });
-
-    newMatches[selectedTop] = bottomId;
-
-    setMatches(newMatches);
-    setSelectedTop(null);
+    if (showAns || lockedIds.some((id) => matches[id] === bottomId)) return;
+    if (selectedTop !== null) commitMatch(selectedTop, bottomId);
+    else {
+      setSelectedBottom(bottomId);
+      setSelectedTop(null);
+    }
     setShowResults(false);
   };
 
- const checkAnswers = () => {
-  if (showAns || showResults) return;
+  const checkAnswers = () => {
+    if (showAns || lockedIds.length === exerciseData.top.length) return;
 
-  const allConnected = exerciseData.top.every(
-    (item) => matches[item.id]
-  );
+    const allConnected = exerciseData.top.every((item) => matches[item.id]);
 
-  if (!allConnected) {
-    ValidationAlert.info("Please connect all items first.");
-    return;
-  }
-
-  setShowResults(true);
-
-  let score = 0;
-
-  Object.keys(exerciseData.correctMatches).forEach((topId) => {
-    if (
-      exerciseData.correctMatches[topId].includes(matches[topId])
-    ) {
-      score++;
+    if (!allConnected) {
+      ValidationAlert.info("Please connect all items first.");
+      return;
     }
-  });
 
-  const totalQuestions = exerciseData.top.length;
+    setShowResults(true);
+    setLockedIds(
+      exerciseData.top
+        .filter((item) =>
+          exerciseData.correctMatches[item.id].includes(matches[item.id]),
+        )
+        .map((item) => item.id),
+    );
 
-  if (score === totalQuestions) {
-    ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
-  } else if (score > 0) {
-    ValidationAlert.warning(`Score: ${score} / ${totalQuestions}`);
-  } else {
-    ValidationAlert.error(`Score: ${score} / ${totalQuestions}`);
-  }
-};
- const handleShowAnswer = () => {
-  const oneCorrectAnswerPerItem = {};
+    let score = 0;
 
-  Object.keys(exerciseData.correctMatches).forEach((topId) => {
-    // ياخد أول إجابة صحيحة فقط
-    oneCorrectAnswerPerItem[topId] =
-      exerciseData.correctMatches[topId][0];
-  });
+    Object.keys(exerciseData.correctMatches).forEach((topId) => {
+      if (exerciseData.correctMatches[topId].includes(matches[topId])) {
+        score++;
+      }
+    });
 
-  setMatches(oneCorrectAnswerPerItem);
-  setShowResults(true);
-  setShowAns(true);
-  setSelectedTop(null);
-};
+    const totalQuestions = exerciseData.top.length;
+
+    if (score === totalQuestions) {
+      ValidationAlert.success(`Score: ${score} / ${totalQuestions}`);
+    } else if (score > 0) {
+      ValidationAlert.warning(`Score: ${score} / ${totalQuestions}`);
+    } else {
+      ValidationAlert.error(`Score: ${score} / ${totalQuestions}`);
+    }
+  };
+  const handleShowAnswer = () => {
+    const oneCorrectAnswerPerItem = {};
+
+    Object.keys(exerciseData.correctMatches).forEach((topId) => {
+      // ياخد أول إجابة صحيحة فقط
+      oneCorrectAnswerPerItem[topId] = exerciseData.correctMatches[topId][0];
+    });
+
+    setMatches(oneCorrectAnswerPerItem);
+    setShowResults(true);
+    setShowAns(true);
+    setSelectedTop(null);
+    setSelectedBottom(null);
+    setLockedIds(exerciseData.top.map((item) => item.id));
+  };
 
   const handleStartAgain = () => {
     setMatches({});
     setSelectedTop(null);
+    setSelectedBottom(null);
     setShowResults(false);
     setShowAns(false);
     setLines([]);
+    setLockedIds([]);
+    keyboard.clear();
+    stopAudio();
   };
 
   const getDotColor = (side, id) => {
@@ -185,16 +217,48 @@ const captions = [
   const isWrongMatch = (topId) => {
     if (!showResults) return false;
     if (!matches[topId]) return false;
-  return !exerciseData.correctMatches[topId].includes(
-  matches[topId]
-);
+    return !exerciseData.correctMatches[topId].includes(matches[topId]);
   };
 
   const isTopSelected = (id) => selectedTop === id;
   const isTopConnected = (id) => !!matches[id];
   const isBottomConnected = (id) => Object.values(matches).includes(id);
   const isSelectedBottomMatch = (id) =>
-    selectedTop !== null && matches[selectedTop] === id;
+    selectedBottom === id ||
+    (selectedTop !== null && matches[selectedTop] === id);
+
+  const getEndpoint = useCallback(
+    (side, id) =>
+      elementRefs.current[`${side}-group-${id}`] ||
+      elementRefs.current[`${side}-${id}`],
+    [],
+  );
+  const getAnchorElement = useCallback(
+    (side, id) => elementRefs.current[`${side}-${id}`],
+    [],
+  );
+  const isBottomLocked = (id) =>
+    lockedIds.some((topId) => matches[topId] === id);
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: exerciseData.top.map((item) => item.id),
+    rightIds: exerciseData.bottom.map((item) => item.id),
+    getElement: (side, id) =>
+      getEndpoint(side === "left" ? "top" : "bottom", id),
+    getAnchorElement: (side, id) =>
+      getAnchorElement(side === "left" ? "top" : "bottom", id),
+    isLeftLocked: (id) => showAns || lockedIds.includes(id),
+    isRightLocked: (id) => showAns || isBottomLocked(id),
+    onCommit: commitMatch,
+    onStart: (side, id) => {
+      setSelectedTop(side === "left" ? id : null);
+      setSelectedBottom(side === "right" ? id : null);
+    },
+    onCancel: () => {
+      setSelectedTop(null);
+      setSelectedBottom(null);
+    },
+  });
 
   return (
     <div className="main-container-component">
@@ -376,13 +440,17 @@ const captions = [
           gap: "40px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          {" "}
-          <span className="WB-ex-A">B</span>
-          Listen and match.
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Listen and match."
+          subTitle="Listen to the full audio once, then replay as needed and match each audio item to the correct cr, dr, or tr blend only after you hear the key sound or word."
+        />
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <QuestionAudioPlayer
+            pageId="WB_Unit10_Page62_Q3"
             src={sound1}
             captions={captions}
             stopAtSecond={5.18}
@@ -414,6 +482,18 @@ const captions = [
                 strokeLinecap="round"
               />
             ))}
+            {keyboard.preview && (
+              <line
+                x1={keyboard.preview.x1}
+                y1={keyboard.preview.y1}
+                x2={keyboard.preview.x2}
+                y2={keyboard.preview.y2}
+                stroke={ACTIVE_COLOR}
+                strokeWidth="3"
+                strokeDasharray="7 7"
+                className="unit4-matching-preview"
+              />
+            )}
           </svg>
 
           <div className="wb-d-top-row">
@@ -423,7 +503,22 @@ const captions = [
               const wrong = isWrongMatch(item.id);
 
               return (
-                <div key={item.id} className="wb-d-top-item">
+                <div
+                  key={item.id}
+                  ref={(el) => {
+                    elementRefs.current[`top-group-${item.id}`] = el;
+                  }}
+                  className="wb-d-top-item unit4-interactive"
+                  role="button"
+                  tabIndex={showAns || lockedIds.includes(item.id) ? -1 : 0}
+                  aria-disabled={showAns || lockedIds.includes(item.id)}
+                  aria-label={`Match audio item ${item.id}`}
+                  onClick={() => handleTopClick(item.id)}
+                  onKeyDown={(event) =>
+                    keyboard.handleKeyDown(event, "left", item.id)
+                  }
+                  onFocus={() => keyboard.handleFocus("left", item.id)}
+                >
                   <div
                     className={`wb-d-number-circle ${
                       selected
@@ -434,7 +529,6 @@ const captions = [
                             : "connected"
                           : ""
                     }`}
-                    onClick={() => handleTopClick(item.id)}
                     style={{
                       cursor: showAns ? "default" : "pointer",
                     }}
@@ -445,7 +539,6 @@ const captions = [
                   <div
                     ref={(el) => (elementRefs.current[`top-${item.id}`] = el)}
                     className={`wb-d-dot ${selected ? "selected" : ""}`}
-                    onClick={() => handleTopClick(item.id)}
                     style={{
                       backgroundColor: getDotColor("top", item.id),
                       cursor: showAns ? "default" : "pointer",
@@ -464,13 +557,37 @@ const captions = [
               const connected = isBottomConnected(item.id);
 
               return (
-                <div key={item.id} className="wb-d-bottom-item">
+                <div
+                  key={item.id}
+                  ref={(el) => {
+                    elementRefs.current[`bottom-group-${item.id}`] = el;
+                  }}
+                  className="wb-d-bottom-item unit4-interactive unit4-audio-control"
+                  role="button"
+                  tabIndex={showAns || isBottomLocked(item.id) ? -1 : 0}
+                  aria-disabled={showAns || isBottomLocked(item.id)}
+                  aria-label={`Match and play ${item.text}`}
+                  onClick={() => {
+                    if (showAns || isBottomLocked(item.id)) return;
+                    playAudio(`blend-${item.id}`, item.audio);
+                    handleBottomClick(item.id);
+                  }}
+                  onKeyDown={(event) => {
+                    keyboard.handleKeyDown(event, "right", item.id);
+                    if (
+                      (event.key === "Enter" || event.key === " ") &&
+                      !showAns &&
+                      !isBottomLocked(item.id)
+                    )
+                      playAudio(`blend-${item.id}`, item.audio);
+                  }}
+                  onFocus={() => keyboard.handleFocus("right", item.id)}
+                >
                   <div
                     ref={(el) =>
                       (elementRefs.current[`bottom-${item.id}`] = el)
                     }
                     className={`wb-d-dot ${selectedMatch ? "selected" : ""}`}
-                    onClick={() => handleBottomClick(item.id)}
                     style={{
                       backgroundColor: getDotColor("bottom", item.id),
                       marginBottom: "10px",
@@ -483,12 +600,14 @@ const captions = [
                     className={`wb-d-word ${
                       selectedMatch ? "selected" : connected ? "connected" : ""
                     }`}
-                    onClick={() => handleBottomClick(item.id)}
                     style={{
                       cursor: showAns ? "default" : "pointer",
                     }}
                   >
                     {item.text}
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `blend-${item.id}`}
+                    />
                   </div>
                 </div>
               );

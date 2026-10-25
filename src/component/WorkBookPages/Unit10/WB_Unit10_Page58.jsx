@@ -1,15 +1,16 @@
-import React from 'react'
-import page_1 from "../../../assets/imgs/pages/WB_Right_3//Right Int WB G3 U10 Folder/Page 58.png";
+import React from "react";
 
-import "./WB_unit10.css"
+import page_1 from "../../../assets/imgs/pages/WB_Right_3//Right Int WB G3 U10 Folder/Page 58.png";
+import "./WB_unit10.css";
+
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
 const WB_Unit10_Page58 = ({ openPopup }) => {
   return (
-    <div className="page1-img-wrapper"
-
-      style={{ backgroundImage: `url(${page_1})` }} >
-
+    <div
+      className="page1-img-wrapper"
+      style={{ backgroundImage: `url(${page_1})` }}
+    >
       <div
         className="q3-10 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -18,11 +19,23 @@ const WB_Unit10_Page58 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 3"
           onClick={() => openPopup("exercise", { startIndex: 120 })}
-          style={{ overflow: "visible" }}
-        // className="click-icon-page8-2 hover:scale-110 transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 120 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
-          <image className="svg-img"
+          <image
+            className="svg-img"
             href={arrowBtn}
             x="0"
             y="0"
@@ -34,18 +47,30 @@ const WB_Unit10_Page58 = ({ openPopup }) => {
       </div>
 
       <div
-        className="q4-10 hover:scale-110 transition "
+        className="q4-10 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
         <svg
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 4"
           onClick={() => openPopup("exercise", { startIndex: 121 })}
-          style={{ overflow: "visible" }}
-        // className="click-icon-page8-2 hover:scale-110 transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 121 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
-          <image className="svg-img"
+          <image
+            className="svg-img"
             href={arrowBtn}
             x="0"
             y="0"
@@ -55,9 +80,8 @@ const WB_Unit10_Page58 = ({ openPopup }) => {
           />
         </svg>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
 export default WB_Unit10_Page58;
