@@ -5,10 +5,10 @@ import page2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Ba
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
 import unit1Audio from "../../../assets/audio/ClassBook/Unit 1/page 2/unit1.mp3";
-import unit2Audio from "../../../assets/audio/ClassBook/Unit 1/Page 2/unit2.mp3";
-import unit3Audio from "../../../assets/audio/ClassBook/Unit 1/Page 2/unit3.mp3";
-import unit4Audio from "../../../assets/audio/ClassBook/Unit 1/Page 2/unit4.mp3";
-import unit5Audio from "../../../assets/audio/ClassBook/Unit 1/Page 2/unit5.mp3";
+import unit2Audio from "../../../assets/audio/ClassBook/Unit 1/page 2/unit2.mp3";
+import unit3Audio from "../../../assets/audio/ClassBook/Unit 1/page 2/unit3.mp3";
+import unit4Audio from "../../../assets/audio/ClassBook/Unit 1/page 2/unit4.mp3";
+import unit5Audio from "../../../assets/audio/ClassBook/Unit 1/page 2/unit5.mp3";
 
 const Page2 = ({ goToUnit }) => {
   const audioRef = useRef(null);
