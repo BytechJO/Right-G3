@@ -1,35 +1,55 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import roomImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/A.1.svg";
 const BORDER_COLOR = "#e0e0e0";
 const WRONG_COLOR = "#ef4444";
 const CHECK_COLOR = "#ef4444";
 import trueIcon from "../../../assets/imgs/true.svg";
+import falseAudio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise A/Item_001_False.mp3";
+import trueAudio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise A/Item_002_True.mp3";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise A/Item_003_The_cat_is_playing_with_a_flag.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise A/Item_004_There_are_flowers_on_the_chair.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise A/Item_005_There_are_plates_on_the_table.mp3";
 const ITEMS = [
   { id: 1, text: "The cat is playing with a flag.", correct: "false" },
   { id: 2, text: "The man is sleeping.", correct: "true" },
   { id: 3, text: "There are flowers on the chair.", correct: "false" },
   { id: 4, text: "There are plates on the table.", correct: "true" },
 ];
+const OPTION_AUDIO = { true: trueAudio, false: falseAudio };
+const SENTENCE_AUDIO = {
+  1: sentence1Audio,
+  3: sentence3Audio,
+  4: sentence4Audio,
+};
+const itemAudioKey = (id, value) => `${id}-${value}`;
 
 export default function WB_TrueFalse_PageA() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns||showResults) return;
+    playAudio(`option-${itemAudioKey(id, value)}`, OPTION_AUDIO[value]);
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({
       ...prev,
       [id]: prev[id] === value ? undefined : value,
     }));
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
@@ -40,6 +60,19 @@ export default function WB_TrueFalse_PageA() {
       if (answers[i.id] === i.correct) score++;
     });
     setShowResults(true);
+    setLockedIds((previous) => [
+      ...new Set([
+        ...previous,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
     const total = ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -54,16 +87,22 @@ export default function WB_TrueFalse_PageA() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) =>
-    showResults && !showAns && answers[item.id] !== item.correct;
+    showResults && !showAns && wrongIds.includes(item.id);
 
   // ── Checkbox component ──
   const renderCheckbox = (item, value) => {
@@ -74,22 +113,37 @@ export default function WB_TrueFalse_PageA() {
     return (
       <div
         onClick={() => handleSelect(item.id, value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleSelect(item.id, value);
+          }
+        }}
+        role="button"
+        tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+        aria-pressed={selected}
+        aria-disabled={lockedIds.includes(item.id) || showAns}
+        className="unit4-audio-control unit4-interactive"
         style={{
           position: "relative",
           width: "45px",
           height: "45px",
-          border: wrong ? `2px solid ${ WRONG_COLOR}` : "1px solid gray",
+          border: wrong ? `2px solid ${WRONG_COLOR}` : "1px solid gray",
           borderRadius: "clamp(5px,0.6vw,8px)",
           background: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: showAns ||showResults? "default" : "pointer",
+          cursor:
+            showAns || lockedIds.includes(item.id) ? "default" : "pointer",
           boxSizing: "border-box",
           flexShrink: 0,
           transition: "border-color 0.2s",
         }}
       >
+        <Unit4PlayingAudioIcon
+          active={activeAudioKey === `option-${itemAudioKey(item.id, value)}`}
+        />
         {/* checkmark */}
         {showCheck && (
           <span
@@ -101,7 +155,7 @@ export default function WB_TrueFalse_PageA() {
               userSelect: "none",
             }}
           >
-            <img src={trueIcon} style={{ height: "25px" }} />
+            <img src={trueIcon} alt="" style={{ height: "25px" }} />
           </span>
         )}
 
@@ -140,34 +194,33 @@ export default function WB_TrueFalse_PageA() {
       <div
         className="div-forall"
         style={{
-       
           gap: "23px",
-    
         }}
       >
         {/* Title */}
-        <h1
-          className="WB-header-title-page8"
-         
-        >
-          <span className="WB-ex-A">A</span>
-          Look, read, and write <strong className="text-red-600">✓</strong> for{" "}
-          <strong style={{ fontWeight: 900,color: "navy" }}>true</strong> or{" "}
-          <strong style={{ fontWeight: 900,color: "navy" }}>false</strong>.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title={
+            <>
+              Look, read, and write <span style={{ color: "#D1232A" }}>✓</span>{" "}
+              for <span style={{ color: "#2e3192" }}>true</span> or{" "}
+              <span style={{ color: "#2e3192" }}>false</span>.
+            </>
+          }
+          subTitle="Read each room-scene statement carefully, use the picture or sentence evidence to check it, then choose the correct Yes/No or True/False response."
+        />
 
         {/* Room image */}
-        
-          <img
-            src={roomImg}
-            alt="room"
-            style={{
-              width: "auto",
-              height: "190px",
-            
-            }}
-          />
-       
+        <img
+          src={roomImg}
+          alt="A living room where a man sleeps on a sofa, a cat plays by a flag, flowers sit on a table, and plates are on a shelf"
+          style={{
+            width: "auto",
+            height: "190px",
+            display: "block",
+            margin: "0 auto",
+          }}
+        />
 
         {/* Table: sentences + True + False */}
         <div
@@ -239,6 +292,28 @@ export default function WB_TrueFalse_PageA() {
                   }}
                 >
                   <span
+                    className={
+                      SENTENCE_AUDIO[item.id]
+                        ? "unit4-audio-control unit4-interactive"
+                        : ""
+                    }
+                    role={SENTENCE_AUDIO[item.id] ? "button" : undefined}
+                    tabIndex={SENTENCE_AUDIO[item.id] ? 0 : undefined}
+                    onClick={() =>
+                      playAudio(`sentence-${item.id}`, SENTENCE_AUDIO[item.id])
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        SENTENCE_AUDIO[item.id] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(
+                          `sentence-${item.id}`,
+                          SENTENCE_AUDIO[item.id],
+                        );
+                      }
+                    }}
                     style={{
                       fontSize: "20px",
                       fontWeight: 500,
@@ -258,8 +333,13 @@ export default function WB_TrueFalse_PageA() {
                       lineHeight: 1.35,
                       wordBreak: "break-word",
                       transition: "color 0.2s",
+                      position: "relative",
+                      cursor: SENTENCE_AUDIO[item.id] ? "pointer" : "default",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `sentence-${item.id}`}
+                    />
                     {item.text}
                   </span>
                 </div>
@@ -289,7 +369,6 @@ export default function WB_TrueFalse_PageA() {
             ))}
           </div>
         </div>
-
         {/* Buttons */}
         <div
           style={{

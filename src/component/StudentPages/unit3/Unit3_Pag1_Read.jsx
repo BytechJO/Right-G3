@@ -25,18 +25,18 @@ const Unit3_Page1_Read = () => {
     { start: 11.44, end: 13.66, text: "chicken,Kitchen, fish" },
   ];
 
- 
-
   return (
     <>
       <FourImagesWithAudio
-        images={[Rabbit, img1, img2, img3,img4]}
+        images={[Rabbit, img1, img2, img3, img4]}
         audioSrc={longAudio}
         checkpoints={[0, 4, 11.44, 11.96, 13.16]}
         popupOpen={true}
         titleQ={"Listen and read along."}
         audioArr={imageSounds}
         captions={captions}
+        pageId="unit3-page22-read"
+        subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
       />
     </>
   );

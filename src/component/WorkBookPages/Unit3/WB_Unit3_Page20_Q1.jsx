@@ -1,9 +1,27 @@
 import React, { useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import useWorkbookUnit3TabDrag from "./useWorkbookUnit3TabDrag";
+import "./workbookUnit3Interactions.css";
+import full1Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/full1.mp3";
+import full2Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/full2.mp3";
+import full3Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/full3.mp3";
+import part1Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_001_The.mp3";
+import part2Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_002_icken_is_eating_a_pea.mp3";
+import part3Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_003_at_the_bea.mp3";
+import part4Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_004_He_wants_a.mp3";
+import part5Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_005_ell._He_doesn't_want_a_wa.mp3";
+import part6Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_006_There_is_fi.mp3";
+import part7Audio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise A/Item_007_in_the_ki.mp3";
 
 import {
   DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
   useDraggable,
   useDroppable,
   DragOverlay,
@@ -24,7 +42,7 @@ const SENTENCES = [
   {
     id: 2,
     parts: ["He wants a ", "ell. He doesn’t want a wa", "."],
-    answers: ["sh", "ch"],
+    answers: ["sh", "tch"],
   },
   {
     id: 3,
@@ -32,6 +50,21 @@ const SENTENCES = [
     answers: ["sh", "tch"],
   },
 ];
+const FULL_AUDIO = { 1: full1Audio, 2: full2Audio, 3: full3Audio };
+const PART_AUDIO = {
+  "1-0": part1Audio,
+  "1-1": part2Audio,
+  "1-2": part3Audio,
+  "2-0": part4Audio,
+  "2-1": part5Audio,
+  "3-0": part6Audio,
+  "3-1": part7Audio,
+};
+const IMAGE_ALTS = {
+  1: "A boy thinking about a seashell and a watch",
+  2: "A fish in a kitchen dish",
+  3: "A chicken eating a peach at the beach",
+};
 
 const IMAGES = [
   { id: 1, img: img1 },
@@ -53,19 +86,30 @@ export default function WB_Phonics_Page227_QA() {
   const [activeNumber, setActiveNumber] = useState(null);
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedSelectKeys, setLockedSelectKeys] = useState([]);
+  const [wrongSelectKeys, setWrongSelectKeys] = useState([]);
+  const [lockedImageIds, setLockedImageIds] = useState([]);
+  const [wrongImageIds, setWrongImageIds] = useState([]);
+  const [shakeGrid, setShakeGrid] = useState(false);
+  const suppressClickRef = useRef(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
   const usedNumbers = Object.values(imageAnswers);
 
   const handleSelectChange = (key, value) => {
-    if (showAns || checked) return;
+    if (showAns || lockedSelectKeys.includes(key)) return;
     setSelectAnswers((prev) => ({
       ...prev,
       [key]: value,
     }));
+    setWrongSelectKeys((prev) => prev.filter((entry) => entry !== key));
   };
 
   const applyDrop = (imageId, num) => {
-    if (showAns || num === null) return;
+    if (showAns || num === null || lockedImageIds.includes(imageId)) return;
 
     const updated = { ...imageAnswers };
 
@@ -77,29 +121,49 @@ export default function WB_Phonics_Page227_QA() {
 
     setImageAnswers(updated);
     setActiveNumber(null);
+    setWrongImageIds((prev) => prev.filter((entry) => entry !== imageId));
   };
+
+  const keyboard = useWorkbookUnit3TabDrag({
+    itemIds: NUMBERS,
+    targetIds: IMAGES.map((item) => item.id),
+    isItemDisabled: (id) => usedNumbers.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedImageIds.includes(id) || showAns,
+    onPlace: (id, imageId) => applyDrop(imageId, id),
+  });
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-    if (!over) return;
+    if (!over) {
+      setShakeGrid(false);
+      window.requestAnimationFrame(() => setShakeGrid(true));
+      return;
+    }
 
     applyDrop(over.id, active.id);
   };
 
   /* draggable */
   const DraggableNumber = ({ num }) => {
+    const disabled = usedNumbers.includes(num);
     const { attributes, listeners, setNodeRef } = useDraggable({
       id: num,
+      disabled: disabled || showAns,
     });
-
-    const disabled = usedNumbers.includes(num);
 
     return (
       <div
-        ref={setNodeRef}
         {...listeners}
         {...attributes}
-        className={`wb-a20-number-chip ${disabled ? "disabled" : ""}`}
+        ref={(element) => {
+          setNodeRef(element);
+          keyboard.registerItem(num, element);
+        }}
+        role="button"
+        tabIndex={disabled || showAns ? -1 : 0}
+        aria-disabled={disabled || showAns}
+        onKeyDown={(event) => keyboard.handleItemKeyDown(event, num)}
+        className={`wb-a20-number-chip wb-unit3-drag-item ${disabled ? "disabled" : ""}`}
         style={{
           backgroundColor: disabled ? "#d1d5db" : "#f39b42",
           cursor: disabled || showAns ? "not-allowed" : "grab",
@@ -116,10 +180,51 @@ export default function WB_Phonics_Page227_QA() {
       id: item.id,
     });
 
+    const filledEditable =
+      Boolean(imageAnswers[item.id]) &&
+      !lockedImageIds.includes(item.id) &&
+      !showAns;
+    const preview =
+      keyboard.keyboardItemId && keyboard.keyboardTargetId === item.id;
     return (
       <div
-        ref={setNodeRef}
-        className="wb-a20-image-card"
+        ref={(element) => {
+          setNodeRef(element);
+          keyboard.registerTarget(item.id, element);
+        }}
+        role="button"
+        tabIndex={keyboard.keyboardItemId || filledEditable ? 0 : -1}
+        aria-disabled={lockedImageIds.includes(item.id) || showAns}
+        onClick={() => {
+          if (!filledEditable || suppressClickRef.current) return;
+          const removed = imageAnswers[item.id];
+          setImageAnswers((prev) => {
+            const next = { ...prev };
+            delete next[item.id];
+            return next;
+          });
+          setWrongImageIds((prev) => prev.filter((id) => id !== item.id));
+          keyboard.focusItem(removed);
+        }}
+        onKeyDown={(event) => {
+          if (keyboard.keyboardItemId)
+            keyboard.handleTargetKeyDown(event, item.id);
+          else if (
+            filledEditable &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            const removed = imageAnswers[item.id];
+            setImageAnswers((prev) => {
+              const next = { ...prev };
+              delete next[item.id];
+              return next;
+            });
+            setWrongImageIds((prev) => prev.filter((id) => id !== item.id));
+            keyboard.focusItem(removed);
+          }
+        }}
+        className="wb-a20-image-card wb-unit3-drop-target"
         style={{
           /* 🔥 hover effect */
           transform: isOver ? "scale(1.05)" : "scale(1)",
@@ -129,11 +234,15 @@ export default function WB_Phonics_Page227_QA() {
       >
         <img
           src={item.img}
-          alt={`phonics-${item.id}`}
+          alt={IMAGE_ALTS[item.id]}
           className="wb-a20-image"
         />
 
-        <div className="wb-a20-image-number">{imageAnswers[item.id] || ""}</div>
+        <div className="wb-a20-image-number">
+          <span className={preview ? "wb-unit3-keyboard-preview" : undefined}>
+            {preview ? keyboard.keyboardItemId : imageAnswers[item.id] || ""}
+          </span>
+        </div>
 
         {isImageWrong(item.id) && <div className="wb-a20-image-wrong">✕</div>}
       </div>
@@ -161,7 +270,13 @@ export default function WB_Phonics_Page227_QA() {
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    const totalBlanks = getTotalBlanks();
+    if (
+      showAns ||
+      (lockedSelectKeys.length === totalBlanks &&
+        lockedImageIds.length === IMAGES.length)
+    )
+      return;
 
     const allSelectsAnswered = SENTENCES.every((sentence) =>
       sentence.answers.every(
@@ -180,6 +295,28 @@ export default function WB_Phonics_Page227_QA() {
     const score = getScore();
 
     setChecked(true);
+    const correctSelects = [];
+    const wrongSelects = [];
+    SENTENCES.forEach((sentence) =>
+      sentence.answers.forEach((answer, index) => {
+        const key = `s${sentence.id}-b${index}`;
+        (selectAnswers[key] === answer ? correctSelects : wrongSelects).push(
+          key,
+        );
+      }),
+    );
+    setLockedSelectKeys(correctSelects);
+    setWrongSelectKeys(wrongSelects);
+    setLockedImageIds(
+      IMAGES.filter(
+        (item) => imageAnswers[item.id] === correctImageAnswers[item.id],
+      ).map((item) => item.id),
+    );
+    setWrongImageIds(
+      IMAGES.filter(
+        (item) => imageAnswers[item.id] !== correctImageAnswers[item.id],
+      ).map((item) => item.id),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -204,6 +341,16 @@ export default function WB_Phonics_Page227_QA() {
     setChecked(true);
     setShowAns(true);
     setActiveNumber(null);
+    setLockedSelectKeys(
+      SENTENCES.flatMap((sentence) =>
+        sentence.answers.map((_, index) => `s${sentence.id}-b${index}`),
+      ),
+    );
+    setWrongSelectKeys([]);
+    setLockedImageIds(IMAGES.map((item) => item.id));
+    setWrongImageIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
@@ -212,28 +359,33 @@ export default function WB_Phonics_Page227_QA() {
     setActiveNumber(null);
     setChecked(false);
     setShowAns(false);
+    setLockedSelectKeys([]);
+    setWrongSelectKeys([]);
+    setLockedImageIds([]);
+    setWrongImageIds([]);
+    setShakeGrid(false);
+    keyboard.cancel();
+    stopAudio();
   };
 
-  const isSelectWrong = (sentenceId, blankIndex, correctValue) => {
-    if (!checked || showAns) return false;
-    return selectAnswers[`s${sentenceId}-b${blankIndex}`] !== correctValue;
+  const isSelectWrong = (sentenceId, blankIndex) => {
+    return wrongSelectKeys.includes(`s${sentenceId}-b${blankIndex}`);
   };
 
   const isImageWrong = (id) => {
-    if (!checked || showAns) return false;
-    return imageAnswers[id] !== correctImageAnswers[id];
+    return wrongImageIds.includes(id);
   };
 
-  const renderSelect = (sentenceId, blankIndex, correctValue) => {
+  const renderSelect = (sentenceId, blankIndex) => {
     const key = `s${sentenceId}-b${blankIndex}`;
     const value = selectAnswers[key] || "";
-    const wrong = isSelectWrong(sentenceId, blankIndex, correctValue);
+    const wrong = isSelectWrong(sentenceId, blankIndex);
 
     return (
       <span className="wb-a20-select-wrap">
         <select
           value={value}
-          disabled={showAns || checked}
+          disabled={showAns || lockedSelectKeys.includes(key)}
           onChange={(e) => handleSelectChange(key, e.target.value)}
           className="wb-a20-select"
           style={{
@@ -257,8 +409,18 @@ export default function WB_Phonics_Page227_QA() {
 
   return (
     <DndContext
-      onDragStart={(e) => setActiveNumber(e.active.id)}
-      onDragEnd={handleDragEnd}
+      sensors={sensors}
+      onDragStart={(e) => {
+        suppressClickRef.current = true;
+        setActiveNumber(e.active.id);
+      }}
+      onDragEnd={(event) => {
+        handleDragEnd(event);
+        setActiveNumber(null);
+        window.setTimeout(() => {
+          suppressClickRef.current = false;
+        }, 0);
+      }}
     >
       <div className="main-container-component">
         {/* 🔥 نفس CSS تبعك بدون تعديل */}
@@ -598,31 +760,115 @@ export default function WB_Phonics_Page227_QA() {
         }
       `}</style>
 
-        <div className="div-forall" style={{ gap: "70px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span>
-            Write <span className="text-blue-800">ch</span>,{" "}
-            <span className="text-blue-800">tch</span>, or{" "}
-            <span className="text-blue-800">sh</span>. Then number the pictures.
-          </h1>
+        <div className="div-forall" style={{ gap: "60px" }}>
+          <ExerciseHeader
+            sectionLetter="A"
+            title={
+              <>
+                Write <span style={{ color: "#2e3192" }}>ch</span>,{" "}
+                <span style={{ color: "#2e3192" }}>tch</span>, or{" "}
+                <span style={{ color: "#2e3192" }}>sh</span>. Then number the
+                pictures.
+              </>
+            }
+            subTitle="Complete the ch, tch, or sh spelling and picture order first, then number the pictures only after each spelling is correct."
+          />
 
           <div className="wb-a20-wrap">
             <div className="wb-a20-main-grid">
               <div className="wb-a20-left">
                 {/* sentences نفسهم */}
-                {SENTENCES.map((s) => (
-                  <div key={s.id} className="wb-a20-sentence-row">
-                    <span className="wb-a20-sentence-num">{s.id}</span>
-                    <div className="wb-a20-sentence-text">
-                      {s.parts.map((part, i) => (
-                        <React.Fragment key={i}>
-                          <span>{part}</span>
-                          {s.answers[i] && renderSelect(s.id, i, s.answers[i])}
-                        </React.Fragment>
-                      ))}
+                {SENTENCES.map((s) => {
+                  const fullEnabled =
+                    checked &&
+                    s.answers.every(
+                      (answer, index) =>
+                        selectAnswers[`s${s.id}-b${index}`] === answer,
+                    );
+                  return (
+                    <div
+                      key={s.id}
+                      className={`wb-a20-sentence-row wb-unit3-audio-control ${fullEnabled ? "wb-unit3-completed-audio" : ""}`}
+                      role={fullEnabled ? "button" : undefined}
+                      tabIndex={fullEnabled ? 0 : undefined}
+                      aria-label={
+                        fullEnabled
+                          ? `Play completed sentence ${s.id}`
+                          : undefined
+                      }
+                      onClick={() => {
+                        if (fullEnabled)
+                          playAudio(`full-${s.id}`, FULL_AUDIO[s.id]);
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          fullEnabled &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          playAudio(`full-${s.id}`, FULL_AUDIO[s.id]);
+                        }
+                      }}
+                    >
+                      <WorkbookUnit3PlayingAudioIcon
+                        active={activeAudioKey === `full-${s.id}`}
+                      />
+                      <span className="wb-a20-sentence-num">{s.id}</span>
+                      <div className="wb-a20-sentence-text">
+                        {s.parts.map((part, i) => (
+                          <React.Fragment key={i}>
+                            <span
+                              className={
+                                PART_AUDIO[`${s.id}-${i}`]
+                                  ? "wb-unit3-audio-control wb-unit3-interactive"
+                                  : undefined
+                              }
+                              role={
+                                !fullEnabled && PART_AUDIO[`${s.id}-${i}`]
+                                  ? "button"
+                                  : undefined
+                              }
+                              tabIndex={
+                                !fullEnabled && PART_AUDIO[`${s.id}-${i}`]
+                                  ? 0
+                                  : undefined
+                              }
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                if (!fullEnabled)
+                                  playAudio(
+                                    `part-${s.id}-${i}`,
+                                    PART_AUDIO[`${s.id}-${i}`],
+                                  );
+                              }}
+                              onKeyDown={(event) => {
+                                if (
+                                  !fullEnabled &&
+                                  PART_AUDIO[`${s.id}-${i}`] &&
+                                  (event.key === "Enter" || event.key === " ")
+                                ) {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  playAudio(
+                                    `part-${s.id}-${i}`,
+                                    PART_AUDIO[`${s.id}-${i}`],
+                                  );
+                                }
+                              }}
+                            >
+                              <WorkbookUnit3PlayingAudioIcon
+                                active={activeAudioKey === `part-${s.id}-${i}`}
+                              />
+                              {part}
+                            </span>
+                            {s.answers[i] &&
+                              renderSelect(s.id, i, s.answers[i])}
+                          </React.Fragment>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <div className="wb-a20-number-bank">
                   {NUMBERS.map((num) => (
@@ -631,7 +877,10 @@ export default function WB_Phonics_Page227_QA() {
                 </div>
               </div>
 
-              <div className="wb-a20-right">
+              <div
+                className={`wb-a20-right ${shakeGrid ? "wb-unit3-invalid-drop-shake" : ""}`}
+                onAnimationEnd={() => setShakeGrid(false)}
+              >
                 {IMAGES.map((item) => (
                   <DroppableImage key={item.id} item={item} />
                 ))}

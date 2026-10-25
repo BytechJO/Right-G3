@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 32/Ex C 2.svg";
+import "./unit4Interactions.css";
 
 const Page8_Q4 = () => {
   const grid = [
@@ -137,12 +139,12 @@ const Page8_Q4 = () => {
     { word: "school2", order: 8 },
   ];
   const [locked, setLocked] = useState(false);
-  const [sentence, setSentence] = useState("");
-  const [selected, setSelected] = useState([]);
-  const [currentWord, setCurrentWord] = useState("");
   const [foundWords, setFoundWords] = useState([]);
-  const [coloredCells, setColoredCells] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
+  const [pointerSelection, setPointerSelection] = useState([]);
+  const [pointerRow, setPointerRow] = useState(null);
+  const [keyboardStart, setKeyboardStart] = useState(null);
+  const [keyboardPreview, setKeyboardPreview] = useState([]);
+  const [shakeInvalidSelection, setShakeInvalidSelection] = useState(false);
   const fullSentence = [
     "the",
     "name",
@@ -155,30 +157,41 @@ const Page8_Q4 = () => {
     "school",
   ];
 
-  const handleMouseDown = (index) => {
-    if (locked) return;
-
-    const row = Math.floor(index / 100);
-    const col = index % 100;
-
-    setIsDragging(true);
-    setSelected([index]);
-    setCurrentWord(letters[row][col]);
-  };
-  const handleMouseEnter = (index) => {
-    if (!isDragging || locked) return;
-
-    const lastIndex = selected[selected.length - 1];
-
-    if (index === lastIndex + 1 || index === lastIndex - 1) {
-      if (!selected.includes(index)) {
-        const row = Math.floor(index / 100);
-        const col = index % 100;
-
-        setSelected((prev) => [...prev, index]);
-        setCurrentWord((prev) => prev + letters[row][col]);
-      }
+  const foundCells = new Set(
+    foundWords.flatMap((word) => correctPositions[word] || []),
+  );
+  const buildRange = (row, startColumn, endColumn) => {
+    const direction = endColumn >= startColumn ? 1 : -1;
+    const cells = [];
+    for (let column = startColumn; direction > 0 ? column <= endColumn : column >= endColumn; column += direction) {
+      cells.push(row * 100 + column);
     }
+    return cells;
+  };
+  const commit = (cells) => {
+    const matched = wordsToFind.find((item) => {
+      const positions = correctPositions[item.id];
+      if (!positions || positions.length !== cells.length) return false;
+      const forward = positions.every((position, index) => position === cells[index]);
+      const reverse = [...positions].reverse().every((position, index) => position === cells[index]);
+      return forward || reverse;
+    });
+    if (!matched) return false;
+    if (!foundWords.includes(matched.id)) setFoundWords((previous) => [...previous, matched.id]);
+    return true;
+  };
+  const showInvalidSelection = () => {
+    setShakeInvalidSelection(false);
+    window.requestAnimationFrame(() => setShakeInvalidSelection(true));
+  };
+  const startPointer = (row, column) => {
+    if (locked) return;
+    setPointerRow(row);
+    setPointerSelection([row * 100 + column]);
+  };
+  const extendPointer = (row, column) => {
+    if (locked || pointerRow !== row || !pointerSelection.length) return;
+    setPointerSelection(buildRange(row, pointerSelection[0] % 100, column));
   };
   const displayedSentence = fullSentence.map((word, index) => {
     const isFound = foundWords.some(
@@ -194,69 +207,49 @@ const Page8_Q4 = () => {
 
     return "_".repeat(SLOT_LENGTH);
   });
-  const handleTouchMove = (e) => {
-    if (!isDragging || locked) return;
-    e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
-
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
-
-    const index = element.getAttribute("data-index");
-    if (index !== null) {
-      handleMouseEnter(Number(index));
-    }
-  };
-
-  const handleMouseUp = () => {
+  const endPointer = () => {
     if (locked) return;
-    setIsDragging(false);
-
-    const reversedWord = currentWord.split("").reverse().join("");
-
-    const matchedWord = wordsToFind.find(
-      (item) =>
-        (item.word === currentWord || item.word === reversedWord) &&
-        !foundWords.includes(item.id),
-    );
-
-    if (matchedWord && !foundWords.includes(matchedWord.id)) {
-      setFoundWords((prev) => [...prev, matchedWord.id]);
-      setColoredCells((prev) => [...prev, ...selected]);
-      setSentence(
-        wordsToFind
-          .filter((item) => [...foundWords, matchedWord.id].includes(item.id))
-          .map((item) => item.word)
-          .join(" "),
-      );
-    }
-
-    setSelected([]);
-    setCurrentWord("");
+    if (pointerSelection.length && !commit(pointerSelection)) showInvalidSelection();
+    setPointerSelection([]);
+    setPointerRow(null);
   };
 
   const reset = () => {
-    setSelected([]);
-    setCurrentWord("");
     setFoundWords([]);
-    setColoredCells([]);
-    setSentence("");
+    setPointerSelection([]);
+    setPointerRow(null);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
     setLocked(false);
+    setShakeInvalidSelection(false);
   };
 
   const showAnswers = () => {
-    let allCells = [];
-    wordsToFind.forEach((item) => {
-      if (correctPositions[item.id]) {
-        allCells.push(...correctPositions[item.id]);
-      }
-    });
     setFoundWords(wordsToFind.map((item) => item.id));
-    setColoredCells(allCells);
-    setSelected([]);
-    setCurrentWord("");
-    setSentence(wordsToFind.map((item) => item.word).join(" "));
+    setPointerSelection([]);
+    setPointerRow(null);
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
     setLocked(true);
+  };
+  const handleCellKeyDown = (event, row, column) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setKeyboardStart(null);
+      setKeyboardPreview([]);
+      return;
+    }
+    if (locked || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    if (!keyboardStart || keyboardStart.row !== row) {
+      setKeyboardStart({ row, column });
+      setKeyboardPreview([row * 100 + column]);
+      return;
+    }
+    const cells = buildRange(row, keyboardStart.column, column);
+    if (!commit(cells)) showInvalidSelection();
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
   };
 
   const checkAnswers = () => {
@@ -282,7 +275,7 @@ const Page8_Q4 = () => {
         </div>
       `);
     }
-    setLocked(true);
+    if (score === total) setLocked(true);
   };
 
   return (
@@ -298,13 +291,7 @@ const Page8_Q4 = () => {
       }}
     >
       <div className="div-forall">
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            C
-          </span>
-          What’s the name of Julia’s school in Helen and Stella Get an e-Mail on
-          page 29?{" "}
-        </h5>
+        <ExerciseHeader sectionLetter="C" title="What's the name of Julia's school in Helen and Stella Get an e-Mail on page 29?" subTitle="Find the hidden school-name words in order, then read the completed name." />
 
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
@@ -315,7 +302,8 @@ const Page8_Q4 = () => {
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10"
+              className={`bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10 ${shakeInvalidSelection ? "unit4-invalid-selection-shake" : ""}`}
+              onAnimationEnd={() => setShakeInvalidSelection(false)}
               style={{
                 userSelect: "none",
                 width: "max-content",
@@ -334,38 +322,59 @@ const Page8_Q4 = () => {
                 >
                   {row.map((letter, colIndex) => {
                     const index = rowIndex * 100 + colIndex;
-                    const isSelected = selected.includes(index);
-                    const isFound = coloredCells.includes(index);
+                    const isSelected = pointerSelection.includes(index);
+                    const keyboardActive = keyboardPreview.includes(index);
+                    const isFound = foundCells.has(index);
 
                     return (
-                      <span
+                      <button
+                        type="button"
                         key={index}
-                        data-index={index}
-                        onMouseDown={() => handleMouseDown(index)}
-                        onMouseEnter={() => handleMouseEnter(index)}
-                        onMouseUp={handleMouseUp}
-                        onDragStart={(e) => e.preventDefault()}
-                        onTouchStart={(e) => {
-                          e.preventDefault(); // 🔥 منع تحريك الصفحة عند بدء اللمس
-                          handleMouseDown(index);
+                        data-row={rowIndex}
+                        data-column={colIndex}
+                        aria-label={`Letter ${letter}, row ${rowIndex + 1}, column ${colIndex + 1}`}
+                        onKeyDown={(event) => handleCellKeyDown(event, rowIndex, colIndex)}
+                        onFocus={() => {
+                          if (keyboardStart?.row === rowIndex) {
+                            setKeyboardPreview(buildRange(rowIndex, keyboardStart.column, colIndex));
+                          }
                         }}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleMouseUp}
+                        onMouseDown={() => startPointer(rowIndex, colIndex)}
+                        onMouseEnter={() => extendPointer(rowIndex, colIndex)}
+                        onMouseUp={endPointer}
+                        onDragStart={(e) => e.preventDefault()}
+                        onTouchStart={() => startPointer(rowIndex, colIndex)}
+                        onTouchMove={(event) => {
+                          event.preventDefault();
+                          const touch = event.touches[0];
+                          const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                          const nextRow = element?.getAttribute("data-row");
+                          const nextColumn = element?.getAttribute("data-column");
+                          if (nextRow !== null && nextColumn !== null) extendPointer(Number(nextRow), Number(nextColumn));
+                        }}
+                        onTouchEnd={endPointer}
                         className={`
+                          unit4-interactive
                           flex items-center justify-center
                           cursor-pointer
                           transition
-                          ${isSelected ? "bg-[#ffd54f] rounded-sm" : ""}
+                          ${keyboardActive ? "unit4-keyboard-preview" : ""}
                           ${isFound ? "bg-[#4caf50] text-white rounded-sm" : ""}
                         `}
                         style={{
                           width: "clamp(16px, 2.5vw, 25px)", // 🔥 عرض ديناميكي
                           height: "clamp(22px, 3.5vw, 35px)", // 🔥 طول ديناميكي
                           fontSize: "clamp(12px, 1.8vw, 18px)", // 🔥 حجم خط ديناميكي
+                          flexShrink: 0,
+                          padding: 0,
+                          border: 0,
+                          borderRadius: "4px",
+                          background: isFound ? "#4caf50" : isSelected || keyboardActive ? "#ffd54f" : "transparent",
+                          color: isFound ? "#fff" : "#111",
                         }}
                       >
                         {letter}
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
@@ -375,7 +384,7 @@ const Page8_Q4 = () => {
             <div className="flex justify-center items-center">
               <img
                 src={img1}
-                alt="start"
+                alt="A monkey representing the first word in the hidden school name"
                 style={{
                   width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
                   height: "auto",
@@ -391,7 +400,7 @@ const Page8_Q4 = () => {
 
               <img
                 src={img2}
-                alt="end"
+                alt="Bananas representing the last word in the hidden school name"
                 style={{
                   width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
                   height: "auto",

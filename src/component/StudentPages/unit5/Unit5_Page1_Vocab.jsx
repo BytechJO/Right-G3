@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/G5_U5_Pg_40.png";
 import ModernVocabularyComponent from "../../ModernVocabularyComponent";
 import vocabulary from "../../../assets/audio/ClassBook/Unit 5/P 40/Pg40_Vocab_Adult Lady.mp3";
@@ -31,7 +31,6 @@ import sound12 from "../../../assets/audio/ClassBook/Unit 5/P 40/sound12.mp3";
 import sound13 from "../../../assets/audio/ClassBook/Unit 5/P 40/sound13.mp3";
 
 const Unit5_Page1_Vocab = () => {
-
   // ================================
   // ✔ Captions Array
   // ================================
@@ -56,7 +55,6 @@ const Unit5_Page1_Vocab = () => {
     { start: 35.26, end: 37.87, text: "13. garage." },
   ];
 
-
   const wordAudios = [
     sound1,
     sound2,
@@ -72,7 +70,6 @@ const Unit5_Page1_Vocab = () => {
     sound12,
     sound13,
   ];
-
 
   const nums = [
     num1,
@@ -104,7 +101,7 @@ const Unit5_Page1_Vocab = () => {
     { top: "83.5%", left: "36%" }, //12
     { top: "86.5%", left: "87%" }, //13
   ];
- 
+
   return (
     <ModernVocabularyComponent
       backgroundImage={backgroundImage}
@@ -112,25 +109,25 @@ const Unit5_Page1_Vocab = () => {
       wordAudios={wordAudios}
       nums={nums}
       vocabulary={[
-       "chimney",
-            "bedroom",
-            "bathroom",
-            "office",
-            "living room",
-            "sofa",
-            "stairs",
-            "hall",
-            "dining room",
-            "kitchen",
-            "basement",
-            "washing machine",
-            "garage",
+        "chimney",
+        "bedroom",
+        "bathroom",
+        "office",
+        "living room",
+        "sofa",
+        "stairs",
+        "hall",
+        "dining room",
+        "kitchen",
+        "basement",
+        "washing machine",
+        "garage",
       ]}
       markers={positions}
       captions={captions}
+      pageId="unit5-page40-vocab"
     />
   );
 };
-
 
 export default Unit5_Page1_Vocab;

@@ -1,6 +1,19 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import Button from "../Button";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import useWorkbookMatchingKeyboard from "./useWorkbookMatchingKeyboard";
+import a1 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_001_It's_cold.mp3";
+import a2 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_002_Wear_your_T-shirt.mp3";
+import a3 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_003_It's_sunny.mp3";
+import a4 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_004_Wear_your_coat.mp3";
+import a5 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_005_It's_rainy.mp3";
+import a6 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_006_Wear_your_sunglasses.mp3";
+import a7 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_007_It's_hot.mp3";
+import a8 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise D/Item_008_Get_your_umbrella.mp3";
 
 // غيّري مسارات الصور حسب مكان ملفاتك
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 22/Ex D 1.svg";
@@ -39,6 +52,10 @@ const EXERCISE_DATA = {
     4: 1, // hot -> T-shirt
   },
 };
+const LEFT_AUDIO = { 1: a1, 2: a3, 3: a5, 4: a7 };
+const RIGHT_AUDIO = { 1: a2, 2: a4, 3: a6, 4: a8 };
+const LEFT_IDS = EXERCISE_DATA.left.map((item) => item.id);
+const RIGHT_IDS = EXERCISE_DATA.right.map((item) => item.id);
 
 const styles = {
   matchArea: {
@@ -202,6 +219,7 @@ const styles = {
   },
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 const TailLeft = () => (
   <svg viewBox="0 0 36 18" style={styles.leftTail}>
     <path
@@ -214,6 +232,7 @@ const TailLeft = () => (
   </svg>
 );
 
+// eslint-disable-next-line react-refresh/only-export-components
 const TailRight = () => (
   <svg viewBox="0 0 36 18" style={styles.rightTail}>
     <path
@@ -228,10 +247,13 @@ const TailRight = () => (
 
 const WB_ReadAndMatch_Page22 = () => {
   const [selectedLeft, setSelectedLeft] = useState(null);
+  const [selectedRight, setSelectedRight] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [lines, setLines] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
@@ -285,13 +307,20 @@ const WB_ReadAndMatch_Page22 = () => {
   }, [matches, showAns, showResults]);
 
   const handleLeftClick = (id) => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
+    if (selectedRight !== null) {
+      assignMatch(id, selectedRight);
+      return;
+    }
     setSelectedLeft(id);
+    setSelectedRight(null);
     setShowResults(false);
   };
 
-  const handleRightClick = (rightId) => {
-    if (showAns || selectedLeft === null ||showResults) return;
+  const assignMatch = (leftId, rightId) => {
+    if (showAns || lockedIds.includes(leftId)) return;
+    const lockedOwner = Object.keys(matches).find((key) => matches[key] === rightId && lockedIds.includes(Number(key)));
+    if (lockedOwner) return;
 
     const newMatches = { ...matches };
 
@@ -301,15 +330,27 @@ const WB_ReadAndMatch_Page22 = () => {
       }
     });
 
-    newMatches[selectedLeft] = rightId;
+    newMatches[leftId] = rightId;
 
     setMatches(newMatches);
     setSelectedLeft(null);
+    setSelectedRight(null);
     setShowResults(false);
+  };
+  const handleRightClick = (rightId) => {
+    const isLockedTarget = Object.keys(matches).some(
+      (key) => matches[key] === rightId && lockedIds.includes(Number(key)),
+    );
+    if (showAns || isLockedTarget) return;
+    if (selectedLeft !== null) assignMatch(selectedLeft, rightId);
+    else {
+      setSelectedRight(rightId);
+      setSelectedLeft(null);
+    }
   };
 
   const checkAnswers = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === EXERCISE_DATA.left.length) return;
 
     const allConnected = EXERCISE_DATA.left.every((item) => matches[item.id]);
 
@@ -317,8 +358,13 @@ const WB_ReadAndMatch_Page22 = () => {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
+    keyboardMatch.clear();
+    setSelectedLeft(null);
+    setSelectedRight(null);
 
     setShowResults(true);
+    const correctIds = EXERCISE_DATA.left.filter((item) => matches[item.id] === EXERCISE_DATA.correctMatches[item.id]).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
 
     let score = 0;
     const total = EXERCISE_DATA.left.length;
@@ -339,18 +385,26 @@ const WB_ReadAndMatch_Page22 = () => {
   };
 
   const handleShowAnswer = () => {
+    keyboardMatch.clear();
     setMatches(EXERCISE_DATA.correctMatches);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(EXERCISE_DATA.left.map((item) => item.id));
     setSelectedLeft(null);
+    setSelectedRight(null);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
+    keyboardMatch.clear();
     setMatches({});
     setSelectedLeft(null);
+    setSelectedRight(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
     setLines([]);
+    stopAudio();
   };
 
   const getLeftDotColor = (leftId) => {
@@ -373,6 +427,37 @@ const WB_ReadAndMatch_Page22 = () => {
     if (!showResults || !matches[leftId]) return false;
     return matches[leftId] !== EXERCISE_DATA.correctMatches[leftId];
   };
+  const getKeyboardElement = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `left-button-${id}` : `right-button-${id}`],
+    [],
+  );
+  const getKeyboardAnchor = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `left-dot-${id}` : `right-dot-${id}`],
+    [],
+  );
+  const isLeftLocked = useCallback((id) => lockedIds.includes(id), [lockedIds]);
+  const isRightLocked = useCallback(
+    (id) => Object.keys(matches).some((key) => matches[key] === id && lockedIds.includes(Number(key))),
+    [lockedIds, matches],
+  );
+  const keyboardMatch = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: LEFT_IDS,
+    rightIds: RIGHT_IDS,
+    getElement: getKeyboardElement,
+    getAnchorElement: getKeyboardAnchor,
+    isLeftLocked,
+    isRightLocked,
+    onCommit: assignMatch,
+    onStart: (side, id) => {
+      if (side === "left") handleLeftClick(id);
+      else handleRightClick(id);
+    },
+    onCancel: () => {
+      setSelectedLeft(null);
+      setSelectedRight(null);
+    },
+  });
 
   return (
     <div className="main-container-component">
@@ -384,12 +469,7 @@ const WB_ReadAndMatch_Page22 = () => {
           
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-        
-        >
-          <span className="WB-ex-A">D</span>Read and match.
-        </h1>
+        <ExerciseHeader sectionLetter="D" title="Read and match." subTitle="Read each weather statement to the correct clothing advice first, then connect it to the matching picture or answer one pair at a time." />
 
         <div ref={containerRef} style={styles.matchArea}>
           <svg
@@ -415,6 +495,15 @@ const WB_ReadAndMatch_Page22 = () => {
                 strokeLinecap="round"
               />
             ))}
+            {keyboardMatch.preview && (
+              <line
+                {...keyboardMatch.preview}
+                stroke={LINE_COLOR}
+                strokeWidth="3.5"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
+            )}
           </svg>
 
           <div style={styles.rowsWrap}>
@@ -422,7 +511,6 @@ const WB_ReadAndMatch_Page22 = () => {
               const rightItem = EXERCISE_DATA.right[index];
               const wrong = isWrongMatch(leftItem.id);
               const isSelected = selectedLeft === leftItem.id;
-              const isConnected = !!matches[leftItem.id];
 
               return (
                 <div key={leftItem.id} style={styles.row}>
@@ -431,13 +519,29 @@ const WB_ReadAndMatch_Page22 = () => {
 
                     <img
                       src={leftItem.img}
-                      alt={`left-${leftItem.id}`}
+                      alt={`${leftItem.text} weather scene`}
                       style={styles.leftImage}
                     />
 
                     <div style={styles.bubbleLeftWrap}>
                       <div
-                        onClick={() => handleLeftClick(leftItem.id)}
+                        ref={(el) => (elementRefs.current[`left-button-${leftItem.id}`] = el)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Play and select ${leftItem.text}`}
+                        draggable={!showAns && !lockedIds.includes(leftItem.id)}
+                        onDragStart={() => handleLeftClick(leftItem.id)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => selectedRight !== null && assignMatch(leftItem.id, selectedRight)}
+                        onClick={() => {
+                          playAudio(`left-${leftItem.id}`, LEFT_AUDIO[leftItem.id]);
+                          handleLeftClick(leftItem.id);
+                        }}
+                        onKeyDown={(event) => {
+                          if (!keyboardMatch.origin && (event.key === "Enter" || event.key === " ")) playAudio(`left-${leftItem.id}`, LEFT_AUDIO[leftItem.id]);
+                          keyboardMatch.handleKeyDown(event, "left", leftItem.id);
+                        }}
+                        onFocus={() => keyboardMatch.handleFocus("left", leftItem.id)}
                         style={{
                           ...styles.bubble,
                           ...styles.leftBubble,
@@ -449,11 +553,11 @@ const WB_ReadAndMatch_Page22 = () => {
                           background: isSelected
                             ? "rgba(243,155,66,0.08)"
                             : "#fff",
-                          cursor: showAns ||showResults? "default" : "pointer",
+                          cursor: showAns || lockedIds.includes(leftItem.id) ? "default" : "pointer",
                         }}
                       >
                         <TailLeft />
-                        <span style={styles.text}>{leftItem.text}</span>
+                        <span style={styles.text}><Unit4PlayingAudioIcon active={activeAudioKey === `left-${leftItem.id}`} />{leftItem.text}</span>
 
                         {wrong && (
                           <div
@@ -500,6 +604,12 @@ const WB_ReadAndMatch_Page22 = () => {
                           (elementRefs.current[`right-dot-${rightItem.id}`] = el)
                         }
                         onClick={() => handleRightClick(rightItem.id)}
+                        tabIndex={-1}
+                        aria-hidden="true"
+                        onDragOver={(event) => event.preventDefault()}
+                        draggable={!showAns && !isRightLocked(rightItem.id)}
+                        onDragStart={() => handleRightClick(rightItem.id)}
+                        onDrop={() => selectedLeft !== null && assignMatch(selectedLeft, rightItem.id)}
                         style={{
                           ...styles.dot,
                           backgroundColor: getRightDotColor(rightItem.id),
@@ -511,7 +621,19 @@ const WB_ReadAndMatch_Page22 = () => {
                       />
 
                       <div
-                        onClick={() => handleRightClick(rightItem.id)}
+                        ref={(el) => (elementRefs.current[`right-button-${rightItem.id}`] = el)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Play ${rightItem.before} ${rightItem.after}`}
+                        onClick={() => {
+                          playAudio(`right-${rightItem.id}`, RIGHT_AUDIO[rightItem.id]);
+                          handleRightClick(rightItem.id);
+                        }}
+                        onKeyDown={(event) => {
+                          if (!keyboardMatch.origin && (event.key === "Enter" || event.key === " ")) playAudio(`right-${rightItem.id}`, RIGHT_AUDIO[rightItem.id]);
+                          keyboardMatch.handleKeyDown(event, "right", rightItem.id);
+                        }}
+                        onFocus={() => keyboardMatch.handleFocus("right", rightItem.id)}
                         style={{
                           ...styles.bubble,
                           ...styles.rightBubble,
@@ -528,16 +650,16 @@ const WB_ReadAndMatch_Page22 = () => {
                               ? "rgba(243,155,66,0.08)"
                               : "#fff",
                           cursor:
-                            showAns || selectedLeft === null||showResults
+                            showAns
                               ? "default"
                               : "pointer",
                         }}
                       >
                         <div style={styles.rightItemWrap}>
-                          <span style={styles.text}>{rightItem.before}</span>
+                          <span style={styles.text}><Unit4PlayingAudioIcon active={activeAudioKey === `right-${rightItem.id}`} />{rightItem.before}</span>
                           <img
                             src={rightItem.img}
-                            alt={`right-${rightItem.id}`}
+                            alt={`${rightItem.before} ${rightItem.after} clothing advice`}
                             style={styles.rightImage}
                           />
                           <span style={styles.text}>{rightItem.after}</span>

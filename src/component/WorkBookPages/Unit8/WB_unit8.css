@@ -94,4 +94,12 @@ top: 3.5% !important;
   padding: 5px !important;
   top: 80% !important;
   left: 73.5% !important;
+}.diagonal-cell-btn:focus {
+  outline: none;
+}
+
+.diagonal-cell:has(.diagonal-cell-btn:focus-visible) {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+  border-radius: 10px;
 }

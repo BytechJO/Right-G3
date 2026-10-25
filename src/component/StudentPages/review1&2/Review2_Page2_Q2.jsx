@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
-import WrongMark from "../../WrongMark";
+import Unit2PlayingAudioIcon from "../unit2/Unit2PlayingAudioIcon";
+import useUnit2Audio from "../unit2/useUnit2Audio";
+import "../unit2/unit2Interactions.css";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+
+const AUDIO_MODULES = import.meta.glob(
+  "../../../assets/audio/ClassBook/Unit 2/Page 19 - Exercise D/*.mp3",
+  { eager: true, query: "?url", import: "default" },
+);
+const audioEndingWith = (ending) =>
+  Object.entries(AUDIO_MODULES).find(([path]) => path.endsWith(ending))?.[1];
 
 const COLORS = [
   { key: "long a", color: "#D1232A" },
@@ -54,18 +64,30 @@ const CORRECT = {
 
 const Review2_Page2_Q2 = () => {
   const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
+  const [checkedWords, setCheckedWords] = useState([]);
+  const [correctWords, setCorrectWords] = useState([]);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   const [selectedWord, setSelectedWord] = useState(null);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit2Audio();
+
+  const wordAudio = (word) =>
+    audioEndingWith(`_${word.replaceAll(" ", "_")}.mp3`);
+  const soundAudio = (sound) =>
+    audioEndingWith(`_${sound.replaceAll(" ", "_")}.mp3`);
 
   const handleWordClick = (word) => {
-    if (locked) return;
+    if (showAnswers || correctWords.includes(word)) return;
+
+    const audio = wordAudio(word);
+    if (audio) playAudio(`word-${word}`, audio);
 
     setSelectedWord((prev) => (prev === word ? null : word));
   };
 
   const handleSelectColor = (colorKey) => {
-    if (!selectedWord || locked) return;
+    if (!selectedWord || showAnswers || correctWords.includes(selectedWord))
+      return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -73,10 +95,14 @@ const Review2_Page2_Q2 = () => {
     }));
 
     setSelectedWord(null);
+    setCheckedWords((previous) =>
+      previous.filter((word) => word !== selectedWord),
+    );
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswers || correctWords.length === Object.keys(CORRECT).length)
+      return;
 
     const allWords = Object.keys(CORRECT);
 
@@ -90,25 +116,32 @@ const Review2_Page2_Q2 = () => {
     allWords.forEach((w) => {
       if (answers[w] === CORRECT[w]) score++;
     });
+    setCorrectWords(allWords.filter((word) => answers[word] === CORRECT[word]));
+    setCheckedWords(allWords);
 
     const total = allWords.length;
 
     if (score === total) ValidationAlert.success(`Score: ${score}/${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score}/${total}`);
     else ValidationAlert.error(`Score: ${score}/${total}`);
-
-    setLocked(true);
   };
 
   const reset = () => {
     setAnswers({});
     setSelectedWord(null);
-    setLocked(false);
+    setCheckedWords([]);
+    setCorrectWords([]);
+    setShowAnswers(false);
+    stopAudio();
   };
 
   const showAnswer = () => {
     setAnswers(CORRECT);
-    setLocked(true);
+    setCheckedWords(Object.keys(CORRECT));
+    setCorrectWords(Object.keys(CORRECT));
+    setShowAnswers(true);
+    setSelectedWord(null);
+    stopAudio();
   };
 
   return (
@@ -120,19 +153,37 @@ const Review2_Page2_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall" style={{ gap: "45px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "20px" }}>D</span>
-           Color each square according to the 
-          <span className="text-blue-800 w-30"> vowel sound </span> you hear in the
-          word.
-        </h5>
+      <div className="div-forall" style={{ gap: "25px" }}>
+        <ExerciseHeaderReview
+          sectionLetter="D"
+          title={
+            <>
+              Color each square according to the{" "}
+              <span style={{ color: "#2e3192" }}>vowel sound</span> you hear in
+              the word.
+            </>
+          }
+          subTitle="Listen to each word, identify its target sound, then apply the matching color carefully."
+        />
 
         {/* COLOR TABLE */}
-        <table className="border-1 border-gray-500 text-center">
+        <table className="border-1 border-gray-500 text-center  w-full">
           <tbody>
             <tr>
-              <td className="border px-3 py-2">color</td>
+              <td className="border px-3 py-2">
+                <button
+                  type="button"
+                  className="unit2-audio-control unit2-interactive"
+                  onClick={() =>
+                    playAudio("header-color", audioEndingWith("_color.mp3"))
+                  }
+                >
+                  color
+                  <Unit2PlayingAudioIcon
+                    active={activeAudioKey === "header-color"}
+                  />
+                </button>
+              </td>
               {COLORS.map((c) => (
                 <td
                   key={c.key}
@@ -143,10 +194,34 @@ const Review2_Page2_Q2 = () => {
             </tr>
 
             <tr>
-              <td className="border px-3 py-2">sound</td>
+              <td className="border px-3 py-2">
+                <button
+                  type="button"
+                  className="unit2-audio-control unit2-interactive"
+                  onClick={() =>
+                    playAudio("header-sound", audioEndingWith("_sound.mp3"))
+                  }
+                >
+                  sound
+                  <Unit2PlayingAudioIcon
+                    active={activeAudioKey === "header-sound"}
+                  />
+                </button>
+              </td>
               {COLORS.map((c) => (
                 <td key={c.key} className="border px-2 text-[18px]">
-                  {c.key}
+                  <button
+                    type="button"
+                    className="unit2-audio-control unit2-interactive"
+                    onClick={() =>
+                      playAudio(`sound-${c.key}`, soundAudio(c.key))
+                    }
+                  >
+                    {c.key}
+                    <Unit2PlayingAudioIcon
+                      active={activeAudioKey === `sound-${c.key}`}
+                    />
+                  </button>
                 </td>
               ))}
             </tr>
@@ -154,7 +229,8 @@ const Review2_Page2_Q2 = () => {
         </table>
 
         {/* WORDS */}
-        <div className="flex flex-col gap-10 mt-6 w-full">
+        <div className="flex flex-col gap-10 mt-6 mb-10 w-full z-0">
+          {" "}
           {WORDS.map((row, i) => (
             <div
               key={i}
@@ -167,13 +243,25 @@ const Review2_Page2_Q2 = () => {
                 const isSelected = selectedWord === word;
 
                 const isWrong =
-                  locked && colorKey && colorKey !== CORRECT[word];
+                  checkedWords.includes(word) &&
+                  colorKey &&
+                  colorKey !== CORRECT[word];
 
                 return (
                   <div key={word} className="relative overflow-visible">
                     <div
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                      aria-disabled={showAnswers || correctWords.includes(word)}
                       onClick={() => handleWordClick(word)}
-                      className="relative py-5 text-lg font-semibold flex items-center justify-center cursor-pointer transition-all"
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleWordClick(word);
+                        }
+                      }}
+                      className="unit2-audio-control unit2-interactive relative py-5 text-lg font-semibold flex items-center justify-center cursor-pointer transition-all"
                       style={{
                         backgroundColor: colorObj?.color || "white",
                         border: isSelected
@@ -187,6 +275,9 @@ const Review2_Page2_Q2 = () => {
                       }}
                     >
                       {word}
+                      <Unit2PlayingAudioIcon
+                        active={activeAudioKey === `word-${word}`}
+                      />
 
                       {isWrong && (
                         <div
@@ -205,29 +296,33 @@ pointer-events-none"
                     </div>
 
                     {/* COLOR PALETTE فوق البوكس */}
-                    {isSelected && !locked && (
-                      <div
-                        className="absolute left-1/2 -top-[65px] -translate-x-1/2 z-[9999]
+                    {isSelected &&
+                      !showAnswers &&
+                      !correctWords.includes(word) && (
+                        <div
+                          className="absolute left-1/2 -top-[65px] -translate-x-1/2 z-[9999]
 bg-white rounded-xl px-3 py-2 flex gap-2
 shadow-[0_10px_25px_rgba(0,0,0,0.2)] border"
-                      >
-                        {COLORS.map((c) => (
-                          <div
-                            key={c.key}
-                            onClick={() => handleSelectColor(c.key)}
-                            style={{
-                              width: 25,
-                              height: 25,
-                              borderRadius: "50%",
-                              background: c.color,
-                              cursor: "pointer",
-                              border: "2px solid white",
-                            }}
-                            title={c.key}
-                          />
-                        ))}
-                      </div>
-                    )}
+                        >
+                          {COLORS.map((c) => (
+                            <button
+                              type="button"
+                              key={c.key}
+                              onClick={() => handleSelectColor(c.key)}
+                              aria-label={`Color ${word} as ${c.key}`}
+                              style={{
+                                width: 25,
+                                height: 25,
+                                borderRadius: "50%",
+                                background: c.color,
+                                cursor: "pointer",
+                                border: "2px solid white",
+                              }}
+                              title={c.key}
+                            />
+                          ))}
+                        </div>
+                      )}
                   </div>
                 );
               })}

@@ -1,14 +1,28 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { FaVolumeUp } from "react-icons/fa";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import bedroomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_001_bedroom.mp3";
+import basementAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_002_basement.mp3";
+import kitchenAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_003_kitchen.mp3";
+import garageAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_004_garage.mp3";
+import officeAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_005_office.mp3";
+import livingRoomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_006_living_room.mp3";
+import diningRoomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_007_dining_room.mp3";
+import bathroomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise B/Item_008_bathroom.mp3";
 
 import {
   DndContext,
   useDraggable,
   useDroppable,
   DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
-
 import imgHouse from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/B1.svg";
 
 const DRAG_ITEMS = [
@@ -32,23 +46,95 @@ const ITEMS = [
   { id: 7, correct: "office" },
   { id: 8, correct: "bathroom" },
 ];
+const ITEM_AUDIO = {
+  act1: bedroomAudio,
+  act2: basementAudio,
+  act3: garageAudio,
+  act4: kitchenAudio,
+  act5: livingRoomAudio,
+  act6: diningRoomAudio,
+  act7: officeAudio,
+  act8: bathroomAudio,
+};
 
 export default function WB_Unit5_Page27_Q2() {
   const [answers, setAnswers] = useState({});
 
-  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const audioRef = useRef(null);
+  const activeAudioIconRef = useRef(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+    if (activeAudioIconRef.current) {
+      activeAudioIconRef.current.hidden = true;
+      activeAudioIconRef.current = null;
+    }
+  };
 
-  const dropRefs = useRef({});
+  const playAudio = (key, src) => {
+    if (!src) return;
+    stopAudio();
+
+    const audio = new Audio(src);
+    audioRef.current = audio;
+    window.requestAnimationFrame(() => {
+      if (audioRef.current !== audio) return;
+      const icon = document.querySelector(`[data-audio-key="${key}"]`);
+      if (icon) {
+        icon.hidden = false;
+        activeAudioIconRef.current = icon;
+      }
+    });
+    audio.onended = () => {
+      if (audioRef.current !== audio) return;
+      if (activeAudioIconRef.current) {
+        activeAudioIconRef.current.hidden = true;
+        activeAudioIconRef.current = null;
+      }
+      audioRef.current = null;
+    };
+    audio.onerror = audio.onended;
+    audio.play().catch(audio.onended);
+  };
+
+  useEffect(() => () => stopAudio(), []);
 
   const usedDragIds = Object.entries(answers)
-    .filter(([key, entry]) => entry)
+    .filter(([, entry]) => entry)
     .map(([, entry]) => entry.dragId);
+
+  const tabDrag = useUnit4TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => item.id),
+    targetIds: ITEMS.map((item) => `a-${item.id}`),
+    isItemDisabled: (id) => usedDragIds.includes(id) || showAns,
+    isTargetDisabled: (id) =>
+      lockedIds.includes(Number(String(id).replace("a-", ""))) || showAns,
+    onPick: (id) => playAudio(`bank-${id}`, ITEM_AUDIO[id]),
+    onPlace: (dragId, boxKey) => {
+      const item = DRAG_ITEMS.find((entry) => entry.id === dragId);
+      if (item) applyDrop(boxKey, item);
+    },
+  });
 
   const applyDrop = (boxKey, item) => {
     const targetItem = ITEMS.find((q) => `a-${q.id}` === boxKey);
-    if (!targetItem || targetItem.fixed || showAns) return;
+    if (!targetItem || lockedIds.includes(targetItem.id) || showAns) return;
 
     const newAnswers = { ...answers };
 
@@ -64,7 +150,7 @@ export default function WB_Unit5_Page27_Q2() {
     };
 
     setAnswers(newAnswers);
-    setChecked(false);
+    setWrongIds((prev) => prev.filter((id) => id !== targetItem.id));
   };
 
   const handleDragEnd = (event) => {
@@ -80,10 +166,10 @@ export default function WB_Unit5_Page27_Q2() {
   };
 
   const handleRemoveAnswer = (boxKey) => {
-  
-
     const targetItem = ITEMS.find((q) => `a-${q.id}` === boxKey);
-    if (!targetItem || targetItem.fixed || showAns|| checked) return;
+    if (!targetItem || lockedIds.includes(targetItem.id) || showAns) return;
+
+    const removedId = answers[boxKey]?.dragId;
 
     setAnswers((prev) => {
       const updated = { ...prev };
@@ -91,11 +177,12 @@ export default function WB_Unit5_Page27_Q2() {
       return updated;
     });
 
-    setChecked(false);
+    setWrongIds((prev) => prev.filter((id) => id !== targetItem.id));
+    if (removedId) tabDrag.focusItem(removedId);
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
 
@@ -112,7 +199,19 @@ export default function WB_Unit5_Page27_Q2() {
       }
     });
 
-    setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter(
+          (item) => answers[`a-${item.id}`]?.value === item.correct,
+        ).map((item) => item.id),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter(
+        (item) => answers[`a-${item.id}`]?.value !== item.correct,
+      ).map((item) => item.id),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -135,24 +234,31 @@ export default function WB_Unit5_Page27_Q2() {
     });
 
     setAnswers(filled);
-    setChecked(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
     setShowAns(false);
     setActiveItem(null);
+    setLockedIds([]);
+    setWrongIds([]);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!checked || showAns || item.fixed) return false;
-    return answers[`a-${item.id}`]?.value !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   // 🔥 Draggable
   const DraggableChip = ({ item, isUsed }) => {
+    const pointerStart = useRef(null);
+    const pointerMoved = useRef(false);
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
       id: item.id,
       disabled: isUsed || showAns,
@@ -160,17 +266,54 @@ export default function WB_Unit5_Page27_Q2() {
 
     return (
       <div
-        ref={setNodeRef}
+        ref={(element) => {
+          setNodeRef(element);
+          tabDrag.registerItem(item.id, element);
+        }}
         {...listeners}
         {...attributes}
-        className={`wb-house-chip ${
-          isUsed || showAns || checked? "wb-house-chip--used" : "wb-house-chip--active"
+        role="button"
+        tabIndex={0}
+        aria-disabled={isUsed || showAns}
+        aria-label={`${isUsed ? "Listen to" : "Pick"} ${item.value}`}
+        onPointerDownCapture={(event) => {
+          pointerStart.current = { x: event.clientX, y: event.clientY };
+          pointerMoved.current = false;
+        }}
+        onPointerMoveCapture={(event) => {
+          if (!pointerStart.current) return;
+          pointerMoved.current =
+            Math.hypot(
+              event.clientX - pointerStart.current.x,
+              event.clientY - pointerStart.current.y,
+            ) > 5;
+        }}
+        onClick={(event) => {
+          if (event.detail === 0) return;
+
+          playAudio(`bank-${item.id}`, ITEM_AUDIO[item.id]);
+        }}
+        onKeyDown={(event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          if (!isUsed && !showAns) tabDrag.pickItem(item.id);
+        }}
+        className={`wb-house-chip unit4-audio-control unit4-interactive ${
+          isUsed || showAns ? "wb-house-chip--used" : "wb-house-chip--active"
         }`}
         style={{
           opacity: isDragging ? 0.3 : 1,
-          cursor: isUsed || showAns|| checked ? "not-allowed" : "grab",
+          cursor: isUsed || showAns ? "pointer" : "grab",
         }}
       >
+        <span
+          data-audio-key={`bank-${item.id}`}
+          className="unit4-playing-audio-icon"
+          hidden
+          aria-hidden="true"
+        >
+          <FaVolumeUp />
+        </span>
         {item.value}
       </div>
     );
@@ -182,17 +325,50 @@ export default function WB_Unit5_Page27_Q2() {
     const { setNodeRef, isOver } = useDroppable({ id: boxKey });
 
     const value = answers[boxKey]?.value || "";
+    const previewItem = DRAG_ITEMS.find(
+      (entry) => entry.id === tabDrag.keyboardItemId,
+    );
+    const showKeyboardPreview =
+      !!previewItem && tabDrag.keyboardTargetId === boxKey;
+    const displayedValue = showKeyboardPreview ? previewItem.value : value;
 
     return (
       <div className="wb-house-line-wrap">
         <div
-          ref={setNodeRef}
+          ref={(element) => {
+            setNodeRef(element);
+            tabDrag.registerTarget(boxKey, element);
+          }}
           onClick={() => handleRemoveAnswer(boxKey)}
+          role="button"
+          tabIndex={
+            tabDrag.keyboardItemId != null ||
+            (value && !lockedIds.includes(item.id))
+              ? 0
+              : -1
+          }
+          aria-disabled={lockedIds.includes(item.id) || showAns}
+          aria-label={`Room ${item.id} answer slot${value ? `, ${value}` : ""}`}
+          onKeyDown={(event) => {
+            if (tabDrag.keyboardItemId != null)
+              tabDrag.handleTargetKeyDown(event, boxKey);
+            else if (
+              (event.key === "Enter" || event.key === " ") &&
+              value &&
+              !lockedIds.includes(item.id)
+            ) {
+              event.preventDefault();
+              handleRemoveAnswer(boxKey);
+            }
+          }}
           className={`wb-house-line ${
             item.fixed ? "wb-house-line--fixed" : ""
           }`}
           style={{
-            cursor: item.fixed || showAns|| checked ? "default" : "pointer",
+            cursor:
+              item.fixed || showAns || lockedIds.includes(item.id)
+                ? "default"
+                : "pointer",
             // boxShadow: isOver
             //   ? "0 0 0 3px rgba(243,155,66,0.25)"
             //   : "none",
@@ -201,13 +377,24 @@ export default function WB_Unit5_Page27_Q2() {
               : isWrong(item)
                 ? "2px solid red"
                 : "1px solid",
-            backgroundColor: isOver ? "rgba(243, 155, 66, 0.18)" : "",
+            backgroundColor:
+              isOver ||
+              (tabDrag.keyboardItemId != null &&
+                tabDrag.keyboardTargetId === boxKey)
+                ? "rgba(243, 155, 66, 0.18)"
+                : "",
             transform: isOver ? "scale(1.02)" : "scale(1)",
             transition: "0.15s",
           }}
         >
-          {value ? (
-            <span className="wb-house-answer">{value}</span>
+          {displayedValue ? (
+            <span
+              className={`wb-house-answer ${
+                showKeyboardPreview ? "unit4-keyboard-preview" : ""
+              }`}
+            >
+              {displayedValue}
+            </span>
           ) : (
             <span className="wb-house-placeholder"></span>
           )}
@@ -220,6 +407,7 @@ export default function WB_Unit5_Page27_Q2() {
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={(e) => {
         const item = DRAG_ITEMS.find((d) => d.id === e.active.id);
         setActiveItem(item);
@@ -445,10 +633,11 @@ export default function WB_Unit5_Page27_Q2() {
 `}</style>
       <div className="main-container-component">
         <div className="div-forall" style={{ gap: "55px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">B</span>
-           Label the rooms in Tom’s house
-          </h1>
+          <ExerciseHeader
+            sectionLetter="B"
+            title="Label the rooms in Tom's house."
+            subTitle="Identify each room name to the numbered room in Tom’s house before dragging it, then place one item at a time and review every target before checking."
+          />
 
           <div className="wb-house-chips">
             {DRAG_ITEMS.map((item) => {
@@ -471,7 +660,11 @@ export default function WB_Unit5_Page27_Q2() {
             </div>
 
             <div className="wb-house-image-wrap">
-              <img src={imgHouse} className="wb-house-image" />
+              <img
+                src={imgHouse}
+                className="wb-house-image"
+                alt="A cutaway view of Tom's house with eight numbered rooms"
+              />
             </div>
 
             <div className="wb-house-col">

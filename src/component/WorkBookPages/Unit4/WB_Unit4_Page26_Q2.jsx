@@ -1,6 +1,26 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import a1 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_001_the.mp3";
+import a2 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_002_thin.mp3";
+import a3 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_003_thank.mp3";
+import a4 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_004_father.mp3";
+import a5 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_005_birthday.mp3";
+import a6 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_006_mother.mp3";
+import a7 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_007_that.mp3";
+import a8 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_008_this.mp3";
+import a9 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_009_these.mp3";
+import a10 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_010_they.mp3";
+import a11 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_011_math.mp3";
+import a12 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_012_bath.mp3";
+import a13 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_013_thick.mp3";
+import a14 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_014_thirsty.mp3";
+import a15 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_015_think.mp3";
+import a16 from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise B/Item_016_brother.mp3";
 
 const ITEMS = [
   {
@@ -29,6 +49,24 @@ const ITEMS = [
     correct: "these",
   },
 ];
+const WORD_AUDIO = {
+  the: a1,
+  thin: a2,
+  thank: a3,
+  father: a4,
+  birthday: a5,
+  mother: a6,
+  that: a7,
+  this: a8,
+  these: a9,
+  they: a10,
+  math: a11,
+  bath: a12,
+  thick: a13,
+  thirsty: a14,
+  think: a15,
+  brother: a16,
+};
 
 const styles = {
   page: {
@@ -55,7 +93,7 @@ const styles = {
 
   grid: {
     display: "flex",
- 
+
     gap: "26px 22px",
     alignItems: "start",
   },
@@ -143,22 +181,24 @@ const styles = {
 
 export default function WB_Unit4_Page233_QB() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, word) => {
-    if (showAns ||checked) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: word,
     }));
 
-    setChecked(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -175,7 +215,15 @@ export default function WB_Unit4_Page233_QB() {
       }
     });
 
-    setChecked(true);
+    const correctIds = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -194,19 +242,22 @@ export default function WB_Unit4_Page233_QB() {
     });
 
     setAnswers(filled);
-    setChecked(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isWrong = (item, word) => {
-    if (!checked || showAns) return false;
-    return answers[item.id] === word && word !== item.correct;
+    return !showAns && wrongIds.includes(item.id) && answers[item.id] === word;
   };
 
   const isSelected = (item, word) => {
@@ -216,32 +267,53 @@ export default function WB_Unit4_Page233_QB() {
 
   return (
     <div className="main-container-component">
-      <div className="div-forall" style={{gap:"110px"}}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span>
-        Tap or click the word in each box that has a different th sound.
-        </h1>
+      <div className="div-forall" style={{ gap: "110px" }}>
+        <ExerciseHeader
+          sectionLetter="B"
+          title="Circle the word in each box that has a different th sound."
+          subTitle="Look at the word with a different th sound in each group first, compare all available options, then tap only the answer that matches."
+        />
 
-        <div style={styles.grid}>
+        <div className=" w-full" style={styles.grid}>
           {ITEMS.map((item) => (
             <div key={item.id} style={styles.itemWrap}>
               <div style={styles.itemNumber}>{item.id}</div>
 
               <div style={styles.card}>
-                {item.words.map((word) => {
+                {item.words.map((word, wordIndex) => {
                   const selected = isSelected(item, word);
                   const wrong = isWrong(item, word);
+                  const audioKey = `word-${item.id}-${wordIndex}`;
 
                   return (
                     <div
                       key={word}
-                      onClick={() => handleSelect(item.id, word)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Select ${word} and play its audio`}
+                      onClick={() => {
+                        playAudio(audioKey, WORD_AUDIO[word]);
+                        handleSelect(item.id, word);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(audioKey, WORD_AUDIO[word]);
+                          handleSelect(item.id, word);
+                        }
+                      }}
                       style={{
                         ...styles.wordBtn,
                         ...(selected ? styles.selectedWord : {}),
-                        cursor: showAns ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedIds.includes(item.id)
+                            ? "default"
+                            : "pointer",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === audioKey}
+                      />
                       {word}
 
                       {wrong && <div style={styles.wrongBadge}>✕</div>}

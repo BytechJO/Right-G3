@@ -1,6 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
 // استبدلي كل imports تبعون drag العادي بهاد
 import {
   DndContext,
@@ -14,11 +19,22 @@ import {
 
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 
-import { CSS } from "@dnd-kit/utilities";
 import girlImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/1.svg";
 import boy1Img from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/2.svg";
 import boy2Img from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/3.svg";
 import img from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/11.svg";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_001_She_was_in_the_swimming_pool_this_morning.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_002_She_is_in_the_post_office_now.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_003_He_is_at_the_gym_now.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_004_He_was_at_the_bus_stop_this_morning.mp3";
+import sentence5Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_005_He_was_at_the_bakery_this_morning.mp3";
+import sentence6Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_006_He_is_on_the_playground_now.mp3";
+import swimmingAudio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_007_at_the_swimming_pool.mp3";
+import busStopAudio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_008_at_the_bus_stop.mp3";
+import bakeryAudio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_009_at_the_bakery.mp3";
+import postOfficeAudio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_010_at_the_post_office.mp3";
+import gymAudio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_011_at_the_gym.mp3";
+import playgroundAudio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise C/Item_012_on_the_playground.mp3";
 const PEOPLE = [
   {
     id: 1,
@@ -27,11 +43,15 @@ const PEOPLE = [
       "She was in the swimming pool this morning.",
       "She is in the post office now.",
     ],
+    alt: "A girl shown in two place-and-time scenes",
+    audios: [sentence1Audio, sentence2Audio],
   },
   {
     id: 2,
     img: boy1Img,
     lines: ["He is at the gym now.", "He was at the bus stop this morning."],
+    alt: "A boy shown in two place-and-time scenes",
+    audios: [sentence3Audio, sentence4Audio],
   },
   {
     id: 3,
@@ -40,6 +60,8 @@ const PEOPLE = [
       "He was at the bakery this morning.",
       "He is on the playground now.",
     ],
+    alt: "A boy shown in bakery and playground scenes",
+    audios: [sentence5Audio, sentence6Audio],
   },
 ];
 
@@ -51,6 +73,14 @@ const DRAG_ITEMS = [
   "at the gym",
   "on the playground",
 ];
+const ITEM_AUDIO = {
+  "at the swimming pool": swimmingAudio,
+  "at the bus stop": busStopAudio,
+  "at the bakery": bakeryAudio,
+  "at the post office": postOfficeAudio,
+  "at the gym": gymAudio,
+  "on the playground": playgroundAudio,
+};
 
 const CORRECT_ANSWERS = {
   "morning-1": "at the swimming pool",
@@ -63,12 +93,11 @@ const CORRECT_ANSWERS = {
 
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "#ef4444";
-const DraggableItem = ({ item, disabled }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useDraggable({
-      id: item,
-      disabled,
-    });
+const DraggableItem = ({ item, disabled, register, pick, play, active }) => {
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: item,
+    disabled,
+  });
 
   const style = {
     // transform: CSS.Translate.toString(transform),
@@ -87,20 +116,61 @@ const DraggableItem = ({ item, disabled }) => {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div
+      ref={(element) => {
+        setNodeRef(element);
+        register(item, element);
+      }}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="unit4-audio-control unit4-interactive"
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled}
+      aria-label={`${item}, press Enter or Space to pick up`}
+      onClick={() => !disabled && play()}
+      onKeyDown={(event) => {
+        if (!disabled && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          event.stopPropagation();
+          play();
+          pick();
+        }
+      }}
+    >
       {item}
+      <Unit4PlayingAudioIcon active={active} />
     </div>
   );
 };
 
-const DropCell = ({ cellKey, value, wrong, onRemove, showAns }) => {
+const DropCell = ({
+  cellKey,
+  value,
+  preview,
+  wrong,
+  onRemove,
+  locked,
+  register,
+  onKeyDown,
+}) => {
   const { setNodeRef, isOver } = useDroppable({
     id: cellKey,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(cellKey, element);
+      }}
+      role="button"
+      tabIndex={!locked && (value || preview) ? 0 : -1}
+      aria-disabled={locked}
+      onClick={() => value && !locked && onRemove(cellKey)}
+      onKeyDown={onKeyDown}
+      className={`unit4-drop-target unit4-interactive ${preview && !value ? "unit4-keyboard-preview" : ""}`}
       style={{
         position: "relative",
         height: "clamp(48px,6vw,68px)",
@@ -119,21 +189,18 @@ const DropCell = ({ cellKey, value, wrong, onRemove, showAns }) => {
 
         boxShadow: isOver ? "0 0 10px rgba(243,155,66,0.35)" : "none",
       }}
-         className={`${!showAns && "hover:text-red-600 "} `}
     >
-      {value && (
+      {(value || preview) && (
         <div
-          onClick={() => onRemove(cellKey)}
           style={{
-            cursor: "pointer",
+            cursor: value && !locked ? "pointer" : "default",
             width: "100%",
             height: "100%",
             display: "flex",
             alignItems: "center",
           }}
-       
         >
-          {value}
+          {value || preview}
         </div>
       )}
 
@@ -163,15 +230,89 @@ const DropCell = ({ cellKey, value, wrong, onRemove, showAns }) => {
     </div>
   );
 };
+
+const SentenceImageAudio = ({ img, people, activeAudioKey, playAudio }) => {
+  const positions = [
+    [8, 17],
+    [45, 54],
+    [82, 91],
+  ];
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "inline-block",
+        height: "250px",
+        maxWidth: "100%",
+      }}
+    >
+      <img
+        src={img}
+        alt="Three people with sentences about past and current places"
+        style={{
+          height: "100%",
+          width: "auto",
+          maxWidth: "100%",
+          display: "block",
+        }}
+      />
+
+      {people.flatMap((person, personIndex) =>
+        person.lines.map((sentence, lineIndex) => {
+          const audioKey = `sentence-${person.id}-${lineIndex}`;
+          const audio = person.audios[lineIndex];
+
+          return (
+            <button
+              key={audioKey}
+              type="button"
+              className="unit4-audio-control unit4-interactive"
+              aria-label={`Play: ${sentence}`}
+              onClick={() => playAudio(audioKey, audio)}
+              style={{
+                position: "absolute",
+                top: `${positions[personIndex][lineIndex]}%`,
+                left: "20%",
+                width: "78%",
+                height: "9%",
+                border: "none",
+                background: "transparent",
+                borderRadius: "4px",
+                cursor: "pointer",
+                padding: 0,
+                textAlign: "left",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: "0",
+                  pointerEvents: "none",
+                }}
+              >
+                <Unit4PlayingAudioIcon active={activeAudioKey === audioKey} />
+              </span>
+            </button>
+          );
+        }),
+      )}
+    </div>
+  );
+};
+
 export default function WB_Unit8_Page52_QC() {
   const [answers, setAnswers] = useState({});
-  const [draggedText, setDraggedText] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
 
   const usedValues = Object.values(answers);
 
   const [activeItem, setActiveItem] = useState(null);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -187,29 +328,34 @@ export default function WB_Unit8_Page52_QC() {
     }),
   );
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-
-    if (!over || showAns) return;
-
-    const draggedValue = active.id;
-
-    const newAnswers = { ...answers };
-
-    Object.keys(newAnswers).forEach((key) => {
-      if (newAnswers[key] === draggedValue) {
-        delete newAnswers[key];
-      }
+  const place = (draggedValue, cellKey) => {
+    if (showAns || lockedIds.includes(cellKey)) return;
+    setAnswers((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key] === draggedValue) delete updated[key];
+      });
+      updated[cellKey] = draggedValue;
+      return updated;
     });
-
-    newAnswers[over.id] = draggedValue;
-
-    setAnswers(newAnswers);
+    setWrongIds((previous) => previous.filter((id) => id !== cellKey));
+  };
+  const keyboard = useUnit4TabDrag({
+    itemIds: DRAG_ITEMS,
+    targetIds: Object.keys(CORRECT_ANSWERS),
+    isItemDisabled: (id) => usedValues.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedIds.includes(id) || showAns,
+    onPick: (id) => playAudio(`bank-${id}`, ITEM_AUDIO[id]),
+    onPlace: place,
+  });
+  const handleDragEnd = ({ active, over }) => {
+    if (over) place(String(active.id), String(over.id));
     setActiveItem(null);
   };
   /* ─── Button handlers ─── */
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === Object.keys(CORRECT_ANSWERS).length)
+      return;
     const allFilled = Object.keys(CORRECT_ANSWERS).every((key) => answers[key]);
     if (!allFilled) {
       ValidationAlert.info("Please complete all answers first.");
@@ -220,6 +366,14 @@ export default function WB_Unit8_Page52_QC() {
       if (answers[key] === CORRECT_ANSWERS[key]) score++;
     });
     setShowResults(true);
+    const keys = Object.keys(CORRECT_ANSWERS);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...keys.filter((key) => answers[key] === CORRECT_ANSWERS[key]),
+      ]),
+    ]);
+    setWrongIds(keys.filter((key) => answers[key] !== CORRECT_ANSWERS[key]));
     const total = Object.keys(CORRECT_ANSWERS).length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -230,19 +384,24 @@ export default function WB_Unit8_Page52_QC() {
     setAnswers(CORRECT_ANSWERS);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(Object.keys(CORRECT_ANSWERS));
+    setWrongIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setDraggedText(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const isWrongCell = (cellKey) => {
-    if (!showResults || showAns) return false;
-    if (!answers[cellKey]) return false;
-    return answers[cellKey] !== CORRECT_ANSWERS[cellKey];
+    return wrongIds.includes(cellKey);
   };
 
   /* ─── Drop cell renderer ─── */
@@ -254,20 +413,41 @@ export default function WB_Unit8_Page52_QC() {
       <DropCell
         cellKey={cellKey}
         value={value}
+        preview={
+          keyboard.keyboardTargetId === cellKey ? keyboard.keyboardItemId : ""
+        }
         wrong={wrong}
         onRemove={handleRemoveFromCell}
-        showAns={showAns || showResults}
+        locked={showAns || lockedIds.includes(cellKey)}
+        register={keyboard.registerTarget}
+        onKeyDown={(event) => {
+          if (
+            !keyboard.keyboardItemId &&
+            value &&
+            !lockedIds.includes(cellKey) &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            handleRemoveFromCell(cellKey);
+            return;
+          }
+          keyboard.handleTargetKeyDown(event, cellKey);
+        }}
       />
     );
   };
 
   const handleRemoveFromCell = (cellKey) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(cellKey)) return;
 
-    const newAnswers = { ...answers };
-    delete newAnswers[cellKey];
-
-    setAnswers(newAnswers);
+    const removed = answers[cellKey];
+    setAnswers((previous) => {
+      const updated = { ...previous };
+      delete updated[cellKey];
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== cellKey));
+    if (removed) keyboard.focusItem(removed);
   };
   return (
     <DndContext
@@ -287,16 +467,26 @@ export default function WB_Unit8_Page52_QC() {
           }}
         >
           {/* Title */}
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">C</span>Read, drag, and drop in the chart.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="C"
+            title="Read and write in the chart."
+            subTitle="Say each current and past places in the correct chart cell aloud, identify its sound or category, then place it in the correct chart group."
+          />
 
           {/* Sentences */}
+
           <div className="flex justify-start">
-            <img src={img} style={{ height: "250px", width: "auto" }} />
+            <SentenceImageAudio
+              img={img}
+              people={PEOPLE}
+              activeAudioKey={activeAudioKey}
+              playAudio={playAudio}
+            />
           </div>
+
           {/* Drag bank */}
           <div
+            className="w-full"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -313,6 +503,10 @@ export default function WB_Unit8_Page52_QC() {
                   key={`${item}-${index}`}
                   item={item}
                   disabled={disabled || showAns}
+                  register={keyboard.registerItem}
+                  pick={() => keyboard.pickItem(item)}
+                  play={() => playAudio(`bank-${item}`, ITEM_AUDIO[item])}
+                  active={activeAudioKey === `bank-${item}`}
                 />
               );
             })}
@@ -368,7 +562,7 @@ export default function WB_Unit8_Page52_QC() {
                   >
                     <img
                       src={person.img}
-                      alt={`head-${person.id}`}
+                      alt={person.alt}
                       style={{
                         width: "45px",
                         height: "45px",

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import page4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 4.png";
 import allUnitSound from "../../../assets/audio/ClassBook/Unit 1/unit1-page4-allunit.mp3";
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
@@ -74,7 +74,20 @@ const Page4 = ({ openPopup }) => {
       text: "Page 5, listen and read along. Long vowels. Cake, bee, bike, home, cube.",
     },
   ];
-
+  const soundLabels = {
+    1: "Scoreboard",
+    2: "Young",
+    3: "Old",
+    4: "Small",
+    5: "Big",
+    6: "Referee",
+    7: "Whistle",
+    8: "Fast",
+    9: "Slow",
+    10: "Tall",
+    11: "Short",
+    12: "Basketball court",
+  };
   const areas = [
     // الصوت الأول – المنطقة الأساسية
     { x1: 27.7, y1: 17.8, sound: 1, isPrimary: true },
@@ -193,53 +206,7 @@ const Page4 = ({ openPopup }) => {
         onClick={handleImageClick}
       >
         <audio ref={audioRef} style={{ display: "none" }} />
-
-        {areas.map((area, index) => {
-          const isActive = activeId === `p4-${area.sound}`;
-
-          // ============================
-          // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
-          // ============================
-          if (area.isPrimary) {
-            return (
-              <div
-                key={index}
-                className={`circle-area ${isActive ? "active" : ""}`}
-                style={{
-                  left: `${area.x1}%`,
-                  top: `${area.y1}%`,
-                }}
-                onClick={() => {
-                  // setActiveAreaIndex(area.sound);
-                  playSound(sounds[area.sound], `p4-${area.sound}`);
-                }}
-              ></div>
-            );
-          }
-
-          // ============================
-          // 2️⃣ المناطق الفرعية → مربعات داكنة مخفية ولازم
-          //    عند الضغط عليها → تفعّل الدائرة الأساسية
-          // ============================
-          return (
-            <div
-              key={index}
-              className="clickable-area"
-              style={{
-                position: "absolute",
-                left: `${area.x1}%`,
-                top: `${area.y1}%`,
-                width: `${area.x2 - area.x1}%`,
-                height: `${area.y2 - area.y1}%`,
-              }}
-              onClick={() => {
-                // setActiveAreaIndex(area.sound); // 👈 يفعل الدائرة فوق الرقم
-                playSound(sounds[area.sound], `p4-${area.sound}`);
-              }}
-            ></div>
-          );
-        })}
-
+        {/* MAIN AUDIO */}
         <div
           className="headset-icon-CD-page4-1 hover:scale-110 transition"
           style={{ overflow: "visible" }}
@@ -248,6 +215,9 @@ const Page4 = ({ openPopup }) => {
             width="22"
             height="22"
             viewBox="0 0 90 90"
+            tabIndex={0}
+            role="button"
+            aria-label="Play page 4 main audio with captions"
             onClick={() =>
               openPopup(
                 "audio",
@@ -261,11 +231,37 @@ const Page4 = ({ openPopup }) => {
                   <AudioWithCaption
                     src={allUnitSound}
                     captions={captionsExample}
+                    pageId="unit1-page4-main-audio"
                   />
                 </div>,
               )
             }
-            style={{ overflow: "visible" }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+
+                openPopup(
+                  "audio",
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignContent: "center",
+                    }}
+                  >
+                    <AudioWithCaption
+                      src={allUnitSound}
+                      captions={captionsExample}
+                      pageId="unit1-page4-main-audio"
+                    />
+                  </div>,
+                );
+              }
+            }}
+            style={{
+              overflow: "visible",
+              cursor: "pointer",
+            }}
           >
             <image
               className="svg-img"
@@ -279,6 +275,7 @@ const Page4 = ({ openPopup }) => {
           </svg>
         </div>
 
+        {/* FIND ACTIVITY */}
         <div
           className="click-icon-page4-1 hover:scale-110 transition"
           style={{ overflow: "visible" }}
@@ -287,8 +284,21 @@ const Page4 = ({ openPopup }) => {
             width="22"
             height="22"
             viewBox="0 0 90 90"
+            tabIndex={0}
+            role="button"
+            aria-label="Open find the basketball hoop activity"
             onClick={() => openPopup("html", <Page4_Interactive1 />)}
-            style={{ overflow: "visible" }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+
+                openPopup("html", <Page4_Interactive1 />);
+              }
+            }}
+            style={{
+              overflow: "visible",
+              cursor: "pointer",
+            }}
           >
             <image
               className="svg-img"
@@ -302,6 +312,7 @@ const Page4 = ({ openPopup }) => {
           </svg>
         </div>
 
+        {/* VOCABULARY */}
         <div
           className="headset-icon-CD-page4-2 hover:scale-110 transition"
           style={{ overflow: "visible" }}
@@ -310,8 +321,21 @@ const Page4 = ({ openPopup }) => {
             width="22"
             height="22"
             viewBox="0 0 90 90"
+            tabIndex={0}
+            role="button"
+            aria-label="Open vocabulary activity"
             onClick={() => openPopup("html", <Page4_vocabulary />)}
-            style={{ overflow: "visible" }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+
+                openPopup("html", <Page4_vocabulary />);
+              }
+            }}
+            style={{
+              overflow: "visible",
+              cursor: "pointer",
+            }}
           >
             <image
               className="svg-img"
@@ -324,6 +348,8 @@ const Page4 = ({ openPopup }) => {
             />
           </svg>
         </div>
+
+        {/* LISTEN AND READ ALONG */}
         <div
           className="click-icon-page4 hover:scale-110 transition"
           style={{ overflow: "visible" }}
@@ -332,6 +358,9 @@ const Page4 = ({ openPopup }) => {
             width="22"
             height="22"
             viewBox="0 0 90 90"
+            tabIndex={0}
+            role="button"
+            aria-label="Open Listen and read along activity"
             onClick={() =>
               openPopup(
                 "html",
@@ -340,13 +369,38 @@ const Page4 = ({ openPopup }) => {
                   audioSrc={longAudio}
                   checkpoints={[0, 3.8, 5.4, 6.52, 7.12, 7.82, 8.56]}
                   popupOpen={true}
-                  titleQ={"Listen and read along."}
+                  titleQ="Listen and read along."
+                  subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
                   audioArr={imageSounds}
                   captions={captions}
+                  pageId="unit1-page4-read"
                 />,
               )
             }
-            style={{ overflow: "visible" }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+
+                openPopup(
+                  "html",
+                  <FourImagesWithAudio
+                    images={[Rabbit, img1, img2, img3, img4, img5, img6]}
+                    audioSrc={longAudio}
+                    checkpoints={[0, 3.8, 5.4, 6.52, 7.12, 7.82, 8.56]}
+                    popupOpen={true}
+                    titleQ="Listen and read along."
+                    subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
+                    audioArr={imageSounds}
+                    captions={captions}
+                    pageId="unit1-page4-read"
+                  />,
+                );
+              }
+            }}
+            style={{
+              overflow: "visible",
+              cursor: "pointer",
+            }}
           >
             <image
               className="svg-img"
@@ -359,6 +413,62 @@ const Page4 = ({ openPopup }) => {
             />
           </svg>
         </div>
+        {areas.map((area, index) => {
+          const isActive = activeId === `p4-${area.sound}`;
+
+          // ============================
+          // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
+          // ============================
+          if (area.isPrimary) {
+            return (
+              <div
+                key={index}
+                className={`circle-area page4-audio-hotspot ${
+                  isActive ? "active" : ""
+                }`}
+                role="button"
+                tabIndex={0}
+                aria-label={`Play pronunciation: ${soundLabels[area.sound]}`}
+                aria-pressed={isActive}
+                style={{
+                  left: `${area.x1}%`,
+                  top: `${area.y1}%`,
+                }}
+                onClick={() => {
+                  playSound(sounds[area.sound], `p4-${area.sound}`);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    playSound(sounds[area.sound], `p4-${area.sound}`);
+                  }
+                }}
+              ></div>
+            );
+          }
+
+          // ============================
+          // 2️⃣ المناطق الفرعية → مربعات داكنة مخفية ولازم
+          //    عند الضغط عليها → تفعّل الدائرة الأساسية
+          // ============================
+          return (
+            <div
+              key={index}
+              className="clickable-area"
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: `${area.x1}%`,
+                top: `${area.y1}%`,
+                width: `${area.x2 - area.x1}%`,
+                height: `${area.y2 - area.y1}%`,
+              }}
+              onClick={() => {
+                playSound(sounds[area.sound], `p4-${area.sound}`);
+              }}
+            ></div>
+          );
+        })}
       </div>
     </>
   );

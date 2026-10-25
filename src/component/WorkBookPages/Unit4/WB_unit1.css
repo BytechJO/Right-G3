@@ -18,7 +18,10 @@
   top: 3.5% !important;
   left: 31% !important;
 }
-
+.wb-g24-row img[role="button"]:focus-visible {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 4px;
+}
 .q4-4 {
   position: absolute !important;
   padding: 5px !important;

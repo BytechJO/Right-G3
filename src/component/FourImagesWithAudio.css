@@ -7,14 +7,7 @@
   gap: 77px;
   /* margin-top: 20px; */
 }
-.four-wrapper.four-wrapper-gap{
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 44px;
-}
+
 .images-layout {
   display: flex;
   flex-direction: column;
@@ -22,22 +15,6 @@
   align-items: center;
   width: 100%;
 }
-.small-images {
-  display: flex;
-  justify-content: center;
-  gap: 35px;
-  /* position: absolute;
-  top: 20%; */
-  width: 60%;
-}
-
-.small-images.wrap-images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
-  justify-content: center;
-}
-/* الصور الصغيرة على اليمين */
 
 .audio-popup-read{
    margin-top: -20px;
@@ -69,6 +46,15 @@
   height: 50px;
 }
 
+/* الصور الصغيرة على اليمين */
+.small-images {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  /* position: absolute;
+  top: 20%; */
+  width: 60%;
+}
 
 .small-box2 {
   padding: 10px;
@@ -76,6 +62,7 @@
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .small-box2.active {
@@ -92,10 +79,10 @@
 .small-box1 {
   padding: 10px;
   background: #fff;
-  width: auto;
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .small-box1.active {
@@ -108,9 +95,88 @@
   height: auto;
 }
 
+.small-box1:focus-visible,
+.small-box2:focus-visible {
+  outline: 4px solid #2563eb;
+  outline-offset: 5px;
+  border-radius: 14px;
+}
+
+.audio-slider:focus-visible {
+  outline: 4px solid #2563eb;
+  outline-offset: 5px;
+  border-radius: 999px;
+}
+
+.caption-toggle-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.caption-toggle-btn:focus-visible {
+  outline: 4px solid #2563eb;
+  outline-offset: 5px;
+}
+
 /* مكان الأوديو */
 .main-audio {
   /* width: 80%; */
   margin: 15px auto;
   display: block;
+}
+.grid-images-layout {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid-images-container {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
+  width: 60%;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.grid-image-box {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.grid-image-box.active {
+  transform: scale(1.05);
+  background: gold;
+}
+
+.grid-image {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Focus only with keyboard */
+.grid-image-box:focus {
+  outline: none;
+}
+
+.grid-image-box:focus-visible {
+  outline: 4px solid #2563eb;
+  outline-offset: 5px;
 }

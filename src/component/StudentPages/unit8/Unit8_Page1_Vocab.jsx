@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/G5_U8_Pg_64.png";
 import ModernVocabularyComponent from "../../ModernVocabularyComponent";
 
@@ -135,6 +135,7 @@ const Unit8_Page1_Vocab = () => {
       ]}
       markers={positions}
       captions={captions}
+      pageId="unit8-page64-vocab"
     />
   );
 };

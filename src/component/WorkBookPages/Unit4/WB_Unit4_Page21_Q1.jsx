@@ -1,12 +1,31 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import hotAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise A/Item_001_hot.mp3";
+import coldAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise A/Item_002_cold.mp3";
+import rainyAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise A/Item_003_rainy.mp3";
+import windyAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise A/Item_004_windy.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 4.svg";
-import { object } from "framer-motion/client";
+const WORD_AUDIO = {
+  hot: hotAudio,
+  cold: coldAudio,
+  rainy: rainyAudio,
+  windy: windyAudio,
+};
+const IMAGE_ALTS = [
+  "Children building a snowman on a cold day",
+  "Two girls walking under umbrellas in rainy weather",
+  "Children playing on a hot beach",
+  "Children playing while leaves blow in windy weather",
+];
 
 const WORDS = ["hot", "cold", "rainy", "windy"];
 
@@ -145,7 +164,6 @@ const styles = {
     width: "100%",
     height: "100%",
     border: "none",
-    outline: "none",
     background: "transparent",
     appearance: "none",
     WebkitAppearance: "none",
@@ -196,20 +214,23 @@ const styles = {
 
 export default function WB_Weather_Page228_QA() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, value) => {
-    if (showAns) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setWrongIds((previous) => previous.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -226,7 +247,16 @@ export default function WB_Weather_Page228_QA() {
       }
     });
 
-    setChecked(true);
+    setLockedIds(
+      ITEMS.flatMap((item) =>
+        answers[item.id] === item.correct ? [item.id] : [],
+      ),
+    );
+    setWrongIds(
+      ITEMS.flatMap((item) =>
+        answers[item.id] !== item.correct ? [item.id] : [],
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -245,19 +275,22 @@ export default function WB_Weather_Page228_QA() {
     });
 
     setAnswers(filled);
-    setChecked(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!checked || showAns) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   const getSelectColor = (item) => {
@@ -268,29 +301,44 @@ export default function WB_Weather_Page228_QA() {
   return (
     <div className="main-container-component">
       <div
-        className="div-forall"
+        className="div-forall mb-10"
         style={{
-   
           gap: "20px",
-        
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>
-         Look, read, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title="Look, read, and write."
+          subTitle="Use the weather word for each scene to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
-        <div style={styles.wordBankWrap}>
+        <div className=" w-full" style={styles.wordBankWrap}>
           <div style={styles.wordBank}>
             {WORDS.map((word) => (
-              <span key={word} style={styles.word}>
+              <span
+                key={word}
+                role="button"
+                tabIndex={0}
+                className="unit4-audio-control unit4-interactive"
+                onClick={() => playAudio(`word-${word}`, WORD_AUDIO[word])}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`word-${word}`, WORD_AUDIO[word]);
+                  }
+                }}
+                style={styles.word}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `word-${word}`}
+                />
                 {word}
               </span>
             ))}
           </div>
         </div>
 
-        <div style={styles.grid}>
+        <div className=" w-full" style={styles.grid}>
           {ITEMS.map((item) => (
             <div key={item.id} style={styles.card}>
               <div style={styles.mediaWrap}>
@@ -299,7 +347,7 @@ export default function WB_Weather_Page228_QA() {
                 <div style={styles.imageBox}>
                   <img
                     src={item.img}
-                    alt={`weather-${item.id}`}
+                    alt={IMAGE_ALTS[item.id - 1]}
                     style={styles.image}
                   />
                 </div>
@@ -309,7 +357,9 @@ export default function WB_Weather_Page228_QA() {
                 <div
                   style={{
                     ...styles.answerLine,
-                    borderBottom: isWrong(item) ? "2px solid red" : "1px solid #4a4a4a",
+                    borderBottom: isWrong(item)
+                      ? "2px solid red"
+                      : "1px solid #4a4a4a",
                   }}
                 >
                   <div
@@ -319,12 +369,15 @@ export default function WB_Weather_Page228_QA() {
                   >
                     <select
                       value={answers[item.id] || ""}
-                      disabled={showAns || checked}
+                      disabled={showAns || lockedIds.includes(item.id)}
                       onChange={(e) => handleChange(item.id, e.target.value)}
                       style={{
                         ...styles.select,
                         color: getSelectColor(item),
-                        cursor: showAns || checked ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedIds.includes(item.id)
+                            ? "default"
+                            : "pointer",
                       }}
                     >
                       <option value="" disabled hidden></option>

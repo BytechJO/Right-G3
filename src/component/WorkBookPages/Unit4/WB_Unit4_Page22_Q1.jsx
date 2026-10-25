@@ -1,6 +1,17 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise C/Item_001_It's_the_7th_month_of_the_year.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise C/Item_002_It's_the_2nd_month_of_the_year.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise C/Item_003_It's_the_5th_month_of_the_year.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise C/Item_004_It's_the_3rd_month_of_the_year.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise C/Item_005_It's_the_9th_month_of_the_year.mp3";
+import audio6 from "../../../assets/audio/WorkBook/unit4/Page 22 - Exercise C/Item_006_It's_the_12th_month_of_the_year.mp3";
+const SENTENCE_AUDIO = [audio1, audio2, audio3, audio4, audio5, audio6];
 
 const ITEMS = [
   {
@@ -52,22 +63,24 @@ const OPTIONS = [
 
 export default function WB_Unit3_Page20_QC() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelectChange = (id, value) => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -84,7 +97,8 @@ export default function WB_Unit3_Page20_QC() {
       }
     });
 
-    setShowResults(true);
+    setLockedIds(ITEMS.flatMap((item) => answers[item.id] === item.correct ? [item.id] : []));
+    setWrongIds(ITEMS.flatMap((item) => answers[item.id] !== item.correct ? [item.id] : []));
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -103,19 +117,18 @@ export default function WB_Unit3_Page20_QC() {
     });
 
     setAnswers(filledAnswers);
-    setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id)); setWrongIds([]); stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
     setShowAns(false);
+    setLockedIds([]); setWrongIds([]); stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   return (
@@ -244,24 +257,21 @@ export default function WB_Unit3_Page20_QC() {
        
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-          
-        >
-          <span className="WB-ex-A">C</span>Read and write.
-        </h1>
+        <ExerciseHeader sectionLetter="C" title="Read and write." subTitle="Use the month name from its ordinal position to decide the missing word or phrase before opening each dropdown, then reread the completed sentence." />
         <div className="wb-months-list">
           {ITEMS.map((item) => (
             <div key={item.id} className="wb-months-row">
               <div className="wb-months-num">{item.id}</div>
 
-              <div className="wb-months-sentence">{item.sentence}</div>
+              <div className="wb-months-sentence unit4-audio-control unit4-interactive" role="button" tabIndex={0} onClick={() => playAudio(`sentence-${item.id}`, SENTENCE_AUDIO[item.id - 1])} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playAudio(`sentence-${item.id}`, SENTENCE_AUDIO[item.id - 1]); } }}>
+                <Unit4PlayingAudioIcon active={activeAudioKey === `sentence-${item.id}`} />{item.sentence}
+              </div>
 
               <div className="wb-months-answer-wrap">
                 <select
                   className="wb-months-select"
                   value={answers[item.id] || ""}
-                  disabled={showAns ||showResults}
+                  disabled={showAns || lockedIds.includes(item.id)}
                   onChange={(e) => handleSelectChange(item.id, e.target.value)}
                   style={{borderBottom:isWrong(item) ? "2px solid red":"1px solid #222"}}
                 >

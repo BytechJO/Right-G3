@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import questionAudio from "../../../assets/audio/WorkBook/unit4/Page 23 - Exercise E/Item_001_What_month_is_it.mp3";
+import answerAudio from "../../../assets/audio/WorkBook/unit4/Page 23 - Exercise E/Item_002_It's.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 23//Ex E 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 23//Ex E 2.svg";
@@ -95,6 +101,7 @@ const styles = {
     lineHeight: 1.2,
     fontWeight: "400",
     wordBreak: "break-word",
+    position:"relative"
   },
 
   imageWrap: {
@@ -176,7 +183,6 @@ const styles = {
     maxWidth: "100%",
     height: "clamp(34px, 6vw, 40px)",
     border: "none",
-    outline: "none",
     background: "transparent",
     appearance: "none",
     WebkitAppearance: "none",
@@ -230,9 +236,11 @@ const styles = {
 
 export default function WB_Months_Page230_QE() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   useEffect(() => {
     const updateScreen = () => {
@@ -246,16 +254,17 @@ export default function WB_Months_Page230_QE() {
   }, []);
 
   const handleChange = (id, value) => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.filter((item) => !item.fixed).every(
       (item) => answers[item.id],
@@ -276,7 +285,15 @@ export default function WB_Months_Page230_QE() {
       }
     });
 
-    setChecked(true);
+    const correctIds = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -297,19 +314,22 @@ export default function WB_Months_Page230_QE() {
     });
 
     setAnswers(filled);
-    setChecked(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!checked || item.fixed) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   const renderAnswerField = (item) => {
@@ -382,17 +402,18 @@ export default function WB_Months_Page230_QE() {
           >
             <select
               value={answers[item.id] || ""}
-              disabled={showAns || checked}
+              disabled={showAns || lockedIds.includes(item.id)}
               onChange={(e) => handleChange(item.id, e.target.value)}
               style={{
                 ...styles.select,
                 color: showAns || answers[item.id] ? "#000000" : "#222",
-                cursor: showAns || checked ? "default" : "pointer",
+                cursor:
+                  showAns || lockedIds.includes(item.id)
+                    ? "default"
+                    : "pointer",
               }}
             >
-              <option value="" disabled>
-               
-              </option>
+              <option value="" disabled></option>
               {MONTHS.map((month) => (
                 <option key={month} value={month}>
                   {month}
@@ -426,10 +447,11 @@ export default function WB_Months_Page230_QE() {
           gap: "28px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-          Read, look, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Read, look, and write."
+          subTitle="Use the month shown on each calendar card to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div style={styles.pageWrap}>
           <div
@@ -445,18 +467,45 @@ export default function WB_Months_Page230_QE() {
                 <div style={styles.questionRow}>
                   <span style={styles.qNumber}>{item.id}</span>
 
-                  <span style={styles.qText}>What month is it?</span>
+                  <span
+                    style={{ ...styles.qText, cursor: "pointer" }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play question ${item.id}: What month is it?`}
+                    onClick={() =>
+                      playAudio(`question-${item.id}`, questionAudio)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`question-${item.id}`, questionAudio);
+                      }
+                    }}
+                  >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `question-${item.id}`}
+                    />
+                    What month is it?
+                  </span>
                 </div>
 
                 <div style={styles.imageWrap}>
                   <img
                     src={item.img}
-                    alt={`month-${item.id}`}
+                    alt={`${item.correct} calendar card`}
                     style={styles.image}
                   />
                 </div>
 
-                <div style={styles.answerWrap}>{renderAnswerField(item)}</div>
+                <div
+                  style={styles.answerWrap}
+                  onClick={(event) => {
+                    if (event.target.tagName !== "SELECT")
+                      playAudio(`answer-${item.id}`, answerAudio);
+                  }}
+                >
+                  {renderAnswerField(item)}
+                </div>
               </div>
             ))}
           </div>

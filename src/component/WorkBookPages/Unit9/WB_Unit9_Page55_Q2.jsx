@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/5.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/6.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/7.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 55/SVG/8.svg";
+import question1Audio from "../../../assets/audio/WorkBook/unit 9/Page 55 - Exercise J/Item_001_Is_the_teacher_at_the_library.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit 9/Page 55 - Exercise J/Item_002_Are_the_kids_in_the_taxi.mp3";
+import question3Audio from "../../../assets/audio/WorkBook/unit 9/Page 55 - Exercise J/Item_003_Are_Hansel_and_Helen_at_the_zoo.mp3";
+import question4Audio from "../../../assets/audio/WorkBook/unit 9/Page 55 - Exercise J/Item_004_Is_Hansel_in_the_living_room.mp3";
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const WRONG_COLOR = "#ef4444";
@@ -18,24 +26,32 @@ const ITEMS = [
     img: img1,
     question: "Is the teacher at the library?",
     correct: "No, he isn't.",
+    audio: question1Audio,
+    alt: "A teacher sitting in a living room",
   },
   {
     id: 2,
     img: img2,
     question: "Are the kids in the taxi?",
     correct: "No, they aren't.",
+    audio: question2Audio,
+    alt: "Children riding on a bus",
   },
   {
     id: 3,
     img: img3,
     question: "Are Hansel and Helen at the zoo?",
     correct: "Yes, they are.",
+    audio: question3Audio,
+    alt: "Hansel and Helen visiting animals at the zoo",
   },
   {
     id: 4,
     img: img4,
     question: "Is Hansel in the living room?",
     correct: "Yes, he is.",
+    audio: question4Audio,
+    alt: "Hansel sitting in the living room",
   },
 ];
 
@@ -77,24 +93,26 @@ const ErrorBadge = () => (
 // ── Main Component ─────────────────────────────────────────────
 export default function WB_Unit8_Page55_QJ() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   // ── Select Answer ───────────────────────────────────────────
   const handleSelect = (id, value) => {
-    if (showAns||checked) return;
-
-    setChecked(false);
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setWrongIds((prev) => prev.filter((itemId) => itemId !== id));
   };
 
   // ── Check ───────────────────────────────────────────────────
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -112,6 +130,19 @@ export default function WB_Unit8_Page55_QJ() {
     });
 
     setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     const total = ITEMS.length;
 
@@ -135,6 +166,8 @@ export default function WB_Unit8_Page55_QJ() {
     setAnswers(correctMap);
     setChecked(false);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
   };
 
   // ── Reset ───────────────────────────────────────────────────
@@ -142,10 +175,13 @@ export default function WB_Unit8_Page55_QJ() {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   // ── Wrong Check ─────────────────────────────────────────────
-  const isWrong = (item) => checked && answers[item.id] !== item.correct;
+  const isWrong = (item) => wrongIds.includes(item.id);
 
   return (
     <div className="main-container-component">
@@ -156,13 +192,15 @@ export default function WB_Unit8_Page55_QJ() {
         }}
       >
         {/* ── Title ───────────────────────────────────────── */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">J</span>
-           Read, look, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="J"
+          title="Read, look, and write."
+          subTitle="Use the is/are question and answer for each place picture to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* ── Questions ───────────────────────────────────── */}
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, minmax(0,1fr))",
@@ -202,6 +240,17 @@ export default function WB_Unit8_Page55_QJ() {
                   </span>
 
                   <p
+                    className="unit4-audio-control unit4-interactive"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play: ${item.question}`}
+                    onClick={() => playAudio(`question-${item.id}`, item.audio)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`question-${item.id}`, item.audio);
+                      }
+                    }}
                     style={{
                       margin: 0,
                       fontSize: "18px",
@@ -211,6 +260,9 @@ export default function WB_Unit8_Page55_QJ() {
                     }}
                   >
                     {item.question}
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `question-${item.id}`}
+                    />
                   </p>
                 </div>
 
@@ -223,7 +275,7 @@ export default function WB_Unit8_Page55_QJ() {
                 >
                   <img
                     src={item.img}
-                    alt={`question-${item.id}`}
+                    alt={item.alt}
                     style={{
                       width: "60%",
                       height: "auto",
@@ -231,8 +283,6 @@ export default function WB_Unit8_Page55_QJ() {
                       display: "block",
                     }}
                   />
-
-   
                 </div>
 
                 {/* Select */}
@@ -245,7 +295,7 @@ export default function WB_Unit8_Page55_QJ() {
                   <select
                     value={answers[item.id] || ""}
                     onChange={(e) => handleSelect(item.id, e.target.value)}
-                    disabled={showAns||checked}
+                    disabled={showAns || lockedIds.includes(item.id)}
                     style={{
                       width: "100%",
                       // minHeight: "48px",
@@ -258,8 +308,10 @@ export default function WB_Unit8_Page55_QJ() {
                       fontSize: "16px",
                       fontWeight: "500",
                       color: "#222",
-                      outline: "none",
-                      cursor: showAns||checked ? "default" : "pointer",
+                      cursor:
+                        showAns || lockedIds.includes(item.id)
+                          ? "default"
+                          : "pointer",
                       appearance: "none",
                       WebkitAppearance: "none",
                       MozAppearance: "none",
@@ -291,18 +343,18 @@ export default function WB_Unit8_Page55_QJ() {
                   </div>
 
                   {/* X فوق الانبوت */}
-                 {wrong && (
-  <div
-    style={{
-      position: "absolute",
-      top: "10px",
-      right: "0px",
-      zIndex: 10,
-    }}
-  >
-    <ErrorBadge />
-  </div>
-)}
+                  {wrong && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "0px",
+                        zIndex: 10,
+                      }}
+                    >
+                      <ErrorBadge />
+                    </div>
+                  )}
                 </div>
               </div>
             );

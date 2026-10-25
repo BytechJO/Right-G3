@@ -1,6 +1,22 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import "./workbookUnit3Interactions.css";
+import shopkeeper1Audio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise H/Item_001_Shopkeeper_1.mp3";
+import shopkeeper2Audio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise H/Item_002_Shopkeeper_2.mp3";
+import shopkeeper3Audio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise H/Item_003_Shopkeeper_3.mp3";
+import description1Audio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise H/Item_004_I_have_some_shorts,_and_I_have_some_shoes._I_don't_have_any_dresses,_but.mp3";
+import description2Audio from "../../../assets/audio/WorkBook/unit3/Page 18 - Exercise H/Item_005_I_have_some_shoes,_and_I_have_some_socks._I_have_some_dresses_too._I_don.mp3";
+
+const SHOPKEEPER_AUDIO = {
+  "Shopkeeper 1": shopkeeper1Audio,
+  "Shopkeeper 2": shopkeeper2Audio,
+  "Shopkeeper 3": shopkeeper3Audio,
+};
+const DESCRIPTION_AUDIO = { 1: description1Audio, 2: description2Audio };
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 18/Ex H 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 18/Ex H 2.svg";
@@ -23,22 +39,26 @@ const OPTIONS = ["Shopkeeper 1", "Shopkeeper 2", "Shopkeeper 3"];
 
 export default function WB_Unit3_Page18_QH() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setShowResults(false);
+    playAudio(`shopkeeper-${value}`, SHOPKEEPER_AUDIO[value]);
+    setWrongIds((prev) => prev.filter((entry) => entry !== id));
   };
 
   const handleCheck = () => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -56,6 +76,16 @@ export default function WB_Unit3_Page18_QH() {
     });
 
     setShowResults(true);
+    setLockedIds(
+      ITEMS.filter((item) => answers[item.id] === item.correct).map(
+        (item) => item.id,
+      ),
+    );
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -76,17 +106,22 @@ export default function WB_Unit3_Page18_QH() {
     setAnswers(correctMap);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   return (
@@ -264,24 +299,86 @@ export default function WB_Unit3_Page18_QH() {
           gap: "50px",
         }}
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">H</span>Look, read, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="H"
+          title="Look, read, and write."
+          subTitle="Use the shopkeeper number that matches each description to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div className="wb-h18-wrap">
           <div className="wb-h18-top-grid">
-            <div className="wb-h18-shop">
-              <img src={img1} alt="Shopkeeper 1" className="wb-h18-shop-img" />
+            <div
+              className="wb-h18-shop wb-unit3-audio-control wb-unit3-interactive"
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                playAudio("shopkeeper-Shopkeeper 1", shopkeeper1Audio)
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  playAudio("shopkeeper-Shopkeeper 1", shopkeeper1Audio);
+                }
+              }}
+            >
+              <WorkbookUnit3PlayingAudioIcon
+                active={activeAudioKey === "shopkeeper-Shopkeeper 1"}
+              />
+              <img
+                src={img1}
+                alt="Shopkeeper 1 with shoes, socks, and dresses"
+                className="wb-h18-shop-img"
+              />
               <div className="wb-h18-shop-label">Shopkeeper 1</div>
             </div>
 
-            <div className="wb-h18-shop">
-              <img src={img2} alt="Shopkeeper 2" className="wb-h18-shop-img" />
+            <div
+              className="wb-h18-shop wb-unit3-audio-control wb-unit3-interactive"
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                playAudio("shopkeeper-Shopkeeper 2", shopkeeper2Audio)
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  playAudio("shopkeeper-Shopkeeper 2", shopkeeper2Audio);
+                }
+              }}
+            >
+              <WorkbookUnit3PlayingAudioIcon
+                active={activeAudioKey === "shopkeeper-Shopkeeper 2"}
+              />
+              <img
+                src={img2}
+                alt="Shopkeeper 2 with displayed clothing items"
+                className="wb-h18-shop-img"
+              />
               <div className="wb-h18-shop-label">Shopkeeper 2</div>
             </div>
 
-            <div className="wb-h18-shop">
-              <img src={img3} alt="Shopkeeper 3" className="wb-h18-shop-img" />
+            <div
+              className="wb-h18-shop wb-unit3-audio-control wb-unit3-interactive"
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                playAudio("shopkeeper-Shopkeeper 3", shopkeeper3Audio)
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  playAudio("shopkeeper-Shopkeeper 3", shopkeeper3Audio);
+                }
+              }}
+            >
+              <WorkbookUnit3PlayingAudioIcon
+                active={activeAudioKey === "shopkeeper-Shopkeeper 3"}
+              />
+              <img
+                src={img3}
+                alt="Shopkeeper 3 with shorts, shoes, and hats"
+                className="wb-h18-shop-img"
+              />
               <div className="wb-h18-shop-label">Shopkeeper 3</div>
             </div>
           </div>
@@ -291,16 +388,40 @@ export default function WB_Unit3_Page18_QH() {
               <div key={item.id} className="wb-h18-row">
                 <span className="wb-h18-num">{item.id}</span>
 
-                <div className="wb-h18-text">{item.text}</div>
+                <div
+                  className="wb-h18-text wb-unit3-audio-control wb-unit3-interactive"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() =>
+                    playAudio(
+                      `description-${item.id}`,
+                      DESCRIPTION_AUDIO[item.id],
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(
+                        `description-${item.id}`,
+                        DESCRIPTION_AUDIO[item.id],
+                      );
+                    }
+                  }}
+                >
+                  <WorkbookUnit3PlayingAudioIcon
+                    active={activeAudioKey === `description-${item.id}`}
+                  />
+                  {item.text}
+                </div>
 
                 <div className="wb-h18-select-wrap">
                   <select
                     value={answers[item.id] || ""}
                     onChange={(e) => handleSelect(item.id, e.target.value)}
-                    disabled={showAns||showResults}
+                    disabled={showAns || lockedIds.includes(item.id)}
                     className={`wb-h18-select ${isWrong(item) ? "wrong" : ""}`}
                   >
-                    <option value=""></option>
+                    <option value="">Select...</option>
                     {OPTIONS.map((option) => (
                       <option key={option} value={option}>
                         {option}

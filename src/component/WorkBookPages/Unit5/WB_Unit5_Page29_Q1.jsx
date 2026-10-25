@@ -1,21 +1,65 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import betweenAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_001_between.mp3";
+import inAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_002_in.mp3";
+import underAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_003_under.mp3";
+import nextToAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_004_next_to.mp3";
+import penAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_005_Where_is_the_pen.mp3";
+import dollAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_006_Where_is_the_doll.mp3";
+import teddyAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_007_Where_is_the_teddy.mp3";
+import onAudio from "../../../assets/audio/WorkBook/unit5/Page 29 - Exercise E/Item_005_on.mp3";
 
 import imgDesk from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 1.svg";
 import imgBed from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 3.svg";
 import imgShelf from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 4.svg";
 import imgToyBox from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 2.svg";
 import imgChair from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 29/SVG/Asset 5.svg";
-
 const WORD_BANK = ["in", "on", "next to", "between", "under"];
+const WORD_AUDIO = {
+  in: inAudio,
+  "next to": nextToAudio,
+  between: betweenAudio,
+  under: underAudio,
+  on: onAudio,
+};
+const QUESTION_AUDIO = { 1: penAudio, 2: dollAudio, 3: teddyAudio };
 
 const SCENE_ITEMS = [
-  { id: 1, img: imgDesk, className: "wb-e-scene-desk", alt: "desk" },
-  { id: 2, img: imgBed, className: "wb-e-scene-bed", alt: "bed" },
-  { id: 3, img: imgShelf, className: "wb-e-scene-shelf", alt: "shelf" },
-  { id: 4, img: imgToyBox, className: "wb-e-scene-toybox", alt: "toy box" },
-  { id: 5, img: imgChair, className: "wb-e-scene-chair", alt: "chair" },
+  {
+    id: 1,
+    img: imgDesk,
+    className: "wb-e-scene-desk",
+    alt: "A school desk with a pen on it",
+  },
+  {
+    id: 2,
+    img: imgBed,
+    className: "wb-e-scene-bed",
+    alt: "A bed with a doll under it",
+  },
+  {
+    id: 3,
+    img: imgShelf,
+    className: "wb-e-scene-shelf",
+    alt: "A shelf with a teddy bear between books",
+  },
+  {
+    id: 4,
+    img: imgToyBox,
+    className: "wb-e-scene-toybox",
+    alt: "A toy box with a car in it",
+  },
+  {
+    id: 5,
+    img: imgChair,
+    className: "wb-e-scene-chair",
+    alt: "A chair with a ball next to it",
+  },
 ];
 
 const ITEMS = [
@@ -23,7 +67,7 @@ const ITEMS = [
     id: 1,
     fixed: false,
     question: "Where is the pen?",
-     options: [
+    options: [
       "It is under the desk.",
       "It is on the desk.",
       "It is next to the desk.",
@@ -83,17 +127,19 @@ const ITEMS = [
 
 export default function WB_Unit5_Page28_QE() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, value) => {
-    if (showAns ||checked) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setChecked(false);
+    setWrongIds((prev) => prev.filter((entry) => entry !== id));
   };
 
   const handleCheck = () => {
-    if (showAns ||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const nonFixedItems = ITEMS.filter((item) => !item.fixed);
 
@@ -113,7 +159,19 @@ export default function WB_Unit5_Page28_QE() {
       }
     });
 
-    setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -132,19 +190,22 @@ export default function WB_Unit5_Page28_QE() {
       }
     });
     setAnswers(filled);
-    setChecked(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
-    if (!checked || showAns || item.fixed) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   const getValue = (id) => answers[id] || "";
@@ -154,7 +215,7 @@ export default function WB_Unit5_Page28_QE() {
       <div className="wb-e-select-wrap">
         <select
           value={getValue(item.id)}
-          disabled={showAns ||checked}
+          disabled={showAns || lockedIds.includes(item.id)}
           onChange={(e) => handleChange(item.id, e.target.value)}
           className={`wb-e-select ${getValue(item.id) ? "wb-e-select--filled" : ""}`}
         >
@@ -174,7 +235,7 @@ export default function WB_Unit5_Page28_QE() {
 
   return (
     <div className="main-container-component mb-10">
-     <style>{`
+      <style>{`
   .wb-e-scene-stage img,
   .wb-e-scene-item img {
     width: 100%;
@@ -480,23 +541,22 @@ export default function WB_Unit5_Page28_QE() {
       <div
         className="div-forall"
         style={{
-         
           gap: "28px",
- 
         }}
       >
-        <h1
-          className="WB-header-title-page8"
-       
-        >
-          <span className="WB-ex-A">E</span>
-          Look, read, and answer.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Look, read, and answer."
+          subTitle="Use the in, on, next to, between, or under answer for each object to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div className="wb-e-scene-wrap">
           <div className="wb-e-scene-stage">
             {SCENE_ITEMS.map((item) => (
-              <div key={item.id} className={`wb-e-scene-item ${item.className}`}>
+              <div
+                key={item.id}
+                className={`wb-e-scene-item ${item.className}`}
+              >
                 <img src={item.img} alt={item.alt} />
               </div>
             ))}
@@ -506,7 +566,28 @@ export default function WB_Unit5_Page28_QE() {
         <div className="wb-e-bank-wrap">
           <div className="wb-e-bank">
             {WORD_BANK.map((word) => (
-              <span key={word} className="wb-e-bank-word">
+              <span
+                key={word}
+                className="wb-e-bank-word unit4-audio-control unit4-interactive"
+                role={WORD_AUDIO[word] ? "button" : undefined}
+                tabIndex={WORD_AUDIO[word] ? 0 : undefined}
+                onClick={() =>
+                  WORD_AUDIO[word] &&
+                  playAudio(`word-${word}`, WORD_AUDIO[word])
+                }
+                onKeyDown={(event) => {
+                  if (
+                    WORD_AUDIO[word] &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    playAudio(`word-${word}`, WORD_AUDIO[word]);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `word-${word}`}
+                />
                 {word}
               </span>
             ))}
@@ -519,8 +600,40 @@ export default function WB_Unit5_Page28_QE() {
               <div className="wb-e-num">{item.id}</div>
 
               <div className="wb-e-line-wrap">
-                <div className="wb-e-line" style={{borderBottom:isWrong(item)?"1px solid red":"1px solid #2f2f2f"}}>
-                  <span className="wb-e-question">{item.question}</span>
+                <div
+                  className="wb-e-line"
+                  style={{
+                    borderBottom: isWrong(item)
+                      ? "1px solid red"
+                      : "1px solid #2f2f2f",
+                  }}
+                >
+                  <span
+                    className="wb-e-question unit4-audio-control unit4-interactive"
+                    role={QUESTION_AUDIO[item.id] ? "button" : undefined}
+                    tabIndex={QUESTION_AUDIO[item.id] ? 0 : undefined}
+                    onClick={() =>
+                      QUESTION_AUDIO[item.id] &&
+                      playAudio(`question-${item.id}`, QUESTION_AUDIO[item.id])
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        QUESTION_AUDIO[item.id] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(
+                          `question-${item.id}`,
+                          QUESTION_AUDIO[item.id],
+                        );
+                      }
+                    }}
+                  >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `question-${item.id}`}
+                    />
+                    {item.question}
+                  </span>
 
                   {item.fixed ? (
                     <span className="wb-e-answer-fixed">{item.answer}</span>

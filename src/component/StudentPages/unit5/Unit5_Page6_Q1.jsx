@@ -1,85 +1,100 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
-
+import WrongMark from "../../WrongMark";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import "../unit4/unit4Interactions.css";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 45/Ex D 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 45/Ex D 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 45/Ex D 3.svg";
-import WrongMark from "../../WrongMark";
+import question1Audio from "../../../assets/audio/ClassBook/Unit 5/Page 45 - Exercise D/Item_001_Is_there_a_bathtub_behind_the_toilet.mp3";
+import question2Audio from "../../../assets/audio/ClassBook/Unit 5/Page 45 - Exercise D/Item_002_Are_there_books_in_front_of_the_door.mp3";
+import question3Audio from "../../../assets/audio/ClassBook/Unit 5/Page 45 - Exercise D/Item_003_Is_there_a_telephone_next_to_the_sink.mp3";
 
-const Unit5_Page6_Q1 = () => {
-  const questions = [
-    {
-      id: 1,
-      img: img1,
-      question: "Is there a bathtub behind the toilet?",
-      correct: "No, there isn’t.",
-    },
-    {
-      id: 2,
-      img: img2,
-      question: "Are there books in front of the door?",
-      correct: "No, there aren’t",
-    },
-    {
-      id: 3,
-      img: img3,
-      question: "Is there a telephone next to the sink?",
-      correct: "Yes, there is.",
-    },
-  ];
+const QUESTIONS = [
+  {
+    id: 1,
+    img: img1,
+    alt: "A bathroom with a toilet, a pedestal sink, and a bathtub",
+    question: "Is there a bathtub behind the toilet?",
+    correct: "No, there isn’t.",
+    audio: question1Audio,
+  },
+  {
+    id: 2,
+    img: img2,
+    alt: "A dining room with a bookcase, table, chairs, and a door",
+    question: "Are there books in front of the door?",
+    correct: "No, there aren’t",
+    audio: question2Audio,
+  },
+  {
+    id: 3,
+    img: img3,
+    alt: "A sink with a telephone on the wall next to it",
+    question: "Is there a telephone next to the sink?",
+    correct: "Yes, there is.",
+    audio: question3Audio,
+  },
+];
 
-  const sentences = [
-    "No, there isn’t.",
-    "No, there aren’t",
-    "Yes, there is.",
-    "Yes, there are.",
-  ];
+const SENTENCES = [
+  "No, there isn’t.",
+  "No, there aren’t",
+  "Yes, there is.",
+  "Yes, there are.",
+];
 
-  const [answers, setAnswers] = useState(questions.map(() => ""));
-  const [locked, setLocked] = useState(false);
+export default function Unit5_Page6_Q1() {
+  const [answers, setAnswers] = useState(QUESTIONS.map(() => ""));
+  const [wrongIds, setWrongIds] = useState([]);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
-  /* ================= SELECT ================= */
   const handleSelect = (value, index) => {
-    if (locked) return;
-
-    const updated = [...answers];
-    updated[index] = value;
-    setAnswers(updated);
+    if (lockedIds.includes(index)) return;
+    setAnswers((previous) => {
+      const next = [...previous];
+      next[index] = value;
+      return next;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== index));
   };
 
-  /* ================= CHECK ================= */
   const checkAnswers = () => {
-    if (locked) return;
-
+    if (lockedIds.length === QUESTIONS.length) return;
     if (answers.includes("")) {
       ValidationAlert.info("Please answer all questions.");
       return;
     }
-
-    let score = 0;
-
-    answers.forEach((ans, i) => {
-      if (ans === questions[i].correct) score++;
-    });
-
-    const total = questions.length;
-
+    const correctIds = QUESTIONS.flatMap((question, index) =>
+      answers[index] === question.correct ? [index] : [],
+    );
+    const wrong = QUESTIONS.flatMap((question, index) =>
+      answers[index] !== question.correct ? [index] : [],
+    );
+    setLockedIds((previous) => [...new Set([...previous, ...correctIds])]);
+    setWrongIds(wrong);
+    const score = correctIds.length;
     ValidationAlert[
-      score === total ? "success" : score === 0 ? "error" : "warning"
-    ](`Score: ${score} / ${total}`);
-
-    setLocked(true);
-  };
-
-  const reset = () => {
-    setAnswers(questions.map(() => ""));
-    setLocked(false);
+      score === QUESTIONS.length ? "success" : score === 0 ? "error" : "warning"
+    ](`Score: ${score} / ${QUESTIONS.length}`);
   };
 
   const showAnswer = () => {
-    setAnswers(questions.map((q) => q.correct));
-    setLocked(true);
+    setAnswers(QUESTIONS.map((question) => question.correct));
+    setWrongIds([]);
+    setLockedIds(QUESTIONS.map((_, index) => index));
+    stopAudio();
+  };
+
+  const reset = () => {
+    setAnswers(QUESTIONS.map(() => ""));
+    setWrongIds([]);
+    setLockedIds([]);
+    stopAudio();
   };
 
   return (
@@ -91,21 +106,19 @@ const Unit5_Page6_Q1 = () => {
         alignItems: "center",
       }}
     >
-      <div className="div-forall" style={{ gap: "40px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            D
-          </span>
-          Look, read, and answer.
-        </h5>
-
-        {/* QUESTIONS */}
-        {questions.map((q, index) => {
-          const isWrong = locked && answers[index] !== q.correct;
-
+      <div className="div-forall mb-10" style={{ gap: "40px" }}>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Look, read, and answer."
+          subTitle="Use the picture, word bank, or grammar clue, then complete every blank before checking."
+        />
+        {QUESTIONS.map((question, index) => {
+          const isWrong = wrongIds.includes(index);
+          const isLocked = lockedIds.includes(index);
           return (
             <div
-              key={q.id}
+              key={question.id}
+              className="w-full"
               style={{
                 display: "flex",
                 alignItems: "flex-start",
@@ -113,15 +126,12 @@ const Unit5_Page6_Q1 = () => {
                 marginBottom: "20px",
               }}
             >
-              <span className="text-[20px] font-bold">{q.id}</span>
-              {/* IMAGE */}
+              <span className="text-[20px] font-bold">{question.id}</span>
               <img
-                src={q.img}
-                alt=""
+                src={question.img}
+                alt={question.alt}
                 style={{ height: "110px", borderRadius: "10px" }}
               />
-
-              {/* QUESTION */}
               <div
                 style={{
                   display: "flex",
@@ -130,11 +140,25 @@ const Unit5_Page6_Q1 = () => {
                   height: "110px",
                 }}
               >
-                <p style={{ fontSize: "20px", marginBottom: "10px" }}>
-                  {q.question}
+                <p
+                  role="button"
+                  tabIndex={0}
+                  className="unit4-audio-control unit4-interactive"
+                  aria-label={`Play: ${question.question}`}
+                  onClick={() => playAudio(`question-${index}`, question.audio)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`question-${index}`, question.audio);
+                    }
+                  }}
+                  style={{ fontSize: "20px", marginBottom: "10px" }}
+                >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `question-${index}`}
+                  />
+                  {question.question}
                 </p>
-
-                {/* DROPDOWN */}
                 <div
                   style={{
                     position: "relative",
@@ -144,29 +168,29 @@ const Unit5_Page6_Q1 = () => {
                 >
                   <select
                     value={answers[index]}
-                    disabled={locked}
-                    onChange={(e) => handleSelect(e.target.value, index)}
+                    disabled={isLocked}
+                    aria-label={`Answer question ${question.id}`}
+                    onChange={(event) =>
+                      handleSelect(event.target.value, index)
+                    }
                     style={{
                       padding: "8px 12px",
                       fontSize: "16px",
-                      // borderRadius: "6px",
                       width: "100%",
                       borderBottom: isWrong
                         ? "2px solid red"
                         : "1px solid #ccc",
                       fontWeight: "bold",
-                      cursor: locked ? "not-allowed" : "pointer",
+                      cursor: isLocked ? "default" : "pointer",
                     }}
                   >
                     <option value="">Choose answer</option>
-                    {sentences.map((s, i) => (
-                      <option key={i} value={s}>
-                        {s}
+                    {SENTENCES.map((sentence) => (
+                      <option key={sentence} value={sentence}>
+                        {sentence}
                       </option>
                     ))}
                   </select>
-
-                  {/* ❌ Wrong mark */}
                   {isWrong && (
                     <div
                       style={{
@@ -183,8 +207,6 @@ const Unit5_Page6_Q1 = () => {
             </div>
           );
         })}
-
-        {/* BUTTONS */}
         <Button
           handleShowAnswer={showAnswer}
           handleStartAgain={reset}
@@ -193,6 +215,4 @@ const Unit5_Page6_Q1 = () => {
       </div>
     </div>
   );
-};
-
-export default Unit5_Page6_Q1;
+}

@@ -1,147 +1,44 @@
-import React, { useState } from "react";
-import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/G5_10_Pg_82.png"; //======= should change ==========
-import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React from "react";
+
+import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/G5_10_Pg_82.png";
 import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/interactive.svg";
 
+import FindQuestion from "../../FindQuestion";
+
+import targetAudio from "../../../assets/audio/ClassBook/Unit 10/page 82/straw.mp3";
+
+const targetArea = {
+  x1: 66.5,
+  y1: 34.9,
+  x2: 69.9,
+  y2: 46.5,
+};
+
 const Unit8_Page1_find = () => {
-  const [clickedPoint, setClickedPoint] = useState(null);
-  const [checkResult, setCheckResult] = useState(null);
-  const [showAnswer, setShowAnswer] = useState(false);
-  // ✅ منطقة المطعم (بالنسب المئوية)
-  const targetArea = {
-    x1: 67.5,
-    y1: 46.9,
-    x2:70.9,
-    y2: 51.5,
-  };
-
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-    console.log(xPercent, yPercent);
-
-    setClickedPoint({
-      x: xPercent,
-      y: yPercent,
-      inside:
-        xPercent >= targetArea.x1 &&
-        xPercent <= targetArea.x2 &&
-        yPercent >= targetArea.y1 &&
-        yPercent <= targetArea.y2,
-    });
-  };
-
-  const handleCheck = () => {
-    if (showAnswer) return;
-    if (!clickedPoint) {
-      ValidationAlert.info(
-        "Pay attention!",
-        "Please click on the image first.",
-      );
-      return;
-    }
-
-    if (clickedPoint.inside) {
-      setCheckResult("success");
-      ValidationAlert.success("Bravo!", "You clicked on the restaurant! 🏆");
-    } else {
-      setCheckResult("fail");
-      ValidationAlert.error("Oops!", "This is not the restaurant. Try again!");
-    }
-  };
-
-  const handleStartAgain = () => {
-    setClickedPoint(null);
-    setCheckResult(null);
-    setShowAnswer(false);
-  };
-
-  const handleShowAnswer = () => {
-    setShowAnswer(true);
-    setClickedPoint(null); // نمسح النقطة اللي كبسها الطالب
-    setCheckResult("success"); // اختيارية إذا بدك يظهر نجاح
-  };
-
   return (
-    <div>
-      <div
-        style={{
-          textAlign: "center",
-          display: "flex",
-          gap: "30px",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{ display: "flex", justifyContent: "center", width: "100%" }}
-        >
-          <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
-          <h5 className="header-title-page8">
-            I need your help. Can you help me find the straw in the picture?
-          </h5>
-        </div>
-        <div style={{ position: "relative", display: "inline-block" }}>
-          <img
-            src={find_img}
-            alt="interactive"
-            style={{
-              width: "auto",
-              height: "70vh",
-                borderRadius: "15px",
-              cursor: "pointer",
-              display: "block",
-            }}
-            onClick={handleImageClick}
-          />
-
-          {/* ✅ الدائرة الحمراء في مكان الكبس */}
-          {clickedPoint && (
-            <div
-              style={{
-                position: "absolute",
-                top: `${clickedPoint.y}%`,
-                left: `${clickedPoint.x}%`,
-                width: "3%",
-                height: "3%",
-                backgroundColor: "red",
-                borderRadius: "50%",
-                transform: "translate(-50%, -50%)",
-                pointerEvents: "none",
-              }}
-            ></div>
-          )}
-
-          {/* ✅ تلوين المنطقة الصحيحة إذا الجواب صح */}
-          {(checkResult === "success" || showAnswer) && (
-            <img
-              src={MySVG}
-              alt="answer highlight"
-              style={{
-                position: "absolute",
-                top: `47%`,
-                left: `67.2%`,
-                height: `5%`,
-                pointerEvents: "none",
-              }}
-            />
-          )}
-        </div>
-      </div>
-      <div className="action-buttons-container ">
-        <button className="try-again-button" onClick={handleStartAgain}>
-          Start Again ↻
-        </button>
-        <button className="show-answer-btn" onClick={handleShowAnswer}>
-          Show Answer
-        </button>
-        <button className="check-button2" onClick={handleCheck}>
-          Check Answer ✓
-        </button>
-      </div>
-    </div>
+    <FindQuestion
+      title="I need your help. Can you help me find the straw in the picture?"
+      subtitle="Look carefully at the picture, then tap the straw."
+      image={find_img}
+      imageAlt="A beach scene with people and different beach objects"
+      targetName="straw"
+      targetArea={targetArea}
+      targetAudio={targetAudio}
+      answerHighlight={MySVG}
+      imageHeight="70vh"
+      highlightTop="36%"
+      highlightLeft="68%"
+      highlightHeight="8%"
+      targetAriaLabel="Select the straw"
+      pointerSelectedMessage="A point in the picture was selected. Use Check Answer to check it."
+      keyboardSelectedMessage="The straw was selected. Use Check Answer to check your answer."
+      correctAnnouncement="Correct. You found the straw."
+      correctAlertMessage="You found the straw! 🏆"
+      wrongAnnouncement="That is not the straw. Try again."
+      wrongAlertMessage="This is not the straw. Try again!"
+      resetAnnouncement="Activity reset. Find the straw in the picture."
+      showAnswerAnnouncement="The straw is highlighted."
+    />
   );
 };
 

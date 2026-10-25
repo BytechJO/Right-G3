@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/3.svg";
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 56/SVG/4.svg";
+import beetsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_001_beets.mp3";
+import dogsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_002_dogs.mp3";
+import ducksAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_003_ducks.mp3";
+import beesAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_004_bees.mp3";
+import bagsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_005_bags.mp3";
+import batsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_006_bats.mp3";
+import cubsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_007_cubs.mp3";
+import cupsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise C/Item_008_cups.mp3";
+
+const WORD_AUDIO = { beets: beetsAudio, dogs: dogsAudio, ducks: ducksAudio, bees: beesAudio, bags: bagsAudio, bats: batsAudio, cubs: cubsAudio, cups: cupsAudio };
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const WRONG_COLOR = "red";
@@ -14,10 +28,10 @@ const CARD_BORDER = "#a3a3a3";
 
 // ── بيانات ─────────────────────────────────────────────────────
 const ITEMS = [
-  { id: 1, img: img1, options: ["dogs", "ducks"], correct: "dogs" },
-  { id: 2, img: img2, options: ["bees", "beets"], correct: "bees" },
-  { id: 3, img: img3, options: ["bags", "bats"], correct: "bats" },
-  { id: 4, img: img4, options: ["cups", "cubs"], correct: "cups" },
+  { id: 1, img: img1, alt: "Several dogs", options: ["dogs", "ducks"], correct: "dogs" },
+  { id: 2, img: img2, alt: "Several bees", options: ["bees", "beets"], correct: "bees" },
+  { id: 3, img: img3, alt: "Several bats", options: ["bags", "bats"], correct: "bats" },
+  { id: 4, img: img4, alt: "Several cups", options: ["cups", "cubs"], correct: "cups" },
 ];
 
 // ── بادج الخطأ ─────────────────────────────────────────────────
@@ -51,18 +65,22 @@ const ErrorBadge = () => (
 // ── المكوّن الرئيسي ─────────────────────────────────────────────
 export default function WB_Unit9_Page56_QC() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   // ── handlers ──
   const handleSelect = (id, value) => {
-    if (showAns||checked) return;
-    setChecked(false);
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
+    setWrongIds((prev) => prev.filter((itemId) => itemId !== id));
+    playAudio(`word-${id}-${value}`, WORD_AUDIO[value]);
   };
 
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first! ✏️");
@@ -73,6 +91,10 @@ export default function WB_Unit9_Page56_QC() {
       if (answers[item.id] === item.correct) correct++;
     });
     setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([...prev, ...ITEMS.filter((item) => answers[item.id] === item.correct).map((item) => item.id)]),
+    ]);
+    setWrongIds(ITEMS.filter((item) => answers[item.id] !== item.correct).map((item) => item.id));
     const total = ITEMS.length;
     if (correct === total)
       ValidationAlert.success(`Score: ${correct} / ${total}`);
@@ -89,16 +111,20 @@ export default function WB_Unit9_Page56_QC() {
     setAnswers(correctMap);
     setChecked(false);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
-  const isWrong = (id) =>
-    checked && answers[id] !== ITEMS.find((item) => item.id === id)?.correct;
+  const isWrong = (id) => wrongIds.includes(id);
 
   // ── ستايل زر الاختيار ──
   const optionStyle = (itemId, option) => {
@@ -112,7 +138,7 @@ export default function WB_Unit9_Page56_QC() {
       fontSize: "18px",
       // fontWeight:      selected ? 500 : 300,
       // color:           wrong ? WRONG_COLOR : selected ? SELECT_COLOR : "#555",
-      cursor: showAns ? "default" : "pointer",
+      cursor: showAns || lockedIds.includes(itemId) ? "default" : "pointer",
       border: selected
         ? `1px solid ${wrong ? WRONG_COLOR : SELECT_COLOR}`
         : "1px solid transparent",
@@ -128,9 +154,11 @@ export default function WB_Unit9_Page56_QC() {
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "120px" }}>
         {/* ── العنوان ── */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span>Look, read, and tap or click. Say.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Look, read, and circle. Say."
+          subTitle="Look at the correct plural word for each picture first, compare all available options, then tap only the answer that matches."
+        />
 
         {/* ── البطاقات 4 في صف ── */}
         <div
@@ -190,7 +218,7 @@ export default function WB_Unit9_Page56_QC() {
                   {/* الصورة */}
                   <img
                     src={item.img}
-                    alt={`item-${item.id}`}
+                    alt={item.alt}
                     style={{
                       width: "100%",
                       height: "clamp(120px,15vw,180px)",
@@ -214,9 +242,19 @@ export default function WB_Unit9_Page56_QC() {
                       <button
                         key={index}
                         onClick={() => handleSelect(item.id, option)}
+                        onKeyDown={(event) => {
+                          if ((event.key === "Enter" || event.key === " ") && !lockedIds.includes(item.id)) {
+                            event.preventDefault();
+                            handleSelect(item.id, option);
+                          }
+                        }}
+                        tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+                        aria-disabled={lockedIds.includes(item.id)}
+                        className="unit4-audio-control unit4-interactive"
                         style={optionStyle(item.id, option)}
                       >
                         {option}
+                        <Unit4PlayingAudioIcon active={activeAudioKey === `word-${item.id}-${option}`} />
                       </button>
                     ))}
                   </div>

@@ -33,7 +33,6 @@ import sound13 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound13.mp3";
 import sound14 from "../../../assets/audio/ClassBook/Unit 3/P 22/sound14.mp3";
 
 const Unit3_Page1_Vocab = () => {
-
   // ================================
   // ✔ Captions Array
   // ================================
@@ -72,7 +71,6 @@ const Unit3_Page1_Vocab = () => {
     sound13,
     sound14,
   ];
-
 
   const nums = [
     num1,
@@ -114,23 +112,24 @@ const Unit3_Page1_Vocab = () => {
       wordAudios={wordAudios}
       nums={nums}
       vocabulary={[
-         "grocery store",
-            "bag",
-            "grapes",
-            "carrots",
-            "apples",
-            "bananas",
-            "basket",
-            "eggplants",
-            "carton of milk",
-            "shelf, shelves",
-            "soap",
-            "toothpaste",
-            "shopping cart",
-            "can, cans",
+        "grocery store",
+        "bag",
+        "grapes",
+        "carrots",
+        "apples",
+        "bananas",
+        "basket",
+        "eggplants",
+        "carton of milk",
+        "shelf, shelves",
+        "soap",
+        "toothpaste",
+        "shopping cart",
+        "can, cans",
       ]}
       markers={positions}
       captions={captions}
+      pageId="unit3-page22-vocab"
     />
   );
 };

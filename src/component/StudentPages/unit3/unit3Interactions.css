@@ -1,0 +1,74 @@
+.unit3-audio-control {
+  position: relative;
+}
+
+.unit3-audio-control:focus-visible,
+.unit3-interactive:focus-visible,
+.unit3-word-cell:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 4px;
+}
+
+.unit3-playing-audio-icon {
+  position: absolute;
+  top: -15px;
+  right: -13px;
+  z-index: 30;
+  display: inline-flex;
+  width: 27px;
+  height: 27px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.28);
+  pointer-events: none;
+}
+
+.unit3-playing-audio-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.unit3-interactive {
+  font: inherit;
+}
+
+.unit3-keyboard-preview {
+  animation: blink-preview-unit3 0.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.unit3-invalid-selection-shake {
+  animation: shake-invalid-selection-unit3 0.38s ease-in-out;
+}
+
+@keyframes blink-preview-unit3 {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes shake-invalid-selection-unit3 {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-9px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(9px);
+  }
+}

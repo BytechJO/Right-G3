@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import introAudio from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise F/Item_001_My_father_was_a_farmer._We_had_dogs,_sheep,_and_goats._I_had_a_horse.mp3";
+import audio1 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise F/Item_002_There_was_..._on_the_farm.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise F/Item_003_There_wasn't_..._on_the_farm.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise F/Item_004_They_had_..._on_the_farm.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise F/Item_005_They_didn't_have.mp3";
 
 import boyImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/2.svg";
 
@@ -15,24 +24,28 @@ const QUESTIONS = [
     before: "There was",
     answer: "a horse",
     after: "on the farm.",
+    audio: audio1,
   },
   {
     id: 2,
     before: "There wasn't",
     answer: "a TV",
     after: "on the farm.",
+    audio: audio2,
   },
   {
     id: 3,
     before: "They had",
     answer: "dogs, sheep, and goats",
     after: "on the farm.",
+    audio: audio3,
   },
   {
     id: 4,
     before: "They didn't have",
     answer: "a cat",
     after: "on the farm.",
+    audio: audio4,
   },
 ];
 
@@ -64,18 +77,20 @@ const ErrorBadge = () => (
 
 export default function WB_Page47_F() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const isComplete = (q) => {
@@ -87,7 +102,7 @@ export default function WB_Page47_F() {
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === QUESTIONS.length) return;
 
     const allAnswered = QUESTIONS.every((q) => isComplete(q));
 
@@ -102,7 +117,16 @@ export default function WB_Page47_F() {
       if (isCorrect(q)) score++;
     });
 
-    setShowResults(true);
+    setLockedIds(
+      QUESTIONS.flatMap((question) =>
+        isCorrect(question) ? [question.id] : [],
+      ),
+    );
+    setWrongIds(
+      QUESTIONS.flatMap((question) =>
+        !isCorrect(question) ? [question.id] : [],
+      ),
+    );
 
     const total = QUESTIONS.length;
 
@@ -120,132 +144,165 @@ export default function WB_Page47_F() {
 
     setAnswers(solved);
     setShowAns(true);
-    setShowResults(false);
+    setLockedIds(QUESTIONS.map((question) => question.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   return (
     <div className="main-container-component">
       <div
-        className="div-forall"
+        className="div-forall mb-5"
         style={{
           gap: "10px",
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">F</span>
-          Read, and write.
-        </h1>
-<div className="flex flex-col gap-5">
-        <img
-          src={boyImg}
-          alt="boy"
-          style={{
-            width: "100%",
-            height: "280px",
-            objectFit: "contain",
-          }}
+        <ExerciseHeader
+          sectionLetter="F"
+          title="Read and write."
+          subTitle="Use the there was/wasn’t and had/didn’t have items on the farm to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
         />
+        <div className="flex flex-col gap-5 w-full">
+          <div
+            role="button"
+            tabIndex={0}
+            className="unit4-audio-control unit4-interactive"
+            onClick={() => playAudio("intro", introAudio)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                playAudio("intro", introAudio);
+              }
+            }}
+          >
+            <Unit4PlayingAudioIcon active={activeAudioKey === "intro"} />
+            <img
+              src={boyImg}
+              alt="A man remembering the animals and objects on his childhood farm"
+              style={{
+                width: "100%",
+                height: "280px",
+                objectFit: "contain",
+              }}
+            />
+          </div>
 
-        {/* Questions */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            width: "100%",
-          }}
-        >
-          {QUESTIONS.map((q) => {
-            const wrong = showResults && isComplete(q) && !isCorrect(q);
+          {/* Questions */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              width: "100%",
+            }}
+          >
+            {QUESTIONS.map((q) => {
+              const wrong = wrongIds.includes(q.id);
 
-            return (
-              <div
-                key={q.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                }}
-              >
-                {/* Number */}
-                <span
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: 700,
-                    color: "#111",
-                  }}
-                >
-                  {q.id}
-                </span>
-
-                {/* Before */}
-                <span
-                  style={{
-                    fontSize: "18px",
-                    color: "#111",
-                  }}
-                >
-                  {q.before}
-                </span>
-
-                {/* Select */}
+              return (
                 <div
+                  key={q.id}
+                  role="button"
+                  tabIndex={0}
+                  className="unit4-audio-control unit4-interactive"
+                  onClick={() => playAudio(`sentence-${q.id}`, q.audio)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`sentence-${q.id}`, q.audio);
+                    }
+                  }}
                   style={{
-                    position: "relative",
-                    display: "inline-block",
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "10px",
                   }}
                 >
-                  <select
-                    disabled={showAns || showResults}
-                    value={answers[q.id] || ""}
-                    onChange={(e) => handleSelect(q.id, e.target.value)}
+                  {/* Number */}
+                  <span
                     style={{
-                      minWidth: "220px",
-                      minHeight: "38px",
-                      borderBottom: wrong
-                        ? `2px solid ${WRONG_COLOR}`
-                        : `1px solid ${BORDER_COLOR}`,
-                      padding: "4px 8px",
-                      fontSize: "18px",
-                      outline: "none",
-                      background: "#fff",
+                      fontSize: "20px",
+                      fontWeight: 700,
                       color: "#111",
                     }}
                   >
-                    <option value="">Select</option>
+                    {q.id}
+                  </span>
 
-                    {OPTIONS.map((op) => (
-                      <option key={op} value={op}>
-                        {op}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Before */}
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      color: "#111",
+                    }}
+                  >
+                    {q.before}
+                  </span>
 
-                  {wrong && <ErrorBadge />}
+                  {/* Select */}
+                  <div
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
+                  >
+                    <select
+                      disabled={showAns || lockedIds.includes(q.id)}
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                      value={answers[q.id] || ""}
+                      onChange={(e) => handleSelect(q.id, e.target.value)}
+                      style={{
+                        minWidth: "220px",
+                        minHeight: "38px",
+                        borderBottom: wrong
+                          ? `2px solid ${WRONG_COLOR}`
+                          : `1px solid ${BORDER_COLOR}`,
+                        padding: "4px 8px",
+                        fontSize: "18px",
+                        background: "#fff",
+                        color: "#111",
+                      }}
+                    >
+                      <option value="">Select</option>
+
+                      {OPTIONS.map((op) => (
+                        <option key={op} value={op}>
+                          {op}
+                        </option>
+                      ))}
+                    </select>
+
+                    {wrong && <ErrorBadge />}
+                  </div>
+
+                  {/* After */}
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      color: "#111",
+                    }}
+                  >
+                    {q.after}
+                  </span>
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `sentence-${q.id}`}
+                  />
                 </div>
-
-                {/* After */}
-                <span
-                  style={{
-                    fontSize: "18px",
-                    color: "#111",
-                  }}
-                >
-                  {q.after}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-</div>
         {/* Buttons */}
         <div
           style={{

@@ -1,6 +1,42 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import useWorkbookUnit1TabDrag from "./useWorkbookUnit1TabDrag";
+import cakeAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_001_cake.mp3";
+import tedAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_002_Ted.mp3";
+import nightAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_003_night.mp3";
+import coatAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_004_coat.mp3";
+import blueAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_005_blue.mp3";
+import glueAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_006_glue.mp3";
+import antAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_007_ant.mp3";
+import feetAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_008_feet.mp3";
+import catAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_009_cat.mp3";
+import sickAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_010_sick.mp3";
+import boxAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_011_box.mp3";
+import beeAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_012_bee.mp3";
+import fishAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_013_fish.mp3";
+import cupAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_014_cup.mp3";
+import kiteAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_015_kite.mp3";
+import rainAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_016_rain.mp3";
+import homeAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_017_home.mp3";
+import bedAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_018_bed.mp3";
+import runAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_019_run.mp3";
+import sockAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_020_sock.mp3";
+import longAAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_021_long_a.mp3";
+import longEAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_022_long_e.mp3";
+import longIAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_023_long_i.mp3";
+import longOAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_024_long_o.mp3";
+import longUAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_025_long_u.mp3";
+import shortAAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_026_short_a.mp3";
+import shortEAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_027_short_e.mp3";
+import shortIAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_028_short_i.mp3";
+import shortOAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_029_short_o.mp3";
+import shortUAudio from "../../../assets/audio/WorkBook/unit1/Page 8 - Exercise A/Item_030_short_u.mp3";
+import "./workbookUnit1Interactions.css";
 const ACTIVE_COLOR = "#f39b42";
 const SOFT_COLOR = "#ffca94";
 const BORDER_COLOR = "#f39b42";
@@ -39,6 +75,41 @@ const DRAG_ITEMS = [
   { id: 19, value: "run" },
   { id: 20, value: "sock" },
 ];
+
+const WORD_AUDIO = [
+  cakeAudio,
+  tedAudio,
+  nightAudio,
+  coatAudio,
+  blueAudio,
+  glueAudio,
+  antAudio,
+  feetAudio,
+  catAudio,
+  sickAudio,
+  boxAudio,
+  beeAudio,
+  fishAudio,
+  cupAudio,
+  kiteAudio,
+  rainAudio,
+  homeAudio,
+  bedAudio,
+  runAudio,
+  sockAudio,
+];
+const SOUND_AUDIO = {
+  "long a": longAAudio,
+  "long e": longEAudio,
+  "long i": longIAudio,
+  "long o": longOAudio,
+  "long u": longUAudio,
+  "short a": shortAAudio,
+  "short e": shortEAudio,
+  "short i": shortIAudio,
+  "short o": shortOAudio,
+  "short u": shortUAudio,
+};
 
 const GROUPS = [
   {
@@ -93,46 +164,108 @@ const GROUP_COLUMNS = GROUPS.map((group) =>
 const ALL_CELLS = GROUPS.flatMap((g) => g.rows.flatMap((r) => r));
 
 /* 🔹 Draggable */
-function DragItem({ item, isUsed, showAns }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: item.id,
+function DragItem({
+  item,
+  isUsed,
+  showAns,
+  registerItem,
+  onKeyboardPick,
+  onPlayAudio,
+  active,
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: String(item.id),
     data: item,
     disabled: isUsed || showAns,
   });
 
-  const style = transform
-    ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
-    : undefined;
+  const pointerStartRef = useRef(null);
+  const pointerMovedRef = useRef(false);
 
   return (
-    <div
-      ref={setNodeRef}
+    <button
+      type="button"
+      ref={(element) => {
+        setNodeRef(element);
+        registerItem(String(item.id), element);
+      }}
       {...listeners}
       {...attributes}
-      // style={style}
-      className={`wb-a-drag-item ${isUsed || showAns ? "used" : "available"}`}
+      aria-disabled={isUsed || showAns}
+      onPointerDownCapture={(event) => {
+        pointerStartRef.current = { x: event.clientX, y: event.clientY };
+        pointerMovedRef.current = false;
+      }}
+      onPointerMoveCapture={(event) => {
+        if (!pointerStartRef.current) return;
+        const dx = event.clientX - pointerStartRef.current.x;
+        const dy = event.clientY - pointerStartRef.current.y;
+        if (Math.sqrt(dx * dx + dy * dy) > 5) pointerMovedRef.current = true;
+      }}
+      onPointerUpCapture={() =>
+        window.requestAnimationFrame(() => {
+          pointerStartRef.current = null;
+        })
+      }
+      onClick={() => {
+        if (pointerMovedRef.current || isDragging) {
+          pointerMovedRef.current = false;
+          return;
+        }
+        onPlayAudio();
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (isUsed || showAns) onPlayAudio();
+        else onKeyboardPick();
+      }}
+      className={`wb-a-drag-item wb-unit1-audio-control wb-unit1-drag-item ${isUsed || showAns ? "used" : "available"}`}
     >
       {item.value}
-    </div>
+      <WorkbookUnit1PlayingAudioIcon active={active} />
+    </button>
   );
 }
 
 /* 🔹 Drop */
-function DropBox({ cell, value, wrong, active }) {
+function DropBox({
+  cell,
+  value,
+  wrong,
+  active,
+  locked,
+  onRemove,
+  registerTarget,
+  onKeyDown,
+  tabIndex,
+  preview,
+}) {
   const { setNodeRef, isOver } = useDroppable({
     id: cell.key,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        registerTarget(cell.key, element);
+      }}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      onClick={() => value && !locked && onRemove(cell.key)}
       className={`wb-a-drop-box
         ${value ? "filled" : ""}
         ${wrong ? "wrong" : ""}
         ${isOver || active ? "active scale-105" : ""}
       `}
     >
-      <span className="wb-a-drop-text">{value}</span>
+      <span
+        className={`wb-a-drop-text ${preview ? "wb-unit1-keyboard-preview" : ""}`}
+      >
+        {preview || value}
+      </span>
       {wrong && <div className="wb-a-wrong-mark">✕</div>}
     </div>
   );
@@ -141,16 +274,31 @@ function DropBox({ cell, value, wrong, active }) {
 export default function WB_Vocabulary_Page_A() {
   const [answers, setAnswers] = useState({});
   const [activeItem, setActiveItem] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+  const [wrongCells, setWrongCells] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const [correctCells, setCorrectCells] = useState([]);
+  const [shakeCharts, setShakeCharts] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
 
   const sensors = useSensors(useSensor(PointerSensor));
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
     .map((entry) => entry.dragId);
+  const keyboard = useWorkbookUnit1TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => String(item.id)),
+    targetIds: ALL_CELLS.map((cell) => cell.key),
+    isItemDisabled: (id) => usedDragIds.includes(Number(id)) || showAns,
+    isTargetDisabled: (id) => correctCells.includes(id) || showAns,
+    onPick: (id) => playAudio(`word-${id}`, WORD_AUDIO[Number(id) - 1]),
+    onPlace: (itemId, targetId) => {
+      const item = DRAG_ITEMS.find((entry) => String(entry.id) === itemId);
+      applyDrop(targetId, item);
+    },
+  });
 
   const applyDrop = (boxKey, item) => {
+    if (showAns || correctCells.includes(boxKey)) return;
     const newAnswers = { ...answers };
 
     Object.keys(newAnswers).forEach((key) => {
@@ -159,20 +307,27 @@ export default function WB_Vocabulary_Page_A() {
 
     newAnswers[boxKey] = { dragId: item.id, value: item.value };
     setAnswers(newAnswers);
-    setShowResults(false);
+    setWrongCells((previous) =>
+      previous.filter((cellKey) => cellKey !== boxKey),
+    );
   };
 
   /* 🔥 Drag End */
   const handleDragEnd = ({ active, over }) => {
-    if (!over || showAns) return;
+    if (!over || showAns) {
+      setShakeCharts(false);
+      window.requestAnimationFrame(() => setShakeCharts(true));
+      setActiveItem(null);
+      return;
+    }
 
     const item = active.data.current;
-    applyDrop(over.id, item);
+    applyDrop(String(over.id), item);
     setActiveItem(null);
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || correctCells.length === ALL_CELLS.length) return;
 
     const allAnswered = ALL_CELLS.every((cell) => answers[cell.key]?.value);
 
@@ -181,30 +336,30 @@ export default function WB_Vocabulary_Page_A() {
       return;
     }
 
-    let score = 0;
-    let total = 0;
+    const nextCorrect = [];
 
     GROUP_COLUMNS.forEach((group) => {
       group.forEach((column) => {
-        const userValues = column.keys
-          .map((key) => answers[key]?.value)
-          .filter(Boolean);
-
         const correctValues = [...column.correctValues];
 
-        total += correctValues.length;
-
-        userValues.forEach((val) => {
-          const index = correctValues.indexOf(val);
+        column.keys.forEach((key) => {
+          const value = answers[key]?.value;
+          const index = correctValues.indexOf(value);
           if (index !== -1) {
-            score++;
+            nextCorrect.push(key);
             correctValues.splice(index, 1);
           }
         });
       });
     });
+    const score = nextCorrect.length;
+    const total = ALL_CELLS.length;
+    const nextWrong = ALL_CELLS.filter(
+      (cell) => !nextCorrect.includes(cell.key),
+    ).map((cell) => cell.key);
 
-    setShowResults(true);
+    setCorrectCells(nextCorrect);
+    setWrongCells(nextWrong);
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -227,28 +382,36 @@ export default function WB_Vocabulary_Page_A() {
 
     setAnswers(correct);
     setShowAns(true);
-    setShowResults(false);
+    setWrongCells([]);
+    setCorrectCells(ALL_CELLS.map((cell) => cell.key));
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setWrongCells([]);
     setShowAns(false);
+    setCorrectCells([]);
+    setShakeCharts(false);
+    keyboard.cancel();
+    stopAudio();
+  };
+
+  const removeAnswer = (key) => {
+    if (showAns || correctCells.includes(key)) return;
+    const removed = answers[key]?.dragId;
+    setAnswers((previous) => {
+      const next = { ...previous };
+      delete next[key];
+      return next;
+    });
+    setWrongCells((previous) => previous.filter((cellKey) => cellKey !== key));
+    if (removed) keyboard.focusItem(String(removed));
   };
 
   const isWrong = (cell) => {
-    if (!showResults || showAns) return false;
-
-    for (const group of GROUP_COLUMNS) {
-      for (const column of group) {
-        if (column.keys.includes(cell.key)) {
-          const value = answers[cell.key]?.value;
-          return !column.correctValues.includes(value);
-        }
-      }
-    }
-
-    return false;
+    return wrongCells.includes(cell.key);
   };
 
   return (
@@ -448,62 +611,135 @@ export default function WB_Vocabulary_Page_A() {
         }
       `}</style>
       <div className="main-container-component">
-        <div className="div-forall" style={{gap:"25px"}}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span>
-            Read and fill in the charts.
-          </h1>
+        <div className="div-forall" style={{ gap: "25px" }}>
+          <ExerciseHeader
+            sectionLetter="A"
+            title="Read and fill in the charts."
+            subTitle="Say each short- and long-vowel word aloud, identify its sound, then place it in the correct chart group."
+          />
 
-
-<div className="flex flex-col gap-10 items-center justify-center">
-          {/* Word Bank */}
-          <div className="wb-a-word-bank">
-            <div className="wb-a-word-grid">
-              {DRAG_ITEMS.map((item) => (
-                <DragItem
-                  key={item.id}
-                  item={item}
-                  isUsed={usedDragIds.includes(item.id)}
-                  showAns={showAns}
-                />
-              ))}
-            </div>
-          </div>
-<div className="flex flex-col gap-5 w-full items-center justify-center">
-          {/* Groups */}
-          {GROUPS.map((group) => (
-            <div key={group.id} className="wb-a-section">
-              <div className="wb-a-head-row">
-                {group.title.map((title) => (
-                  <div key={title} className="wb-a-head-cell">
-                    {title}
-                  </div>
+          <div className="flex flex-col gap-10 items-center justify-center w-full">
+            {/* Word Bank */}
+            <div className="wb-a-word-bank">
+              <div className="wb-a-word-grid">
+                {DRAG_ITEMS.map((item) => (
+                  <DragItem
+                    key={item.id}
+                    item={item}
+                    isUsed={usedDragIds.includes(item.id)}
+                    showAns={showAns}
+                    registerItem={keyboard.registerItem}
+                    onKeyboardPick={() => keyboard.pickItem(String(item.id))}
+                    onPlayAudio={() =>
+                      playAudio(`word-${item.id}`, WORD_AUDIO[item.id - 1])
+                    }
+                    active={activeAudioKey === `word-${item.id}`}
+                  />
                 ))}
               </div>
-
-              <div className="wb-a-table">
-                {group.rows.map((row, rowIndex) => (
-                  <div key={rowIndex} className="wb-a-row">
-                    {row.map((cell) => (
-                      <div key={cell.key} className="wb-a-cell">
-                        <DropBox
-                          cell={cell}
-                          value={answers[cell.key]?.value || ""}
-                          wrong={isWrong(cell)}
+            </div>
+            <div
+              className={`flex flex-col gap-5 w-full items-center justify-center ${shakeCharts ? "wb-unit1-invalid-drop-shake" : ""}`}
+              onAnimationEnd={(event) => {
+                if (event.animationName === "shake-invalid-drop-wb-unit1")
+                  setShakeCharts(false);
+              }}
+            >
+              {/* Groups */}
+              {GROUPS.map((group) => (
+                <div key={group.id} className="wb-a-section">
+                  <div className="wb-a-head-row">
+                    {group.title.map((title) => (
+                      <button
+                        type="button"
+                        key={title}
+                        className="wb-a-head-cell wb-unit1-audio-control wb-unit1-interactive"
+                        onClick={() =>
+                          playAudio(`sound-${title}`, SOUND_AUDIO[title])
+                        }
+                        style={{
+                          border: 0,
+                          background: "transparent",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {title}
+                        <WorkbookUnit1PlayingAudioIcon
+                          active={activeAudioKey === `sound-${title}`}
                         />
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="wb-a-table">
+                    {group.rows.map((row, rowIndex) => (
+                      <div key={rowIndex} className="wb-a-row">
+                        {row.map((cell) => (
+                          <div key={cell.key} className="wb-a-cell">
+                            <DropBox
+                              cell={cell}
+                              value={answers[cell.key]?.value || ""}
+                              wrong={isWrong(cell)}
+                              locked={
+                                showAns || correctCells.includes(cell.key)
+                              }
+                              onRemove={removeAnswer}
+                              registerTarget={keyboard.registerTarget}
+                              tabIndex={
+                                !showAns &&
+                                !correctCells.includes(cell.key) &&
+                                (keyboard.keyboardItemId ||
+                                  answers[cell.key]?.value)
+                                  ? 0
+                                  : -1
+                              }
+                              preview={
+                                keyboard.keyboardTargetId === cell.key
+                                  ? DRAG_ITEMS.find(
+                                      (entry) =>
+                                        String(entry.id) ===
+                                        keyboard.keyboardItemId,
+                                    )?.value
+                                  : null
+                              }
+                              onKeyDown={(event) => {
+                                const value = answers[cell.key]?.value;
+
+                                if (
+                                  !keyboard.keyboardItemId &&
+                                  value &&
+                                  !showAns &&
+                                  !correctCells.includes(cell.key) &&
+                                  (event.key === "Enter" || event.key === " ")
+                                ) {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+
+                                  removeAnswer(cell.key);
+
+                                  return;
+                                }
+
+                                keyboard.handleTargetKeyDown(event, cell.key);
+                              }}
+                            />
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          ))}</div>
-</div>
+          </div>
           <div className="wb-a-buttons">
             <Button
               checkAnswers={handleCheck}
               handleShowAnswer={handleShowAnswer}
               handleStartAgain={handleStartAgain}
+              checkDisabled={
+                showAns || correctCells.length === ALL_CELLS.length
+              }
             />
           </div>
         </div>

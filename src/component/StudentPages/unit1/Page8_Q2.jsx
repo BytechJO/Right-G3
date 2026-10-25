@@ -1,284 +1,285 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useRef, useEffect } from "react";
-import "./Page8_Q2.css";
-import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 8/unit1-pg8-EX-A.mp3";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React, { useState } from "react";
 import Button from "../../Button";
-import WrongMark from "../../WrongMark";
+import ExerciseHeader from "../../ExerciseHeader";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ValidationAlert from "../../Popup/ValidationAlert";
+import WrongMark from "../../WrongMark";
+import Unit1PlayingAudioIcon from "./Unit1PlayingAudioIcon";
+import useUnit1Audio from "./useUnit1Audio";
+import track from "../../../assets/audio/ClassBook/Unit 1/P 8/unit1-pg8-EX-A.mp3";
+import may from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_001_may.mp3";
+import lake from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_002_lake.mp3";
+import jam from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_003_jam.mp3";
+import paint from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_004_paint.mp3";
+import bee from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_005_bee.mp3";
+import bed from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_006_bed.mp3";
+import feet from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_007_feet.mp3";
+import tea from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_008_tea.mp3";
+import kite from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_009_kite.mp3";
+import bike from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_010_bike.mp3";
+import light from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_011_light.mp3";
+import fish from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_012_fish.mp3";
+import home from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_013_home.mp3";
+import boat from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_014_boat.mp3";
+import box from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_015_box.mp3";
+import note from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_016_note.mp3";
+import run from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_017_run.mp3";
+import blue from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_018_blue.mp3";
+import sue from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_019_sue.mp3";
+import tube from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise A2/Item_020_tube.mp3";
+import "./Page8_Q2.css";
+import "./unit1Interactions.css";
 
-const Page8_Q2 = () => {
-  const groups = [
-    { words: ["may", "lake", "jam", "paint"], correct: [0, 1, 3] },
-    { words: ["bee", "bed", "feet", "tea"], correct: [0, 2, 3] },
-    { words: ["kite", "bike", "light", "fish"], correct: [0, 1, 2] },
-    { words: ["home", "boat", "box", "note"], correct: [0, 1, 3] },
-    { words: ["run", "blue", "sue", "tube"], correct: [1, 2, 3] },
-  ];
-  const [showResult2, setShowResult2] = useState(false);
-  const [selected, setSelected] = useState(groups.map(() => []));
-  const [showResult, setShowResult] = useState(false);
-  const [locked, setLocked] = useState(false);
+const GROUPS = [
+  {
+    words: [
+      { text: "may", audio: may },
+      { text: "lake", audio: lake },
+      { text: "jam", audio: jam },
+      { text: "paint", audio: paint },
+    ],
+    correct: [0, 1, 3],
+  },
+  {
+    words: [
+      { text: "bee", audio: bee },
+      { text: "bed", audio: bed },
+      { text: "feet", audio: feet },
+      { text: "tea", audio: tea },
+    ],
+    correct: [0, 2, 3],
+  },
+  {
+    words: [
+      { text: "kite", audio: kite },
+      { text: "bike", audio: bike },
+      { text: "light", audio: light },
+      { text: "fish", audio: fish },
+    ],
+    correct: [0, 1, 2],
+  },
+  {
+    words: [
+      { text: "home", audio: home },
+      { text: "boat", audio: boat },
+      { text: "box", audio: box },
+      { text: "note", audio: note },
+    ],
+    correct: [0, 1, 3],
+  },
+  {
+    words: [
+      { text: "run", audio: run },
+      { text: "blue", audio: blue },
+      { text: "sue", audio: sue },
+      { text: "tube", audio: tube },
+    ],
+    correct: [1, 2, 3],
+  },
+];
 
-  // ================================
-  // ✔ Captions Array
-  // ================================
-  const captions = [
-    {
-      start: 0.259,
-      end: 18.899,
-      text: "Page 8. Write activities. Exercise A, Number 2. Listen and circle the words with long vowel sounds. One, may, lake, jam, paint. Two, bee, bed,",
-    },
-    {
-      start: 19.939,
-      end: 26.959,
-      text: "feet, tea. Three, kite, bike, light,",
-    },
-    {
-      start: 27.979,
-      end: 28.379,
-      text: "fish.",
-    },
-    {
-      start: 29.739,
-      end: 31.319,
-      text: "Four, home,",
-    },
-    {
-      start: 32.34,
-      end: 32.799,
-      text: "boat,",
-    },
-    {
-      start: 33.86,
-      end: 34.36,
-      text: "box,",
-    },
-    {
-      start: 35.419,
-      end: 39.779,
-      text: "note. Five, run, blue,",
-    },
-    {
-      start: 40.819,
-      end: 42.919,
-      text: "Sue, tube",
-    },
-  ];
-  const showAnswers = () => {
-    const correctSelections = groups.map((g) => g.correct);
+const CAPTIONS = [
+  {
+    start: 0.259,
+    end: 18.899,
+    text: "Page 8. Write activities. Exercise A, number two. Listen and circle the words with long vowel sounds. One: may, lake, jam, paint. Two: bee, bed.",
+  },
+  {
+    start: 19.939,
+    end: 28.379,
+    text: "Feet, tea. Three: kite, bike, light, fish.",
+  },
+  {
+    start: 29.739,
+    end: 42.919,
+    text: "Four: home, boat, box, note. Five: run, blue, Sue, tube.",
+  },
+];
 
-    setSelected(correctSelections);
-    setShowResult2(true);
-    setLocked(true);
+export default function Page8_Q2() {
+  const { activeAudioKey, playAudio, stopAudio } = useUnit1Audio();
+  const [selected, setSelected] = useState(GROUPS.map(() => []));
+  const [checked, setChecked] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [lockedChoices, setLockedChoices] = useState(GROUPS.map(() => []));
+  const [completed, setCompleted] = useState(false);
+
+  const toggleWord = (groupIndex, wordIndex) => {
+    const word = GROUPS[groupIndex].words[wordIndex];
+    playAudio(`word-${groupIndex}-${wordIndex}`, word.audio);
+    if (revealed || completed || lockedChoices[groupIndex].includes(wordIndex))
+      return;
+    setSelected((previous) =>
+      previous.map((group, index) => {
+        if (index !== groupIndex) return group;
+        return group.includes(wordIndex)
+          ? group.filter((value) => value !== wordIndex)
+          : [...group, wordIndex];
+      }),
+    );
+    setChecked(false);
   };
 
   const checkAnswers = () => {
-    if (locked || showResult2) return;
-
-    const hasEmpty = selected.some((arr) => arr.length === 0);
-
-    if (hasEmpty) {
-      ValidationAlert.info("Please select at least one word in each group!");
+    if (completed || revealed) return;
+    if (selected.some((group) => group.length === 0)) {
+      ValidationAlert.info("Please select at least one word in each group.");
       return;
     }
-
-    let correctCount = 0;
+    let score = 0;
     let total = 0;
-
-    groups.forEach((group, index) => {
+    GROUPS.forEach((group, groupIndex) => {
       total += group.correct.length;
-
       group.correct.forEach((correctIndex) => {
-        if (selected[index].includes(correctIndex)) {
-          correctCount++;
-        }
+        if (selected[groupIndex].includes(correctIndex)) score += 1;
       });
     });
+    const hasWrongSelections = GROUPS.some((group, groupIndex) =>
+      selected[groupIndex].some(
+        (wordIndex) => !group.correct.includes(wordIndex),
+      ),
+    );
+    const isPerfect = score === total && !hasWrongSelections;
+    setLockedChoices(
+      GROUPS.map((group, groupIndex) =>
+        selected[groupIndex].filter((wordIndex) =>
+          group.correct.includes(wordIndex),
+        ),
+      ),
+    );
+    setChecked(true);
+    setCompleted(isPerfect);
+    if (isPerfect) ValidationAlert.success(`Score: ${score} / ${total}`);
+    else if (score === 0) ValidationAlert.error(`Score: ${score} / ${total}`);
+    else ValidationAlert.warning(`Score: ${score} / ${total}`);
+  };
 
-    const color =
-      correctCount === total ? "green" : correctCount === 0 ? "red" : "orange";
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${correctCount} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (correctCount === total) ValidationAlert.success(msg);
-    else if (correctCount === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setShowResult2(true);
-    setLocked(true);
+  const showAnswers = () => {
+    setSelected(GROUPS.map((group) => [...group.correct]));
+    setLockedChoices(GROUPS.map((group) => [...group.correct]));
+    setChecked(true);
+    setRevealed(true);
+    setCompleted(true);
+    stopAudio();
   };
 
   const reset = () => {
-    setSelected(groups.map(() => []));
-    setShowResult(false);
-    setShowResult2(false);
-    setLocked(false);
+    setSelected(GROUPS.map(() => []));
+    setChecked(false);
+    setRevealed(false);
+    setLockedChoices(GROUPS.map(() => []));
+    setCompleted(false);
+    stopAudio();
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "30px",
-      }}
-    >
-      <div className="div-forall">
+    <div className="main-container-component">
+      <div className="div-forall" style={{ gap: "30px" }}>
+        <ExerciseHeader
+          sectionLetter="A"
+          questionNumber="2"
+          title={
+            <>
+              Listen and circle the words with{" "}
+              <span className="text-blue-800">long vowel</span> sounds.
+            </>
+          }
+          subTitle="Listen for the vowel sound, replay if needed, then select only the words with the long sound."
+        />
+        <QuestionAudioPlayer
+          src={track}
+          captions={CAPTIONS}
+          stopAtSecond={9.2}
+          pageId="unit1-page8-q2"
+        />
+
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: "30px",
+            justifyContent: "space-between",
+            gap: "25px",
+            width: "100%",
+            flexWrap: "wrap",
           }}
         >
-          <h5 className="header-title-page8">
-            <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
-            Listen and tap or click the words with{" "}
-            <span className="text-blue-800">long vowel </span>sounds.
-          </h5>
-          <QuestionAudioPlayer
-            src={sound1}
-            captions={captions}
-            stopAtSecond={9.2}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              width: "100%",
-
-              gap: "25px",
-            }}
-          >
-            <div
+          {GROUPS.map((group, groupIndex) => (
+            <fieldset
+              key={groupIndex}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "35px",
-                width: "100%",
-                marginTop: "30px",
+                position: "relative",
+                minWidth: "135px",
+                padding: "18px 28px",
+                border: 0,
+                borderRadius: "16px",
+                background: "#FEF3E6",
               }}
             >
-              {groups.map((group, index) => (
-                <div
-                  key={index}
-                  style={{
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "-20px",
-                      fontWeight: "bold",
-                      fontSize: "20px",
-                    }}
-                  >
-                    {index + 1}
-                  </div>
-
-                  <div
-                    style={{
-                      background: "#FEF3E6",
-                      padding: "1vw 2.5vw",
-                      borderRadius: "1vw",
-                      minWidth: "7vw",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "20px",
-                    }}
-                  >
-                    {group.words.map((word, i) => {
-                      const isSelected = selected[index].includes(i);
-                      const isCorrect = group.correct.includes(i);
-
-                      return (
-                        <div
-                          key={i}
-                          onClick={() => {
-                            if (locked) return;
-
-                            const newSelected = [...selected];
-
-                            if (newSelected[index].includes(i)) {
-                              newSelected[index] = newSelected[index].filter(
-                                (x) => x !== i,
-                              );
-                            } else {
-                              newSelected[index].push(i);
-                            }
-
-                            setSelected(newSelected);
-                          }}
-                          style={{
-                            fontSize: "18px",
-                            cursor: locked ? "default" : "pointer",
-                            position: "relative",
-                            height: "50px",
-                            width: "50px",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-
-                            // padding: "10px 8px",
-                          }}
-                        >
-                          {word}
-
-                          {isSelected && (
-                            <>
-                              {isSelected && (
-                                <div
-                                  style={{
-                                    position: "absolute",
-                                    top: "-4px",
-                                    left: "-6px",
-                                    right: "-6px",
-                                    bottom: "-4px",
-                                    border: isSelected
-                                      ? showResult2
-                                        ? isCorrect
-                                          ? "1px solid #f39b42" // صح → يضل أزرق
-                                          : "2px solid red" // غلط → أحمر
-                                        : "1px solid #f39b42" // قبل check
-                                      : "none",
-                                    borderRadius: "50%",
-                                    pointerEvents: "none",
-                                  }}
-                                />
-                              )}
-
-                              {/* ❌ علامة الغلط */}
-                              {showResult2 && !isCorrect && <WrongMark />}
-                            </>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+              <legend
+                style={{
+                  position: "absolute",
+                  left: "-18px",
+                  top: "8px",
+                  fontWeight: 700,
+                  fontSize: "20px",
+                }}
+              >
+                {groupIndex + 1}
+              </legend>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "15px",
+                }}
+              >
+                {group.words.map((word, wordIndex) => {
+                  const isSelected = selected[groupIndex].includes(wordIndex);
+                  const isCorrect = group.correct.includes(wordIndex);
+                  const wrong = checked && isSelected && !isCorrect;
+                  return (
+                    <button
+                      type="button"
+                      key={word.text}
+                      className="unit1-audio-control unit1-interactive"
+                      onClick={() => toggleWord(groupIndex, wordIndex)}
+                      aria-pressed={isSelected}
+                      aria-label={`${word.text}${isSelected ? ", selected" : ""}. Activate to play and select.`}
+                      style={{
+                        minWidth: "72px",
+                        minHeight: "42px",
+                        padding: "6px 12px",
+                        border: isSelected
+                          ? `2px solid ${wrong ? "#dc2626" : "#f39b42"}`
+                          : "2px solid transparent",
+                        borderRadius: "22px",
+                        background: "transparent",
+                        fontSize: "18px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {word.text}
+                      <Unit1PlayingAudioIcon
+                        active={
+                          activeAudioKey === `word-${groupIndex}-${wordIndex}`
+                        }
+                      />
+                      {wrong && <WrongMark />}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+          ))}
         </div>
+
         <Button
           handleShowAnswer={showAnswers}
           handleStartAgain={reset}
           checkAnswers={checkAnswers}
+          checkDisabled={completed || revealed}
         />
       </div>
     </div>
   );
-};
-
-export default Page8_Q2;
+}

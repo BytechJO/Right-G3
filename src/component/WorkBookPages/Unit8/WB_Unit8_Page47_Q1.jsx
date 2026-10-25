@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_001_There_..._horses_on_Grandpa's_farm.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_002_a_tractor_on_Grandpa's_farm.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_003_a_dog_on_Grandpa's_farm.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_004_goats_on_Grandpa's_farm.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_005_cows_on_Grandpa's_farm.mp3";
+import audio6 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_006_chickens_on_Grandpa's_farm.mp3";
+import audio7 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_007_a_barn_on_Grandpa's_farm.mp3";
+import audio8 from "../../../assets/audio/WorkBook/unit8/Page 47 - Exercise E/Item_008_a_big_tree_on_Grandpa's_farm.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 47/SVG/1.svg";
 import trueIcon from "../../../assets/imgs/true.svg";
@@ -17,6 +29,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "were",
     end: "horses on Grandpa’s farm.",
+    audio: audio1,
   },
   {
     id: 2,
@@ -25,6 +38,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "wasn't",
     end: "a tractor on Grandpa’s farm.",
+    audio: audio2,
   },
   {
     id: 3,
@@ -33,6 +47,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "was",
     end: "a dog on Grandpa’s farm.",
+    audio: audio3,
   },
   {
     id: 4,
@@ -41,6 +56,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "were",
     end: "goats on Grandpa’s farm.",
+    audio: audio4,
   },
   {
     id: 5,
@@ -49,6 +65,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "were",
     end: "cows on Grandpa’s farm.",
+    audio: audio5,
   },
   {
     id: 6,
@@ -57,6 +74,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "were",
     end: "chickens on Grandpa’s farm.",
+    audio: audio6,
   },
   {
     id: 7,
@@ -65,6 +83,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "was",
     end: "a barn on Grandpa’s farm.",
+    audio: audio7,
   },
   {
     id: 8,
@@ -73,6 +92,7 @@ const SENTENCES = [
     start: "There",
     firstAnswer: "wasn't",
     end: "a big tree on Grandpa’s farm.",
+    audio: audio8,
   },
 ];
 
@@ -106,29 +126,29 @@ const ErrorBadge = () => (
 export default function WB_Unit8_Page46_QD() {
   const [answers, setAnswers] = useState({});
   const [checks, setChecks] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const handleCheckBox = (id) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setChecks((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  const isComplete = (item) => {
-    return answers[item.id] && checks[item.id] !== undefined;
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const isCorrect = (item) => {
@@ -139,7 +159,7 @@ export default function WB_Unit8_Page46_QD() {
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === SENTENCES.length) return;
 
     const allSelectsAnswered = SENTENCES.every((item) => answers[item.id]);
 
@@ -154,7 +174,12 @@ export default function WB_Unit8_Page46_QD() {
       if (isCorrect(item)) score++;
     });
 
-    setShowResults(true);
+    setLockedIds(
+      SENTENCES.flatMap((item) => (isCorrect(item) ? [item.id] : [])),
+    );
+    setWrongIds(
+      SENTENCES.flatMap((item) => (!isCorrect(item) ? [item.id] : [])),
+    );
 
     const total = SENTENCES.length;
 
@@ -176,13 +201,17 @@ export default function WB_Unit8_Page46_QD() {
     setChecks(solvedChecks);
 
     setShowAns(true);
-    setShowResults(false);
+    setLockedIds(SENTENCES.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
   const handleStartAgain = () => {
     setAnswers({});
     setChecks({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   return (
@@ -194,11 +223,16 @@ export default function WB_Unit8_Page46_QD() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-         Look and write <strong className="text-red-600">✓ </strong> . Then
-          Then write sentences.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="E"
+          title={
+            <>
+              Look and write <span style={{ color: "#D1232A" }}>✓</span>. Then
+              write sentences.
+            </>
+          }
+          subTitle="Use the what was and wasn’t on Grandpa’s farm to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* Top Checkboxes */}
         <div
@@ -221,7 +255,8 @@ export default function WB_Unit8_Page46_QD() {
           >
             {SENTENCES.map((item) => {
               const checkWrong =
-                showResults && checks[item.id] !== item.checkedAnswer;
+                wrongIds.includes(item.id) &&
+                checks[item.id] !== item.checkedAnswer;
 
               return (
                 <div
@@ -249,7 +284,17 @@ export default function WB_Unit8_Page46_QD() {
                     }}
                   >
                     <div
+                      role="button"
+                      tabIndex={showAns || lockedIds.includes(item.id) ? -1 : 0}
+                      aria-disabled={showAns || lockedIds.includes(item.id)}
+                      aria-label={`Mark ${item.word} as present on the farm`}
                       onClick={() => handleCheckBox(item.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleCheckBox(item.id);
+                        }
+                      }}
                       style={{
                         width: "35px",
                         height: "35px",
@@ -260,7 +305,10 @@ export default function WB_Unit8_Page46_QD() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        cursor: showAns || showResults ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedIds.includes(item.id)
+                            ? "default"
+                            : "pointer",
                         // background: "#fff",
                         // color: "#ef4444",
                         // fontWeight: 700,
@@ -269,7 +317,11 @@ export default function WB_Unit8_Page46_QD() {
                       }}
                     >
                       {checks[item.id] ? (
-                        <img src={trueIcon} style={{ height: "25px" }} />
+                        <img
+                          src={trueIcon}
+                          alt="Selected"
+                          style={{ height: "25px" }}
+                        />
                       ) : (
                         ""
                       )}
@@ -294,11 +346,21 @@ export default function WB_Unit8_Page46_QD() {
             }}
           >
             {SENTENCES.map((item) => {
-              const wrong = showResults && isComplete(item) && !isCorrect(item);
+              const wrong = wrongIds.includes(item.id);
 
               return (
                 <div
                   key={item.id}
+                  role="button"
+                  tabIndex={0}
+                  className="unit4-audio-control unit4-interactive"
+                  onClick={() => playAudio(`sentence-${item.id}`, item.audio)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`sentence-${item.id}`, item.audio);
+                    }
+                  }}
                   style={{
                     position: "relative",
                     display: "flex",
@@ -324,7 +386,9 @@ export default function WB_Unit8_Page46_QD() {
                     }}
                   >
                     <select
-                      disabled={showAns || showResults}
+                      disabled={showAns || lockedIds.includes(item.id)}
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
                       value={answers[item.id] || ""}
                       onChange={(e) => handleSelect(item.id, e.target.value)}
                       style={{
@@ -336,7 +400,6 @@ export default function WB_Unit8_Page46_QD() {
                             : `1px solid ${BORDER_COLOR}`,
                         padding: "4px 8px",
                         fontSize: "18px",
-                        outline: "none",
                         background: "#fff",
                         color: "#111",
                       }}
@@ -363,13 +426,16 @@ export default function WB_Unit8_Page46_QD() {
                   >
                     {item.end}
                   </span>
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `sentence-${item.id}`}
+                  />
                 </div>
               );
             })}
           </div>
           <img
             src={img1}
-            alt="img1"
+            alt="Grandpa’s farm with animals, a barn, and a tractor"
             style={{ height: "350px", width: "auto" }}
           />
         </div>

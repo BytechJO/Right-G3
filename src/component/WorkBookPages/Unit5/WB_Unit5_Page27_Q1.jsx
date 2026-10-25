@@ -2,6 +2,20 @@ import { useState } from "react";
 
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import bathroomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_001_bathroom.mp3";
+import diningRoomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_002_dining_room.mp3";
+import kitchenAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_003_kitchen.mp3";
+import basementAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_004_basement.mp3";
+import livingRoomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_005_living_room.mp3";
+import garageAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_006_garage.mp3";
+import hallAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_007_hall.mp3";
+import bedroomAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_008_bedroom.mp3";
+import officeAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_009_office.mp3";
+import stairsAudio from "../../../assets/audio/WorkBook/unit5/Page 27 - Exercise A/Item_010_stairs.mp3";
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 27/A3.svg";
@@ -13,6 +27,18 @@ const YELLOW_COLOR = "#f39b42";
 const RED_COLOR = "red";
 const TEXT_COLOR = "#222";
 const BORDER_COLOR = "#d4d4d4";
+const OPTION_AUDIO = {
+  bathroom: bathroomAudio,
+  "dining room": diningRoomAudio,
+  kitchen: kitchenAudio,
+  basement: basementAudio,
+  "living room": livingRoomAudio,
+  garage: garageAudio,
+  hall: hallAudio,
+  bedroom: bedroomAudio,
+  office: officeAudio,
+  stairs: stairsAudio,
+};
 
 const DATA = [
   {
@@ -154,21 +180,23 @@ const WB_Unit7_Page27_Q1 = () => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState({});
   const [checkedAnswers, setCheckedAnswers] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, option) => {
-    if (showAnswers ||checkedAnswers) return;
+    playAudio(`option-${id}-${option}`, OPTION_AUDIO[option]);
+    if (showAnswers || lockedIds.includes(id)) return;
 
     setUserSelections((prev) => ({
       ...prev,
       [id]: option,
     }));
 
-    setCheckedAnswers(false);
-    setWrongAnswers({});
+    setWrongAnswers((prev) => ({ ...prev, [id]: false }));
   };
 
   const checkAnswers = () => {
-    if (showAnswers ||checkedAnswers) return;
+    if (showAnswers || lockedIds.length === DATA.length) return;
     const allAnswered = Object.values(userSelections).every((val) => val !== null);
 
     if (!allAnswered) {
@@ -193,6 +221,14 @@ const WB_Unit7_Page27_Q1 = () => {
 
     setWrongAnswers(newWrong);
     setCheckedAnswers(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...DATA.filter((item) => userSelections[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
 
     if (currentScore === totalQuestions) {
       ValidationAlert.success(`Score: ${currentScore} / ${totalQuestions}`);
@@ -213,6 +249,8 @@ const WB_Unit7_Page27_Q1 = () => {
     setShowAnswers(true);
     setCheckedAnswers(false);
     setWrongAnswers({});
+    setLockedIds(DATA.map((item) => item.id));
+    stopAudio();
   };
 
   const handleStartAgain = () => {
@@ -220,6 +258,8 @@ const WB_Unit7_Page27_Q1 = () => {
     setShowAnswers(false);
     setWrongAnswers({});
     setCheckedAnswers(false);
+    setLockedIds([]);
+    stopAudio();
   };
 
   const getOptionStyle = (item, option) => {
@@ -268,13 +308,11 @@ const WB_Unit7_Page27_Q1 = () => {
         }}
 
       >
-        <h1
-          className="WB-header-title-page8"
-         
-        >
-          <span className="WB-ex-A">A</span>
-          Look, read, and tap or click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title="Look, read, and circle."
+          subTitle="Look at the room or object word that matches each picture first, compare all available options, then tap only the answer that matches."
+        />
 
         <div className="wb-u7-q1-grid" style={styles.grid}>
           {DATA.map((item) => (
@@ -284,7 +322,18 @@ const WB_Unit7_Page27_Q1 = () => {
 
                 <div style={styles.imageWrap}>
                    <div style={styles.number}>{item.id}</div>
-                  <img src={item.img} alt={`option-${item.id}`} style={styles.image} />
+                  <img
+                    src={item.img}
+                    alt={[
+                      "A chest of drawers",
+                      "A dining place setting with a plate and cutlery",
+                      "A kitchen sink",
+                      "An office desk and chair",
+                      "A washing machine",
+                      "A bathtub",
+                    ][item.id - 1]}
+                    style={styles.image}
+                  />
                 </div>
 
                 <div style={styles.optionsWrap}>
@@ -300,9 +349,16 @@ const WB_Unit7_Page27_Q1 = () => {
                         onClick={() => handleSelect(item.id, option)}
                         style={{
                           ...getOptionStyle(item, option),
-                          cursor: showAnswers ? "default" : "pointer",
+                          cursor:
+                            showAnswers || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                         }}
+                        aria-disabled={showAnswers || lockedIds.includes(item.id)}
                       >
+                        <Unit4PlayingAudioIcon
+                          active={activeAudioKey === `option-${item.id}-${option}`}
+                        />
                         {option}
 
                         {isWrongSelected && (

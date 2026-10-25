@@ -1,6 +1,22 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import "./workbookUnit3Interactions.css";
+import chAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise D/Item_001_ch.mp3";
+import tchAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise D/Item_002_tch.mp3";
+import shAudio from "../../../assets/audio/WorkBook/unit3/Page 20 - Exercise D/Item_003_sh.mp3";
+
+const SOUND_AUDIO = { ch: chAudio, tch: tchAudio, sh: shAudio };
+const IMAGE_ALTS = {
+  1: "A seashell",
+  2: "A piece of cheese",
+  3: "A beach with an umbrella and palm tree",
+  4: "A cake",
+  5: "A shop",
+};
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 20/2.svg";
@@ -20,15 +36,16 @@ export default function WB_Unit3_Page18_QD() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all pictures first.");
@@ -39,6 +56,11 @@ export default function WB_Unit3_Page18_QD() {
       if (answers[item.id] === item.correct) score++;
     });
     setShowResults(true);
+    setLockedIds(
+      ITEMS.filter((item) => answers[item.id] === item.correct).map(
+        (item) => item.id,
+      ),
+    );
     if (score === ITEMS.length)
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
     else if (score > 0)
@@ -54,12 +76,16 @@ export default function WB_Unit3_Page18_QD() {
     setAnswers(filledAnswers);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    stopAudio();
   };
 
   const isWrong = (item, option) =>
@@ -70,10 +96,30 @@ export default function WB_Unit3_Page18_QD() {
   const renderOption = (item, option) => {
     const selected = isSelected(item, option);
     const wrong = isWrong(item, option);
+    const audioKey = `sound-${item.id}-${option}`;
 
     return (
       <div
-        onClick={() => handleSelect(item.id, option)}
+        className="wb-unit3-audio-control wb-unit3-interactive"
+        role="button"
+        tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+        aria-label={`${option}${selected ? ", selected" : ""}`}
+        aria-disabled={lockedIds.includes(item.id)}
+        onClick={() => {
+          if (lockedIds.includes(item.id)) return;
+          handleSelect(item.id, option);
+          playAudio(audioKey, SOUND_AUDIO[option]);
+        }}
+        onKeyDown={(event) => {
+          if (
+            (event.key === "Enter" || event.key === " ") &&
+            !lockedIds.includes(item.id)
+          ) {
+            event.preventDefault();
+            handleSelect(item.id, option);
+            playAudio(audioKey, SOUND_AUDIO[option]);
+          }
+        }}
         style={{
           position: "relative",
           display: "inline-flex",
@@ -92,12 +138,13 @@ export default function WB_Unit3_Page18_QD() {
           color: "#222",
           fontSize: "18px",
           fontWeight: "500",
-          cursor: showAns ||showResults? "default" : "pointer",
+          cursor: showAns || showResults ? "default" : "pointer",
           boxSizing: "border-box",
           userSelect: "none",
           lineHeight: "1.1",
         }}
       >
+        <WorkbookUnit3PlayingAudioIcon active={activeAudioKey === audioKey} />
         {option}
         {wrong && (
           <div
@@ -212,11 +259,19 @@ export default function WB_Unit3_Page18_QD() {
         }
       `}</style>
 
-      <div className="div-forall" style={{ gap: "160px" }}>
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A">D</span> Does it have ch, tch, or sh sound?
-          Look and tap or click.
-        </h1>
+      <div className="div-forall" style={{ gap: "115px" }}>
+        <ExerciseHeader
+          sectionLetter="D"
+          title={
+            <>
+              Does it have <span style={{ color: "#2e3192" }}>ch</span>,{" "}
+              <span style={{ color: "#2e3192" }}>tch</span>, or{" "}
+              <span style={{ color: "#2e3192" }}>sh</span> sound? Look and
+              circle.
+            </>
+          }
+          subTitle="Look at the ch, tch, or sh sound that matches each picture first, compare all available options, then tap only the answer that matches."
+        />
 
         <div className="wb-d-grid">
           {ITEMS.map((item) => (
@@ -227,7 +282,7 @@ export default function WB_Unit3_Page18_QD() {
                 <div className="wb-d-img-frame">
                   <img
                     src={item.img}
-                    alt={`item-${item.id}`}
+                    alt={IMAGE_ALTS[item.id]}
                     className="wb-d-img"
                   />
                 </div>

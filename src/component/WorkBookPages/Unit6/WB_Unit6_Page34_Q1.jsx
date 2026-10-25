@@ -1,6 +1,11 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 34/C.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 34/C.4.svg";
@@ -13,8 +18,18 @@ import {
   useDraggable,
   useDroppable,
   DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
-function DraggableNumber({ num, disabled }) {
+import sentence1Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise C/Item_001_A_small_cat_and_a_big_dog_are_running_down_the_hill.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise C/Item_002_They're_running_across_the_street.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise C/Item_003_The_cat_can_go_through_the_fence._The_dog_can't.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise C/Item_004_The_dog_can't_jump_over_the_fence.mp3";
+import sentence5Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise C/Item_005_The_cat_is_climbing_up_a_tree.mp3";
+import sentence6Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise C/Item_006_The_cat_is_happy._The_dog_is_sad.mp3";
+
+function DraggableNumber({ num, disabled, register, onKeyDown }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: num,
     disabled,
@@ -30,9 +45,17 @@ function DraggableNumber({ num, disabled }) {
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(element);
+      }}
       {...listeners}
       {...attributes}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled}
+      onKeyDown={onKeyDown}
+      className="unit4-interactive"
       style={{
         ...style,
         width: "45px",
@@ -68,9 +91,6 @@ function DroppableCard({ id, children }) {
     </div>
   );
 }
-const BORDER_COLOR = "#f39b42";
-const WRONG_COLOR = "#ef4444";
-const DRAG_BG = "#f29a1f";
 const TEXT_COLOR = "#111";
 
 const SENTENCES = [
@@ -92,21 +112,53 @@ const IMAGE_CARDS = [
 ];
 
 const DRAG_NUMBERS = [1, 2, 3, 4, 5, 6];
+const SENTENCE_AUDIO = {
+  1: sentence1Audio,
+  2: sentence2Audio,
+  3: sentence3Audio,
+  4: sentence4Audio,
+  5: sentence5Audio,
+  6: sentence6Audio,
+};
+const IMAGE_ALT = {
+  1: "A cat going through a fence while a dog stays behind it",
+  2: "A cat climbing a tree",
+  3: "A cat and a dog running across a street",
+  4: "A happy cat and a sad dog",
+  5: "A small cat and a big dog running down a hill",
+  6: "A dog trying to jump over a fence",
+};
 
 export default function SB_ReadLookNumber_PageC() {
   const [imageAnswers, setImageAnswers] = useState({});
   const [draggedNumber, setDraggedNumber] = useState(null);
-  const [touchItem, setTouchItem] = useState(null);
-  const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+  const [shakeDrops, setShakeDrops] = useState(false);
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   const usedNumbers = useMemo(
     () => Object.values(imageAnswers),
     [imageAnswers],
   );
+  const tabDrag = useUnit4TabDrag({
+    itemIds: DRAG_NUMBERS,
+    targetIds: IMAGE_CARDS.map((card) => card.id),
+    isItemDisabled: (id) => usedNumbers.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedIds.includes(id) || showAns,
+    onPlace: (num, cardId) => applyDrop(Number(cardId), Number(num)),
+  });
 
   const applyDrop = (cardId, num) => {
+    if (showAns || lockedIds.includes(cardId)) return;
+    const previousCardId = Number(
+      Object.keys(imageAnswers).find((key) => imageAnswers[key] === num),
+    );
     const updated = { ...imageAnswers };
     Object.keys(updated).forEach((k) => {
       if (updated[k] === num) delete updated[k];
@@ -114,21 +166,27 @@ export default function SB_ReadLookNumber_PageC() {
     updated[cardId] = num;
     setImageAnswers(updated);
     setDraggedNumber(null);
-    setChecked(false);
+    setWrongIds((previous) =>
+      previous.filter(
+        (id) => id !== cardId && (!previousCardId || id !== previousCardId),
+      ),
+    );
   };
 
   const handleRemoveNumber = (cardId) => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.includes(cardId)) return;
+    const removedNumber = imageAnswers[cardId];
     setImageAnswers((prev) => {
       const updated = { ...prev };
       delete updated[cardId];
       return updated;
     });
-    setChecked(false);
+    setWrongIds((previous) => previous.filter((id) => id !== cardId));
+    if (removedNumber) tabDrag.focusItem(removedNumber);
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.length === IMAGE_CARDS.length) return;
     const allAnswered = IMAGE_CARDS.every((c) => imageAnswers[c.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -139,6 +197,15 @@ export default function SB_ReadLookNumber_PageC() {
       if (imageAnswers[c.id] === c.correctNumber) score++;
     });
     setChecked(true);
+    const correctIds = IMAGE_CARDS.filter(
+      (card) => imageAnswers[card.id] === card.correctNumber,
+    ).map((card) => card.id);
+    setLockedIds((previous) => [...new Set([...previous, ...correctIds])]);
+    setWrongIds(
+      IMAGE_CARDS.filter(
+        (card) => imageAnswers[card.id] !== card.correctNumber,
+      ).map((card) => card.id),
+    );
     const total = IMAGE_CARDS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -154,25 +221,30 @@ export default function SB_ReadLookNumber_PageC() {
     setChecked(true);
     setShowAns(true);
     setDraggedNumber(null);
-    setTouchItem(null);
+    setLockedIds(IMAGE_CARDS.map((card) => card.id));
+    setWrongIds([]);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   const handleReset = () => {
     setImageAnswers({});
     setDraggedNumber(null);
-    setTouchItem(null);
     setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    tabDrag.cancel();
+    stopAudio();
   };
 
   const isCardWrong = (cardId) => {
-    if (!checked || showAns) return false;
-    const card = IMAGE_CARDS.find((c) => c.id === cardId);
-    return imageAnswers[cardId] !== card.correctNumber;
+    return checked && !showAns && wrongIds.includes(cardId);
   };
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={(event) => {
         setDraggedNumber(event.active.id);
       }}
@@ -181,7 +253,11 @@ export default function SB_ReadLookNumber_PageC() {
 
         setDraggedNumber(null);
 
-        if (!over) return;
+        if (!over) {
+          setShakeDrops(false);
+          window.requestAnimationFrame(() => setShakeDrops(true));
+          return;
+        }
 
         const cardId = over.id;
 
@@ -196,10 +272,11 @@ export default function SB_ReadLookNumber_PageC() {
           }}
         >
           {/* Title */}
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">C</span>
-          Read, look, and number the pictures. Point and say.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="C"
+            title="Read, look, and number the pictures. Point and say."
+            subTitle="Read all six action sentences to the correct cat and dog pictures clues first, then assign the numbers carefully so the picture or order is used correctly."
+          />
 
           {/* Sentences */}
           <div
@@ -213,12 +290,29 @@ export default function SB_ReadLookNumber_PageC() {
             {SENTENCES.map((s) => (
               <div
                 key={s.id}
+                className="unit4-audio-control unit4-interactive"
+                role="button"
+                tabIndex={0}
+                onClick={() =>
+                  playAudio(`sentence-${s.id}`, SENTENCE_AUDIO[s.id])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`sentence-${s.id}`, SENTENCE_AUDIO[s.id]);
+                  }
+                }}
                 style={{
                   display: "flex",
                   alignItems: "baseline",
                   gap: "clamp(8px,1vw,14px)",
+                  position: "relative",
+                  cursor: "pointer",
                 }}
               >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `sentence-${s.id}`}
+                />
                 <span
                   style={{
                     fontSize: "20px",
@@ -255,12 +349,21 @@ export default function SB_ReadLookNumber_PageC() {
                   key={num}
                   num={num}
                   disabled={disabled || showAns}
+                  register={(element) => tabDrag.registerItem(num, element)}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!disabled && !showAns) tabDrag.pickItem(num);
+                  }}
                 />
               );
             })}
           </div>
           {/* Image cards 3×2 */}
           <div
+            className={shakeDrops ? "unit4-invalid-selection-shake" : ""}
+            onAnimationEnd={() => setShakeDrops(false)}
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -284,13 +387,19 @@ export default function SB_ReadLookNumber_PageC() {
                         //   isOver ? "#f59e0b" : wrong ? "#ef4444" : "#f39b42"
                         // }`,
                         // borderRadius: "12px",
-                        background: isOver ? "#fff7ed" : "white",
+                        background:
+                          isOver ||
+                          (tabDrag.keyboardItemId != null &&
+                            tabDrag.keyboardTargetId === card.id)
+                            ? "#fff7ed"
+                            : "white",
                         transition: "0.2s",
                       }}
                     >
                       {/* الصورة */}
                       <img
                         src={card.img}
+                        alt={IMAGE_ALT[card.id]}
                         style={{
                           width: "90%",
                           height: "auto",
@@ -301,7 +410,32 @@ export default function SB_ReadLookNumber_PageC() {
 
                       {/* الرقم */}
                       <div
+                        ref={(element) =>
+                          tabDrag.registerTarget(card.id, element)
+                        }
                         onClick={() => handleRemoveNumber(card.id)}
+                        onKeyDown={(event) => {
+                          if (tabDrag.keyboardItemId != null)
+                            tabDrag.handleTargetKeyDown(event, card.id);
+                          else if (
+                            (event.key === "Enter" || event.key === " ") &&
+                            num &&
+                            !lockedIds.includes(card.id)
+                          ) {
+                            event.preventDefault();
+                            handleRemoveNumber(card.id);
+                          }
+                        }}
+                        role="button"
+                        tabIndex={
+                          showAns || lockedIds.includes(card.id)
+                            ? -1
+                            : tabDrag.keyboardItemId != null || num
+                              ? 0
+                              : -1
+                        }
+                        aria-disabled={lockedIds.includes(card.id) || showAns}
+                        className="unit4-interactive"
                         style={{
                           position: "absolute",
                           top: "2%",
@@ -315,10 +449,25 @@ export default function SB_ReadLookNumber_PageC() {
                           fontSize: "22px",
                           fontWeight: "bold",
                           color: wrong ? "red" : "#111",
-                          cursor: num && !showAns ? "pointer" : "default",
+                          cursor:
+                            !showAns && !lockedIds.includes(card.id)
+                              ? "pointer"
+                              : "default",
                         }}
                       >
-                        {num || ""}
+                        <span
+                          className={
+                            tabDrag.keyboardItemId != null &&
+                            tabDrag.keyboardTargetId === card.id
+                              ? "unit4-keyboard-preview"
+                              : ""
+                          }
+                        >
+                          {tabDrag.keyboardItemId != null &&
+                          tabDrag.keyboardTargetId === card.id
+                            ? tabDrag.keyboardItemId
+                            : num || ""}
+                        </span>
                       </div>
 
                       {/* ❌ علامة الخطأ */}
@@ -367,32 +516,6 @@ export default function SB_ReadLookNumber_PageC() {
             />
           </div>
         </div>
-
-        {/* Touch ghost */}
-        {touchItem !== null && (
-          <div
-            style={{
-              position: "fixed",
-              left: touchPos.x - 28,
-              top: touchPos.y - 28,
-              width: "clamp(40px,5vw,56px)",
-              height: "clamp(40px,5vw,56px)",
-              borderRadius: "50%",
-              background: DRAG_BG,
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "clamp(18px,2.4vw,30px)",
-              fontWeight: 700,
-              pointerEvents: "none",
-              zIndex: 9999,
-              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-            }}
-          >
-            {touchItem}
-          </div>
-        )}
       </div>
       <DragOverlay>
         {draggedNumber ? (

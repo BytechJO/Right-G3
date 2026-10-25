@@ -1,15 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import page_8 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8.png";
-
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
-import "./Page8.css"
+import "./Page8.css";
+
 const Page8 = ({ openPopup }) => {
   return (
     <div
       className="page1-img-wrapper"
       style={{ backgroundImage: `url(${page_8})` }}
     >
-      {/* <img src={page_8} /> */}
       <div
         className="click-icon-page8-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -18,9 +17,20 @@ const Page8 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 0 })}
-          // className="click-icon-page8-1 hover:scale-110 transition"
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 0 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -33,6 +43,7 @@ const Page8 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="click-icon-page8-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -41,9 +52,20 @@ const Page8 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 1 })}
-          style={{ overflow: "visible" }}
-          // className="click-icon-page8-2 hover:scale-110 transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 1 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -65,9 +87,20 @@ const Page8 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 3"
           onClick={() => openPopup("exercise", { startIndex: 2 })}
-          // className="click-icon-page8-3 hover:scale-110 transition"
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 2 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -80,6 +113,7 @@ const Page8 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="click-icon-page8-4 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -88,9 +122,20 @@ const Page8 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 4"
           onClick={() => openPopup("exercise", { startIndex: 3 })}
-          // className="click-icon-page8-4 hover:scale-110 transition"
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 3 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"

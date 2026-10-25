@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/G5_U6_Pg_46.png";
 import ModernVocabularyComponent from "../../ModernVocabularyComponent";
 import vocabulary from "../../../assets/audio/ClassBook/Unit 6/P 46/Pg46_Vocab_Adult Lady.mp3";
@@ -31,7 +31,6 @@ import sound12 from "../../../assets/audio/ClassBook/Unit 6/P 46/sound12.mp3";
 import sound13 from "../../../assets/audio/ClassBook/Unit 6/P 46/sound13.mp3";
 
 const Unit6_Page1_Vocab = () => {
-
   // ================================
   // ✔ Captions Array
   // ================================
@@ -126,6 +125,7 @@ const Unit6_Page1_Vocab = () => {
       ]}
       markers={positions}
       captions={captions}
+      pageId="unit6-page46-vocab"
     />
   );
 };

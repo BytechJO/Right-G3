@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
 import "./Unit5_Page5_Q1.css";
+import "../unit4/unit4Interactions.css";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex A 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex A 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex A 3.svg";
@@ -13,155 +18,179 @@ import img9 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms Ho
 import img10 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex A 10.svg";
 import img11 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex A 11.svg";
 import img12 from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Page 44/Ex A 12.svg";
+import skyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_001_sky.mp3";
+import candyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_002_candy.mp3";
+import pennyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_003_Penny.mp3";
+import cryAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_004_cry.mp3";
+import partyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_005_party.mp3";
+import julyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_006_July.mp3";
+import bunnyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_007_bunny.mp3";
+import babyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_008_baby.mp3";
+import sunnyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_009_sunny.mp3";
+import shyAudio from "../../../assets/audio/ClassBook/Unit 5/Page 44 - Exercise A/Item_010_shy.mp3";
 
-const Unit5_Page5_Q1 = () => {
-  const groups = [
-    {
-      title: "sky",
-      correctWords: ["cry", "July", "shy"],
-      items: [
-        { img: img1, word: "candy" },
-        { img: img2, word: "Penny" },
-        { img: img3, word: "cry" },
-        { img: img4, word: "bunny" },
-        { img: img5, word: "July" },
-        { img: img6, word: "baby" },
-        { img: img7, word: "shy" },
-      ],
-    },
-    {
-      title: "candy",
-      correctWords: ["party", "bunny", "baby", "sunny"],
-      items: [
-        { img: img8, word: "sky" },
-        { img: img9, word: "party" },
-        { img: img10, word: "July" },
-        { img: img11, word: "bunny" },
-        { img: img12, word: "baby" },
-        { img: img1, word: "sunny" },
-      ],
-    },
-  ];
+const WORD_AUDIO = {
+  sky: skyAudio,
+  candy: candyAudio,
+  Penny: pennyAudio,
+  cry: cryAudio,
+  party: partyAudio,
+  July: julyAudio,
+  bunny: bunnyAudio,
+  baby: babyAudio,
+  sunny: sunnyAudio,
+  shy: shyAudio,
+};
+
+const GROUPS = [
+  {
+    title: "sky",
+    correctWords: ["cry", "July", "shy"],
+    items: [
+      { img: img1, word: "candy", alt: "Two wrapped candies" },
+      { img: img2, word: "Penny", alt: "A girl named Penny" },
+      { img: img3, word: "cry", alt: "A boy crying" },
+      { img: img4, word: "bunny", alt: "A brown bunny" },
+      { img: img5, word: "July", alt: "A July calendar" },
+      { img: img6, word: "baby", alt: "A crawling baby" },
+      { img: img7, word: "shy", alt: "A shy boy" },
+    ],
+  },
+  {
+    title: "candy",
+    correctWords: ["party", "bunny", "baby", "sunny"],
+    items: [
+      { img: img8, word: "sky", alt: "A blue cloud in the sky" },
+      { img: img9, word: "party", alt: "Children at a party" },
+      { img: img10, word: "July", alt: "A July calendar" },
+      { img: img11, word: "bunny", alt: "A brown bunny" },
+      { img: img12, word: "baby", alt: "A bright sun" },
+      { img: img1, word: "sunny", alt: "Two wrapped candies" },
+    ],
+  },
+];
+
+const itemKey = (groupIndex, itemIndex) => `${groupIndex}-${itemIndex}`;
+
+export default function Unit5_Page5_Q1() {
   const [answers, setAnswers] = useState(
-    groups.map((group) => Array(group.items.length).fill(false)),
+    GROUPS.map((group) => Array(group.items.length).fill(false)),
   );
-  const [locked, setLocked] = useState(false); // ⭐ NEW — يمنع التعديل بعد Show Answer
-  const getCorrectCount = (group) => {
-    return group.items.filter((item) => group.correctWords.includes(item.word))
-      .length;
-  };
-  // ----------- الداتا الجديدة الخاصة بسؤال short a ---------------
+  const [lockedItems, setLockedItems] = useState([]);
+  const [wrongItems, setWrongItems] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+
+  const totalCorrect = GROUPS.reduce(
+    (total, group) => total + group.correctWords.length,
+    0,
+  );
 
   const handleSelect = (groupIndex, itemIndex) => {
-    if (locked) return;
+    const group = GROUPS[groupIndex];
+    const item = group.items[itemIndex];
+    const key = itemKey(groupIndex, itemIndex);
+    playAudio(`word-${key}`, WORD_AUDIO[item.word]);
+    if (lockedItems.includes(key)) return;
 
-    const updated = answers.map((group) => [...group]);
-
-    const group = groups[groupIndex];
-
-    const correctLimit = getCorrectCount(group);
-
-    const currentSelectedCount = updated[groupIndex].filter(Boolean).length;
-
-    const isSelected = updated[groupIndex][itemIndex];
-
-    // 🔥 إذا بدو يختار زيادة → امنعه
-    if (!isSelected && currentSelectedCount >= correctLimit) return;
-
-    updated[groupIndex][itemIndex] = !updated[groupIndex][itemIndex];
-
-    setAnswers(updated);
+    setAnswers((previous) => {
+      const next = previous.map((row) => [...row]);
+      const selectedCount = next[groupIndex].filter(Boolean).length;
+      if (
+        !next[groupIndex][itemIndex] &&
+        selectedCount >= group.correctWords.length
+      ) {
+        return previous;
+      }
+      next[groupIndex][itemIndex] = !next[groupIndex][itemIndex];
+      return next;
+    });
+    setWrongItems((previous) => previous.filter((id) => id !== key));
   };
 
   const checkAnswers = () => {
-    if (locked) return;
-
-    // ✅ لازم على الأقل اختيار واحد من كل جروب
-    const hasEmptyGroup = answers.some(
-      (groupAnswers) => !groupAnswers.some((isSelected) => isSelected),
+    if (lockedItems.length === totalCorrect) return;
+    const incomplete = GROUPS.some(
+      (group, groupIndex) =>
+        answers[groupIndex].filter(Boolean).length !==
+        group.correctWords.length,
     );
-
-    if (hasEmptyGroup) {
+    if (incomplete) {
       ValidationAlert.info(
-        "Oops!",
-        "Please choose at least one picture from each group.",
+        "Please select all required pictures before checking.",
       );
       return;
     }
 
+    const nextLocked = [...lockedItems];
+    const nextWrong = [];
     let score = 0;
-    let total = 0;
-
-    groups.forEach((group, groupIndex) => {
+    GROUPS.forEach((group, groupIndex) => {
       group.items.forEach((item, itemIndex) => {
-        const isSelected = answers[groupIndex][itemIndex];
-        const isCorrect = group.correctWords.includes(item.word);
-
-        if (isCorrect) total++;
-
-        if (isSelected && isCorrect) {
-          score++;
+        if (!answers[groupIndex][itemIndex]) return;
+        const key = itemKey(groupIndex, itemIndex);
+        if (group.correctWords.includes(item.word)) {
+          score += 1;
+          if (!nextLocked.includes(key)) nextLocked.push(key);
+        } else {
+          nextWrong.push(key);
         }
       });
     });
-
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
-
-    const scoreMessage = `
-    <div style="font-size: 20px; text-align:center; margin-top: 8px;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${score} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (score === total) ValidationAlert.success(scoreMessage);
-    else if (score === 0) ValidationAlert.error(scoreMessage);
-    else ValidationAlert.warning(scoreMessage);
-
-    setLocked(true);
-  };
-  const resetAnswers = () => {
-    setAnswers(groups.map((group) => Array(group.items.length).fill(false)));
-    setLocked(false);
+    setLockedItems(nextLocked);
+    setWrongItems(nextWrong);
+    ValidationAlert[
+      score === totalCorrect ? "success" : score === 0 ? "error" : "warning"
+    ](`Score: ${score} / ${totalCorrect}`);
   };
 
-  // ⭐⭐⭐ NEW — Show Answer
   const showAnswer = () => {
-    const correctSelections = groups.map((group) =>
-      group.items.map((item) => group.correctWords.includes(item.word)),
+    setAnswers(
+      GROUPS.map((group) =>
+        group.items.map((item) => group.correctWords.includes(item.word)),
+      ),
     );
-
-    setAnswers(correctSelections);
-    setLocked(true);
+    setLockedItems(
+      GROUPS.flatMap((group, groupIndex) =>
+        group.items.flatMap((item, itemIndex) =>
+          group.correctWords.includes(item.word)
+            ? [itemKey(groupIndex, itemIndex)]
+            : [],
+        ),
+      ),
+    );
+    setWrongItems([]);
+    stopAudio();
   };
+
+  const resetAnswers = () => {
+    setAnswers(GROUPS.map((group) => Array(group.items.length).fill(false)));
+    setLockedItems([]);
+    setWrongItems([]);
+    stopAudio();
+  };
+
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         padding: "30px",
       }}
     >
-      <div
-        className="div-forall mb-10"
-        style={{
-          gap: "30px",
-        }}
-      >
-        <div>
-          <h5 className="header-title-page8">
-            <span className="ex-A" style={{ marginRight: "10px" }}>
-              A
-            </span>{" "}
-            Which pictures have the same
-            <span style={{ color: "#2e3192" }}> -y sound </span>? Tap or click.
-          </h5>
-        </div>
-
+      <div className="div-forall mb-10" style={{ gap: "30px" }}>
+        <ExerciseHeader
+          sectionLetter="A"
+          title={
+            <>
+              Which pictures have the same{" "}
+              <span style={{ color: "#2e3192" }}>-y sound?</span> Circle.
+            </>
+          }
+          subTitle="Say the picture names aloud, then tap the pictures that share the same final -y sound."
+        />
         <div
+          className="w-full"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -170,9 +199,9 @@ const Unit5_Page5_Q1 = () => {
             marginTop: "20px",
           }}
         >
-          {groups.map((group, groupIndex) => (
+          {GROUPS.map((group, groupIndex) => (
             <div
-              key={groupIndex}
+              key={group.title}
               style={{
                 border: "1px solid #F79530",
                 borderRadius: "18px",
@@ -182,7 +211,6 @@ const Unit5_Page5_Q1 = () => {
                 background: "#fff",
               }}
             >
-              {/* عنوان البوكس */}
               <div
                 style={{
                   position: "absolute",
@@ -198,8 +226,6 @@ const Unit5_Page5_Q1 = () => {
               >
                 {group.title}
               </div>
-
-              {/* العناصر داخل البوكس */}
               <div
                 style={{
                   display: "grid",
@@ -211,38 +237,54 @@ const Unit5_Page5_Q1 = () => {
                 }}
               >
                 {group.items.map((item, itemIndex) => {
+                  const key = itemKey(groupIndex, itemIndex);
                   const isSelected = answers[groupIndex][itemIndex];
-                  const isCorrect = group.correctWords.includes(item.word);
-                  const isWrong = locked && isSelected && !isCorrect;
-
+                  const isWrong = wrongItems.includes(key);
+                  const isLocked = lockedItems.includes(key);
                   return (
                     <div
-                      key={itemIndex}
+                      key={key}
+                      className="unit4-audio-control unit4-interactive"
                       onClick={() => handleSelect(groupIndex, itemIndex)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleSelect(groupIndex, itemIndex);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                      aria-label={
+                        isLocked
+                          ? `Play ${item.word}`
+                          : `${isSelected ? "Unselect" : "Select"} ${item.word}`
+                      }
                       style={{
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        cursor: locked ? "default" : "pointer",
+                        cursor: isLocked ? "default" : "pointer",
                         position: "relative",
                         minHeight: "120px",
                       }}
                     >
-                      {/* الدائرة الحمراء */}
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `word-${key}`}
+                      />
                       <div
                         style={{
                           width: "92px",
                           height: "92px",
-                          position: "relative", // 🔥 مهم
+                          position: "relative",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        {/* الصورة */}
                         <img
                           src={item.img}
-                          alt={item.word}
+                          alt={item.alt}
                           style={{
                             width: "74px",
                             height: "74px",
@@ -251,8 +293,6 @@ const Unit5_Page5_Q1 = () => {
                             zIndex: 1,
                           }}
                         />
-
-                        {/* 🔵 الدائرة فوق الصورة */}
                         {isSelected && (
                           <div
                             style={{
@@ -262,14 +302,12 @@ const Unit5_Page5_Q1 = () => {
                               border: isWrong
                                 ? "2px solid red"
                                 : "1px solid #F79530",
-                              zIndex: 2, // 🔥 فوق الصورة
+                              zIndex: 2,
                               pointerEvents: "none",
                             }}
                           />
                         )}
                       </div>
-
-                      {/* الكلمة تحت الصورة */}
                       <span
                         style={{
                           marginTop: "6px",
@@ -280,39 +318,12 @@ const Unit5_Page5_Q1 = () => {
                       >
                         {item.word}
                       </span>
-
-                      {/* اكس إذا غلط */}
                       {isWrong && (
                         <div
-                          style={{
-                            position: "absolute",
-                            right: "2px",
-                            top: "10%",
-                            transform: "translateY(-50%)",
-                            width: "22px",
-                            height: "22px",
-                            background: "red",
-                            color: "white",
-                            borderRadius: "50%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: "bold",
-                            border: "2px solid white",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                            zIndex: 99999,
-                            pointerEvents: "none",
-                          }}
+                          className="CB-unit5-p5-q1-wrong-x"
+                          aria-hidden="true"
                         >
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              lineHeight: "1",
-                              transform: "translateY(-1px)",
-                            }}
-                          >
-                            ✕
-                          </span>
+                          ✕
                         </div>
                       )}
                     </div>
@@ -323,21 +334,11 @@ const Unit5_Page5_Q1 = () => {
           ))}
         </div>
       </div>
-      <div className="action-buttons-container">
-        <button onClick={resetAnswers} className="try-again-button">
-          Start Again ↻
-        </button>
-        {/* ⭐⭐⭐ NEW: زر Show Answer */}
-        <button onClick={showAnswer} className="show-answer-btn swal-continue">
-          Show Answer
-        </button>
-
-        <button onClick={checkAnswers} className="check-button2">
-          Check Answer ✓
-        </button>
-      </div>
+      <Button
+        handleStartAgain={resetAnswers}
+        handleShowAnswer={showAnswer}
+        checkAnswers={checkAnswers}
+      />
     </div>
   );
-};
-
-export default Unit5_Page5_Q1;
+}

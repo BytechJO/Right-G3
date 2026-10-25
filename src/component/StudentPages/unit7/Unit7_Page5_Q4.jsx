@@ -1,260 +1,209 @@
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Page 62/Ex C 2.svg";
+import "../unit4/unit4Interactions.css";
 
-const Page8_Q4 = () => {
-  const grid = [
-    [
-      "y",
-      "i",
-      "d",
-      "k",
-      "n",
-      "d",
-      "d",
-      "t",
-      "h",
-      "e",
-      "p",
-      "h",
-      "b",
-      "s",
-      "d",
-      "l",
-      "p",
-      "l",
-      "a",
-      "y",
-      "g",
-      "r",
-      "o",
-      "u",
-      "n",
-      "d",
-    ],
-    [
-      "t",
-      "v",
-      "g",
-      "f",
-      "d",
-      "z",
-      "a",
-      "w",
-      "q",
-      "i",
-      "s",
-      "z",
-      "n",
-      "j",
-      "k",
-      "u",
-      "m",
-      "w",
-      "a",
-      "s",
-      "p",
-      "l",
-      "o",
-      "i",
-      "j",
-      "b",
-    ],
-    [
-      "f",
-      "x",
-      "b",
-      "e",
-      "h",
-      "i",
-      "n",
-      "d",
-      "q",
-      "w",
-      "u",
-      "i",
-      "b",
-      "g",
-      "h",
-      "n",
-      "t",
-      "h",
-      "e",
-      "l",
-      "o",
-      "k",
-      "m",
-      "a",
-      "f",
-      "c",
-    ],
-    ["s", "c", "h", "o", "o", "l", "r", "u", "i", "o", "k", "l"],
-  ];
-  const letters = grid;
-  const wordsToFind = [
-    { id: "the1", word: "the" },
-    { id: "playground", word: "playground" },
-    { id: "was", word: "was" },
-    { id: "behind", word: "behind" },
-    { id: "the2", word: "the" },
-    { id: "school", word: "school" },
-  ];
-  const correctPositions = {
-    the1: [7, 8, 9], // أول the
-    playground: [16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
-    was: [100 + 17, 100 + 18, 100 + 19], // w d s (اللي بالصورة)
-    behind: [200 + 2, 200 + 3, 200 + 4, 200 + 5, 200 + 6, 200 + 7],
-    the2: [200 + 16, 200 + 17, 200 + 18], // ثاني the
-    school: [300 + 0, 300 + 1, 300 + 2, 300 + 3, 300 + 4, 300 + 5],
-  };
-  const correctAnswers = [
-    { word: "the1", order: 0 },
-    { word: "playground", order: 1 },
-    { word: "was", order: 2 },
-    { word: "behind", order: 3 },
-    { word: "the2", order: 4 },
-    { word: "school", order: 5 },
-  ];
-  const [locked, setLocked] = useState(false);
-  const [sentence, setSentence] = useState("");
-  const [selected, setSelected] = useState([]);
-  const [currentWord, setCurrentWord] = useState("");
+const GRID = [
+  "yidknddthephbsdlplayground".split(""),
+  "tvgfdzawqisznjkumwasploijb".split(""),
+  "fxbehindqwuibghnthelokmafc".split(""),
+  "schoolruiokl".split(""),
+];
+
+// Keep both occurrences of "the" independent.
+const WORDS = [
+  { id: "the1", text: "the" },
+  { id: "playground", text: "playground" },
+  { id: "was", text: "was" },
+  { id: "behind", text: "behind" },
+  { id: "the2", text: "the" },
+  { id: "school", text: "school" },
+];
+
+const POSITIONS = {
+  the1: [
+    [0, 7],
+    [0, 8],
+    [0, 9],
+  ],
+  playground: Array.from({ length: 10 }, (_, i) => [0, 16 + i]),
+  was: [
+    [1, 17],
+    [1, 18],
+    [1, 19],
+  ],
+  behind: Array.from({ length: 6 }, (_, i) => [2, 2 + i]),
+  the2: [
+    [2, 16],
+    [2, 17],
+    [2, 18],
+  ],
+  school: Array.from({ length: 6 }, (_, i) => [3, i]),
+};
+
+const cellId = (row, column) => `${row}-${column}`;
+
+export default function Page8_Q4() {
   const [foundWords, setFoundWords] = useState([]);
-  const [coloredCells, setColoredCells] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const fullSentence = ["the", "playground", "was", "behind", "the", "school"];
+  const [pointerSelection, setPointerSelection] = useState([]);
+  const [keyboardStart, setKeyboardStart] = useState(null);
+  const [keyboardPreview, setKeyboardPreview] = useState([]);
+  const [locked, setLocked] = useState(false);
+  const [shakeInvalidSelection, setShakeInvalidSelection] = useState(false);
+  const pointerStartRef = useRef(null);
+  const pointerSelectionRef = useRef([]);
+  const gridRef = useRef(null);
 
-  const handleMouseDown = (index) => {
-    if (locked) return;
+  const foundCells = useMemo(
+    () =>
+      new Set(
+        foundWords.flatMap((wordId) =>
+          POSITIONS[wordId].map(([row, column]) => cellId(row, column)),
+        ),
+      ),
+    [foundWords],
+  );
 
-    const row = Math.floor(index / 100);
-    const col = index % 100;
-
-    setIsDragging(true);
-    setSelected([index]);
-    setCurrentWord(letters[row][col]);
-  };
-  const handleMouseEnter = (index) => {
-    if (!isDragging || locked) return;
-
-    const lastIndex = selected[selected.length - 1];
-
-    if (index === lastIndex + 1 || index === lastIndex - 1) {
-      if (!selected.includes(index)) {
-        const row = Math.floor(index / 100);
-        const col = index % 100;
-
-        setSelected((prev) => [...prev, index]);
-        setCurrentWord((prev) => prev + letters[row][col]);
-      }
+  const buildRange = (row, start, end) => {
+    const step = start <= end ? 1 : -1;
+    const cells = [];
+    for (
+      let column = start;
+      step > 0 ? column <= end : column >= end;
+      column += step
+    ) {
+      cells.push({ row, column });
     }
-  };
-  const displayedSentence = fullSentence.map((word, index) => {
-    const isFound = foundWords.some(
-      (foundWord) =>
-        correctAnswers.find((c) => c.word === foundWord)?.order === index,
-    );
-
-    const SLOT_LENGTH = 8;
-
-    if (isFound) {
-      return word.padEnd(SLOT_LENGTH, "");
-    }
-
-    return "_".repeat(SLOT_LENGTH);
-  });
-  const handleTouchMove = (e) => {
-    if (!isDragging || locked) return;
-    e.preventDefault(); // منع التمرير في الصفحة أثناء السحب
-
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
-
-    const index = element.getAttribute("data-index");
-    if (index !== null) {
-      handleMouseEnter(Number(index));
-    }
+    return cells;
   };
 
-  const handleMouseUp = () => {
-    if (locked) return;
-    setIsDragging(false);
-
-    const reversedWord = currentWord.split("").reverse().join("");
-
-    const matchedWord = wordsToFind.find(
-      (item) =>
-        (item.word === currentWord || item.word === reversedWord) &&
-        !foundWords.includes(item.id),
-    );
-
-    if (matchedWord && !foundWords.includes(matchedWord.id)) {
-      setFoundWords((prev) => [...prev, matchedWord.id]);
-      setColoredCells((prev) => [...prev, ...selected]);
-      setSentence(
-        wordsToFind
-          .filter((item) => [...foundWords, matchedWord.id].includes(item.id))
-          .map((item) => item.word)
-          .join(" "),
-      );
-    }
-
-    setSelected([]);
-    setCurrentWord("");
-  };
-
-  const reset = () => {
-    setSelected([]);
-    setCurrentWord("");
-    setFoundWords([]);
-    setColoredCells([]);
-    setSentence("");
-    setLocked(false);
-  };
-
-  const showAnswers = () => {
-    let allCells = [];
-    wordsToFind.forEach((item) => {
-      if (correctPositions[item.id]) {
-        allCells.push(...correctPositions[item.id]);
-      }
+  const commit = (cells) => {
+    const matched = WORDS.find(({ id }) => {
+      const positions = POSITIONS[id];
+      if (positions.length !== cells.length) return false;
+      const same = (sequence) =>
+        sequence.every(
+          ([row, column], index) =>
+            row === cells[index].row && column === cells[index].column,
+        );
+      return same(positions) || same([...positions].reverse());
     });
-    setFoundWords(wordsToFind.map((item) => item.id));
-    setColoredCells(allCells);
-    setSelected([]);
-    setCurrentWord("");
-    setSentence(wordsToFind.map((item) => item.word).join(" "));
-    setLocked(true);
+    if (!matched) return false;
+    setFoundWords((prev) =>
+      prev.includes(matched.id) ? prev : [...prev, matched.id],
+    );
+    return true;
+  };
+
+  const invalidSelection = () => {
+    setShakeInvalidSelection(false);
+    window.requestAnimationFrame(() => setShakeInvalidSelection(true));
+  };
+
+  const startPointer = (event, row, column) => {
+    if (locked || (event.pointerType === "mouse" && event.button !== 0)) return;
+    event.preventDefault();
+    pointerStartRef.current = { pointerId: event.pointerId, row, column };
+    const cells = [{ row, column }];
+    pointerSelectionRef.current = cells;
+    setPointerSelection(cells);
+    gridRef.current?.setPointerCapture?.(event.pointerId);
+  };
+
+  const movePointer = (event) => {
+    const start = pointerStartRef.current;
+    if (locked || !start || start.pointerId !== event.pointerId) return;
+    const cell = document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest?.("[data-word-cell]");
+    if (!cell || !gridRef.current?.contains(cell)) return;
+    const row = Number(cell.dataset.row);
+    const column = Number(cell.dataset.column);
+    if (row !== start.row) return;
+    const cells = buildRange(row, start.column, column);
+    pointerSelectionRef.current = cells;
+    setPointerSelection(cells);
+  };
+
+  const endPointer = (event) => {
+    if (!pointerStartRef.current) return;
+    if (event && event.pointerId !== pointerStartRef.current.pointerId) return;
+    pointerStartRef.current = null;
+    if (
+      !locked &&
+      pointerSelectionRef.current.length &&
+      !commit(pointerSelectionRef.current)
+    ) {
+      invalidSelection();
+    }
+    pointerSelectionRef.current = [];
+    setPointerSelection([]);
+  };
+
+  const cancelPointer = () => {
+    pointerStartRef.current = null;
+    pointerSelectionRef.current = [];
+    setPointerSelection([]);
+  };
+
+  const handleCellKeyDown = (event, row, column) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setKeyboardStart(null);
+      setKeyboardPreview([]);
+      return;
+    }
+    if (locked || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    if (!keyboardStart || keyboardStart.row !== row) {
+      setKeyboardStart({ row, column });
+      setKeyboardPreview([{ row, column }]);
+      return;
+    }
+    const cells = buildRange(row, keyboardStart.column, column);
+    if (!commit(cells)) invalidSelection();
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
   };
 
   const checkAnswers = () => {
     if (locked) return;
-    const total = wordsToFind.length;
-    const score = foundWords.length;
-
-    if (score === 0) {
-      ValidationAlert.info();
+    if (foundWords.length === 0) {
+      ValidationAlert.info("Find the hidden words before checking.");
       return;
     }
-
-    if (score < total) {
-      ValidationAlert.warning(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:orange;">Score: ${score} / ${total}</b>
-        </div>
-      `);
+    const score = foundWords.length;
+    if (score === WORDS.length) {
+      setLocked(true);
+      ValidationAlert.success(`Score: ${score} / ${WORDS.length}`);
     } else {
-      ValidationAlert.success(`
-        <div style="font-size:20px;text-align:center;">
-          <b style="color:green;">Score: ${score} / ${total}</b>
-        </div>
-      `);
+      ValidationAlert.warning(`Score: ${score} / ${WORDS.length}`);
     }
+  };
+
+  const showAnswers = () => {
+    setFoundWords(WORDS.map((word) => word.id));
+    cancelPointer();
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
     setLocked(true);
   };
+
+  const reset = () => {
+    setFoundWords([]);
+    cancelPointer();
+    setKeyboardStart(null);
+    setKeyboardPreview([]);
+    setLocked(false);
+    setShakeInvalidSelection(false);
+  };
+
+  const displayedSentence = WORDS.map(({ id, text }) =>
+    foundWords.includes(id) ? text : "________",
+  ).join(" ");
 
   return (
     <div
@@ -263,131 +212,130 @@ const Page8_Q4 = () => {
         flexDirection: "column",
         alignItems: "center",
         padding: "30px",
-
         width: "100%",
         boxSizing: "border-box",
       }}
     >
       <div className="div-forall">
-        <h5 className="header-title-page8 pb-2.5">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            C
-          </span>
-          Where was the playground in The New Boy in School on page 59?
-        </h5>
-
-        {/* Words List
-        <div className="flex flex-wrap justify-center gap-3 mb-5 border-2 border-dashed border-gray-300 rounded-[14px] p-3">
-          {wordsToFind.map((item) => (
-            <span
-              key={item.id}
-              className={`px-3 py-1.5 rounded-[10px] border-2 border-blue-800 ${
-                foundWords.includes(item.id)
-                  ? "bg-[#2c5287] text-white"
-                  : "bg-white text-black"
-              }`}
-            >
-              {item.word}
-            </span>
-          ))}
-        </div> */}
-
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Where was the playground in The New Boy in School on page 59?"
+          subTitle="Find the hidden location words in order, then read where the playground was."
+        />
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
-          {/* Grid Wrapper */}
           <div
             className="px-4 pt-4 pb-5"
             style={{ width: "fit-content", margin: "0 auto" }}
           >
             <div
-              className="bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10"
+              ref={gridRef}
+              className={`bg-[#daf5ff] rounded-[15px] p-2 sm:p-[15px] mb-10 ${shakeInvalidSelection ? "unit4-invalid-selection-shake" : ""}`}
+              onAnimationEnd={(event) => {
+                if (event.animationName === "shake-invalid-selection-unit4")
+                  setShakeInvalidSelection(false);
+              }}
+              onPointerMove={movePointer}
+              onPointerUp={endPointer}
+              onPointerCancel={cancelPointer}
               style={{
                 userSelect: "none",
                 width: "max-content",
-                touchAction: "none", // 🔥 الحل السحري لمنع تحريك الصفحة أثناء السحب على الآيباد
+                touchAction: "none",
                 WebkitOverflowScrolling: "touch",
               }}
             >
-              {letters.map((row, rowIndex) => (
+              {GRID.map((letters, rowIndex) => (
                 <div
                   key={rowIndex}
                   style={{
                     display: "flex",
-                    gap: "clamp(1px, 0.3vw, 4px)", // مسافة تتغير حسب الشاشة
+                    gap: "clamp(1px, 0.3vw, 4px)",
                     width: "fit-content",
                   }}
                 >
-                  {row.map((letter, colIndex) => {
-                    const index = rowIndex * 100 + colIndex;
-                    const isSelected = selected.includes(index);
-                    const isFound = coloredCells.includes(index);
-
+                  {letters.map((letter, columnIndex) => {
+                    const id = cellId(rowIndex, columnIndex);
+                    const pointerActive = pointerSelection.some(
+                      (cell) => cellId(cell.row, cell.column) === id,
+                    );
+                    const keyboardActive = keyboardPreview.some(
+                      (cell) => cellId(cell.row, cell.column) === id,
+                    );
+                    const isFound = foundCells.has(id);
                     return (
-                      <span
-                        key={index}
-                        data-index={index}
-                        onMouseDown={() => handleMouseDown(index)}
-                        onMouseEnter={() => handleMouseEnter(index)}
-                        onMouseUp={handleMouseUp}
-                        onDragStart={(e) => e.preventDefault()}
-                        onTouchStart={(e) => {
-                          e.preventDefault(); // 🔥 منع تحريك الصفحة عند بدء اللمس
-                          handleMouseDown(index);
+                      <button
+                        key={id}
+                        type="button"
+                        data-word-cell="true"
+                        data-row={rowIndex}
+                        data-column={columnIndex}
+                        className={`unit4-interactive ${keyboardActive ? "unit4-keyboard-preview" : ""}`}
+                        onPointerDown={(event) =>
+                          startPointer(event, rowIndex, columnIndex)
+                        }
+                        onFocus={() => {
+                          if (keyboardStart?.row === rowIndex) {
+                            setKeyboardPreview(
+                              buildRange(
+                                rowIndex,
+                                keyboardStart.column,
+                                columnIndex,
+                              ),
+                            );
+                          }
                         }}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleMouseUp}
-                        className={`
-                          flex items-center justify-center
-                          cursor-pointer
-                          transition
-                          ${isSelected ? "bg-[#ffd54f] rounded-sm" : ""}
-                          ${isFound ? "bg-[#4caf50] text-white rounded-sm" : ""}
-                        `}
+                        onKeyDown={(event) =>
+                          handleCellKeyDown(event, rowIndex, columnIndex)
+                        }
+                        aria-label={`${letter}, row ${rowIndex + 1}, position ${columnIndex + 1}`}
+                        tabIndex={locked ? -1 : 0}
                         style={{
-                          width: "clamp(16px, 2.5vw, 25px)", // 🔥 عرض ديناميكي
-                          height: "clamp(22px, 3.5vw, 35px)", // 🔥 طول ديناميكي
-                          fontSize: "clamp(12px, 1.8vw, 18px)", // 🔥 حجم خط ديناميكي
+                          width: "clamp(16px, 2.5vw, 25px)",
+                          height: "clamp(22px, 3.5vw, 35px)",
+                          flexShrink: 0,
+                          padding: 0,
+                          border: 0,
+                          borderRadius: "4px",
+                          background: isFound
+                            ? "#4caf50"
+                            : pointerActive || keyboardActive
+                              ? "#ffd54f"
+                              : "transparent",
+                          color: isFound ? "#fff" : "#111",
+                          fontSize: "clamp(12px, 1.8vw, 18px)",
+                          cursor: locked ? "default" : "pointer",
                         }}
                       >
                         {letter}
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
               ))}
             </div>
-
             <div className="flex justify-center items-center">
               <img
                 src={img1}
-                alt="start"
-                style={{
-                  width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
-                  height: "auto",
-                }}
+                alt="Illustration beside the beginning of the playground sentence"
+                style={{ width: "clamp(40px, 10vw, 100px)", height: "auto" }}
               />
-
               <input
                 className="answer-input-CB-unit3-p5-q4"
-                value={displayedSentence.join(" ")}
+                value={displayedSentence}
                 readOnly
-                style={{ fontFamily: "monospace" }} // 🔥 مهم جدا
+                aria-label="Completed playground sentence"
+                style={{ fontFamily: "monospace" }}
               />
-
               <img
                 src={img2}
-                alt="end"
-                style={{
-                  width: "clamp(40px, 10vw, 100px)", // 🔥 حجم ديناميكي للصور
-                  height: "auto",
-                }}
+                alt="Illustration beside the end of the playground sentence"
+                style={{ width: "clamp(40px, 10vw, 100px)", height: "auto" }}
               />
             </div>
           </div>
         </div>
-
-        {/* BUTTONS */}
         <Button
           handleShowAnswer={showAnswers}
           handleStartAgain={reset}
@@ -396,6 +344,4 @@ const Page8_Q4 = () => {
       </div>
     </div>
   );
-};
-
-export default Page8_Q4;
+}

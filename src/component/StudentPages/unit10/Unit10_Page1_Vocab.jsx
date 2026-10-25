@@ -35,7 +35,6 @@ import sound14 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound14.mp3";
 import sound15 from "../../../assets/audio/ClassBook/Unit 10/P 82/sound15.mp3";
 
 const Unit10_Page1_Vocab = () => {
-
   // ================================
   // ✔ Captions Array
   // ================================
@@ -100,7 +99,6 @@ const Unit10_Page1_Vocab = () => {
     sound15,
   ];
 
-
   const nums = [
     num1,
     num2,
@@ -119,7 +117,6 @@ const Unit10_Page1_Vocab = () => {
     num15,
   ];
 
- 
   return (
     <ModernVocabularyComponent
       backgroundImage={backgroundImage}
@@ -127,27 +124,27 @@ const Unit10_Page1_Vocab = () => {
       wordAudios={wordAudios}
       nums={nums}
       vocabulary={[
-         "beach",
-            "sea",
-            "swim",
-            "beach umbrella",
-            "float",
-            "sunglasses",
-            "sunscreen",
-            "pail",
-            "shovel",
-            "build a sandcastle",
-            "dig",
-            "beach ball",
-            "read a book",
-            "sand",
-            "goggles",
+        "beach",
+        "sea",
+        "swim",
+        "beach umbrella",
+        "float",
+        "sunglasses",
+        "sunscreen",
+        "pail",
+        "shovel",
+        "build a sandcastle",
+        "dig",
+        "beach ball",
+        "read a book",
+        "sand",
+        "goggles",
       ]}
       markers={positions}
+      pageId="unit10-page82-vocab"
       captions={captions}
     />
   );
 };
-
 
 export default Unit10_Page1_Vocab;

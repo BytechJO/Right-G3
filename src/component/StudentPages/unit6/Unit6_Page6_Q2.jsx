@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 51/Untitled-2.png";
 
 const Unit6_Page6_Q2 = () => {
   const letters = ["a", "e", "o", "i", "u"];
-  const [results, setResults] = useState({});
+  const [wrongSlots, setWrongSlots] = useState([]);
+  const [lockedSlots, setLockedSlots] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   const words = [
     {
@@ -146,22 +149,21 @@ const Unit6_Page6_Q2 = () => {
 
   const [answers, setAnswers] = useState(Array(totalSlots).fill(""));
 
-  const [locked, setLocked] = useState(false);
-
   // change select
   const handleSelect = (slot, value) => {
-    if (locked) return;
+    if (lockedSlots.includes(slot) || showAnswer) return;
 
     setAnswers((prev) => {
       const updated = [...prev];
       updated[slot] = value;
       return updated;
     });
+    setWrongSlots((previous) => previous.filter((id) => id !== slot));
   };
 
   // check
   const checkAnswers = () => {
-    if (locked) return;
+    if (lockedSlots.length === totalSlots || showAnswer) return;
 
     const usedSlots = words.flatMap((w) =>
       w.structure
@@ -177,7 +179,8 @@ const Unit6_Page6_Q2 = () => {
     }
 
     let score = 0;
-    let newResults = {};
+    const correctSlots = [];
+    const incorrectSlots = [];
 
     words.forEach((w) => {
       let isCorrect = true;
@@ -190,18 +193,20 @@ const Unit6_Page6_Q2 = () => {
 
           if (answers[slot] !== correctLetter) {
             isCorrect = false;
+            incorrectSlots.push(slot);
           } else {
             score++;
+            correctSlots.push(slot);
           }
 
           correctIndex++;
         }
       });
 
-      newResults[w.id] = isCorrect;
+      void isCorrect;
     });
-
-    setResults(newResults);
+    setLockedSlots(correctSlots);
+    setWrongSlots(incorrectSlots);
 
     const total = totalSlots;
 
@@ -216,14 +221,13 @@ const Unit6_Page6_Q2 = () => {
         </span>
       </div>
     `);
-
-    setLocked(true);
   };
 
   const reset = () => {
     setAnswers(Array(totalSlots).fill(""));
-    setResults({});
-    setLocked(false);
+    setWrongSlots([]);
+    setLockedSlots([]);
+    setShowAnswer(false);
   };
 
   const showAnswers = () => {
@@ -241,9 +245,9 @@ const Unit6_Page6_Q2 = () => {
     });
 
     setAnswers(filled);
-    setResults({});
-
-    setLocked(true);
+    setWrongSlots([]);
+    setLockedSlots(Array.from({ length: totalSlots }, (_, index) => index));
+    setShowAnswer(true);
   };
 
   return (
@@ -262,12 +266,11 @@ const Unit6_Page6_Q2 = () => {
           gap: "20px",
         }}
       >
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "15px" }} className="ex-A">
-            E
-          </span>
-       Look and write.
-        </h5>
+        <ExerciseHeader
+          sectionLetter="E"
+          title="Look and write."
+          subTitle="Use the month sequence as a guide, then complete each missing month carefully."
+        />
         <div className="flex gap-10">
           {/* الكلمات */}
           <div
@@ -334,7 +337,7 @@ const Unit6_Page6_Q2 = () => {
                       <select
                         key={item.slot}
                         value={answers[item.slot]}
-                        disabled={locked}
+                        disabled={lockedSlots.includes(item.slot) || showAnswer}
                         onChange={(e) =>
                           handleSelect(item.slot, e.target.value)
                         }
@@ -343,21 +346,16 @@ const Unit6_Page6_Q2 = () => {
                           height: "35px",
                           margin: "0 4px",
                           textAlign: "center",
-                          borderBottom: locked
-                            ? answers[item.slot] !==
-                              word.correct[
-                                word.structure
-                                  .filter((x) => typeof x !== "string")
-                                  .findIndex((x) => x.slot === item.slot)
-                              ]
-                              ? "2px solid red"
-                              : "1px solid #ccc"
+                          borderBottom: wrongSlots.includes(item.slot)
+                            ? "2px solid red"
                             : "1px solid #ccc",
                           // borderRadius: "6px",
                           fontWeight: "bold",
                           background: "#fff",
-                          cursor: locked? "default":"pointer",
-                          outline: "none",
+                          cursor:
+                            lockedSlots.includes(item.slot) || showAnswer
+                              ? "default"
+                              : "pointer",
                         }}
                       >
                         <option value=""></option>
@@ -372,7 +370,10 @@ const Unit6_Page6_Q2 = () => {
                   })}
                 </span>
 
-                {locked && results[word.id] === false && (
+                {word.structure.some(
+                  (item) =>
+                    typeof item !== "string" && wrongSlots.includes(item.slot),
+                ) && (
                   <span className="absolute -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">
                     ✕
                   </span>
@@ -382,7 +383,7 @@ const Unit6_Page6_Q2 = () => {
           </div>
           <img
             src={img1}
-            alt="exercise"
+            alt="A young month detective holding a calendar clue board"
             style={{
               width: "auto",
               height: "450px",

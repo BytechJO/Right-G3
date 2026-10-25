@@ -1,147 +1,43 @@
-import React, { useState } from "react";
-import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/G5_U7_Pg_58.png"; //======= should change ==========
-import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React from "react";
+
+import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/G5_U7_Pg_58.png";
 import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 7 Thats My School Folder/Interactive svg.svg";
+import FindQuestion from "../../FindQuestion";
+import targetAudio from "../../../assets/audio/ClassBook/Unit 7/page 58/Item_001_drum.mp3";
+const targetArea = {
+  x1: 64,
+  y1: 43,
+  x2: 72,
+  y2: 57.5,
+};
 
-const Unit3_Page1_find = () => {
-  const [clickedPoint, setClickedPoint] = useState(null);
-  const [checkResult, setCheckResult] = useState(null);
-  const [showAnswer, setShowAnswer] = useState(false);
-  // ✅ منطقة المطعم (بالنسب المئوية)
-  const targetArea = {
-    x1: 65,
-    y1: 40,
-    x2: 72,
-    y2: 46.5,
-  };
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-
-    setClickedPoint({
-      x: xPercent,
-      y: yPercent,
-      inside:
-        xPercent >= targetArea.x1 &&
-        xPercent <= targetArea.x2 &&
-        yPercent >= targetArea.y1 &&
-        yPercent <= targetArea.y2,
-    });
-  };
-
-  const handleCheck = () => {
-    if (showAnswer) return;
-    if (!clickedPoint) {
-      ValidationAlert.info(
-        "Pay attention!",
-        "Please click on the image first.",
-      );
-      return;
-    }
-
-    if (clickedPoint.inside) {
-      setCheckResult("success");
-      ValidationAlert.success("Bravo!", "You clicked on the restaurant! 🏆");
-    } else {
-      setCheckResult("fail");
-      ValidationAlert.error("Oops!", "This is not the restaurant. Try again!");
-    }
-  };
-
-  const handleStartAgain = () => {
-    setClickedPoint(null);
-    setCheckResult(null);
-    setShowAnswer(false);
-  };
-
-  const handleShowAnswer = () => {
-    setShowAnswer(true);
-    setClickedPoint(null); // نمسح النقطة اللي كبسها الطالب
-    setCheckResult("success"); // اختيارية إذا بدك يظهر نجاح
-  };
-
+const Unit7_Page1_find = () => {
   return (
-    <div>
-      <div
-        style={{
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          gap:"30px",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{ display: "flex", justifyContent: "center", width: "100%" }}
-        >
-          <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
-          <h5 className="header-title-page8">
-            I need your help. Can you help me find the drum in the picture?
-          </h5>
-        </div>
-        <div style={{ position: "relative", display: "inline-block" }}>
-          <img
-            src={find_img}
-            alt="interactive"
-            style={{
-              width: "auto",
-                  borderRadius:"15px",
-              height: "70vh",
-              cursor: "pointer",
-              display: "block",
-            }}
-            onClick={handleImageClick}
-          />
-
-          {/* ✅ الدائرة الحمراء في مكان الكبس */}
-          {clickedPoint && (
-            <div
-              style={{
-                position: "absolute",
-                top: `${clickedPoint.y}%`,
-                left: `${clickedPoint.x}%`,
-                width: "3%",
-                height: "3%",
-                backgroundColor: "red",
-                borderRadius: "50%",
-                transform: "translate(-50%, -50%)",
-                pointerEvents: "none",
-              }}
-            ></div>
-          )}
-
-          {/* ✅ تلوين المنطقة الصحيحة إذا الجواب صح */}
-          {(checkResult === "success" || showAnswer) && (
-            <img
-              src={MySVG}
-              alt="answer highlight"
-              style={{
-                position: "absolute",
-                top: `${targetArea.y1}%`,
-                left: `${targetArea.x1}%`,
-                width: `${targetArea.x2 - targetArea.x1}%`,
-                height: `${targetArea.y2 - targetArea.y1}%`,
-                pointerEvents: "none",
-              }}
-            />
-          )}
-        </div>
-      </div>
-      <div className="action-buttons-container ">
-        <button className="try-again-button" onClick={handleStartAgain}>
-          Start Again ↻
-        </button>
-        <button className="show-answer-btn" onClick={handleShowAnswer}>
-          Show Answer
-        </button>
-        <button className="check-button2" onClick={handleCheck}>
-          Check Answer ✓
-        </button>
-      </div>
-    </div>
+    <FindQuestion
+      title="Can you help me find a drum in the picture?"
+      subtitle="Scan the whole picture first, then tap the drum."
+      image={find_img}
+      imageAlt="A school scene with children and different objects, including a drum"
+      targetName="drum"
+      targetArea={targetArea}
+      targetAudio={targetAudio}
+      answerHighlight={MySVG}
+      imageHeight="70vh"
+      highlightTop="43%"
+      highlightLeft="64%"
+      highlightWidth="8%"
+      highlightHeight="12.5%"
+      targetAriaLabel="Select the drum"
+      pointerSelectedMessage="A point in the picture was selected. Use Check Answer to check it."
+      keyboardSelectedMessage="The drum was selected. Use Check Answer to check your answer."
+      correctAnnouncement="Correct. You found the drum."
+      correctAlertMessage="You found the drum! 🏆"
+      wrongAnnouncement="That is not the drum. Try again."
+      wrongAlertMessage="This is not the drum. Try again!"
+      resetAnnouncement="Activity reset. Find the drum in the picture."
+      showAnswerAnnouncement="The drum is highlighted."
+    />
   );
 };
 
-export default Unit3_Page1_find;
+export default Unit7_Page1_find;

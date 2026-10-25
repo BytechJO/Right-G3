@@ -2,6 +2,18 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import tryAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_001_try.mp3";
+import fryAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_002_fry.mp3";
+import grumpyAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_003_grumpy.mp3";
+import cryAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_004_cry.mp3";
+import sandyAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_005_sandy.mp3";
+import heartyAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_006_hearty.mp3";
+import partyAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_007_party.mp3";
+import spyAudio from "../../../assets/audio/WorkBook/unit5/Page 32 - Exercise C/Item_008_spy.mp3";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd6pg32instruction-adult-lady_xXPh6TKj.mp3"; // ← غيّر المسار حسب ملف الأوديو
 const ITEMS = [
   {
@@ -15,10 +27,22 @@ const ITEMS = [
     correct: ["sandy", "hearty", "party"],
   },
 ];
+const WORD_AUDIO = {
+  try: tryAudio,
+  fry: fryAudio,
+  grumpy: grumpyAudio,
+  cry: cryAudio,
+  sandy: sandyAudio,
+  hearty: heartyAudio,
+  party: partyAudio,
+  spy: spyAudio,
+};
 export default function WB_Unit5_Page32_Qc() {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const captions = [
     {
       start: 0.57,
@@ -28,10 +52,11 @@ export default function WB_Unit5_Page32_Qc() {
 
     { start: 10.92, end: 16.79, text: "1- try, grumpy, fry, cry." },
 
-    { start: 18.1, end: 22.73, text: "2- sandy, hardy, party, spy." },
+    { start: 18.1, end: 22.73, text: "2- sandy, hearty, party, spy." },
   ];
   const handleSelect = (id, word) => {
-    if (showAns || checked) return;
+    playAudio(`word-${id}-${word}`, WORD_AUDIO[word]);
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => {
       const current = prev[id] || [];
@@ -48,12 +73,10 @@ export default function WB_Unit5_Page32_Qc() {
         [id]: [...current, word],
       };
     });
-
-    setChecked(false);
   };
 
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]?.length > 0);
 
@@ -83,6 +106,18 @@ export default function WB_Unit5_Page32_Qc() {
     });
 
     setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => {
+          const selected = answers[item.id] || [];
+          return (
+            selected.length === item.correct.length &&
+            item.correct.every((word) => selected.includes(word))
+          );
+        }).map((item) => item.id),
+      ]),
+    ]);
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -102,17 +137,21 @@ export default function WB_Unit5_Page32_Qc() {
     setAnswers(filled);
     setChecked(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    stopAudio();
   };
 
   const isWrong = (item, word) => {
     if (!checked || showAns) return false;
-    return answers[item.id] === word && word !== item.correct;
+    return answers[item.id]?.includes(word) && !item.correct.includes(word);
   };
 
   const isSelected = (item, word) => {
@@ -134,19 +173,27 @@ export default function WB_Unit5_Page32_Qc() {
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "60px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>
-          Which words have the same{" "}
-          <span className="text-blue-900"> -y sound </span>? Listen and tap or
-          click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title={
+            <>
+              Which words have the same{" "}
+              <span class="text-blue-900">-y sound</span>? Listen and circle.
+            </>
+          }
+          subTitle="Listen carefully for the target sound, replay if needed, then choose the words that share the same -y sound that matches what you hear."
+        />
         <QuestionAudioPlayer
+          pageId="wb-unit5-page32-q3"
           src={sound1}
           captions={captions}
-          stopAtSecond={9.88}
+          stopAtSecond={9}
         />
         {/* LIST */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "60px" }}>
+        <div
+          className="w-full"
+          style={{ display: "flex", flexDirection: "column", gap: "60px" }}
+        >
           {ITEMS.map((item) => (
             <div
               key={item.id}
@@ -208,12 +255,26 @@ export default function WB_Unit5_Page32_Qc() {
                   return (
                     <div
                       key={word}
+                      className="unit4-audio-control unit4-interactive"
                       onClick={() => handleSelect(item.id, word)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleSelect(item.id, word);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-disabled={showAns || lockedIds.includes(item.id)}
+                      aria-label={`${selected ? "Unselect" : "Select"} and play ${word}`}
                       style={{
                         position: "relative",
                         padding: "6px 14px",
                         fontSize: "22px",
-                        cursor: showAns || checked ? "default" : "pointer",
+                        cursor:
+                          showAns || lockedIds.includes(item.id)
+                            ? "pointer"
+                            : "pointer",
                         borderRadius: "50%",
                         border: selected
                           ? wrong
@@ -222,6 +283,9 @@ export default function WB_Unit5_Page32_Qc() {
                           : "2px solid transparent",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `word-${item.id}-${word}`}
+                      />
                       {word}
                     </div>
                   );

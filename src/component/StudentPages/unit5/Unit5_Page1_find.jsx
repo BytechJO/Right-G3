@@ -1,147 +1,44 @@
-import React, { useState } from "react";
-import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/G5_U5_Pg_40.png"; //======= should change ==========
-import Rabbit from "../../../assets/Page 01/Rabbit.svg";
-import ValidationAlert from "../../Popup/ValidationAlert";
+import React from "react";
+
+import find_img from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/G5_U5_Pg_40.png";
 import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 5 At Toms House! Folder/Interactive.svg";
 
+import FindQuestion from "../../FindQuestion";
+
+import targetAudio from "../../../assets/audio/ClassBook/Unit 5/page 40/stove.mp3";
+
+const targetArea = {
+  x1: 79.8,
+  y1: 60.9,
+  x2: 86.1,
+  y2: 77.9,
+};
+
 const Unit5_Page1_find = () => {
-  const [clickedPoint, setClickedPoint] = useState(null);
-  const [checkResult, setCheckResult] = useState(null);
-  const [showAnswer, setShowAnswer] = useState(false);
-  // ✅ منطقة المطعم (بالنسب المئوية)
-  const targetArea = {
-    x1: 81.4,
-    y1: 60.9,
-    x2: 87.1,
-    y2: 66.9,
-  };
-
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-
-    setClickedPoint({
-      x: xPercent,
-      y: yPercent,
-      inside:
-        xPercent >= targetArea.x1 &&
-        xPercent <= targetArea.x2 &&
-        yPercent >= targetArea.y1 &&
-        yPercent <= targetArea.y2,
-    });
-  };
-
-  const handleCheck = () => {
-    if (showAnswer) return;
-    if (!clickedPoint) {
-      ValidationAlert.info(
-        "Pay attention!",
-        "Please click on the image first.",
-      );
-      return;
-    }
-
-    if (clickedPoint.inside) {
-      setCheckResult("success");
-      ValidationAlert.success("Bravo!", "You clicked on the restaurant! 🏆");
-    } else {
-      setCheckResult("fail");
-      ValidationAlert.error("Oops!", "This is not the restaurant. Try again!");
-    }
-  };
-
-  const handleStartAgain = () => {
-    setClickedPoint(null);
-    setCheckResult(null);
-    setShowAnswer(false);
-  };
-
-  const handleShowAnswer = () => {
-    setShowAnswer(true);
-    setClickedPoint(null); // نمسح النقطة اللي كبسها الطالب
-    setCheckResult("success"); // اختيارية إذا بدك يظهر نجاح
-  };
-
   return (
-    <div>
-      <div
-        style={{
-          textAlign: "center",
-          display: "flex",
-             gap:"30px",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{ display: "flex", justifyContent: "center", width: "100%" }}
-        >
-          <img src={Rabbit} style={{ height: "50px", width: "auto" }} />{" "}
-          <h5 className="header-title-page8">
-            I need your help. Can you help me find the stove in the picture?
-          </h5>
-        </div>
-        <div style={{ position: "relative", display: "inline-block" }}>
-          <img
-            src={find_img}
-            alt="interactive"
-            style={{
-              width: "auto",
-              height: "70vh",
-                             borderRadius:"15px",
-              cursor: "pointer",
-              display: "block",
-            }}
-            onClick={handleImageClick}
-          />
-
-          {/* ✅ الدائرة الحمراء في مكان الكبس */}
-          {clickedPoint && (
-            <div
-              style={{
-                position: "absolute",
-                top: `${clickedPoint.y}%`,
-                left: `${clickedPoint.x}%`,
-                width: "3%",
-                height: "3%",
-                backgroundColor: "red",
-                borderRadius: "50%",
-                transform: "translate(-50%, -50%)",
-                pointerEvents: "none",
-              }}
-            ></div>
-          )}
-
-          {/* ✅ تلوين المنطقة الصحيحة إذا الجواب صح */}
-          {(checkResult === "success" || showAnswer) && (
-            <img
-              src={MySVG}
-              alt="answer highlight"
-              style={{
-                position: "absolute",
-                top: `60.9%`,
-                
-                left: `79%`,
-                height: `7%`,
-                pointerEvents: "none",
-              }}
-            />
-          )}
-        </div>
-      </div>
-      <div className="action-buttons-container ">
-        <button className="try-again-button" onClick={handleStartAgain}>
-          Start Again ↻
-        </button>
-        <button className="show-answer-btn" onClick={handleShowAnswer}>
-          Show Answer
-        </button>
-        <button className="check-button2" onClick={handleCheck}>
-          Check Answer ✓
-        </button>
-      </div>
-    </div>
+    <FindQuestion
+      title="Can you help me find the stove in the picture?"
+      subtitle="Scan the whole picture first, then tap the stove."
+      image={find_img}
+      imageAlt="A cutaway view of a house showing several rooms with furniture and household objects, including a kitchen, living room, bedroom, bathroom, garage, and stove"
+      targetName="stove"
+      targetArea={targetArea}
+      targetAudio={targetAudio}
+      answerHighlight={MySVG}
+      imageHeight="70vh"
+      highlightTop="61.9%"
+      highlightLeft="78%"
+      highlightHeight="13%"
+      targetAriaLabel="Select the stove"
+      pointerSelectedMessage="A point in the picture was selected. Use Check Answer to check it."
+      keyboardSelectedMessage="The stove was selected. Use Check Answer to check your answer."
+      correctAnnouncement="Correct. You found the stove."
+      correctAlertMessage="You found the stove! 🏆"
+      wrongAnnouncement="That is not the stove. Try again."
+      wrongAlertMessage="This is not the stove. Try again!"
+      resetAnnouncement="Activity reset. Find the stove in the picture."
+      showAnswerAnnouncement="The stove is highlighted."
+    />
   );
 };
 

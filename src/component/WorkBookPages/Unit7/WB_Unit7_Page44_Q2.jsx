@@ -1,8 +1,10 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../Button";
-import AudioWithCaption from "../../AudioWithCaption";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
+import useWorkbookMatchingKeyboard from "../Unit4/useWorkbookMatchingKeyboard";
+import "../../StudentPages/unit4/unit4Interactions.css";
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd9pg44instruction2-adult-lady_nRQ4BWTI.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
 const ACTIVE_COLOR = "#f39b42";
@@ -44,13 +46,61 @@ const exerciseData = {
 
 export default function WB_Unit7_Page44_QB() {
   const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedBottom, setSelectedBottom] = useState(null);
   const [matches, setMatches] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [lines, setLines] = useState([]);
+  const [lockedTopIds, setLockedTopIds] = useState([]);
+  const [wrongTopIds, setWrongTopIds] = useState([]);
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
+  const anchorRefs = useRef({});
+  const lockedBottomIds = lockedTopIds.map((id) => matches[id]).filter(Boolean);
+  const commitMatch = useCallback(
+    (topId, bottomId) => {
+      const leftId = Number(topId);
+      const rightId = Number(bottomId);
+      if (
+        showAns ||
+        lockedTopIds.includes(leftId) ||
+        lockedBottomIds.includes(rightId)
+      )
+        return;
+      setMatches((previous) => {
+        const updated = { ...previous };
+        Object.keys(updated).forEach((key) => {
+          if (updated[key] === rightId && !lockedTopIds.includes(Number(key)))
+            delete updated[key];
+        });
+        updated[leftId] = rightId;
+        return updated;
+      });
+      setWrongTopIds((previous) => previous.filter((id) => id !== leftId));
+    },
+    [showAns, lockedTopIds, lockedBottomIds],
+  );
+  const getEndpoint = useCallback(
+    (side, id) =>
+      elementRefs.current[`${side === "left" ? "top" : "bottom"}-${id}`],
+    [],
+  );
+  const getAnchor = useCallback(
+    (side, id) =>
+      anchorRefs.current[`${side === "left" ? "top" : "bottom"}-${id}`],
+    [],
+  );
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: exerciseData.top.map((item) => item.id),
+    rightIds: exerciseData.bottom.map((item) => item.id),
+    getElement: getEndpoint,
+    getAnchorElement: getAnchor,
+    isLeftLocked: (id) => lockedTopIds.includes(Number(id)),
+    isRightLocked: (id) => lockedBottomIds.includes(Number(id)),
+    onCommit: commitMatch,
+  });
   const captions = [
     {
       start: 0.52,
@@ -74,8 +124,8 @@ export default function WB_Unit7_Page44_QB() {
 
       const newLines = Object.entries(matches)
         .map(([topId, bottomId]) => {
-          const topEl = elementRefs.current[`top-${topId}`];
-          const bottomEl = elementRefs.current[`bottom-${bottomId}`];
+          const topEl = anchorRefs.current[`top-${topId}`];
+          const bottomEl = anchorRefs.current[`bottom-${bottomId}`];
 
           if (!topEl || !bottomEl) return null;
 
@@ -101,31 +151,28 @@ export default function WB_Unit7_Page44_QB() {
   }, [matches]);
 
   const handleTopClick = (id) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedTopIds.includes(id)) return;
+    if (selectedBottom !== null) {
+      commitMatch(id, selectedBottom);
+      setSelectedBottom(null);
+      return;
+    }
     setSelectedTop(id);
-    setShowResults(false);
+    setSelectedBottom(null);
   };
 
   const handleBottomClick = (bottomId) => {
-    if (showAns || selectedTop === null || showResults) return;
-
-    const newMatches = { ...matches };
-
-    Object.keys(newMatches).forEach((key) => {
-      if (newMatches[key] === bottomId) {
-        delete newMatches[key];
-      }
-    });
-
-    newMatches[selectedTop] = bottomId;
-
-    setMatches(newMatches);
-    setSelectedTop(null);
-    setShowResults(false);
+    if (showAns || lockedBottomIds.includes(bottomId)) return;
+    if (selectedTop !== null) {
+      commitMatch(selectedTop, bottomId);
+      setSelectedTop(null);
+      return;
+    }
+    setSelectedBottom(bottomId);
   };
 
   const checkAnswers = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedTopIds.length === exerciseData.top.length) return;
 
     const allConnected = exerciseData.top.every((item) => matches[item.id]);
 
@@ -134,14 +181,25 @@ export default function WB_Unit7_Page44_QB() {
       return;
     }
 
+    const correctIds = Object.keys(exerciseData.correctMatches).flatMap(
+      (topId) =>
+        matches[topId] === exerciseData.correctMatches[topId]
+          ? [Number(topId)]
+          : [],
+    );
+    const incorrectIds = Object.keys(exerciseData.correctMatches).flatMap(
+      (topId) =>
+        matches[topId] !== exerciseData.correctMatches[topId]
+          ? [Number(topId)]
+          : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
-
-    let score = 0;
-    Object.keys(exerciseData.correctMatches).forEach((topId) => {
-      if (matches[topId] === exerciseData.correctMatches[topId]) {
-        score++;
-      }
-    });
+    setLockedTopIds(correctIds);
+    setWrongTopIds(incorrectIds);
+    setSelectedTop(null);
+    setSelectedBottom(null);
+    keyboard.clear();
 
     const totalQuestions = exerciseData.top.length;
 
@@ -159,6 +217,10 @@ export default function WB_Unit7_Page44_QB() {
     setShowResults(true);
     setShowAns(true);
     setSelectedTop(null);
+    setSelectedBottom(null);
+    setLockedTopIds(exerciseData.top.map((item) => item.id));
+    setWrongTopIds([]);
+    keyboard.clear();
   };
 
   const handleStartAgain = () => {
@@ -167,6 +229,10 @@ export default function WB_Unit7_Page44_QB() {
     setShowResults(false);
     setShowAns(false);
     setLines([]);
+    setSelectedBottom(null);
+    setLockedTopIds([]);
+    setWrongTopIds([]);
+    keyboard.clear();
   };
 
   const getDotColor = (side, id) => {
@@ -181,16 +247,15 @@ export default function WB_Unit7_Page44_QB() {
   };
 
   const isWrongMatch = (topId) => {
-    if (!showResults) return false;
-    if (!matches[topId]) return false;
-    return matches[topId] !== exerciseData.correctMatches[topId];
+    return wrongTopIds.includes(Number(topId));
   };
 
   const isTopSelected = (id) => selectedTop === id;
   const isTopConnected = (id) => !!matches[id];
   const isBottomConnected = (id) => Object.values(matches).includes(id);
   const isSelectedBottomMatch = (id) =>
-    selectedTop !== null && matches[selectedTop] === id;
+    selectedBottom === id ||
+    (selectedTop !== null && matches[selectedTop] === id);
 
   return (
     <div className="main-container-component">
@@ -369,20 +434,24 @@ export default function WB_Unit7_Page44_QB() {
           gap: "40px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          {" "}
-          <span className="WB-ex-A">B</span>
-           Listen and match.
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <ExerciseHeader
+          sectionLetter="B"
+          title="Listen and match."
+          subTitle="Listen to the full audio once, then replay as needed and match each audio item to the matching beginning letter only after you hear the key sound or word."
+        />
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <QuestionAudioPlayer
             src={sound1}
             captions={captions}
             stopAtSecond={5.18}
+            pageId="wb-unit7-page44-q2"
           />
         </div>
 
-        <div ref={containerRef} className="wb-d-board">
+        <div ref={containerRef} className="wb-d-board w-full">
           <svg
             style={{
               position: "absolute",
@@ -402,22 +471,43 @@ export default function WB_Unit7_Page44_QB() {
                 y1={line.y1}
                 x2={line.x2}
                 y2={line.y2}
-                stroke={"#f39b42"}
+                stroke={
+                  lockedTopIds.includes(Number(line.id.split("-")[0]))
+                    ? "#22c55e"
+                    : wrongTopIds.includes(Number(line.id.split("-")[0]))
+                      ? "#ef4444"
+                      : "#f39b42"
+                }
                 strokeWidth="2"
                 strokeLinecap="round"
               />
             ))}
+            {keyboard.preview && (
+              <line
+                {...keyboard.preview}
+                stroke="#f39b42"
+                strokeWidth="3"
+                strokeDasharray="8 7"
+                strokeLinecap="round"
+                className="unit4-keyboard-preview"
+              />
+            )}
           </svg>
 
           <div className="wb-d-top-row">
             {exerciseData.top.map((item) => {
-              const selected = isTopSelected(item.id);
+              const selected =
+                isTopSelected(item.id) ||
+                (keyboard.origin?.side === "left" &&
+                  keyboard.origin.id === item.id);
               const connected = isTopConnected(item.id);
               const wrong = isWrongMatch(item.id);
 
               return (
                 <div key={item.id} className="wb-d-top-item">
-                  <div
+                  <button
+                    type="button"
+                    ref={(el) => (elementRefs.current[`top-${item.id}`] = el)}
                     className={`wb-d-number-circle ${
                       selected
                         ? "selected"
@@ -428,24 +518,56 @@ export default function WB_Unit7_Page44_QB() {
                           : ""
                     }`}
                     onClick={() => handleTopClick(item.id)}
+                    tabIndex={lockedTopIds.includes(item.id) ? -1 : 0}
+                    aria-disabled={lockedTopIds.includes(item.id)}
+                    aria-label={`Match item ${item.text}`}
+                    onKeyDown={(event) =>
+                      keyboard.handleKeyDown(event, "left", item.id)
+                    }
+                    onFocus={() => keyboard.handleFocus("left", item.id)}
                     style={{
                       cursor: showAns ? "default" : "pointer",
                     }}
                   >
                     {item.text}
-                  </div>
+                  </button>
 
-                  <div
-                    ref={(el) => (elementRefs.current[`top-${item.id}`] = el)}
+                  <button
+                    type="button"
+                    ref={(el) => (anchorRefs.current[`top-${item.id}`] = el)}
                     className={`wb-d-dot ${selected ? "selected" : ""}`}
                     onClick={() => handleTopClick(item.id)}
+                    tabIndex={-1}
+                    aria-hidden="true"
                     style={{
                       backgroundColor: getDotColor("top", item.id),
                       cursor: showAns ? "default" : "pointer",
                     }}
                   />
 
-                  {wrong && <div className="wb-d-wrong">✕</div>}
+                  {wrong && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-6px",
+                        right: "-6px",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        background: "red",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      ✕
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -453,17 +575,21 @@ export default function WB_Unit7_Page44_QB() {
 
           <div className="wb-d-bottom-row">
             {exerciseData.bottom.map((item) => {
-              const selectedMatch = isSelectedBottomMatch(item.id);
+              const selectedMatch =
+                isSelectedBottomMatch(item.id) ||
+                (keyboard.origin?.side === "right" &&
+                  keyboard.origin.id === item.id);
               const connected = isBottomConnected(item.id);
 
               return (
                 <div key={item.id} className="wb-d-bottom-item">
-                  <div
-                    ref={(el) =>
-                      (elementRefs.current[`bottom-${item.id}`] = el)
-                    }
+                  <button
+                    type="button"
+                    ref={(el) => (anchorRefs.current[`bottom-${item.id}`] = el)}
                     className={`wb-d-dot ${selectedMatch ? "selected" : ""}`}
                     onClick={() => handleBottomClick(item.id)}
+                    tabIndex={-1}
+                    aria-hidden="true"
                     style={{
                       backgroundColor: getDotColor("bottom", item.id),
                       marginBottom: "10px",
@@ -472,17 +598,28 @@ export default function WB_Unit7_Page44_QB() {
                     }}
                   />
 
-                  <div
+                  <button
+                    type="button"
+                    ref={(el) =>
+                      (elementRefs.current[`bottom-${item.id}`] = el)
+                    }
                     className={`wb-d-number-circle ${
                       selectedMatch ? "selected" : connected ? "connected" : ""
                     }`}
                     onClick={() => handleBottomClick(item.id)}
+                    tabIndex={lockedBottomIds.includes(item.id) ? -1 : 0}
+                    aria-disabled={lockedBottomIds.includes(item.id)}
+                    aria-label={`Match letter ${item.text}`}
+                    onKeyDown={(event) =>
+                      keyboard.handleKeyDown(event, "right", item.id)
+                    }
+                    onFocus={() => keyboard.handleFocus("right", item.id)}
                     style={{
                       cursor: showAns ? "default" : "pointer",
                     }}
                   >
                     {item.text}
-                  </div>
+                  </button>
                 </div>
               );
             })}

@@ -1,20 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
+
 import page_6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Page 15.png";
-// import song from "../../../assets/img_unit2/sounds-unit2/Pg15.Sing_Adult Lady.mp3";
 import "./Unit2_Page6.css";
-import audioBtn from "../../../assets/Page 01/Audio btn.svg";
+
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
 
 const Unit2_Page6 = ({ openPopup }) => {
-
-
   return (
     <div
       className="page1-img-wrapper"
       style={{ backgroundImage: `url(${page_6})` }}
     >
-      {/* <img src={page_6} /> */}
-
       <div
         className="click-icon-unit2-page6-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -23,8 +19,20 @@ const Unit2_Page6 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 1"
           onClick={() => openPopup("exercise", { startIndex: 10 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 10 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -37,7 +45,6 @@ const Unit2_Page6 = ({ openPopup }) => {
         </svg>
       </div>
 
-
       <div
         className="click-icon-unit2-page6-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -46,8 +53,20 @@ const Unit2_Page6 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open exercise 2"
           onClick={() => openPopup("exercise", { startIndex: 11 })}
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup("exercise", { startIndex: 11 });
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"

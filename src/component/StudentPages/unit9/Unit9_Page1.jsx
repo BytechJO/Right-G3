@@ -1,13 +1,19 @@
-import { useState, useRef } from "react";
+import { useContext } from "react";
+
 import page_1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 76.png";
 import "./Unit9_Page1.css";
+
 import Unit5_Page1_Read from "./Unit9_Pag1_Read";
 import Unit5_Page1_Vocab from "./Unit9_Page1_Vocab";
 import Unit5_Page1_find from "./Unit9_Page1_find";
+
 import AudioWithCaption from "../../AudioWithCaption";
+
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
+
 import allunit3 from "../../../assets/audio/ClassBook/Unit 9/P 76/unit9-pg76-unitall.mp3";
+
 import sound1 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound1.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound2.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound3.mp3";
@@ -23,13 +29,10 @@ import sound12 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound12.mp3";
 import sound13 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound13.mp3";
 import sound14 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound14.mp3";
 import sound15 from "../../../assets/audio/ClassBook/Unit 9/P 76/sound15.mp3";
-import { useContext } from "react";
+
 import { AudioContext } from "../../../AudioContext";
 
 const Unit9_Page1 = ({ openPopup }) => {
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
-  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const { audioRef, activeId, setActiveId } = useContext(AudioContext);
 
   const captionsExample = [
@@ -89,53 +92,177 @@ const Unit9_Page1 = ({ openPopup }) => {
       text: "Page 77. Listen and read along. S. Bags, girls, peas.",
     },
   ];
+
+  const soundLabels = {
+    1: "Clinic",
+    2: "Post office",
+    3: "Restaurant",
+    4: "Swimming pool",
+    5: "Hospital",
+    6: "Car wash",
+    7: "Zoo",
+    8: "Airport",
+    9: "Bus stop",
+    10: "Gym",
+    11: "Bakery",
+    12: "Theater",
+    13: "Playground",
+    14: "Toy shop",
+    15: "Bank",
+  };
+
   const areas = [
-    // الصوت الأول – المنطقة الأساسية
     { x1: 86.21, y1: 22.05, sound: 1, isPrimary: true },
-    { x1: 76.73, y1: 15.95, x2: 86.21, y2: 22.05, sound: 1, isPrimary: false },
+    {
+      x1: 76.73,
+      y1: 15.95,
+      x2: 86.21,
+      y2: 22.05,
+      sound: 1,
+      isPrimary: false,
+    },
 
     { x1: 66.7, y1: 17.5, sound: 2, isPrimary: true },
-    { x1: 58.85, y1: 13.07, x2: 66.7, y2: 17.5, sound: 2, isPrimary: false },
+    {
+      x1: 58.85,
+      y1: 13.07,
+      x2: 66.7,
+      y2: 17.5,
+      sound: 2,
+      isPrimary: false,
+    },
 
     { x1: 43.5, y1: 15.9, sound: 3, isPrimary: true },
-    { x1: 43.55, y1: 13.41, x2: 55.4, y2: 20.18, sound: 3, isPrimary: false },
+    {
+      x1: 43.55,
+      y1: 13.41,
+      x2: 55.4,
+      y2: 20.18,
+      sound: 3,
+      isPrimary: false,
+    },
 
     { x1: 29.5, y1: 13.8, sound: 4, isPrimary: true },
-    { x1: 28.0, y1: 17.47, x2: 40.96, y2: 21.87, sound: 4, isPrimary: false },
+    {
+      x1: 28.0,
+      y1: 17.47,
+      x2: 40.96,
+      y2: 21.87,
+      sound: 4,
+      isPrimary: false,
+    },
 
     { x1: 91.3, y1: 33.3, sound: 5, isPrimary: true },
-    { x1: 79.75, y1: 26.27, x2: 90.95, y2: 32.26, sound: 5, isPrimary: false },
+    {
+      x1: 79.75,
+      y1: 26.27,
+      x2: 90.95,
+      y2: 32.26,
+      sound: 5,
+      isPrimary: false,
+    },
 
     { x1: 61, y1: 41.2, sound: 6, isPrimary: true },
-    { x1: 56.91, y1: 38.12, x2: 65.31, y2: 41.33, sound: 6, isPrimary: false },
+    {
+      x1: 56.91,
+      y1: 38.12,
+      x2: 65.31,
+      y2: 41.33,
+      sound: 6,
+      isPrimary: false,
+    },
 
     { x1: 39.2, y1: 59.4, sound: 7, isPrimary: true },
-    { x1: 32.35, y1: 56.06, x2: 54.54, y2: 62.15, sound: 7, isPrimary: false },
+    {
+      x1: 32.35,
+      y1: 56.06,
+      x2: 54.54,
+      y2: 62.15,
+      sound: 7,
+      isPrimary: false,
+    },
 
     { x1: 44, y1: 48.9, sound: 8, isPrimary: true },
-    { x1: 39.03, y1: 46.24, x2: 55.62, y2: 52.67, sound: 8, isPrimary: false },
+    {
+      x1: 39.03,
+      y1: 46.24,
+      x2: 55.62,
+      y2: 52.67,
+      sound: 8,
+      isPrimary: false,
+    },
 
     { x1: 75.3, y1: 55.4, sound: 9, isPrimary: true },
-    { x1: 71.99, y1: 50.13, x2: 81.47, y2: 55.72, sound: 9, isPrimary: false },
+    {
+      x1: 71.99,
+      y1: 50.13,
+      x2: 81.47,
+      y2: 55.72,
+      sound: 9,
+      isPrimary: false,
+    },
 
     { x1: 71.6, y1: 36.6, sound: 10, isPrimary: true },
-    { x1: 70.05, y1: 33.72, x2: 82.33, y2: 38.97, sound: 10, isPrimary: false },
+    {
+      x1: 70.05,
+      y1: 33.72,
+      x2: 82.33,
+      y2: 38.97,
+      sound: 10,
+      isPrimary: false,
+    },
 
     { x1: 65.7, y1: 47.4, sound: 11, isPrimary: true },
-    { x1: 57.77, y1: 44.72, x2: 65.7, y2: 47.4, sound: 11, isPrimary: false },
+    {
+      x1: 57.77,
+      y1: 44.72,
+      x2: 65.7,
+      y2: 47.4,
+      sound: 11,
+      isPrimary: false,
+    },
 
     { x1: 60.3, y1: 27.4, sound: 12, isPrimary: true },
-    { x1: 53.68, y1: 23.9, x2: 62.3, y2: 29.4, sound: 12, isPrimary: false },
+    {
+      x1: 53.68,
+      y1: 23.9,
+      x2: 62.3,
+      y2: 29.4,
+      sound: 12,
+      isPrimary: false,
+    },
 
     { x1: 63.1, y1: 54.14, sound: 13, isPrimary: true },
-    { x1: 60.14, y1: 51.32, x2: 69.19, y2: 54, sound: 13, isPrimary: false },
+    {
+      x1: 60.14,
+      y1: 51.32,
+      x2: 69.19,
+      y2: 54,
+      sound: 13,
+      isPrimary: false,
+    },
 
     { x1: 69, y1: 27.4, sound: 14, isPrimary: true },
-    { x1: 66.17, y1: 22.21, x2: 74.79, y2: 28.98, sound: 14, isPrimary: false },
+    {
+      x1: 66.17,
+      y1: 22.21,
+      x2: 74.79,
+      y2: 28.98,
+      sound: 14,
+      isPrimary: false,
+    },
 
     { x1: 40.5, y1: 33.4, sound: 15, isPrimary: true },
-    { x1: 40.53, y1: 31.01, x2: 54.75, y2: 36.43, sound: 15, isPrimary: false },
+    {
+      x1: 40.53,
+      y1: 31.01,
+      x2: 54.75,
+      y2: 36.43,
+      sound: 15,
+      isPrimary: false,
+    },
   ];
+
   const sounds = {
     1: sound1,
     2: sound2,
@@ -154,82 +281,73 @@ const Unit9_Page1 = ({ openPopup }) => {
     15: sound15,
   };
 
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-    console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
-  };
   const playSound = (path, id) => {
     if (!audioRef.current) return;
 
-    // 🔥 وقف أي صوت شغال بأي صفحة
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
 
     audioRef.current.src = path;
     audioRef.current.play();
 
-    setActiveId(id); // 🔥 مهم للهايلايت
+    setActiveId(id);
 
     audioRef.current.onended = () => {
       setActiveId(null);
     };
   };
+
+  const openMainAudio = () => {
+    openPopup(
+      "audio",
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <AudioWithCaption
+          src={allunit3}
+          captions={captionsExample}
+          pageId="unit9-page76-main-audio"
+        />
+      </div>,
+    );
+  };
+
+  const openFind = () => {
+    openPopup(
+      "html",
+      <>
+        <Unit5_Page1_find />
+      </>,
+    );
+  };
+
+  const openVocab = () => {
+    openPopup(
+      "html",
+      <>
+        <Unit5_Page1_Vocab />
+      </>,
+    );
+  };
+
+  const openRead = () => {
+    openPopup(
+      "html",
+      <>
+        <Unit5_Page1_Read />
+      </>,
+    );
+  };
+
   return (
     <div
       className="page1-img-wrapper"
-      onClick={handleImageClick}
       style={{ backgroundImage: `url(${page_1})` }}
     >
-      <audio ref={audioRef} style={{ display: "none" }} />
-
-      {areas.map((area, index) => {
-      const isActive = activeId === `p76-${area.sound}`;
-
-        // ============================
-        // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
-        // ============================
-        if (area.isPrimary) {
-          return (
-            <div
-              key={index}
-              className={`circle-area ${isActive ? "active" : ""}`}
-              style={{
-                left: `${area.x1}%`,
-                top: `${area.y1}%`,
-              }}
-              onClick={() => {
-                  // setActiveAreaIndex(area.sound);
-                  playSound(sounds[area.sound], `p76-${area.sound}`);
-                }}
-            ></div>
-          );
-        }
-
-        // ============================
-        // 2️⃣ المناطق الفرعية → مربعات داكنة مخفية ولازم
-        //    عند الضغط عليها → تفعّل الدائرة الأساسية
-        // ============================
-        return (
-          <div
-            key={index}
-            className="clickable-area"
-            style={{
-              position: "absolute",
-              left: `${area.x1}%`,
-              top: `${area.y1}%`,
-              width: `${area.x2 - area.x1}%`,
-              height: `${area.y2 - area.y1}%`,
-            }}
-           onClick={() => {
-                  // setActiveAreaIndex(area.sound);
-                  playSound(sounds[area.sound], `p76-${area.sound}`);
-                }}
-          ></div>
-        );
-      })}
-
       <div
         className="headset-icon-CD-unit9-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -238,21 +356,20 @@ const Unit9_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "audio",
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignContent: "center",
-                }}
-              >
-                <AudioWithCaption src={allunit3} captions={captionsExample} />
-              </div>,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Play Unit 9 page 76 audio"
+          onClick={openMainAudio}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openMainAudio();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -273,15 +390,20 @@ const Unit9_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "html",
-              <>
-                <Unit5_Page1_find />
-              </>,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Open find activity"
+          onClick={openFind}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openFind();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -293,6 +415,7 @@ const Unit9_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="headset-icon-CD-unit9-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -301,15 +424,20 @@ const Unit9_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "html",
-              <>
-                <Unit5_Page1_Vocab />
-              </>,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Open Unit 9 vocabulary activity"
+          onClick={openVocab}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openVocab();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -321,6 +449,7 @@ const Unit9_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="click-icon-unit9-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -329,15 +458,20 @@ const Unit9_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "html",
-              <>
-                <Unit5_Page1_Read />
-              </>,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Open Unit 9 reading activity"
+          onClick={openRead}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openRead();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -349,6 +483,60 @@ const Unit9_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
+      {areas.map((area, index) => {
+        const areaId = `p76-${area.sound}`;
+        const isActive = activeId === areaId;
+
+        if (area.isPrimary) {
+          return (
+            <div
+              key={index}
+              className={`circle-area page4-audio-hotspot ${
+                isActive ? "active" : ""
+              }`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Play pronunciation: ${soundLabels[area.sound]}`}
+              aria-pressed={isActive}
+              style={{
+                left: `${area.x1}%`,
+                top: `${area.y1}%`,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                playSound(sounds[area.sound], areaId);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  playSound(sounds[area.sound], areaId);
+                }
+              }}
+            />
+          );
+        }
+
+        return (
+          <div
+            key={index}
+            className="clickable-area"
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: `${area.x1}%`,
+              top: `${area.y1}%`,
+              width: `${area.x2 - area.x1}%`,
+              height: `${area.y2 - area.y1}%`,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              playSound(sounds[area.sound], areaId);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

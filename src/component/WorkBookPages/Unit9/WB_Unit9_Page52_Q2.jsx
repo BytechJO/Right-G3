@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/7.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/6.svg";
@@ -8,6 +13,12 @@ import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folde
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/10.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/9.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 52/SVG/8.svg";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise D/Item_001_They_were_at_the_bakery_yesterday.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise D/Item_002_She_is_at_the_library_now.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise D/Item_003_He_was_at_the_bus_stop_a_week_ago.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise D/Item_004_She_is_at_the_airport_now.mp3";
+import sentence5Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise D/Item_005_They_were_at_the_clinic_last_week.mp3";
+import sentence6Audio from "../../../assets/audio/WorkBook/unit 9/Page 52 - Exercise D/Item_006_was_at_work_today.mp3";
 
 import {
   DndContext,
@@ -34,14 +45,22 @@ const SENTENCES = [
   "They were at the clinic last week.",
   "I was at work today.",
 ];
+const SENTENCE_AUDIO = [
+  sentence1Audio,
+  sentence2Audio,
+  sentence3Audio,
+  sentence4Audio,
+  sentence5Audio,
+  sentence6Audio,
+];
 
 const ITEMS = [
-  { id: 1, img: img1 },
-  { id: 2, img: img2 },
-  { id: 3, img: img3 },
-  { id: 4, img: img4 },
-  { id: 5, img: img5 },
-  { id: 6, img: img6 },
+  { id: 1, img: img1, alt: "A woman at an airport" },
+  { id: 2, img: img2, alt: "People at a bakery" },
+  { id: 3, img: img3, alt: "A girl at a library" },
+  { id: 4, img: img4, alt: "People at a clinic" },
+  { id: 5, img: img5, alt: "A person at work" },
+  { id: 6, img: img6, alt: "A boy at a bus stop" },
 ];
 
 const CORRECT_ANSWERS = {
@@ -83,15 +102,14 @@ const ErrorBadge = () => (
 );
 
 // ── Draggable Number ───────────────────────────────────────────
-function DraggableNumber({ num, disabled, activeId }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: `number-${num}`,
-      data: {
-        num,
-      },
-      disabled,
-    });
+function DraggableNumber({ num, disabled, activeId, register, pick }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `number-${num}`,
+    data: {
+      num,
+    },
+    disabled,
+  });
 
   const style = {
     width: "45px",
@@ -116,21 +134,58 @@ function DraggableNumber({ num, disabled, activeId }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div
+      ref={(element) => {
+        setNodeRef(element);
+        register(`number-${num}`, element);
+      }}
+      style={style}
+      {...listeners}
+      {...attributes}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled}
+      aria-label={`Number ${num}, press Enter or Space to pick up`}
+      className="unit4-interactive"
+      onKeyDown={(event) => {
+        if (!disabled && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          event.stopPropagation();
+          pick();
+        }
+      }}
+    >
       {num}
     </div>
   );
 }
 
 // ── Drop Zone ──────────────────────────────────────────────────
-function DropImage({ item, num, wrong, checked, showAns, handleRemove }) {
+function DropImage({
+  item,
+  num,
+  preview,
+  wrong,
+  locked,
+  handleRemove,
+  register,
+  onKeyDown,
+}) {
   const { setNodeRef, isOver } = useDroppable({
     id: `drop-${item.id}`,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register(`drop-${item.id}`, element);
+      }}
+      role="button"
+      tabIndex={!locked && (num || preview) ? 0 : -1}
+      aria-disabled={locked}
+      onKeyDown={onKeyDown}
+      className={`unit4-drop-target unit4-interactive ${preview && !num ? "unit4-keyboard-preview" : ""}`}
       style={{
         display: "flex",
         // justifyContent: "center",
@@ -154,7 +209,7 @@ function DropImage({ item, num, wrong, checked, showAns, handleRemove }) {
         {/* الصورة */}
         <img
           src={item.img}
-          alt={`item-${item.id}`}
+          alt={item.alt}
           style={{
             width: "100%",
             height: "auto",
@@ -182,7 +237,7 @@ function DropImage({ item, num, wrong, checked, showAns, handleRemove }) {
 
         {/* مربع الرقم */}
         <div
-          onClick={() => handleRemove(item.id)}
+          onClick={() => num && !locked && handleRemove(item.id)}
           style={{
             position: "absolute",
 
@@ -204,12 +259,12 @@ function DropImage({ item, num, wrong, checked, showAns, handleRemove }) {
 
             zIndex: 5,
 
-            cursor: num && !showAns && !checked ? "pointer" : "default",
+            cursor: num && !locked ? "pointer" : "default",
 
             transition: "0.2s ease",
           }}
         >
-          {num || ""}
+          {num || preview || ""}
         </div>
 
         {/* Error Badge */}
@@ -222,9 +277,12 @@ function DropImage({ item, num, wrong, checked, showAns, handleRemove }) {
 // ── Main Component ─────────────────────────────────────────────
 export default function WB_Unit8_Page52_QD() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
+  const [, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [activeId, setActiveId] = useState(null);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -248,21 +306,10 @@ export default function WB_Unit8_Page52_QD() {
   };
 
   // ── Drag End ─────────────────────────────────────────────────
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-
-    setActiveId(null);
-
-    if (!over || showAns) return;
-
-    const draggedNum = active.data.current?.num;
-
-    const dropId = Number(over.id.toString().replace("drop-", ""));
-
-    if (!draggedNum || !dropId) return;
-
-    setChecked(false);
-
+  const place = (numberId, targetId) => {
+    const draggedNum = Number(String(numberId).replace("number-", ""));
+    const dropId = Number(String(targetId).replace("drop-", ""));
+    if (!draggedNum || !dropId || showAns || lockedIds.includes(dropId)) return;
     setAnswers((prev) => {
       const updated = { ...prev };
 
@@ -276,11 +323,26 @@ export default function WB_Unit8_Page52_QD() {
 
       return updated;
     });
+    setWrongIds((prev) => prev.filter((id) => id !== dropId));
+  };
+  const keyboard = useUnit4TabDrag({
+    itemIds: NUMBERS.map((num) => `number-${num}`),
+    targetIds: ITEMS.map((item) => `drop-${item.id}`),
+    isItemDisabled: (id) =>
+      usedNumbers.includes(Number(String(id).replace("number-", ""))) ||
+      showAns,
+    isTargetDisabled: (id) =>
+      lockedIds.includes(Number(String(id).replace("drop-", ""))) || showAns,
+    onPlace: place,
+  });
+  const handleDragEnd = ({ active, over }) => {
+    if (over) place(String(active.id), String(over.id));
+    setActiveId(null);
   };
 
   // ── Remove ───────────────────────────────────────────────────
   const handleRemove = (id) => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => {
       const updated = { ...prev };
@@ -289,11 +351,14 @@ export default function WB_Unit8_Page52_QD() {
     });
 
     setChecked(false);
+    setWrongIds((prev) => prev.filter((itemId) => itemId !== id));
+    const removed = answers[id];
+    if (removed) keyboard.focusItem(`number-${removed}`);
   };
 
   // ── Check ────────────────────────────────────────────────────
   const handleCheck = () => {
-    if (showAns || checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -311,6 +376,19 @@ export default function WB_Unit8_Page52_QD() {
     });
 
     setChecked(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter(
+          (item) => answers[item.id] === CORRECT_ANSWERS[item.id],
+        ).map((item) => item.id),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== CORRECT_ANSWERS[item.id]).map(
+        (item) => item.id,
+      ),
+    );
 
     const total = ITEMS.length;
 
@@ -328,6 +406,10 @@ export default function WB_Unit8_Page52_QD() {
     setAnswers({ ...CORRECT_ANSWERS });
     setChecked(false);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   // ── Reset ────────────────────────────────────────────────────
@@ -336,9 +418,13 @@ export default function WB_Unit8_Page52_QD() {
     setChecked(false);
     setShowAns(false);
     setActiveId(null);
+    setLockedIds([]);
+    setWrongIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
-  const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
+  const isWrong = (id) => wrongIds.includes(id);
 
   return (
     <div className="main-container-component">
@@ -349,13 +435,15 @@ export default function WB_Unit8_Page52_QD() {
         }}
       >
         {/* العنوان */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>
-      Read, look, and number the pictures.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Read, look, and number the pictures."
+          subTitle="Read all past or present sentence to the correct place picture clues first, then assign the numbers carefully so the picture or order is used correctly."
+        />
 
         {/* الجمل */}
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
@@ -384,6 +472,19 @@ export default function WB_Unit8_Page52_QD() {
               </span>
 
               <p
+                className="unit4-audio-control unit4-interactive"
+                role="button"
+                tabIndex={0}
+                aria-label={`Play: ${sentence}`}
+                onClick={() =>
+                  playAudio(`sentence-${index}`, SENTENCE_AUDIO[index])
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio(`sentence-${index}`, SENTENCE_AUDIO[index]);
+                  }
+                }}
                 style={{
                   margin: 0,
                   fontSize: "18px",
@@ -393,6 +494,9 @@ export default function WB_Unit8_Page52_QD() {
                 }}
               >
                 {sentence}
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `sentence-${index}`}
+                />
               </p>
             </div>
           ))}
@@ -406,6 +510,7 @@ export default function WB_Unit8_Page52_QD() {
           onDragEnd={handleDragEnd}
         >
           <div
+            className="w-full"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -419,12 +524,15 @@ export default function WB_Unit8_Page52_QD() {
                 num={num}
                 disabled={usedNumbers.includes(num) || showAns}
                 activeId={activeId}
+                register={keyboard.registerItem}
+                pick={() => keyboard.pickItem(`number-${num}`)}
               />
             ))}
           </div>
 
           {/* الصور */}
           <div
+            className="w-full"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, minmax(0,1fr))",
@@ -437,10 +545,30 @@ export default function WB_Unit8_Page52_QD() {
                 key={item.id}
                 item={item}
                 num={answers[item.id]}
+                preview={
+                  keyboard.keyboardTargetId === `drop-${item.id}`
+                    ? Number(
+                        String(keyboard.keyboardItemId).replace("number-", ""),
+                      )
+                    : ""
+                }
                 wrong={isWrong(item.id)}
-                checked={checked}
-                showAns={showAns}
+                locked={showAns || lockedIds.includes(item.id)}
                 handleRemove={handleRemove}
+                register={keyboard.registerTarget}
+                onKeyDown={(event) => {
+                  if (
+                    !keyboard.keyboardItemId &&
+                    answers[item.id] &&
+                    !lockedIds.includes(item.id) &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    handleRemove(item.id);
+                    return;
+                  }
+                  keyboard.handleTargetKeyDown(event, `drop-${item.id}`);
+                }}
               />
             ))}
           </div>

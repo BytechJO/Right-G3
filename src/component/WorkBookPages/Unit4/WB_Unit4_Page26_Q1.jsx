@@ -1,6 +1,13 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 import Button from "../Button";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import useWorkbookMatchingKeyboard from "./useWorkbookMatchingKeyboard";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise A/Item_001_Lolo_is_thirsty.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit4/Page 26 - Exercise A/Item_002_He_thanks_his_mother_with_a_flower.mp3";
 
 import rightImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 26/Ex A  1.svg";
 import rightImg2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 26/Ex A  2.svg";
@@ -35,16 +42,22 @@ const exerciseData = {
     2: 1,
   },
 };
+const LEFT_IDS = exerciseData.left.map((item) => item.id);
+const RIGHT_IDS = exerciseData.right.map((item) => item.id);
 
 export default function WB_Unit3_Page26_QA() {
   const [selectedLeft, setSelectedLeft] = useState(null);
+  const [selectedRight, setSelectedRight] = useState(null);
   const [matches, setMatches] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
   const [lines, setLines] = useState([]);
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const sentenceAudio = { 1: sentence1Audio, 2: sentence2Audio };
 
   useLayoutEffect(() => {
     const updateLines = () => {
@@ -81,13 +94,19 @@ export default function WB_Unit3_Page26_QA() {
   }, [matches]);
 
   const handleLeftClick = (id) => {
-    if (showAns) return;
+    if (showAns || lockedIds.includes(id)) return;
+    if (selectedRight !== null) {
+      assignMatch(id, selectedRight);
+      return;
+    }
     setSelectedLeft(id);
-    setShowResults(false);
+    setSelectedRight(null);
   };
 
-  const handleRightClick = (rightId) => {
-    if (showAns || selectedLeft === null || showResults) return;
+  const assignMatch = (leftId, rightId) => {
+    if (showAns || lockedIds.includes(leftId)) return;
+    const lockedOwner = Object.keys(matches).find((key) => matches[key] === rightId && lockedIds.includes(Number(key)));
+    if (lockedOwner) return;
 
     const newMatches = { ...matches };
 
@@ -97,15 +116,28 @@ export default function WB_Unit3_Page26_QA() {
       }
     });
 
-    newMatches[selectedLeft] = rightId;
+    newMatches[leftId] = rightId;
 
     setMatches(newMatches);
     setSelectedLeft(null);
+    setSelectedRight(null);
     setShowResults(false);
   };
 
+  const handleRightClick = (rightId) => {
+    const isLockedTarget = Object.keys(matches).some(
+      (key) => matches[key] === rightId && lockedIds.includes(Number(key)),
+    );
+    if (showAns || isLockedTarget) return;
+    if (selectedLeft !== null) assignMatch(selectedLeft, rightId);
+    else {
+      setSelectedRight(rightId);
+      setSelectedLeft(null);
+    }
+  };
+
   const checkAnswers = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === exerciseData.left.length) return;
 
     const allConnected = exerciseData.left.every((item) => matches[item.id]);
 
@@ -113,8 +145,13 @@ export default function WB_Unit3_Page26_QA() {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
+    keyboardMatch.clear();
+    setSelectedLeft(null);
+    setSelectedRight(null);
 
     setShowResults(true);
+    const correctIds = exerciseData.left.filter((item) => matches[item.id] === exerciseData.correctMatches[item.id]).map((item) => item.id);
+    setLockedIds((prev) => [...new Set([...prev, ...correctIds])]);
 
     let score = 0;
     Object.keys(exerciseData.correctMatches).forEach((leftId) => {
@@ -135,18 +172,26 @@ export default function WB_Unit3_Page26_QA() {
   };
 
   const handleShowAnswer = () => {
+    keyboardMatch.clear();
     setMatches(exerciseData.correctMatches);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(exerciseData.left.map((item) => item.id));
     setSelectedLeft(null);
+    setSelectedRight(null);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
+    keyboardMatch.clear();
     setMatches({});
     setSelectedLeft(null);
+    setSelectedRight(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
     setLines([]);
+    stopAudio();
   };
 
   const getDotColor = (side, id) => {
@@ -168,9 +213,38 @@ export default function WB_Unit3_Page26_QA() {
 
   const isLeftSelected = (id) => selectedLeft === id;
   const isLeftConnected = (id) => !!matches[id];
-  const isRightConnected = (id) => Object.values(matches).includes(id);
-  const isSelectedRightMatch = (id) =>
-    selectedLeft !== null && matches[selectedLeft] === id;
+  const isSelectedRightMatch = (id) => selectedRight === id || (selectedLeft !== null && matches[selectedLeft] === id);
+  const getKeyboardElement = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `left-button-${id}` : `right-${id}`],
+    [],
+  );
+  const getKeyboardAnchor = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `left-${id}` : `right-${id}`],
+    [],
+  );
+  const isLeftLocked = useCallback((id) => lockedIds.includes(id), [lockedIds]);
+  const isRightLocked = useCallback(
+    (id) => Object.keys(matches).some((key) => matches[key] === id && lockedIds.includes(Number(key))),
+    [lockedIds, matches],
+  );
+  const keyboardMatch = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: LEFT_IDS,
+    rightIds: RIGHT_IDS,
+    getElement: getKeyboardElement,
+    getAnchorElement: getKeyboardAnchor,
+    isLeftLocked,
+    isRightLocked,
+    onCommit: assignMatch,
+    onStart: (side, id) => {
+      if (side === "left") handleLeftClick(id);
+      else handleRightClick(id);
+    },
+    onCancel: () => {
+      setSelectedLeft(null);
+      setSelectedRight(null);
+    },
+  });
 
   return (
     <div className="main-container-component">
@@ -359,11 +433,7 @@ export default function WB_Unit3_Page26_QA() {
           gap: "90px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          {" "}
-          <span className="WB-ex-A">A</span>
-        Read and match.
-        </h1>
+        <ExerciseHeader sectionLetter="A" title="Read and match." subTitle="Read each th-sound sentence to the matching picture first, then connect it to the matching picture or answer one pair at a time." />
 
         <div ref={containerRef} className="wb-a26-grid">
           <svg
@@ -390,6 +460,15 @@ export default function WB_Unit3_Page26_QA() {
                 strokeLinecap="round"
               />
             ))}
+            {keyboardMatch.preview && (
+              <line
+                {...keyboardMatch.preview}
+                stroke={LINE_COLOR}
+                strokeWidth="3.5"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
+            )}
           </svg>
 
           <div className="wb-a26-left-col">
@@ -403,6 +482,7 @@ export default function WB_Unit3_Page26_QA() {
                   <div className="wb-a26-num">{item.id}</div>
 
                   <div
+                    ref={(el) => (elementRefs.current[`left-button-${item.id}`] = el)}
                     className={`wb-a26-text ${
                       selected
                         ? "selected"
@@ -412,11 +492,28 @@ export default function WB_Unit3_Page26_QA() {
                             : "connected"
                           : ""
                     }`}
-                    onClick={() => handleLeftClick(item.id)}
+                    onClick={() => {
+                      playAudio(`sentence-${item.id}`, sentenceAudio[item.id]);
+                      handleLeftClick(item.id);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play and select: ${item.text}`}
+                    aria-disabled={showAns || lockedIds.includes(item.id)}
+                    draggable={!showAns && !lockedIds.includes(item.id)}
+                    onDragStart={() => handleLeftClick(item.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => selectedRight !== null && assignMatch(item.id, selectedRight)}
+                    onKeyDown={(event) => {
+                      if (!keyboardMatch.origin && (event.key === "Enter" || event.key === " ")) playAudio(`sentence-${item.id}`, sentenceAudio[item.id]);
+                      keyboardMatch.handleKeyDown(event, "left", item.id);
+                    }}
+                    onFocus={() => keyboardMatch.handleFocus("left", item.id)}
                     style={{
-                      cursor: showAns ? "default" : "pointer",
+                      cursor: showAns || lockedIds.includes(item.id) ? "default" : "pointer",
                     }}
                   >
+                    <Unit4PlayingAudioIcon active={activeAudioKey === `sentence-${item.id}`} />
                     {item.text}
                   </div>
 
@@ -441,13 +538,24 @@ export default function WB_Unit3_Page26_QA() {
           <div className="wb-a26-right-col">
             {exerciseData.right.map((item) => {
               const selectedMatch = isSelectedRightMatch(item.id);
-              const connected = isRightConnected(item.id);
 
               return (
                 <div key={item.id} className="wb-a26-right-row">
                   <div
                     ref={(el) => (elementRefs.current[`right-${item.id}`] = el)}
                     onClick={() => handleRightClick(item.id)}
+                    role="button"
+                    tabIndex={isRightLocked(item.id) ? -1 : 0}
+                    aria-disabled={showAns || isRightLocked(item.id)}
+                    aria-label={`Connect to picture ${item.id}`}
+                    draggable={!showAns && !isRightLocked(item.id)}
+                    onDragStart={() => handleRightClick(item.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => selectedLeft !== null && assignMatch(selectedLeft, item.id)}
+                    onKeyDown={(event) => {
+                      keyboardMatch.handleKeyDown(event, "right", item.id);
+                    }}
+                    onFocus={() => keyboardMatch.handleFocus("right", item.id)}
                     className={`wb-a26-dot ${selectedMatch ? "selected" : ""}`}
                     style={{
                       backgroundColor: getDotColor("right", item.id),
@@ -466,7 +574,7 @@ export default function WB_Unit3_Page26_QA() {
                   >
                     <img
                       src={item.img}
-                      alt={`match-${item.id}`}
+                      alt={item.id === 1 ? "A child thanking his mother with a flower" : "A thirsty cat beside water"}
                       className="wb-a26-right-img"
                     />
                   </div>

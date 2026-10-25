@@ -1,12 +1,43 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
 
 // الصور
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 34/D.1.svg";
+import item1Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/Item_001_The_third_boy.mp3";
+import item2Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/Item_002_The_boy_is_riding_a_bike.mp3";
+import item3Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/Item_003_The_sixth_boy.mp3";
+import item4Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/Item_004_The_boy_is_kicking_the_ball.mp3";
+import item5Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/Item_005_The_fourth_boy.mp3";
+import item6Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/Item_006_The_boy_is_skateboarding.mp3";
+import full1Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/full1.mp3";
+import full2Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/full2.mp3";
+import full3Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/full3.mp3";
+import full4Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/full4.mp3";
+import full5Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/full5.mp3";
+import full6Audio from "../../../assets/audio/WorkBook/unit6/Page 34 - Exercise D/full6.mp3";
 
 const WRONG_COLOR = "#ef4444";
-const CORRECT_COLOR = "#22c55e";
+const ITEM_AUDIO = {
+  1: item1Audio,
+  2: item2Audio,
+  3: item3Audio,
+  4: item4Audio,
+  5: item5Audio,
+  6: item6Audio,
+};
+const FULL_AUDIO = {
+  1: full1Audio,
+  2: full2Audio,
+  3: full3Audio,
+  4: full4Audio,
+  5: full5Audio,
+  6: full6Audio,
+};
 
 const ITEMS = [
   {
@@ -57,17 +88,21 @@ export default function WB_LookReadWrite_PageD() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
-    setShowResults(false);
+    setWrongIds((previous) => previous.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((i) => answers[i.id]);
 
@@ -83,6 +118,19 @@ export default function WB_LookReadWrite_PageD() {
     });
 
     setShowResults(true);
+    setLockedIds((previous) => [
+      ...new Set([
+        ...previous,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     const total = ITEMS.length;
 
@@ -100,29 +148,37 @@ export default function WB_LookReadWrite_PageD() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) =>
-    showResults && !showAns && answers[item.id] !== item.correct;
+    showResults && !showAns && wrongIds.includes(item.id);
 
   return (
     <div className="main-container-component">
       <div className="div-forall">
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">D</span>Look, read, and write.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Look, read, and write."
+          subTitle="Use the ordinal boy and action in each sentence to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
            
        <div className="flex flex-col justify-start items-start gap-20">
           <img
             src={img1}
-            alt=""
+            alt="Six boys in order: riding a bike, skateboarding, running, singing, kicking a ball, and eating ice cream"
             style={{ width: "auto", height: "150px", objectFit: "contain" }}
           />
     
@@ -138,18 +194,67 @@ export default function WB_LookReadWrite_PageD() {
           {ITEMS.map((item) => (
             <div
               key={item.id}
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              className={
+                lockedIds.includes(item.id)
+                  ? "unit4-full-audio-enabled unit4-audio-control"
+                  : ""
+              }
+              role={lockedIds.includes(item.id) ? "button" : undefined}
+              tabIndex={lockedIds.includes(item.id) ? 0 : undefined}
+              onClick={() => {
+                if (lockedIds.includes(item.id))
+                  playAudio(`full-${item.id}`, FULL_AUDIO[item.id]);
+              }}
+              onKeyDown={(event) => {
+                if (
+                  lockedIds.includes(item.id) &&
+                  (event.key === "Enter" || event.key === " ")
+                ) {
+                  event.preventDefault();
+                  playAudio(`full-${item.id}`, FULL_AUDIO[item.id]);
+                }
+              }}
+              style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative" }}
             >
+              <Unit4PlayingAudioIcon
+                active={activeAudioKey === `full-${item.id}`}
+              />
               <span style={{ fontWeight: "bold", fontSize: "18px" }}>
                 {item.id}
               </span>
 
-              <span style={{ fontSize: "18px" }}>{item.sentence.before}</span>
+              <span
+                className="unit4-audio-control unit4-interactive"
+                role="button"
+                tabIndex={0}
+                onClick={(event) => {
+                  if (lockedIds.includes(item.id)) return;
+                  event.stopPropagation();
+                  playAudio(`item-${item.id}`, ITEM_AUDIO[item.id]);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    if (lockedIds.includes(item.id)) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    playAudio(`item-${item.id}`, ITEM_AUDIO[item.id]);
+                  }
+                }}
+                style={{ fontSize: "18px", position: "relative", cursor: "pointer" }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `item-${item.id}`}
+                />
+                {item.sentence.before}
+              </span>
 
               <select
                 value={answers[item.id] || ""}
                 onChange={(e) => handleSelect(item.id, e.target.value)}
-                disabled={showAns || showResults}
+                disabled={showAns || lockedIds.includes(item.id)}
+                onClick={(event) => {
+                  if (!lockedIds.includes(item.id)) event.stopPropagation();
+                }}
                 style={{
                   minWidth: "140px",
                   height: "36px",
@@ -159,6 +264,7 @@ export default function WB_LookReadWrite_PageD() {
                   }`,
                   padding: "4px 8px",
                   fontSize: "18px",
+                  pointerEvents: lockedIds.includes(item.id) ? "none" : "auto",
                 }}
               >
                 <option value="" disabled>

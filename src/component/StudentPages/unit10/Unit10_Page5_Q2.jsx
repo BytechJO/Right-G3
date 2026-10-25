@@ -10,6 +10,25 @@ import Button from "../../Button";
 import blue from "../../../assets/audio/ClassBook/Unit 10/P 86/unit10-pg86-EXA2.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+import brAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise A2/Item_001_br.mp3";
+import grAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise A2/Item_002_gr.mp3";
+import trAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise A2/Item_003_tr.mp3";
+import crAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise A2/Item_004_cr.mp3";
+import drAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise A2/Item_005_dr.mp3";
+import frAudio from "../../../assets/audio/ClassBook/Unit 10/Page 86 - Exercise A2/Item_006_fr.mp3";
+
+const optionAudio = {
+  br: brAudio,
+  gr: grAudio,
+  tr: trAudio,
+  cr: crAudio,
+  dr: drAudio,
+  fr: frAudio,
+};
 
 const Unit10_Page5_Q2 = () => {
   const items = [
@@ -35,24 +54,25 @@ const Unit10_Page5_Q2 = () => {
     },
   ];
   const captions = [
-  {
-    start: 0.28,
-    end: 6.899,
-    text: "Page 86, write activities, exercise A, number two. Listen and choose."
-  },
-  {
-    start: 6.899,
-    end: 15.46,
-    text: "One, grapes. Two, train. Three, fries. Four, broom."
-  }
-];
+    {
+      start: 0.28,
+      end: 6.899,
+      text: "Page 86, write activities, exercise A, number two. Listen and choose.",
+    },
+    {
+      start: 6.899,
+      end: 15.46,
+      text: "One, grapes. Two, train. Three, fries. Four, broom.",
+    },
+  ];
   const [selected, setSelected] = useState(Array(items.length).fill(""));
   const [answers, setAnswers] = useState(Array(items.length).fill(""));
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const chooseOption = (i, value) => {
-    if (locked) return;
+    if (lockedIds.includes(i)) return;
 
     const newSelected = [...selected];
     newSelected[i] = value;
@@ -61,23 +81,27 @@ const Unit10_Page5_Q2 = () => {
     const newAnswers = [...answers];
     newAnswers[i] = items[i].start + value + items[i].end;
     setAnswers(newAnswers);
+    setWrongIds((previous) => previous.filter((id) => id !== i));
   };
 
   const resetAll = () => {
     setSelected(Array(items.length).fill(""));
     setAnswers(Array(items.length).fill(""));
-    setLocked(false);
-    setShowResult(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const showAnswers = () => {
     setSelected(items.map((i) => i.correct));
     setAnswers(items.map((i) => i.start + i.correct + i.end));
-    setLocked(true);
+    setLockedIds(items.map((_, index) => index));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (lockedIds.length === items.length) return;
 
     if (selected.includes("")) {
       ValidationAlert.info();
@@ -108,8 +132,16 @@ const Unit10_Page5_Q2 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setLocked(true);
-    setShowResult(true); // 🔥 مهم
+    setLockedIds(
+      items.flatMap((item, index) =>
+        selected[index] === item.correct ? [index] : [],
+      ),
+    );
+    setWrongIds(
+      items.flatMap((item, index) =>
+        selected[index] !== item.correct ? [index] : [],
+      ),
+    );
   };
 
   return (
@@ -121,15 +153,24 @@ const Unit10_Page5_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall" style={{
+      <div
+        className="div-forall"
+        style={{
           gap: "50px",
-          
-        }}>
-        <h5 className="header-title-page8">
-          <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>
-         Listen and choose.
-        </h5>
-        <QuestionAudioPlayer src={blue} captions={captions} stopAtSecond={6.3} />
+        }}
+      >
+        <ExerciseHeader
+          sectionLetter="A"
+          questionNumber="2"
+          title="Listen and choose."
+          subTitle="Listen to the beginning blend, then choose the letters that match the sound you hear."
+        />
+        <QuestionAudioPlayer
+          src={blue}
+          captions={captions}
+          stopAtSecond={6.3}
+          pageId="unit10-page86-a2"
+        />
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-10 mb-10 px-2">
           {items.map((item, i) => (
@@ -143,23 +184,30 @@ const Unit10_Page5_Q2 = () => {
               }}
             >
               <div className="flex gap-2">
-              {/* الرقم */}
-              <div style={{ fontWeight: "bold", fontSize: "18px" }}>
-                {i + 1}
-              </div>
+                {/* الرقم */}
+                <div style={{ fontWeight: "bold", fontSize: "18px" }}>
+                  {i + 1}
+                </div>
 
-              {/* الصورة */}
-              <img
-                src={item.img}
-                alt=""
-                style={{
-                  width: "100%",
-                
-                  height: "120px",
-                  objectFit: "contain",
-                }}
-              />
-</div>
+                {/* الصورة */}
+                <img
+                  src={item.img}
+                  alt={
+                    [
+                      "A bunch of purple grapes.",
+                      "A blue and red train.",
+                      "A carton of French fries.",
+                      "A broom.",
+                    ][i]
+                  }
+                  style={{
+                    width: "100%",
+
+                    height: "120px",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
               {/* الخيارات */}
               <div
                 style={{
@@ -180,24 +228,39 @@ const Unit10_Page5_Q2 = () => {
                   }
 
                   if (
-                    showResult &&
+                    wrongIds.includes(i) &&
                     selected[i] === opt &&
                     opt !== item.correct
                   ) {
                     borderColor = "red";
-                    
                   }
 
                   return (
                     <div
                       key={idx}
-                      onClick={() => chooseOption(i, opt)}
+                      role="button"
+                      tabIndex={lockedIds.includes(i) ? -1 : 0}
+                      aria-disabled={lockedIds.includes(i)}
+                      onClick={() => {
+                        if (lockedIds.includes(i)) return;
+                        playAudio(`option-${i}-${idx}`, optionAudio[opt]);
+                        chooseOption(i, opt);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          if (lockedIds.includes(i)) return;
+                          playAudio(`option-${i}-${idx}`, optionAudio[opt]);
+                          chooseOption(i, opt);
+                        }
+                      }}
+                      className="unit4-interactive unit4-audio-control"
                       style={{
                         flex: 1,
                         textAlign: "center",
                         padding: "4px 8px", // padding شامل عشان يبان كـ زر
                         borderRadius: "20px",
-                        cursor: locked ? "not-allowed" : "pointer",
+                        cursor: lockedIds.includes(i) ? "default" : "pointer",
                         border: `2px solid ${borderColor}`,
                         backgroundColor: bgColor,
                         fontWeight: "500",
@@ -208,9 +271,12 @@ const Unit10_Page5_Q2 = () => {
                       }}
                     >
                       {opt}
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `option-${i}-${idx}`}
+                      />
 
                       {/* ❌ أيقونة الخطأ */}
-                      {showResult &&
+                      {wrongIds.includes(i) &&
                         selected[i] === opt &&
                         opt !== item.correct && (
                           <div

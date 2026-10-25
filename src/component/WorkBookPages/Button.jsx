@@ -1,7 +1,11 @@
-const Button = ({ handleStartAgain, handleShowAnswer, checkAnswers }) => {
+const Button = ({
+  handleStartAgain,
+  handleShowAnswer,
+  checkAnswers,
+  checkDisabled = false,
+}) => {
   return (
     <div className="action-buttons-container">
-
       {handleStartAgain && (
         <button onClick={handleStartAgain} className="try-again-button">
           Start Again ↻
@@ -9,17 +13,28 @@ const Button = ({ handleStartAgain, handleShowAnswer, checkAnswers }) => {
       )}
 
       {handleShowAnswer && (
-        <button onClick={handleShowAnswer} className="show-answer-btn swal-continue">
+        <button
+          onClick={handleShowAnswer}
+          className="show-answer-btn swal-continue"
+        >
           Show Answer
         </button>
       )}
 
       {checkAnswers && (
-        <button onClick={checkAnswers} className="check-button2">
+        <button
+          onClick={() => {
+            if (checkDisabled) return;
+
+            checkAnswers();
+          }}
+          className="check-button2"
+          aria-disabled={checkDisabled}
+          tabIndex={0}
+        >
           Check Answer ✓
         </button>
       )}
-
     </div>
   );
 };

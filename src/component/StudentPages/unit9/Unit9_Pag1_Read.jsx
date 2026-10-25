@@ -40,6 +40,8 @@ const Unit5_Page1_Read = () => {
         popupOpen={true}
         titleQ={"Listen and read along."}
         audioArr={imageSounds}
+        pageId="unit9-page76-read"
+        subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
         captions={captions}
       />
     </>

@@ -1,6 +1,33 @@
-import React, { useMemo, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useMemo, useRef, useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import "./Review3_Page1_Q2.css";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import useUnit4TabDrag from "../unit4/useUnit4TabDrag";
+import "../unit4/unit4Interactions.css";
+import answer1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_001_Yes,_they_have_some.mp3";
+import answer2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_002_No,_she_hasn't_any.mp3";
+import answer3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_003_No,_he_hasn't_any.mp3";
+import answer4Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_004_Yes,_she_has_some.mp3";
+import question1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_005_Do_they_have_any_milkshakes.mp3";
+import question2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_006_Does_she_have_any_potatoes.mp3";
+import question3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_007_Does_he_have_any_salad.mp3";
+import question4Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/Item_008_Does_she_have_any_fruit.mp3";
+import full1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/full1.mp3";
+import full2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/full2.mp3";
+import full3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/full3.mp3";
+import full4Audio from "../../../assets/audio/ClassBook/Unit 4/Page 34 - Exercise B/full4.mp3";
+
+const ANSWER_AUDIO = [answer1Audio, answer2Audio, answer3Audio, answer4Audio];
+const QUESTION_AUDIO = [
+  question1Audio,
+  question2Audio,
+  question3Audio,
+  question4Audio,
+];
+const FULL_AUDIO = [full1Audio, full2Audio, full3Audio, full4Audio];
 
 import {
   DndContext,
@@ -18,7 +45,17 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frien
 /* =========================
    DRAGGABLE WORD
 ========================= */
-const DraggableWord = ({ word, disabled }) => {
+const DraggableWord = ({
+  word,
+  index,
+  disabled,
+  registerItem,
+  onKeyboardPick,
+  onPlayAudio,
+  activeAudio,
+}) => {
+  const pointerStart = useRef(null);
+  const pointerMoved = useRef(false);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: word,
     disabled,
@@ -38,16 +75,48 @@ const DraggableWord = ({ word, disabled }) => {
     fontSize: "16px",
     opacity: disabled ? 0.4 : 1,
     touchAction: "none",
-  };
 
+    // ✅ مهم حتى أيقونة الصوت تنربط بنفس الكلمة
+    position: "relative",
+  };
   return (
     <span
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        registerItem(`word-${index}`, element);
+      }}
       style={style}
       {...listeners}
       {...attributes}
       className="season-chip"
+      role="button"
+      tabIndex={0}
+      aria-disabled={disabled}
+      onPointerDownCapture={(event) => {
+        pointerStart.current = { x: event.clientX, y: event.clientY };
+        pointerMoved.current = false;
+      }}
+      onPointerMoveCapture={(event) => {
+        if (
+          pointerStart.current &&
+          Math.hypot(
+            event.clientX - pointerStart.current.x,
+            event.clientY - pointerStart.current.y,
+          ) > 5
+        )
+          pointerMoved.current = true;
+      }}
+      onClick={(event) => {
+        if (event.detail !== 0 && !pointerMoved.current) onPlayAudio();
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        if (disabled) onPlayAudio();
+        else onKeyboardPick();
+      }}
     >
+      <Unit4PlayingAudioIcon active={activeAudio} />
       {word}
     </span>
   );
@@ -56,16 +125,33 @@ const DraggableWord = ({ word, disabled }) => {
 /* =========================
    DROP ZONE
 ========================= */
-const DropZone = ({ id, value, isWrong, showCorrect, onRemove }) => {
+const DropZone = ({
+  id,
+  value,
+  isWrong,
+  showCorrect,
+  onRemove,
+  locked,
+  registerTarget,
+  onKeyDown,
+  preview,
+}) => {
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
 
   return (
     <div
-      ref={setNodeRef}
-      className={`${showCorrect ? "" : "hover:text-red-500"}`}
-      onClick={() => value && onRemove()}
+      ref={(element) => {
+        setNodeRef(element);
+        registerTarget(id, element);
+      }}
+      onClick={() => value && !locked && onRemove()}
+      onKeyDown={onKeyDown}
+      role="button"
+      tabIndex={preview || (value && !locked) ? 0 : -1}
+      aria-disabled={locked}
+      className={`${showCorrect ? "" : "hover:text-red-500"} unit4-drop-target`}
       style={{
         position: "relative",
         minWidth: "250px",
@@ -99,7 +185,9 @@ const DropZone = ({ id, value, isWrong, showCorrect, onRemove }) => {
         cursor: value ? "pointer" : "default",
       }}
     >
-      {value}
+      <span className={preview ? "unit4-keyboard-preview" : undefined}>
+        {preview || value}
+      </span>
 
       {showCorrect && isWrong && (
         <div
@@ -152,7 +240,9 @@ const Review3_Page1_Q2 = () => {
 
   const [showCorrect, setShowCorrect] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
+  const [lockedTargets, setLockedTargets] = useState([]);
   const [activeWord, setActiveWord] = useState(null);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   /* =========================
      SENSORS
@@ -178,7 +268,7 @@ const Review3_Page1_Q2 = () => {
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
-    if (!over) return;
+    if (!over || lockedTargets.includes(String(over.id))) return;
 
     const draggedWord = active.id;
     const index = Number(over.id);
@@ -195,20 +285,46 @@ const Review3_Page1_Q2 = () => {
     updated[index] = draggedWord;
 
     setAnswers(updated);
+    setWrongMarks((previous) =>
+      previous.filter((mark) => mark.qIndex !== index),
+    );
   };
 
   /* =========================
      REMOVE WORD
   ========================= */
   const removeWord = (index) => {
-    if (showCorrect) return;
+    if (lockedTargets.includes(String(index))) return;
 
     const updated = [...answers];
 
     updated[index] = "";
 
     setAnswers(updated);
+    setWrongMarks((previous) =>
+      previous.filter((mark) => mark.qIndex !== index),
+    );
   };
+
+  const itemIds = wordBank.map((_, index) => `word-${index}`);
+  const targetIds = items.map((_, index) => String(index));
+  const placeWord = (itemId, targetId) => {
+    const wordIndex = Number(itemId.replace("word-", ""));
+    const word = wordBank[wordIndex];
+    handleDragEnd({ active: { id: word }, over: { id: targetId } });
+  };
+  const keyboard = useUnit4TabDrag({
+    itemIds,
+    targetIds,
+    isItemDisabled: (id) =>
+      usedWords.includes(wordBank[Number(id.replace("word-", ""))]),
+    isTargetDisabled: (id) => lockedTargets.includes(id),
+    onPick: (id) => {
+      const index = Number(id.replace("word-", ""));
+      playAudio(`answer-${index}`, ANSWER_AUDIO[index]);
+    },
+    onPlace: placeWord,
+  });
 
   /* =========================
      SHOW ANSWERS
@@ -218,6 +334,9 @@ const Review3_Page1_Q2 = () => {
 
     setShowCorrect(true);
     setWrongMarks([]);
+    setLockedTargets(targetIds);
+    keyboard.cancel();
+    stopAudio();
   };
 
   /* =========================
@@ -228,13 +347,16 @@ const Review3_Page1_Q2 = () => {
 
     setShowCorrect(false);
     setWrongMarks([]);
+    setLockedTargets([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   /* =========================
      CHECK ANSWERS
   ========================= */
   const checkAnswers = () => {
-    if (showCorrect) return;
+    if (lockedTargets.length === items.length) return;
 
     if (answers.includes("")) {
       ValidationAlert.info();
@@ -255,6 +377,13 @@ const Review3_Page1_Q2 = () => {
 
     setWrongMarks(wrong);
     setShowCorrect(true);
+    setLockedTargets(
+      items.flatMap((item, i) =>
+        answers[i]?.trim().toLowerCase() === item.answer.toLowerCase()
+          ? [String(i)]
+          : [],
+      ),
+    );
 
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
@@ -295,11 +424,12 @@ const Review3_Page1_Q2 = () => {
           padding: "30px",
         }}
       >
-        <div className="div-forall" style={{ gap: "20px" }}>
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>B</span>
-           Read, look, and answer. Use the sentences below.
-          </h5>
+        <div className="div-forall mb-10" style={{ gap: "20px" }}>
+          <ExerciseHeaderReview
+            sectionLetter="B"
+            title="Read, look, and answer. Use the sentences below."
+            subTitle="Use the picture, word bank, or grammar clue, then complete every blank before checking."
+          />
 
           {/* WORD BANK */}
           <div
@@ -315,11 +445,18 @@ const Review3_Page1_Q2 = () => {
               flexWrap: "wrap",
             }}
           >
-            {wordBank.map((word) => (
+            {wordBank.map((word, index) => (
               <DraggableWord
                 key={word}
                 word={word}
+                index={index}
                 disabled={usedWords.includes(word)}
+                registerItem={keyboard.registerItem}
+                onKeyboardPick={() => keyboard.pickItem(`word-${index}`)}
+                onPlayAudio={() =>
+                  playAudio(`answer-${index}`, ANSWER_AUDIO[index])
+                }
+                activeAudio={activeAudioKey === `answer-${index}`}
               />
             ))}
           </div>
@@ -336,7 +473,7 @@ const Review3_Page1_Q2 = () => {
 
             <img
               src={img1}
-              alt="exercise"
+              alt="Three children having a picnic with milkshakes, pizza, potatoes, salad, and fruit"
               style={{
                 width: "auto",
                 height: "350px",
@@ -359,6 +496,24 @@ const Review3_Page1_Q2 = () => {
                 return (
                   <div
                     key={i}
+                    className={`unit4-audio-control ${lockedTargets.includes(String(i)) ? "unit4-full-audio-enabled" : ""}`}
+                    role={
+                      lockedTargets.includes(String(i)) ? "button" : undefined
+                    }
+                    tabIndex={lockedTargets.includes(String(i)) ? 0 : -1}
+                    onClick={() => {
+                      if (lockedTargets.includes(String(i)))
+                        playAudio(`full-${i}`, FULL_AUDIO[i]);
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        lockedTargets.includes(String(i)) &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`full-${i}`, FULL_AUDIO[i]);
+                      }
+                    }}
                     style={{
                       display: "flex",
                       flexDirection: "column",
@@ -367,12 +522,36 @@ const Review3_Page1_Q2 = () => {
                       marginBottom: "15px",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `full-${i}`}
+                    />
                     <span
-                      className="text-base"
+                      role="button"
+                      tabIndex={lockedTargets.includes(String(i)) ? -1 : 0}
+                      className="unit4-audio-control unit4-interactive text-base"
+                      onClick={(event) => {
+                        if (!lockedTargets.includes(String(i))) {
+                          event.stopPropagation();
+                          playAudio(`question-${i}`, QUESTION_AUDIO[i]);
+                        }
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          !lockedTargets.includes(String(i)) &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          playAudio(`question-${i}`, QUESTION_AUDIO[i]);
+                        }
+                      }}
                       style={{
                         fontSize: "20px",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `question-${i}`}
+                      />
                       {i + 1}. {item.text}
                     </span>
 
@@ -382,6 +561,34 @@ const Review3_Page1_Q2 = () => {
                       isWrong={isWrong}
                       showCorrect={showCorrect}
                       onRemove={() => removeWord(i)}
+                      locked={lockedTargets.includes(String(i))}
+                      registerTarget={keyboard.registerTarget}
+                      preview={
+                        keyboard.keyboardTargetId === String(i)
+                          ? wordBank[
+                              Number(
+                                keyboard.keyboardItemId?.replace("word-", ""),
+                              )
+                            ]
+                          : ""
+                      }
+                      onKeyDown={(event) => {
+                        event.stopPropagation();
+                        if (
+                          !keyboard.keyboardItemId &&
+                          answers[i] &&
+                          !lockedTargets.includes(String(i)) &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          const removedIndex = wordBank.indexOf(answers[i]);
+                          removeWord(i);
+                          if (removedIndex >= 0)
+                            keyboard.focusItem(`word-${removedIndex}`);
+                          return;
+                        }
+                        keyboard.handleTargetKeyDown(event, String(i));
+                      }}
                     />
                   </div>
                 );

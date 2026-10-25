@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import "./Unit8_Page5_Q2.css";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 68/Ex A2-1.svg";
@@ -10,21 +9,26 @@ import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import blue from "../../../assets/audio/ClassBook/Unit 8/P 68/unit8-pg68-EXA2.mp3";
+import ExerciseHeader from "../../ExerciseHeader";
+import "../unit4/unit4Interactions.css";
 
 const Unit8_Page5_Q2 = () => {
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [showAns, setShowAns] = useState(false);
 
   const questions = [
     {
       id: 1,
       image1: img1,
+      alt: "Two bikes and two horses",
 
       correct: "✗",
     },
-    { id: 2, image1: img2, correct: "✓" },
+    { id: 2, image1: img2, alt: "Two foxes and three boxes", correct: "✓" },
     {
       id: 3,
       image1: img3,
+      alt: "Two buses and four sandwiches",
 
       correct: "✓",
     },
@@ -45,9 +49,11 @@ const Unit8_Page5_Q2 = () => {
   const [showResult, setShowResult] = useState([]);
 
   const selectAnswer = (id, value) => {
-    if (locked) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers({ ...answers, [id]: value });
-    setShowResult(false);
+    setShowResult((previous) =>
+      previous.map((result, index) => (index === id - 1 ? undefined : result)),
+    );
   };
 
   const showAnswers = () => {
@@ -57,11 +63,12 @@ const Unit8_Page5_Q2 = () => {
     });
     setAnswers(corrects);
     setShowResult([]);
-    setLocked(true);
+    setLockedIds(questions.map((question) => question.id));
+    setShowAns(true);
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAns || lockedIds.length === questions.length) return;
     const isEmpty = questions.some((q) => !answers[q.id]);
     if (isEmpty) {
       ValidationAlert.info("Please choose ✓ or ✗ for all questions!");
@@ -72,7 +79,11 @@ const Unit8_Page5_Q2 = () => {
       answers[q.id] === q.correct ? "correct" : "wrong",
     );
     setShowResult(results);
-    setLocked(true);
+    setLockedIds(
+      questions
+        .filter((question) => answers[question.id] === question.correct)
+        .map((question) => question.id),
+    );
 
     const correctCount = results.filter((r) => r === "correct").length;
     const total = questions.length;
@@ -97,7 +108,8 @@ const Unit8_Page5_Q2 = () => {
   const resetAnswers = () => {
     setAnswers({});
     setShowResult([]);
-    setLocked(false);
+    setLockedIds([]);
+    setShowAns(false);
   };
 
   return (
@@ -116,24 +128,29 @@ const Unit8_Page5_Q2 = () => {
           className="div-forall mb-10"
           style={{
             gap: "30px",
-
-           
           }}
         >
-          <h5 className="header-title-page8">
-            <span style={{ color: "#2e3192", marginRight: "10px" }}>2</span>{" "}
-            Does it have the same<span style={{ color: "#2e3192" }}>-es </span>
-            sound? Listen and write
-            <span style={{ color: "#D52328" }}>✓</span> or{" "}
-            <span style={{ color: "#D52328" }}>✗</span>.
-          </h5>
+          <ExerciseHeader
+            sectionLetter="A"
+            questionNumber="2"
+            title={
+              <>
+                Does it have the same{" "}
+                <span style={{ color: "#2e3192" }}>-es</span> sound? Listen and
+                write <span style={{ color: "#D1232A" }}>✓</span> or{" "}
+                <span style={{ color: "#D1232A" }}>✗</span>.
+              </>
+            }
+            subTitle="Listen to both endings, then mark whether the -es sounds are the same."
+          />
           <QuestionAudioPlayer
             src={blue}
             captions={captions}
             stopAtSecond={13.2}
+            pageId="unit8-page68-a2"
           />
 
-          <div className="grid grid-cols-3 gap-[30px] u8p5-grid">
+          <div className="grid grid-cols-3 gap-[30px] u8p5-grid w-full">
             {questions.map((q, index) => (
               <div
                 key={q.id}
@@ -146,7 +163,7 @@ const Unit8_Page5_Q2 = () => {
                     <span className="text-[darkblue] font-bold">{q.id}.</span>
                     <img
                       src={q.image1}
-                      alt=""
+                      alt={q.alt}
                       style={{ height: "120px", objectFit: "contain" }}
                     />
                   </div>
@@ -155,8 +172,12 @@ const Unit8_Page5_Q2 = () => {
                   <div className="u8p5-opts-row flex gap-5">
                     {/* ✓ */}
                     <div className="relative">
-                      <div
-                        className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
+                      <button
+                        type="button"
+                        tabIndex={lockedIds.includes(q.id) || showAns ? -1 : 0}
+                        aria-disabled={lockedIds.includes(q.id) || showAns}
+                        aria-label={`Question ${q.id}: same ending sound`}
+                        className={`unit4-interactive u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${lockedIds.includes(q.id) || showAns ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✓"
                             ? showResult[index] === "wrong" &&
                               answers[q.id] === "✓"
@@ -166,8 +187,12 @@ const Unit8_Page5_Q2 = () => {
                         }`}
                         onClick={() => selectAnswer(q.id, "✓")}
                       >
-                        <img src={trueIcon} style={{ height: "25px" }} />
-                      </div>
+                        <img
+                          src={trueIcon}
+                          alt="Check mark"
+                          style={{ height: "25px" }}
+                        />
+                      </button>
 
                       {showResult[index] === "wrong" &&
                         answers[q.id] === "✓" && (
@@ -179,8 +204,12 @@ const Unit8_Page5_Q2 = () => {
 
                     {/* ✗ */}
                     <div className="relative">
-                      <div
-                        className={`u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${locked ? "" : " hover:border-[#F79530]"} ${
+                      <button
+                        type="button"
+                        tabIndex={lockedIds.includes(q.id) || showAns ? -1 : 0}
+                        aria-disabled={lockedIds.includes(q.id) || showAns}
+                        aria-label={`Question ${q.id}: different ending sound`}
+                        className={`unit4-interactive u8p5-opt-btn w-[45px] h-[45px] rounded-md flex items-center justify-center cursor-pointer text-[22px] font-bold transition-all duration-150 ${lockedIds.includes(q.id) || showAns ? "" : " hover:border-[#F79530]"} ${
                           answers[q.id] === "✗"
                             ? showResult[index] === "wrong" &&
                               answers[q.id] === "✗"
@@ -190,8 +219,12 @@ const Unit8_Page5_Q2 = () => {
                         }`}
                         onClick={() => selectAnswer(q.id, "✗")}
                       >
-                        <img src={falseIcon} style={{ height: "25px" }} />
-                      </div>
+                        <img
+                          src={falseIcon}
+                          alt="X mark"
+                          style={{ height: "25px" }}
+                        />
+                      </button>
 
                       {showResult[index] === "wrong" &&
                         answers[q.id] === "✗" && (

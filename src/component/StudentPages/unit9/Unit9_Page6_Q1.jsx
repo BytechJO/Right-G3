@@ -1,22 +1,24 @@
 import { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 1.svg";
-import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 2.svg";
-import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 3.svg";
-import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 4.svg";
+import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 2.svg";
+import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 3.svg";
+import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex D 4.svg";
+import ExerciseHeader from "../../ExerciseHeader";
 
 const Unit9_Page6_Q1 = () => {
   const [userAnswers, setUserAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
-
-  const [checked, setChecked] = useState(false);
+  const [lockedFields, setLockedFields] = useState([]);
+  const [wrongFields, setWrongFields] = useState([]);
+  const [showAns, setShowAns] = useState(false);
 
   const questions = [
     {
       id: 1,
       image: img1,
+      imageAlt:
+        "Yesterday, two people are at the train station. Now, they are at the airport.",
       sentence: "Where were they yesterday?",
       word1: ["the train stop", "the airport"],
       word2: ["are at", "were at", "are in", "were in"],
@@ -24,6 +26,8 @@ const Unit9_Page6_Q1 = () => {
     {
       id: 2,
       image: img2,
+      imageAlt:
+        "Yesterday, two people are at the theater. Now, they are at the bakery.",
       sentence: "Where are they now?",
       word1: ["work", "the clinic"],
       word2: ["are at", "were at", "are in", "were in"],
@@ -31,6 +35,8 @@ const Unit9_Page6_Q1 = () => {
     {
       id: 3,
       image: img3,
+      imageAlt:
+        "Yesterday, two people are at work. Now, they are at the clinic.",
       sentence: "Where are they now?",
       word1: ["the library", "the bus stop"],
       word2: ["are at", "were at", "are in", "were in"],
@@ -38,6 +44,8 @@ const Unit9_Page6_Q1 = () => {
     {
       id: 4,
       image: img4,
+      imageAlt:
+        "Yesterday, two people are in the library. Now, they are at the bus stop.",
       sentence: "Where were they yesterday?",
       word1: ["the theater", "the bakery"],
       word2: ["are at", "were at", "are in", "were in"],
@@ -50,7 +58,8 @@ const Unit9_Page6_Q1 = () => {
     4: { word1: "the theater", word2: "were at" },
   };
   const handleChange = (id, field, value) => {
-    if (locked) return;
+    const key = `${id}-${field}`;
+    if (showAns || lockedFields.includes(key)) return;
 
     setUserAnswers((prev) => ({
       ...prev,
@@ -59,14 +68,21 @@ const Unit9_Page6_Q1 = () => {
         [field]: value,
       },
     }));
+    setWrongFields((previous) => previous.filter((item) => item !== key));
   };
   const showAnswer = () => {
     setUserAnswers(correctAnswers);
-    setLocked(true);
-    setChecked(true);
+    setLockedFields(
+      questions.flatMap((question) => [
+        `${question.id}-word1`,
+        `${question.id}-word2`,
+      ]),
+    );
+    setWrongFields([]);
+    setShowAns(true);
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAns || lockedFields.length === questions.length * 2) return;
 
     // ✅ التحقق إذا في فراغ
     const empty = questions.some(
@@ -78,19 +94,17 @@ const Unit9_Page6_Q1 = () => {
       return;
     }
 
-    let score = 0;
-
+    const nextLockedFields = [];
+    const nextWrongFields = [];
     Object.keys(correctAnswers).forEach((id) => {
-      // ✅ أول select
-      if (userAnswers[id]?.word2 === correctAnswers[id].word2) {
-        score += 1;
-      }
-
-      // ✅ ثاني select
-      if (userAnswers[id]?.word1 === correctAnswers[id].word1) {
-        score += 1;
-      }
+      ["word1", "word2"].forEach((field) => {
+        const key = `${id}-${field}`;
+        if (userAnswers[id]?.[field] === correctAnswers[id][field])
+          nextLockedFields.push(key);
+        else nextWrongFields.push(key);
+      });
     });
+    const score = nextLockedFields.length;
 
     const total = Object.keys(correctAnswers).length * 2; // = 8
 
@@ -104,8 +118,8 @@ const Unit9_Page6_Q1 = () => {
     </div>
   `;
 
-    setChecked(true);
-    setLocked(true);
+    setLockedFields(nextLockedFields);
+    setWrongFields(nextWrongFields);
 
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
@@ -113,8 +127,9 @@ const Unit9_Page6_Q1 = () => {
   };
   const handleStartAgain = () => {
     setUserAnswers({});
-    setChecked(false);
-    setLocked(false);
+    setLockedFields([]);
+    setWrongFields([]);
+    setShowAns(false);
   };
 
   return (
@@ -132,13 +147,13 @@ const Unit9_Page6_Q1 = () => {
           gap: "10px",
         }}
       >
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            D
-          </span>
-         Read and answer the questions.
-        </h5>
+        <ExerciseHeader
+          sectionLetter="D"
+          title="Read and answer the questions."
+          subTitle="Look at the pictures, read each question, and choose the correct words to complete the answer."
+        />
         <div
+          className="w-full"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -182,7 +197,7 @@ const Unit9_Page6_Q1 = () => {
                     </span>
                     <img
                       src={q.image}
-                      alt={`q${q.id}`}
+                      alt={q.imageAlt}
                       style={{
                         width: "280px",
                         height: "auto",
@@ -223,17 +238,18 @@ const Unit9_Page6_Q1 = () => {
                         onChange={(e) =>
                           handleChange(q.id, "word2", e.target.value)
                         }
-                        disabled={locked}
+                        disabled={
+                          showAns || lockedFields.includes(`${q.id}-word2`)
+                        }
                         style={{
                           appearance: "none",
                           WebkitAppearance: "none",
                           MozAppearance: "none",
 
                           border: "none",
-                          borderBottom: checked &&
-                        userAnswers[q.id]?.word2 &&
-                        userAnswers[q.id]?.word2 !==
-                          correctAnswers[q.id].word2 ?  "2px solid red":"1px solid transparent",
+                          borderBottom: wrongFields.includes(`${q.id}-word2`)
+                            ? "2px solid red"
+                            : "1px solid transparent",
                           backgroundColor: "transparent",
 
                           fontSize: "inherit",
@@ -242,8 +258,11 @@ const Unit9_Page6_Q1 = () => {
 
                           padding: "2px 18px 2px 4px",
                           minWidth: "90px",
-                          outline: "none",
-                          cursor: locked ? "not-allowed" : "pointer",
+                          // outline: "none",
+                          cursor:
+                            showAns || lockedFields.includes(`${q.id}-word2`)
+                              ? "default"
+                              : "pointer",
                         }}
                       >
                         <option value="" disabled hidden>
@@ -255,34 +274,31 @@ const Unit9_Page6_Q1 = () => {
                           </option>
                         ))}
                       </select>
-                      {checked &&
-                        userAnswers[q.id]?.word2 &&
-                        userAnswers[q.id]?.word2 !==
-                          correctAnswers[q.id].word2 && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-6px",
-                              right: "-6px",
-                              transform: "translateY(-50%)",
-                              width: "22px",
-                              height: "22px",
-                              background: "red",
-                              color: "white",
-                              borderRadius: "50%",
-                              fontSize: "12px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontWeight: "bold",
-                              border: "2px solid white",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                              pointerEvents: "none",
-                            }}
-                          >
-                            ✕
-                          </div>
-                        )}
+                      {wrongFields.includes(`${q.id}-word2`) && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-6px",
+                            right: "-6px",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "red",
+                            color: "white",
+                            borderRadius: "50%",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          ✕
+                        </div>
+                      )}
                       <span
                         style={{
                           position: "absolute",
@@ -305,27 +321,31 @@ const Unit9_Page6_Q1 = () => {
                         onChange={(e) =>
                           handleChange(q.id, "word1", e.target.value)
                         }
-                        disabled={locked}
+                        disabled={
+                          showAns || lockedFields.includes(`${q.id}-word1`)
+                        }
                         style={{
                           appearance: "none",
                           WebkitAppearance: "none",
                           MozAppearance: "none",
 
                           border: "none",
-                          borderBottom: checked &&
-                        userAnswers[q.id]?.word1 &&
-                        userAnswers[q.id]?.word1 !==
-                          correctAnswers[q.id].word1 ?"2px solid red":"1px dashed transparent",
+                          borderBottom: wrongFields.includes(`${q.id}-word1`)
+                            ? "2px solid red"
+                            : "1px dashed transparent",
                           backgroundColor: "transparent",
 
                           fontSize: "inherit",
                           fontWeight: "600",
                           // color: userAnswers[q.id]?.word1 ? "#1e3a8a" : "#aaa",
-                          outline: "none",
+                          // outline: "none",
                           padding: "2px 18px 2px 4px",
                           minWidth: "90px",
 
-                          cursor: locked ? "not-allowed" : "pointer",
+                          cursor:
+                            showAns || lockedFields.includes(`${q.id}-word1`)
+                              ? "default"
+                              : "pointer",
                         }}
                       >
                         <option value="" disabled hidden>
@@ -337,34 +357,31 @@ const Unit9_Page6_Q1 = () => {
                           </option>
                         ))}
                       </select>
-                      {checked &&
-                        userAnswers[q.id]?.word1 &&
-                        userAnswers[q.id]?.word1 !==
-                          correctAnswers[q.id].word1 && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-6px",
-                              right: "-6px",
-                              transform: "translateY(-50%)",
-                              width: "22px",
-                              height: "22px",
-                              background: "red",
-                              color: "white",
-                              borderRadius: "50%",
-                              fontSize: "12px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontWeight: "bold",
-                              border: "2px solid white",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                              pointerEvents: "none",
-                            }}
-                          >
-                            ✕
-                          </div>
-                        )}
+                      {wrongFields.includes(`${q.id}-word1`) && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-6px",
+                            right: "-6px",
+                            transform: "translateY(-50%)",
+                            width: "22px",
+                            height: "22px",
+                            background: "red",
+                            color: "white",
+                            borderRadius: "50%",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          ✕
+                        </div>
+                      )}
                       <span
                         style={{
                           position: "absolute",

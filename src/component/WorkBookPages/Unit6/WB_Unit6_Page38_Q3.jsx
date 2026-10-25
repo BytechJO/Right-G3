@@ -1,10 +1,18 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import useWorkbookMatchingKeyboard from "../Unit4/useWorkbookMatchingKeyboard";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 38/C.3.svg";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise C/Item_001_The_plums_play_on_the_plate.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise C/Item_002_The_slug_sleeps_on_the_slide.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit6/Page 38 - Exercise C/Item_003_The_fly_and_the_flea_float_on_the_flag.mp3";
 const DOT_COLOR = "#9ca3af";
 const ACTIVE_COLOR = "#f39b42";
 const BORDER_COLOR = "#e0e0e0";
@@ -25,6 +33,17 @@ const RIGHT_ITEMS = [
 ];
 
 const CORRECT_MATCHES = { 1: 2, 2: 3, 3: 1 };
+const SENTENCE_AUDIO = {
+  1: sentence1Audio,
+  2: sentence2Audio,
+  3: sentence3Audio,
+};
+const IMAGE_ALT = {
+  1: "A fly and a flea floating on a flag",
+  2: "Plums playing on a plate",
+  3: "A slug sleeping on a playground slide",
+};
+const IDS = LEFT_ITEMS.map((item) => item.id);
 
 // ── Wrong badge يسار أعلى فقط بدون أي تأثير تاني
 const WrongBadge = () => (
@@ -54,14 +73,79 @@ const WrongBadge = () => (
 );
 
 export default function WB_ReadAndMatch_PageC() {
-  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [selected, setSelected] = useState(null);
   const [matches, setMatches] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [paths, setPaths] = useState([]);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const boardRef = useRef(null);
   const pointRefs = useRef({});
+  const endpointRefs = useRef({});
+  const isLeftLocked = useCallback((id) => lockedIds.includes(id), [lockedIds]);
+  const isRightLocked = useCallback(
+    (id) =>
+      Object.keys(matches).some(
+        (key) => matches[key] === id && lockedIds.includes(Number(key)),
+      ),
+    [lockedIds, matches],
+  );
+  const getElement = useCallback(
+    (side, id) => endpointRefs.current[`${side}-${id}`],
+    [],
+  );
+  const getAnchor = useCallback(
+    (side, id) => pointRefs.current[`${side}-${id}`],
+    [],
+  );
+
+  const commit = (leftId, rightId) => {
+    if (showAns || isLeftLocked(leftId) || isRightLocked(rightId)) return;
+    setMatches((previous) => {
+      const updated = { ...previous };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key] === rightId && !lockedIds.includes(Number(key)))
+          delete updated[key];
+      });
+      updated[leftId] = rightId;
+      return updated;
+    });
+    setWrongIds((previous) => previous.filter((id) => id !== leftId));
+    setSelected(null);
+  };
+
+  const choose = (side, id) => {
+    if (side === "left") playAudio(`sentence-${id}`, SENTENCE_AUDIO[id]);
+    if (showAns || (side === "left" ? isLeftLocked(id) : isRightLocked(id)))
+      return;
+    if (!selected || selected.side === side) {
+      setSelected({ side, id });
+      return;
+    }
+    commit(
+      side === "left" ? id : selected.id,
+      side === "right" ? id : selected.id,
+    );
+  };
+
+  const keyboard = useWorkbookMatchingKeyboard({
+    boardRef,
+    leftIds: IDS,
+    rightIds: IDS,
+    getElement,
+    getAnchorElement: getAnchor,
+    isLeftLocked,
+    isRightLocked,
+    onCommit: commit,
+    onStart: (side, id) => {
+      setSelected({ side, id });
+      if (side === "left") playAudio(`sentence-${id}`, SENTENCE_AUDIO[id]);
+    },
+    onCancel: () => setSelected(null),
+  });
 
   useLayoutEffect(() => {
     const update = () => {
@@ -85,7 +169,7 @@ export default function WB_ReadAndMatch_PageC() {
           return {
             id: `path-${leftId}-${rightId}`,
             d: `M ${x1} ${y1} C ${x1 + dx * 0.42} ${y1}, ${x2 - dx * 0.42} ${y2}, ${x2} ${y2}`,
-            color: PATH_COLOR,
+            color: wrongIds.includes(Number(leftId)) ? WRONG_COLOR : PATH_COLOR,
           };
         })
         .filter(Boolean);
@@ -104,28 +188,10 @@ export default function WB_ReadAndMatch_PageC() {
       window.removeEventListener("resize", update);
       obs?.disconnect();
     };
-  }, [matches, showResults]);
-
-  const handleLeftSelect = (id) => {
-    if (showAns || showResults) return;
-    setSelectedLeft((prev) => (prev === id ? null : id));
-    setShowResults(false);
-  };
-
-  const handleRightSelect = (rightId) => {
-    if (showAns || selectedLeft === null || showResults) return;
-    const upd = { ...matches };
-    Object.keys(upd).forEach((k) => {
-      if (upd[k] === rightId) delete upd[k];
-    });
-    upd[selectedLeft] = rightId;
-    setMatches(upd);
-    setSelectedLeft(null);
-    setShowResults(false);
-  };
+  }, [matches, wrongIds]);
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === LEFT_ITEMS.length) return;
     const allConnected = LEFT_ITEMS.every((i) => matches[i.id]);
     if (!allConnected) {
       ValidationAlert.info("Please connect all sentences first.");
@@ -136,6 +202,17 @@ export default function WB_ReadAndMatch_PageC() {
       if (matches[i.id] === CORRECT_MATCHES[i.id]) score++;
     });
     setShowResults(true);
+    const correctIds = LEFT_ITEMS.filter(
+      (item) => matches[item.id] === CORRECT_MATCHES[item.id],
+    ).map((item) => item.id);
+    setLockedIds((previous) => [...new Set([...previous, ...correctIds])]);
+    setWrongIds(
+      LEFT_ITEMS.filter(
+        (item) => matches[item.id] !== CORRECT_MATCHES[item.id],
+      ).map((item) => item.id),
+    );
+    setSelected(null);
+    keyboard.clear();
     const total = LEFT_ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -146,25 +223,80 @@ export default function WB_ReadAndMatch_PageC() {
     setMatches({ ...CORRECT_MATCHES });
     setShowResults(true);
     setShowAns(true);
-    setSelectedLeft(null);
+    setSelected(null);
+    setLockedIds(IDS);
+    setWrongIds([]);
+    keyboard.clear();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
-    setSelectedLeft(null);
+    setSelected(null);
     setMatches({});
     setShowResults(false);
     setShowAns(false);
     setPaths([]);
+    setLockedIds([]);
+    setWrongIds([]);
+    keyboard.clear();
+    stopAudio();
   };
 
   const getLeftConn = (id) => !!matches[id];
   const getRightConn = (id) => Object.values(matches).includes(id);
-  const isWrongMatch = (leftId) =>
-    showResults &&
-    !showAns &&
-    !!matches[leftId] &&
-    matches[leftId] !== CORRECT_MATCHES[leftId];
+  const isWrongMatch = (leftId) => wrongIds.includes(leftId);
+  const handleBoardTabOrder = (event) => {
+    if (event.key !== "Tab") return;
 
+    // أثناء اختيار عنصر للتوصيل، خلي الـ hook يتحكم بالتاب
+    if (keyboard.preview) return;
+
+    const order = [
+      ...LEFT_ITEMS.map((item) => `left-${item.id}`),
+      ...RIGHT_ITEMS.map((item) => `right-${item.id}`),
+    ];
+
+    const currentIndex = order.findIndex(
+      (key) => endpointRefs.current[key] === event.target,
+    );
+
+    if (currentIndex === -1) return;
+
+    const nextIndex = event.shiftKey ? currentIndex - 1 : currentIndex + 1;
+
+    // تجاهل العناصر المقفولة
+    let index = nextIndex;
+
+    while (index >= 0 && index < order.length) {
+      const [side, id] = order[index].split("-");
+      const locked =
+        showAns ||
+        (side === "left"
+          ? isLeftLocked(Number(id))
+          : isRightLocked(Number(id)));
+
+      if (!locked) break;
+
+      index += event.shiftKey ? -1 : 1;
+    }
+
+    // السماح بالخروج من التمرين عند الأطراف
+    if (index < 0 || index >= order.length) return;
+
+    const nextElement = endpointRefs.current[order[index]];
+
+    if (nextElement) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      nextElement.focus({ preventScroll: true });
+      nextElement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+  };
   return (
     <div className="main-container-component">
       <div
@@ -174,12 +306,19 @@ export default function WB_ReadAndMatch_PageC() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span> Read and match.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Read and match."
+          subTitle="Read each fl, pl, or sl sentence to the matching picture first, then connect it to the matching picture or answer one pair at a time."
+        />
 
         {/* Board */}
-        <div ref={boardRef} style={{ position: "relative", width: "100%" }}>
+        <div
+          ref={boardRef}
+          onKeyDownCapture={handleBoardTabOrder}
+          style={{ position: "relative", width: "100%" }}
+        >
+          {" "}
           {/* SVG lines */}
           <svg
             style={{
@@ -202,8 +341,17 @@ export default function WB_ReadAndMatch_PageC() {
                 strokeLinecap="round"
               />
             ))}
+            {keyboard.preview && (
+              <line
+                {...keyboard.preview}
+                className="unit4-keyboard-preview"
+                stroke={ACTIVE_COLOR}
+                strokeWidth="2.4"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
+            )}
           </svg>
-
           {/* Grid */}
           <div
             style={{
@@ -219,14 +367,37 @@ export default function WB_ReadAndMatch_PageC() {
               const rItem = RIGHT_ITEMS[idx];
               const lConn = getLeftConn(lItem.id);
               const rConn = getRightConn(rItem.id);
-              const lSelected = selectedLeft === lItem.id;
+              const lSelected =
+                selected?.side === "left" && selected.id === lItem.id;
+              const rSelected =
+                selected?.side === "right" && selected.id === rItem.id;
               const wrong = isWrongMatch(lItem.id);
 
               return (
                 <React.Fragment key={lItem.id}>
                   {/* ── sentence ── */}
                   <div
-                    onClick={() => handleLeftSelect(lItem.id)}
+                    ref={(element) => {
+                      endpointRefs.current[`left-${lItem.id}`] = element;
+                    }}
+                    onClick={() => choose("left", lItem.id)}
+                    onKeyDown={(event) => {
+                      if (
+                        isLeftLocked(lItem.id) &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(
+                          `sentence-${lItem.id}`,
+                          SENTENCE_AUDIO[lItem.id],
+                        );
+                      } else keyboard.handleKeyDown(event, "left", lItem.id);
+                    }}
+                    onFocus={() => keyboard.handleFocus("left", lItem.id)}
+                    role="button"
+                    tabIndex={0}
+                    aria-disabled={isLeftLocked(lItem.id) || showAns}
+                    className="unit4-audio-control unit4-interactive"
                     style={{
                       position: "relative",
                       display: "flex",
@@ -242,11 +413,14 @@ export default function WB_ReadAndMatch_PageC() {
                       background: lSelected
                         ? "rgba(243,155,66,0.08)"
                         : "transparent",
-                      cursor: showAns || showResults ? "default" : "pointer",
+                      cursor: isLeftLocked(lItem.id) ? "default" : "pointer",
                       transition: "border-color 0.2s, background 0.2s",
                       userSelect: "none",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `sentence-${lItem.id}`}
+                    />
                     <span
                       style={{
                         fontSize: "20px",
@@ -280,7 +454,7 @@ export default function WB_ReadAndMatch_PageC() {
                   {/* ── left dot ── */}
                   <div
                     ref={(el) => (pointRefs.current[`left-${lItem.id}`] = el)}
-                    onClick={() => handleLeftSelect(lItem.id)}
+                    onClick={() => choose("left", lItem.id)}
                     style={{
                       width: "clamp(10px,1.3vw,16px)",
                       height: "clamp(10px,1.3vw,16px)",
@@ -303,17 +477,14 @@ export default function WB_ReadAndMatch_PageC() {
                   {/* ── right dot ── */}
                   <div
                     ref={(el) => (pointRefs.current[`right-${rItem.id}`] = el)}
-                    onClick={() => handleRightSelect(rItem.id)}
+                    onClick={() => choose("right", rItem.id)}
                     style={{
                       width: "clamp(10px,1.3vw,16px)",
                       height: "clamp(10px,1.3vw,16px)",
                       borderRadius: "50%",
                       flexShrink: 0,
                       background: rConn ? ACTIVE_COLOR : DOT_COLOR,
-                      cursor:
-                        showAns || selectedLeft === null
-                          ? "default"
-                          : "pointer",
+                      cursor: isRightLocked(rItem.id) ? "default" : "pointer",
                       transition: "background 0.2s",
                       zIndex: 2,
                     }}
@@ -321,7 +492,18 @@ export default function WB_ReadAndMatch_PageC() {
 
                   {/* ── image — بدون أي تأثير للخطأ ── */}
                   <div
-                    onClick={() => handleRightSelect(rItem.id)}
+                    ref={(element) => {
+                      endpointRefs.current[`right-${rItem.id}`] = element;
+                    }}
+                    onClick={() => choose("right", rItem.id)}
+                    onKeyDown={(event) =>
+                      keyboard.handleKeyDown(event, "right", rItem.id)
+                    }
+                    onFocus={() => keyboard.handleFocus("right", rItem.id)}
+                    role="button"
+                    tabIndex={isRightLocked(rItem.id) ? -1 : 0}
+                    aria-disabled={isRightLocked(rItem.id) || showAns}
+                    className="unit4-interactive"
                     style={{
                       position: "relative",
                       width: "clamp(90px,13vw,160px)",
@@ -329,10 +511,11 @@ export default function WB_ReadAndMatch_PageC() {
                       overflow: "hidden",
 
                       flexShrink: 0,
-                      cursor:
-                        showAns || selectedLeft === null
-                          ? "default"
-                          : "pointer",
+                      cursor: isRightLocked(rItem.id) ? "default" : "pointer",
+                      border: rSelected
+                        ? `2px solid ${ACTIVE_COLOR}`
+                        : "2px solid transparent",
+                      borderRadius: "12px",
                       transition: "border-color 0.2s",
                       boxSizing: "border-box",
                       zIndex: 2,
@@ -340,7 +523,7 @@ export default function WB_ReadAndMatch_PageC() {
                   >
                     <img
                       src={rItem.img}
-                      alt={`img-${rItem.id}`}
+                      alt={IMAGE_ALT[rItem.id]}
                       style={{
                         width: "100%",
                         height: "100%",

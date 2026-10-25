@@ -1,6 +1,41 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import ducksAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_001_ducks.mp3";
+import girlsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_002_girls.mp3";
+import beesAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_003_bees.mp3";
+import catsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_004_cats.mp3";
+import cupsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_005_cups.mp3";
+import batsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_006_bats.mp3";
+import socksAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_007_socks.mp3";
+import nutsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_008_nuts.mp3";
+import topsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_009_tops.mp3";
+import beetsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_010_beets.mp3";
+import bagsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_011_bags.mp3";
+import ratsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_012_rats.mp3";
+import capsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_013_caps.mp3";
+import cubsAudio from "../../../assets/audio/WorkBook/unit 9/Page 56 - Exercise B/Item_014_cubs.mp3";
+
+const WORD_AUDIO = {
+  ducks: ducksAudio,
+  girls: girlsAudio,
+  bees: beesAudio,
+  cats: catsAudio,
+  cups: cupsAudio,
+  bats: batsAudio,
+  socks: socksAudio,
+  nuts: nutsAudio,
+  tops: topsAudio,
+  beets: beetsAudio,
+  bags: bagsAudio,
+  rats: ratsAudio,
+  caps: capsAudio,
+  cubs: cubsAudio,
+};
 
 const ITEMS = [
   {
@@ -32,20 +67,25 @@ const ITEMS = [
 
 export default function WB_Unit9_Page56_QB() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (columnId, word) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(columnId)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [columnId]: word,
     }));
+    setWrongIds((prev) => prev.filter((id) => id !== columnId));
+    playAudio(`word-${columnId}-${word}`, WORD_AUDIO[word]);
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -63,6 +103,19 @@ export default function WB_Unit9_Page56_QB() {
     });
 
     setShowResults(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -82,17 +135,21 @@ export default function WB_Unit9_Page56_QB() {
     setAnswers(correctMap);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
   };
 
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const isWrong = (id) => {
-    if (!showResults) return false;
-    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
+    return wrongIds.includes(id);
   };
 
   const getWordStyle = (columnId, word) => {
@@ -107,7 +164,7 @@ export default function WB_Unit9_Page56_QB() {
       fontSize: "18px",
       lineHeight: "1.2",
       color: "#222",
-      cursor: showAns ? "default" : "pointer",
+      cursor: showAns || lockedIds.includes(columnId) ? "default" : "pointer",
       border: selected ? "1px solid #f39b42" : "1px solid transparent",
       borderRadius: "999px",
       backgroundColor: "transparent",
@@ -125,11 +182,19 @@ export default function WB_Unit9_Page56_QB() {
           gap: "120px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span>Read and say. Tap or click the word with a different -s sound.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Read and say. Circle the word with a different{" "}
+              <span style={{ color: "#2e3192" }}>-s sound</span>.
+            </>
+          }
+          subTitle="Look at the odd word with a different final -s sound first, compare all available options, then tap only the answer that matches."
+        />
 
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(5, 1fr)",
@@ -163,7 +228,9 @@ export default function WB_Unit9_Page56_QB() {
                 style={{
                   width: "100px",
                   minHeight: "280px",
-                  border: isWrong(item.id) ?"2px solid red":"2px solid #a3a3a3",
+                  border: isWrong(item.id)
+                    ? "2px solid red"
+                    : "2px solid #a3a3a3",
                   borderRadius: "24px",
                   backgroundColor: "#fff",
                   display: "flex",
@@ -179,9 +246,24 @@ export default function WB_Unit9_Page56_QB() {
                   <button
                     key={index}
                     onClick={() => handleSelect(item.id, word)}
+                    onKeyDown={(event) => {
+                      if (
+                        (event.key === "Enter" || event.key === " ") &&
+                        !lockedIds.includes(item.id)
+                      ) {
+                        event.preventDefault();
+                        handleSelect(item.id, word);
+                      }
+                    }}
+                    tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+                    aria-disabled={lockedIds.includes(item.id)}
+                    className="unit4-audio-control unit4-interactive"
                     style={getWordStyle(item.id, word)}
                   >
                     {word}
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `word-${item.id}-${word}`}
+                    />
                   </button>
                 ))}
 

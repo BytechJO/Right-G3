@@ -1,6 +1,22 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit1PlayingAudioIcon from "./WorkbookUnit1PlayingAudioIcon";
+import useWorkbookUnit1Audio from "./useWorkbookUnit1Audio";
+import giraffeAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_001_giraffe.mp3";
+import bearAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_002_bear.mp3";
+import basketballAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_003_basketball.mp3";
+import footballAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_004_football.mp3";
+import snakeAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_005_snake.mp3";
+import elephantAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_006_elephant.mp3";
+import bigAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_007_big.mp3";
+import smallAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_008_small.mp3";
+import lightAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_009_light.mp3";
+import heavyAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_010_heavy.mp3";
+import slowAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_011_slow.mp3";
+import fastAudio from "../../../assets/audio/WorkBook/unit1/Page 6 - Exercise G/Item_012_fast.mp3";
+import "./workbookUnit1Interactions.css";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/Asset 1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U1 Folder/Page 6/SVG/Asset 2.svg";
@@ -51,13 +67,39 @@ const ITEMS = [
   },
 ];
 
+const AUDIO_BY_WORD = {
+  giraffe: giraffeAudio,
+  bear: bearAudio,
+  basketball: basketballAudio,
+  football: footballAudio,
+  snake: snakeAudio,
+  elephant: elephantAudio,
+  big: bigAudio,
+  small: smallAudio,
+  light: lightAudio,
+  heavy: heavyAudio,
+  slow: slowAudio,
+  fast: fastAudio,
+};
+
+const IMAGE_ALTS = {
+  1: "A giraffe",
+  2: "A basketball",
+  3: "A snake",
+  4: "A large elephant",
+  5: "A light feather",
+  6: "A fast-running animal",
+};
+
 export default function WB_Unit3_Page6_QG() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [correctItems, setCorrectItems] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit1Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns||showResults) return;
+    if (showAns || correctItems.includes(id)) return;
 
 
     setAnswers((prev) => ({
@@ -69,7 +111,7 @@ export default function WB_Unit3_Page6_QG() {
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || correctItems.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -78,14 +120,12 @@ export default function WB_Unit3_Page6_QG() {
       return;
     }
 
-    let score = 0;
+    const nextCorrect = ITEMS.filter(
+      (item) => answers[item.id] === item.correct,
+    ).map((item) => item.id);
+    const score = nextCorrect.length;
 
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) {
-        score++;
-      }
-    });
-
+    setCorrectItems(nextCorrect);
     setShowResults(true);
 
     if (score === ITEMS.length) {
@@ -106,12 +146,16 @@ export default function WB_Unit3_Page6_QG() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setCorrectItems(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setCorrectItems([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
@@ -126,12 +170,25 @@ export default function WB_Unit3_Page6_QG() {
 
     return (
       <div
-        onClick={() => handleSelect(item.id, option)}
-        className={`wb-g6-option ${
+        role="button"
+        tabIndex={0}
+        onClick={() => {
+          playAudio(`word-${item.id}-${option}`, AUDIO_BY_WORD[option]);
+          handleSelect(item.id, option);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            playAudio(`word-${item.id}-${option}`, AUDIO_BY_WORD[option]);
+            handleSelect(item.id, option);
+          }
+        }}
+        className={`wb-g6-option wb-unit1-audio-control wb-unit1-interactive ${
           selected || showCorrectAsSelected ? "selected" : ""
         } ${wrong ? "wrong" : ""} ${showAns ? "disabled" : ""}`}
       >
         {option}
+        <WorkbookUnit1PlayingAudioIcon active={activeAudioKey === `word-${item.id}-${option}`} />
 
         {wrong && <div className="wb-g6-wrong-badge">✕</div>}
       </div>
@@ -309,9 +366,11 @@ export default function WB_Unit3_Page6_QG() {
         className="div-forall"
        style={{gap:"45px"}}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">G</span> Look, read, and tap or click.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="G"
+          title="Look, read, and circle."
+          subTitle="Look at the vocabulary word that matches each picture first, compare all available options, then tap only the answer that matches."
+        />
 
         <div className="wb-g6-wrap">
           <div className="wb-g6-grid">
@@ -322,7 +381,7 @@ export default function WB_Unit3_Page6_QG() {
                 <div className="wb-g6-image-wrap">
                   <img
                     src={item.img}
-                    alt={`question-${item.id}`}
+                    alt={IMAGE_ALTS[item.id]}
                     className="wb-g6-image"
                   />
                 </div>
@@ -341,6 +400,7 @@ export default function WB_Unit3_Page6_QG() {
               checkAnswers={handleCheck}
               handleShowAnswer={handleShowAnswer}
               handleStartAgain={handleStartAgain}
+              checkDisabled={showAns || correctItems.length === ITEMS.length}
             />
           </div>
         </div>

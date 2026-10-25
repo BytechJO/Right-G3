@@ -8,6 +8,27 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+
+const statementAudio = [
+  "Item_001_She_will_go_to_the_beach.mp3",
+  "Item_002_She_will_go_to_the_library.mp3",
+  "Item_003_He_will_plant_a_tree.mp3",
+  "Item_004_He_will_go_to_his_grandparents'_farm.mp3",
+  "Item_005_She_will_go_to_the_park.mp3",
+  "Item_006_She_will_go_to_a_restaurant.mp3",
+  "Item_007_She_will_do_her_homework.mp3",
+  "Item_008_She_will_watch_TV.mp3",
+].map(
+  (file) =>
+    new URL(
+      `../../../assets/audio/ClassBook/Unit 10/Page 87 - Exercise D/${file}`,
+      import.meta.url,
+    ).href,
+);
 const exerciseQuestions = [
   {
     id: "g1",
@@ -58,14 +79,15 @@ const exerciseQuestions = [
 const Unit10_Page6_Q1 = () => {
   const [userAnswers, setUserAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelectAnswer = (questionId, answer) => {
-    if(showResults)return
+    if (lockedIds.includes(questionId)) return;
     setUserAnswers((prev) => ({
       ...prev,
       [questionId]: answer,
     }));
-
   };
 
   const handleShowAnswer = () => {
@@ -78,15 +100,25 @@ const Unit10_Page6_Q1 = () => {
     });
 
     setUserAnswers(correct);
-    setShowResults(true)
+    setShowResults(true);
+    setLockedIds(
+      exerciseQuestions.flatMap((group) => group.questions.map((q) => q.id)),
+    );
+    stopAudio();
   };
   const handleStartAgain = () => {
     setUserAnswers({});
     setShowResults(false);
+    setLockedIds([]);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if(showResults)return
+    if (
+      lockedIds.length ===
+      exerciseQuestions.reduce((sum, group) => sum + group.questions.length, 0)
+    )
+      return;
 
     let totalQuestions = 0;
     let correctCount = 0;
@@ -107,6 +139,13 @@ const Unit10_Page6_Q1 = () => {
     }
 
     setShowResults(true);
+    setLockedIds(
+      exerciseQuestions.flatMap((group) =>
+        group.questions
+          .filter((q) => userAnswers[q.id] === q.correctAnswer)
+          .map((q) => q.id),
+      ),
+    );
 
     if (correctCount === totalQuestions) {
       ValidationAlert.success(`Score: ${correctCount}/${totalQuestions}`);
@@ -127,14 +166,18 @@ const Unit10_Page6_Q1 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "20px" }}>
-        <h5 className="header-title-page8 mb-5">
-          <span className="ex-A mr-3">D</span>
-         Read, look and write <span className="text-[#D1232A]">
-            ✓
-          </span> and <span className="text-[#D1232A]">✕</span>
-        </h5>
+        <ExerciseHeader
+          sectionLetter="D"
+          title={
+            <>
+              Read, look, and write <span style={{ color: "#D1232A" }}>✓</span>{" "}
+              and <span style={{ color: "#D1232A" }}>✗</span>.
+            </>
+          }
+          subTitle="Read each statement and compare it with the picture or sentence before choosing the two-way answer."
+        />
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           {exerciseQuestions.map((group, groupIndex) => (
             <div key={group.id} className="mb-5">
               <div className="grid grid-cols-[220px_1fr_auto] gap-x-6 items-start ">
@@ -146,7 +189,14 @@ const Unit10_Page6_Q1 = () => {
 
                   <img
                     src={group.img}
-                    alt={`Group ${groupIndex + 1}`}
+                    alt={
+                      [
+                        "A girl choosing between the beach and the library.",
+                        "A boy choosing between planting a tree and visiting his grandparents' farm.",
+                        "A girl choosing between the park and a restaurant.",
+                        "A girl choosing between doing homework and watching TV.",
+                      ][groupIndex]
+                    }
                     style={{
                       width: "200px",
                       height: "auto",
@@ -157,13 +207,41 @@ const Unit10_Page6_Q1 = () => {
 
                 {/* right: true / false boxes */}
                 <div className="flex flex-col gap-3">
-                  {group.questions.map((question) => (
+                  {group.questions.map((question, questionIndex) => (
                     <div
                       key={question.id}
                       className="flex items-center justify-between"
                     >
                       {/* النص */}
-                      <p className="text-[18px] text-black">{question.text}</p>
+                      <p
+                        className="text-[18px] text-black unit4-interactive unit4-audio-control"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Play ${question.text}`}
+                        onClick={() =>
+                          playAudio(
+                            `statement-${groupIndex}-${questionIndex}`,
+                            statementAudio[groupIndex * 2 + questionIndex],
+                          )
+                        }
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            playAudio(
+                              `statement-${groupIndex}-${questionIndex}`,
+                              statementAudio[groupIndex * 2 + questionIndex],
+                            );
+                          }
+                        }}
+                      >
+                        <Unit4PlayingAudioIcon
+                          active={
+                            activeAudioKey ===
+                            `statement-${groupIndex}-${questionIndex}`
+                          }
+                        />
+                        {question.text}
+                      </p>
 
                       {/* البوكسات */}
                       {/* البوكسات */}
@@ -172,6 +250,15 @@ const Unit10_Page6_Q1 = () => {
                         <div
                           style={{ position: "relative" }}
                           onClick={() => handleSelectAnswer(question.id, true)}
+                          role="button"
+                          tabIndex={lockedIds.includes(question.id) ? -1 : 0}
+                          aria-disabled={lockedIds.includes(question.id)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleSelectAnswer(question.id, true);
+                            }
+                          }}
                           className={`w-[40px] h-[40px] rounded-md cursor-pointer flex items-center justify-center border-1 transition-all ${
                             showResults &&
                             userAnswers[question.id] === true &&
@@ -221,6 +308,15 @@ const Unit10_Page6_Q1 = () => {
                         <div
                           style={{ position: "relative" }}
                           onClick={() => handleSelectAnswer(question.id, false)}
+                          role="button"
+                          tabIndex={lockedIds.includes(question.id) ? -1 : 0}
+                          aria-disabled={lockedIds.includes(question.id)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleSelectAnswer(question.id, false);
+                            }
+                          }}
                           className={`w-[40px] h-[40px] rounded-md cursor-pointer flex items-center justify-center border-1 transition-all ${
                             showResults &&
                             userAnswers[question.id] === false &&

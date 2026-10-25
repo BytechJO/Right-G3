@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeader from "../../ExerciseHeader";
 
 import sound1 from "../../../assets/audio/ClassBook/Grade 3/cd8pg44instruction1-adult-lady_BcSB6hth.mp3"; // ← غيّر المسار حسب ملف الأوديو
 
@@ -14,17 +15,19 @@ const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "red";
 
 const ITEMS = [
-  { id: 1, img: img1, options: ["h", "s", "g"], correct: "h" },
-  { id: 2, img: img2, options: ["p", "r", "m"], correct: "m" },
-  { id: 3, img: img3, options: ["c", "t", "k"], correct: "t" },
-  { id: 4, img: img4, options: ["v", "k", "s"], correct: "k" },
-  { id: 5, img: img5, options: ["n", "m", "b"], correct: "n" },
+  { id: 1, img: img1, alt: "A house", options: ["h", "s", "g"], correct: "h" },
+  { id: 2, img: img2, alt: "The moon", options: ["p", "r", "m"], correct: "m" },
+  { id: 3, img: img3, alt: "A tie", options: ["c", "t", "k"], correct: "t" },
+  { id: 4, img: img4, alt: "A kite", options: ["v", "k", "s"], correct: "k" },
+  { id: 5, img: img5, alt: "A net", options: ["n", "m", "b"], correct: "n" },
 ];
 
 export default function WB_ListenAndCircle_PageA() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const captions = [
     { start: 0.54, end: 3.2, text: "Page 44, phonics exercise A." },
     { start: 3.2, end: 6.16, text: "Listen and circle the beginning sound." },
@@ -35,23 +38,28 @@ export default function WB_ListenAndCircle_PageA() {
     { start: 18.6, end: 20.4, text: "5- net." },
   ];
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => answers[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
       return;
     }
-    let score = 0;
-    ITEMS.forEach((i) => {
-      if (answers[i.id] === i.correct) score++;
-    });
+    const correctIds = ITEMS.flatMap((i) =>
+      answers[i.id] === i.correct ? [i.id] : [],
+    );
+    const incorrectIds = ITEMS.flatMap((i) =>
+      answers[i.id] !== i.correct ? [i.id] : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
     const total = ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -66,25 +74,24 @@ export default function WB_ListenAndCircle_PageA() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((i) => i.id));
+    setWrongIds([]);
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
   };
 
   const getOptStyle = (item, opt) => {
     const isSelected = answers[item.id] === opt;
-    const isWrong =
-      showResults &&
-      !showAns &&
-      answers[item.id] === opt &&
-      opt !== item.correct;
+    const isWrong = wrongIds.includes(item.id) && answers[item.id] === opt;
     const isCorrectShown = showAns && opt === item.correct;
 
-    if (isWrong)
-      return { border: `1px solid ${WRONG_COLOR}` };
+    if (isWrong) return { border: `1px solid ${WRONG_COLOR}` };
     if (isSelected || isCorrectShown)
       return { border: `1px solid ${BORDER_COLOR}`, color: "#111" };
     return { border: "1px solid transparent", color: "#444" };
@@ -94,20 +101,31 @@ export default function WB_ListenAndCircle_PageA() {
     <div className="main-container-component">
       <div
         className="div-forall"
-        style={{
-          // gap: "40px",
-        }}
+        style={
+          {
+            // gap: "40px",
+          }
+        }
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>
-          Listen and tap or click the
-          <strong className="text-blue-800"> beginning sound</strong>.
-        </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <ExerciseHeader
+          sectionLetter="A"
+          title={
+            <>
+              Listen and circle the{" "}
+              <span style={{ color: "#2e3192" }}>beginning sound</span>.
+            </>
+          }
+          subTitle="Listen carefully for the target sound, replay if needed, then choose the beginning letter sound for each picture that matches what you hear."
+        />
+        <div
+          className="w-full"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <QuestionAudioPlayer
             src={sound1}
             captions={captions}
             stopAtSecond={6.16}
+            pageId="wb-unit7-page44-q1"
           />
         </div>
 
@@ -146,7 +164,7 @@ export default function WB_ListenAndCircle_PageA() {
 
               <img
                 src={item.img}
-                alt={`item-${item.id}`}
+                alt={item.alt}
                 style={{
                   width: "90px",
                   height: "80px",
@@ -167,13 +185,15 @@ export default function WB_ListenAndCircle_PageA() {
               >
                 {item.options.map((opt) => {
                   const isWrong =
-                    showResults &&
-                    !showAns &&
-                    answers[item.id] === opt &&
-                    opt !== item.correct;
+                    wrongIds.includes(item.id) && answers[item.id] === opt;
                   return (
                     <div key={opt} style={{ position: "relative" }}>
                       <button
+                        type="button"
+                        tabIndex={
+                          lockedIds.includes(item.id) || showAns ? -1 : 0
+                        }
+                        aria-pressed={answers[item.id] === opt}
                         onClick={() => handleSelect(item.id, opt)}
                         style={{
                           width: "100%",
@@ -182,7 +202,9 @@ export default function WB_ListenAndCircle_PageA() {
                           fontSize: "clamp(15px,1.8vw,22px)",
                           fontWeight: answers[item.id] === opt ? 700 : 500,
                           cursor:
-                            showAns || showResults ? "default" : "pointer",
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                           transition: "all 0.15s",
                           userSelect: "none",
                           textAlign: "center",

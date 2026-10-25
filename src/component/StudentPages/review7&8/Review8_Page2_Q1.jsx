@@ -1,19 +1,19 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { useState } from "react";
 import {
   DndContext,
+  DragOverlay,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
   useSensor,
   useSensors,
-  PointerSensor,
-  MouseSensor,
-  TouchSensor,
-  DragOverlay,
 } from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import Button from "../../Button";
 import WrongMark from "../../WrongMark";
+import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import useUnit4TabDrag from "../unit4/useUnit4TabDrag";
+import "../unit4/unit4Interactions.css";
 import sound from "../../../assets/audio/ClassBook/Unit 8/P 73/unit8-pg73-EXC.mp3";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 2.svg";
@@ -35,9 +35,7 @@ import img17 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Gr
 import img18 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 18.svg";
 import img19 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 19.svg";
 import img20 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 73/Ex C 20.svg";
-import QuestionAudioPlayer from "../../QuestionAudioPlayer";
-
-/* ===== البيانات ===== */
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 
 const LETTERS = [
   "j",
@@ -60,24 +58,21 @@ const LETTERS = [
   "d",
 ];
 const ITEMS = [
-  { id: "q1", word: "Calendar", img: img1, correct: "c" },
+  { id: "q1", word: "calendar", img: img1, correct: "c" },
   { id: "q2", word: "van", img: img2, correct: "v" },
   { id: "q3", word: "wagon", img: img3, correct: "w" },
   { id: "q4", word: "cat", img: img4, correct: "c" },
   { id: "q5", word: "yo-yo", img: img5, correct: "y" },
-
   { id: "q6", word: "jeep", img: img6, correct: "j" },
   { id: "q7", word: "nine", img: img7, correct: "n" },
   { id: "q8", word: "kite", img: img8, correct: "k" },
   { id: "q9", word: "bubbles", img: img9, correct: "b" },
   { id: "q10", word: "moon", img: img10, correct: "m" },
-
-  { id: "q11", word: "food", img: img11, correct: "f" },
+  { id: "q11", word: "fries", img: img11, correct: "f" },
   { id: "q12", word: "book", img: img12, correct: "b" },
-  { id: "q13", word: "x-ray", img: img13, correct: "x" },
+  { id: "q13", word: "X-ray", img: img13, correct: "x" },
   { id: "q14", word: "elephant", img: img14, correct: "e" },
   { id: "q15", word: "snail", img: img15, correct: "s" },
-
   { id: "q16", word: "zebra", img: img16, correct: "z" },
   { id: "q17", word: "tomato", img: img17, correct: "t" },
   { id: "q18", word: "house", img: img18, correct: "h" },
@@ -96,268 +91,319 @@ const captions = [
     text: "X-ray, elephant, snail, zebra, tomatoes, house, apple, dog",
   },
 ];
-/* ===== draggable ===== */
 
-function DraggableLetter({ item, locked }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: item, disabled: locked });
-
+function LetterTile({ letter, disabled, register, pick }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: letter,
+    disabled,
+  });
   return (
     <div
-      ref={setNodeRef}
-      {...attributes}
+      ref={(element) => {
+        setNodeRef(element);
+        register(letter, element);
+      }}
       {...listeners}
+      {...attributes}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled}
+      aria-label={`${letter}, press Enter or Space to pick up`}
+      onKeyDown={(event) => {
+        if (!disabled && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          event.stopPropagation();
+          pick();
+        }
+      }}
+      className="unit4-interactive"
       style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         padding: "6px 10px",
         border: "1px solid #F79530",
-        borderRadius: "8px",
+        borderRadius: 8,
         background: "white",
         fontWeight: "bold",
-        fontSize: "18px",
-        cursor: "grab",
-        minWidth: "35px",
-        touchAction: "none", // مهم جدا
+        fontSize: 18,
+        cursor: disabled ? "default" : "grab",
+        minWidth: 35,
+        touchAction: "none",
         userSelect: "none",
-        WebkitUserSelect: "none",
+        transform: transform
+          ? `translate(${transform.x}px, ${transform.y}px)`
+          : undefined,
       }}
     >
-      {item}
+      {letter}
     </div>
   );
 }
 
-/* ===== drop slot ===== */
-
-function DropSlot({ id, content, onRemove }) {
-  const { setNodeRef, isOver } = useSortable({ id });
-
+function PictureSlot({
+  item,
+  value,
+  preview,
+  wrong,
+  locked,
+  register,
+  onKeyDown,
+  onRemove,
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: item.id,
+    disabled: locked,
+  });
+  const editable = Boolean(value) && !locked;
   return (
-    <div
-      ref={setNodeRef}
-      style={{
-        position: "relative",
-        width: "30px",
-        height: "30px",
-        border: isOver ? "2px dashed #F79530" : "2px solid #F79530",
-        borderRadius: "6px",
-        background: isOver ? "#fffaeeff" : "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: "bold",
-        fontSize: "16px",
-        transition: "0.2s",
-      }}
-    >
-      {content && (
-        <span
-          onClick={() => onRemove(id)}
+    <div style={{ textAlign: "center" }}>
+      <div style={{ position: "relative", display: "inline-block" }}>
+        <div
+          ref={(element) => {
+            setNodeRef(element);
+            register(item.id, element);
+          }}
+          role="button"
+          tabIndex={!locked && (value || preview) ? 0 : -1}
+          aria-disabled={locked}
+          aria-label={`${item.word}. ${
+            value ? `Beginning sound ${value}` : "Empty beginning sound slot"
+          }`}
+          onKeyDown={onKeyDown}
+          onClick={() => editable && onRemove(item.id, value)}
+          className={`unit4-drop-target unit4-interactive ${
+            preview && !value ? "unit4-keyboard-preview" : ""
+          }`}
           style={{
-            cursor: "pointer",
-            width: "100%",
-            height: "100%",
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            zIndex: 2,
+            width: 30,
+            height: 30,
+            border:
+              isOver || (preview && !value)
+                ? "2px dashed #F79530"
+                : "2px solid #F79530",
+            borderRadius: 6,
+            background: "white",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            fontWeight: "bold",
+            fontSize: 16,
+            cursor: editable ? "pointer" : "default",
           }}
         >
-          {content}
-        </span>
-      )}
+          {value || preview || ""}
+        </div>
+        <img
+          src={item.img}
+          alt={item.word}
+          draggable={false}
+          style={{
+            width: 150,
+            height: 120,
+            border: "2px solid #F79530",
+            borderRadius: 10,
+            objectFit: "contain",
+            userSelect: "none",
+            pointerEvents: "none",
+          }}
+        />
+        {wrong && (
+          <div
+            style={{ position: "absolute", bottom: 25, right: 45, zIndex: 10 }}
+          >
+            <WrongMark />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-/* ===== main ===== */
 
-const Review8_Page2_Q1 = () => {
+export default function Review8_Page2_Q1() {
   const [answers, setAnswers] = useState(
-    Object.fromEntries(ITEMS.map((i) => [i.id, null])),
+    Object.fromEntries(ITEMS.map((item) => [item.id, null])),
   );
-  const [activeId, setActiveId] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-  const [locked, setLocked] = useState(false);
-
+  const [activeLetter, setActiveLetter] = useState(null);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
+  const placeLetter = (letter, targetId) => {
+    if (showAnswer || lockedIds.includes(targetId)) return;
+    setAnswers((previous) => ({ ...previous, [targetId]: letter }));
+    setWrongIds((previous) => previous.filter((id) => id !== targetId));
+  };
+  const keyboard = useUnit4TabDrag({
+    itemIds: LETTERS,
+    targetIds: ITEMS.map((item) => item.id),
+    isItemDisabled: () => showAnswer,
+    isTargetDisabled: (id) => showAnswer || lockedIds.includes(id),
+    onPlace: placeLetter,
+  });
+  const removeLetter = (targetId, letter) => {
+    if (showAnswer || lockedIds.includes(targetId)) return;
+    setAnswers((previous) => ({ ...previous, [targetId]: null }));
+    setWrongIds((previous) => previous.filter((id) => id !== targetId));
+    keyboard.focusItem(letter);
+  };
   const checkAnswers = () => {
-    if (locked) return;
-
-    if (Object.values(answers).includes(null)) {
-      ValidationAlert.info();
+    if (showAnswer || lockedIds.length === ITEMS.length) return;
+    if (ITEMS.some((item) => !answers[item.id])) {
+      ValidationAlert.info("Please complete all answers first.");
       return;
     }
-
-    let score = 0;
-
-    ITEMS.forEach((item) => {
-      if (answers[item.id] === item.correct) score++;
-    });
-
-    const total = ITEMS.length;
-
-    if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
-    else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
-    else ValidationAlert.error(`Score: ${score} / ${total}`);
-
-    setShowResults(true);
-    setLocked(true);
+    const correctIds = ITEMS.flatMap((item) =>
+      answers[item.id] === item.correct ? [item.id] : [],
+    );
+    const incorrectIds = ITEMS.flatMap((item) =>
+      answers[item.id] !== item.correct ? [item.id] : [],
+    );
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
+    const score = correctIds.length;
+    if (score === ITEMS.length)
+      ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
+    else if (score > 0)
+      ValidationAlert.warning(`Score: ${score} / ${ITEMS.length}`);
+    else ValidationAlert.error(`Score: ${score} / ${ITEMS.length}`);
   };
-
+  const handleShowAnswer = () => {
+    setAnswers(
+      Object.fromEntries(ITEMS.map((item) => [item.id, item.correct])),
+    );
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
+    setShowAnswer(true);
+    setActiveLetter(null);
+    keyboard.cancel();
+  };
   const handleReset = () => {
-    setAnswers(Object.fromEntries(ITEMS.map((i) => [i.id, null])));
-    setShowResults(false);
-    setLocked(false);
+    setAnswers(Object.fromEntries(ITEMS.map((item) => [item.id, null])));
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAnswer(false);
+    setActiveLetter(null);
+    keyboard.cancel();
   };
-  const handleRemoveLetter = (slotId) => {
-    if (locked) return;
 
-    setAnswers((prev) => ({
-      ...prev,
-      [slotId]: null,
-    }));
-  };
   return (
     <DndContext
       sensors={sensors}
-      onDragStart={(e) => setActiveId(e.active.id)}
-      onDragEnd={(e) => {
-        if (locked) return;
-        if (e.over) {
-          setAnswers((prev) => ({
-            ...prev,
-            [e.over.id]: e.active.id,
-          }));
-        }
-        setActiveId(null);
+      onDragStart={(event) => setActiveLetter(String(event.active.id))}
+      onDragEnd={(event) => {
+        if (event.over)
+          placeLetter(String(event.active.id), String(event.over.id));
+        setActiveLetter(null);
       }}
+      onDragCancel={() => setActiveLetter(null)}
     >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: "30px",
+          padding: 30,
         }}
       >
-        <div className="div-forall" style={{ gap: "30px" }}>
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "20px" }}>C</span>
-            Listen, drag, and drop the
-            <span style={{ color: "#2e3192" }}> beginning sound</span> for each
-            word.
-          </h5>
+        <div className="div-forall" style={{ gap: 30 }}>
+          <ExerciseHeaderReview
+            sectionLetter="C"
+            title={
+              <>
+                Listen and write the{" "}
+                <span style={{ color: "#2e3192" }}>beginning sound</span> for
+                each word.
+              </>
+            }
+            subTitle="Replay the word if needed, identify its sound, then drag the matching sound tile into place."
+          />
           <QuestionAudioPlayer
             src={sound}
             captions={captions}
             stopAtSecond={8}
+            pageId="review8-page73-c"
           />
-
-          <div
-            style={{
-              marginBottom: "30px",
-            }}
-          >
-            {/* 🔤 البنك */}
+          <div className="w-full" style={{ marginBottom: 30 }}>
             <div className="p-3 mb-6">
               <div className="flex flex-wrap justify-center gap-3">
-                <SortableContext items={LETTERS}>
-                  {LETTERS.map((l) => (
-                    <DraggableLetter key={l} item={l} locked={locked} />
-                  ))}
-                </SortableContext>
+                {LETTERS.map((letter) => (
+                  <LetterTile
+                    key={letter}
+                    letter={letter}
+                    disabled={showAnswer}
+                    register={keyboard.registerItem}
+                    pick={() => keyboard.pickItem(letter)}
+                  />
+                ))}
               </div>
             </div>
-
-            {/* 🧩 الصور */}
             <div className="grid grid-cols-5 gap-x-3 gap-y-3">
-              {ITEMS.map((item) => (
-                <div key={item.id} style={{ textAlign: "center" }}>
-                  {/* 🔥 wrapper للصورة فقط */}
-                  <div
-                    style={{
-                      position: "relative",
-                      display: "inline-block",
+              {ITEMS.map((item) => {
+                const value = answers[item.id];
+                const locked = showAnswer || lockedIds.includes(item.id);
+                const preview =
+                  keyboard.keyboardTargetId === item.id
+                    ? keyboard.keyboardItemId
+                    : null;
+                return (
+                  <PictureSlot
+                    key={item.id}
+                    item={item}
+                    value={value}
+                    preview={preview}
+                    wrong={wrongIds.includes(item.id)}
+                    locked={locked}
+                    register={keyboard.registerTarget}
+                    onRemove={removeLetter}
+                    onKeyDown={(event) => {
+                      if (
+                        !keyboard.keyboardItemId &&
+                        value &&
+                        !locked &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        removeLetter(item.id, value);
+                        return;
+                      }
+                      keyboard.handleTargetKeyDown(event, item.id);
                     }}
-                  >
-                    {/* 📦 البوكس مربوط بالصورة */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: "0px",
-                        right: "0px",
-                        zIndex: 2,
-                      }}
-                    >
-                      <DropSlot
-                        id={item.id}
-                        content={answers[item.id]}
-                        onRemove={handleRemoveLetter}
-                      />
-                    </div>
-
-                    {/* 🖼️ الصورة */}
-                    <img
-                      src={item.img}
-                      style={{
-                        width: "150px",
-                        height: "120px",
-                        border: "2px solid #F79530",
-                        borderRadius: "10px",
-                      }}
-                    />
-                    {showResults &&
-                      answers[item.id] &&
-                      answers[item.id] !== item.correct && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: "25px",
-                            right: "45px", // 🔥 زي المثال اللي بدك
-                            zIndex: 10,
-                          }}
-                        >
-                          <WrongMark />
-                        </div>
-                      )}
-                  </div>
-                </div>
-              ))}
+                  />
+                );
+              })}
             </div>
           </div>
-
-          {/* 🔴 نفس البوتون */}
           <Button
-            handleShowAnswer={() => {
-              setAnswers(
-                Object.fromEntries(ITEMS.map((i) => [i.id, i.correct])),
-              );
-              setShowResults(true);
-              setLocked(true);
-            }}
+            handleShowAnswer={handleShowAnswer}
             handleStartAgain={handleReset}
             checkAnswers={checkAnswers}
           />
         </div>
       </div>
-
       <DragOverlay>
-        {activeId ? (
-          <div className="p-3 bg-white border-2 rounded-xl border-[#F79530] shadow text-[18px]">
-            {activeId}
+        {activeLetter ? (
+          <div
+            style={{
+              padding: "6px 10px",
+              background: "white",
+              border: "2px solid #F79530",
+              borderRadius: 8,
+              fontWeight: "bold",
+              fontSize: 18,
+            }}
+          >
+            {activeLetter}
           </div>
         ) : null}
       </DragOverlay>
     </DndContext>
   );
-};
-
-export default Review8_Page2_Q1;
+}

@@ -5,6 +5,20 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shal
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 90/Ex B 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 90/Ex B 4.svg";
 import "./Review10_Page1_Q2.css";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+import full1 from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/full1.mp3";
+import full2 from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/full2.mp3";
+import full3 from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/full3.mp3";
+import full4 from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/full4.mp3";
+import question1Audio from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/Item_001_What_will_she_do_on_the_weekend.mp3";
+import question2Audio from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/Item_002_What_will_they_do_on_the_weekend.mp3";
+import statement3Audio from "../../../assets/audio/ClassBook/Unit 10/Page 90 - Exercise B/Item_003_He_will_build_a_sandcastle.mp3";
+
+const fullAudio = [full1, full2, full3, full4];
+const promptAudio = [question1Audio, question2Audio, statement3Audio, null];
 const Review10_Page1_Q2 = () => {
   const questions = [
     {
@@ -49,11 +63,17 @@ const Review10_Page1_Q2 = () => {
   });
 
   const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [revealed, setRevealed] = useState(false);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const reset = () => {
     setAnswers({});
-    setLocked(false);
+    setLockedIds([]);
+    setRevealed(false);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const showAnswers = () => {
@@ -66,10 +86,13 @@ const Review10_Page1_Q2 = () => {
     });
 
     setAnswers(formatted);
-    setLocked(true);
+    setLockedIds(questions.map((_, index) => index));
+    setRevealed(true);
+    setWrongIds([]);
+    stopAudio();
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (revealed || lockedIds.length === questions.length) return;
     let score = 0;
 
     const empty = questions.some(
@@ -98,13 +121,20 @@ const Review10_Page1_Q2 = () => {
         </div>
       `);
     }
-    setLocked(true);
+    setLockedIds(
+      questions.flatMap((question, index) =>
+        answers[index] === question.correct ? [index] : [],
+      ),
+    );
+    setWrongIds(
+      questions.flatMap((question, index) =>
+        answers[index] !== question.correct ? [index] : [],
+      ),
+    );
   };
 
   const isWrong = (index) => {
-    if (!locked) return false;
-
-    return answers[index] !== questions[index].correct;
+    return wrongIds.includes(index);
   };
 
   return (
@@ -116,15 +146,36 @@ const Review10_Page1_Q2 = () => {
         padding: "30px",
       }}
     >
-      <div className="div-forall" style={{gap:"20px"}}>
-        <h5 className="header-title-page8 mb-7">
-          <span className="mr-3">B</span>Look, read, and write the questions or answers.
-        </h5>
+      <div className="div-forall" style={{ gap: "20px" }}>
+        <ExerciseHeaderReview
+          sectionLetter="B"
+          title="Look, read, and write the questions or answers."
+          subTitle="Use the picture, word bank, or grammar clue, then complete every blank before checking."
+        />
 
         <div className="questions-grid">
           {questions.map((item, i) => (
             <div
               key={i}
+              role={lockedIds.includes(i) ? "button" : undefined}
+              tabIndex={lockedIds.includes(i) ? 0 : undefined}
+              className={
+                lockedIds.includes(i)
+                  ? "unit4-audio-control unit4-full-audio-enabled"
+                  : ""
+              }
+              onClick={() =>
+                lockedIds.includes(i) && playAudio(`full-${i}`, fullAudio[i])
+              }
+              onKeyDown={(event) => {
+                if (
+                  lockedIds.includes(i) &&
+                  (event.key === "Enter" || event.key === " ")
+                ) {
+                  event.preventDefault();
+                  playAudio(`full-${i}`, fullAudio[i]);
+                }
+              }}
               style={{
                 display: "flex",
                 alignItems: "flex-start",
@@ -132,6 +183,7 @@ const Review10_Page1_Q2 = () => {
                 // height: "300px",
               }}
             >
+              <Unit4PlayingAudioIcon active={activeAudioKey === `full-${i}`} />
               {/* الرقم - جزء من الـ flex بدل absolute */}
               <span
                 style={{
@@ -160,7 +212,14 @@ const Review10_Page1_Q2 = () => {
                 {/* الصورة */}
                 <img
                   src={item.img}
-                  alt="question"
+                  alt={
+                    [
+                      "A girl reading a book.",
+                      "A family eating at a restaurant.",
+                      "A boy building a sandcastle at the beach.",
+                      "A girl doing her homework.",
+                    ][i]
+                  }
                   style={{
                     width: "180px",
                     height: "auto",
@@ -170,12 +229,69 @@ const Review10_Page1_Q2 = () => {
 
                 {/* نص السؤال */}
                 {item.q && (
-                  <p style={{ margin: 0, fontWeight: "500" }}>{item.q}</p>
+                  <p
+                    style={{ margin: 0, fontWeight: "500" }}
+                    role={promptAudio[i] ? "button" : undefined}
+                    tabIndex={promptAudio[i] ? 0 : undefined}
+                    className={
+                      promptAudio[i]
+                        ? "unit4-interactive unit4-audio-control"
+                        : ""
+                    }
+                    onClick={(event) => {
+                      if (!lockedIds.includes(i)) {
+                        event.stopPropagation();
+                        if (promptAudio[i])
+                          playAudio(`prompt-${i}`, promptAudio[i]);
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        !lockedIds.includes(i) &&
+                        promptAudio[i] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        playAudio(`prompt-${i}`, promptAudio[i]);
+                      }
+                    }}
+                  >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `prompt-${i}`}
+                    />
+                    {item.q}
+                  </p>
                 )}
 
                 {/* نوع fixed */}
                 {item.type === "fixed" && (
                   <div
+                    role={promptAudio[i] ? "button" : undefined}
+                    tabIndex={promptAudio[i] ? 0 : undefined}
+                    className={
+                      promptAudio[i]
+                        ? "unit4-interactive unit4-audio-control"
+                        : ""
+                    }
+                    onClick={(event) => {
+                      if (!lockedIds.includes(i)) {
+                        event.stopPropagation();
+                        if (promptAudio[i])
+                          playAudio(`prompt-${i}`, promptAudio[i]);
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        !lockedIds.includes(i) &&
+                        promptAudio[i] &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        playAudio(`prompt-${i}`, promptAudio[i]);
+                      }
+                    }}
                     style={{
                       borderBottom: "2px solid black",
                       padding: "5px 0",
@@ -184,6 +300,9 @@ const Review10_Page1_Q2 = () => {
                       color: "#000",
                     }}
                   >
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `prompt-${i}`}
+                    />
                     {item.answer}
                   </div>
                 )}
@@ -198,14 +317,18 @@ const Review10_Page1_Q2 = () => {
                       }}
                     >
                       <select
-                        disabled={locked}
+                        disabled={revealed || lockedIds.includes(i)}
+                        onClick={(event) => event.stopPropagation()}
                         value={answers[i] || ""}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setAnswers((prev) => ({
                             ...prev,
                             [i]: e.target.value,
-                          }))
-                        }
+                          }));
+                          setWrongIds((previous) =>
+                            previous.filter((id) => id !== i),
+                          );
+                        }}
                         style={{
                           width: "100%",
                           padding: "10px",
@@ -216,7 +339,6 @@ const Review10_Page1_Q2 = () => {
                           background: "white",
                           fontSize: "17px",
                           // fontWeight: "bold",
-                          outline: "none",
                           // color: answers[i] ? "#1e3a8a" : "#000",
                           appearance: "none",
                         }}

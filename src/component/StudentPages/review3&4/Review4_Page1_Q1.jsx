@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useRef, useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import {
   DndContext,
@@ -13,14 +14,45 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frien
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex A 4.svg";
-const ImageDrop = ({ i, children }) => {
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import useUnit4TabDrag from "../unit4/useUnit4TabDrag";
+import "../unit4/unit4Interactions.css";
+import sentence1Audio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise A/Item_001_It_is_cold._There_is_snow_on_the_ground._The_trees_have_no_leaves.mp3";
+import itsAudio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise A/Item_002_It's.mp3";
+import sentence2Audio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise A/Item_003_It_is_hot._The_sun_is_shining._We_are_playing_in_the_yard.mp3";
+import sentence3Audio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise A/Item_004_It_is_cool._The_leaves_on_the_trees_are_turning_brown._We_like_to_play_i.mp3";
+import sentence4Audio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise A/Item_005_It_is_warm._The_flowers_and_plants_are_growing._There_are_baby_birds_in.mp3";
+
+const SENTENCE_AUDIO = [
+  sentence1Audio,
+  sentence2Audio,
+  sentence3Audio,
+  sentence4Audio,
+];
+const ImageDrop = ({
+  i,
+  children,
+  registerTarget,
+  onKeyDown,
+  preview,
+  editable,
+}) => {
   const { setNodeRef } = useDroppable({
     id: `image-${i}`,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        registerTarget(`image-${i}`, element);
+      }}
+      role="button"
+      tabIndex={preview || editable ? 0 : -1}
+      onKeyDown={onKeyDown}
+      className="unit4-drop-target"
       style={{
         position: "relative",
         borderRadius: "16px",
@@ -29,6 +61,33 @@ const ImageDrop = ({ i, children }) => {
       }}
     >
       {children}
+
+      {preview && (
+        <span
+          className="unit4-keyboard-preview"
+          style={{
+            position: "absolute",
+            right: "7px",
+            bottom: "7px",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#fff",
+            border: "2px solid #F79530",
+            borderRadius: "12px",
+            fontSize: "20px",
+            fontWeight: "bold",
+            color: "#000",
+            boxSizing: "border-box",
+            pointerEvents: "none",
+            zIndex: 10,
+          }}
+        >
+          {preview}
+        </span>
+      )}
     </div>
   );
 };
@@ -83,6 +142,18 @@ const Review4_Page1_Q1 = () => {
   const [imageNumbers, setImageNumbers] = useState([null, null, null, null]);
   const [showCorrect, setShowCorrect] = useState(false);
   const [wrongMarks, setWrongMarks] = useState([]);
+  const [lockedWords, setLockedWords] = useState([]);
+  const [lockedImages, setLockedImages] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const clearWrongAspect = (questionIndex, aspect) => {
+    setWrongMarks((previous) =>
+      previous.flatMap((mark) => {
+        if (mark.qIndex !== questionIndex) return [mark];
+        const updated = { ...mark, [aspect]: false };
+        return updated.wordWrong || updated.imageWrong ? [updated] : [];
+      }),
+    );
+  };
 
   // =========================
   // dnd-kit sensors
@@ -122,12 +193,25 @@ const Review4_Page1_Q1 = () => {
       if (destinationId.startsWith("image-")) {
         const index = Number(destinationId.split("-")[1]);
 
-        const updated = [...imageNumbers];
+        if (lockedImages.includes(index)) return;
+        const updated = imageNumbers.map((value) =>
+          value === number ? null : value,
+        );
         updated[index] = number;
         setImageNumbers(updated);
+        clearWrongAspect(index, "imageWrong");
       }
     }
   };
+
+  const keyboard = useUnit4TabDrag({
+    itemIds: [1, 2, 3, 4].map((number) => `num-${number}`),
+    targetIds: [0, 1, 2, 3].map((index) => `image-${index}`),
+    isItemDisabled: (id) => imageNumbers.includes(Number(id.split("-")[1])),
+    isTargetDisabled: (id) => lockedImages.includes(Number(id.split("-")[1])),
+    onPlace: (id, targetId) =>
+      onDragEnd({ active: { id }, over: { id: targetId } }),
+  });
 
   // =========================
   const showAnswers = () => {
@@ -135,6 +219,10 @@ const Review4_Page1_Q1 = () => {
     setImageNumbers(questions.map((q) => q.correctImage));
     setShowCorrect(true);
     setWrongMarks([]);
+    setLockedWords([0, 1, 2, 3]);
+    setLockedImages([0, 1, 2, 3]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const resetAll = () => {
@@ -142,12 +230,20 @@ const Review4_Page1_Q1 = () => {
     setImageNumbers([null, null, null, null]);
     setShowCorrect(false);
     setWrongMarks([]);
+    setLockedWords([]);
+    setLockedImages([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (showCorrect) return;
+    if (
+      lockedWords.length === questions.length &&
+      lockedImages.length === questions.length
+    )
+      return;
 
-    if (answers.includes("")) {
+    if (answers.includes("") || imageNumbers.some((number) => number == null)) {
       ValidationAlert.info();
       return;
     }
@@ -175,6 +271,16 @@ const Review4_Page1_Q1 = () => {
 
     setWrongMarks(wrong);
     setShowCorrect(true);
+    setLockedWords(
+      questions.flatMap((q, i) =>
+        answers[i]?.trim().toLowerCase() === q.answer.toLowerCase() ? [i] : [],
+      ),
+    );
+    setLockedImages(
+      questions.flatMap((q, i) =>
+        imageNumbers[i] === q.correctImage ? [i] : [],
+      ),
+    );
 
     const total = questions.length * 2;
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
@@ -196,14 +302,19 @@ const Review4_Page1_Q1 = () => {
   // DRAGGABLE NUMBER (same UI)
   // =========================
   const NumberItem = ({ num, isUsed }) => {
-    const { setNodeRef, listeners, attributes, transform, isDragging } =
-      useDraggable({
-        id: `num-${num}`,
-      });
+    const pointerStart = useRef(null);
+    const pointerMoved = useRef(false);
+    const { setNodeRef, listeners, attributes, transform } = useDraggable({
+      id: `num-${num}`,
+      disabled: isUsed,
+    });
 
     return (
       <div
-        ref={setNodeRef}
+        ref={(element) => {
+          setNodeRef(element);
+          keyboard.registerItem(`num-${num}`, element);
+        }}
         {...listeners}
         {...attributes}
         style={{
@@ -220,13 +331,36 @@ const Review4_Page1_Q1 = () => {
           cursor: isUsed ? "not-allowed" : "grab",
           opacity: isUsed ? 0.5 : 1,
           userSelect: "none",
-          touchAction:"none",
+          touchAction: "none",
           zIndex: 9999999,
           ...(transform
             ? {
                 transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
               }
             : {}),
+        }}
+        role="button"
+        tabIndex={0}
+        aria-disabled={isUsed}
+        onPointerDownCapture={(event) => {
+          pointerStart.current = { x: event.clientX, y: event.clientY };
+          pointerMoved.current = false;
+        }}
+        onPointerMoveCapture={(event) => {
+          if (
+            pointerStart.current &&
+            Math.hypot(
+              event.clientX - pointerStart.current.x,
+              event.clientY - pointerStart.current.y,
+            ) > 5
+          )
+            pointerMoved.current = true;
+        }}
+        onKeyDown={(event) => {
+          if ((event.key === "Enter" || event.key === " ") && !isUsed) {
+            event.preventDefault();
+            keyboard.pickItem(`num-${num}`);
+          }
         }}
       >
         {num}
@@ -245,14 +379,17 @@ const Review4_Page1_Q1 = () => {
         }}
       >
         <div className="div-forall" style={{ gap: "5px" }}>
-          <h5 className="header-title-page8">
-            <span style={{ marginRight: "10px" }}>A</span>Read and write the season. Number the pictures.
-          </h5>
+          <ExerciseHeaderReview
+            sectionLetter="A"
+            title="Read and write the season. Number the pictures."
+            subTitle="Read one sentence at a time, then place its number on the picture that matches it."
+          />
 
           {/* ========================= */}
           {/* NUMBERS BANK */}
           {/* ========================= */}
           <div
+            className="w-full"
             style={{
               display: "flex",
               gap: "8px",
@@ -273,7 +410,7 @@ const Review4_Page1_Q1 = () => {
           {/* ========================= */}
           {/* QUESTIONS */}
           {/* ========================= */}
-          <div>
+          <div className="w-full">
             {questions.map((q, i) => {
               const wrongItem = wrongMarks.find((w) => w.qIndex === i);
               const isWordWrong = wrongItem?.wordWrong;
@@ -291,10 +428,48 @@ const Review4_Page1_Q1 = () => {
                   }}
                 >
                   {/* TEXT */}
-                  <div style={{ flex: 1, fontSize: "18px" }}>
-                    <span style={{ fontWeight: "bold" }}>{i + 1}</span> {q.text}
+                  <div
+                    className="unit4-audio-control"
+                    style={{ flex: 1, fontSize: "18px" }}
+                  >
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="unit4-interactive"
+                      onClick={() =>
+                        playAudio(`sentence-${i}`, SENTENCE_AUDIO[i])
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`sentence-${i}`, SENTENCE_AUDIO[i]);
+                        }
+                      }}
+                    >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `sentence-${i}`}
+                      />
+                      <span style={{ fontWeight: "bold" }}>{i + 1}</span>{" "}
+                      {q.text}
+                    </span>
                     <br />
-                    It’s{" "}
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="unit4-audio-control unit4-interactive"
+                      onClick={() => playAudio(`its-${i}`, itsAudio)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`its-${i}`, itsAudio);
+                        }
+                      }}
+                    >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `its-${i}`}
+                      />
+                      It’s
+                    </span>{" "}
                     <div
                       id={`${i}`}
                       style={{
@@ -311,26 +486,22 @@ const Review4_Page1_Q1 = () => {
                     >
                       <select
                         value={answers[i]}
-                        disabled={showCorrect}
+                        disabled={lockedWords.includes(i)}
                         onChange={(e) => {
                           const updated = [...answers];
                           updated[i] = e.target.value;
                           setAnswers(updated);
+                          clearWrongAspect(i, "wordWrong");
                         }}
                         style={{
                           border: "none",
-                          outline: "none",
                           // fontWeight: "bold",
                           fontSize: "20px",
                         }}
                       >
                         <option value="">Choose</option>
                         {wordBank.map((word) => (
-                          <option
-                            key={word}
-                            value={word}
-                            disabled={showCorrect}
-                          >
+                          <option key={word} value={word}>
                             {word}
                           </option>
                         ))}
@@ -350,9 +521,48 @@ const Review4_Page1_Q1 = () => {
                   </div>
 
                   {/* IMAGE */}
-                  <ImageDrop i={i}>
+                  <ImageDrop
+                    i={i}
+                    registerTarget={keyboard.registerTarget}
+                    editable={
+                      !lockedImages.includes(i) && imageNumbers[i] != null
+                    }
+                    preview={
+                      keyboard.keyboardTargetId === `image-${i}`
+                        ? keyboard.keyboardItemId?.split("-")[1]
+                        : ""
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        !keyboard.keyboardItemId &&
+                        imageNumbers[i] != null &&
+                        !lockedImages.includes(i) &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        const removed = imageNumbers[i];
+                        setImageNumbers((previous) =>
+                          previous.map((value, index) =>
+                            index === i ? null : value,
+                          ),
+                        );
+                        clearWrongAspect(i, "imageWrong");
+                        keyboard.focusItem(`num-${removed}`);
+                        return;
+                      }
+                      keyboard.handleTargetKeyDown(event, `image-${i}`);
+                    }}
+                  >
                     <img
                       src={images[i]}
+                      alt={
+                        [
+                          "Children playing among autumn leaves",
+                          "A spring scene with flowers and baby birds",
+                          "Children playing in winter snow",
+                          "Children playing sports on a hot summer day",
+                        ][i]
+                      }
                       style={{
                         width: "auto",
                         height: "100px",
@@ -373,10 +583,11 @@ const Review4_Page1_Q1 = () => {
                     )}
                     <div
                       onClick={() => {
-                        if (showCorrect) return;
+                        if (lockedImages.includes(i)) return;
                         const updated = [...imageNumbers];
                         updated[i] = null;
                         setImageNumbers(updated);
+                        clearWrongAspect(i, "imageWrong");
                       }}
                       style={{
                         position: "absolute",
@@ -391,7 +602,7 @@ const Review4_Page1_Q1 = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         fontWeight: "bold",
-                        
+
                         fontSize: "20px",
                         color: showCorrect && isImageWrong ? "red" : "black",
                       }}

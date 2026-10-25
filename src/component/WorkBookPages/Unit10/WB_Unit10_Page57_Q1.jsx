@@ -1,6 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4TabDrag from "../../StudentPages/unit4/useUnit4TabDrag";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
 import {
   DndContext,
   PointerSensor,
@@ -18,6 +23,12 @@ import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Fold
 import img4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Folder/Page 57/SVG/4.svg";
 import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Folder/Page 57/SVG/5.svg";
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U10 Folder/Page 57/SVG/6.svg";
+import sentence1Audio from "../../../assets/audio/WorkBook/unit10/Page 57 - Exercise A/Item_001_He_will_swim_in_the_sea.mp3";
+import sentence2Audio from "../../../assets/audio/WorkBook/unit10/Page 57 - Exercise A/Item_002_She_won't_fly_a_kite.mp3";
+import sentence3Audio from "../../../assets/audio/WorkBook/unit10/Page 57 - Exercise A/Item_003_They_will_go_to_the_beach.mp3";
+import sentence4Audio from "../../../assets/audio/WorkBook/unit10/Page 57 - Exercise A/Item_004_She_will_do_her_homework.mp3";
+import sentence5Audio from "../../../assets/audio/WorkBook/unit10/Page 57 - Exercise A/Item_005_She_won't_plant_a_flower.mp3";
+import sentence6Audio from "../../../assets/audio/WorkBook/unit10/Page 57 - Exercise A/Item_006_He_won't_play_the_drum.mp3";
 
 // ── ثوابت ──────────────────────────────────────────────────────
 const WRONG_COLOR = "red";
@@ -26,21 +37,21 @@ const BORDER_COLOR = "#f39b42";
 
 // ── بيانات ─────────────────────────────────────────────────────
 const SENTENCES = [
-  { id: 1, text: "He will swim in the sea." },
-  { id: 2, text: "She won't fly a kite." },
-  { id: 3, text: "They will go to the beach." },
-  { id: 4, text: "She will do her homework." },
-  { id: 5, text: "She won't plant a flower." },
-  { id: 6, text: "He won't play the drum." },
+  { id: 1, text: "He will swim in the sea.", audio: sentence1Audio },
+  { id: 2, text: "She won't fly a kite.", audio: sentence2Audio },
+  { id: 3, text: "They will go to the beach.", audio: sentence3Audio },
+  { id: 4, text: "She will do her homework.", audio: sentence4Audio },
+  { id: 5, text: "She won't plant a flower.", audio: sentence5Audio },
+  { id: 6, text: "He won't play the drum.", audio: sentence6Audio },
 ];
 
 const ITEMS = [
-  { id: 1, img: img1 },
-  { id: 2, img: img2 },
-  { id: 3, img: img3 },
-  { id: 4, img: img4 },
-  { id: 5, img: img5 },
-  { id: 6, img: img6 },
+  { id: 1, img: img1, alt: "A girl doing her homework" },
+  { id: 2, img: img2, alt: "A girl not flying a kite" },
+  { id: 3, img: img3, alt: "Children going to the beach" },
+  { id: 4, img: img4, alt: "A boy swimming in the sea" },
+  { id: 5, img: img5, alt: "A girl not planting a flower" },
+  { id: 6, img: img6, alt: "A boy not playing the drum" },
 ];
 
 const CORRECT_ANSWERS = { 1: 4, 2: 2, 3: 5, 4: 3, 5: 6, 6: 1 };
@@ -73,17 +84,37 @@ const ErrorBadge = () => (
     ✕
   </div>
 );
-function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+function DraggableNumber({
+  num,
+  disabled,
+  draggedNumber,
+  setDraggedNumber,
+  keyboard,
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: String(num),
     disabled,
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        keyboard.registerItem(num, node);
+      }}
       {...listeners}
       {...attributes}
+      data-unit4-bank-item={num}
+      tabIndex={disabled ? -1 : 0}
+      role="button"
+      aria-label={`Number ${num}${disabled ? ", already used" : ""}`}
+      aria-disabled={disabled}
+      onKeyDown={(event) => {
+        if ((event.key === "Enter" || event.key === " ") && !disabled) {
+          event.preventDefault();
+          keyboard.pickItem(num);
+        }
+      }}
       onMouseDown={() => setDraggedNumber(num)}
       onTouchStart={() => setDraggedNumber(num)}
       style={{
@@ -116,14 +147,38 @@ function DraggableNumber({ num, disabled, draggedNumber, setDraggedNumber }) {
   );
 }
 
-function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
+function DroppableImage({
+  item,
+  num,
+  wrong,
+  locked,
+  showAns,
+  handleRemove,
+  keyboard,
+}) {
   const { setNodeRef, isOver } = useDroppable({
     id: String(item.id),
   });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        keyboard.registerTarget(item.id, node);
+      }}
+      data-unit4-drop-slot={item.id}
+      tabIndex={!locked && (keyboard.keyboardItemId !== null || num) ? 0 : -1}
+      role="button"
+      aria-label={`Picture ${item.id}${num ? `, number ${num}` : ", empty"}`}
+      aria-disabled={locked}
+      onKeyDown={(event) => {
+        if (keyboard.keyboardItemId !== null) {
+          keyboard.handleTargetKeyDown(event, item.id);
+        } else if (num && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          handleRemove(item.id);
+        }
+      }}
       style={{
         position: "relative",
         width: "180px",
@@ -137,21 +192,18 @@ function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
           : "0 3px 10px rgba(0,0,0,.08)",
       }}
     >
-     
-        <img
-          src={item.img}
-          alt={`item-${item.id}`}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            display: "block",
-            userSelect: "none",
-            pointerEvents: "none",
-          
-          }}
-        />
-      
+      <img
+        src={item.img}
+        alt={item.alt}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          display: "block",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      />
 
       {/* صندوق الرقم */}
       <div
@@ -174,13 +226,20 @@ function DroppableImage({ item, num, wrong, showAns, handleRemove }) {
           boxShadow: "0 2px 8px rgba(0,0,0,.15)",
           zIndex: 10,
           cursor: num && !showAns ? "pointer" : "default",
-            transition: "0.25s ease",
-            transform: isOver ? "scale(1.05)" : "scale(1)",
-            filter: isOver ? "brightness(1.05)" : "brightness(1)",
+          transition: "0.25s ease",
+          transform: isOver ? "scale(1.05)" : "scale(1)",
+          filter: isOver ? "brightness(1.05)" : "brightness(1)",
           boxSizing: "border-box",
         }}
       >
-        {num || ""}
+        {keyboard.keyboardItemId !== null &&
+        keyboard.keyboardTargetId === item.id ? (
+          <span className="unit4-keyboard-preview">
+            {keyboard.keyboardItemId}
+          </span>
+        ) : (
+          num || ""
+        )}
       </div>
 
       {/* بادج الخطأ */}
@@ -195,6 +254,8 @@ export default function WB_Unit10_Page57_QA() {
 
   const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -210,22 +271,22 @@ export default function WB_Unit10_Page57_QA() {
   );
   const usedNumbers = Object.values(answers);
   const applyDrop = (id, num) => {
-  if (!num || showAns) return;
+    if (!num || showAns || lockedIds.includes(Number(id))) return;
 
-  setChecked(false);
+    setChecked(false);
 
-  setAnswers((prev) => {
-    const updated = { ...prev };
+    setAnswers((prev) => {
+      const updated = { ...prev };
 
-    Object.keys(updated).forEach((k) => {
-      if (updated[k] === num) delete updated[k];
+      Object.keys(updated).forEach((k) => {
+        if (updated[k] === num) delete updated[k];
+      });
+
+      updated[id] = num;
+
+      return updated;
     });
-
-    updated[id] = num;
-
-    return updated;
-  });
-};
+  };
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
@@ -236,18 +297,27 @@ export default function WB_Unit10_Page57_QA() {
     applyDrop(Number(over.id), Number(active.id));
   };
   const handleRemove = (id) => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.includes(Number(id))) return;
+    const returnedNumber = answers[id];
     setChecked(false);
     setAnswers((prev) => {
       const u = { ...prev };
       delete u[id];
       return u;
     });
+    if (returnedNumber) keyboard.focusItem(returnedNumber);
   };
+  const keyboard = useUnit4TabDrag({
+    itemIds: NUMBERS,
+    targetIds: ITEMS.map((item) => item.id),
+    isItemDisabled: (num) => usedNumbers.includes(num) || showAns,
+    isTargetDisabled: (id) => lockedIds.includes(Number(id)),
+    onPlace: (num, id) => applyDrop(Number(id), num),
+  });
 
   // ── Check / Show / Reset ──
   const handleCheck = () => {
-    if (showAns||checked) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((item) => answers[item.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first! ✏️");
@@ -258,8 +328,13 @@ export default function WB_Unit10_Page57_QA() {
       if (answers[item.id] === CORRECT_ANSWERS[item.id]) correct++;
     });
     setChecked(true);
+    setLockedIds(
+      ITEMS.filter((item) => answers[item.id] === CORRECT_ANSWERS[item.id]).map(
+        (item) => item.id,
+      ),
+    );
     const total = ITEMS.length;
-  if (correct === total) {
+    if (correct === total) {
       ValidationAlert.success(`Score: ${correct} / ${total}`);
     } else if (correct > 0) {
       ValidationAlert.warning(`Score: ${correct} / ${total}`);
@@ -272,8 +347,10 @@ export default function WB_Unit10_Page57_QA() {
     setAnswers({ ...CORRECT_ANSWERS });
     setChecked(false);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
 
     setDraggedNumber(null);
+    keyboard.cancel();
   };
 
   const handleReset = () => {
@@ -282,6 +359,9 @@ export default function WB_Unit10_Page57_QA() {
 
     setChecked(false);
     setShowAns(false);
+    setLockedIds([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const isWrong = (id) => checked && answers[id] !== CORRECT_ANSWERS[id];
@@ -295,12 +375,15 @@ export default function WB_Unit10_Page57_QA() {
       >
         <div className="div-forall" style={{ gap: "clamp(16px,2vw,24px)" }}>
           {/* ── العنوان ── */}
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">A</span> Read, look, and number the pictures.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="A"
+            title="Read, look, and number the pictures."
+            subTitle="Read all future sentence to the correct picture clues first, then assign the numbers carefully so the picture or order is used correctly."
+          />
 
           {/* ── الأرقام للسحب ── */}
           <div
+            className="w-full"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -316,6 +399,7 @@ export default function WB_Unit10_Page57_QA() {
                   disabled={usedNumbers.includes(num) || showAns}
                   draggedNumber={draggedNumber}
                   setDraggedNumber={setDraggedNumber}
+                  keyboard={keyboard}
                 />
               );
             })}
@@ -323,6 +407,7 @@ export default function WB_Unit10_Page57_QA() {
 
           {/* ── اليسار: الجمل | اليمين: الصور ── */}
           <div
+            className="w-full"
             style={{
               display: "grid",
               gridTemplateColumns: "0.95fr 1.3fr",
@@ -334,9 +419,9 @@ export default function WB_Unit10_Page57_QA() {
             <div
               style={{
                 display: "flex",
-              flexDirection: "column",
-              height:"100%",
-              justifyContent:"space-between",
+                flexDirection: "column",
+                height: "100%",
+                justifyContent: "space-between",
                 // gap: "clamp(14px,2vw,24px)",
               }}
             >
@@ -362,6 +447,17 @@ export default function WB_Unit10_Page57_QA() {
                     {item.id}
                   </span>
                   <p
+                    className="unit4-audio-control"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play: ${item.text}`}
+                    onClick={() => playAudio(`sentence-${item.id}`, item.audio)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`sentence-${item.id}`, item.audio);
+                      }
+                    }}
                     style={{
                       margin: 0,
                       fontSize: "18px",
@@ -371,6 +467,9 @@ export default function WB_Unit10_Page57_QA() {
                     }}
                   >
                     {item.text}
+                    <Unit4PlayingAudioIcon
+                      active={activeAudioKey === `sentence-${item.id}`}
+                    />
                   </p>
                 </div>
               ))}
@@ -394,8 +493,10 @@ export default function WB_Unit10_Page57_QA() {
                     item={item}
                     num={num}
                     wrong={wrong}
-                    showAns={showAns||checked}
+                    showAns={showAns || checked}
+                    locked={lockedIds.includes(item.id)}
                     handleRemove={handleRemove}
+                    keyboard={keyboard}
                   />
                 );
               })}

@@ -1,6 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 // ExerciseC.jsx
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -13,6 +14,42 @@ import {
 } from "@dnd-kit/core";
 import Button from "../../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+
+const page91D = (file) =>
+  new URL(
+    `../../../assets/audio/ClassBook/Unit 10/Page 91 - Exercise D/${file}`,
+    import.meta.url,
+  ).href;
+const WORD_AUDIO = Object.fromEntries(
+  [
+    "marks",
+    "makes",
+    "sandwiches",
+    "plays",
+    "eats",
+    "girls",
+    "boys",
+    "bags",
+    "downstairs",
+  ].map((word, index) => [
+    word,
+    page91D(`Item_${String(index + 1).padStart(3, "0")}_${word}.mp3`),
+  ]),
+);
+const SOUND_AUDIO = {
+  s: page91D("Item_010_s.mp3"),
+  z: page91D("Item_011_z.mp3"),
+};
+const SENTENCE_AUDIO = [
+  page91D("Item_012_She_gets_full_marks.mp3"),
+  page91D("Item_013_Dad_makes_us_sandwiches.mp3"),
+  page91D("Item_014_Jacob_usually_plays,_then_eats_his_lunch.mp3"),
+  page91D("Item_015_The_girls_and_boys_are_carrying_the_bags_downstairs.mp3"),
+];
 
 const wordBank = [
   "marks",
@@ -32,7 +69,18 @@ const correctAnswers = {
 };
 
 /* ===== كلمة قابلة للسحب ===== */
-function DraggableWord({ id, word, disabled, className, style, onClick }) {
+function DraggableWord({
+  id,
+  word,
+  disabled,
+  className,
+  style,
+  onClick,
+  onKeyDown,
+  register,
+  tabIndex = 0,
+  active,
+}) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
     disabled,
@@ -40,11 +88,16 @@ function DraggableWord({ id, word, disabled, className, style, onClick }) {
 
   return (
     <button
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register?.(element);
+      }}
       {...attributes}
       {...listeners}
       onClick={onClick}
-      disabled={disabled}
+      aria-disabled={disabled}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
       className={className}
       style={{
         ...style,
@@ -53,19 +106,24 @@ function DraggableWord({ id, word, disabled, className, style, onClick }) {
         cursor: disabled ? "not-allowed" : "grab",
       }}
     >
+      <Unit4PlayingAudioIcon active={active} />
       {word}
     </button>
   );
 }
 
 /* ===== منطقة قابلة للإفلات ===== */
-function DroppableZone({ id, children, className }) {
+function DroppableZone({ id, children, className, register, ...props }) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(element) => {
+        setNodeRef(element);
+        register?.(element);
+      }}
       className={className}
+      {...props}
       style={{ outline: isOver ? "2px solid #f97316" : "none" }}
     >
       {children}
@@ -76,7 +134,15 @@ function DroppableZone({ id, children, className }) {
 export default function Review10_Page2_Q2() {
   const [columns, setColumns] = useState({ s: [], z: [] });
   const [showResult, setShowResult] = useState(false);
+  const [lockedWords, setLockedWords] = useState([]);
+  const [revealed, setRevealed] = useState(false);
   const [activeWord, setActiveWord] = useState(null);
+  const [keyboardWord, setKeyboardWord] = useState(null);
+  const [focusedColumn, setFocusedColumn] = useState("s");
+  const bankRefs = useRef({});
+  const columnRefs = useRef({});
+  const draggedRef = useRef(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   // pointer sensor مع مسافة تفعيل، عشان الضغطة العادية ما تتحول لسحب
   const sensors = useSensors(
@@ -86,7 +152,7 @@ export default function Review10_Page2_Q2() {
   );
 
   const addWordToColumn = (col, word) => {
-    if (showResult || !word) return;
+    if (revealed || lockedWords.includes(word) || !word) return;
 
     setColumns((prev) => {
       const alreadyUsed = prev.s.includes(word) || prev.z.includes(word);
@@ -97,7 +163,8 @@ export default function Review10_Page2_Q2() {
   };
 
   const moveWordBetweenColumns = (fromCol, toCol, word) => {
-    if (showResult || !word || fromCol === toCol) return;
+    if (revealed || lockedWords.includes(word) || !word || fromCol === toCol)
+      return;
 
     setColumns((prev) => {
       if (prev[toCol].includes(word)) return prev;
@@ -111,7 +178,7 @@ export default function Review10_Page2_Q2() {
   };
 
   const returnWordToBank = (fromCol, word) => {
-    if (showResult || !word) return;
+    if (revealed || lockedWords.includes(word) || !word) return;
 
     setColumns((prev) => ({
       ...prev,
@@ -121,14 +188,18 @@ export default function Review10_Page2_Q2() {
 
   /* ===== dnd-kit handlers ===== */
   const handleDragStart = (event) => {
-    if (showResult) return;
+    if (revealed) return;
     const [, word] = String(event.active.id).split(":");
+    draggedRef.current = true;
     setActiveWord(word);
   };
 
   const handleDragEnd = (event) => {
     setActiveWord(null);
-    if (showResult) return;
+    window.setTimeout(() => {
+      draggedRef.current = false;
+    }, 0);
+    if (revealed) return;
 
     const { active, over } = event;
     if (!over) return;
@@ -149,10 +220,13 @@ export default function Review10_Page2_Q2() {
     }
   };
 
-  const handleDragCancel = () => setActiveWord(null);
+  const handleDragCancel = () => {
+    setActiveWord(null);
+    draggedRef.current = false;
+  };
 
   const checkAnswers = () => {
-    if (showResult) return;
+    if (revealed || lockedWords.length === wordBank.length) return;
 
     const usedWordsCount = columns.s.length + columns.z.length;
 
@@ -177,6 +251,13 @@ export default function Review10_Page2_Q2() {
     });
 
     setShowResult(true);
+    setLockedWords(
+      wordBank.filter(
+        (word) =>
+          (columns.s.includes(word) && correctAnswers.s.includes(word)) ||
+          (columns.z.includes(word) && correctAnswers.z.includes(word)),
+      ),
+    );
 
     const correctCount = results.filter((r) => r === "correct").length;
     const total = wordBank.length;
@@ -201,12 +282,20 @@ export default function Review10_Page2_Q2() {
   const handleShowAnswer = () => {
     setColumns({ s: [...correctAnswers.s], z: [...correctAnswers.z] });
     setShowResult(true);
+    setLockedWords([...wordBank]);
+    setRevealed(true);
+    setKeyboardWord(null);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setColumns({ s: [], z: [] });
     setShowResult(false);
+    setLockedWords([]);
+    setRevealed(false);
     setActiveWord(null);
+    setKeyboardWord(null);
+    stopAudio();
   };
 
   const getWordClass = (col, word) => {
@@ -241,15 +330,18 @@ export default function Review10_Page2_Q2() {
         }}
       >
         <div className="div-forall" style={{ gap: "20px" }}>
-          <h5 className="header-title-page8" style={{ display: "flex" }}>
-            <span style={{ marginRight: "15px" }}>D</span>
-            <div>
-              Does the underlined word have an{" "}
-              <span style={{ color: "#2e3192" }}>/s/</span> or{" "}
-              <span style={{ color: "#2e3192" }}>/z/</span> sound at the end?
-              Drag and drop the words in the correct columns.
-            </div>
-          </h5>
+          <ExerciseHeaderReview
+            sectionLetter="D"
+            title={
+              <>
+                Does the underlined word have an{" "}
+                <span style={{ color: "#2e3192" }}>/s/</span> or{" "}
+                <span style={{ color: "#2e3192" }}>/z/</span> sound at the end?
+                Write the words in the correct columns.
+              </>
+            }
+            subTitle="Say each word's final sound, then drag it into the /s/ or /z/ column."
+          />
 
           {/* Word Bank */}
           <DroppableZone
@@ -265,8 +357,30 @@ export default function Review10_Page2_Q2() {
                   key={word}
                   id={`bank:${word}`}
                   word={word}
-                  disabled={showResult || isUsed}
-                  className="px-4 py-2 bg-white border-1 border-gray-300 rounded-lg text-[17px] text-gray-700 transition-all"
+                  disabled={revealed || isUsed}
+                  register={(element) => {
+                    bankRefs.current[word] = element;
+                  }}
+                  tabIndex={isUsed ? -1 : 0}
+                  onClick={() =>
+                    !isUsed &&
+                    !draggedRef.current &&
+                    playAudio(`bank-${word}`, WORD_AUDIO[word])
+                  }
+                  onKeyDown={(event) => {
+                    if (isUsed) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      playAudio(`bank-${word}`, WORD_AUDIO[word]);
+                      setKeyboardWord(word);
+                      setFocusedColumn("s");
+                      window.requestAnimationFrame(() =>
+                        columnRefs.current.s?.focus(),
+                      );
+                    }
+                  }}
+                  active={activeAudioKey === `bank-${word}`}
+                  className="px-4 py-2 bg-white border-1 border-gray-300 rounded-lg text-[17px] text-gray-700 transition-all unit4-interactive unit4-audio-control"
                   style={{ opacity: isUsed ? 0.4 : 1 }}
                 />
               );
@@ -279,13 +393,96 @@ export default function Review10_Page2_Q2() {
               {["s", "z"].map((col) => (
                 <div key={col}>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="font-bold text-blue-800 text-lg">
+                    <span
+                      className="font-bold text-blue-800 text-lg unit4-interactive unit4-audio-control"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        playAudio(`sound-${col}`, SOUND_AUDIO[col])
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`sound-${col}`, SOUND_AUDIO[col]);
+                        }
+                      }}
+                    >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `sound-${col}`}
+                      />
                       /{col}/
                     </span>
                   </div>
 
-                  <DroppableZone id={`dropzone:${col}`} className={colClass}>
+                  <DroppableZone
+                    id={`dropzone:${col}`}
+                    className={`${colClass} ${
+                      keyboardWord && focusedColumn === col
+                        ? "unit4-keyboard-preview"
+                        : ""
+                    }`}
+                    role="button"
+                    tabIndex={keyboardWord ? 0 : -1}
+                    onFocus={() => setFocusedColumn(col)}
+                    onKeyDown={(event) => {
+                      if (!keyboardWord) return;
+
+                      if (event.key === "Tab") {
+                        event.preventDefault();
+
+                        const next = col === "s" ? "z" : "s";
+
+                        setFocusedColumn(next);
+
+                        columnRefs.current[next]?.focus();
+                      } else if (event.key === "Escape") {
+                        event.preventDefault();
+
+                        const word = keyboardWord;
+
+                        setKeyboardWord(null);
+
+                        window.requestAnimationFrame(() =>
+                          bankRefs.current[word]?.focus(),
+                        );
+                      } else if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+
+                        const word = keyboardWord;
+
+                        addWordToColumn(col, word);
+
+                        setKeyboardWord(null);
+
+                        window.requestAnimationFrame(() => {
+                          const next = wordBank.find(
+                            (candidate) =>
+                              !columns.s.includes(candidate) &&
+                              !columns.z.includes(candidate) &&
+                              candidate !== word,
+                          );
+
+                          bankRefs.current[next]?.focus();
+                        });
+                      }
+                    }}
+                    register={(element) => {
+                      columnRefs.current[col] = element;
+                    }}
+                  >
                     <div className="flex flex-wrap gap-2">
+                      {keyboardWord && focusedColumn === col && (
+                        <div
+                          className={`${getWordClass(col, keyboardWord)} unit4-keyboard-preview`}
+                          style={{
+                            opacity: 0.65,
+                            pointerEvents: "none",
+                          }}
+                        >
+                          {keyboardWord}
+                        </div>
+                      )}
+
                       {columns[col].map((word) => {
                         const isCorrect = correctAnswers[col].includes(word);
 
@@ -294,10 +491,30 @@ export default function Review10_Page2_Q2() {
                             <DraggableWord
                               id={`${col}:${word}`}
                               word={word}
-                              disabled={showResult}
+                              disabled={revealed || lockedWords.includes(word)}
+                              tabIndex={
+                                revealed || lockedWords.includes(word) ? -1 : 0
+                              }
                               className={getWordClass(col, word)}
                               onClick={() => {
-                                if (!showResult) returnWordToBank(col, word);
+                                if (!revealed && !lockedWords.includes(word)) {
+                                  returnWordToBank(col, word);
+                                }
+                              }}
+                              onKeyDown={(event) => {
+                                if (
+                                  !revealed &&
+                                  !lockedWords.includes(word) &&
+                                  (event.key === "Enter" || event.key === " ")
+                                ) {
+                                  event.preventDefault();
+
+                                  returnWordToBank(col, word);
+
+                                  window.requestAnimationFrame(() =>
+                                    bankRefs.current[word]?.focus(),
+                                  );
+                                }
                               }}
                             />
 
@@ -306,7 +523,7 @@ export default function Review10_Page2_Q2() {
                                 style={{
                                   position: "absolute",
                                   right: "-10px",
-                                  top: "00%",
+                                  top: "0%",
                                   transform: "translateY(-50%)",
                                   width: "22px",
                                   height: "22px",
@@ -338,11 +555,12 @@ export default function Review10_Page2_Q2() {
                       })}
                     </div>
 
-                    {columns[col].length === 0 && (
-                      <div className="text-gray-400 text-sm mt-2">
-                        Drag words here
-                      </div>
-                    )}
+                    {columns[col].length === 0 &&
+                      !(keyboardWord && focusedColumn === col) && (
+                        <div className="text-gray-400 text-sm mt-2">
+                          Drag words here
+                        </div>
+                      )}
                   </DroppableZone>
                 </div>
               ))}
@@ -351,22 +569,78 @@ export default function Review10_Page2_Q2() {
             <div
               style={{ marginTop: "20px", fontSize: "18px", lineHeight: "2" }}
             >
-              <div>
+              <div
+                role="button"
+                tabIndex={0}
+                className="unit4-interactive unit4-audio-control"
+                onClick={() => playAudio("sentence-0", SENTENCE_AUDIO[0])}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio("sentence-0", SENTENCE_AUDIO[0]);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === "sentence-0"}
+                />
                 <strong>1</strong> She gets full{" "}
                 <span style={{ textDecoration: "underline" }}>marks</span>.
               </div>
-              <div>
+              <div
+                role="button"
+                tabIndex={0}
+                className="unit4-interactive unit4-audio-control"
+                onClick={() => playAudio("sentence-1", SENTENCE_AUDIO[1])}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio("sentence-1", SENTENCE_AUDIO[1]);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === "sentence-1"}
+                />
                 <strong>2</strong> Dad{" "}
                 <span style={{ textDecoration: "underline" }}>makes</span> us{" "}
                 <span style={{ textDecoration: "underline" }}>sandwiches</span>.
               </div>
-              <div>
+              <div
+                role="button"
+                tabIndex={0}
+                className="unit4-interactive unit4-audio-control"
+                onClick={() => playAudio("sentence-2", SENTENCE_AUDIO[2])}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio("sentence-2", SENTENCE_AUDIO[2]);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === "sentence-2"}
+                />
                 <strong>3</strong> Jacob usually{" "}
                 <span style={{ textDecoration: "underline" }}>plays</span>, then{" "}
                 <span style={{ textDecoration: "underline" }}>eats</span> his
                 lunch.
               </div>
-              <div>
+              <div
+                role="button"
+                tabIndex={0}
+                className="unit4-interactive unit4-audio-control"
+                onClick={() => playAudio("sentence-3", SENTENCE_AUDIO[3])}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    playAudio("sentence-3", SENTENCE_AUDIO[3]);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === "sentence-3"}
+                />
                 <strong>4</strong> The{" "}
                 <span style={{ textDecoration: "underline" }}>girls</span> and{" "}
                 <span style={{ textDecoration: "underline" }}>boys</span> are

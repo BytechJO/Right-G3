@@ -1,4 +1,9 @@
-const Button = ({ handleStartAgain, handleShowAnswer, checkAnswers }) => {
+const Button = ({
+  handleStartAgain,
+  handleShowAnswer,
+  checkAnswers,
+  checkDisabled = false,
+}) => {
     return(
         <div className="action-buttons-container">
         <button onClick={handleStartAgain} className="try-again-button">
@@ -12,7 +17,13 @@ const Button = ({ handleStartAgain, handleShowAnswer, checkAnswers }) => {
           Show Answer
         </button>
 
-        <button onClick={checkAnswers} className="check-button2">
+        <button
+          onClick={() => {
+            if (!checkDisabled) checkAnswers();
+          }}
+          className="check-button2"
+          aria-disabled={checkDisabled}
+        >
           Check Answer ✓
         </button>
       </div>

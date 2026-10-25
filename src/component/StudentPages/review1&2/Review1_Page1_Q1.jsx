@@ -4,6 +4,24 @@ import ValidationAlert from "../../Popup/ValidationAlert";
 import imgA from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 16/Asset 17 (1).svg";
 import WrongMark from "../../WrongMark";
 import Button from "../../Button";
+import Unit2PlayingAudioIcon from "../unit2/Unit2PlayingAudioIcon";
+import useUnit2Audio from "../unit2/useUnit2Audio";
+import "../unit2/unit2Interactions.css";
+import oldestQuestionAudio from "../../../assets/audio/ClassBook/Unit 2/Page 16 - Exercise A/Item_001_Who_is_the_oldest.mp3";
+import tallestQuestionAudio from "../../../assets/audio/ClassBook/Unit 2/Page 16 - Exercise A/Item_002_Who_is_the_tallest.mp3";
+import shortestQuestionAudio from "../../../assets/audio/ClassBook/Unit 2/Page 16 - Exercise A/Item_006_Who_is_the_shortest.mp3";
+import saddestQuestionAudio from "../../../assets/audio/ClassBook/Unit 2/Page 16 - Exercise A/Item_007_Who_is_the_saddest.mp3";
+import loudestQuestionAudio from "../../../assets/audio/ClassBook/Unit 2/Page 16 - Exercise A/Item_010_Who_is_the_loudest.mp3";
+import thinnestQuestionAudio from "../../../assets/audio/ClassBook/Unit 2/Page 16 - Exercise A/Item_011_Who_is_the_thinnest.mp3";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+const QUESTION_AUDIO = {
+  1: oldestQuestionAudio,
+  2: tallestQuestionAudio,
+  3: shortestQuestionAudio,
+  4: saddestQuestionAudio,
+  5: loudestQuestionAudio,
+  6: thinnestQuestionAudio,
+};
 
 const Review1_Page1_Q1 = () => {
   const answersBank = ["A", "B", "C", "D", "E", "F"];
@@ -23,21 +41,26 @@ const Review1_Page1_Q1 = () => {
   ];
   const [textAnswer, setTextAnswer] = useState("");
   const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit2Audio();
   const handleSelect = (questionId, value) => {
-    if (locked) return;
+    if (showAnswer || correctIds.includes(questionId)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [questionId]: value,
     }));
+    setCheckedIds((previous) => previous.filter((id) => id !== questionId));
   };
   const reset = () => {
     setAnswers({});
-    setLocked(false);
-    setTextAnswer("")
-    setShowResult(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
+    setShowAnswer(false);
+    setTextAnswer("");
+    stopAudio();
   };
 
   const showAnswers = () => {
@@ -46,11 +69,14 @@ const Review1_Page1_Q1 = () => {
       filled[q.id] = q.answer;
     });
     setAnswers(filled);
-    setLocked(true);
+    setCheckedIds(questions.slice(0, 6).map((question) => question.id));
+    setCorrectIds(questions.slice(0, 6).map((question) => question.id));
+    setShowAnswer(true);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer || correctIds.length === 6) return;
     const requiredQuestions = questions.slice(0, 6);
 
     if (Object.keys(answers).length < requiredQuestions.length) {
@@ -63,6 +89,12 @@ const Review1_Page1_Q1 = () => {
     requiredQuestions.forEach((q) => {
       if (answers[q.id] === q.answer) correct++;
     });
+    setCorrectIds(
+      requiredQuestions
+        .filter((question) => answers[question.id] === question.answer)
+        .map((question) => question.id),
+    );
+    setCheckedIds(requiredQuestions.map((question) => question.id));
 
     const total = requiredQuestions.length;
 
@@ -80,8 +112,6 @@ const Review1_Page1_Q1 = () => {
     if (correct === total) ValidationAlert.success(msg);
     else if (correct === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
-    setShowResult(true);
-    setLocked(true);
   };
   return (
     <div
@@ -93,17 +123,19 @@ const Review1_Page1_Q1 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "20px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>A</span>
-          Look, read, and answer the questions.
-        </h5>
+        <ExerciseHeaderReview
+          sectionLetter="A"
+          title="Look, read, and answer the questions."
+          subTitle="Use the picture, word bank, or grammar clue, then complete every blank before checking."
+        />
 
         {/* IMAGES */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 w-full">
           <div className="flex justify-center gap-8 ">
             <div className="relative">
               <img
                 src={imgA}
+                alt="Seven labeled clowns with different ages, heights, expressions, body shapes, and one using a megaphone"
                 style={{
                   width: "100%",
                   height: "40vh",
@@ -115,26 +147,54 @@ const Review1_Page1_Q1 = () => {
 
           {/* QUESTIONS GRID */}
 
-          <div className="grid grid-cols-2 gap-x-16 mb-15 ">
+          <div className="grid grid-cols-2 gap-x-16 mb-15 w-full">
             {questions.map((q) => (
               <div key={q.id}>
                 <div className="flex gap-3 text-lg">
                   <span className="font-bold">{q.id}</span>
-                  <p>{q.text}</p>
+                  <p
+                    role={q.id <= 6 ? "button" : undefined}
+                    tabIndex={q.id <= 6 ? 0 : undefined}
+                    className={
+                      q.id <= 6
+                        ? "unit2-audio-control unit2-interactive"
+                        : undefined
+                    }
+                    onClick={() =>
+                      q.id <= 6 &&
+                      playAudio(`question-${q.id}`, QUESTION_AUDIO[q.id])
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        q.id <= 6 &&
+                        (event.key === "Enter" || event.key === " ")
+                      ) {
+                        event.preventDefault();
+                        playAudio(`question-${q.id}`, QUESTION_AUDIO[q.id]);
+                      }
+                    }}
+                  >
+                    {q.text}
+                    {q.id <= 6 && (
+                      <Unit2PlayingAudioIcon
+                        active={activeAudioKey === `question-${q.id}`}
+                      />
+                    )}
+                  </p>
                 </div>
 
                 {q.id === 7 ? (
                   <input
                     value={textAnswer}
                     onChange={(e) => setTextAnswer(e.target.value)}
-                    disabled={locked}
+                    disabled={showAnswer}
                     placeholder="Type your answer..."
                     className="border-b-1 border-black w-full mt-2"
                   />
                 ) : (
                   <div
                     style={{
-                      borderBottom: locked
+                      borderBottom: checkedIds.includes(q.id)
                         ? answers[q.id] === q.answer
                           ? "1px solid #656565ff"
                           : "2px solid #ef4444"
@@ -153,7 +213,7 @@ const Review1_Page1_Q1 = () => {
                         <select
                           value={answers[q.id] || ""}
                           onChange={(e) => handleSelect(q.id, e.target.value)}
-                          disabled={locked}
+                          disabled={showAnswer || correctIds.includes(q.id)}
                           className="border-b px-2 py-1 bg-white"
                         >
                           <option value="">Select</option>
@@ -167,7 +227,7 @@ const Review1_Page1_Q1 = () => {
                         is the {q.text.split("the ")[1].replace("?", "")}.
                       </p>
 
-                      {showResult &&
+                      {checkedIds.includes(q.id) &&
                         answers[q.id] &&
                         answers[q.id] !== q.answer && (
                           <div

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import ValidationAlert from "../../Popup/ValidationAlert";
-import img from "../../../assets/imgs/test6.png";
 import Button from "../../Button";
+import ExerciseHeader from "../../ExerciseHeader";
+import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
+import Unit1PlayingAudioIcon from "./Unit1PlayingAudioIcon";
+import useUnit1Audio from "./useUnit1Audio";
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 3.svg";
@@ -11,206 +12,280 @@ import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Bas
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 5.svg";
 import img6 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 6.svg";
 import img7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 8/Ex B 7.svg";
-const Page8_Q3 = () => {
-  const [showResult, setShowResult] = useState(false);
-  const questions = [
-    {
-      id: 1,
-      text: "Jad is older than his dad.",
-      answer: "false",
-      images: [img1], // صورة وحدة
-    },
-    {
-      id: 2,
-      text: "The giraffe is taller than the bear.",
-      answer: "true",
-      images: [img2, img3], // صورتين
-    },
-    {
-      id: 3,
-      text: "The bus is faster than the airplane.",
-      answer: "false",
-      images: [img4, img5],
-    },
-    {
-      id: 4,
-      text: "The car is bigger than the bike.",
-      answer: "true",
-      images: [img6, img7],
-    },
-  ];
+import sentence1 from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise B/Item_001_Jad_is_older_than_his_dad.mp3";
+import trueAudio from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise B/Item_002_true.mp3";
+import falseAudio from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise B/Item_003_false.mp3";
+import sentence2 from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise B/Item_004_The_giraffe_is_taller_than_the_bear.mp3";
+import sentence3 from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise B/Item_005_The_bus_is_faster_than_the_airplane.mp3";
+import sentence4 from "../../../assets/audio/ClassBook/Unit 1/Page 8 - Exercise B/Item_006_The_car_is_bigger_than_the_bike.mp3";
+import "./Page8_Q3.css";
+import "./unit1Interactions.css";
 
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "Jad is older than his dad.",
+    answer: "false",
+    audio: sentence1,
+    images: [{ src: img1, alt: "Jad standing next to his father" }],
+  },
+  {
+    id: 2,
+    text: "The giraffe is taller than the bear.",
+    answer: "true",
+    audio: sentence2,
+    images: [
+      { src: img2, alt: "A giraffe" },
+      { src: img3, alt: "A bear" },
+    ],
+  },
+  {
+    id: 3,
+    text: "The bus is faster than the airplane.",
+    answer: "false",
+    audio: sentence3,
+    images: [
+      { src: img4, alt: "A bus" },
+      { src: img5, alt: "An airplane" },
+    ],
+  },
+  {
+    id: 4,
+    text: "The car is bigger than the bike.",
+    answer: "true",
+    audio: sentence4,
+    images: [
+      { src: img6, alt: "A car" },
+      { src: img7, alt: "A bicycle" },
+    ],
+  },
+];
+
+const optionAudio = { true: trueAudio, false: falseAudio };
+
+export default function Page8_Q3() {
+  const { activeAudioKey, playAudio, stopAudio } = useUnit1Audio();
   const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [correctIds, setCorrectIds] = useState([]);
 
-  const [locked, setLocked] = useState(false);
-
-  const reset = () => {
-    setAnswers({ 1: "", 2: "", 3: "" });
-    setLocked(false);
-    setShowResult(false);
+  const selectAnswer = (event, question, value) => {
+    event.stopPropagation();
+    playAudio(`option-${question.id}-${value}`, optionAudio[value]);
+    if (revealed || correctIds.includes(question.id)) return;
+    setAnswers((previous) => ({ ...previous, [question.id]: value }));
+    setChecked(false);
   };
 
-  const showAnswers = () => {
-    const filled = {};
-    questions.forEach((q) => {
-      filled[q.id] = q.answer;
-    });
-    setAnswers(filled);
-    setLocked(true);
-    setShowResult(true);
+  const playSentence = (event, question) => {
+    event.stopPropagation();
+    playAudio(`sentence-${question.id}`, question.audio);
   };
 
   const checkAnswers = () => {
-    if (locked) return;
-
-    if (questions.some((q) => !answers[q.id])) {
-      ValidationAlert.info("Please answer all questions");
+    if (revealed || correctIds.length === QUESTIONS.length) return;
+    if (QUESTIONS.some((question) => !answers[question.id])) {
+      ValidationAlert.info("Please answer all questions.");
       return;
     }
-
-    let correct = 0;
-
-    questions.forEach((q) => {
-      if (answers[q.id] === q.answer) correct++;
-    });
-
-    const total = questions.length;
-
-    const color =
-      correct === total ? "green" : correct === 0 ? "red" : "orange";
-
-    const msg = `
-    <div style="font-size:20px;text-align:center;">
-      <span style="color:${color}; font-weight:bold;">
-        Score: ${correct} / ${total}
-      </span>
-    </div>
-  `;
-
-    if (correct === total) ValidationAlert.success(msg);
-    else if (correct === 0) ValidationAlert.error(msg);
-    else ValidationAlert.warning(msg);
-
-    setShowResult(true);
-    setLocked(true);
+    const correct = QUESTIONS.filter(
+      (question) => answers[question.id] === question.answer,
+    ).map((question) => question.id);
+    setCorrectIds(correct);
+    setChecked(true);
+    if (correct.length === QUESTIONS.length)
+      ValidationAlert.success(`Score: ${correct.length} / ${QUESTIONS.length}`);
+    else if (correct.length === 0)
+      ValidationAlert.error(`Score: 0 / ${QUESTIONS.length}`);
+    else
+      ValidationAlert.warning(`Score: ${correct.length} / ${QUESTIONS.length}`);
   };
+
+  const showAnswers = () => {
+    setAnswers(
+      Object.fromEntries(
+        QUESTIONS.map((question) => [question.id, question.answer]),
+      ),
+    );
+    setCorrectIds(QUESTIONS.map((question) => question.id));
+    setChecked(true);
+    setRevealed(true);
+    stopAudio();
+  };
+
+  const reset = () => {
+    setAnswers({});
+    setChecked(false);
+    setRevealed(false);
+    setCorrectIds([]);
+    stopAudio();
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "30px",
-      }}
-    >
-      <div className="div-forall" style={{ gap: "10px" }}>
-        <h5 className="header-title-page8">
-          <span className="ex-A" style={{ marginRight: "10px" }}>
-            B
-          </span>
-          Look, and write
-          <span style={{ color: "#2e3192" }}> true</span> or
-          <span style={{ color: "#2e3192" }}> false</span>.
-        </h5>
-        <div className=" flex flex-col  gap-8 mt-8">
-          {questions.map((q) => (
-            <div key={q.id} className="flex items-center h-[90px]">
-              <div className="flex items-center gap-4 w-[55%]">
-                <span className="font-bold text-[20px]">{q.id}</span>
-                <span className="text-[18px]">{q.text}</span>
-              </div>
+    <div className="main-container-component">
+      <div className="div-forall" style={{ gap: "20px" }}>
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Look and write <span className="text-blue-800">true</span> or{" "}
+              <span className="text-blue-800">false</span>.
+            </>
+          }
+          subTitle="Read each statement and compare it with the picture or sentence before choosing the two-way answer."
+        />
 
-              <div className="flex flex-col items-center w-[50%]">
-                <div className="flex gap-6 mb-2 text-[18px]">
-                  {["true", "false"].map((val) => {
-                    const isSelected = answers[q.id] === val;
-                    const isCorrect = q.answer === val;
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            marginTop: "12px",
+          }}
+        >
+          {QUESTIONS.map((question) => {
+            const isCorrect = correctIds.includes(question.id);
+            const cardAudioEnabled = checked && isCorrect;
+            return (
+              <div
+                key={question.id}
+                className={`unit1-audio-control ${cardAudioEnabled ? "unit1-completed-audio" : ""}`}
+                role={cardAudioEnabled ? "button" : undefined}
+                tabIndex={cardAudioEnabled ? 0 : undefined}
+                aria-label={
+                  cardAudioEnabled
+                    ? `Play complete sentence: ${question.text}`
+                    : undefined
+                }
+                onClick={() =>
+                  cardAudioEnabled &&
+                  playAudio(`full-${question.id}`, question.audio)
+                }
+                onKeyDown={(event) => {
+                  if (
+                    cardAudioEnabled &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    playAudio(`full-${question.id}`, question.audio);
+                  }
+                }}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "minmax(290px, 1.2fr) minmax(190px, .75fr) minmax(180px, .8fr)",
+                  alignItems: "center",
+                  gap: "20px",
+                  minHeight: "100px",
+                  padding: "10px 16px",
+                  borderRadius: "14px",
+                }}
+              >
+                <Unit1PlayingAudioIcon
+                  active={activeAudioKey === `full-${question.id}`}
+                />
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
+                  <strong style={{ fontSize: "20px" }}>{question.id}.</strong>
+                  <button
+                    type="button"
+                    className="unit1-audio-control unit1-interactive"
+                    onClick={(event) => playSentence(event, question)}
+                    style={{
+                      padding: "8px",
+                      background: "transparent",
+                      textAlign: "left",
+                      fontSize: "18px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {question.text}
+                    <Unit1PlayingAudioIcon
+                      active={activeAudioKey === `sentence-${question.id}`}
+                    />
+                  </button>
+                </div>
 
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "22px",
+                    borderBottom: "1px solid #6b7280",
+                    paddingBottom: "10px",
+                  }}
+                >
+                  {["true", "false"].map((value) => {
+                    const selected = answers[question.id] === value;
+                    const wrong =
+                      checked && selected && value !== question.answer;
                     return (
-                      <span
-                        key={val}
-                        onClick={() => {
-                          if (locked) return;
-                          setAnswers({ ...answers, [q.id]: val });
-                        }}
+                      <button
+                        type="button"
+                        key={value}
+                        className="unit1-audio-control unit1-interactive"
+                        onClick={(event) =>
+                          selectAnswer(event, question, value)
+                        }
+                        aria-pressed={selected}
                         style={{
                           position: "relative",
-                          cursor: locked ? "default" : "pointer",
-                          padding: "4px 12px",
-                          display: "inline-block",
+                          padding: "7px 14px",
+                          border: selected
+                            ? `2px solid ${wrong ? "#dc2626" : "#f39b42"}`
+                            : "2px solid transparent",
+                          borderRadius: "20px",
+                          background: "transparent",
+                          fontSize: "18px",
+                          cursor: "pointer",
                         }}
                       >
-                        {val}
-
-                        {/* الدائرة */}
-                        {isSelected && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-6px",
-                              left: "-10px",
-                              right: "-10px",
-                              bottom: "-6px",
-                              border: isSelected
-                                ? showResult
-                                  ? isCorrect
-                                    ? "1px solid #f39b42"
-                                    : "2px solid red"
-                                  : "1px solid #f39b42"
-                                : "none",
-                              borderRadius: "20px",
-                              pointerEvents: "none",
-                            }}
-                          />
-                        )}
-
-                        {showResult && isSelected && !isCorrect && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              right: "-2px", // 🔥 حركها يمين
-                              top: "0px", // 🔥 حركها لأعلى
-                            }}
-                          >
-                            <WrongMark />
-                          </div>
-                        )}
-                      </span>
+                        {value}
+                        <Unit1PlayingAudioIcon
+                          active={
+                            activeAudioKey === `option-${question.id}-${value}`
+                          }
+                        />
+                        {wrong && <WrongMark />}
+                      </button>
                     );
                   })}
                 </div>
 
-                {/* الخط */}
-                <div className="w-[70%] border-b-[1px] border-gray-500"></div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "10px",
+                  }}
+                >
+                  {question.images.map((image) => (
+                    <img
+                      key={image.src}
+                      src={image.src}
+                      alt={image.alt}
+                      style={{
+                        width: question.images.length === 1 ? "105px" : "76px",
+                        height: "78px",
+                        objectFit: "contain",
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-
-              {/* الصورة */}
-              <div className="w-[50%] flex justify-center gap-2">
-                {q.images.map((image, i) => (
-                  <img
-                    key={i}
-                    src={image}
-                    alt=""
-                    style={{
-                      width: q.images.length === 1 ? "100px" : "70px",
-                      height: "auto",
-                      objectFit: "contain",
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        {/* BUTTONS */}
+
         <Button
           handleShowAnswer={showAnswers}
           handleStartAgain={reset}
           checkAnswers={checkAnswers}
+          checkDisabled={revealed || correctIds.length === QUESTIONS.length}
         />
       </div>
     </div>
   );
-};
-
-export default Page8_Q3;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 1.svg";
@@ -6,6 +6,17 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Frien
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 4.svg";
 import img5 from "../../../assets/imgs/pages/classbook/Right 3 Unit 4 My E-Friend Folder/Page 36/Ex C 5.svg";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import "../unit4/unit4Interactions.css";
+import cloudyAudio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise C/Item_001_cloudy.mp3";
+import rainyAudio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise C/Item_002_rainy.mp3";
+import coldAudio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise C/Item_003_cold.mp3";
+import warmAudio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise C/Item_004_warm.mp3";
+import hotAudio from "../../../assets/audio/ClassBook/Unit 4/Page 36 - Exercise C/Item_005_hot.mp3";
+
+const WORD_AUDIO = [cloudyAudio, rainyAudio, coldAudio, warmAudio, hotAudio];
 
 const Review4_Page1_Q3 = () => {
   const [lines, setLines] = useState([]);
@@ -16,6 +27,25 @@ const Review4_Page1_Q3 = () => {
   const containerRef = useRef(null);
   const [isChecked, setIsChecked] = useState(false);
   const [showedAnswer, setShowedAnswer] = useState(false);
+  const [lockedImages, setLockedImages] = useState([]);
+  const [wrongImages, setWrongImages] = useState([]);
+  const [keyboardOrigin, setKeyboardOrigin] = useState(null);
+  const [keyboardTarget, setKeyboardTarget] = useState(null);
+  const endpointRefs = useRef({});
+  const [pointerPreview, setPointerPreview] = useState(null);
+  const [, setLayoutTick] = useState(0);
+  const pointerOrigin = useRef(null);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  useEffect(() => {
+    const update = () => setLayoutTick((value) => value + 1);
+    window.addEventListener("resize", update);
+    const observer = new ResizeObserver(update);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => {
+      window.removeEventListener("resize", update);
+      observer.disconnect();
+    };
+  }, []);
   const images = [
     { image: img1 },
     { image: img2 },
@@ -34,7 +64,16 @@ const Review4_Page1_Q3 = () => {
   };
 
   const handleDotClick = (index, type) => {
-    if (isChecked || showedAnswer) return;
+    if (showedAnswer) return;
+    const endpointLocked =
+      type === "image"
+        ? lockedImages.includes(index)
+        : lines.some(
+            (line) =>
+              line.to.index === index && lockedImages.includes(line.from.index),
+          );
+    if (type === "text") playAudio(`word-${index}`, WORD_AUDIO[index]);
+    if (endpointLocked) return;
     if (!startDot) {
       setStartDot({ index, type });
       return;
@@ -48,6 +87,19 @@ const Review4_Page1_Q3 = () => {
     const imageIndex = startDot.type === "image" ? startDot.index : index;
 
     const textIndex = startDot.type === "text" ? startDot.index : index;
+
+    if (lockedImages.includes(imageIndex)) {
+      setStartDot(null);
+      return;
+    }
+    const lockedTargetUsed = lines.some(
+      (line) =>
+        line.to.index === textIndex && lockedImages.includes(line.from.index),
+    );
+    if (lockedTargetUsed) {
+      setStartDot(null);
+      return;
+    }
 
     setLines((prevLines) => {
       let updatedLines = [...prevLines];
@@ -73,12 +125,134 @@ const Review4_Page1_Q3 = () => {
       return updatedLines;
     });
 
+    setWrongImages((previous) => previous.filter((id) => id !== imageIndex));
+
     setStartDot(null);
   };
 
-  const showAnswers = () => {
-    if (isChecked) return;
+  const availableTargets = (origin) =>
+    [0, 1, 2, 3, 4].filter((id) => {
+      if (origin.type === "image")
+        return !lines.some(
+          (line) =>
+            line.to.index === id && lockedImages.includes(line.from.index),
+        );
+      return !lockedImages.includes(id);
+    });
+  const focusEndpoint = (type, id) =>
+    requestAnimationFrame(() =>
+      endpointRefs.current[`${type}-${id}`]?.focus({ preventScroll: true }),
+    );
+  const handleEndpointKeyDown = (event, index, type) => {
+    if (!keyboardOrigin) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        if (type === "text") playAudio(`word-${index}`, WORD_AUDIO[index]);
+        const origin = { index, type };
+        const targets = availableTargets(origin);
+        if (!targets.length) return;
+        setKeyboardOrigin(origin);
+        setStartDot(origin);
+        setKeyboardTarget(targets[0]);
+        focusEndpoint(type === "image" ? "text" : "image", targets[0]);
+      }
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      const origin = keyboardOrigin;
+      setKeyboardOrigin(null);
+      setKeyboardTarget(null);
+      setStartDot(null);
+      focusEndpoint(origin.type, origin.index);
+      return;
+    }
+    const targetType = keyboardOrigin.type === "image" ? "text" : "image";
+    if (type !== targetType) return;
+    if (event.key === "Tab") {
+      event.preventDefault();
+      const targets = availableTargets(keyboardOrigin);
+      const current = targets.indexOf(index);
+      const next =
+        targets[
+          (current + (event.shiftKey ? -1 : 1) + targets.length) %
+            targets.length
+        ];
+      setKeyboardTarget(next);
+      focusEndpoint(type, next);
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      const origin = keyboardOrigin;
+      handleDotClick(index, type);
+      setKeyboardOrigin(null);
+      setKeyboardTarget(null);
+      focusEndpoint(origin.type, origin.index);
+    }
+  };
+  const beginPointerMatch = (event, index, type) => {
+    if (showedAnswer) return;
+    const dot =
+      type === "image"
+        ? imageDotRefs.current[index]
+        : textDotRefs.current[index];
+    if (!dot || !containerRef.current) return;
+    const dotRect = dot.getBoundingClientRect();
+    const box = containerRef.current.getBoundingClientRect();
+    pointerOrigin.current = {
+      index,
+      type,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+    setPointerPreview({
+      x1: dotRect.left - box.left + dotRect.width / 2,
+      y1: dotRect.top - box.top + dotRect.height / 2,
+      x2: dotRect.left - box.left + dotRect.width / 2,
+      y2: dotRect.top - box.top + dotRect.height / 2,
+      moved: false,
+    });
+  };
+  const movePointerMatch = (event) => {
+    if (!pointerOrigin.current || !containerRef.current) return;
+    const box = containerRef.current.getBoundingClientRect();
+    const moved =
+      Math.hypot(
+        event.clientX - pointerOrigin.current.startX,
+        event.clientY - pointerOrigin.current.startY,
+      ) > 5;
+    setPointerPreview((previous) =>
+      previous
+        ? {
+            ...previous,
+            x2: event.clientX - box.left,
+            y2: event.clientY - box.top,
+            moved,
+          }
+        : previous,
+    );
+  };
+  const endPointerMatch = (event) => {
+    if (!pointerOrigin.current) return;
+    const origin = pointerOrigin.current;
+    if (pointerPreview?.moved) {
+      const endpoint = document
+        .elementFromPoint(event.clientX, event.clientY)
+        ?.closest("[data-match-side]");
+      setStartDot(origin);
+      if (endpoint && endpoint.dataset.matchSide !== origin.type)
+        handleDotClick(
+          Number(endpoint.dataset.matchId),
+          endpoint.dataset.matchSide,
+        );
+      else setStartDot(null);
+    } else handleDotClick(origin.index, origin.type);
+    pointerOrigin.current = null;
+    setPointerPreview(null);
+  };
 
+  const showAnswers = () => {
     const answerLines = Object.keys(correctMatches).map((imgIndex) => ({
       from: { index: parseInt(imgIndex), type: "image" },
       to: { index: correctMatches[imgIndex], type: "text" },
@@ -86,16 +260,28 @@ const Review4_Page1_Q3 = () => {
 
     setLines(answerLines);
     setShowedAnswer(true);
+    setLockedImages([0, 1, 2, 3, 4]);
+    setWrongImages([]);
+    setKeyboardOrigin(null);
+    setKeyboardTarget(null);
+    setPointerPreview(null);
+    stopAudio();
   };
   const resetAll = () => {
     setLines([]);
     setStartDot(null);
     setIsChecked(false);
     setShowedAnswer(false);
+    setLockedImages([]);
+    setWrongImages([]);
+    setKeyboardOrigin(null);
+    setKeyboardTarget(null);
+    setPointerPreview(null);
+    stopAudio();
   };
 
   const checkAnswers = () => {
-    if (showedAnswer) return;
+    if (showedAnswer || lockedImages.length === images.length) return;
     if (lines.length !== images.length) {
       ValidationAlert.info(
         "Oops!",
@@ -130,6 +316,22 @@ const Review4_Page1_Q3 = () => {
       </div>
     `;
     setIsChecked(true);
+    const correct = lines.flatMap((line) =>
+      correctMatches[line.from.index] === line.to.index
+        ? [line.from.index]
+        : [],
+    );
+    const wrong = lines.flatMap((line) =>
+      correctMatches[line.from.index] !== line.to.index
+        ? [line.from.index]
+        : [],
+    );
+    setLockedImages(correct);
+    setWrongImages(wrong);
+    setStartDot(null);
+    setKeyboardOrigin(null);
+    setKeyboardTarget(null);
+    setPointerPreview(null);
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
@@ -144,7 +346,7 @@ const Review4_Page1_Q3 = () => {
       const textIndex =
         line.from.type === "text" ? line.from.index : line.to.index;
 
-      if (correctMatches[imageIndex] !== textIndex) {
+      if (wrongImages.includes(imageIndex)) {
         wrongWords.push(textIndex);
       }
     });
@@ -152,6 +354,12 @@ const Review4_Page1_Q3 = () => {
   return (
     <div
       ref={containerRef}
+      onPointerMove={movePointerMatch}
+      onPointerUp={endPointerMatch}
+      onPointerCancel={() => {
+        pointerOrigin.current = null;
+        setPointerPreview(null);
+      }}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -161,18 +369,28 @@ const Review4_Page1_Q3 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "20px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>C</span> Match and write the words.
-        </h5>
+        <ExerciseHeaderReview
+          sectionLetter="C"
+          title="Match and write the words."
+          subTitle="Start with one word or picture, then connect it to the partner that means the same thing."
+        />
 
         {/* TEXTS TOP */}
-        <div className="flex flex-wrap justify-center gap-10 md:gap-12 lg:gap-15 mb-10 md:mb-20 lg:mb-30 mt-5 md:mt-10 lg:mt-7">
+        <div className="flex flex-wrap justify-center gap-10 md:gap-12 lg:gap-15 mb-10 md:mb-20 lg:mb-30 mt-5 md:mt-10 lg:mt-7 w-full">
           {words.map((word, i) => {
             const isWrong = wrongWords.includes(i);
 
             return (
               <div key={`text-${i}`} className="relative inline-block">
                 <p
+                  ref={(element) => {
+                    endpointRefs.current[`text-${i}`] = element;
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Match ${word}`}
+                  data-match-side="text"
+                  data-match-id={i}
                   className={`px-10 py-2 rounded-[20px] font-semibold text-[15px] cursor-pointer min-w-[120px] text-center whitespace-pre-line
         ${
           startDot?.index === i && startDot?.type === "text"
@@ -183,8 +401,12 @@ const Review4_Page1_Q3 = () => {
         }
       
         `}
-                  onClick={() => handleDotClick(i, "text")}
+                  onPointerDown={(event) => beginPointerMatch(event, i, "text")}
+                  onKeyDown={(event) => handleEndpointKeyDown(event, i, "text")}
                 >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `word-${i}`}
+                  />
                   {word}
                 </p>
 
@@ -224,7 +446,7 @@ const Review4_Page1_Q3 = () => {
 
                 <div
                   ref={(el) => (textDotRefs.current[i] = el)}
-                  onClick={() => handleDotClick(i, "text")}
+                  aria-hidden="true"
                   className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-3 h-3 bg-[#F79530] rounded-full cursor-pointer"
                 />
               </div>
@@ -233,21 +455,41 @@ const Review4_Page1_Q3 = () => {
         </div>
 
         {/* IMAGES BOTTOM */}
-        <div className="flex flex-wrap justify-center gap-4 mt-16">
+        <div className="flex flex-wrap justify-center gap-4 mt-16 w-full" >
           {images.map((item, i) => (
             <div
               key={`img-${i}`}
+              ref={(element) => {
+                endpointRefs.current[`image-${i}`] = element;
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={`Match ${["Cold weather", "Warm sunny weather", "Hot sunny weather", "Rainy weather", "Cloudy weather"][i]}`}
+              data-match-side="image"
+              data-match-id={i}
+              onPointerDown={(event) => beginPointerMatch(event, i, "image")}
+              onKeyDown={(event) => handleEndpointKeyDown(event, i, "image")}
               className="flex flex-col items-center relative"
+              style={{ touchAction: "none" }}
             >
               <div
                 ref={(el) => (imageDotRefs.current[i] = el)}
-                onClick={() => handleDotClick(i, "image")}
+                aria-hidden="true"
                 className="w-3 h-3 bg-[#F79530] rounded-full cursor-pointer "
               />
 
               <img
                 src={item.image}
-                onClick={() => handleDotClick(i, "image")}
+                alt={
+                  [
+                    "Cold weather",
+                    "Warm sunny weather",
+                    "Hot sunny weather",
+                    "Rainy weather",
+                    "Cloudy weather",
+                  ][i]
+                }
+                draggable={false}
                 style={{
                   height:
                     window.innerWidth >= 768 && window.innerWidth < 1024
@@ -313,6 +555,48 @@ const Review4_Page1_Q3 = () => {
             />
           );
         })}
+        {pointerPreview?.moved && (
+          <line
+            x1={pointerPreview.x1}
+            y1={pointerPreview.y1}
+            x2={pointerPreview.x2}
+            y2={pointerPreview.y2}
+            stroke="#F79530"
+            strokeWidth="3.5"
+            strokeDasharray="6 4"
+            strokeLinecap="round"
+          />
+        )}
+        {keyboardOrigin &&
+          keyboardTarget != null &&
+          (() => {
+            const originDot =
+              keyboardOrigin.type === "image"
+                ? imageDotRefs.current[keyboardOrigin.index]
+                : textDotRefs.current[keyboardOrigin.index];
+            const targetType =
+              keyboardOrigin.type === "image" ? "text" : "image";
+            const targetDot =
+              targetType === "image"
+                ? imageDotRefs.current[keyboardTarget]
+                : textDotRefs.current[keyboardTarget];
+            if (!originDot || !targetDot || !containerRef.current) return null;
+            const box = containerRef.current.getBoundingClientRect();
+            const a = originDot.getBoundingClientRect();
+            const b = targetDot.getBoundingClientRect();
+            return (
+              <line
+                x1={a.left - box.left + a.width / 2}
+                y1={a.top - box.top + a.height / 2}
+                x2={b.left - box.left + b.width / 2}
+                y2={b.top - box.top + b.height / 2}
+                stroke="#F79530"
+                strokeWidth="3.5"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
+            );
+          })()}
       </svg>
 
       <div className="action-buttons-container">

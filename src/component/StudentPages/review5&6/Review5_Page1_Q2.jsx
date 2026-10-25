@@ -1,5 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 import ValidationAlert from "../../Popup/ValidationAlert";
+import { FaVolumeUp } from "react-icons/fa";
 import "./Review5_Page1_Q2.css";
 
 import behind from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Ex B 1.svg";
@@ -9,153 +11,998 @@ import inFrontOf from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets 
 import on from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Asset 10.svg";
 import nextTo from "../../../assets/imgs/pages/classbook/Right 3 Unit 6 Lets Run! Folder/Page 52/Asset 9.svg";
 
-const Review5_Page1_Q2 = () => {
-  const leftRefs = useRef({});
-  const rightRefs = useRef({});
-  const items = [
-    { id: 1, text: "behind" },
-    { id: 2, text: "in front of" },
-    { id: 3, text: "next to" },
-    { id: 4, text: "between" },
-    { id: 5, text: "on" },
-    { id: 6, text: "under" },
-  ];
+import behindAudio from "../../../assets/audio/ClassBook/Unit 6/Page 52 - Exercise B/Item_001_behind.mp3";
+import inFrontAudio from "../../../assets/audio/ClassBook/Unit 6/Page 52 - Exercise B/Item_002_in_front_of.mp3";
+import nextToAudio from "../../../assets/audio/ClassBook/Unit 6/Page 52 - Exercise B/Item_003_next_to.mp3";
+import betweenAudio from "../../../assets/audio/ClassBook/Unit 6/Page 52 - Exercise B/Item_004_between.mp3";
+import onAudio from "../../../assets/audio/ClassBook/Unit 6/Page 52 - Exercise B/Item_005_on.mp3";
+import underAudio from "../../../assets/audio/ClassBook/Unit 6/Page 52 - Exercise B/Item_006_under.mp3";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 
-  const images = [
-    { id: "a", src: behind },
-    { id: "b", src: under },
-    { id: "c", src: between },
-    { id: "d", src: inFrontOf },
-    { id: "e", src: nextTo },
-    { id: "f", src:  on },
-  ];
-  const correctAnswers = {
-    1: "a",
-    2: "d",
-    3: "e",
-    4: "c",
-    5: "f",
-    6: "b",
-  };
-  const [locked, setLocked] = useState(false);
-  const [selected, setSelected] = useState(null);
+const ITEMS = [
+  {
+    id: 1,
+    text: "behind",
+    audio: behindAudio,
+  },
+  {
+    id: 2,
+    text: "in front of",
+    audio: inFrontAudio,
+  },
+  {
+    id: 3,
+    text: "next to",
+    audio: nextToAudio,
+  },
+  {
+    id: 4,
+    text: "between",
+    audio: betweenAudio,
+  },
+  {
+    id: 5,
+    text: "on",
+    audio: onAudio,
+  },
+  {
+    id: 6,
+    text: "under",
+    audio: underAudio,
+  },
+];
+
+const IMAGES = [
+  {
+    id: "a",
+    src: behind,
+    alt: "A red ball behind a box.",
+  },
+  {
+    id: "b",
+    src: under,
+    alt: "A red ball under a box.",
+  },
+  {
+    id: "c",
+    src: between,
+    alt: "A red ball between two boxes.",
+  },
+  {
+    id: "d",
+    src: inFrontOf,
+    alt: "A red ball in front of a box.",
+  },
+  {
+    id: "e",
+    src: nextTo,
+    alt: "A red ball next to a box.",
+  },
+  {
+    id: "f",
+    src: on,
+    alt: "A red ball on a box.",
+  },
+];
+
+const CORRECT_ANSWERS = {
+  1: "a",
+  2: "d",
+  3: "e",
+  4: "c",
+  5: "f",
+  6: "b",
+};
+
+const Review5_Page1_Q2 = () => {
+  const containerRef = useRef(null);
+
+  // Anchor points for lines
+  const leftAnchorRefs = useRef({});
+  const rightAnchorRefs = useRef({});
+
+  // Focusable elements
+  const leftFocusRefs = useRef({});
+  const rightFocusRefs = useRef({});
+
+  // Audio
+  const audioRef = useRef(null);
+  const [playingId, setPlayingId] = useState(null);
+
+  // Connections
   const [connections, setConnections] = useState([]);
+
+  // Mouse selection
+  const [selected, setSelected] = useState(null);
+
+  // Keyboard matching
+  const [keyboardStart, setKeyboardStart] = useState(null);
+  const [keyboardTarget, setKeyboardTarget] = useState(null);
+
+  // Validation
   const [wrongMap, setWrongMap] = useState({});
-  const getRelativePos = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const parent = e.target.closest(".container").getBoundingClientRect();
+  const [lockedIds, setLockedIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [checkCompleted, setCheckCompleted] = useState(false);
+
+  // Force lines to recalculate on resize
+  const [, forceLineUpdate] = useState(0);
+
+  /* =====================================================
+     AUDIO
+  ===================================================== */
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+
+      try {
+        audioRef.current.currentTime = 0;
+      } catch {
+        // ignore
+      }
+
+      audioRef.current = null;
+    }
+
+    setPlayingId(null);
+  };
+
+  const playWordAudio = (item) => {
+    if (!item?.audio) return;
+
+    stopAudio();
+
+    const audio = new Audio(item.audio);
+
+    audioRef.current = audio;
+    setPlayingId(item.id);
+
+    audio.onended = () => {
+      if (audioRef.current === audio) {
+        audioRef.current = null;
+        setPlayingId(null);
+      }
+    };
+
+    audio.onerror = () => {
+      if (audioRef.current === audio) {
+        audioRef.current = null;
+        setPlayingId(null);
+      }
+    };
+
+    audio.play().catch(() => {
+      if (audioRef.current === audio) {
+        audioRef.current = null;
+        setPlayingId(null);
+      }
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  /* =====================================================
+     RESIZE
+  ===================================================== */
+
+  useEffect(() => {
+    const handleResize = () => {
+      forceLineUpdate((prev) => prev + 1);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  /* =====================================================
+     LOCK HELPERS
+  ===================================================== */
+
+  const isSourceLocked = (sourceId) => lockedIds.includes(sourceId);
+
+  const isTargetLocked = (targetId) =>
+    connections.some(
+      (connection) =>
+        connection.to === targetId && lockedIds.includes(connection.from),
+    );
+
+  /* =====================================================
+     LINE POSITION
+  ===================================================== */
+
+  const getCenter = (element) => {
+    if (!element || !containerRef.current) {
+      return null;
+    }
+
+    const parentRect = containerRef.current.getBoundingClientRect();
+
+    const rect = element.getBoundingClientRect();
 
     return {
-      x: rect.left - parent.left + rect.width / 2,
-      y: rect.top - parent.top + rect.height / 2,
+      x: rect.left - parentRect.left + rect.width / 2,
+
+      y: rect.top - parentRect.top + rect.height / 2,
     };
   };
 
-  const handleSelect = (id, e) => {
-    const pos = getRelativePos(e);
-    setSelected({ id, ...pos });
+  const getConnectionPositions = (from, to) => {
+    const leftElement = leftAnchorRefs.current[from];
+
+    const rightElement = rightAnchorRefs.current[to];
+
+    const leftPos = getCenter(leftElement);
+    const rightPos = getCenter(rightElement);
+
+    if (!leftPos || !rightPos) {
+      return null;
+    }
+
+    return {
+      x1: leftPos.x,
+      y1: leftPos.y,
+      x2: rightPos.x,
+      y2: rightPos.y,
+    };
   };
 
-const handleImage = (id) => {
-  if (!selected) return;
+  /* =====================================================
+     PERMANENT LINE PATH
+  ===================================================== */
 
-  const parent = document
-    .querySelector(".container")
-    .getBoundingClientRect();
+  const makePath = (line) => {
+    if (!line) return "";
 
-  const rightEl = rightRefs.current[id];
-  const rect = rightEl.getBoundingClientRect();
-
-  const newConnection = {
-    from: selected.id,
-    to: id,
-    x1: selected.x,
-    y1: selected.y,
-    x2: rect.left - parent.left - 15,
-    y2: rect.top - parent.top + rect.height / 2,
+    return `
+      M ${line.x1} ${line.y1}
+      C ${(line.x1 + line.x2) / 2} ${line.y1},
+        ${(line.x1 + line.x2) / 2} ${line.y2},
+        ${line.x2} ${line.y2}
+    `;
   };
 
-  const filtered = connections.filter(
-    (c) => c.from !== selected.id && c.to !== id,
-  );
+  /* =====================================================
+     KEYBOARD PREVIEW LINE
+  ===================================================== */
 
-  setConnections([...filtered, newConnection]);
+  const getKeyboardPreviewLine = () => {
+    if (!keyboardStart || !keyboardTarget) {
+      return null;
+    }
 
-  setSelected(null);
-};
-  const resetAll = () => {
-    setConnections([]);
-    setSelected(null);
-    setLocked(false);
-    setWrongMap({});
+    /*
+      LEFT -> RIGHT
+    */
+
+    if (keyboardStart.side === "left" && keyboardTarget.side === "right") {
+      return getConnectionPositions(keyboardStart.id, keyboardTarget.id);
+    }
+
+    /*
+      RIGHT -> LEFT
+
+      Line still needs:
+      source anchor -> image anchor
+    */
+
+    if (keyboardStart.side === "right" && keyboardTarget.side === "left") {
+      return getConnectionPositions(keyboardTarget.id, keyboardStart.id);
+    }
+
+    return null;
   };
 
-  const showAnswers = () => {
-    const parent = document.querySelector(".container").getBoundingClientRect();
+  const keyboardPreviewLine = getKeyboardPreviewLine();
 
-    const newConnections = items.map((item) => {
-      const to = correctAnswers[item.id];
+  /* =====================================================
+     AVAILABLE TARGETS
+  ===================================================== */
 
-      const leftEl = leftRefs.current[item.id];
-      const rightEl = rightRefs.current[to];
+  const getAvailableTargets = () =>
+    IMAGES.map((image) => image.id).filter(
+      (targetId) => !isTargetLocked(targetId),
+    );
 
-      const leftRect = leftEl.getBoundingClientRect();
-      const rightRect = rightEl.getBoundingClientRect();
+  const getAvailableSources = () =>
+    ITEMS.map((item) => item.id).filter(
+      (sourceId) => !isSourceLocked(sourceId),
+    );
 
-      return {
-  from: item.id,
-  to: to,
-  x1: leftRect.left - parent.left + leftRect.width / 2,
-  y1: leftRect.top - parent.top + leftRect.height / 2,
-  x2: rightRect.left - parent.left - 15,
-  y2: rightRect.top - parent.top + rightRect.height / 2,
-};
+  /* =====================================================
+     FOCUS HELPERS
+  ===================================================== */
+
+  const focusSource = (sourceId) => {
+    window.requestAnimationFrame(() => {
+      leftFocusRefs.current[sourceId]?.focus({
+        preventScroll: true,
+      });
+    });
+  };
+
+  const focusTarget = (targetId) => {
+    window.requestAnimationFrame(() => {
+      rightFocusRefs.current[targetId]?.focus({
+        preventScroll: true,
+      });
+    });
+  };
+
+  /* =====================================================
+     COMMIT CONNECTION
+     ONE TO ONE
+  ===================================================== */
+
+  const commitConnection = (sourceId, targetId) => {
+    if (
+      showAnswer ||
+      checkCompleted ||
+      isSourceLocked(sourceId) ||
+      isTargetLocked(targetId)
+    ) {
+      return;
+    }
+
+    /*
+      Find displaced wrong source before replacing.
+    */
+
+    const displacedConnection = connections.find(
+      (connection) =>
+        connection.to === targetId &&
+        connection.from !== sourceId &&
+        !isSourceLocked(connection.from),
+    );
+
+    /*
+      One-to-one:
+      remove previous line from this source
+      AND previous line using this target.
+    */
+
+    setConnections((previous) => [
+      ...previous.filter(
+        (connection) =>
+          connection.from !== sourceId && connection.to !== targetId,
+      ),
+      {
+        from: sourceId,
+        to: targetId,
+      },
+    ]);
+
+    /*
+      Clear wrong X only for edited source
+      and displaced wrong source.
+    */
+
+    setWrongMap((previous) => {
+      const next = {
+        ...previous,
+      };
+
+      delete next[sourceId];
+
+      if (displacedConnection) {
+        delete next[displacedConnection.from];
+      }
+
+      return next;
     });
 
-    setConnections(newConnections);
-    setLocked(true);
+    setSelected(null);
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
   };
-  const checkAnswers = () => {
-    if (locked) return;
 
-    if (connections.length !== items.length) {
+  /* =====================================================
+     MOUSE SOURCE
+  ===================================================== */
+
+  const handleSourceClick = (sourceId) => {
+    const item = ITEMS.find((entry) => entry.id === sourceId);
+
+    /*
+      Word click always plays audio.
+    */
+
+    if (item) {
+      playWordAudio(item);
+    }
+
+    /*
+      Correct locked source:
+      audio only.
+    */
+
+    if (showAnswer || checkCompleted || isSourceLocked(sourceId)) {
+      return;
+    }
+
+    /*
+      Mouse selection started from image side.
+    */
+
+    if (selected?.side === "right") {
+      commitConnection(sourceId, selected.id);
+      return;
+    }
+
+    setSelected({
+      side: "left",
+      id: sourceId,
+    });
+
+    /*
+      Mouse mode cancels keyboard preview.
+    */
+
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
+  };
+
+  /* =====================================================
+     MOUSE TARGET
+  ===================================================== */
+
+  const handleTargetClick = (targetId) => {
+    if (showAnswer || checkCompleted || isTargetLocked(targetId)) {
+      return;
+    }
+
+    /*
+      Mouse selection started from word side.
+    */
+
+    if (selected?.side === "left") {
+      commitConnection(selected.id, targetId);
+      return;
+    }
+
+    setSelected({
+      side: "right",
+      id: targetId,
+    });
+
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
+  };
+
+  /* =====================================================
+     KEYBOARD START FROM SOURCE
+  ===================================================== */
+
+  const startKeyboardFromSource = (sourceId) => {
+    const item = ITEMS.find((entry) => entry.id === sourceId);
+
+    /*
+      Enter / Space on word plays audio.
+    */
+
+    if (item) {
+      playWordAudio(item);
+    }
+
+    /*
+      Locked correct word remains audio accessible.
+    */
+
+    if (showAnswer || checkCompleted || isSourceLocked(sourceId)) {
+      return;
+    }
+
+    const targets = getAvailableTargets();
+
+    if (!targets.length) return;
+
+    setSelected({
+      side: "left",
+      id: sourceId,
+    });
+
+    setKeyboardStart({
+      side: "left",
+      id: sourceId,
+    });
+
+    setKeyboardTarget({
+      side: "right",
+      id: targets[0],
+    });
+
+    focusTarget(targets[0]);
+  };
+
+  /* =====================================================
+     KEYBOARD START FROM TARGET
+  ===================================================== */
+
+  const startKeyboardFromTarget = (targetId) => {
+    if (showAnswer || checkCompleted || isTargetLocked(targetId)) {
+      return;
+    }
+
+    const sources = getAvailableSources();
+
+    if (!sources.length) return;
+
+    setSelected({
+      side: "right",
+      id: targetId,
+    });
+
+    setKeyboardStart({
+      side: "right",
+      id: targetId,
+    });
+
+    setKeyboardTarget({
+      side: "left",
+      id: sources[0],
+    });
+
+    focusSource(sources[0]);
+  };
+
+  /* =====================================================
+     CANCEL KEYBOARD
+  ===================================================== */
+
+  const cancelKeyboardMatch = () => {
+    const origin = keyboardStart;
+
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
+    setSelected(null);
+
+    if (!origin) return;
+
+    if (origin.side === "left") {
+      focusSource(origin.id);
+    } else {
+      focusTarget(origin.id);
+    }
+  };
+  const focusNextUnconnectedSource = (justConnectedSourceId) => {
+    window.requestAnimationFrame(() => {
+      const connectedSourceIds = new Set(
+        connections
+          .filter((connection) => connection.from !== justConnectedSourceId)
+          .map((connection) => connection.from),
+      );
+
+      connectedSourceIds.add(justConnectedSourceId);
+
+      const nextSource = ITEMS.find(
+        (item) => !connectedSourceIds.has(item.id) && !isSourceLocked(item.id),
+      );
+
+      if (nextSource) {
+        focusSource(nextSource.id);
+      }
+    });
+  };
+  /* =====================================================
+     SOURCE KEYBOARD
+  ===================================================== */
+
+  const handleSourceKeyDown = (event, sourceId) => {
+    /* =====================================================
+     ACTIVE MATCH:
+     started from RIGHT -> cycling LEFT
+  ===================================================== */
+
+    if (keyboardStart?.side === "right" && keyboardTarget?.side === "left") {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        cancelKeyboardMatch();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        event.preventDefault();
+
+        const sources = getAvailableSources();
+
+        if (!sources.length) return;
+
+        const currentIndex = sources.indexOf(sourceId);
+
+        const direction = event.shiftKey ? -1 : 1;
+
+        const nextIndex =
+          (currentIndex + direction + sources.length) % sources.length;
+
+        const nextSource = sources[nextIndex];
+
+        setKeyboardTarget({
+          side: "left",
+          id: nextSource,
+        });
+
+        focusSource(nextSource);
+
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const item = ITEMS.find((entry) => entry.id === sourceId);
+
+        if (item) {
+          playWordAudio(item);
+        }
+
+        commitConnection(sourceId, keyboardStart.id);
+
+        focusNextUnconnectedSource(sourceId);
+
+        return;
+      }
+    }
+
+    /* =====================================================
+     NORMAL TAB ORDER:
+     SOURCE 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> TARGET a
+  ===================================================== */
+
+    if (event.key === "Tab" && !keyboardStart) {
+      const sourceIds = ITEMS.map((item) => item.id);
+
+      const currentIndex = sourceIds.indexOf(sourceId);
+
+      /* Shift + Tab */
+
+      if (event.shiftKey) {
+        /*
+        من أول source نخلي المتصفح يطلع للعنصر السابق
+        الطبيعي خارج السؤال.
+      */
+        if (currentIndex === 0) {
+          return;
+        }
+
+        event.preventDefault();
+
+        focusSource(sourceIds[currentIndex - 1]);
+
+        return;
+      }
+
+      /* Normal Tab */
+
+      event.preventDefault();
+
+      /*
+      إذا مش آخر كلمة:
+      روح للكلمة اللي بعدها.
+    */
+
+      if (currentIndex < sourceIds.length - 1) {
+        focusSource(sourceIds[currentIndex + 1]);
+
+        return;
+      }
+
+      /*
+      آخر كلمة -> أول صورة
+    */
+
+      const targets = getAvailableTargets();
+
+      if (targets.length) {
+        focusTarget(targets[0]);
+      }
+
+      return;
+    }
+
+    /* =====================================================
+     ENTER / SPACE START MATCH
+  ===================================================== */
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+
+      startKeyboardFromSource(sourceId);
+
+      return;
+    }
+
+    /* =====================================================
+     ESCAPE
+  ===================================================== */
+
+    if (event.key === "Escape" && selected?.side === "left") {
+      event.preventDefault();
+      event.stopPropagation();
+
+      setSelected(null);
+      setKeyboardStart(null);
+      setKeyboardTarget(null);
+    }
+  };
+
+  /* =====================================================
+     TARGET KEYBOARD
+  ===================================================== */
+
+  const handleTargetKeyDown = (event, targetId) => {
+    /* =====================================================
+     ACTIVE MATCH:
+     started from LEFT -> cycling RIGHT
+  ===================================================== */
+
+    if (keyboardStart?.side === "left" && keyboardTarget?.side === "right") {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        cancelKeyboardMatch();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        event.preventDefault();
+
+        const targets = getAvailableTargets();
+
+        if (!targets.length) return;
+
+        const currentIndex = targets.indexOf(targetId);
+
+        const direction = event.shiftKey ? -1 : 1;
+
+        const nextIndex =
+          (currentIndex + direction + targets.length) % targets.length;
+
+        const nextTarget = targets[nextIndex];
+
+        setKeyboardTarget({
+          side: "right",
+          id: nextTarget,
+        });
+
+        focusTarget(nextTarget);
+
+        return;
+      }
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const connectedSourceId = keyboardStart.id;
+
+        commitConnection(connectedSourceId, targetId);
+
+        focusNextUnconnectedSource(connectedSourceId);
+
+        return;
+      }
+    }
+
+    /* =====================================================
+     NORMAL TAB ORDER:
+     TARGET a -> b -> c -> d -> e -> f
+  ===================================================== */
+
+    if (event.key === "Tab" && !keyboardStart) {
+      const targets = getAvailableTargets();
+
+      const currentIndex = targets.indexOf(targetId);
+
+      /*
+      Shift + Tab
+    */
+
+      if (event.shiftKey) {
+        event.preventDefault();
+
+        /*
+        أول صورة -> آخر كلمة يسار
+      */
+
+        if (currentIndex === 0) {
+          const sources = ITEMS.map((item) => item.id).filter(
+            (id) => !isSourceLocked(id),
+          );
+
+          if (sources.length) {
+            focusSource(sources[sources.length - 1]);
+          }
+
+          return;
+        }
+
+        focusTarget(targets[currentIndex - 1]);
+
+        return;
+      }
+
+      /*
+      Normal Tab
+    */
+
+      /*
+      آخر target:
+      لا نمنع الـTab،
+      خليه يطلع طبيعي للأزرار اللي بعد السؤال.
+    */
+
+      if (currentIndex === targets.length - 1) {
+        return;
+      }
+
+      event.preventDefault();
+
+      focusTarget(targets[currentIndex + 1]);
+
+      return;
+    }
+
+    /* =====================================================
+     ENTER / SPACE START FROM TARGET
+  ===================================================== */
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+
+      startKeyboardFromTarget(targetId);
+
+      return;
+    }
+
+    /* =====================================================
+     ESCAPE
+  ===================================================== */
+
+    if (event.key === "Escape" && selected?.side === "right") {
+      event.preventDefault();
+      event.stopPropagation();
+
+      setSelected(null);
+      setKeyboardStart(null);
+      setKeyboardTarget(null);
+    }
+  };
+
+  /* =====================================================
+     CHECK
+  ===================================================== */
+
+  const checkAnswers = () => {
+    if (showAnswer || checkCompleted) {
+      return;
+    }
+
+    if (connections.length !== ITEMS.length) {
       ValidationAlert.info("Complete all matches first!");
       return;
     }
 
     let score = 0;
-    const wrongs = {};
 
-    connections.forEach((c) => {
-      const isCorrect = correctAnswers[c.from] === c.to;
+    const nextWrong = {};
+    const correctIds = [];
 
-      if (isCorrect) {
+    connections.forEach((connection) => {
+      const correct = CORRECT_ANSWERS[connection.from] === connection.to;
+
+      if (correct) {
         score++;
+
+        correctIds.push(connection.from);
       } else {
-        wrongs[c.from] = true; // 👈 نخزن الغلط حسب رقم السؤال
+        nextWrong[connection.from] = true;
       }
     });
 
-    setWrongMap(wrongs);
+    /*
+      Lock only correct sources.
+    */
 
-    const total = items.length;
+    setLockedIds((previous) => [...new Set([...previous, ...correctIds])]);
 
-    const color = score === total ? "green" : score === 0 ? "red" : "orange";
+    setWrongMap(nextWrong);
 
-    const message = `
-<div style="font-size:20px;text-align:center;">
-<span style="color:${color};font-weight:bold;">
-Score: ${score} / ${total}
-</span>
-</div>
-`;
+    setSelected(null);
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
 
-    if (score === total) ValidationAlert.success(message);
-    else if (score === 0) ValidationAlert.error(message);
-    else ValidationAlert.warning(message);
+    const total = ITEMS.length;
 
-    setLocked(true);
+    if (score === total) {
+      setLockedIds(ITEMS.map((item) => item.id));
+
+      setCheckCompleted(true);
+
+      ValidationAlert.success(`Score: ${score} / ${total}`);
+    } else if (score === 0) {
+      ValidationAlert.error(`Score: ${score} / ${total}`);
+    } else {
+      ValidationAlert.warning(`Score: ${score} / ${total}`);
+    }
   };
+
+  /* =====================================================
+     SHOW ANSWER
+  ===================================================== */
+
+  const showAnswers = () => {
+    const answers = ITEMS.map((item) => ({
+      from: item.id,
+      to: CORRECT_ANSWERS[item.id],
+    }));
+
+    setConnections(answers);
+
+    setWrongMap({});
+
+    setLockedIds(ITEMS.map((item) => item.id));
+
+    setSelected(null);
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
+
+    setShowAnswer(true);
+    setCheckCompleted(true);
+
+    stopAudio();
+  };
+
+  /* =====================================================
+     RESET
+  ===================================================== */
+
+  const resetAll = () => {
+    setConnections([]);
+
+    setSelected(null);
+
+    setKeyboardStart(null);
+    setKeyboardTarget(null);
+
+    setWrongMap({});
+
+    setLockedIds([]);
+
+    setShowAnswer(false);
+    setCheckCompleted(false);
+
+    stopAudio();
+  };
+
+  /* =====================================================
+     SELECTION HELPERS
+  ===================================================== */
+
+  const isSourceSelected = (id) =>
+    selected?.side === "left" && selected.id === id;
+
+  const isTargetSelected = (id) =>
+    selected?.side === "right" && selected.id === id;
+
+  const isKeyboardSourceTarget = (id) =>
+    keyboardTarget?.side === "left" && keyboardTarget.id === id;
+
+  const isKeyboardRightTarget = (id) =>
+    keyboardTarget?.side === "right" && keyboardTarget.id === id;
 
   return (
     <div
@@ -166,55 +1013,242 @@ Score: ${score} / ${total}
         padding: "30px",
       }}
     >
-      <div className="div-forall" style={{ gap: "15px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>B</span>
-         Read, match, and write.
-        </h5>
+      {/* =================================================
+          LOCAL STYLE
+      ================================================= */}
 
-        <div className="container relative w-full h-[500px] px-5">
-          {/* الخطوط */}
-          <svg className="absolute w-full h-full pointer-events-none">
-            {connections.map((c, i) => (
+      <style>{`
+        .review5-match-source,
+        .review5-match-target {
+          outline: none;
+          border-radius: 8px;
+          transition:
+            outline 0.15s ease,
+            transform 0.15s ease,
+            background-color 0.15s ease;
+        }
+
+        /* NORMAL TAB FOCUS */
+        .review5-match-source:focus-visible,
+        .review5-match-target:focus-visible {
+          outline: 3px solid #2563eb !important;
+          outline-offset: 4px;
+        }
+
+        /* SELECTED ORIGIN */
+        .review5-match-selected {
+          outline: 3px solid #2563eb !important;
+          outline-offset: 4px;
+        }
+
+        /* CURRENT KEYBOARD TARGET */
+        .review5-match-keyboard-target {
+          outline: 3px dashed #2563eb !important;
+          outline-offset: 4px;
+        }
+
+        .review5-match-source:hover,
+        .review5-match-target:hover {
+          transform: scale(1.02);
+        }
+
+        .review5-match-locked {
+          cursor: default;
+        }
+
+        .review5-match-image {
+          width: 80px;
+          height: 60px;
+          object-fit: contain;
+          display: block;
+          user-select: none;
+          pointer-events: none;
+        }
+      `}</style>
+
+      <div
+        className="div-forall"
+        style={{
+          gap: "15px",
+        }}
+      >
+        <ExerciseHeaderReview
+          sectionLetter="B"
+          title="Read, match, and write."
+          subTitle="Start with one word or picture, then connect it to the partner that means the same thing."
+        />
+        <div
+          ref={containerRef}
+          className="container relative w-full h-[500px] px-5"
+        >
+          {/* =================================================
+              LINES
+          ================================================= */}
+
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            aria-hidden="true"
+            style={{
+              zIndex: 0,
+              overflow: "visible",
+            }}
+          >
+            {/* PERMANENT CONNECTIONS */}
+
+            {connections.map((connection) => {
+              const line = getConnectionPositions(
+                connection.from,
+                connection.to,
+              );
+
+              if (!line) return null;
+
+              return (
+                <path
+                  key={`${connection.from}-${connection.to}`}
+                  d={makePath(line)}
+                  stroke="red"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray="5 5"
+                />
+              );
+            })}
+
+            {/* =========================================
+                KEYBOARD PREVIEW
+            ========================================= */}
+
+            {keyboardPreviewLine && (
               <path
-                key={i}
-                d={`M ${c.x1} ${c.y1}
-                C ${(c.x1 + c.x2) / 2} ${c.y1},
-                  ${(c.x1 + c.x2) / 2} ${c.y2},
-                  ${c.x2} ${c.y2}`}
-                stroke="red"
-                strokeWidth="2"
+                d={makePath(keyboardPreviewLine)}
+                stroke="#2563eb"
+                strokeWidth="3"
                 fill="none"
-                strokeDasharray="5,5"
+                strokeDasharray="7 5"
+                strokeLinecap="round"
               />
-            ))}
+            )}
           </svg>
 
-          {/* اليسار (كلمات + بوكس) */}
-          <div className="w-full flex flex-col gap-6">
-            {items.map((item, index) => {
-              const img = images[index];
+          {/* =================================================
+              ROWS
+          ================================================= */}
+
+          <div
+            className="w-full flex flex-col gap-6"
+            style={{
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            {ITEMS.map((item, index) => {
+              const img = IMAGES[index];
+
               const isRight = index % 2 !== 0;
+
+              const sourceLocked = isSourceLocked(item.id);
+
+              const targetLocked = isTargetLocked(img.id);
+
+              const sourceSelected = isSourceSelected(item.id);
+
+              const targetSelected = isTargetSelected(img.id);
+
+              const sourceKeyboardTarget = isKeyboardSourceTarget(item.id);
+
+              const targetKeyboardTarget = isKeyboardRightTarget(img.id);
+
+              const connected = connections.find(
+                (connection) => connection.from === item.id,
+              );
 
               return (
                 <div
                   key={item.id}
                   className="flex items-center justify-between w-[90%]"
                 >
-                  {/* 🔹 اليسار */}
-                  <div className="flex items-center gap-4">
-                    <div style={{ width: "150px" }}>
-                      <span style={{ fontWeight: "bold", marginRight: "10px" }}>
+                  {/* =========================================
+                      LEFT
+                  ========================================= */}
+
+                  <div
+                    ref={(element) => {
+                      leftFocusRefs.current[item.id] = element;
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={
+                      sourceLocked
+                        ? `Play ${item.text}`
+                        : `${item.text}. Press Enter or Space to start matching.`
+                    }
+                    onClick={() => handleSourceClick(item.id)}
+                    onKeyDown={(event) => handleSourceKeyDown(event, item.id)}
+                    className={`
+                      flex items-center gap-4
+                      review5-match-source
+                      ${sourceSelected ? "review5-match-selected" : ""}
+                      ${
+                        sourceKeyboardTarget
+                          ? "review5-match-keyboard-target"
+                          : ""
+                      }
+                      ${sourceLocked ? "review5-match-locked" : ""}
+                    `}
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    {/* WORD */}
+
+                    <div
+                      style={{
+                        width: "150px",
+                        position: "relative",
+                        paddingRight: "22px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: "bold",
+                          marginRight: "10px",
+                        }}
+                      >
                         {item.id}
                       </span>
+
                       {item.text}
+
+                      {/* AUDIO ICON ONLY WHILE PLAYING */}
+
+                      {playingId === item.id && (
+                        <FaVolumeUp
+                          aria-hidden="true"
+                          size={15}
+                          style={{
+                            position: "absolute",
+                            top: "2px",
+                            right: "2px",
+                            pointerEvents: "none",
+                            zIndex: 5,
+                          }}
+                        />
+                      )}
+
+                      {/* WRONG */}
+
                       {wrongMap[item.id] && (
                         <span
+                          aria-hidden="true"
                           style={{
+                            position: "absolute",
+                            top: "-10px",
+                            right: "-8px",
                             width: "20px",
                             height: "20px",
                             background: "#ef4444",
-                            color: "white",
+                            color: "#fff",
                             borderRadius: "50%",
                             display: "flex",
                             alignItems: "center",
@@ -224,7 +1258,7 @@ Score: ${score} / ${total}
                             border: "2px solid white",
                             boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                             pointerEvents: "none",
-                            zIndex: 3,
+                            zIndex: 5,
                           }}
                         >
                           ✕
@@ -232,53 +1266,113 @@ Score: ${score} / ${total}
                       )}
                     </div>
 
-                    <div
-                      ref={(el) => (leftRefs.current[item.id] = el)}
-                      onClick={(e) => handleSelect(item.id, e)}
-                      className="w-10 h-10 flex items-center justify-center cursor-pointer"
-                      style={{
-                        border: "2px solid orange",
-                        borderRadius: "10px",
-                        backgroundColor:
-                          selected?.id === item.id ? "#fde68a" : "#fff",
-                      }}
-                    >
-                      {connections.find((c) => c.from === item.id)?.to}
-                    </div>
-                  </div>
+                    {/* LEFT DOT / BOX */}
 
-                  {/* 🔹 اليمين (الصورة + البوكس) */}
-                  <div
-                   onClick={() => handleImage(img.id)}
-                    className="flex items-center gap-3 cursor-pointer"
-                    style={{
-                      marginRight: isRight ? "40px" : "0px",
-                    }}
-                  >
                     <div
-                      ref={(el) => (rightRefs.current[img.id] = el)}
+                      ref={(element) => {
+                        leftAnchorRefs.current[item.id] = element;
+                      }}
+                      aria-hidden="true"
                       style={{
-                        width: "30px",
-                        height: "30px",
-                        border: "2px solid orange",
-                        borderRadius: "8px",
+                        width: "40px",
+                        height: "40px",
+
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+
+                        border:
+                          sourceSelected || sourceKeyboardTarget
+                            ? "3px solid #2563eb"
+                            : "2px solid orange",
+
+                        borderRadius: "10px",
+
                         backgroundColor:
-                          selected?.id &&
-                          connections.find((c) => c.to === img.id)
-                            ? "#fff"
+                          sourceSelected || sourceKeyboardTarget
+                            ? "#fde68a"
                             : "#fff",
+
+                        boxSizing: "border-box",
+
+                        transition: "border 0.15s ease, background 0.15s ease",
+                      }}
+                    >
+                      {connected?.to}
+                    </div>
+                  </div>
+
+                  {/* =========================================
+                      RIGHT
+                  ========================================= */}
+
+                  <div
+                    ref={(element) => {
+                      rightFocusRefs.current[img.id] = element;
+                    }}
+                    role="button"
+                    tabIndex={targetLocked ? -1 : 0}
+                    aria-label={`Option ${img.id}. ${img.alt}`}
+                    onClick={() => handleTargetClick(img.id)}
+                    onKeyDown={(event) => handleTargetKeyDown(event, img.id)}
+                    className={`
+                      flex items-center gap-3
+                      review5-match-target
+                      ${targetSelected ? "review5-match-selected" : ""}
+                      ${
+                        targetKeyboardTarget
+                          ? "review5-match-keyboard-target"
+                          : ""
+                      }
+                      ${targetLocked ? "review5-match-locked" : ""}
+                    `}
+                    style={{
+                      marginRight: isRight ? "40px" : "0px",
+
+                      cursor: targetLocked ? "default" : "pointer",
+                    }}
+                  >
+                    {/* RIGHT DOT / BOX */}
+
+                    <div
+                      ref={(element) => {
+                        rightAnchorRefs.current[img.id] = element;
+                      }}
+                      aria-hidden="true"
+                      style={{
+                        width: "30px",
+                        height: "30px",
+
+                        border:
+                          targetSelected || targetKeyboardTarget
+                            ? "3px solid #2563eb"
+                            : "2px solid orange",
+
+                        borderRadius: "8px",
+
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+
+                        backgroundColor:
+                          targetSelected || targetKeyboardTarget
+                            ? "#fde68a"
+                            : "#fff",
+
+                        boxSizing: "border-box",
+
+                        transition: "border 0.15s ease, background 0.15s ease",
                       }}
                     >
                       {img.id}
                     </div>
 
+                    {/* IMAGE */}
+
                     <img
                       src={img.src}
-                      alt=""
-                      style={{ width: "80px", height: "60px" }}
+                      alt={img.alt}
+                      className="review5-match-image"
                     />
                   </div>
                 </div>
@@ -288,16 +1382,20 @@ Score: ${score} / ${total}
         </div>
       </div>
 
+      {/* =================================================
+          BUTTONS
+      ================================================= */}
+
       <div className="action-buttons-container">
-        <button onClick={resetAll} className="try-again-button">
+        <button type="button" onClick={resetAll} className="try-again-button">
           Start Again ↻
         </button>
 
-        <button onClick={showAnswers} className="show-answer-btn">
+        <button type="button" onClick={showAnswers} className="show-answer-btn">
           Show Answer
         </button>
 
-        <button onClick={checkAnswers} className="check-button2">
+        <button type="button" onClick={checkAnswers} className="check-button2">
           Check Answer ✓
         </button>
       </div>

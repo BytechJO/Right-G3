@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import audio1 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_001_There_were_horses_on_the_farm.mp3";
+import audio2 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_002_There_weren't_horses_on_the_farm.mp3";
+import audio3 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_003_They_were_at_the_bus_station.mp3";
+import audio4 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_004_They_weren't_at_the_bus_station.mp3";
+import audio5 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_005_They_were_watching_TV_at_home.mp3";
+import audio6 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_006_They_weren't_watching_TV_at_home.mp3";
+import audio7 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_007_He_was_at_school.mp3";
+import audio8 from "../../../assets/audio/WorkBook/unit8/Page 49 - Exercise I/Item_008_He_wasn't_at_school.mp3";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U8 Folder/Page 49/SVG/2.svg";
@@ -42,23 +54,36 @@ const ITEMS = [
     correct: "He wasn’t at school.",
   },
 ];
+const OPTION_AUDIO = [
+  audio1,
+  audio2,
+  audio3,
+  audio4,
+  audio5,
+  audio6,
+  audio7,
+  audio8,
+];
 
 export default function WB_Unit8_Page48_QI() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
+    setWrongIds((previous) => previous.filter((itemId) => itemId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -75,7 +100,16 @@ export default function WB_Unit8_Page48_QI() {
       }
     });
 
-    setShowResults(true);
+    setLockedIds(
+      ITEMS.flatMap((item) =>
+        answers[item.id] === item.correct ? [item.id] : [],
+      ),
+    );
+    setWrongIds(
+      ITEMS.flatMap((item) =>
+        answers[item.id] !== item.correct ? [item.id] : [],
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -93,19 +127,22 @@ export default function WB_Unit8_Page48_QI() {
     });
 
     setAnswers(correctMap);
-    setShowResults(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
     setShowAns(true);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
+    setLockedIds([]);
+    setWrongIds([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const isWrong = (id) => {
-    if (!showResults) return false;
-    return answers[id] !== ITEMS.find((item) => item.id === id).correct;
+    return wrongIds.includes(id);
   };
 
   const renderCheckBox = (itemId, text) => {
@@ -114,6 +151,9 @@ export default function WB_Unit8_Page48_QI() {
     return (
       <div className="relative">
         <button
+          type="button"
+          tabIndex={lockedIds.includes(itemId) || showAns ? -1 : 0}
+          aria-disabled={lockedIds.includes(itemId) || showAns}
           onClick={() => handleSelect(itemId, text)}
           style={{
             width: "44px",
@@ -128,7 +168,8 @@ export default function WB_Unit8_Page48_QI() {
             fontSize: "40px",
             lineHeight: "1",
             fontWeight: "700",
-            cursor: showAns ? "default" : "pointer",
+            cursor:
+              showAns || lockedIds.includes(itemId) ? "default" : "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -136,7 +177,9 @@ export default function WB_Unit8_Page48_QI() {
             padding: 0,
           }}
         >
-          {selected && <img src={trueIcon} style={{ height: "25px" }} />}
+          {selected && (
+            <img src={trueIcon} alt="Selected" style={{ height: "25px" }} />
+          )}
         </button>
         {isWrong(itemId) && selected && (
           <div
@@ -174,10 +217,11 @@ export default function WB_Unit8_Page48_QI() {
           gap: "clamp(18px,2.5vw,28px)",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">I</span>Look, read, and write
-          <strong className="text-red-600"> ✓</strong>.
-        </h1>
+        <ExerciseHeader
+          sectionLetter="I"
+          title="Look, read, and write."
+          subTitle="Read each past-location statement that matches each picture carefully, use the picture or sentence evidence to check it, then choose the correct Yes/No or True/False response."
+        />
 
         <div
           style={{
@@ -222,7 +266,14 @@ export default function WB_Unit8_Page48_QI() {
 
                 <img
                   src={item.img}
-                  alt={`question-${item.id}`}
+                  alt={
+                    [
+                      "Horses on a farm",
+                      "People away from a bus station",
+                      "A family watching TV at home",
+                      "A boy away from school",
+                    ][item.id - 1]
+                  }
                   style={{
                     width: "auto",
                     height: "100px",
@@ -255,6 +306,24 @@ export default function WB_Unit8_Page48_QI() {
                     }}
                   >
                     <p
+                      role="button"
+                      tabIndex={0}
+                      className="unit4-audio-control unit4-interactive"
+                      onClick={() =>
+                        playAudio(
+                          `option-${item.id}-${index}`,
+                          OPTION_AUDIO[(item.id - 1) * 2 + index],
+                        )
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(
+                            `option-${item.id}-${index}`,
+                            OPTION_AUDIO[(item.id - 1) * 2 + index],
+                          );
+                        }
+                      }}
                       style={{
                         margin: 0,
                         fontSize: "18px",
@@ -263,6 +332,9 @@ export default function WB_Unit8_Page48_QI() {
                         width: "60%",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `option-${item.id}-${index}`}
+                      />
                       {option}
                     </p>
 

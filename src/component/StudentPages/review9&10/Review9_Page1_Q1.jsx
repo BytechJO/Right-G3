@@ -7,6 +7,23 @@ import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shal
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 10 What Shall We Do on the Weekend Folder/Page 88/Ex A 4.svg";
 
 import Button from "../../Button";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
+
+const page88Audio = (file) =>
+  new URL(
+    `../../../assets/audio/ClassBook/Unit 10/Page 88 - Exercise A/${file}`,
+    import.meta.url,
+  ).href;
+const wordAudio = {
+  was: page88Audio("Item_001_was.mp3"),
+  were: page88Audio("Item_002_were.mp3"),
+  "wasn’t": page88Audio("Item_003_wasn't.mp3"),
+  "weren’t": page88Audio("Item_004_weren't.mp3"),
+};
+const fullAudio = [1, 2, 3, 4].map((id) => page88Audio(`full${id}.mp3`));
 
 const Review9_Page1_Q1 = () => {
   const questions = [
@@ -18,9 +35,11 @@ const Review9_Page1_Q1 = () => {
 
   const words = ["was", "were", "wasn’t", "weren’t"];
 
-  const [showResult, setShowResult] = useState(false);
+  const [wrongIds, setWrongIds] = useState([]);
   const [answers, setAnswers] = useState({});
-  const [locked, setLocked] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [revealed, setRevealed] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const pronouns = {
     1: "They",
@@ -30,16 +49,17 @@ const Review9_Page1_Q1 = () => {
   };
 
   const handleSelect = (id, value) => {
-    if (locked) return;
+    if (revealed || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [`slot-${id}`]: value,
     }));
+    setWrongIds((previous) => previous.filter((wrongId) => wrongId !== id));
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (revealed || lockedIds.length === questions.length) return;
 
     const empty = questions.some((q) => !answers[`slot-${q.id}`]);
 
@@ -72,8 +92,16 @@ const Review9_Page1_Q1 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setShowResult(true);
-    setLocked(true);
+    setLockedIds(
+      questions.flatMap((q) =>
+        answers[`slot-${q.id}`] === q.correct ? [q.id] : [],
+      ),
+    );
+    setWrongIds(
+      questions.flatMap((q) =>
+        answers[`slot-${q.id}`] !== q.correct ? [q.id] : [],
+      ),
+    );
   };
 
   const showAnswers = () => {
@@ -84,14 +112,18 @@ const Review9_Page1_Q1 = () => {
     });
 
     setAnswers(correctAnswers);
-    setLocked(true);
-    setShowResult(false);
+    setLockedIds(questions.map((q) => q.id));
+    setRevealed(true);
+    setWrongIds([]);
+    stopAudio();
   };
 
   const reset = () => {
     setAnswers({});
-    setLocked(false);
-    setShowResult(false);
+    setLockedIds([]);
+    setRevealed(false);
+    setWrongIds([]);
+    stopAudio();
   };
 
   return (
@@ -104,11 +136,13 @@ const Review9_Page1_Q1 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "10px" }}>
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>A</span>
-      Look, read, and write. Use the words below.
-        </h5>
-  <div
+        <ExerciseHeaderReview
+          sectionLetter="A"
+          title="Look, read, and write. Use the words below."
+          subTitle="Use the picture, word bank, or grammar clue, then complete every blank before checking."
+        />
+        <div
+          className="w-full"
           style={{
             display: "flex",
             // gap: "12px",
@@ -124,28 +158,43 @@ const Review9_Page1_Q1 = () => {
         >
           {words.map((word) => (
             <span
-            className="bg-[#fdc791]"
+              className="bg-[#fdc791] unit4-interactive unit4-audio-control"
               key={word}
+              role="button"
+              tabIndex={0}
+              aria-label={`Play ${word}`}
+              onClick={() => playAudio(`bank-${word}`, wordAudio[word])}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  playAudio(`bank-${word}`, wordAudio[word]);
+                }
+              }}
               style={{
                 // padding: "7px 14px",
-                height:"40px",width:"100px",
-                display:"flex",
-                justifyContent:"center",
-                alignItems:"center",
+                height: "40px",
+                width: "100px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 // border: "2px solid #2c5287",
-                backgroundColor:"#fdc791",
+                backgroundColor: "#fdc791",
                 borderRadius: "50px",
                 // background: "white",
                 fontWeight: "bold",
                 fontSize: "16px",
               }}
             >
+              <Unit4PlayingAudioIcon
+                active={activeAudioKey === `bank-${word}`}
+              />
               {word}
             </span>
           ))}
         </div>
         {/* الأسئلة */}
         <div
+          className="w-full"
           style={{
             display: "grid",
             gridTemplateColumns: "auto auto",
@@ -157,12 +206,38 @@ const Review9_Page1_Q1 = () => {
         >
           {questions.map((q) => {
             const isWrong =
-              showResult &&
+              wrongIds.includes(q.id) &&
               answers[`slot-${q.id}`] &&
               answers[`slot-${q.id}`] !== q.correct;
 
             return (
-              <div key={q.id} style={{ marginBottom: "20px" }}>
+              <div
+                key={q.id}
+                style={{ marginBottom: "20px", position: "relative" }}
+                role={lockedIds.includes(q.id) ? "button" : undefined}
+                tabIndex={lockedIds.includes(q.id) ? 0 : undefined}
+                className={
+                  lockedIds.includes(q.id)
+                    ? "unit4-audio-control unit4-full-audio-enabled"
+                    : ""
+                }
+                onClick={() =>
+                  lockedIds.includes(q.id) &&
+                  playAudio(`full-${q.id}`, fullAudio[q.id - 1])
+                }
+                onKeyDown={(event) => {
+                  if (
+                    lockedIds.includes(q.id) &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    playAudio(`full-${q.id}`, fullAudio[q.id - 1]);
+                  }
+                }}
+              >
+                <Unit4PlayingAudioIcon
+                  active={activeAudioKey === `full-${q.id}`}
+                />
                 <div className="flex gap-3">
                   <span style={{ fontSize: "20px", fontWeight: "bold" }}>
                     {q.id}
@@ -170,6 +245,14 @@ const Review9_Page1_Q1 = () => {
 
                   <img
                     src={q.img}
+                    alt={
+                      [
+                        "Children playing together at the park.",
+                        "A girl outside a store.",
+                        "A boy at a farm.",
+                        "A group of people at the mall.",
+                      ][q.id - 1]
+                    }
                     style={{
                       width: "auto",
                       height: "150px",
@@ -192,7 +275,8 @@ const Review9_Page1_Q1 = () => {
 
                   <div style={{ fontSize: "20px", position: "relative" }}>
                     <select
-                      disabled={locked}
+                      disabled={revealed || lockedIds.includes(q.id)}
+                      onClick={(event) => event.stopPropagation()}
                       value={answers[`slot-${q.id}`] || ""}
                       onChange={(e) => handleSelect(q.id, e.target.value)}
                       style={{
@@ -202,7 +286,6 @@ const Review9_Page1_Q1 = () => {
                         borderBottom: `1px solid ${isWrong ? "red" : "#000"}`,
                         fontSize: "18px",
                         fontWeight: "500",
-                        outline: "none",
                         background: "#fff",
                       }}
                     >

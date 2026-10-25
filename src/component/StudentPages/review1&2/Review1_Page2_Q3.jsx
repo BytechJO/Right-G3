@@ -12,6 +12,7 @@ import blue from "../../../assets/audio/ClassBook/Unit 2/P 17/unit2-pg17-EXE.mp3
 
 import Button from "../../Button";
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
 const Review1_Page2_Q3 = () => {
   const items = [
     { img: img1, correct: "no" },
@@ -21,7 +22,10 @@ const Review1_Page2_Q3 = () => {
   ];
 
   const [selected, setSelected] = useState(Array(items.length).fill(""));
-  const [locked, setLocked] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [correctIds, setCorrectIds] = useState([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [forceStop, setForceStop] = useState(false);
   const captions = [
     {
       start: 0.199,
@@ -30,15 +34,16 @@ const Review1_Page2_Q3 = () => {
     },
   ];
   const choose = (i, value) => {
-    if (locked) return;
+    if (showAnswer || correctIds.includes(i)) return;
 
     const updated = [...selected];
     updated[i] = value;
     setSelected(updated);
+    setCheckedIds((previous) => previous.filter((id) => id !== i));
   };
 
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAnswer || correctIds.length === items.length) return;
 
     if (selected.includes("")) {
       ValidationAlert.info();
@@ -50,6 +55,12 @@ const Review1_Page2_Q3 = () => {
     items.forEach((item, i) => {
       if (selected[i] === item.correct) score++;
     });
+    setCorrectIds(
+      items.flatMap((item, index) =>
+        selected[index] === item.correct ? [index] : [],
+      ),
+    );
+    setCheckedIds(items.map((_, index) => index));
 
     const total = items.length;
 
@@ -66,18 +77,24 @@ const Review1_Page2_Q3 = () => {
     if (score === total) ValidationAlert.success(msg);
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
-
-    setLocked(true);
   };
 
   const showAnswers = () => {
     setSelected(items.map((i) => i.correct));
-    setLocked(true);
+    setCheckedIds(items.map((_, index) => index));
+    setCorrectIds(items.map((_, index) => index));
+    setShowAnswer(true);
+    setForceStop(true);
+    window.requestAnimationFrame(() => setForceStop(false));
   };
 
   const reset = () => {
     setSelected(Array(items.length).fill(""));
-    setLocked(false);
+    setCheckedIds([]);
+    setCorrectIds([]);
+    setShowAnswer(false);
+    setForceStop(true);
+    window.requestAnimationFrame(() => setForceStop(false));
   };
 
   return (
@@ -90,17 +107,24 @@ const Review1_Page2_Q3 = () => {
       }}
     >
       <div className="div-forall">
-        <h5 className="header-title-page8">
-          <span style={{ marginRight: "10px" }}>E</span>
-         Does it have a
-          <span style={{ color: "#2e3192" }}> short vowel sound </span>? Listen,
-          and write<span style={{ color: "#D52328" }}> ✓ </span>or
-          <span style={{ color: "#D52328" }}> ✗</span>
-        </h5>
+        <ExerciseHeaderReview
+          sectionLetter="E"
+          title={
+            <>
+              Does it have a{" "}
+              <span style={{ color: "#2e3192" }}>short vowel sound</span>?
+              Listen and write <span style={{ color: "red" }}>✓</span> or{" "}
+              <span style={{ color: "red" }}>✗</span>.
+            </>
+          }
+          subTitle="Listen for the vowel sound, replay if needed, then select only the words with the short sound."
+        />
         <QuestionAudioPlayer
           src={blue}
           captions={captions}
           stopAtSecond={9.5}
+          pageId="review1-page2-q3"
+          forceStop={forceStop}
         />
 
         {/* GRID */}
@@ -113,6 +137,15 @@ const Review1_Page2_Q3 = () => {
 
               <img
                 src={item.img}
+                alt={
+                  i === 0
+                    ? "An ice cube"
+                    : i === 1
+                      ? "A train"
+                      : i === 2
+                        ? "A cooking pot"
+                        : "A bat"
+                }
                 style={{
                   width: "auto",
                   height: "20vh",
@@ -127,6 +160,9 @@ const Review1_Page2_Q3 = () => {
                 >
                   <button
                     onClick={() => choose(i, "yes")}
+                    aria-label={`Item ${i + 1}: yes, it has a short vowel sound`}
+                    aria-pressed={selected[i] === "yes"}
+                    aria-disabled={showAnswer || correctIds.includes(i)}
                     style={{
                       width: "40px",
                       height: "40px",
@@ -135,10 +171,13 @@ const Review1_Page2_Q3 = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "18px",
-                      cursor: locked ? "default" : "pointer",
+                      cursor:
+                        showAnswer || correctIds.includes(i)
+                          ? "default"
+                          : "pointer",
                       border:
                         selected[i] === "yes"
-                          ? locked &&
+                          ? checkedIds.includes(i) &&
                             selected[i] === "yes" &&
                             item.correct !== "yes"
                             ? "2px solid red"
@@ -146,17 +185,17 @@ const Review1_Page2_Q3 = () => {
                           : "2px solid #ccc",
                     }}
                   >
-                    <img src={trueIcon} style={{ height: "25px" }} />
+                    <img src={trueIcon} alt="" style={{ height: "25px" }} />
                   </button>
 
-                  {locked &&
+                  {checkedIds.includes(i) &&
                     selected[i] === "yes" &&
                     item.correct !== "yes" && (
                       <div
                         style={{
                           position: "absolute",
-                           left: "20px",
-                        top: "5%",
+                          left: "20px",
+                          top: "5%",
                           transform: "translateY(-50%)",
                           zIndex: 10,
                         }}
@@ -173,6 +212,9 @@ const Review1_Page2_Q3 = () => {
                 >
                   <button
                     onClick={() => choose(i, "no")}
+                    aria-label={`Item ${i + 1}: no, it does not have a short vowel sound`}
+                    aria-pressed={selected[i] === "no"}
+                    aria-disabled={showAnswer || correctIds.includes(i)}
                     style={{
                       width: "40px",
                       height: "40px",
@@ -181,10 +223,13 @@ const Review1_Page2_Q3 = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "18px",
-                      cursor: locked ? "default" : "pointer",
+                      cursor:
+                        showAnswer || correctIds.includes(i)
+                          ? "default"
+                          : "pointer",
                       border:
                         selected[i] === "no"
-                          ? locked &&
+                          ? checkedIds.includes(i) &&
                             selected[i] === "no" &&
                             item.correct !== "no"
                             ? "2px solid red"
@@ -192,21 +237,23 @@ const Review1_Page2_Q3 = () => {
                           : "2px solid #ccc",
                     }}
                   >
-                    <img src={falseIcon} style={{ height: "25px" }} />
+                    <img src={falseIcon} alt="" style={{ height: "25px" }} />
                   </button>
-                  {locked && selected[i] === "no" && item.correct !== "no" && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: "20px",
-                        top: "5%",
-                        transform: "translateY(-50%)",
-                        zIndex: 10,
-                      }}
-                    >
-                      <WrongMark />
-                    </div>
-                  )}
+                  {checkedIds.includes(i) &&
+                    selected[i] === "no" &&
+                    item.correct !== "no" && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "20px",
+                          top: "5%",
+                          transform: "translateY(-50%)",
+                          zIndex: 10,
+                        }}
+                      >
+                        <WrongMark />
+                      </div>
+                    )}
                 </div>
               </div>
             </div>

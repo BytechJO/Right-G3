@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import question1Audio from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise C/Item_001_Is_he_in_the_bedroom.mp3";
+import question2Audio from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise C/Item_002_Is_he_in_the_living_room.mp3";
+import question3Audio from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise C/Item_003_Is_she_in_the_bedroom.mp3";
+import question4Audio from "../../../assets/audio/WorkBook/unit5/Page 28 - Exercise C/Item_004_Is_she_in_the_dining_room.mp3";
 
 import topImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 28/C1.svg";
 
@@ -139,14 +147,24 @@ const ITEMS = [
     ],
   },
 ];
+const QUESTION_AUDIO = {
+  1: question1Audio,
+  2: question2Audio,
+  3: question3Audio,
+  4: question4Audio,
+};
+const answerKey = (itemId, lineKey) => `${itemId}-${lineKey}`;
 
 export default function WB_Unit5_Page28_QC() {
   const [answers, setAnswers] = useState({});
-  const [checked, setChecked] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const [wrongKeys, setWrongKeys] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (itemId, lineKey, value) => {
-    if (showAns||checked) return;
+    const key = answerKey(itemId, lineKey);
+    if (showAns || lockedKeys.includes(key)) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -156,19 +174,17 @@ export default function WB_Unit5_Page28_QC() {
       },
     }));
 
-    setChecked(false);
+    setWrongKeys((prev) => prev.filter((entry) => entry !== key));
   };
 
   const getValue = (itemId, lineKey) => answers[itemId]?.[lineKey] || "";
 
   const isLineWrong = (item, line) => {
-    if (!checked || showAns || line.type !== "select") return false;
-    return getValue(item.id, line.key) !== line.correct;
+    return wrongKeys.includes(answerKey(item.id, line.key));
   };
 
-
   const checkAnswers = () => {
-    if (showAns||checked) return;
+    if (showAns) return;
 
     const requiredLines = ITEMS.flatMap((item) =>
       item.lines
@@ -182,6 +198,12 @@ export default function WB_Unit5_Page28_QC() {
     const allAnswered = requiredLines.every(
       ({ itemId, lineKey }) => getValue(itemId, lineKey).trim() !== "",
     );
+    if (
+      requiredLines.every(({ itemId, lineKey }) =>
+        lockedKeys.includes(answerKey(itemId, lineKey)),
+      )
+    )
+      return;
 
     if (!allAnswered) {
       ValidationAlert.info("Please complete all answers first.");
@@ -199,7 +221,20 @@ export default function WB_Unit5_Page28_QC() {
       if (allCorrect) score += 1;
     });
 
-    setChecked(true);
+    const correctKeys = [];
+    const incorrectKeys = [];
+    ITEMS.forEach((item) =>
+      item.lines
+        .filter((line) => line.type === "select")
+        .forEach((line) => {
+          const key = answerKey(item.id, line.key);
+          if (getValue(item.id, line.key) === line.correct)
+            correctKeys.push(key);
+          else incorrectKeys.push(key);
+        }),
+    );
+    setLockedKeys((prev) => [...new Set([...prev, ...correctKeys])]);
+    setWrongKeys(incorrectKeys);
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -223,14 +258,24 @@ export default function WB_Unit5_Page28_QC() {
     });
 
     setAnswers(filled);
-    setChecked(true);
     setShowAns(true);
+    setLockedKeys(
+      ITEMS.flatMap((item) =>
+        item.lines
+          .filter((line) => line.type === "select")
+          .map((line) => answerKey(item.id, line.key)),
+      ),
+    );
+    setWrongKeys([]);
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
-    setChecked(false);
     setShowAns(false);
+    setLockedKeys([]);
+    setWrongKeys([]);
+    stopAudio();
   };
 
   const renderLine = (item, line) => {
@@ -251,12 +296,12 @@ export default function WB_Unit5_Page28_QC() {
           <div className="wb-c-select-wrap">
             <select
               value={getValue(item.id, line.key)}
-              disabled={showAns||checked}
+              disabled={
+                showAns || lockedKeys.includes(answerKey(item.id, line.key))
+              }
               onChange={(e) => handleChange(item.id, line.key, e.target.value)}
               className={`wb-c-select ${
-                getValue(item.id, line.key)
-                  ? "wb-c-select--filled"
-                  : ""
+                getValue(item.id, line.key) ? "wb-c-select--filled" : ""
               }`}
             >
               <option value="" disabled hidden>
@@ -518,13 +563,18 @@ export default function WB_Unit5_Page28_QC() {
           gap: "40px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">C</span>
-          Look, read, and write. 
-        </h1>
+        <ExerciseHeader
+          sectionLetter="C"
+          title="Look, read, and write."
+          subTitle="Use the room and location answer for each person to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         <div className="wb-c-top-images">
-          <img src={topImg1} className="wb-c-top-img" />
+          <img
+            src={topImg1}
+            className="wb-c-top-img"
+            alt="A house scene showing people in the bathroom, living room, bedroom, and kitchen"
+          />
         </div>
 
         <div className="wb-c-grid">
@@ -534,10 +584,40 @@ export default function WB_Unit5_Page28_QC() {
                 <div className="wb-c-num">{item.id}</div>
                 <img
                   src={item.icon}
-                  alt={`icon-${item.id}`}
+                  alt={
+                    item.id <= 2
+                      ? `Boy for question ${item.id}`
+                      : item.id <= 4
+                        ? `Girl for question ${item.id}`
+                        : item.id === 5
+                          ? "Sofa"
+                          : "Fridge"
+                  }
                   className="wb-c-icon"
                 />
-                <div className="wb-c-question">{item.question}</div>
+                <div
+                  className="wb-c-question unit4-audio-control unit4-interactive"
+                  role={QUESTION_AUDIO[item.id] ? "button" : undefined}
+                  tabIndex={QUESTION_AUDIO[item.id] ? 0 : undefined}
+                  onClick={() =>
+                    QUESTION_AUDIO[item.id] &&
+                    playAudio(`question-${item.id}`, QUESTION_AUDIO[item.id])
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      QUESTION_AUDIO[item.id] &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      playAudio(`question-${item.id}`, QUESTION_AUDIO[item.id]);
+                    }
+                  }}
+                >
+                  <Unit4PlayingAudioIcon
+                    active={activeAudioKey === `question-${item.id}`}
+                  />
+                  {item.question}
+                </div>
               </div>
 
               <div className="wb-c-answer-block">

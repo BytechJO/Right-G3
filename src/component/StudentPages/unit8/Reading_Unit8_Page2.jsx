@@ -1,4 +1,4 @@
-import React, { useRef,useState } from "react";
+import React, { useState } from "react";
 import page25 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 75.png";
 import "./Reading_Unit8_Page1.css";
 import { FaHeadphones } from "react-icons/fa";
@@ -9,13 +9,10 @@ import sound4 from "../../../assets/audio/ClassBook/Unit 8/P 75/Pg75_1.8_Adult L
 import { useContext } from "react";
 import { AudioContext } from "../../../AudioContext";
 
-
 const Reading_Unit8_Page2 = () => {
-   const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+  const { audioRef, activeId, setActiveId } = useContext(AudioContext);
 
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [activeAreaIndex, setActiveAreaIndex] = useState(null);
   const clickableAreas = [
     { x1: 8.06, y1: 41.45, x2: 46.33, y2: 50.13, sound: sound1 },
     { x1: 48.35, y1: 41.45, x2: 86.64, y2: 50.13, sound: sound2 },
@@ -28,7 +25,7 @@ const Reading_Unit8_Page2 = () => {
     const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
     console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
- const playSound = (path, id) => {
+  const playSound = (path, id) => {
     if (!audioRef.current) return;
 
     // 🔥 وقف أي صوت شغال بأي صفحة
@@ -46,42 +43,56 @@ const Reading_Unit8_Page2 = () => {
   };
 
   return (
-    <div className="page1-img-wrapper"
-          onClick={handleImageClick}
-          style={{ backgroundImage: `url(${page25})` }}>
+    <div
+      className="page1-img-wrapper"
+      onClick={handleImageClick}
+      style={{ backgroundImage: `url(${page25})` }}
+    >
       {/* <img
         src={page25}
         style={{ display: "block" }}
         onClick={handleImageClick}
       /> */}
 
-      {clickableAreas.map((area, index) => (
-        <div
-          key={index}
-          className={`clickable-area ${
-            hoveredAreaIndex === index || activeId === index
-              ? "highlight"
-              : ""
-          }`}
-          style={{
-            position: "absolute",
-            left: `${area.x1}%`,
-            top: `${area.y1}%`,
-            width: `${area.x2 - area.x1}%`,
-            height: `${area.y2 - area.y1}%`,
-          }}
-         onClick={() => {
-                  // setActiveAreaIndex(area.sound);
-                  playSound(area.sound, `p75-${area.sound}`);
-                }}
-          onMouseEnter={() => {
-            if (!isPlaying) setHoveredAreaIndex(index);
-          }}
-          onMouseLeave={() => {
-            if (!isPlaying) setHoveredAreaIndex(null);
-          }}
-        ></div>
-      ))}
+      {clickableAreas.map((area, index) => {
+        const areaId = `p75-${index}`;
+        const isActive = activeId === areaId;
+
+        return (
+          <div
+            key={index}
+            role="button"
+            tabIndex={0}
+            aria-label={`Play sentence audio ${index + 1}`}
+            aria-pressed={isActive}
+            className={`clickable-area ${
+              isActive || hoveredAreaIndex === index ? "highlight" : ""
+            }`}
+            style={{
+              position: "absolute",
+              left: `${area.x1}%`,
+              top: `${area.y1}%`,
+              width: `${area.x2 - area.x1}%`,
+              height: `${area.y2 - area.y1}%`,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              playSound(area.sound, areaId);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                playSound(area.sound, areaId);
+              }
+            }}
+            onFocus={() => setHoveredAreaIndex(index)}
+            onBlur={() => setHoveredAreaIndex(null)}
+            onMouseEnter={() => setHoveredAreaIndex(index)}
+            onMouseLeave={() => setHoveredAreaIndex(null)}
+          />
+        );
+      })}
       <audio ref={audioRef} style={{ display: "none" }} />
     </div>
   );

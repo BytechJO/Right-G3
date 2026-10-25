@@ -1,6 +1,35 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import "./workbookUnit3Interactions.css";
+import option1Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_001_She_has_a_few_apples_in_the_bowl.mp3";
+import option2Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_002_She_has_a_few_water_in_the_glass.mp3";
+import option3Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_003_She_has_a_little_apples_in_the_bowl.mp3";
+import option4Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_004_She_has_a_little_water_in_the_glass.mp3";
+import option5Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_005_There_is_a_few_chicken_on_the_plate.mp3";
+import option6Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_006_They_have_a_few_cookies_on_the_plate.mp3";
+import option7Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_007_They_have_a_little_cookies_on_the_plate.mp3";
+import option8Audio from "../../../assets/audio/WorkBook/unit3/Page 19 - Exercise J/Item_008_There_is_a_little_chicken_on_the_plate.mp3";
+
+const OPTION_AUDIO = {
+  "She has a few apples in the bowl.": option1Audio,
+  "She has a few water in the glass.": option2Audio,
+  "She has a little apples in the bowl.": option3Audio,
+  "She has a little water in the glass.": option4Audio,
+  "There is a few chicken on the plate.": option5Audio,
+  "They have a few cookies on the plate.": option6Audio,
+  "They have a little cookies on the plate.": option7Audio,
+  "There is a little chicken on the plate.": option8Audio,
+};
+const IMAGE_ALTS = {
+  1: "A bowl with a few apples",
+  2: "A glass with a little water",
+  3: "A plate with a little chicken",
+  4: "Children with a few cookies on a plate",
+};
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 19/Ex J  1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 19/Ex J  2.svg";
@@ -50,19 +79,20 @@ export default function WB_Unit3_Page17_QJ() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
 
   const handleSelect = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
-    setShowResults(false);
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -80,6 +110,7 @@ export default function WB_Unit3_Page17_QJ() {
     });
 
     setShowResults(true);
+    setLockedIds(ITEMS.filter((item) => answers[item.id] === item.correct).map((item) => item.id));
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -99,12 +130,16 @@ export default function WB_Unit3_Page17_QJ() {
     setAnswers(correctMap);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    stopAudio();
   };
 
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    stopAudio();
   };
 
   const isWrong = (item) => {
@@ -119,11 +154,26 @@ export default function WB_Unit3_Page17_QJ() {
 
     return (
       <div
-        onClick={() => handleSelect(item.id, option)}
-        className={`wb-j-option ${
+        onClick={() => {
+          if (lockedIds.includes(item.id)) return;
+          handleSelect(item.id, option);
+          playAudio(`option-${item.id}-${option}`, OPTION_AUDIO[option]);
+        }}
+        onKeyDown={(event) => {
+          if ((event.key === "Enter" || event.key === " ") && !lockedIds.includes(item.id)) {
+            event.preventDefault();
+            handleSelect(item.id, option);
+            playAudio(`option-${item.id}-${option}`, OPTION_AUDIO[option]);
+          }
+        }}
+        role="button"
+        tabIndex={lockedIds.includes(item.id) ? -1 : 0}
+        aria-disabled={lockedIds.includes(item.id)}
+        className={`wb-j-option wb-unit3-audio-control wb-unit3-interactive ${
           selected || showCorrectAsSelected ? "selected" : ""
         } ${wrong ? "wrong" : ""} ${showAns ? "disabled" : ""}`}
       >
+        <WorkbookUnit3PlayingAudioIcon active={activeAudioKey === `option-${item.id}-${option}`} />
         {option}
 
         {wrong && <div className="wb-j-wrong-mark">✕</div>}
@@ -301,9 +351,7 @@ export default function WB_Unit3_Page17_QJ() {
 
         }}
       >
-        <h1 className="WB-header-title-page8" style={{ margin: 0 }}>
-          <span className="WB-ex-A"> J </span>Look, read, and tap or click.
-        </h1>
+        <ExerciseHeader sectionLetter="J" title="Look, read, and circle." subTitle="Look at the few/little sentence that matches each picture first, compare all available options, then tap only the answer that matches." />
 
         <div className="wb-j-wrap">
           <div className="wb-j-grid">
@@ -313,7 +361,7 @@ export default function WB_Unit3_Page17_QJ() {
                   <div className="wb-j-number">{item.id}</div>
                   <img
                     src={item.img}
-                    alt={`question-${item.id}`}
+                    alt={IMAGE_ALTS[item.id]}
                     className="wb-j-img"
                   />
                 </div>

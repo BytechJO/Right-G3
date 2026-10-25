@@ -7,36 +7,66 @@ import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad 
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 80/Asset 53.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 80/Asset 54.svg";
 import sound1 from "../../../assets/audio/ClassBook/Unit 9/P 80/unit9-pg80-EXB.mp3";
+import socksAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_001_socks.mp3";
+import spoonsAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_002_spoons.mp3";
+import dogsAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_003_dogs.mp3";
+import rocksAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_004_rocks.mp3";
+import bumpsAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_005_bumps.mp3";
+import frogsAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_006_frogs.mp3";
+import racksAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_007_racks.mp3";
+import booksAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_008_books.mp3";
+import foldersAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_009_folders.mp3";
+import capsAudio from "../../../assets/audio/ClassBook/Unit 9/Page 80 - Exercise B/Item_010_caps.mp3";
 
 import QuestionAudioPlayer from "../../QuestionAudioPlayer";
 import WrongMark from "../../WrongMark";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import "../unit4/unit4Interactions.css";
 const Unit9_Page5_Q2 = () => {
   const items = [
     {
       img: img1,
+      imageAlt: "Three colorful pairs of socks.",
+      word: "socks",
+      wordAudio: socksAudio,
       options: ["dogs", "rocks", "bumps"],
+      optionAudio: { dogs: dogsAudio, rocks: rocksAudio, bumps: bumpsAudio },
       correct: ["rocks"],
     },
     {
       img: img2,
+      imageAlt: "Three silver spoons.",
+      word: "spoons",
+      wordAudio: spoonsAudio,
       options: ["frogs", "racks", "books"],
+      optionAudio: { frogs: frogsAudio, racks: racksAudio, books: booksAudio },
       correct: ["racks", "books"],
     },
     {
       img: img3,
+      imageAlt: "Several colorful file folders.",
+      word: "folders",
+      wordAudio: foldersAudio,
       options: ["shoulders", "bats", "tacos"],
       correct: ["shoulders"],
     },
     {
       img: img4,
+      imageAlt: "Two blue and red baseball caps.",
+      word: "caps",
+      wordAudio: capsAudio,
       options: ["sacks", "maps", "chairs"],
       correct: ["maps"],
     },
   ];
 
-  const [selected, setSelected] = useState(Array(items.length).fill([]));
-  const [locked, setLocked] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [selected, setSelected] = useState(items.map(() => []));
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
   const captions = [
     {
       start: 0.119,
@@ -48,8 +78,12 @@ const Unit9_Page5_Q2 = () => {
     { start: 25.76, end: 31.679, text: "shoulders, bats, tacos. Four, caps," },
     { start: 32.919, end: 35.399, text: "sacks, maps, chairs" },
   ];
+  const itemIsCorrect = (item, values) =>
+    values.length === item.correct.length &&
+    item.correct.every((answer) => values.includes(answer));
+
   const chooseOption = (i, value) => {
-    if (locked) return;
+    if (showAns || lockedIds.includes(i)) return;
 
     const newSelected = [...selected];
     const current = newSelected[i];
@@ -63,46 +97,48 @@ const Unit9_Page5_Q2 = () => {
     }
 
     setSelected(newSelected);
+    setWrongIds((previous) => previous.filter((id) => id !== i));
   };
   const resetAll = () => {
-    setSelected(Array(items.length).fill(""));
-    setLocked(false);
-    setShowResult(false);
+    setSelected(items.map(() => []));
+    setLockedIds([]);
+    setWrongIds([]);
+    setShowAns(false);
+    stopAudio();
   };
   const showAnswers = () => {
     setSelected(items.map((i) => i.correct));
-    setLocked(true);
+    setLockedIds(items.map((_, index) => index));
+    setWrongIds([]);
+    setShowAns(true);
+    stopAudio();
   };
   const checkAnswers = () => {
-    if (locked) return;
+    if (showAns || lockedIds.length === items.length) return;
 
-    if (selected.includes("")) {
+    if (selected.some((answers) => answers.length === 0)) {
       ValidationAlert.info();
       return;
     }
-    let score = 0;
-    let total = 0;
-
-    items.forEach((item, i) => {
-      total += item.correct.length;
-
-      // ✅ الصح
-      item.correct.forEach((correctAns) => {
-        if (selected[i]?.includes(correctAns)) {
-          score++;
-        }
-      });
-
-      // ❌ الغلط
-      selected[i]?.forEach((ans) => {
-        if (!item.correct.includes(ans)) {
-          score--;
-        }
-      });
-    });
-
-    // ❗ ما نخليه ينزل تحت الصفر
-    if (score < 0) score = 0;
+    const nextLockedIds = items.flatMap((item, index) =>
+      itemIsCorrect(item, selected[index]) ? [index] : [],
+    );
+    const nextWrongIds = items.flatMap((item, index) =>
+      itemIsCorrect(item, selected[index]) ? [] : [index],
+    );
+    const total = items.reduce((sum, item) => sum + item.correct.length, 0);
+    const score = Math.max(
+      0,
+      items.reduce((sum, item, index) => {
+        const correctSelections = selected[index].filter((answer) =>
+          item.correct.includes(answer),
+        ).length;
+        const wrongSelections = selected[index].filter(
+          (answer) => !item.correct.includes(answer),
+        ).length;
+        return sum + correctSelections - wrongSelections;
+      }, 0),
+    );
 
     const color = score === total ? "green" : score === 0 ? "red" : "orange";
 
@@ -118,8 +154,8 @@ const Unit9_Page5_Q2 = () => {
     else if (score === 0) ValidationAlert.error(msg);
     else ValidationAlert.warning(msg);
 
-    setLocked(true);
-    setShowResult(true);
+    setLockedIds(nextLockedIds);
+    setWrongIds(nextWrongIds);
   };
   return (
     <div
@@ -131,15 +167,21 @@ const Unit9_Page5_Q2 = () => {
       }}
     >
       <div className="div-forall" style={{ gap: "25px" }}>
-        <h5 className="header-title-page8 mb-5">
-          <span className="ex-A mr-3">B</span>
-          Listen and tap or click the words with the same final
-          <span style={{ color: "#2e3192" }}> -s sound</span>?
-        </h5>
+        <ExerciseHeader
+          sectionLetter="B"
+          title={
+            <>
+              Listen and circle the words with the same final
+              <span style={{ color: "#2e3192" }}> -s sound</span>?
+            </>
+          }
+          subTitle="Listen to the final sound in each word, then select or mark the matching -s sound."
+        />
         <QuestionAudioPlayer
           src={sound1}
           captions={captions}
           stopAtSecond={9.5}
+          pageId="unit9-page80-b"
         />
         <div className="flex w-full">
           <div className="flex justify-center w-full">
@@ -152,35 +194,75 @@ const Unit9_Page5_Q2 = () => {
                         {i + 1}
                       </span>
 
-                      <img
-                        src={item.img}
-                        alt=""
-                        style={{
-                          width: "150px",
-                          height: "auto",
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        className="unit4-audio-control unit4-interactive"
+                        aria-label={`Play ${item.word}`}
+                        onClick={() => playAudio(`word-${i}`, item.wordAudio)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            playAudio(`word-${i}`, item.wordAudio);
+                          }
                         }}
-                      />
+                        style={{ position: "relative", display: "inline-flex" }}
+                      >
+                        <Unit4PlayingAudioIcon
+                          active={activeAudioKey === `word-${i}`}
+                        />
+                        <img
+                          src={item.img}
+                          alt={item.imageAlt}
+                          style={{ width: "150px", height: "auto" }}
+                        />
+                      </span>
                     </div>
                     {/* OPTIONS تحت الصورة وبالعرض */}
                     <div className="flex gap-3 text-[18px] mt-2">
                       {item.options.map((opt, idx) => (
                         <span
                           key={idx}
-                          onClick={() => chooseOption(i, opt)}
+                          role="button"
+                          tabIndex={
+                            showAns || lockedIds.includes(i)
+                              ? item.optionAudio?.[opt]
+                                ? 0
+                                : -1
+                              : 0
+                          }
+                          aria-disabled={showAns || lockedIds.includes(i)}
+                          onClick={() => {
+                            chooseOption(i, opt);
+                            if (item.optionAudio?.[opt])
+                              playAudio(`option-${i}-${idx}`, item.optionAudio[opt]);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              chooseOption(i, opt);
+                              if (item.optionAudio?.[opt])
+                                playAudio(
+                                  `option-${i}-${idx}`,
+                                  item.optionAudio[opt],
+                                );
+                            }
+                          }}
                           className={`relative cursor-pointer px-3 py-1 rounded-full border-1 ${
                             selected[i]?.includes(opt)
-                              ? showResult
-                                ? items[i].correct.includes(opt)
-                                  ? "border-[#F79530] bg-orange-50"
-                                  : "border-red-500"
-                                : "border-[#F79530] bg-orang-50"
+                              ? wrongIds.includes(i) && !items[i].correct.includes(opt)
+                                ? "border-red-500"
+                                : "border-[#F79530] bg-orange-50"
                               : "border-transparent hover:border-[#F79530]"
                           }`}
                         >
+                          <Unit4PlayingAudioIcon
+                            active={activeAudioKey === `option-${i}-${idx}`}
+                          />
                           {opt}
 
                           {/* ❌ على الخيار الغلط */}
-                          {showResult &&
+                          {wrongIds.includes(i) &&
                             selected[i]?.includes(opt) &&
                             !items[i].correct.includes(opt) && (
                               <span className="absolute top-0 right-6">

@@ -75,6 +75,20 @@ const Unit2_Page1 = ({ openPopup }) => {
       text: "Page eleven. Listen and read along.",
     },
   ];
+  const soundLabels = {
+    1: "France",
+    2: "Bus",
+    3: "Clock tower",
+    4: "World map",
+    5: "Nile River",
+    6: "Egypt",
+    7: "Pyramids",
+    8: "Australia",
+    9: "South America",
+    10: "Statue of Liberty",
+    11: "Tourist",
+    12: "Globe",
+  };
   const captions = [
     { start: 0, end: 3.5, text: "Page 4. Listen and read along." },
     { start: 3.8, end: 7.54, text: " Short U. Bug, runner, cup" },
@@ -128,7 +142,7 @@ const Unit2_Page1 = ({ openPopup }) => {
     { x1: 28.4, y1: 43.5, sound: 9, isPrimary: true },
 
     // الصوت التاسع – الإضافية
-    { x1: 22.68, y1: 40.15, x2: 33.24, y2: 53.35, sound: 9, isPrimary: false },
+    { x1: 28.68, y1: 40.15, x2: 33.24, y2: 53.35, sound: 9, isPrimary: false },
 
     // الصوت العاشر – الأساسية
     { x1: 32.2, y1: 22.5, sound: 10, isPrimary: true },
@@ -197,50 +211,8 @@ const Unit2_Page1 = ({ openPopup }) => {
         onClick={handleImageClick}
         style={{ display: "block" }}
       /> */}
-      {areas.map((area, index) => {
-        const isActive = activeId === `p11-${area.sound}`;
 
-        // ============================
-        // 1️⃣ المنطقة الأساسية → دائرة تظهر فقط عندما تكون Active
-        // ============================
-        if (area.isPrimary) {
-          return (
-            <div
-              key={index}
-              className={`circle-area ${isActive ? "active" : ""}`}
-              style={{
-                left: `${area.x1}%`,
-                top: `${area.y1}%`,
-              }}
-              onClick={() => {
-                playSound(sounds[area.sound], `p11-${area.sound}`);
-              }}
-            ></div>
-          );
-        }
-
-        // ============================
-        // 2️⃣ المناطق الفرعية → مربعات داكنة مخفية ولازم
-        //    عند الضغط عليها → تفعّل الدائرة الأساسية
-        // ============================
-        return (
-          <div
-            key={index}
-            className="clickable-area"
-            style={{
-              position: "absolute",
-              left: `${area.x1}%`,
-              top: `${area.y1}%`,
-              width: `${area.x2 - area.x1}%`,
-              height: `${area.y2 - area.y1}%`,
-            }}
-            onClick={() => {
-              playSound(sounds[area.sound], `p11-${area.sound}`);
-            }}
-          ></div>
-        );
-      })}
-
+      {/* MAIN AUDIO */}
       <div
         className="headset-icon-CD-unit2-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -249,6 +221,9 @@ const Unit2_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Play page 10 main audio with captions"
           onClick={() =>
             openPopup(
               "audio",
@@ -259,11 +234,40 @@ const Unit2_Page1 = ({ openPopup }) => {
                   alignContent: "center",
                 }}
               >
-                <AudioWithCaption src={allUnit2} captions={captionsExample} />
+                <AudioWithCaption
+                  src={allUnit2}
+                  captions={captionsExample}
+                  pageId="unit2-page10-main-audio"
+                />
               </div>,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "audio",
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                  }}
+                >
+                  <AudioWithCaption
+                    src={allUnit2}
+                    captions={captionsExample}
+                    pageId="unit2-page10-main-audio"
+                  />
+                </div>,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -276,6 +280,7 @@ const Unit2_Page1 = ({ openPopup }) => {
         </svg>
       </div>
 
+      {/* FIND */}
       <div
         className="click-icon-unit2-page1-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -284,6 +289,9 @@ const Unit2_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open find activity"
           onClick={() =>
             openPopup(
               "html",
@@ -292,7 +300,22 @@ const Unit2_Page1 = ({ openPopup }) => {
               </>,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "html",
+                <>
+                  <Unit2_Page1_find />
+                </>,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -304,6 +327,8 @@ const Unit2_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
+      {/* VOCAB */}
       <div
         className="headset-icon-CD-unit2-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -312,6 +337,9 @@ const Unit2_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open vocabulary activity"
           onClick={() =>
             openPopup(
               "html",
@@ -320,7 +348,22 @@ const Unit2_Page1 = ({ openPopup }) => {
               </>,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "html",
+                <>
+                  <Unit2_Page1_Vocab />
+                </>,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -332,6 +375,8 @@ const Unit2_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
+      {/* READ */}
       <div
         className="click-icon-unit2-page1-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -340,6 +385,9 @@ const Unit2_Page1 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Open Listen and read along activity"
           onClick={() =>
             openPopup(
               "html",
@@ -348,13 +396,38 @@ const Unit2_Page1 = ({ openPopup }) => {
                 audioSrc={longAudio}
                 checkpoints={[0, 3.2, 5.4, 6.52, 7.12]}
                 popupOpen={true}
-                titleQ={"Listen and read along."}
+                titleQ="Listen and read along."
                 audioArr={imageSounds}
                 captions={captions}
+                subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
+                pageId="unit2-page10-read"
               />,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "html",
+                <FourImagesWithAudio
+                  images={[Rabbit, img1, img2, img3, img4]}
+                  audioSrc={longAudio}
+                  checkpoints={[0, 3.2, 5.4, 6.52, 7.12]}
+                  popupOpen={true}
+                  titleQ="Listen and read along."
+                  audioArr={imageSounds}
+                  captions={captions}
+                  subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
+                  pageId="unit2-page10-read"
+                />,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -367,6 +440,60 @@ const Unit2_Page1 = ({ openPopup }) => {
           />
         </svg>
       </div>
+      {areas.map((area, index) => {
+        const areaId = `p10-${area.sound}`;
+        const isActive = activeId === areaId;
+
+        if (area.isPrimary) {
+          return (
+            <div
+              key={index}
+              className={`circle-area page4-audio-hotspot ${
+                isActive ? "active" : ""
+              }`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Play pronunciation: ${soundLabels[area.sound]}`}
+              aria-pressed={isActive}
+              style={{
+                left: `${area.x1}%`,
+                top: `${area.y1}%`,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                playSound(sounds[area.sound], areaId);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  playSound(sounds[area.sound], areaId);
+                }
+              }}
+            />
+          );
+        }
+
+        return (
+          <div
+            key={index}
+            className="clickable-area"
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: `${area.x1}%`,
+              top: `${area.y1}%`,
+              width: `${area.x2 - area.x1}%`,
+              height: `${area.y2 - area.y1}%`,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              playSound(sounds[area.sound], areaId);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

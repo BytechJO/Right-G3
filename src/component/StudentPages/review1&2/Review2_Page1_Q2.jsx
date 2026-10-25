@@ -6,6 +6,21 @@ import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vac
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Pahe 18/Ex B 4.svg";
+import Unit2PlayingAudioIcon from "../unit2/Unit2PlayingAudioIcon";
+import useUnit2Audio from "../unit2/useUnit2Audio";
+import "../unit2/unit2Interactions.css";
+import howAudio from "../../../assets/audio/ClassBook/Unit 2/Page 18 - Exercise B/Item_001_How.mp3";
+import sheAudio from "../../../assets/audio/ClassBook/Unit 2/Page 18 - Exercise B/Item_002_She.mp3";
+import heAudio from "../../../assets/audio/ClassBook/Unit 2/Page 18 - Exercise B/Item_003_He.mp3";
+import ExerciseHeaderReview from "../../ExerciseHeaderReview";
+
+const FIXED_AUDIO = { How: howAudio, She: sheAudio, He: heAudio };
+const IMAGE_ALTS = [
+  "A girl in a bedroom",
+  "A girl jumping rope",
+  "A boy thinking about going to the store",
+  "A boy talking about bedtime",
+];
 
 const ANSWER_COLOR = "#000";
 const WRONG_COLOR = "#ef4444";
@@ -63,20 +78,24 @@ const buildAnswerOptions = (sentence) => {
 
 export default function Review2_Page1_Q2() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [checkedKeys, setCheckedKeys] = useState([]);
+  const [correctKeys, setCorrectKeys] = useState([]);
   const [showAns, setShowAns] = useState(false);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit2Audio();
 
   const handleChange = (id, type, value) => {
-    if (showAns || showResults) return;
+    const key = `${type}-${id}`;
+    if (showAns || correctKeys.includes(key)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [`${type}-${id}`]: value,
     }));
+    setCheckedKeys((previous) => previous.filter((item) => item !== key));
   };
 
   const isWrong = (item, type) => {
-    if (!showResults || showAns) return false;
+    if (!checkedKeys.includes(`${type}-${item.id}`) || showAns) return false;
 
     if (type === "question") {
       return answers[`question-${item.id}`] !== item.question;
@@ -85,7 +104,7 @@ export default function Review2_Page1_Q2() {
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || correctKeys.length === ITEMS.length * 2) return;
 
     const editable = ITEMS.filter((i) => !i.example);
 
@@ -106,7 +125,17 @@ export default function Review2_Page1_Q2() {
       if (answers[`answer-${item.id}`] === item.answer) score++;
     });
 
-    setShowResults(true);
+    const nextCorrect = [];
+    editable.forEach((item) => {
+      if (answers[`question-${item.id}`] === item.question)
+        nextCorrect.push(`question-${item.id}`);
+      if (answers[`answer-${item.id}`] === item.answer)
+        nextCorrect.push(`answer-${item.id}`);
+    });
+    setCorrectKeys(nextCorrect);
+    setCheckedKeys(
+      editable.flatMap((item) => [`question-${item.id}`, `answer-${item.id}`]),
+    );
 
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -122,14 +151,18 @@ export default function Review2_Page1_Q2() {
     });
 
     setAnswers(filled);
-    setShowResults(true);
+    setCheckedKeys(Object.keys(filled));
+    setCorrectKeys(Object.keys(filled));
     setShowAns(true);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
-    setShowResults(false);
+    setCheckedKeys([]);
+    setCorrectKeys([]);
     setShowAns(false);
+    stopAudio();
   };
 
   const renderSelect = (item, type) => {
@@ -166,6 +199,18 @@ export default function Review2_Page1_Q2() {
       >
         {/* الكلمة الثابتة */}
         <span
+          role="button"
+          tabIndex={0}
+          className="unit2-audio-control unit2-interactive"
+          onClick={() =>
+            playAudio(`fixed-${item.id}-${type}`, FIXED_AUDIO[firstWord])
+          }
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              playAudio(`fixed-${item.id}-${type}`, FIXED_AUDIO[firstWord]);
+            }
+          }}
           style={{
             fontWeight: "600",
             fontSize: "20px",
@@ -173,6 +218,9 @@ export default function Review2_Page1_Q2() {
           }}
         >
           {firstWord}
+          <Unit2PlayingAudioIcon
+            active={activeAudioKey === `fixed-${item.id}-${type}`}
+          />
         </span>
 
         <select
@@ -181,12 +229,11 @@ export default function Review2_Page1_Q2() {
             const finalValue = `${firstWord} ${e.target.value}`;
             handleChange(item.id, type, finalValue);
           }}
-          disabled={showResults || showAns}
+          disabled={showAns || correctKeys.includes(`${type}-${item.id}`)}
           style={{
             width: "100%",
             borderBottom: `1px solid ${wrong ? "red" : "navy"}`,
             fontSize: "clamp(12px, 1.4vw, 18px)",
-            outline: "none",
             padding: "4px",
           }}
         >
@@ -229,20 +276,21 @@ export default function Review2_Page1_Q2() {
   return (
     <div className="main-container-component">
       <div className="div-forall" style={{ gap: "40px" }}>
-        <h1 className="header-title-page8">
-          <span className="mr-1">B </span>
-          Look at Exercise A. Write the questions and answers.
-        </h1>
-        <div>
+        <ExerciseHeaderReview
+          sectionLetter="B"
+          title="Look at Exercise A. Write the questions and answers."
+          subTitle="Use the picture, word bank, or grammar clue, then complete every blank before checking."
+        />
+        <div className="w-full">
           {ITEMS.map((item) => (
             <div
               key={item.id}
               style={{ marginBottom: "20px" }}
-              className="flex gap-5 items-center"
+              className="flex gap-5 items-center "
             >
               <img
                 src={item.img}
-                alt=""
+                alt={IMAGE_ALTS[item.id - 1]}
                 style={{ width: "20%", height: "100px" }}
               />
               <div className="w-[70%] flex flex-col gap-5">

@@ -1,12 +1,26 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import useWorkbookUnit3TabDrag from "./useWorkbookUnit3TabDrag";
+import {
+  WorkbookUnit3DragItem,
+  WorkbookUnit3DropTarget,
+} from "./WorkbookUnit3DragControls";
+import "./workbookUnit3Interactions.css";
+import fruitsAudio from "../../../assets/audio/WorkBook/unit3/Page 16 - Exercise C/Item_001_fruits.mp3";
+import capsAudio from "../../../assets/audio/WorkBook/unit3/Page 16 - Exercise C/Item_002_caps.mp3";
+import sweetsAudio from "../../../assets/audio/WorkBook/unit3/Page 16 - Exercise C/Item_003_sweets.mp3";
+import prefixAudio from "../../../assets/audio/WorkBook/unit3/Page 16 - Exercise C/Item_004_They_have_some.mp3";
 
 import {
   DndContext,
-  useDraggable,
+  PointerSensor,
+  useSensor,
+  useSensors,
   DragOverlay,
-  useDroppable,
 } from "@dnd-kit/core";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U3 Folder/Page 16/Ex C 1.svg";
@@ -24,22 +38,33 @@ const ITEMS = [
 ];
 
 const DRAG_ITEMS = [
-  { id: 1, value: "fruits." },
-  { id: 2, value: "caps." },
-  { id: 3, value: "sweets." },
+  { id: 1, value: "fruits.", audio: fruitsAudio },
+  { id: 2, value: "caps.", audio: capsAudio },
+  { id: 3, value: "sweets.", audio: sweetsAudio },
 ];
+
+const IMAGE_ALTS = {
+  1: "Children with a bowl of fruit",
+  2: "Children wearing caps",
+  3: "Boys with sweets and a cake",
+};
 
 export default function WB_Unit3_Page16_QC() {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
     .map((entry) => entry.dragId);
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedKeys.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[`a-${item.id}`]?.value);
 
@@ -58,6 +83,11 @@ export default function WB_Unit3_Page16_QC() {
     });
 
     setShowResults(true);
+    setLockedKeys(
+      ITEMS.filter(
+        (item) => answers[`a-${item.id}`]?.value === item.correct,
+      ).map((item) => `a-${item.id}`),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -83,16 +113,24 @@ export default function WB_Unit3_Page16_QC() {
     setAnswers(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedKeys(ITEMS.map((item) => `a-${item.id}`));
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setAnswers({});
     setShowResults(false);
     setShowAns(false);
+    setLockedKeys([]);
+    keyboard.cancel();
+    stopAudio();
   };
 
   const handleRemoveAnswer = (boxKey) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedKeys.includes(boxKey)) return;
+
+    const removedId = answers[boxKey]?.dragId;
 
     setAnswers((prev) => {
       const updated = { ...prev };
@@ -100,7 +138,7 @@ export default function WB_Unit3_Page16_QC() {
       return updated;
     });
 
-    setShowResults(false);
+    if (removedId) keyboard.focusItem(removedId);
   };
 
   const isWrongAnswer = (item) => {
@@ -109,50 +147,64 @@ export default function WB_Unit3_Page16_QC() {
   };
 
   // ✅ draggable
-  const DraggableItem = ({ item, isUsed }) => {
-    const { attributes, listeners, setNodeRef } = useDraggable({
-      id: item.id,
-      disabled: isUsed || showAns,
+  const placeItem = (dragId, boxKey) => {
+    if (showAns || lockedKeys.includes(boxKey)) return;
+    const draggedItem = DRAG_ITEMS.find((item) => item.id === dragId);
+    if (!draggedItem) return;
+    setAnswers((prev) => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach((key) => {
+        if (updated[key]?.dragId === dragId) delete updated[key];
+      });
+      updated[boxKey] = { dragId, value: draggedItem.value };
+      return updated;
     });
-
-    return (
-      <div
-        ref={setNodeRef}
-        {...listeners}
-        {...attributes}
-        className="wb-c16-chip"
-        style={{
-          border: `1px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-          backgroundColor: isUsed ? "#efefef" : "",
-          color: isUsed ? "#9a9a9a" : "#222",
-          cursor: isUsed || showAns || showResults ? "not-allowed" : "grab",
-          opacity: isUsed ? 0.55 : 1,
-          zIndex: "9999999",
-        }}
-      >
-        {item.value}
-      </div>
-    );
   };
 
-  // ✅ droppable
-  const DropBox = ({ boxKey, isWrong }) => {
-    const { setNodeRef, isOver } = useDroppable({
-      id: boxKey,
-    });
-
+  const keyboard = useWorkbookUnit3TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => item.id),
+    targetIds: ITEMS.map((item) => `a-${item.id}`),
+    isItemDisabled: (id) => usedDragIds.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedKeys.includes(id) || showAns,
+    onPick: (id) => {
+      const item = DRAG_ITEMS.find((entry) => entry.id === id);
+      playAudio(`drag-${id}`, item?.audio);
+    },
+    onPlace: placeItem,
+  });
+  const renderDropBox = (boxKey, isWrong) => {
     const value = answers[boxKey]?.value || "";
+    const filledEditable =
+      Boolean(value) && !lockedKeys.includes(boxKey) && !showAns;
+    const preview =
+      keyboard.keyboardItemId && keyboard.keyboardTargetId === boxKey;
+    const previewValue = preview
+      ? DRAG_ITEMS.find((item) => item.id === keyboard.keyboardItemId)?.value
+      : "";
 
     return (
-      <div
-        ref={setNodeRef}
-        className={`wb-c16-drop-box ${isWrong ? "wrong" : ""}`}
-        style={{
+      <WorkbookUnit3DropTarget
+        id={boxKey}
+        registerTarget={keyboard.registerTarget}
+        locked={lockedKeys.includes(boxKey) || showAns}
+        tabIndex={keyboard.keyboardItemId || filledEditable ? 0 : -1}
+        ariaLabel={`${value || "Empty answer slot"}${lockedKeys.includes(boxKey) ? ", correct and locked" : ""}`}
+        onRemove={() => handleRemoveAnswer(boxKey)}
+        onKeyDown={(event) => {
+          if (keyboard.keyboardItemId) {
+            keyboard.handleTargetKeyDown(event, boxKey);
+          } else if (
+            filledEditable &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            handleRemoveAnswer(boxKey);
+          }
+        }}
+        className={`wb-c16-drop-box wb-unit3-drop-target ${isWrong ? "wrong" : ""}`}
+        getStyle={(isOver) => ({
           color: showAns ? "#000000ff" : "#111",
-
-          /* 🔥 الإيفيكت */
           backgroundColor: isOver ? "rgba(243, 155, 66, 0.15)" : "transparent",
-
           borderBottom: isOver
             ? "2px solid #f39b42"
             : isWrong
@@ -160,13 +212,12 @@ export default function WB_Unit3_Page16_QC() {
               : "1px solid #444",
 
           transform: isOver ? "scale(1.03)" : "scale(1)",
-
           transition: "all 0.2s ease",
-        }}
-      >
-        {value}
-        {isWrong && <div className="wb-c16-wrong">✕</div>}
-      </div>
+        })}
+        value={value}
+        preview={previewValue}
+        wrongNode={isWrong ? <div className="wb-c16-wrong">✕</div> : null}
+      />
     );
   };
 
@@ -358,6 +409,7 @@ object-fit: cover;
         }
       `}</style>
       <DndContext
+        sensors={sensors}
         onDragStart={(event) => {
           const item = DRAG_ITEMS.find((i) => i.id === event.active.id);
           setActiveItem(item);
@@ -365,41 +417,53 @@ object-fit: cover;
         onDragEnd={(event) => {
           const { active, over } = event;
 
-          if (over && !showAns) {
-            const draggedItem = DRAG_ITEMS.find((i) => i.id === active.id);
-            const boxKey = over.id;
+          if (over && !showAns) placeItem(active.id, over.id);
 
-            const newAnswers = { ...answers };
-
-            Object.keys(newAnswers).forEach((key) => {
-              if (newAnswers[key]?.dragId === draggedItem.id) {
-                delete newAnswers[key];
-              }
-            });
-
-            newAnswers[boxKey] = {
-              dragId: draggedItem.id,
-              value: draggedItem.value,
-            };
-
-            setAnswers(newAnswers);
-            setShowResults(false);
-          }
-
-          setActiveItem(null); // مهم جدًا
+          setActiveItem(null);
         }}
       >
         <div className="div-forall" style={{ gap: "25px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">C</span> Look and complete the sentences.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="C"
+            title="Look and complete the sentences."
+            subTitle="Identify each fruit, caps, or sweets word into the correct sentence before dragging it, then place one item at a time and review every target before checking."
+          />
 
           {/* DRAG ITEMS */}
-          <div className="wb-c16-bank">
+          <div className="wb-c16-bank w-full">
             {DRAG_ITEMS.map((item) => {
               const isUsed = usedDragIds.includes(item.id);
               return (
-                <DraggableItem key={item.id} item={item} isUsed={isUsed} />
+                <WorkbookUnit3DragItem
+                  key={item.id}
+                  id={item.id}
+                  disabled={isUsed || showAns}
+                  registerItem={keyboard.registerItem}
+                  onPlayAudio={() =>
+                    playAudio(`drag-${item.id}`, item.audio)
+                  }
+                  onKeyboardPick={() => keyboard.pickItem(item.id)}
+                  activeAudio={activeAudioKey === `drag-${item.id}`}
+                  ariaLabel={`${item.value} draggable answer${
+                    isUsed ? ", already used" : ""
+                  }`}
+                  className="wb-c16-chip wb-unit3-drag-item wb-unit3-audio-control"
+                  style={{
+                    border: `1px solid ${
+                      isUsed ? BORDER_COLOR : ACTIVE_COLOR
+                    }`,
+                    backgroundColor: isUsed ? "#efefef" : "",
+                    color: isUsed ? "#9a9a9a" : "#222",
+                    cursor:
+                      isUsed || showAns || showResults
+                        ? "not-allowed"
+                        : "grab",
+                    opacity: isUsed ? 0.55 : 1,
+                    zIndex: "9999999",
+                  }}
+                >
+                  {item.value}
+                </WorkbookUnit3DragItem>
               );
             })}
           </div>
@@ -413,6 +477,7 @@ object-fit: cover;
 
                   <img
                     src={item.img}
+                    alt={IMAGE_ALTS[item.id]}
                     className="wb-c16-img"
                     style={{ height: "120px", width: "auto" }}
                   />
@@ -420,12 +485,27 @@ object-fit: cover;
 
                 <div className="wb-c16-sentence-wrap">
                   <div className="wb-c16-sentence-line">
-                    <span className="wb-c16-prefix">{item.prefix}</span>
+                    <span
+                      className="wb-c16-prefix wb-unit3-audio-control wb-unit3-interactive"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        playAudio(`prefix-${item.id}`, prefixAudio)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`prefix-${item.id}`, prefixAudio);
+                        }
+                      }}
+                    >
+                      <WorkbookUnit3PlayingAudioIcon
+                        active={activeAudioKey === `prefix-${item.id}`}
+                      />
+                      {item.prefix}
+                    </span>
 
-                    <DropBox
-                      boxKey={`a-${item.id}`}
-                      isWrong={isWrongAnswer(item)}
-                    />
+                    {renderDropBox(`a-${item.id}`, isWrongAnswer(item))}
                   </div>
                 </div>
               </div>

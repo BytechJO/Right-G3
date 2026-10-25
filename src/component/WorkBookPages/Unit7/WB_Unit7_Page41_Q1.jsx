@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import catAudio from "../../../assets/audio/WorkBook/unit7/Page 41 - Exercise E/Item_001_There's_a_cat.mp3";
+import houseAudio from "../../../assets/audio/WorkBook/unit7/Page 41 - Exercise E/Item_002_the_toy_house.mp3";
+import mouseAudio from "../../../assets/audio/WorkBook/unit7/Page 41 - Exercise E/Item_003_There's_a_mouse.mp3";
+import cheeseAudio from "../../../assets/audio/WorkBook/unit7/Page 41 - Exercise E/Item_004_There's_cheese.mp3";
 
 import houseImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 41/SVG/1.svg";
 
@@ -15,44 +23,55 @@ const ITEMS = [
     before: "There's a cat",
     after: "the toy house.",
     correct: "on",
+    audio: catAudio,
   },
   {
     id: 2,
     before: "There's a mouse",
     after: "the toy house.",
     correct: "in",
+    audio: mouseAudio,
   },
   {
     id: 3,
     before: "There's cheese",
     after: "the toy house.",
     correct: "in front of",
+    audio: cheeseAudio,
   },
 ];
 
 export default function WB_ReadLookWrite_PageE() {
   const [selected, setSelected] = useState({});
-  const [showResults, setShowResults] = useState(false);
+  const [, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   const handleChange = (id, value) => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
     setSelected((prev) => ({ ...prev, [id]: value }));
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((wrongId) => wrongId !== id));
   };
 
   const handleCheck = () => {
-    if (showAns || showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
     const allAnswered = ITEMS.every((i) => selected[i.id]);
     if (!allAnswered) {
       ValidationAlert.info("Please answer all questions first.");
       return;
     }
-    let score = 0;
-    ITEMS.forEach((i) => {
-      if (selected[i.id] === i.correct) score++;
-    });
+    const correctIds = ITEMS.flatMap((i) =>
+      selected[i.id] === i.correct ? [i.id] : [],
+    );
+    const incorrectIds = ITEMS.flatMap((i) =>
+      selected[i.id] !== i.correct ? [i.id] : [],
+    );
+    const score = correctIds.length;
     setShowResults(true);
+    setLockedIds(correctIds);
+    setWrongIds(incorrectIds);
     const total = ITEMS.length;
     if (score === total) ValidationAlert.success(`Score: ${score} / ${total}`);
     else if (score > 0) ValidationAlert.warning(`Score: ${score} / ${total}`);
@@ -67,16 +86,21 @@ export default function WB_ReadLookWrite_PageE() {
     setSelected(filled);
     setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((i) => i.id));
+    setWrongIds([]);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
     setSelected({});
     setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
+    stopAudio();
   };
 
-  const isWrong = (item) =>
-    showResults && !showAns && selected[item.id] !== item.correct;
+  const isWrong = (item) => wrongIds.includes(item.id);
 
   return (
     <div className="main-container-component">
@@ -87,21 +111,17 @@ export default function WB_ReadLookWrite_PageE() {
         }}
       >
         {/* Title */}
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">E</span>
-          Read, look, and write
-          <span className="text-blue-900" style={{ fontWeight: 900 }}> in
-          </span>
-          ,{" "}
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}>
-            on
-          </strong>
-          , or{" "}
-          <strong className="text-blue-900" style={{ fontWeight: 900 }}>
-            in front of
-          </strong>
-          .
-        </h1>
+        <ExerciseHeader
+          sectionLetter="E"
+          title={
+            <>
+              Read, look, and write <span style={{ color: "#2e3192" }}>in</span>
+              , <span style={{ color: "#2e3192" }}>on</span>, or{" "}
+              <span style={{ color: "#2e3192" }}>in front of</span>.
+            </>
+          }
+          subTitle="Use the in, on, or in front of for the toy-house objects to decide the missing word or phrase before opening each dropdown, then reread the completed sentence."
+        />
 
         {/* Main layout: sentences LEFT | house image RIGHT */}
         <div
@@ -161,6 +181,16 @@ export default function WB_ReadLookWrite_PageE() {
                   >
                     {/* before */}
                     <span
+                      role="button"
+                      tabIndex={0}
+                      className="unit4-audio-control unit4-interactive"
+                      onClick={() => playAudio(`prefix-${item.id}`, item.audio)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`prefix-${item.id}`, item.audio);
+                        }
+                      }}
                       style={{
                         fontSize: "18px",
                         // fontWeight: 500,
@@ -169,6 +199,9 @@ export default function WB_ReadLookWrite_PageE() {
                         whiteSpace: "nowrap",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `prefix-${item.id}`}
+                      />
                       {item.before}
                     </span>
 
@@ -181,7 +214,7 @@ export default function WB_ReadLookWrite_PageE() {
                       }}
                     >
                       <select
-                        disabled={showAns || showResults}
+                        disabled={showAns || lockedIds.includes(item.id)}
                         value={selected[item.id] || ""}
                         onChange={(e) => handleChange(item.id, e.target.value)}
                         style={{
@@ -193,14 +226,16 @@ export default function WB_ReadLookWrite_PageE() {
                             ? `2px solid ${WRONG_COLOR}`
                             : `1px solid ${LINE_COLOR}`,
                           borderRadius: 0,
-                          outline: "none",
+                          // outline: "none",
                           fontSize: "20px",
                           // fontWeight: 700,
                           // color: RED_COLOR,
                           padding: "0 clamp(4px,0.6vw,8px) 3px 2px",
                           background: "transparent",
                           cursor:
-                            showAns || showResults ? "default" : "pointer",
+                            showAns || lockedIds.includes(item.id)
+                              ? "default"
+                              : "pointer",
                           appearance: "auto",
                           boxSizing: "border-box",
                         }}
@@ -243,6 +278,16 @@ export default function WB_ReadLookWrite_PageE() {
 
                     {/* after */}
                     <span
+                      role="button"
+                      tabIndex={0}
+                      className="unit4-audio-control unit4-interactive"
+                      onClick={() => playAudio(`suffix-${item.id}`, houseAudio)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playAudio(`suffix-${item.id}`, houseAudio);
+                        }
+                      }}
                       style={{
                         fontSize: "18px",
                         // fontWeight: 500,
@@ -251,6 +296,9 @@ export default function WB_ReadLookWrite_PageE() {
                         whiteSpace: "nowrap",
                       }}
                     >
+                      <Unit4PlayingAudioIcon
+                        active={activeAudioKey === `suffix-${item.id}`}
+                      />
                       {item.after}
                     </span>
                   </div>
@@ -268,7 +316,7 @@ export default function WB_ReadLookWrite_PageE() {
           >
             <img
               src={houseImg}
-              alt="toy house"
+              alt="A toy house with a cat on the roof, a mouse inside, and cheese in front"
               style={{
                 width: "auto",
                 height: "400px",

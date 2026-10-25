@@ -1,37 +1,47 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
+
 import page_2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 65.png";
+
 import img1_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/1-06.svg";
 import img2_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/1-07.svg";
 import img3_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/1-08.svg";
 import img4_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/1-09.svg";
 import img5_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/1-10.svg";
 import img6_letter from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/1-11.svg";
+
 import Rabbit from "../../../assets/Page 01/Rabbit.svg";
+
 import soundListen from "../../../assets/audio/ClassBook/Unit 8/P 65/unit8-pg65-reading.mp3";
+
 import img1_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/Asset 41.svg";
 import img2_conversation from "../../../assets/imgs/pages/classbook/Right 3 Unit 8 At Our Grandparents Farm Folder/Page 64-65/Asset 42.svg";
+
 import sound1_letter from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_2.1_Adult Lady.mp3";
 import sound2_letter from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_2.2_Adult Lady.mp3";
 import sound3_letter from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_2.3_Adult Lady.mp3";
 import sound4_letter from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_2.4_Adult Lady.mp3";
 import sound5_letter from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_2.5_Adult Lady.mp3";
 import sound6_letter from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_2.6_Adult Lady.mp3";
+
 import letterSound from "../../../assets/audio/ClassBook/Unit 8/P 65/unit8-pg65-listen.mp3";
+
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
 import arrowBtn from "../../../assets/Page 01/Arrow.svg";
+
 import AudioWithCaption from "../../AudioWithCaption";
 import FourImagesWithAudio from "../../FourImagesWithAudio";
+
 import read from "../../../assets/imgs/P1 listen and repeat 01.svg";
+
 import repeat from "../../../assets/audio/ClassBook/Unit 8/P 65/unit8-pg65-bebo&lolo.mp3";
 import Bebo from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_1.1_Bebo.mp3";
 import Lolo from "../../../assets/audio/ClassBook/Unit 8/P 65/Pg65_1.1_Lolo.mp3";
+
 import "./Unit8_Page2.css";
+
 const Unit8_Page2 = ({ openPopup }) => {
- 
-  const audioRef = useRef(null);
-  // أصوات الصور
   const imageSounds = [
-    null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
+    null,
     new Audio(sound1_letter),
     new Audio(sound2_letter),
     new Audio(sound3_letter),
@@ -39,19 +49,18 @@ const Unit8_Page2 = ({ openPopup }) => {
     new Audio(sound5_letter),
     new Audio(sound6_letter),
   ];
+
   const captionsExample = [
     {
       start: 0.319,
       end: 6.5,
       text: "Page 65, reading. Listen and read along. Helping out on the farm.",
     },
-
     {
       start: 7.859,
       end: 27.559,
       text: "Tom and his sister were visiting their grandparents for one week. They live on a farm. Tom and his sister like it because it reminds them of the past. The weather was sunny. It didn't rain the whole week. There are many animals on the farm. Tom and his sister helped their grandparents on the farm.",
     },
-
     {
       start: 28.619,
       end: 40.639,
@@ -60,7 +69,11 @@ const Unit8_Page2 = ({ openPopup }) => {
   ];
 
   const captions2 = [
-    { start: 0, end: 3.74, text: "Page 65. Listen and read along. " },
+    {
+      start: 0,
+      end: 3.74,
+      text: "Page 65. Listen and read along.",
+    },
     {
       start: 4.48,
       end: 13.68,
@@ -68,25 +81,19 @@ const Unit8_Page2 = ({ openPopup }) => {
     },
   ];
 
+  const repeatSounds = [null, new Audio(Bebo), new Audio(Lolo)];
 
-  const repeatSounds = [
-    null, // الصورة الأولى الكبيرة (إن ما بدك صوت إلها)
-    new Audio(Bebo),
-    new Audio(Lolo),
-  ];
   const captions3 = [
     {
       start: 0.199,
       end: 4.619,
       text: "Page 65. Listen, read, and repeat.",
     },
-
     {
       start: 4.619,
       end: 6.519,
       text: "Where were you last week?",
     },
-
     {
       start: 6.519,
       end: 7.499,
@@ -94,14 +101,65 @@ const Unit8_Page2 = ({ openPopup }) => {
     },
   ];
 
+  const openMainAudio = () => {
+    openPopup(
+      "audio",
+      <AudioWithCaption
+        src={soundListen}
+        captions={captionsExample}
+        pageId="unit8-page65-main-audio"
+      />,
+    );
+  };
+
+  const openRepeat = () => {
+    openPopup(
+      "html",
+      <FourImagesWithAudio
+        images={[read, img2_conversation, img1_conversation]}
+        audioSrc={repeat}
+        checkpoints={[0, 4.4, 6.04]}
+        popupOpen={true}
+        titleQ="Listen, read, and repeat."
+        pageId="unit8-page65-repeat"
+        subHeader="Press Play, then tap each card to hear it again."
+        audioArr={repeatSounds}
+        captions={captions3}
+      />,
+    );
+  };
+
+  const openRead = () => {
+    openPopup(
+      "html",
+      <FourImagesWithAudio
+        images={[
+          Rabbit,
+          img1_letter,
+          img2_letter,
+          img3_letter,
+          img4_letter,
+          img5_letter,
+          img6_letter,
+        ]}
+        audioSrc={letterSound}
+        checkpoints={[0, 4.38, 8.46, 9.62, 10.66, 12, 13.06]}
+        popupOpen={true}
+        subHeader="Press Play, follow each word or picture, then tap a card to replay it if needed."
+        titleQ="Listen and read along."
+        pageId="unit8-page65-read"
+        audioArr={imageSounds}
+        captions={captions2}
+      />,
+    );
+  };
+
   return (
     <div
       className="page1-img-wrapper"
- 
       style={{ backgroundImage: `url(${page_2})` }}
     >
-      <audio ref={audioRef} style={{ display: "none" }} />
-    <div
+      <div
         className="headset-icon-CD-unit8-page2-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
       >
@@ -109,13 +167,20 @@ const Unit8_Page2 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "audio",
-              <AudioWithCaption src={soundListen} captions={captionsExample} />,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Play Unit 8 page 65 reading audio"
+          onClick={openMainAudio}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openMainAudio();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -127,6 +192,7 @@ const Unit8_Page2 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="headset-icon-CD-unit8-page2-2 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -135,21 +201,20 @@ const Unit8_Page2 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "html",
-              <FourImagesWithAudio
-                images={[read, img2_conversation, img1_conversation]}
-                audioSrc={repeat}
-                checkpoints={[0, 4.4, 6.04]}
-                popupOpen={true}
-                titleQ={`Listen, read, and repeat.`}
-                audioArr={repeatSounds}
-                captions={captions3}
-              />,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Open listen, read, and repeat activity"
+          onClick={openRepeat}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openRepeat();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -161,6 +226,7 @@ const Unit8_Page2 = ({ openPopup }) => {
           />
         </svg>
       </div>
+
       <div
         className="click-icon-unit8-page2-1 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -169,29 +235,20 @@ const Unit8_Page2 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
-          onClick={() =>
-            openPopup(
-              "html",
-              <FourImagesWithAudio
-                images={[
-                  Rabbit,
-                  img1_letter,
-                  img2_letter,
-                  img3_letter,
-                  img4_letter,
-                  img5_letter,
-                  img6_letter,
-                ]}
-                audioSrc={letterSound}
-                checkpoints={[0, 4.38, 8.46, 9.62, 10.66, 12, 13.06]}
-                popupOpen={true}
-                titleQ={"Listen and read along."}
-                audioArr={imageSounds}
-                captions={captions2}
-              />,
-            )
-          }
-          style={{ overflow: "visible" }}
+          tabIndex={0}
+          role="button"
+          aria-label="Open listen and read along activity"
+          onClick={openRead}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openRead();
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"

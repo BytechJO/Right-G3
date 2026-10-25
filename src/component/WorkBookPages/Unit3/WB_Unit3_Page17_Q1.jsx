@@ -1,11 +1,25 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import WorkbookUnit3PlayingAudioIcon from "./WorkbookUnit3PlayingAudioIcon";
+import useWorkbookUnit3Audio from "./useWorkbookUnit3Audio";
+import useWorkbookUnit3TabDrag from "./useWorkbookUnit3TabDrag";
+import {
+  WorkbookUnit3DragItem,
+  WorkbookUnit3DropTarget,
+} from "./WorkbookUnit3DragControls";
+import "./workbookUnit3Interactions.css";
+import glovesAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise E/Item_001_They_have_gloves.mp3";
+import questionAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise E/Item_002_What_do_they_have.mp3";
+import dollsAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise E/Item_003_They_have_some_dolls.mp3";
+import fruitAudio from "../../../assets/audio/WorkBook/unit3/Page 17 - Exercise E/Item_004_They_have_some_fruit.mp3";
 
 import {
   DndContext,
-  useDraggable,
-  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
   DragOverlay,
 } from "@dnd-kit/core";
 
@@ -48,22 +62,38 @@ const ITEMS = [
   },
 ];
 const DRAG_ITEMS = [
-  { id: 1, value: "They have gloves." },
-  { id: 2, value: "What do they have?" },
-  { id: 3, value: "They have some dolls." },
+  { id: 1, value: "They have gloves.", audio: glovesAudio },
+  { id: 2, value: "What do they have?", audio: questionAudio },
+  { id: 3, value: "They have some dolls.", audio: dollsAudio },
 ];
+const LINE_AUDIO = {
+  "They have gloves.": glovesAudio,
+  "What do they have?": questionAudio,
+  "They have some dolls.": dollsAudio,
+  "They have some fruit.": fruitAudio,
+};
+const IMAGE_ALTS = {
+  1: "People wearing gloves",
+  2: "Girls with fruit",
+  3: "A woman and children with dolls",
+};
 export default function WB_Unit3_Page16_QE() {
   const [answers, setAnswers] = useState({});
   const [activeItem, setActiveItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedKeys, setLockedKeys] = useState([]);
+  const { activeAudioKey, playAudio, stopAudio } = useWorkbookUnit3Audio();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
   const usedDragIds = Object.values(answers)
     .filter(Boolean)
     .map((entry) => entry.dragId);
 
   const applyDrop = (boxKey, item) => {
-    if (showAns || !item) return;
+    if (showAns || !item || lockedKeys.includes(boxKey)) return;
 
     const newAnswers = { ...answers };
 
@@ -80,9 +110,24 @@ export default function WB_Unit3_Page16_QE() {
 
     setAnswers(newAnswers);
     setActiveItem(null);
-    setShowResults(false);
   };
 
+  const targetIds = ["a-1", "q-2", "a-3"];
+  const keyboard = useWorkbookUnit3TabDrag({
+    itemIds: DRAG_ITEMS.map((item) => item.id),
+    targetIds,
+    isItemDisabled: (id) => usedDragIds.includes(id) || showAns,
+    isTargetDisabled: (id) => lockedKeys.includes(id) || showAns,
+    onPick: (id) => {
+      const item = DRAG_ITEMS.find((entry) => entry.id === id);
+      playAudio(`drag-${id}`, item?.audio);
+    },
+    onPlace: (id, boxKey) =>
+      applyDrop(
+        boxKey,
+        DRAG_ITEMS.find((item) => item.id === id),
+      ),
+  });
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
@@ -92,45 +137,54 @@ export default function WB_Unit3_Page16_QE() {
     applyDrop(over.id, dragged);
   };
 
-  /* draggable */
-  const DraggableChip = ({ item }) => {
-    const { attributes, listeners, setNodeRef } = useDraggable({
-      id: item.id,
-    });
-
-    const isUsed = usedDragIds.includes(item.id);
-
-    return (
-      <div
-        ref={setNodeRef}
-        {...listeners}
-        {...attributes}
-        className={`wb-e17-chip ${isUsed ? "disabled" : ""}`}
-        style={{
-          border: `1px solid ${isUsed ? BORDER_COLOR : ACTIVE_COLOR}`,
-          backgroundColor: isUsed ? "#efefef" : "",
-          color: isUsed ? "#9a9a9a" : "#222",
-          cursor: isUsed || showAns ? "not-allowed" : "grab",
-        }}
-      >
-        {item.value}
-      </div>
-    );
-  };
-
-  /* droppable */
-  const DropBox = ({ boxKey, isWrong }) => {
-    const { setNodeRef, isOver } = useDroppable({
-      id: boxKey,
-    });
-
+  const renderDropBox = (boxKey, isWrong) => {
     const value = answers[boxKey]?.value || "";
+    const filledEditable =
+      Boolean(value) && !lockedKeys.includes(boxKey) && !showAns;
+    const preview =
+      keyboard.keyboardItemId && keyboard.keyboardTargetId === boxKey;
+    const previewValue = preview
+      ? DRAG_ITEMS.find((item) => item.id === keyboard.keyboardItemId)?.value
+      : "";
 
     return (
-      <div
-        ref={setNodeRef}
-        className={`wb-e17-drop ${isWrong ? "wrong" : ""}`}
-        style={{
+      <WorkbookUnit3DropTarget
+        id={boxKey}
+        registerTarget={keyboard.registerTarget}
+        locked={lockedKeys.includes(boxKey) || showAns}
+        tabIndex={keyboard.keyboardItemId || filledEditable ? 0 : -1}
+        ariaLabel={`${value || "Empty answer slot"}${
+          lockedKeys.includes(boxKey) ? ", correct and locked" : ""
+        }`}
+        onRemove={() => {
+          if (!filledEditable) return;
+          const removedId = answers[boxKey]?.dragId;
+          setAnswers((prev) => {
+            const next = { ...prev };
+            delete next[boxKey];
+            return next;
+          });
+          if (removedId) keyboard.focusItem(removedId);
+        }}
+        onKeyDown={(event) => {
+          if (keyboard.keyboardItemId)
+            keyboard.handleTargetKeyDown(event, boxKey);
+          else if (
+            filledEditable &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            const removedId = answers[boxKey]?.dragId;
+            setAnswers((prev) => {
+              const next = { ...prev };
+              delete next[boxKey];
+              return next;
+            });
+            if (removedId) keyboard.focusItem(removedId);
+          }
+        }}
+        className={`wb-e17-drop wb-unit3-drop-target ${isWrong ? "wrong" : ""}`}
+        getStyle={(isOver) => ({
           color: showAns ? "#000000ff" : "#111",
 
           /* 🔥 الإيفيكت */
@@ -145,15 +199,17 @@ export default function WB_Unit3_Page16_QE() {
           transform: isOver ? "scale(1.03)" : "scale(1)",
 
           transition: "all 0.2s ease",
-        }}
-      >
-        {value}
-        {isWrong && <div className="wb-e17-wrong-badge">✕</div>}
-      </div>
+        })}
+        value={value}
+        preview={previewValue}
+        wrongNode={
+          isWrong ? <div className="wb-e17-wrong-badge">✕</div> : null
+        }
+      />
     );
   };
   const handleCheck = () => {
-    if (showAns) return;
+    if (showAns || lockedKeys.length === targetIds.length) return;
 
     const allAnswered = ITEMS.every((item) => {
       const qReady = item.lockQuestion || answers[`q-${item.id}`]?.value;
@@ -185,6 +241,16 @@ export default function WB_Unit3_Page16_QE() {
     });
 
     setShowResults(true);
+    setLockedKeys(
+      targetIds.filter((key) => {
+        const [type, rawId] = key.split("-");
+        const item = ITEMS.find((entry) => entry.id === Number(rawId));
+        return (
+          answers[key]?.value ===
+          (type === "q" ? item.correctQuestion : item.correctAnswer)
+        );
+      }),
+    );
 
     if (score === total) {
       ValidationAlert.success(`Score: ${score} / ${total}`);
@@ -225,12 +291,18 @@ export default function WB_Unit3_Page16_QE() {
     setShowResults(true);
     setShowAns(true);
     setActiveItem(null);
+    setLockedKeys(targetIds);
+    keyboard.cancel();
+    stopAudio();
   };
   const handleStartAgain = () => {
     setAnswers({});
     setActiveItem(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedKeys([]);
+    keyboard.cancel();
+    stopAudio();
   };
   const isWrongQuestion = (item) =>
     showResults &&
@@ -242,18 +314,37 @@ export default function WB_Unit3_Page16_QE() {
     !item.lockAnswer &&
     answers[`a-${item.id}`]?.value !== item.correctAnswer;
 
-  const renderFixedLine = (text, color = "#111") => (
-    <div className="wb-e17-drop wb-e17-fixed" style={{ color }}>
+  const renderFixedLine = (text, instanceKey, color = "#111") => (
+    <div
+      className="wb-e17-drop wb-e17-fixed wb-unit3-audio-control wb-unit3-interactive"
+      role="button"
+      tabIndex={0}
+      onClick={() => playAudio(`fixed-${instanceKey}`, LINE_AUDIO[text])}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          playAudio(`fixed-${instanceKey}`, LINE_AUDIO[text]);
+        }
+      }}
+      style={{ color }}
+    >
+      <WorkbookUnit3PlayingAudioIcon
+        active={activeAudioKey === `fixed-${instanceKey}`}
+      />
       {text}
     </div>
   );
 
   return (
     <DndContext
-      onDragStart={(e) =>
-        setActiveItem(DRAG_ITEMS.find((d) => d.id === e.active.id))
-      }
-      onDragEnd={handleDragEnd}
+      sensors={sensors}
+      onDragStart={(e) => {
+        setActiveItem(DRAG_ITEMS.find((d) => d.id === e.active.id));
+      }}
+      onDragEnd={(event) => {
+        handleDragEnd(event);
+        setActiveItem(null);
+      }}
     >
       <div className="main-container-component">
         {/* 🔹 نفس الستايل 100% بدون تغيير */}
@@ -449,15 +540,46 @@ export default function WB_Unit3_Page16_QE() {
         }
       `}</style>
         <div className="div-forall" style={{ gap: "25px" }}>
-          <h1 className="WB-header-title-page8">
-            <span className="WB-ex-A">E</span>  Look, drag and drop the questions or answers.
-          </h1>
+          <ExerciseHeader
+            sectionLetter="E"
+            title="Look and write the questions or answers."
+            subTitle="Identify each question or answer chip into each conversation line before dragging it, then place one item at a time and review every target before checking."
+          />
 
           <div className="wb-e17-wrap">
             <div className="wb-e17-bank">
-              {DRAG_ITEMS.map((item) => (
-                <DraggableChip key={item.id} item={item} />
-              ))}
+              {DRAG_ITEMS.map((item) => {
+                const isUsed = usedDragIds.includes(item.id);
+                return (
+                  <WorkbookUnit3DragItem
+                    key={item.id}
+                    id={item.id}
+                    disabled={isUsed || showAns}
+                    registerItem={keyboard.registerItem}
+                    onPlayAudio={() =>
+                      playAudio(`drag-${item.id}`, item.audio)
+                    }
+                    onKeyboardPick={() => keyboard.pickItem(item.id)}
+                    activeAudio={activeAudioKey === `drag-${item.id}`}
+                    ariaLabel={`${item.value} draggable answer${
+                      isUsed ? ", already used" : ""
+                    }`}
+                    className={`wb-e17-chip wb-unit3-drag-item wb-unit3-audio-control ${
+                      isUsed ? "disabled" : ""
+                    }`}
+                    style={{
+                      border: `1px solid ${
+                        isUsed ? BORDER_COLOR : ACTIVE_COLOR
+                      }`,
+                      backgroundColor: isUsed ? "#efefef" : "",
+                      color: isUsed ? "#9a9a9a" : "#222",
+                      cursor: isUsed || showAns ? "not-allowed" : "grab",
+                    }}
+                  >
+                    {item.value}
+                  </WorkbookUnit3DragItem>
+                );
+              })}
             </div>
 
             <div className="wb-e17-list">
@@ -467,27 +589,24 @@ export default function WB_Unit3_Page16_QE() {
 
                   <img
                     src={item.img}
-                    alt={`item-${item.id}`}
+                    alt={IMAGE_ALTS[item.id]}
                     className="wb-e17-img"
                   />
 
                   <div className="wb-e17-lines">
                     {item.lockQuestion ? (
-                      renderFixedLine(item.fixedQuestion)
+                      renderFixedLine(item.fixedQuestion, `question-${item.id}`)
                     ) : (
-                      <DropBox
-                        boxKey={`q-${item.id}`}
-                        isWrong={isWrongQuestion(item)}
-                      />
+                      renderDropBox(
+                        `q-${item.id}`,
+                        isWrongQuestion(item),
+                      )
                     )}
 
                     {item.lockAnswer ? (
-                      renderFixedLine(item.fixedAnswer)
+                      renderFixedLine(item.fixedAnswer, `answer-${item.id}`)
                     ) : (
-                      <DropBox
-                        boxKey={`a-${item.id}`}
-                        isWrong={isWrongAnswer(item)}
-                      />
+                      renderDropBox(`a-${item.id}`, isWrongAnswer(item))
                     )}
                   </div>
                 </div>

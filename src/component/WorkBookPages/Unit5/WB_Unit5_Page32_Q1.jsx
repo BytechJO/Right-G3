@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
 
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/A.1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/A.2.svg";
@@ -10,16 +11,16 @@ import img5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folde
 import img6 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U5 Folder/Page 32/A.6.svg";
 
 const BORDER_COLOR = "#f39b42";
-const WRONG_COLOR  = "#ef4444";
-const RIGHT_COLOR  = "#22c55e";
+const WRONG_COLOR = "#ef4444";
+const RIGHT_COLOR = "#22c55e";
 
 const ITEMS = [
-  { id: 1, img: img1, correct: "✓"  },
+  { id: 1, img: img1, correct: "✓" },
   { id: 2, img: img2, correct: "✕" },
-  { id: 3, img: img3, correct: "✓"  },
+  { id: 3, img: img3, correct: "✓" },
   { id: 4, img: img4, correct: "✕" },
   { id: 5, img: img5, correct: "✕" },
-  { id: 6, img: img6, correct: "✓"  },
+  { id: 6, img: img6, correct: "✓" },
 ];
 
 import trueIcon from "../../../assets/imgs/true.svg";
@@ -27,27 +28,27 @@ import falseIcon from "../../../assets/imgs/false.svg";
 
 // كمل باقي الصور هون
 
-
 const OPTIONS = ["✓", "✕"];
 
 export default function WB_Unit5_Page32_QA() {
   const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [lockedIds, setLockedIds] = useState([]);
+  const [wrongIds, setWrongIds] = useState([]);
 
   const handleSelect = (id, value) => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedIds.includes(id)) return;
 
     setAnswers((prev) => ({
       ...prev,
       [id]: value,
     }));
 
-    setShowResults(false);
+    setWrongIds((prev) => prev.filter((entry) => entry !== id));
   };
 
   const handleCheck = () => {
-    if (showAns||showResults) return;
+    if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allAnswered = ITEMS.every((item) => answers[item.id]);
 
@@ -64,7 +65,19 @@ export default function WB_Unit5_Page32_QA() {
       }
     });
 
-    setShowResults(true);
+    setLockedIds((prev) => [
+      ...new Set([
+        ...prev,
+        ...ITEMS.filter((item) => answers[item.id] === item.correct).map(
+          (item) => item.id,
+        ),
+      ]),
+    ]);
+    setWrongIds(
+      ITEMS.filter((item) => answers[item.id] !== item.correct).map(
+        (item) => item.id,
+      ),
+    );
 
     if (score === ITEMS.length) {
       ValidationAlert.success(`Score: ${score} / ${ITEMS.length}`);
@@ -82,29 +95,39 @@ export default function WB_Unit5_Page32_QA() {
     });
 
     setAnswers(correctMap);
-    setShowResults(true);
     setShowAns(true);
+    setLockedIds(ITEMS.map((item) => item.id));
+    setWrongIds([]);
   };
 
   const handleReset = () => {
     setAnswers({});
-    setShowResults(false);
     setShowAns(false);
+    setLockedIds([]);
+    setWrongIds([]);
   };
 
   const isWrong = (item) => {
-    if (!showResults) return false;
-    return answers[item.id] !== item.correct;
+    return wrongIds.includes(item.id);
   };
 
   const renderChoice = (item, value) => {
     const selected = answers[item.id] === value;
     const wrong = isWrong(item) && selected;
-    const correctSelected = showAns && item.correct === value;
 
     return (
       <div
         onClick={() => handleSelect(item.id, value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleSelect(item.id, value);
+          }
+        }}
+        role="button"
+        tabIndex={showAns || lockedIds.includes(item.id) ? -1 : 0}
+        aria-label={`${value === "✓" ? "Yes" : "No"} for picture ${item.id}`}
+        aria-disabled={showAns || lockedIds.includes(item.id)}
         style={{
           position: "relative",
           width: "45px",
@@ -119,13 +142,14 @@ export default function WB_Unit5_Page32_QA() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: showAns ||showResults? "default" : "pointer",
+          cursor:
+            showAns || lockedIds.includes(item.id) ? "default" : "pointer",
         }}
       >
         {value === "✓" ? (
-          <img src={trueIcon} style={{ height: "25px" }} />
+          <img src={trueIcon} alt="Yes" style={{ height: "25px" }} />
         ) : (
-          <img src={falseIcon} style={{ height: "25px" }} />
+          <img src={falseIcon} alt="No" style={{ height: "25px" }} />
         )}
 
         {wrong && (
@@ -210,19 +234,37 @@ export default function WB_Unit5_Page32_QA() {
       `}</style>
 
       <div className="div-forall" style={{ gap: "150px" }}>
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">A</span>Does it have a<span className="text-blue-900"> -y sound </span>? Write
-          <span className="text-red-600"> ✓ </span> or
-          <span className="text-red-600"> ✕</span> .
-        </h1>
+        <ExerciseHeader
+          sectionLetter="A"
+          title={
+            <>
+              Does it have a <span class="text-blue-900">-y sound</span>? Write{" "}
+              <span class="text-red-600">✓</span> or{" "}
+              <span class="text-red-600">✗</span>.
+            </>
+          }
+          subTitle="Read each whether each word has the -y sound carefully, use the picture or sentence evidence to check it, then choose the correct Yes/No or True/False response."
+        />
 
-        <div className="wb-b-grid">
+        <div className="wb-b-grid w-full">
           {ITEMS.map((item) => (
             <div key={item.id} className="w-full">
               <div className="wb-b-card">
-                
-                  <img src={item.img} className="wb-b-img" />
-                
+                <img
+                  src={item.img}
+                  alt={
+                    [
+                      "Candy",
+                      "A foot",
+                      "A crying boy",
+                      "An umbrella",
+                      "A ship",
+                      "A party",
+                    ][item.id - 1]
+                  }
+                  className="wb-b-img"
+                />
+
                 {/* {(answers[item.id] || showAns) && (
                   <div className="wb-b-answer-box">
                     {answers[item.id] === "✓" ? (

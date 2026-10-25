@@ -1,32 +1,30 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useContext } from "react";
+
 import page_7 from "../../../assets/imgs/pages/classbook/Right 3 Unit 1 At The Basketball Game Folder/Page 7.png";
+
 import grammarSound from "../../../assets/audio/ClassBook/Unit 1/P 7/unit1-pg7-grammer2.mp3";
+
 import sound1 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_2.1_Adult Lady.mp3";
 import sound2 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_3.1_Adult Lady.mp3";
 import sound3 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_4.1_Adult Lady.mp3";
 import sound4 from "../../../assets/audio/ClassBook/Unit 1/P 7/Pg7_5.1_Adult Lady.mp3";
+
 import "./Page7.css";
+
 import audioBtn from "../../../assets/Page 01/Audio btn.svg";
-import video from "../../../assets/videos/grade 3 unit 1 page 7.mp4";
-import AudioWithCaption from "../../AudioWithCaption";
 import pauseBtn from "../../../assets/Page 01/Right Video Button.svg";
-import { useContext } from "react";
+
+import video from "../../../assets/videos/grade 3 unit 1 page 7.mp4";
+
+import AudioWithCaption from "../../AudioWithCaption";
+
 import { AudioContext } from "../../../AudioContext";
 
 const Page7 = ({ openPopup }) => {
   const { audioRef, activeId, setActiveId } = useContext(AudioContext);
+
   const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
 
-  const handleImageClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
-
-    console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
-
-    checkAreaAndPlaySound(xPercent, yPercent);
-  };
   const captionsExample = [
     {
       start: 0,
@@ -56,70 +54,73 @@ const Page7 = ({ openPopup }) => {
   ];
 
   const clickableAreas = [
-    { x1: 7.41, y1: 9.52, x2: 85.8, y2: 20.98, sound: sound1 },
-    { x1: 10.08, y1:57.56, x2: 42.26, y2: 63.73, sound: sound2 },
-    { x1: 51.80, y1: 32.03, x2: 93.81, y2: 38.29, sound: sound3 },
-    { x1: 6.12, y1: 64.85, x2: 49.06, y2: 71.12, sound: sound4 },
+    {
+      x1: 7.41,
+      y1: 9.52,
+      x2: 85.8,
+      y2: 20.98,
+      sound: sound1,
+    },
+    {
+      x1: 10.08,
+      y1: 57.56,
+      x2: 42.26,
+      y2: 63.73,
+      sound: sound2,
+    },
+    {
+      x1: 51.8,
+      y1: 32.03,
+      x2: 93.81,
+      y2: 38.29,
+      sound: sound3,
+    },
+    {
+      x1: 6.12,
+      y1: 64.85,
+      x2: 49.06,
+      y2: 71.12,
+      sound: sound4,
+    },
   ];
 
-  const checkAreaAndPlaySound = (x, y) => {
-    const area = clickableAreas.find(
-      (a) => x >= a.x1 && x <= a.x2 && y >= a.y1 && y <= a.y2,
-    );
+  const handleImageClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
 
-    console.log("Matched Area:", area);
+    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
 
-    if (area) playSound(area.sound);
+    console.log("X%:", xPercent.toFixed(2), "Y%:", yPercent.toFixed(2));
   };
-   const playSound = (path, id) => {
+
+  const playSound = (path, id) => {
     if (!audioRef.current) return;
 
-    // 🔥 وقف أي صوت شغال بأي صفحة
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
 
     audioRef.current.src = path;
     audioRef.current.play();
 
-    setActiveId(id); // 🔥 مهم للهايلايت
+    setActiveId(id);
 
     audioRef.current.onended = () => {
       setActiveId(null);
     };
   };
+
   return (
     <div
       className="page1-img-wrapper"
       onClick={handleImageClick}
       style={{ backgroundImage: `url(${page_7})` }}
     >
-      {/* <img src={page_7} onClick={handleImageClick} /> */}
-      {clickableAreas.map((area, index) => (
-        <div
-          key={index}
-          className={`clickable-area ${
-            hoveredAreaIndex === index || activeId === index
-              ? "highlight"
-              : ""
-          }`}
-          style={{
-            position: "absolute",
-            left: `${area.x1}%`,
-            top: `${area.y1}%`,
-            width: `${area.x2 - area.x1}%`,
-            height: `${area.y2 - area.y1}%`,
-          }}
-          onClick={() => {
-            playSound(area.sound, `p7-${area.sound}`);
-          }}
-          onMouseEnter={() => {
-            if (!isPlaying) setHoveredAreaIndex(index);
-          }}
-          onMouseLeave={() => {
-            if (!isPlaying) setHoveredAreaIndex(null);
-          }}
-        ></div>
-      ))}
+      <audio ref={audioRef} style={{ display: "none" }} />
+
+      {/* =====================================================
+          GRAMMAR AUDIO
+      ===================================================== */}
+
       <div
         className="headset-icon-CD-page7 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -128,6 +129,9 @@ const Page7 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Play page 7 grammar audio with captions"
           onClick={() =>
             openPopup(
               "audio",
@@ -141,12 +145,39 @@ const Page7 = ({ openPopup }) => {
                 <AudioWithCaption
                   src={grammarSound}
                   captions={captionsExample}
+                  pageId="unit1-page7-grammar"
                 />
               </div>,
               true,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "audio",
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                  }}
+                >
+                  <AudioWithCaption
+                    src={grammarSound}
+                    captions={captionsExample}
+                    pageId="unit1-page7-grammar"
+                  />
+                </div>,
+                true,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -160,6 +191,10 @@ const Page7 = ({ openPopup }) => {
         </svg>
       </div>
 
+      {/* =====================================================
+          VIDEO
+      ===================================================== */}
+
       <div
         className="pauseBtn-icon-CD-page7 hover:scale-110 transition"
         style={{ overflow: "visible" }}
@@ -168,6 +203,9 @@ const Page7 = ({ openPopup }) => {
           width="22"
           height="22"
           viewBox="0 0 90 90"
+          tabIndex={0}
+          role="button"
+          aria-label="Play page 7 grammar video"
           onClick={() =>
             openPopup(
               "video",
@@ -196,7 +234,42 @@ const Page7 = ({ openPopup }) => {
               </div>,
             )
           }
-          style={{ overflow: "visible" }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+
+              openPopup(
+                "video",
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    width: "100%",
+                  }}
+                >
+                  <video
+                    autoPlay
+                    controls
+                    style={{
+                      width: "auto",
+                      height: "80%",
+                      objectFit: "fill",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    <source src={video} type="video/mp4" />
+                  </video>
+                </div>,
+              );
+            }
+          }}
+          style={{
+            overflow: "visible",
+            cursor: "pointer",
+          }}
         >
           <image
             className="svg-img"
@@ -208,7 +281,59 @@ const Page7 = ({ openPopup }) => {
           />
         </svg>
       </div>
-      <audio ref={audioRef} style={{ display: "none" }} />
+
+      {/* =====================================================
+          SENTENCE AUDIOS - LAST
+      ===================================================== */}
+
+      {clickableAreas.map((area, index) => {
+        const areaId = `p7-${index}`;
+        const isActive = activeId === areaId;
+
+        return (
+          <div
+            key={index}
+            role="button"
+            tabIndex={0}
+            aria-label={`Play sentence audio ${index + 1}`}
+            aria-pressed={isActive}
+            className={`clickable-area ${
+              isActive || hoveredAreaIndex === index ? "highlight" : ""
+            }`}
+            style={{
+              position: "absolute",
+              left: `${area.x1}%`,
+              top: `${area.y1}%`,
+              width: `${area.x2 - area.x1}%`,
+              height: `${area.y2 - area.y1}%`,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              playSound(area.sound, areaId);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+
+                playSound(area.sound, areaId);
+              }
+            }}
+            onFocus={() => {
+              setHoveredAreaIndex(index);
+            }}
+            onBlur={() => {
+              setHoveredAreaIndex(null);
+            }}
+            onMouseEnter={() => {
+              setHoveredAreaIndex(index);
+            }}
+            onMouseLeave={() => {
+              setHoveredAreaIndex(null);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

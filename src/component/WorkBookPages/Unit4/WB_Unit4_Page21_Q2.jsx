@@ -1,5 +1,14 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
+import ExerciseHeader from "../../ExerciseHeader";
+import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
+import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
+import "../../StudentPages/unit4/unit4Interactions.css";
+import useWorkbookMatchingKeyboard from "./useWorkbookMatchingKeyboard";
+import summerAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise B/Item_001_summer.mp3";
+import winterAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise B/Item_002_winter.mp3";
+import springAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise B/Item_003_spring.mp3";
+import autumnAudio from "../../../assets/audio/WorkBook/unit4/Page 21 - Exercise B/Item_004_autumn.mp3";
 import Button from "../Button";
 
 import topImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U4 Folder/Page 21/Ex A 5.svg";
@@ -53,15 +62,23 @@ const EXERCISE_DATA = {
     4: 4, // autumn -> autumn picture
   },
 };
+const SEASON_AUDIO = { summer: summerAudio, winter: winterAudio, spring: springAudio, autumn: autumnAudio };
+const TOP_IDS = EXERCISE_DATA.top.map((item) => item.id);
+const MIDDLE_IDS = EXERCISE_DATA.middle.map((item) => item.id);
+const BOTTOM_IDS = EXERCISE_DATA.bottom.map((item) => item.id);
 
 const WB_UnitX_Page21_QB = () => {
   const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedMiddleTop, setSelectedMiddleTop] = useState(null);
   const [selectedMiddle, setSelectedMiddle] = useState(null);
+  const [selectedBottom, setSelectedBottom] = useState(null);
 
   const [topMatches, setTopMatches] = useState({});
   const [bottomMatches, setBottomMatches] = useState({});
 
   const [showResults, setShowResults] = useState(false);
+  const [lockedTopIds, setLockedTopIds] = useState([]);
+  const [lockedBottomIds, setLockedBottomIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
 
   const [topLines, setTopLines] = useState([]);
@@ -69,6 +86,7 @@ const WB_UnitX_Page21_QB = () => {
 
   const containerRef = useRef(null);
   const elementRefs = useRef({});
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
 
   useLayoutEffect(() => {
     const updateLines = () => {
@@ -126,14 +144,24 @@ const WB_UnitX_Page21_QB = () => {
   }, [topMatches, bottomMatches]);
 
   const handleTopClick = (id) => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedTopIds.includes(id)) return;
+    if (selectedMiddleTop !== null) {
+      assignTopMatch(id, selectedMiddleTop);
+      return;
+    }
     setSelectedTop(id);
+    setSelectedMiddleTop(null);
     setSelectedMiddle(null);
+    setSelectedBottom(null);
     setShowResults(false);
   };
 
-  const handleMiddleTopClick = (middleId) => {
-    if (showAns || selectedTop === null ||showResults) return;
+  const assignTopMatch = (topId, middleId) => {
+    if (showAns || lockedTopIds.includes(topId)) return;
+    const lockedOwner = Object.keys(topMatches).find(
+      (key) => topMatches[key] === middleId && lockedTopIds.includes(Number(key)),
+    );
+    if (lockedOwner) return;
 
     const newMatches = { ...topMatches };
 
@@ -143,22 +171,45 @@ const WB_UnitX_Page21_QB = () => {
       }
     });
 
-    newMatches[selectedTop] = middleId;
+    newMatches[topId] = middleId;
 
     setTopMatches(newMatches);
     setSelectedTop(null);
+    setSelectedMiddleTop(null);
     setShowResults(false);
+  };
+  const handleMiddleTopClick = (middleId) => {
+    const isLockedTarget = Object.keys(topMatches).some(
+      (key) => topMatches[key] === middleId && lockedTopIds.includes(Number(key)),
+    );
+    if (showAns || isLockedTarget) return;
+    if (selectedTop !== null) assignTopMatch(selectedTop, middleId);
+    else {
+      setSelectedMiddleTop(middleId);
+      setSelectedMiddle(null);
+      setSelectedBottom(null);
+    }
   };
 
   const handleMiddleBottomClick = (middleId) => {
-    if (showAns ||showResults) return;
+    if (showAns || lockedBottomIds.includes(middleId)) return;
+    if (selectedBottom !== null) {
+      assignBottomMatch(middleId, selectedBottom);
+      return;
+    }
     setSelectedMiddle(middleId);
+    setSelectedBottom(null);
     setSelectedTop(null);
+    setSelectedMiddleTop(null);
     setShowResults(false);
   };
 
-  const handleBottomClick = (bottomId) => {
-    if (showAns || selectedMiddle === null ||showResults) return;
+  const assignBottomMatch = (middleId, bottomId) => {
+    if (showAns || lockedBottomIds.includes(middleId)) return;
+    const lockedOwner = Object.keys(bottomMatches).find(
+      (key) => bottomMatches[key] === bottomId && lockedBottomIds.includes(Number(key)),
+    );
+    if (lockedOwner) return;
 
     const newMatches = { ...bottomMatches };
 
@@ -168,15 +219,28 @@ const WB_UnitX_Page21_QB = () => {
       }
     });
 
-    newMatches[selectedMiddle] = bottomId;
+    newMatches[middleId] = bottomId;
 
     setBottomMatches(newMatches);
     setSelectedMiddle(null);
+    setSelectedBottom(null);
     setShowResults(false);
+  };
+  const handleBottomClick = (bottomId) => {
+    const isLockedTarget = Object.keys(bottomMatches).some(
+      (key) => bottomMatches[key] === bottomId && lockedBottomIds.includes(Number(key)),
+    );
+    if (showAns || isLockedTarget) return;
+    if (selectedMiddle !== null) assignBottomMatch(selectedMiddle, bottomId);
+    else {
+      setSelectedBottom(bottomId);
+      setSelectedTop(null);
+      setSelectedMiddleTop(null);
+    }
   };
 
   const checkAnswers = () => {
-    if (showAns||showResults) return;
+    if (showAns || (lockedTopIds.length === EXERCISE_DATA.top.length && lockedBottomIds.length === EXERCISE_DATA.middle.length)) return;
 
     const allTopConnected = EXERCISE_DATA.top.every(
       (item) => topMatches[item.id],
@@ -189,8 +253,16 @@ const WB_UnitX_Page21_QB = () => {
       ValidationAlert.info("Please connect all items first.");
       return;
     }
+    upperKeyboard.clear();
+    lowerKeyboard.clear();
+    setSelectedTop(null);
+    setSelectedMiddleTop(null);
+    setSelectedMiddle(null);
+    setSelectedBottom(null);
 
     setShowResults(true);
+    setLockedTopIds((prev) => [...new Set([...prev, ...EXERCISE_DATA.top.filter((item) => topMatches[item.id] === EXERCISE_DATA.correctTopMatches[item.id]).map((item) => item.id)])]);
+    setLockedBottomIds((prev) => [...new Set([...prev, ...EXERCISE_DATA.middle.filter((item) => bottomMatches[item.id] === EXERCISE_DATA.correctBottomMatches[item.id]).map((item) => item.id)])]);
 
     let score = 0;
     const total = EXERCISE_DATA.top.length + EXERCISE_DATA.middle.length;
@@ -219,23 +291,37 @@ const WB_UnitX_Page21_QB = () => {
   };
 
   const handleShowAnswer = () => {
+    upperKeyboard.clear();
+    lowerKeyboard.clear();
     setTopMatches(EXERCISE_DATA.correctTopMatches);
     setBottomMatches(EXERCISE_DATA.correctBottomMatches);
     setShowResults(true);
     setShowAns(true);
+    setLockedTopIds(EXERCISE_DATA.top.map((item) => item.id));
+    setLockedBottomIds(EXERCISE_DATA.middle.map((item) => item.id));
     setSelectedTop(null);
+    setSelectedMiddleTop(null);
     setSelectedMiddle(null);
+    setSelectedBottom(null);
+    stopAudio();
   };
 
   const handleStartAgain = () => {
+    upperKeyboard.clear();
+    lowerKeyboard.clear();
     setTopMatches({});
     setBottomMatches({});
     setSelectedTop(null);
+    setSelectedMiddleTop(null);
     setSelectedMiddle(null);
+    setSelectedBottom(null);
     setShowResults(false);
     setShowAns(false);
+    setLockedTopIds([]);
+    setLockedBottomIds([]);
     setTopLines([]);
     setBottomLines([]);
+    stopAudio();
   };
 
   const getTopDotColor = (topId) => {
@@ -282,6 +368,62 @@ const WB_UnitX_Page21_QB = () => {
       bottomMatches[middleId] !== EXERCISE_DATA.correctBottomMatches[middleId]
     );
   };
+  const getUpperElement = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `top-button-${id}` : `middle-top-dot-${id}`],
+    [],
+  );
+  const getUpperAnchor = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `top-dot-${id}` : `middle-top-dot-${id}`],
+    [],
+  );
+  const getLowerElement = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `middle-bottom-dot-${id}` : `bottom-button-${id}`],
+    [],
+  );
+  const getLowerAnchor = useCallback(
+    (side, id) => elementRefs.current[side === "left" ? `middle-bottom-dot-${id}` : `bottom-dot-${id}`],
+    [],
+  );
+  const isTopLocked = useCallback((id) => lockedTopIds.includes(id), [lockedTopIds]);
+  const isMiddleTopLocked = useCallback(
+    (id) => Object.keys(topMatches).some((key) => topMatches[key] === id && lockedTopIds.includes(Number(key))),
+    [lockedTopIds, topMatches],
+  );
+  const isMiddleBottomLocked = useCallback((id) => lockedBottomIds.includes(id), [lockedBottomIds]);
+  const isBottomLocked = useCallback(
+    (id) => Object.keys(bottomMatches).some((key) => bottomMatches[key] === id && lockedBottomIds.includes(Number(key))),
+    [bottomMatches, lockedBottomIds],
+  );
+  const upperKeyboard = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: TOP_IDS,
+    rightIds: MIDDLE_IDS,
+    getElement: getUpperElement,
+    getAnchorElement: getUpperAnchor,
+    isLeftLocked: isTopLocked,
+    isRightLocked: isMiddleTopLocked,
+    onCommit: assignTopMatch,
+    onStart: (side, id) => side === "left" ? handleTopClick(id) : handleMiddleTopClick(id),
+    onCancel: () => {
+      setSelectedTop(null);
+      setSelectedMiddleTop(null);
+    },
+  });
+  const lowerKeyboard = useWorkbookMatchingKeyboard({
+    boardRef: containerRef,
+    leftIds: MIDDLE_IDS,
+    rightIds: BOTTOM_IDS,
+    getElement: getLowerElement,
+    getAnchorElement: getLowerAnchor,
+    isLeftLocked: isMiddleBottomLocked,
+    isRightLocked: isBottomLocked,
+    onCommit: assignBottomMatch,
+    onStart: (side, id) => side === "left" ? handleMiddleBottomClick(id) : handleBottomClick(id),
+    onCancel: () => {
+      setSelectedMiddle(null);
+      setSelectedBottom(null);
+    },
+  });
 
   return (
     <div className="main-container-component">
@@ -291,9 +433,7 @@ const WB_UnitX_Page21_QB = () => {
           gap: "28px",
         }}
       >
-        <h1 className="WB-header-title-page8">
-          <span className="WB-ex-A">B</span> Look, read, and match.
-        </h1>
+        <ExerciseHeader sectionLetter="B" title="Look, read, and match." subTitle="Read each season symbol to the matching scene first, then connect it to the matching picture or answer one pair at a time." />
 
         <div
           ref={containerRef}
@@ -342,6 +482,16 @@ const WB_UnitX_Page21_QB = () => {
                 strokeLinecap="round"
               />
             ))}
+            {[upperKeyboard.preview, lowerKeyboard.preview].filter(Boolean).map((preview, index) => (
+              <line
+                key={`keyboard-preview-${index}`}
+                {...preview}
+                stroke={LINE_COLOR}
+                strokeWidth="3.5"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
+            ))}
           </svg>
 
           {/* Top row */}
@@ -369,14 +519,27 @@ const WB_UnitX_Page21_QB = () => {
                   }}
                 >
                   <div
+                    ref={(el) => (elementRefs.current[`top-button-${item.id}`] = el)}
                     onClick={() => handleTopClick(item.id)}
+                    role="button"
+                    tabIndex={lockedTopIds.includes(item.id) ? -1 : 0}
+                    aria-disabled={showAns || lockedTopIds.includes(item.id)}
+                    aria-label={`Select season symbol ${item.id}`}
+                    draggable={!showAns && !lockedTopIds.includes(item.id)}
+                    onDragStart={() => handleTopClick(item.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => selectedMiddleTop !== null && assignTopMatch(item.id, selectedMiddleTop)}
+                    onKeyDown={(event) => {
+                      upperKeyboard.handleKeyDown(event, "left", item.id);
+                    }}
+                    onFocus={() => upperKeyboard.handleFocus("left", item.id)}
                     style={{
                       width: "150px",
                       height: "100px",
                       display: "flex",
                       alignItems: "flex-start",
                       justifyContent: "center",
-                      cursor: showAns ||showResults ? "default" : "pointer",
+                      cursor: showAns || lockedTopIds.includes(item.id) ? "default" : "pointer",
                       border:
                         selectedTop === item.id
                           ? `1px solid ${ACTIVE_COLOR}`
@@ -406,7 +569,7 @@ const WB_UnitX_Page21_QB = () => {
                     </div>
                     <img
                       src={item.img}
-                      alt={`top-${item.id}`}
+                      alt={["Flower symbol", "Falling leaf symbol", "Beach umbrella symbol", "Snowman symbol"][item.id - 1]}
                       style={{
                         width: "auto",
                         height: "95px",
@@ -490,6 +653,16 @@ const WB_UnitX_Page21_QB = () => {
                       (elementRefs.current[`middle-top-dot-${item.id}`] = el)
                     }
                     onClick={() => handleMiddleTopClick(item.id)}
+                    role="button"
+                    tabIndex={isMiddleTopLocked(item.id) ? -1 : 0}
+                    aria-disabled={showAns || isMiddleTopLocked(item.id)}
+                    aria-label={`Connect upper symbol to ${item.text}`}
+                    onKeyDown={(event) => upperKeyboard.handleKeyDown(event, "right", item.id)}
+                    onFocus={() => upperKeyboard.handleFocus("right", item.id)}
+                    draggable={!showAns && !isMiddleTopLocked(item.id)}
+                    onDragStart={() => handleMiddleTopClick(item.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => selectedTop !== null && assignTopMatch(selectedTop, item.id)}
                     style={{
                       width: "16px",
                       height: "16px",
@@ -502,10 +675,22 @@ const WB_UnitX_Page21_QB = () => {
 
                   <div
                     onClick={() => {
+                      playAudio(`season-${item.id}`, SEASON_AUDIO[item.text.toLowerCase()]);
                       if (selectedTop !== null) {
                         handleMiddleTopClick(item.id);
                       } else {
                         handleMiddleBottomClick(item.id);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Play and select ${item.text}`}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        playAudio(`season-${item.id}`, SEASON_AUDIO[item.text.toLowerCase()]);
+                        if (selectedTop !== null) handleMiddleTopClick(item.id);
+                        else handleMiddleBottomClick(item.id);
                       }
                     }}
                     style={{
@@ -530,11 +715,11 @@ const WB_UnitX_Page21_QB = () => {
                       fontSize: "18px",
                       color: "#222",
                       lineHeight: "1",
-                      cursor: showAns ||showResults? "default" : "pointer",
+                      cursor: showAns ? "default" : "pointer",
                       boxSizing: "border-box",
                     }}
                   >
-                    {item.text}
+                    <Unit4PlayingAudioIcon active={activeAudioKey === `season-${item.id}`} />{item.text}
                   </div>
 
                   <div
@@ -542,6 +727,16 @@ const WB_UnitX_Page21_QB = () => {
                       (elementRefs.current[`middle-bottom-dot-${item.id}`] = el)
                     }
                     onClick={() => handleMiddleBottomClick(item.id)}
+                    role="button"
+                    tabIndex={isMiddleBottomLocked(item.id) ? -1 : 0}
+                    aria-disabled={showAns || isMiddleBottomLocked(item.id)}
+                    aria-label={`Connect ${item.text} to a lower scene`}
+                    onKeyDown={(event) => lowerKeyboard.handleKeyDown(event, "left", item.id)}
+                    onFocus={() => lowerKeyboard.handleFocus("left", item.id)}
+                    draggable={!showAns && !isMiddleBottomLocked(item.id)}
+                    onDragStart={() => handleMiddleBottomClick(item.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => selectedBottom !== null && assignBottomMatch(item.id, selectedBottom)}
                     style={{
                       width: "16px",
                       height: "16px",
@@ -613,20 +808,31 @@ const WB_UnitX_Page21_QB = () => {
                       (elementRefs.current[`bottom-dot-${item.id}`] = el)
                     }
                     onClick={() => handleBottomClick(item.id)}
+                    draggable={!showAns && !isBottomLocked(item.id)}
+                    onDragStart={() => handleBottomClick(item.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => selectedMiddle !== null && assignBottomMatch(selectedMiddle, item.id)}
                     style={{
                       width: "16px",
                       height: "16px",
                       borderRadius: "50%",
                       backgroundColor: getBottomDotColor(item.id),
                       cursor:
-                        showAns || selectedMiddle === null
+                        showAns
                           ? "default"
                           : "pointer",
                     }}
                   />
 
                   <div
+                    ref={(el) => (elementRefs.current[`bottom-button-${item.id}`] = el)}
                     onClick={() => handleBottomClick(item.id)}
+                    role="button"
+                    tabIndex={isBottomLocked(item.id) ? -1 : 0}
+                    aria-disabled={showAns || isBottomLocked(item.id)}
+                    aria-label={`Select season scene ${item.id}`}
+                    onKeyDown={(event) => lowerKeyboard.handleKeyDown(event, "right", item.id)}
+                    onFocus={() => lowerKeyboard.handleFocus("right", item.id)}
                     style={{
                       width: "150px",
                       height: "100px",
@@ -650,7 +856,7 @@ const WB_UnitX_Page21_QB = () => {
                   >
                     <img
                       src={item.img}
-                      alt={`bottom-${item.id}`}
+                      alt={["Spring scene", "Summer scene", "Winter scene", "Autumn scene"][item.id - 1]}
                       style={{
                         width: "auto",
                         height: "100px",
