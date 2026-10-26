@@ -1,16 +1,16 @@
 import React from "react";
 
-import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/G5_U2_Pg_10.png";
+import backgroundImage from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/test.png";
 
 import MySVG from "../../../assets/imgs/pages/classbook/Right 3 Unit 2 Summer Vacation Folder/Interactive.svg";
+import targetAudio from "../../../assets/audio/ClassBook/Unit 2/P 10/carriage.mp3";
 
 import FindQuestion from "../../FindQuestion";
-
 const targetArea = {
-  x1: 36.53,
-  y1: 76.6,
-  x2: 60.7,
-  y2: 91.0,
+  x1: 35.53,
+  y1: 65.6,
+  x2: 67.7,
+  y2: 90,
 };
 
 const Unit2_Page1_find = () => {
@@ -23,10 +23,11 @@ const Unit2_Page1_find = () => {
       targetName="carriage"
       targetArea={targetArea}
       answerHighlight={MySVG}
+      targetAudio={targetAudio}
       imageHeight="70vh"
-      highlightTop="76.5%"
+      highlightTop="65.5%"
       highlightLeft="35.5%"
-      highlightHeight="15%"
+      highlightHeight="22%"
       targetAriaLabel="Select the carriage"
       pointerSelectedMessage="A point in the picture was selected. Use Check Answer to check it."
       keyboardSelectedMessage="Carriage selected. Use Check Answer to check your answer."
