@@ -41,6 +41,17 @@
   transition: 0.2s ease-in-out;
 }
 
+.audio-btn-poster:focus-visible,
+.vocab_container_poster_vocab h6[role="button"]:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.vocab_container_poster_vocab h6[role="button"] {
+  cursor: pointer;
+}
+
 /* @media (max-width: 1180px) {
   .vocab_container_poster_vocab {
     font-size: 16px;
