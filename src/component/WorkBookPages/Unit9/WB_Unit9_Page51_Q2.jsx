@@ -1,3 +1,6 @@
+import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
+import missingAudio0 from "../../../assets/audio/missings/he library 12 p.m..mp3";
+import missingAudio1 from "../../../assets/audio/missings/I school 9 a.m..mp3";
 import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -22,6 +25,36 @@ import prompt2Audio from "../../../assets/audio/WorkBook/unit 9/Page 51 - Exerci
 import sentence2Audio from "../../../assets/audio/WorkBook/unit 9/Page 51 - Exercise B/Item_004_She_was_at_the_museum_at_4_00_p.m.mp3";
 import prompt3Audio from "../../../assets/audio/WorkBook/unit 9/Page 51 - Exercise B/Item_005_they_restaurant_last_night.mp3";
 import sentence3Audio from "../../../assets/audio/WorkBook/unit 9/Page 51 - Exercise B/Item_006_They_were_at_the_restaurant_last_night.mp3";
+
+function useNativeCheck(disabled) {
+  const root = useCheckRef(null);
+  useCheckEffect(() => {
+    const button = root.current?.querySelector(".check-button2");
+    if (!button) return;
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "not-allowed" : "";
+    button.setAttribute("aria-disabled", String(disabled));
+  }, [disabled]);
+  return root;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const shuffleArray = (array) => {
   const newArray = [...array];
@@ -57,11 +90,13 @@ const ITEMS = [
   {
     id: 4,
     prompt: "he / library / 12:00 p.m.",
+    promptAudio: missingAudio0,
     words: ["He", "was", "at", "the", "library", "at", "12:00", "p.m."],
   },
   {
     id: 5,
     prompt: "I / school / 9:00 a.m.",
+    promptAudio: missingAudio1,
     words: ["I", "was", "at", "school", "at", "9:00", "a.m."],
   },
   {
@@ -280,6 +315,7 @@ export default function WB_Unit8_Page45_QB() {
   });
 
   const handleCheck = () => {
+    stopAudio();
     if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allCompleted = ITEMS.every((item) => isSentenceComplete(item));
@@ -344,6 +380,8 @@ export default function WB_Unit8_Page45_QB() {
     stopAudio();
   };
 
+  const exerciseRoot = useNativeCheck(showAns || lockedIds.length === ITEMS.length);
+
   return (
     <DndContext
       sensors={sensors}
@@ -354,7 +392,7 @@ export default function WB_Unit8_Page45_QB() {
       }}
       onDragCancel={() => setActiveDragId(null)}
     >
-      <div className="main-container-component">
+      <div ref={exerciseRoot} className="main-container-component">
         <div
           className="div-forall"
           style={{

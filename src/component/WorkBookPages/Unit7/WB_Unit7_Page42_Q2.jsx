@@ -1,3 +1,15 @@
+import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
+import missingAudio0 from "../../../assets/audio/missings/The game.mp3";
+import missingAudio1 from "../../../assets/audio/missings/The shirt.mp3";
+import missingAudio2 from "../../../assets/audio/missings/The doll.mp3";
+import missingAudio3 from "../../../assets/audio/missings/The teddy bear.mp3";
+import missingAudio4 from "../../../assets/audio/missings/The table lamp.mp3";
+import missingAudio5 from "../../../assets/audio/missings/is next to the bed..mp3";
+import missingAudio6 from "../../../assets/audio/missings/is on the chair..mp3";
+import missingAudio7 from "../../../assets/audio/missings/is under the bed..mp3";
+import missingAudio8 from "../../../assets/audio/missings/is on the table..mp3";
+import missingAudio9 from "../../../assets/audio/missings/is in front of the pillow..mp3";
+import missingAudio10 from "../../../assets/audio/missings/is under the table..mp3";
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -22,6 +34,45 @@ import chairAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise 
 import catAudio from "../../../assets/audio/WorkBook/unit7/Page 42 - Exercise H/Item_005_The_cat.mp3";
 import roomImg from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U7 Folder/Page 42/SVG/2.svg";
 
+function useNativeCheck(disabled) {
+  const root = useCheckRef(null);
+  useCheckEffect(() => {
+    const button = root.current?.querySelector(".check-button2");
+    if (!button) return;
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "not-allowed" : "";
+    button.setAttribute("aria-disabled", String(disabled));
+  }, [disabled]);
+  return root;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "red";
 const ANSWER_COLOR = "#000000ff";
@@ -42,22 +93,22 @@ const LEFT_ITEMS = [
   { id: 1, text: "The bag", audio: bagAudio },
   { id: 2, text: "The guitar", audio: guitarAudio },
   { id: 3, text: "The cat", audio: catAudio },
-  { id: 4, text: "The game" },
-  { id: 5, text: "The shirt" },
-  { id: 6, text: "The doll" },
-  { id: 7, text: "The teddy bear" },
-  { id: 8, text: "The table lamp" },
+  { id: 4, text: "The game", audio: missingAudio0 },
+  { id: 5, text: "The shirt", audio: missingAudio1 },
+  { id: 6, text: "The doll", audio: missingAudio2 },
+  { id: 7, text: "The teddy bear", audio: missingAudio3 },
+  { id: 8, text: "The table lamp", audio: missingAudio4 },
 ];
 
 const RIGHT_ITEMS = [
   { id: "a", text: "is on the bed.", audio: bedAudio },
   { id: "b", text: "is next to the chair.", audio: chairAudio },
-  { id: "c", text: "is next to the bed." },
-  { id: "d", text: "is on the chair." },
-  { id: "e", text: "is under the bed." },
-  { id: "f", text: "is on the table." },
-  { id: "g", text: "is in front of the pillow." },
-  { id: "h", text: "is under the table." },
+  { id: "c", text: "is next to the bed.", audio: missingAudio5 },
+  { id: "d", text: "is on the chair.", audio: missingAudio6 },
+  { id: "e", text: "is under the bed.", audio: missingAudio7 },
+  { id: "f", text: "is on the table.", audio: missingAudio8 },
+  { id: "g", text: "is in front of the pillow.", audio: missingAudio9 },
+  { id: "h", text: "is under the table.", audio: missingAudio10 },
 ];
 
 const CORRECT = {
@@ -252,6 +303,7 @@ export default function WB_LookReadMatch_PageH() {
   };
 
   const handleCheck = () => {
+    stopAudio();
     if (showAns || lockedIds.length === LEFT_ITEMS.length) return;
     const allAnswered = LEFT_ITEMS.every((i) => answers[`a-${i.id}`]?.value);
     if (!allAnswered) {
@@ -302,6 +354,8 @@ export default function WB_LookReadMatch_PageH() {
 
   const isWrong = (id) => wrongIds.includes(id);
 
+  const exerciseRoot = useNativeCheck(showAns || lockedIds.length === LEFT_ITEMS.length);
+
   return (
     <DndContext
       sensors={sensors}
@@ -321,7 +375,7 @@ export default function WB_LookReadMatch_PageH() {
         setActiveItem(null);
       }}
     >
-      <div className="main-container-component">
+      <div ref={exerciseRoot} className="main-container-component">
         <div
           className="div-forall"
           style={{
@@ -476,6 +530,8 @@ export default function WB_LookReadMatch_PageH() {
                           (event.key === "Enter" || event.key === " ")
                         ) {
                           event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                           playAudio(`left-${item.id}`, item.audio);
                         }
                       }}
@@ -540,6 +596,8 @@ export default function WB_LookReadMatch_PageH() {
                         (event.key === "Enter" || event.key === " ")
                       ) {
                         event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                         playAudio(`right-${item.id}`, item.audio);
                       }
                     }}
