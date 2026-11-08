@@ -1,3 +1,4 @@
+import newMissing0 from "../../../assets/audio/G3-missing/they circus last week.mp3";
 import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
 import missingAudio0 from "../../../assets/audio/missings/he library 12 p.m..mp3";
 import missingAudio1 from "../../../assets/audio/missings/I school 9 a.m..mp3";
@@ -102,6 +103,7 @@ const ITEMS = [
   {
     id: 6,
     prompt: "they / circus / last week",
+    promptAudio: newMissing0,
     words: ["They", "were", "at", "the", "circus", "last", "week."],
   },
 ];
@@ -473,6 +475,8 @@ export default function WB_Unit8_Page45_QB() {
                           ? (event) => {
                               if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault();
+                                event.stopPropagation();
+                                if (event.repeat) return;
                                 playAudio(
                                   `prompt-${item.id}`,
                                   item.promptAudio,

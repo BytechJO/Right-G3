@@ -1,3 +1,6 @@
+import newMissing2 from "../../../assets/audio/G3-missing/for running, but you mustn't wear a.mp3";
+import newMissing1 from "../../../assets/audio/G3-missing/for biking, but you mustn't wear a.mp3";
+import newMissing0 from "../../../assets/audio/G3-missing/for cooking, but you mustn't wear a.mp3";
 import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
 import missingAudio0 from "../../../assets/audio/missings/Helmet.mp3";
 import missingAudio1 from "../../../assets/audio/missings/Scarf.mp3";
@@ -86,7 +89,7 @@ const OPTION_AUDIO = {
   coat: missingAudio2,
   shoes: missingAudio3,
 };
-const MIDDLE_AUDIO = { 1: swimmingPhraseAudio, 2: tennisPhraseAudio };
+const MIDDLE_AUDIO = {3: newMissing0, 4: newMissing1, 5: newMissing2,  1: swimmingPhraseAudio, 2: tennisPhraseAudio };
 const IMAGE_ALT = {
   1: "Swimming clothes with swimsuit and glasses choices",
   2: "Tennis clothes with socks and necklace choices",

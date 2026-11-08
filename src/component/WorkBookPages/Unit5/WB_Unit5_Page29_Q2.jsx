@@ -1,3 +1,5 @@
+import newMissing1 from "../../../assets/audio/G3-missing/The table is next to the sofa..mp3";
+import newMissing0 from "../../../assets/audio/G3-missing/The cup is between the dishes..mp3";
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -90,7 +92,9 @@ const QUESTIONS = [
     correct: "b",
   },
 ];
-const SENTENCE_AUDIO = {
+const SENTENCE_AUDIO = {  5: newMissing0,
+  6: newMissing1,
+
   1: sentence1Audio,
   2: sentence2Audio,
   3: sentence3Audio,
@@ -422,6 +426,8 @@ export default function WB_Unit5_Page29_QF() {
                     (event.key === "Enter" || event.key === " ")
                   ) {
                     event.preventDefault();
+                    event.stopPropagation();
+                    if (event.repeat) return;
                     playAudio(
                       `sentence-${question.id}`,
                       SENTENCE_AUDIO[question.id],

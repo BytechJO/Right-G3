@@ -1,3 +1,5 @@
+import newMissing1 from "../../../assets/audio/G3-missing/Where is the ball.mp3";
+import newMissing0 from "../../../assets/audio/G3-missing/Where is the car.mp3";
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -27,7 +29,7 @@ const WORD_AUDIO = {
   under: underAudio,
   on: onAudio,
 };
-const QUESTION_AUDIO = { 1: penAudio, 2: dollAudio, 3: teddyAudio };
+const QUESTION_AUDIO = {4: newMissing0, 5: newMissing1,  1: penAudio, 2: dollAudio, 3: teddyAudio };
 
 const SCENE_ITEMS = [
   {
@@ -622,6 +624,8 @@ export default function WB_Unit5_Page28_QE() {
                         (event.key === "Enter" || event.key === " ")
                       ) {
                         event.preventDefault();
+                        event.stopPropagation();
+                        if (event.repeat) return;
                         playAudio(
                           `question-${item.id}`,
                           QUESTION_AUDIO[item.id],
