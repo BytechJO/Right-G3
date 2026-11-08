@@ -1,3 +1,11 @@
+import newMissing2 from "../../../assets/audio/G3-missing/for running, but you mustn't wear a.mp3";
+import newMissing1 from "../../../assets/audio/G3-missing/for biking, but you mustn't wear a.mp3";
+import newMissing0 from "../../../assets/audio/G3-missing/for cooking, but you mustn't wear a.mp3";
+import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
+import missingAudio0 from "../../../assets/audio/missings/Helmet.mp3";
+import missingAudio1 from "../../../assets/audio/missings/Scarf.mp3";
+import missingAudio2 from "../../../assets/audio/missings/Coat.mp3";
+import missingAudio3 from "../../../assets/audio/missings/Shoes.mp3";
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -5,26 +13,67 @@ import ExerciseHeader from "../../ExerciseHeader";
 import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
 import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
 import "../../StudentPages/unit4/unit4Interactions.css";
-
-// صور الأنشطة
 import actImg1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.1.svg";
 import actImg2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.2.svg";
 import actImg3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.3.svg";
 import actImg4 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.4.svg";
 import actImg5 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U6 Folder/Page 37/J.5.svg";
-
 import trueIcon from "../../../assets/imgs/true.svg";
 import falseIcon from "../../../assets/imgs/false.svg";
 import swimsuitAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_001_swimsuit.mp3";
 import glassesAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_002_glasses.mp3";
 import socksAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_003_socks.mp3";
 import necklaceAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_004_necklace.mp3";
-import apronAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_005_apron.mp3";
+import apronAudio from "../../../assets/audio/missings/Apron.mp3";
 import bootsAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_006_boots.mp3";
 import mustWearAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_007_You_must_wear_a.mp3";
 import forAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_008_for.mp3";
 import swimmingPhraseAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_009_for_swimming,_but_you_mustn't_wear_a.mp3";
 import tennisPhraseAudio from "../../../assets/audio/WorkBook/unit6/Page 37 - Exercise J/Item_010_for_tennis,_but_you_mustn't_wear_a.mp3";
+
+function useNativeCheck(disabled) {
+  const root = useCheckRef(null);
+  useCheckEffect(() => {
+    const button = root.current?.querySelector(".check-button2");
+    if (!button) return;
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "not-allowed" : "";
+    button.setAttribute("aria-disabled", String(disabled));
+  }, [disabled]);
+  return root;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// صور الأنشطة
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const BORDER_COLOR = "#f39b42";
 const WRONG_COLOR = "#ef4444";
@@ -35,8 +84,12 @@ const OPTION_AUDIO = {
   necklace: necklaceAudio,
   apron: apronAudio,
   boots: bootsAudio,
+  helmet: missingAudio0,
+  scarf: missingAudio1,
+  coat: missingAudio2,
+  shoes: missingAudio3,
 };
-const MIDDLE_AUDIO = { 1: swimmingPhraseAudio, 2: tennisPhraseAudio };
+const MIDDLE_AUDIO = {3: newMissing0, 4: newMissing1, 5: newMissing2,  1: swimmingPhraseAudio, 2: tennisPhraseAudio };
 const IMAGE_ALT = {
   1: "Swimming clothes with swimsuit and glasses choices",
   2: "Tennis clothes with socks and necklace choices",
@@ -168,6 +221,7 @@ export default function WB_LookAndWrite_PageJ() {
     return null;
   };
   const handleCheck = () => {
+    stopAudio();
     if (showAns || lockedKeys.length === ITEMS.length * 4) return;
 
     const allAnswered = ITEMS.every((i) => {
@@ -308,6 +362,7 @@ export default function WB_LookAndWrite_PageJ() {
       <div style={{ position: "relative", display: "inline-flex" }}>
         <select
           disabled={showAns || lockedKeys.includes(fieldKey)}
+          aria-label={`Question ${item.id}, clothing choice ${field}`}
           value={value}
           onChange={(e) => handleChange(item.id, field, e.target.value)}
           style={{
@@ -353,8 +408,10 @@ export default function WB_LookAndWrite_PageJ() {
     );
   };
 
+  const exerciseRoot = useNativeCheck(showAns || lockedKeys.length === ITEMS.length * 4);
+
   return (
-    <div className="main-container-component mb-15">
+    <div ref={exerciseRoot} className="main-container-component mb-15">
       <div className="div-forall" style={{ gap: "30px" }}>
         <ExerciseHeader
           sectionLetter="J"
@@ -493,6 +550,8 @@ export default function WB_LookAndWrite_PageJ() {
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                       playAudio(`must-wear-${item.id}`, mustWearAudio);
                     }
                   }}
@@ -517,6 +576,8 @@ export default function WB_LookAndWrite_PageJ() {
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                       playAudio(
                         `middle-${item.id}`,
                         MIDDLE_AUDIO[item.id] || forAudio,

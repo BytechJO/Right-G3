@@ -1,13 +1,74 @@
+import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
+import missingAudio0 from "../../../assets/audio/missings/Was he at the zoo.mp3";
+import missingAudio1 from "../../../assets/audio/missings/Was she in the restaurant.mp3";
+import missingAudio2 from "../../../assets/audio/missings/Was she at the bakery.mp3";
+import missingAudio3 from "../../../assets/audio/missings/Where is she now.mp3";
+import missingAudio4 from "../../../assets/audio/missings/Yes, he was..mp3";
+import missingAudio5 from "../../../assets/audio/missings/No, he wasn’t..mp3";
+import missingAudio6 from "../../../assets/audio/missings/Yes, she was..mp3";
+import missingAudio7 from "../../../assets/audio/missings/No, she wasn’t..mp3";
+import missingAudio8 from "../../../assets/audio/missings/She is on the train..mp3";
+import missingAudio9 from "../../../assets/audio/missings/She is in the computer lab..mp3";
+import useUnit4Audio from "../unit4/useUnit4Audio";
+import Unit4PlayingAudioIcon from "../unit4/Unit4PlayingAudioIcon";
+import "../unit4/unit4Interactions.css";
 import React, { useState } from "react";
 import ValidationAlert from "../../Popup/ValidationAlert";
 import WrongMark from "../../WrongMark";
-
 import img1 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 1.svg";
 import img2 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 2.svg";
 import img3 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 3.svg";
 import img4 from "../../../assets/imgs/pages/classbook/Right 3 Unit 9 Where Dad Folder/Page 81/Ex E 4.svg";
 import Button from "../../Button";
 import ExerciseHeader from "../../ExerciseHeader";
+
+function useNativeCheck(disabled) {
+  const root = useCheckRef(null);
+  useCheckEffect(() => {
+    const button = root.current?.querySelector(".check-button2");
+    if (!button) return;
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "not-allowed" : "";
+    button.setAttribute("aria-disabled", String(disabled));
+  }, [disabled]);
+  return root;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const MISSING_AUDIO = {
+  "Was he at the zoo": missingAudio0,
+  "Was she in the restaurant": missingAudio1,
+  "Was she at the bakery": missingAudio2,
+  "Where is she now": missingAudio3,
+  "Yes, he was.": missingAudio4,
+  "No, he wasn’t.": missingAudio5,
+  "Yes, she was.": missingAudio6,
+  "No, she wasn’t.": missingAudio7,
+  "She is on the train.": missingAudio8,
+  "She is in the computer lab.": missingAudio9
+};
+
+
+
+
+
+
+
+
+
+
 
 const Unit9_Page6_Q2 = () => {
   const items = [
@@ -46,7 +107,20 @@ const Unit9_Page6_Q2 = () => {
   const [wrongIds, setWrongIds] = useState([]);
   const [showAns, setShowAns] = useState(false);
 
+  const { activeAudioKey, playAudio, stopAudio } = useUnit4Audio();
+  const audioFor = (text) => MISSING_AUDIO[text.replace(/\?$/, "")];
+  const hearProps = (key, text) => ({
+    role: "button", tabIndex: 0, className: "unit4-audio-control unit4-interactive",
+    onClick: () => playAudio(key, audioFor(text)),
+    onKeyDown: (event) => {
+      if (!["Enter", " "].includes(event.key)) return;
+      event.preventDefault(); event.stopPropagation();
+      if (!event.repeat) playAudio(key, audioFor(text));
+    },
+    onKeyUp: (event) => { if (["Enter", " "].includes(event.key)) event.stopPropagation(); },
+  });
   const chooseOption = (i, value) => {
+    playAudio(`option-${i}-${value}`, audioFor(value));
     if (showAns || lockedIds.includes(i)) return;
 
     const newSelected = [...selected];
@@ -56,6 +130,7 @@ const Unit9_Page6_Q2 = () => {
   };
 
   const resetAll = () => {
+    stopAudio();
     setSelected(Array(items.length).fill(""));
     setLockedIds([]);
     setWrongIds([]);
@@ -63,6 +138,7 @@ const Unit9_Page6_Q2 = () => {
   };
 
   const showAnswers = () => {
+    stopAudio();
     setSelected(items.map((i) => i.correct));
     setLockedIds(items.map((_, index) => index));
     setWrongIds([]);
@@ -70,6 +146,7 @@ const Unit9_Page6_Q2 = () => {
   };
 
   const checkAnswers = () => {
+    stopAudio();
     if (showAns || lockedIds.length === items.length) return;
 
     if (selected.includes("")) {
@@ -105,8 +182,10 @@ const Unit9_Page6_Q2 = () => {
     setWrongIds(nextWrongIds);
   };
 
+  const exerciseRoot = useNativeCheck(showAns || lockedIds.length === items.length);
+
   return (
-    <div
+    <div ref={exerciseRoot}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -138,7 +217,9 @@ const Unit9_Page6_Q2 = () => {
                 <span style={{ fontWeight: "bold", fontSize: "18px" }}>
                   {i + 1}.
                 </span>
-                <span style={{ fontSize: "18px" }}>{item.q}</span>
+                <span {...hearProps(`question-${i}`, item.q)} style={{ fontSize: "18px", position: "relative", borderRadius: 4 }}>
+                  <Unit4PlayingAudioIcon active={activeAudioKey === `question-${i}`} />{item.q}
+                </span>
               </div>
 
               {/* الصورة */}
@@ -156,6 +237,7 @@ const Unit9_Page6_Q2 = () => {
                 {item.options.map((opt, idx) => (
                   <div key={idx} style={{ position: "relative" }}>
                     <span
+                      className="unit4-audio-control unit4-interactive"
                       role="button"
                       tabIndex={showAns || lockedIds.includes(i) ? -1 : 0}
                       aria-disabled={showAns || lockedIds.includes(i)}
@@ -163,7 +245,8 @@ const Unit9_Page6_Q2 = () => {
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          chooseOption(i, opt);
+                          event.stopPropagation();
+                          if (!event.repeat) chooseOption(i, opt);
                         }
                       }}
                       style={{
@@ -181,6 +264,7 @@ const Unit9_Page6_Q2 = () => {
                             : "1px solid transparent",
                       }}
                     >
+                      <Unit4PlayingAudioIcon active={activeAudioKey === `option-${i}-${opt}`} />
                       {opt}
                     </span>
 

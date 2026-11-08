@@ -1,3 +1,5 @@
+import newMissing1 from "../../../assets/audio/G3-missing/Where's the fridge.mp3";
+import newMissing0 from "../../../assets/audio/G3-missing/Where's the sofa.mp3";
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -147,7 +149,9 @@ const ITEMS = [
     ],
   },
 ];
-const QUESTION_AUDIO = {
+const QUESTION_AUDIO = {  5: newMissing0,
+  6: newMissing1,
+
   1: question1Audio,
   2: question2Audio,
   3: question3Audio,
@@ -609,6 +613,8 @@ export default function WB_Unit5_Page28_QC() {
                       (event.key === "Enter" || event.key === " ")
                     ) {
                       event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                       playAudio(`question-${item.id}`, QUESTION_AUDIO[item.id]);
                     }
                   }}

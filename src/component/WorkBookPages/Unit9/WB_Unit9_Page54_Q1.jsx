@@ -1,3 +1,6 @@
+import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
+import missingAudio0 from "../../../assets/audio/missings/Are they on the playground.mp3";
+import missingAudio1 from "../../../assets/audio/missings/Are they at the zoo.mp3";
 import React, { useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -5,7 +8,6 @@ import ExerciseHeader from "../../ExerciseHeader";
 import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
 import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
 import "../../StudentPages/unit4/unit4Interactions.css";
-
 import img1 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/1.svg";
 import img2 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/2.svg";
 import img3 from "../../../assets/imgs/pages/WB_Right_3/Right Int WB G3 U9 Folder/Page 54/SVG/3.svg";
@@ -15,6 +17,37 @@ import noAudio from "../../../assets/audio/WorkBook/unit 9/Page 54 - Exercise G/
 import clinicAudio from "../../../assets/audio/WorkBook/unit 9/Page 54 - Exercise G/Item_003_Are_they_at_the_clinic.mp3";
 import circusAudio from "../../../assets/audio/WorkBook/unit 9/Page 54 - Exercise G/Item_004_Are_they_at_the_circus.mp3";
 
+function useNativeCheck(disabled) {
+  const root = useCheckRef(null);
+  useCheckEffect(() => {
+    const button = root.current?.querySelector(".check-button2");
+    if (!button) return;
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "not-allowed" : "";
+    button.setAttribute("aria-disabled", String(disabled));
+  }, [disabled]);
+  return root;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const YELLOW_COLOR = "#f39b42";
 const RED_COLOR = "#ef4444";
 const TEXT_COLOR = "#222";
@@ -23,6 +56,7 @@ const DATA = [
   {
     id: 1,
     question: "Are they on the playground?",
+    questionAudio: missingAudio0,
     img: img1,
     options: ["Yes, they are.", "No, they aren't."],
     correct: "Yes, they are.",
@@ -31,6 +65,7 @@ const DATA = [
   {
     id: 2,
     question: "Are they at the zoo?",
+    questionAudio: missingAudio1,
     img: img2,
     options: ["Yes, they are.", "No, they aren't."],
     correct: "No, they aren't.",
@@ -77,6 +112,7 @@ const WB_Unit9_Page54_QG = () => {
   };
 
   const checkAnswers = () => {
+    stopAudio();
     if (showAnswers || lockedIds.length === DATA.length) return;
 
     const allAnswered = DATA.every((item) => userSelections[item.id] !== null);
@@ -112,6 +148,7 @@ const WB_Unit9_Page54_QG = () => {
   };
 
   const handleShowAnswer = () => {
+    stopAudio();
     const answers = {};
     DATA.forEach((item) => {
       answers[item.id] = item.correct;
@@ -162,8 +199,10 @@ const WB_Unit9_Page54_QG = () => {
     return base;
   };
 
+  const exerciseRoot = useNativeCheck(showAnswers || lockedIds.length === DATA.length);
+
   return (
-    <div className="main-container-component">
+    <div ref={exerciseRoot} className="main-container-component">
       <div
         className="div-forall"
         style={{

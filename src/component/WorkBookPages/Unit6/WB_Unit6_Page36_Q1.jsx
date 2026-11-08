@@ -1,10 +1,11 @@
+import missingAudio0 from "../../../assets/audio/missings/Draw a triangle in the seventh square and a star in the twelfth square..mp3";
+import missingAudio1 from "../../../assets/audio/missings/Write your birthday in the sixth square and your friend's birthday in the eleventh square..mp3";
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import ExerciseHeader from "../../ExerciseHeader";
 import useUnit4Audio from "../../StudentPages/unit4/useUnit4Audio";
 import Unit4PlayingAudioIcon from "../../StudentPages/unit4/Unit4PlayingAudioIcon";
 import "../../StudentPages/unit4/unit4Interactions.css";
-
 import instruction1Audio from "../../../assets/audio/WorkBook/unit6/Page 36 - Exercise G/Item_001_Draw_a_face_in_the_first_square_and_an_umbrella_in_the_fifth_square.mp3";
 import instruction2Audio from "../../../assets/audio/WorkBook/unit6/Page 36 - Exercise G/Item_002_Color_the_second_square_green_and_the_eighth_square_red.mp3";
 import instruction3Audio from "../../../assets/audio/WorkBook/unit6/Page 36 - Exercise G/Item_003_Write_your_name_in_the_third_square_and_your_friend's_name_in_the_tenth.mp3";
@@ -24,6 +25,8 @@ const INSTRUCTION_AUDIO = [
   instruction2Audio,
   instruction3Audio,
   instruction4Audio,
+  missingAudio0,
+  missingAudio1,
 ];
 
 const COLORS = [
@@ -994,6 +997,8 @@ export default function WB_Unit6_Page36_QG() {
                     (event.key === "Enter" || event.key === " ")
                   ) {
                     event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
 
                     playAudio(`instruction-${index}`, INSTRUCTION_AUDIO[index]);
                   }

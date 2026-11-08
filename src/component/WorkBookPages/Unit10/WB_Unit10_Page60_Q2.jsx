@@ -1,3 +1,7 @@
+import { useEffect as useCheckEffect, useRef as useCheckRef } from "react";
+import missingAudio0 from "../../../assets/audio/missings/I won't watch movie.mp3";
+import missingAudio1 from "../../../assets/audio/missings/she won't lie sun.mp3";
+import missingAudio2 from "../../../assets/audio/missings/he read book.mp3";
 import React, { useMemo, useState } from "react";
 import Button from "../Button";
 import ValidationAlert from "../../Popup/ValidationAlert";
@@ -11,6 +15,35 @@ import prompt2Audio from "../../../assets/audio/WorkBook/unit10/Page 60 - Exerci
 import full2Audio from "../../../assets/audio/WorkBook/unit10/Page 60 - Exercise H/Item_004_They_will_wash_the_car.mp3";
 import prompt3Audio from "../../../assets/audio/WorkBook/unit10/Page 60 - Exercise H/Item_005_she_build_snowman.mp3";
 import full3Audio from "../../../assets/audio/WorkBook/unit10/Page 60 - Exercise H/Item_006_She_will_build_a_snowman.mp3";
+
+function useNativeCheck(disabled) {
+  const root = useCheckRef(null);
+  useCheckEffect(() => {
+    const button = root.current?.querySelector(".check-button2");
+    if (!button) return;
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "not-allowed" : "";
+    button.setAttribute("aria-disabled", String(disabled));
+  }, [disabled]);
+  return root;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const shuffleArray = (array) => {
   const newArray = [...array];
@@ -46,16 +79,19 @@ const ITEMS = [
   {
     id: 4,
     prompt: "I / won't / watch / movie",
+    promptAudio: missingAudio0,
     words: ["I", "won't", "watch", "a", "movie."],
   },
   {
     id: 5,
     prompt: "she / won't / lie / sun",
+    promptAudio: missingAudio1,
     words: ["She", "won't", "lie", "in", "the", "sun."],
   },
   {
     id: 6,
     prompt: "he / read / book",
+    promptAudio: missingAudio2,
     words: ["He", "will", "read", "a", "book."],
   },
 ];
@@ -141,6 +177,7 @@ export default function WB_Unit10_Page10_Q2() {
   };
 
   const handleCheck = () => {
+    stopAudio();
     if (showAns || lockedIds.length === ITEMS.length) return;
 
     const allCompleted = ITEMS.every((item) => isSentenceComplete(item));
@@ -171,6 +208,7 @@ export default function WB_Unit10_Page10_Q2() {
   };
 
   const handleShowAnswer = () => {
+    stopAudio();
     const solved = {};
     ITEMS.forEach((item) => {
       solved[item.id] = [...item.words];
@@ -191,8 +229,10 @@ export default function WB_Unit10_Page10_Q2() {
     stopAudio();
   };
 
+  const exerciseRoot = useNativeCheck(showAns || lockedIds.length === ITEMS.length);
+
   return (
-    <div className="main-container-component">
+    <div ref={exerciseRoot} className="main-container-component">
       <div
         className="div-forall"
         style={{
@@ -252,6 +292,8 @@ export default function WB_Unit10_Page10_Q2() {
                     (event.key === "Enter" || event.key === " ")
                   ) {
                     event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                     playAudio(`full-${item.id}`, item.fullAudio);
                   }
                 }}
@@ -308,6 +350,8 @@ export default function WB_Unit10_Page10_Q2() {
                         (event.key === "Enter" || event.key === " ")
                       ) {
                         event.preventDefault();
+                      event.stopPropagation();
+                      if (event.repeat) return;
                         event.stopPropagation();
                         playAudio(`prompt-${item.id}`, item.promptAudio);
                       }
