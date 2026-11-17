@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "package:scorm": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-scorm.ps1",
     "lint": "eslint .",
     "preview": "vite preview"
   },

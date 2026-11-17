@@ -9,5 +9,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["@jsplumb/browser-ui"],
   },
-
+  base: "./",
+  build: { outDir: "dist-scorm" },
 });
